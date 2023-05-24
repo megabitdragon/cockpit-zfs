@@ -1,0 +1,37 @@
+{
+    "__version": "45D-R1",
+    "name": "cockpit-zfs",
+    "title": "Cockpit File Sharing",
+    "prerelease": false,
+    "version": "0.0.0",
+    "buildVersion": "0",
+    "author": "Jordan Keough <jkeough@45drives.com>",
+    "url": "",
+    "category": "utils",
+    "priority": "optional",
+    "licence": "GPL-3.0+",
+    "architecture": {
+        "deb": "all"
+    },
+    "description": {
+        "long": "ZFS Pool and Disk Manager for Cockpit",
+        "short": "ZFS Pool and Disk Manager for Cockpit"
+    },
+    "defaults": {
+        "urgency": "medium"
+    },
+    "dependencies": {
+        "deb": [
+            "cockpit",
+            "attr",
+            "coreutils",
+            "libc-bin",
+            "nfs-kernel-server",
+            "samba",
+            "samba-common-bin",
+            "systemd",
+            "winbind",
+            "gawk"
+        ]
+    }
+}
