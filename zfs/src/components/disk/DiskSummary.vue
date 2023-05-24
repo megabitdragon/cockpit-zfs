@@ -17,119 +17,35 @@
                     </span>
                 </template>
                 <template v-slot:content>
-                    <tr>
+                  <tr>
                     <td>
-                        <Card class="mt-2 mb-4">
-                        <template v-slot:title>
-                            <tr>
-                            <td>
-                                <img src="../../../public/icons/success.svg">
-                            </td>
-                            <td><span>SSD1</span></td><td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<DotsVerticalIcon class="h-3 h-5"/></button></td>
-                            </tr>
-                            <tr>
-                            <span>ONLINE</span>
-                            </tr>
-                        </template>
-                        <template v-slot:content>
-                            <tr>
-                            <div class="flex justify-between mb-1">
-                                <span class="text-base font-medium text-green-700 dark:text-white">Space Usage&nbsp; &nbsp;&nbsp;</span>
-                                <span class="text-sm font-medium text-green-700 dark:text-white">45%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                <div class="bg-green-600 h-2.5 rounded-full" style="width: 45%"></div>
-                            </div>
-                            </tr>
-                        </template>
-                        <template v-slot:footer>
-                            <tr>
-                            Used&nbsp; &nbsp;&nbsp;X TB
-                            </tr>
-                            <tr>
-                            Free&nbsp; &nbsp;&nbsp;Y TB
-                            </tr>
-                            <tr>
-                            <b>Total&nbsp; &nbsp;&nbsp;Z TB</b>
-                            </tr>
-                        </template>
-                        </Card>
-                        </td>
-                        <td>
-                        <Card class="mt-2 mb-4">
-                        <template v-slot:title>
-                            <tr>
-                            <td>
-                                <img src="../../../public/icons/warning.svg">
-                            </td>
-                            <td><span>SSD 2</span></td><td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<DotsVerticalIcon class="h-3 h-5"/></button></td>
-                            </tr>
-                            <tr>
-                            <span>ONLINE</span>
-                            </tr>
-                        </template>
-                        <template v-slot:content>
-                            <tr>
-                            <div class="flex justify-between mb-1">
-                                <span class="text-base font-medium text-red-700 dark:text-white">Space Usage&nbsp; &nbsp;&nbsp;</span>
-                                <span class="text-sm font-medium text-red-700 dark:text-white">95%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                <div class="bg-red-600 h-2.5 rounded-full" style="width: 95%"></div>
-                            </div>
-                            </tr>
-                        </template>
-                        <template v-slot:footer>
-                            <tr>
-                            Used&nbsp; &nbsp;&nbsp;X TB
-                            </tr>
-                            <tr>
-                            Free&nbsp; &nbsp;&nbsp;Y TB
-                            </tr>
-                            <tr>
-                            <b>Total&nbsp; &nbsp;&nbsp;Z TB</b>
-                            </tr>
-                        </template>
-                        </Card>
-                        </td>
-                        <td>
-                        <Card class="mt-2 mb-4">
-                        <template v-slot:title>
-                            <tr>
-                            <td>
-                                <img src="../../../public/icons/success.svg">
-                            </td>
-                            <td><span>HDD 4</span></td><td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<DotsVerticalIcon class="h-3 h-5"/></button></td>
-                            </tr>
-                            <tr>
-                            <span>ONLINE</span>
-                            </tr>
-                        </template>
-                        <template v-slot:content>
-                            <tr>
-                            <div class="flex justify-between mb-1">
-                                <span class="text-base font-medium text-green-700 dark:text-white">Space Usage&nbsp; &nbsp;&nbsp;</span>
-                                <span class="text-sm font-medium text-green-700 dark:text-white">15%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                <div class="bg-green-600 h-2.5 rounded-full" style="width: 15%"></div>
-                            </div>
-                            </tr>
-                        </template>
-                        <template v-slot:footer>
-                            <tr>
-                            Used&nbsp; &nbsp;&nbsp;X TB
-                            </tr>
-                            <tr>
-                            Free&nbsp; &nbsp;&nbsp;Y TB
-                            </tr>
-                            <tr>
-                            <b>Total&nbsp; &nbsp;&nbsp;Z TB</b>
-                            </tr>
-                        </template>
-                        </Card>
-                        </td>
-                    </tr>
+                      <DiskCard name="SSD1" status="ONLINE" spaceUsed="45" :icon="successIcon"/>
+                    </td>
+                    <td>
+                      <DiskCard name="SSD2" status="ONLINE" spaceUsed="60" :icon="successIcon"/>
+                    </td>
+                    <td>
+                      <DiskCard name="SSD3" status="ONLINE" spaceUsed="27" :icon="successIcon"/>
+                    </td>
+                    <td>
+                      <DiskCard name="SSD4" status="ONLINE" spaceUsed="45" :icon="successIcon"/>
+                    </td>
+                    <td>
+                      <DiskCard name="HDD1" status="ONLINE" spaceUsed="95" :icon="warningIcon"/>
+                    </td>
+                    <td>
+                      <DiskCard name="HDD2" status="ONLINE" spaceUsed="33" :icon="successIcon"/>
+                    </td>
+                    <td>
+                      <DiskCard name="HDD3" status="ONLINE" spaceUsed="75" :icon="successIcon"/>
+                    </td>
+                    <td>
+                      <DiskCard name="HDD4" status="ONLINE" spaceUsed="50" :icon="successIcon"/>
+                    </td>
+                    <td>
+                      <DiskCard name="HDD5" status="OFFLINE" spaceUsed="0" :icon="warningIcon"/>
+                    </td>
+                  </tr>
                 </template>
             </Accordion>
         </tbody>
@@ -139,9 +55,12 @@
 <script>
   import {CheckCircleIcon, DotsVerticalIcon, ExclamationCircleIcon, RefreshIcon, QuestionMarkCircleIcon} from '@heroicons/vue/outline';
   import Accordion from '../common/Accordion.vue';
-  import Card from '../common/Card.vue';
+  import DiskCard from '../disk/DiskCard.vue';
+
+  const successIcon = "../../../public/icons/success.svg";
+  const warningIcon = "../../../public/icons/warning.svg";
 
   export default {
-
+    components: { Accordion, DiskCard }
 };
 </script>
