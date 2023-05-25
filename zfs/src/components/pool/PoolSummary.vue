@@ -9,32 +9,32 @@
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><img src="../../../public/icons/success.svg"></td>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">7</td>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Effective Space: 0 TB</td>
-                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><RefreshIcon class="h-3 h-5"/></td>
+                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button><ArrowPathIcon class="h-3 h-5"/></button></td>
                         </tr>
                     </span>
                 </template>
                 <template v-slot:content>
                     <tr>
                         <td>
-                          <PoolCard name="Pool1" status="ONLINE" spaceUsed="45" :icon="successIcon"/>
+                          <PoolCard name="Pool1" status="ONLINE" :spaceUsed="45"/>
                         </td>
                         <td>
-                          <PoolCard name="Pool2" status="ONLINE" spaceUsed="88" :icon="warningIcon"/>
+                          <PoolCard name="Pool2" status="ONLINE" :spaceUsed="88"/>
                         </td>
                         <td>
-                          <PoolCard name="Pool3" status="ONLINE" spaceUsed="50" :icon="successIcon"/>
+                          <PoolCard name="Pool3" status="ONLINE" :spaceUsed="50"/>
                         </td>
                         <td>
-                          <PoolCard name="Pool4" status="ONLINE" spaceUsed="75" :icon="successIcon"/>
+                          <PoolCard name="Pool4" status="ONLINE" :spaceUsed="75"/>
                         </td>
                         <td>
-                          <PoolCard name="Pool5" status="ONLINE" spaceUsed="13" :icon="successIcon"/>
+                          <PoolCard name="Pool5" status="ONLINE" :spaceUsed="13"/>
                         </td>
                         <td>
-                          <PoolCard name="Pool6" status="ONLINE" spaceUsed="66" :icon="successIcon"/>
+                          <PoolCard name="Pool6" status="ONLINE" :spaceUsed="66"/>
                         </td>
                         <td>
-                          <PoolCard name="Pool7" status="ONLINE" spaceUsed="25" :icon="successIcon"/>
+                          <PoolCard name="Pool7" status="ONLINE" :spaceUsed="25"/>
                         </td>
                     </tr>
                 </template>
@@ -43,15 +43,10 @@
     </table>
 </template>
 
-<script>
-  import {CheckCircleIcon, DotsVerticalIcon, ExclamationCircleIcon, RefreshIcon, QuestionMarkCircleIcon} from '@heroicons/vue/outline';
-  import Accordion from "../common/Accordion.vue";
-  import PoolCard from "../pool/PoolCard.vue";
+<script setup lang="ts">
+import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+import Accordion from "../common/Accordion.vue";
+import PoolCard from "../pool/PoolCard.vue";
 
-  const successIcon = "../../../public/icons/success.svg";
-  const warningIcon = "../../../public/icons/warning.svg";
 
-  export default {
-    components: { Accordion, PoolCard }
-  };
 </script>

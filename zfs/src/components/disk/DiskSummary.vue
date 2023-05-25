@@ -12,38 +12,38 @@
                         <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">5 HDDs</td>
                         <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Maximum Temp. X° C</td>
                         <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Raw Space: 0 TB</td>
-                        <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><RefreshIcon class="h-3 h-5"/></td>
+                        <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button><ArrowPathIcon class="h-3 h-5"/></button></td>
                         </tr>
                     </span>
                 </template>
                 <template v-slot:content>
                   <tr>
                     <td>
-                      <DiskCard name="SSD1" status="ONLINE" spaceUsed="45" :icon="successIcon"/>
+                      <DiskCard name="SSD1" status="ONLINE" :spaceUsed="45"/>
                     </td>
                     <td>
-                      <DiskCard name="SSD2" status="ONLINE" spaceUsed="60" :icon="successIcon"/>
+                      <DiskCard name="SSD2" status="ONLINE" :spaceUsed="60"/>
                     </td>
                     <td>
-                      <DiskCard name="SSD3" status="ONLINE" spaceUsed="27" :icon="successIcon"/>
+                      <DiskCard name="SSD3" status="ONLINE" :spaceUsed="27"/>
                     </td>
                     <td>
-                      <DiskCard name="SSD4" status="ONLINE" spaceUsed="45" :icon="successIcon"/>
+                      <DiskCard name="SSD4" status="ONLINE" :spaceUsed="45"/>
                     </td>
                     <td>
-                      <DiskCard name="HDD1" status="ONLINE" spaceUsed="95" :icon="warningIcon"/>
+                      <DiskCard name="HDD1" status="ONLINE" :spaceUsed="95"/>
                     </td>
                     <td>
-                      <DiskCard name="HDD2" status="ONLINE" spaceUsed="33" :icon="successIcon"/>
+                      <DiskCard name="HDD2" status="ONLINE" :spaceUsed="33"/>
                     </td>
                     <td>
-                      <DiskCard name="HDD3" status="ONLINE" spaceUsed="75" :icon="successIcon"/>
+                      <DiskCard name="HDD3" status="ONLINE" :spaceUsed="75"/>
                     </td>
                     <td>
-                      <DiskCard name="HDD4" status="ONLINE" spaceUsed="50" :icon="successIcon"/>
+                      <DiskCard name="HDD4" status="ONLINE" :spaceUsed="50"/>
                     </td>
                     <td>
-                      <DiskCard name="HDD5" status="OFFLINE" spaceUsed="0" :icon="warningIcon"/>
+                      <DiskCard name="HDD5" status="ONLINE" :spaceUsed="90"/>
                     </td>
                   </tr>
                 </template>
@@ -52,15 +52,10 @@
     </table>
 </template>
 
-<script>
-  import {CheckCircleIcon, DotsVerticalIcon, ExclamationCircleIcon, RefreshIcon, QuestionMarkCircleIcon} from '@heroicons/vue/outline';
-  import Accordion from '../common/Accordion.vue';
-  import DiskCard from '../disk/DiskCard.vue';
+<script setup lang="ts">
+import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+import Accordion from '../common/Accordion.vue';
+import DiskCard from '../disk/DiskCard.vue';
 
-  const successIcon = "../../../public/icons/success.svg";
-  const warningIcon = "../../../public/icons/warning.svg";
 
-  export default {
-    components: { Accordion, DiskCard }
-};
 </script>
