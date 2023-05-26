@@ -29,24 +29,57 @@
             </li>
           </ul>
         </fieldset>
+
+         <!-- TODO -->
+         <!-- Add a button for Add Disk Group -->
+
+         <!-- Move Virtual Device to here? -->
       </div>
     </div>
 
     <div v-if=" props.tag ==='pool-settings'">
       <div>
-
+         <!-- TODO -->
+        <!-- Virtual Device (Select) -->
+        <!-- Sector Size (Select) -->
+        <!-- Record Size (Select) -->
+        <!-- LZ4 Compression (Toggle) -->
+        <!-- Advanced Settings (Modal) -->
+              <!-- Deduplication (Toggle) -->
+              <!-- Refreservation (Slider) -->
+              <!-- Auto-Expand Pool (Toggle) -->
+              <!-- Auto-Replace Devices (Toggle) -->
+              <!-- Auto-TRIM (Toggle) -->
+              <!-- Forcefully Create Pool (Toggle) -->
+              <!-- Save Advanced Settings (Button) -->
       </div>
     </div>
 
     <div v-if=" props.tag ==='file-system'">
       <div>
-
+         <!-- TODO -->
+        <!-- Create a File System (Checkbox) -> Enables all fields underneath -->
+          <!-- Name of File System (Text) -->
+          <!-- Encryption (Toggle) -> Reveals extra fields-->
+              <!-- Passphrase (Text) -->
+              <!-- Confirm Passphrase (Text) -->
+              <!-- Cipher (Select) -->
+          <!-- Inherit Pool Settings (Toggle) -> On by Default, if Off then reveals all fields to set -->
+              <!-- Access Time (Select) -->
+              <!-- Case Sensitivity (Select) -->
+              <!-- Compression (Select) -->
+              <!-- Deduplication (Select) -->
+              <!-- DNode Size (Select) -->
+              <!-- Extended Attributes (Select) -->
+              <!-- Record Size (Select) -->
+          <!-- Quota (Slider + Select) -->
+          <!-- Read Only (Toggle) -->
       </div>
     </div>
 
     <div v-if=" props.tag ==='review'">
       <div>
-
+        <!-- Recap all settings (Summary of main settings, More Details button for everything) -->
       </div>
     </div>
 </template>
