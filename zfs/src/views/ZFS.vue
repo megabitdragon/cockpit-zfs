@@ -38,13 +38,8 @@
 <script setup lang="ts">
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import { useSpawn, objectURLDownload } from "@45drives/cockpit-helpers";
-import { ref, computed, watch, reactive, provide } from "vue";
-import { pluginVersion } from "../version";
-import { HoustonHeader } from "@45drives/cockpit-vue-components";
 import DiskSummary from "../components/disk/DiskSummary.vue";
 import PoolSummary from "../components/pool/PoolSummary.vue";
-import CreatePool from "../components/pool/CreatePool.vue";
 import PoolsList from "../components/pool/PoolsList.vue";
 
 interface ZFSProps {

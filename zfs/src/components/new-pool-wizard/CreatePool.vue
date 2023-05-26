@@ -1,7 +1,7 @@
 <template>
-  <Modal class="lg:border-b lg:border-t lg:border-gray-200">
+  <Modal>
     <template v-slot:title>
-      <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Progress">
+      <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Pool Creation Progress">
         <ol role="list" class="overflow-hidden rounded-md lg:flex lg:rounded-none lg:border-l lg:border-r lg:border-gray-200">
           <li v-for="(step, stepIdx) in steps" :key="step.id" class="relative overflow-hidden lg:flex-1">
             <div :class="[stepIdx === 0 ? 'rounded-t-md border-b-0' : '', stepIdx === steps.length - 1 ? 'rounded-b-md border-t-0' : '', 'overflow-hidden border border-gray-200 lg:border-0']">
@@ -15,7 +15,6 @@
                   </span>
                   <span class="ml-4 mt-0.5 flex min-w-0 flex-col">
                     <span class="text-sm font-medium">{{ step.name }}</span>
-                    <!-- <span class="text-sm font-medium text-gray-500">{{ step.description }}</span> -->
                   </span>
                 </span>
               </a>
@@ -29,7 +28,6 @@
                   </span>
                   <span class="ml-4 mt-0.5 flex min-w-0 flex-col">
                     <span class="text-sm font-medium text-slate-600">{{ step.name }}</span>
-                    <!-- <span class="text-sm font-medium text-gray-500">{{ step.description }}</span> -->
                   </span>
                 </span>
               </a>
@@ -43,7 +41,6 @@
                   </span>
                   <span class="ml-4 mt-0.5 flex min-w-0 flex-col">
                     <span class="text-sm font-medium text-gray-500">{{ step.name }}</span>
-                    <!-- <span class="text-sm font-medium text-gray-500">{{ step.description }}</span> -->
                   </span>
                 </span>
               </a>
@@ -61,7 +58,40 @@
       </nav>
     </template>
     <template v-slot:content>
+      <div tag="name">
+        <div class="">
+          <legend class="text-base font-semibold leading-6 text-gray-900">Name</legend>
+          <div class="">
+            <input type="name" name="pool-name" id="name" class="block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Pool Name" />
+          </div>
+        </div>
+      </div>
 
+      <div tag="disks">
+        <div>
+          <div class="">
+            <DiskSelection/>
+          </div>
+        </div>
+      </div>
+
+      <div tag="settings">
+        <div>
+
+        </div>
+      </div>
+
+      <div tag="file-system">
+        <div>
+
+        </div>
+      </div>
+
+      <div tag="summary">
+        <div>
+
+        </div>
+      </div>
     </template>
     <template v-slot:footer>
       <div class="button-group-row">
@@ -75,14 +105,15 @@
 
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
+import DiskSelection from './DiskSelection.vue';
 import { CheckCircleIcon } from '@heroicons/vue/24/outline';
 
 const steps = [
-  { id: '01',name: 'Name this pool', href: '#', status: 'current' },
-  { id: '02',name: 'Select disks', href: '#', status: 'upcoming' },
-  { id: '03',name: 'Configure pool settings',href: '#', status: 'upcoming' },
-  { id: '04',name: 'Set up a file system', href: '#', status: 'upcoming' },
-  { id: '05',name: 'Review configuration', href: '#',  status: 'upcoming' },
+  { id: '01', name: 'Name this pool', href: '#', status: 'current' },
+  { id: '02', name: 'Select disks', href: '#', status: 'upcoming' },
+  { id: '03', name: 'Configure pool settings',href: '#', status: 'upcoming' },
+  { id: '04', name: 'Set up a file system', href: '#', status: 'upcoming' },
+  { id: '05', name: 'Review configuration', href: '#',  status: 'upcoming' },
 ]
 
 </script>

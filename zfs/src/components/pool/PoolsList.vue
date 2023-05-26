@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!showConfig" class="px-4 sm:px-6 lg:px-8">
+  <div class="px-4 sm:px-6 lg:px-8">
     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
       <div class="button-group-row">
           <button id="createPool" class="btn btn-primary object-left justify-start" @click="showConfig = true">Create Storage Pool</button>
@@ -58,15 +58,14 @@
   </div>
 
   <div v-if="showConfig">
-    <CreatePool/>
+    <CreatePool @close="showConfig = false"/>
   </div>  
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
-import CreatePool from './CreatePool.vue';
-import Modal from "../common/Modal.vue";
+import CreatePool from '../new-pool-wizard/CreatePool.vue';
 
 const pools = [
   { name: 'Pool1', status: 'ONLINE', spaceUsedPercent: 45,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
