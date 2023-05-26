@@ -17,17 +17,20 @@
       </div>
 
       <div v-if="props.tag === 'pools'" class="p-4">
-        <div class="button-group-row justify-end">
-            <button id="createPool" class="btn btn-primary object-right" @click="">Create Storage Pool</button>
-            <button id="importPool" class="btn btn-secondary object-right" @click="" disabled>Import Storage Pool</button>
-        </div>
-
+        <PoolsList/>
       </div>
 
       <div v-if="props.tag === 'disks'" class="p-4">
-       
+        
       </div>
 
+      <div v-if="props.tag === 'stats'" class="p-4">
+      
+      </div>
+
+      <div v-if="props.tag === 'settings'" class="p-4">
+      
+    </div>
     </div>
   </div>
 </template>
@@ -42,6 +45,7 @@ import { HoustonHeader } from "@45drives/cockpit-vue-components";
 import DiskSummary from "../components/disk/DiskSummary.vue";
 import PoolSummary from "../components/pool/PoolSummary.vue";
 import CreatePool from "../components/pool/CreatePool.vue";
+import PoolsList from "../components/pool/PoolsList.vue";
 
 interface ZFSProps {
   tag: string;

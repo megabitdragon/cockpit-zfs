@@ -12,21 +12,15 @@
     <!--vvv Desktop/Regular version vvv-->
     <div class="hidden sm:block">
       <div class="border-b border-gray-200">
-        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+        <nav class="-mb-px flex justify-center" aria-label="Tabs">
           <a v-for="item in props.navigationItems" :key="item.name"
 										@click.prevent="navigationCallback(item)"
-										:class="[item.current ? 'border-slate-500 text-slate-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700', 'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
+										:class="[item.current ? 'border-slate-500 text-slate-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700', 'whitespace-nowrap border-b-2 py-4 px-4 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
         </nav>
       </div>
     </div>
 
-  	<!-- <main class="flex-1">
-      <div v-if="props.show" class="py-6">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-          <h1 class="text-2xl font-semibold text-gray-900">{{props.currentNavigationItem?.name}}</h1>
-        </div>
-      </div>
-    </main> -->
+  
   </div>
 </template>
 

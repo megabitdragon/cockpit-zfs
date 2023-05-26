@@ -3,8 +3,7 @@
     <HoustonHeader moduleName="ZFS" sourceURL=""
       issuesURL="" :pluginVersion="Number(pluginVersion)"
       :infoNudgeScrollbar="true" />
-    <Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show">
-    </Navigation>
+    <Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
     <ZFS :tag="navTag" :next="next"/>
   </div>
 </template>
