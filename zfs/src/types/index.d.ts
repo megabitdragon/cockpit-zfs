@@ -15,7 +15,7 @@ interface Pool {
 
 interface VirtualDevice {
   type: 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'special';
-  disks: DiskList;
+  disks: DiskList[];
   forceAdd: boolean;
 }
 
@@ -23,7 +23,9 @@ interface Disk {
   name: string;
 }
 
-type DiskList = Disk;
+interface DiskList {
+  
+}
 
 interface FileSystem {
   name: string;

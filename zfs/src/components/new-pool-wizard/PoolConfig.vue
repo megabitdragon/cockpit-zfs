@@ -256,7 +256,7 @@
 
           <!-- Inherit Pool Settings (Toggle) -> On by Default, if Off then reveals all fields to set -->
           <div>
-            <label for="inherit" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Inherit Pool Settings?</label>
+            <label for="inherit" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Inherit Pool Settings</label>
             <Switch v-model="inheritEnabled" :class="[inheritEnabled ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
               <span class="sr-only">Use setting</span>
               <span :class="[inheritEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
@@ -383,7 +383,7 @@
 
             <!-- Read Only (Toggle) -->
             <div>
-              <label for="fs-read-only" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Read Only?</label>
+              <label for="fs-read-only" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Read Only</label>
               <Switch v-model="readOnlyEnabled" :class="[readOnlyEnabled ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                 <span class="sr-only">Use setting</span>
                 <span :class="[readOnlyEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
@@ -408,6 +408,32 @@
     <div v-if=" props.tag ==='review'">
       <div>
         <!-- Recap all settings (Summary of main settings, More Details button for everything) -->
+        <Accordion>
+          <!-- Pool Info -->
+              <!-- Name -->
+              <!-- Total Space in VDevs -->
+              <!-- Sector Size -->
+              <!-- Record Size -->
+              <!-- Compression -->
+              <!-- Advanced? -->
+                  <!-- Deduplication -->
+                  <!-- Refreservation Amount -->
+                  <!-- Auto Settings (Expand, Replace, Trim) -->
+        </Accordion>
+        <Accordion>
+          <!-- Virtual Device Info -->
+              <!-- Number of VDevs -->
+                <!-- For each: -->
+                  <!-- Type of VDev -->
+                  <!-- Drives in VDev -->
+        </Accordion>
+        <Accordion>
+          <!-- File System Info? -->
+              <!-- Name -->
+              <!-- Encryption -->
+              <!-- Quota -->
+              <!-- Read Only -->
+        </Accordion>
       </div>
     </div>
 </template>
