@@ -1,5 +1,5 @@
 <template>
-      <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Pool Creation Progress">
+      <nav class="mx-auto max-w-full px-4 sm:px-6 lg:px-8" aria-label="Pool Creation Progress">
         <ol role="list" class="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0">
           <li v-for="(step, stepIdx) in props.navigationItems" :key="step.id" class="relative overflow-hidden lg:flex-1">
               <a v-if="step.status === 'completed'" @click.prevent="navigationCallback(step)" class="group flex w-full items-center">
@@ -10,15 +10,14 @@
                   <span class="ml-4 text-sm font-medium text-gray-900">{{ step.name }}</span>
                 </span>
               </a>
-              <a v-else-if="step.status === 'current'" class="flex items-center px-6 py-4 text-sm font-medium" @click.prevent="navigationCallback(step)" aria-current="step">
-                <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-600" aria-hidden="true" />             
-                  <span class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-600">
-                    <span class="text-slate-600">{{ step.id }}</span>
+              <a v-else-if="step.status === 'current'" @click.prevent="navigationCallback(step)" class="flex items-center px-6 py-4 text-sm font-medium" aria-current="step">          
+                  <span class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-600">
+                    <span class="text-green-600">{{ step.id }}</span>
                   </span>
-                  <span class="text-sm font-medium text-slate-600">{{ step.name }}</span>         
+                  <span class="ml-4 text-sm font-medium text-slate-600">{{ step.name }}</span>         
               </a>
-              <a v-else class="group flex items-center" @click.prevent="navigationCallback(step)">
-                <span class="flex items-center px-6 py-4 text-sm font-medium">    
+              <a v-else @click.prevent="navigationCallback(step)" class="group flex items-center">
+                <span class="flex items-center px-6 py-4 text-sm font-medium">
                   <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 group-hover:border-gray-400">
                     <span class="text-gray-500 group-hover:text-gray-900">{{ step.id }}</span>
                   </span>

@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, watch } from 'vue';
+import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 
 import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
@@ -50,11 +50,11 @@ const prev = () => {
 };
 
 const navigation = reactive<StepsNavigationItem[]>([
-	{ name: 'Name this pool', id: '01', tag: 'name-entry', current: computed(() => navTag.value == 'name-entry') as unknown as boolean, status: 'current', show: true, } ,
-  { name: 'Select disks', id: '02', tag: 'disk-selection', current: computed(() => navTag.value == 'disk-selection') as unknown as boolean, status: 'upcoming', show: true,},
-  { name: 'Configure pool settings', id: '03', tag: 'pool-settings', current: computed(() => navTag.value == 'pool-settings') as unknown as boolean, status: 'upcoming', show: true, },
-  { name: 'Set up a file system', id: '04', tag: 'file-system', current: computed(() => navTag.value == 'file-system') as unknown as boolean, status: 'upcoming', show: true, },
-  { name: 'Review configuration', id: '05',tag: 'review', current: computed(() => navTag.value == 'review') as unknown as boolean, status: 'upcoming', show: true, },
+	{ name: 'Name', id: '01', tag: 'name-entry', current: computed(() => navTag.value == 'name-entry') as unknown as boolean, status: 'current', show: true, } ,
+  { name: 'Virtual Devices', id: '02', tag: 'virtual-devices', current: computed(() => navTag.value == 'virtual-devices') as unknown as boolean, status: 'upcoming', show: true,},
+  { name: 'Pool Settings', id: '03', tag: 'pool-settings', current: computed(() => navTag.value == 'pool-settings') as unknown as boolean, status: 'upcoming', show: true, },
+  { name: 'File System', id: '04', tag: 'file-system', current: computed(() => navTag.value == 'file-system') as unknown as boolean, status: 'upcoming', show: true, },
+  { name: 'Summary', id: '05',tag: 'review', current: computed(() => navTag.value == 'review') as unknown as boolean, status: 'upcoming', show: true, },
 ].filter(item => item.show));
 
 const updateStatus = () => {
