@@ -5,19 +5,19 @@
       <div v-if="props.tag === 'dashboard'" class="p-4">
           <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <PoolSummary/>
+              <PoolSummary :pools="props.pools"/>
             </div>
           </div>
 
           <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <DiskSummary/>
+              <DiskSummary :disks="props.disks"/>
             </div>
           </div>
       </div>
 
       <div v-if="props.tag === 'pools'" class="p-4">
-        <PoolsList/>
+        <PoolsList :pools="props.pools"/>
       </div>
 
       <div v-if="props.tag === 'disks'" class="p-4">
@@ -45,6 +45,8 @@ import PoolsList from "../components/pool/PoolsList.vue";
 interface ZFSProps {
   tag: string;
   next: any;
+  pools: Pool[];
+  disks: Disk[];
 }
 
 const props = defineProps<ZFSProps>();

@@ -4,7 +4,7 @@
       issuesURL="" :pluginVersion="Number(pluginVersion)"
       :infoNudgeScrollbar="true" />
     <Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
-    <ZFS :tag="navTag" :next="next"/>
+    <ZFS :tag="navTag" :next="next" :pools="dashboard.pools" :disks="dashboard.disks"/>
   </div>
 </template>
 
@@ -25,6 +25,61 @@ const show = ref(true);
 const navTag = ref('dashboard');
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
+
+// const pools = ref<Pool[]>([
+  const dashboard = reactive<Dashboard>({
+    pools: 
+    [
+        {
+        name: 'tank',
+        vdevs: [
+          {type: 'mirror',
+          disks: [{name: '1-11', type: 'ssd',},{name: '1-12', type: 'ssd'},],
+          isPrimary: true,
+          forceAdd: false,},
+          {type: 'cache',
+          disks: [{name: '1-13', type: 'ssd',},],
+          isPrimary: false,
+          forceAdd: false,},
+        ],
+        sector: '4kib',
+        record: '128kib',
+        compression: true,
+        deduplication: false,
+        refreservation: 0.10,
+        autoExpand: true,
+        autoReplace: false,
+        autoTrim: false,
+        forceCreate: false,
+        usagePercent: 45,
+        status: 'ONLINE',
+      },
+      {
+        name: 'battletank',
+        vdevs: [
+          {type: 'raidz2',
+          disks: [{name: '2-11', type: 'ssd',},{name: '2-12', type: 'ssd'},{name: '2-13', type: 'ssd',},],
+          isPrimary: true,
+          forceAdd: false,},
+        ],
+        sector: '4kib',
+        record: '128kib',
+        compression: true,
+        deduplication: false,
+        refreservation: 0.10,
+        autoExpand: true,
+        autoReplace: false,
+        autoTrim: false,
+        forceCreate: false,
+        usagePercent: 88,
+        status: 'WARNING - NEAR CAPACITY',
+      },
+    ],
+    disks : 
+    [{name: '1-11', type: 'ssd',},{name: '1-12', type: 'ssd'},{name: '2-11', type: 'ssd',},{name: '2-12', type: 'ssd'},{name: '2-13', type: 'ssd',},]
+  });
+
+
 
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;

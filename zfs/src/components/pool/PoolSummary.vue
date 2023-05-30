@@ -7,7 +7,7 @@
                         <tr>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Pools</td>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><img src="../../../public/icons/success.svg"></td>
-                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">7</td>
+                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{props.pools.length}}</td>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Effective Space: 0 TB</td>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button><ArrowPathIcon class="h-3 h-5"/></button></td>
                         </tr>
@@ -15,27 +15,9 @@
                 </template>
                 <template v-slot:content>
                     <tr>
-                        <td>
-                          <PoolCard name="Pool1" status="ONLINE" :spaceUsed="45"/>
-                        </td>
-                        <td>
-                          <PoolCard name="Pool2" status="ONLINE" :spaceUsed="88"/>
-                        </td>
-                        <td>
-                          <PoolCard name="Pool3" status="ONLINE" :spaceUsed="50"/>
-                        </td>
-                        <td>
-                          <PoolCard name="Pool4" status="ONLINE" :spaceUsed="75"/>
-                        </td>
-                        <td>
-                          <PoolCard name="Pool5" status="ONLINE" :spaceUsed="13"/>
-                        </td>
-                        <td>
-                          <PoolCard name="Pool6" status="ONLINE" :spaceUsed="66"/>
-                        </td>
-                        <td>
-                          <PoolCard name="Pool7" status="ONLINE" :spaceUsed="25"/>
-                        </td>
+                      <td v-for="(pool, index) in props.pools" :key="index">
+                        <PoolCard :name="pool.name" :status="pool.status" :spaceUsed="pool.usagePercent!"/>
+                      </td>
                     </tr>
                 </template>
             </Accordion>
@@ -44,9 +26,16 @@
 </template>
 
 <script setup lang="ts">
+// import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Accordion from "../common/Accordion.vue";
 import PoolCard from "../pool/PoolCard.vue";
+// import { injectionKeys } from '../../constants/keys';
 
+interface PoolSummaryProps {
+  pools: Pool[];
+}
+
+const props = defineProps<PoolSummaryProps>();
 
 </script>

@@ -7,7 +7,7 @@
     <div v-if=" props.tag ==='virtual-devices'">
       <div>
         <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Create a Virtual Device</legend>
-        <VDevs/>
+        <VDevs :isPrimary="true"/>
       </div>
       <div>
         <br/>
@@ -18,7 +18,7 @@
         <br/>
         <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="anotherVDev = false">Remove VDev</button>
         <br/>
-        <VDevs/>
+        <VDevs :isPrimary="false"/>
       </div>
     </div>
 

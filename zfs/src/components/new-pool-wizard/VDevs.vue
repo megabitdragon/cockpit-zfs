@@ -1,17 +1,22 @@
 <template>
   <fieldset>
     <!-- Virtual Device (Select) -->
-    <div>
+    <div v-if="isPrimary">
       <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
       <select id="virtual-device" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-        <option>Cache</option>
         <option>Disk</option>
-        <option>Log</option> 
         <option>Mirror</option>
         <option>RaidZ1</option>
         <option selected>RaidZ2</option>
         <option>RaidZ3</option>  
-        <option>Special</option>        
+      </select>
+    </div>
+    <div v-if="!isPrimary">
+      <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
+      <select id="virtual-device" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+        <option selected>Cache</option>
+        <option>Log</option> 
+        <option>Special</option> 
       </select>
     </div>
 
@@ -89,6 +94,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+
+interface VDevsProps {
+  // idKey: string;
+  // dataKey: string;
+  isPrimary: boolean;
+}
+
+const props = defineProps<VDevsProps>();
 
 const disks = [
   { id: 1, name: 'SSD1', status: 'ONLINE', description: '480.1 GB Micron_5300_MTFD (500a075135044d40)'},
