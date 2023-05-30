@@ -1,6 +1,6 @@
 interface Pool {
   name: string;
-  vdevs: VirtualDevice?;
+  vdevs: VirtualDevice[];
   sector: string;
   record: string;
   compression: boolean;

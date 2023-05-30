@@ -2,7 +2,7 @@
     <div>
         <button
             @click="toggleAccordion()"
-            class="flex items-center space-x-3"
+            class="flex items-center space-x-3 ml-4"
             :aria-expanded="isOpen"
             :aria-controls="`collapse${_uid}`"
         >

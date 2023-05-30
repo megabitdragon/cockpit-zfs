@@ -1,7 +1,7 @@
 <template>
     <table class="min-w-full divide-y divide-gray-300">
         <tbody class="bg-gray-50">
-            <Accordion class="ml-4">
+            <Accordion>
                 <template v-slot:title>
                     <span class="font-semibold text-xl">
                         <tr>
