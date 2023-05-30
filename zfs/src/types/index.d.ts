@@ -1,7 +1,3 @@
-interface Dashboard {
-  pools: Pool[];
-  disks: Disk[];
-}
 
 interface Pool {
   name: string;
@@ -37,6 +33,7 @@ interface Disk {
   used?: number;
   free?: number;
   usagePercent?: number;
+  status: string;
 }
 
 interface FileSystem {

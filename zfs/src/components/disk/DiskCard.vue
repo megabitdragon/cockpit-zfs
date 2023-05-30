@@ -11,7 +11,7 @@
     </tr>
     <tr>
       <span>{{props.status}}</span>
-      <span>&nbsp;&nbsp;DiskType</span>
+      <span>&nbsp;&nbsp;{{props.type}}</span>
     </tr>
   </template>
   <template v-slot:content>
@@ -57,6 +57,7 @@ interface DiskCardProps {
   name: string,
   status: string,
   spaceUsed: number,
+  type: string;
 }
 
 const props = defineProps<DiskCardProps>();

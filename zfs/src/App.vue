@@ -4,7 +4,7 @@
       issuesURL="" :pluginVersion="Number(pluginVersion)"
       :infoNudgeScrollbar="true" />
     <Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
-    <ZFS :tag="navTag" :next="next" :pools="dashboard.pools" :disks="dashboard.disks"/>
+    <ZFS :tag="navTag" :next="next" :pools="pools" :disks="disks"/>
   </div>
 </template>
 
@@ -26,60 +26,61 @@ const navTag = ref('dashboard');
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
-// const pools = ref<Pool[]>([
-  const dashboard = reactive<Dashboard>({
-    pools: 
-    [
-        {
-        name: 'tank',
-        vdevs: [
-          {type: 'mirror',
-          disks: [{name: '1-11', type: 'ssd',},{name: '1-12', type: 'ssd'},],
-          isPrimary: true,
-          forceAdd: false,},
-          {type: 'cache',
-          disks: [{name: '1-13', type: 'ssd',},],
-          isPrimary: false,
-          forceAdd: false,},
-        ],
-        sector: '4kib',
-        record: '128kib',
-        compression: true,
-        deduplication: false,
-        refreservation: 0.10,
-        autoExpand: true,
-        autoReplace: false,
-        autoTrim: false,
-        forceCreate: false,
-        usagePercent: 45,
-        status: 'ONLINE',
-      },
-      {
-        name: 'battletank',
-        vdevs: [
-          {type: 'raidz2',
-          disks: [{name: '2-11', type: 'ssd',},{name: '2-12', type: 'ssd'},{name: '2-13', type: 'ssd',},],
-          isPrimary: true,
-          forceAdd: false,},
-        ],
-        sector: '4kib',
-        record: '128kib',
-        compression: true,
-        deduplication: false,
-        refreservation: 0.10,
-        autoExpand: true,
-        autoReplace: false,
-        autoTrim: false,
-        forceCreate: false,
-        usagePercent: 88,
-        status: 'WARNING - NEAR CAPACITY',
-      },
+const disks =  reactive<Disk[]>([
+  {name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE'},
+  {name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE'},
+  {name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE'},
+  {name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE'},
+  {name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING'},
+  {name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING'}
+])
+
+const pools = reactive<Pool[]>([
+  {
+    name: 'tank',
+    vdevs: [
+      {type: 'mirror',
+      disks: [disks[0], disks[1]],
+      isPrimary: true,
+      forceAdd: false,},
+      {type: 'cache',
+      disks: [disks[2]],
+      isPrimary: false,
+      forceAdd: false,},
     ],
-    disks : 
-    [{name: '1-11', type: 'ssd',},{name: '1-12', type: 'ssd'},{name: '2-11', type: 'ssd',},{name: '2-12', type: 'ssd'},{name: '2-13', type: 'ssd',},]
-  });
-
-
+    sector: '4kib',
+    record: '128kib',
+    compression: true,
+    deduplication: false,
+    refreservation: 0.10,
+    autoExpand: true,
+    autoReplace: false,
+    autoTrim: false,
+    forceCreate: false,
+    usagePercent: 45,
+    status: 'ONLINE',
+  },
+  {
+    name: 'battletank',
+    vdevs: [
+      {type: 'raidz2',
+      disks: [disks[3], disks[4], disks[5]],
+      isPrimary: true,
+      forceAdd: false,},
+    ],
+    sector: '4kib',
+    record: '128kib',
+    compression: true,
+    deduplication: false,
+    refreservation: 0.10,
+    autoExpand: true,
+    autoReplace: false,
+    autoTrim: false,
+    forceCreate: false,
+    usagePercent: 88,
+    status: 'WARNING',
+  },
+])
 
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;

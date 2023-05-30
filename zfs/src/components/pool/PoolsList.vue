@@ -36,13 +36,13 @@
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.status }}</td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
                     <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-                        <div v-if="pool.spaceUsedPercent <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.spaceUsedPercent}%`}">{{ pool.spaceUsedPercent }}%</div>
-                        <div v-if="pool.spaceUsedPercent > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.spaceUsedPercent}%`}">{{ pool.spaceUsedPercent }}%</div>
+                        <div v-if="pool.usagePercent! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.usagePercent}%`}">{{ pool.usagePercent }}%</div>
+                        <div v-if="pool.usagePercent! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.usagePercent}%`}">{{ pool.usagePercent }}%</div>
                     </div>
                   </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.spaceUsed }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.spaceFree }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.spaceTotal }}</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Y TB</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">X TB</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Z TB</td>
                   <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                     <a href="#" class="text-btn-primary hover:text-btn-primary">
                       <EllipsisVerticalIcon class="h-3 h-5"/><span class="sr-only">, {{ pool.name }}</span>
@@ -67,15 +67,22 @@ import { ref } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import CreatePool from '../new-pool-wizard/CreatePool.vue';
 
-const pools = [
-  { name: 'Pool1', status: 'ONLINE', spaceUsedPercent: 45,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-  { name: 'Pool2', status: 'ONLINE', spaceUsedPercent: 88,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-  { name: 'Pool3', status: 'ONLINE', spaceUsedPercent: 50,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-  { name: 'Pool4', status: 'ONLINE', spaceUsedPercent: 75,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-  { name: 'Pool5', status: 'ONLINE', spaceUsedPercent: 13,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-  { name: 'Pool6', status: 'ONLINE', spaceUsedPercent: 66,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-  { name: 'Pool7', status: 'ONLINE', spaceUsedPercent: 25,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-]
+interface PoolsListProps {
+  pools: Pool[];
+}
+
+const props = defineProps<PoolsListProps>();
+
+const pools = props.pools
+// const pools = [
+//   { name: 'Pool1', status: 'ONLINE', spaceUsedPercent: 45,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
+//   { name: 'Pool2', status: 'ONLINE', spaceUsedPercent: 88,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
+//   { name: 'Pool3', status: 'ONLINE', spaceUsedPercent: 50,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
+//   { name: 'Pool4', status: 'ONLINE', spaceUsedPercent: 75,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
+//   { name: 'Pool5', status: 'ONLINE', spaceUsedPercent: 13,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
+//   { name: 'Pool6', status: 'ONLINE', spaceUsedPercent: 66,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
+//   { name: 'Pool7', status: 'ONLINE', spaceUsedPercent: 25,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
+// ]
 
 const showConfig = ref(false);
 
