@@ -4,7 +4,7 @@
       <div class="button-group-row">
           <button id="createPool" class="btn btn-primary object-left justify-start" @click="showConfig = true">Create Storage Pool</button>
           <button id="importPool" class="btn btn-secondary object-left justify-start" @click="" disabled>Import Storage Pool</button>
-          <button id="refreshPools" class="btn btn-secondary object-right justify-end"><ArrowPathIcon class="h-3 h-5"/></button>
+          <button id="refreshPools" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="h-3 h-5"/></button>
       </div>
     </div>
 

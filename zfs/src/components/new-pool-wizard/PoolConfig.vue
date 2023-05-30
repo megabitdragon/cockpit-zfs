@@ -6,12 +6,18 @@
 
     <div v-if=" props.tag ==='virtual-devices'">
       <div>
+        <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Create a Virtual Device</legend>
         <VDevs/>
       </div>
       <div>
+        <br/>
         <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="anotherVDev = true">Add Another VDev</button>
+        <br/>
       </div>
       <div v-if="anotherVDev">
+        <br/>
+        <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="anotherVDev = false">Remove VDev</button>
+        <br/>
         <VDevs/>
       </div>
     </div>
@@ -74,7 +80,7 @@
         <!-- Advanced Settings (Accordion) -->
         <Accordion>
           <template v-slot:title>
-            <span>Advanced Settings</span>
+            <span><b>Advanced Settings</b></span>
           </template>
           <template v-slot:content>
             <!-- Deduplication (Toggle) -->
@@ -408,7 +414,7 @@
     <div v-if=" props.tag ==='review'">
       <div>
         <!-- Recap all settings (Summary of main settings, More Details button for everything) -->
-        <Accordion>
+        <Accordion class="ml-4">
           <!-- Pool Info -->
           <template v-slot:title>
             <p><b>Pool Details</b></p>
@@ -420,7 +426,7 @@
             <p class="ml-10">Record Size</p>
             <p class="ml-10">Compression On/Off</p>
             <p class="ml-10">
-              <Accordion>
+              <Accordion class="ml-4">
                 <template v-slot:title>
                   <p><b>Advanced Settings</b></p>
                 </template>
@@ -436,14 +442,14 @@
           </template>
         </Accordion>
         <br/>
-        <Accordion>
+        <Accordion class="ml-4">
           <!-- Virtual Device Info -->
           <template v-slot:title>
             <p><b>VDev Details</b></p>
           </template>
           <template v-slot:content>
             <p class="ml-8">
-              <Accordion>
+              <Accordion class="ml-4">
               <template v-slot:title>
                   <p>mirror-0 (2 disks)</p>
                 </template>
@@ -457,7 +463,7 @@
            
             </p>
             <p class="ml-8">
-              <Accordion>
+              <Accordion class="ml-4">
                 <template v-slot:title>
                     <p>mirror-1 (2 disks)</p>
                   </template>
@@ -471,7 +477,7 @@
           </template>
         </Accordion>
         <br/>
-        <Accordion>
+        <Accordion class="ml-4">
         <!-- File System Info? -->
           <template v-slot:title>
               <p><b>File System Details</b></p>

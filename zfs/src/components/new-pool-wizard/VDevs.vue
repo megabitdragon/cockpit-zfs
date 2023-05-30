@@ -1,6 +1,5 @@
 <template>
   <fieldset>
-    <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Create a Virtual Device</legend>
     <!-- Virtual Device (Select) -->
     <div>
       <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
