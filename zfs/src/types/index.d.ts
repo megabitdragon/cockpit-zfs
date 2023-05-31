@@ -1,7 +1,16 @@
-
 interface Pool {
   name: string;
   vdevs: VirtualDevice[];
+  settings: PoolSettings;
+  fileSystem?: FileSystem;
+  totalSize?: number;
+  used?: number;
+  free?: number;
+  usagePercent?: number;
+  status: string;
+}
+
+interface PoolSettings {
   sector: string;
   record: string;
   compression: boolean;
@@ -11,12 +20,6 @@ interface Pool {
   autoReplace: boolean;
   autoTrim: boolean;
   forceCreate: boolean;
-  fileSystem?: FileSystem;
-  totalSize?: number;
-  used?: number;
-  free?: number;
-  usagePercent?: number;
-  status: string;
 }
 
 interface VirtualDevice {
@@ -27,13 +30,17 @@ interface VirtualDevice {
 }
 
 interface Disk {
+  id: number;
   name: string;
   type: 'hdd' | 'ssd' | 'm2nvme';
+  available: boolean;
+  member?: string;
   totalSize?: number;
   used?: number;
   free?: number;
   usagePercent?: number;
   status: string;
+  description?: string;
 }
 
 interface FileSystem {

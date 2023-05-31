@@ -19,7 +19,7 @@
                 <template v-slot:content>
                   <tr>
                     <td v-for="(disk, index) in props.disks" :key="index">
-                      <DiskCard :name="disk.name" :type="disk.type" :status="disk.status" :spaceUsed="disk.usagePercent!"/>
+                      <DiskCard :name="disk.name" :member="disk.member" :type="disk.type" :status="disk.status" :spaceUsed="disk.usagePercent!"/>
                     </td>
                   </tr>
                 </template>
@@ -29,6 +29,7 @@
 </template>
 
 <script setup lang="ts">
+import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Accordion from '../common/Accordion.vue';
 import DiskCard from '../disk/DiskCard.vue';
@@ -36,6 +37,7 @@ import DiskCard from '../disk/DiskCard.vue';
 interface DiskSummaryProps {
   disks: Disk[];
 }
+
 
 const props = defineProps<DiskSummaryProps>();
 

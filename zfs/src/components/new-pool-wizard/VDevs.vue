@@ -1,7 +1,7 @@
 <template>
   <fieldset>
     <!-- Virtual Device (Select) -->
-    <div v-if="isPrimary">
+    <div v-if="props.isPrimary">
       <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
       <select id="virtual-device" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
         <option>Disk</option>
@@ -11,7 +11,7 @@
         <option>RaidZ3</option>  
       </select>
     </div>
-    <div v-if="!isPrimary">
+    <div v-if="!props.isPrimary">
       <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
       <select id="virtual-device" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
         <option selected>Cache</option>
@@ -53,7 +53,7 @@
 
     <label for="disk-list" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
     <ul id="disk-list" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <li v-for="(disk, diskIdx) in disks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
+      <li v-for="(disk, diskIdx) in availDisks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
           <div class="flex w-full items-center justify-between space-x-6 p-6 border border-gray-200 rounded dark:border-gray-700">
             <div class="flex-1 truncate">
               <div class="flex items-center space-x-3">
@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 
 interface VDevsProps {
   // idKey: string;
@@ -103,13 +103,7 @@ interface VDevsProps {
 
 const props = defineProps<VDevsProps>();
 
-const disks = [
-  { id: 1, name: 'SSD1', status: 'ONLINE', description: '480.1 GB Micron_5300_MTFD (500a075135044d40)'},
-  { id: 2, name: 'SSD2' , status: 'ONLINE', description: '480.1 GB Micron_5300_MTFD (500a075135044e7a)'},
-  { id: 3, name: 'SSD3' , status: 'ONLINE', description: '480.1 GB Micron_5300_MTFD (500a075135044ad0)'},
-  { id: 4, name: 'SSD4' , status: 'ONLINE', description: '480.1 GB Micron_5300_MTFD (500a075135044a73)'},
-  { id: 5, name: 'HDD1' , status: 'ONLINE', description: '10TB SPINNYBOY HARD DRIVE'},
-]
+const availDisks = inject<Disk[]>("available_disks");
 
 const isMirror = ref(false);
 

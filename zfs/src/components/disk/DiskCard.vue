@@ -7,7 +7,7 @@
         <img v-if="spaceUsed > 85" src="../../../public/icons/warning.svg">
       </td>
       <td><span>{{ props.name }}</span></td>
-      <td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<DotsVerticalIcon class="h-3 h-5"/></button></td>
+      <td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<DotsVerticalIcon class="h-3"/></button></td>
     </tr>
     <tr>
       <span>{{props.status}}</span>
@@ -17,7 +17,7 @@
   <template v-slot:content>
     <tr>
       <div>
-        <span>X° C&nbsp;&nbsp;&nbsp;</span><span>PoolName</span>
+        <span>X° C&nbsp;&nbsp;&nbsp;</span><span>{{ props.member }}</span>
       </div>
       
       <div v-if="spaceUsed <= 85" class="flex justify">
@@ -58,6 +58,7 @@ interface DiskCardProps {
   status: string,
   spaceUsed: number,
   type: string;
+  member?: string;
 }
 
 const props = defineProps<DiskCardProps>();

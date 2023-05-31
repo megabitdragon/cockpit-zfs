@@ -20,6 +20,28 @@ import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import WizardButtons from './WizardButtons.vue';
 
+const poolConfig = reactive<Pool>({
+  name: '',
+  vdevs: [
+    {type: 'disk',
+    disks: [],
+    isPrimary: true,
+    forceAdd: false,},
+  ],
+  settings: {
+    sector: '4kib',
+    record: '128kib',
+    compression: true,
+    deduplication: false,
+    refreservation: 0.10,
+    autoExpand: true,
+    autoReplace: false,
+    autoTrim: false,
+    forceCreate: false,
+  },
+  status: '',
+});
+
 const show = ref(true);
 const navTag = ref('name-entry');
 

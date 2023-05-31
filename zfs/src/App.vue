@@ -4,7 +4,7 @@
       issuesURL="" :pluginVersion="Number(pluginVersion)"
       :infoNudgeScrollbar="true" />
     <Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
-    <ZFS :tag="navTag" :next="next" :pools="pools" :disks="disks"/>
+    <ZFS :tag="navTag" :next="next" :pools="pools" :disks="allDisks"/>
   </div>
 </template>
 
@@ -26,37 +26,45 @@ const navTag = ref('dashboard');
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
-const disks =  reactive<Disk[]>([
-  {name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE'},
-  {name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE'},
-  {name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE'},
-  {name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE'},
-  {name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING'},
-  {name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING'}
-])
+const allDisks =  reactive<Disk[]>([
+  {id: 1, name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, member: 'tank'},
+  {id: 2, name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, member: 'tank'},
+  {id: 3, name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE', available: false, member: 'tank'},
+  {id: 4, name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE', available: false, member: 'battletank'},
+  {id: 5, name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING', available: false, member: 'battletank'},
+  {id: 6, name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING', available: false, member: 'battletank'},
+  {id: 7, name: '3-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+  {id: 8, name: '3-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+  {id: 9, name: '3-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+  {id: 10, name: '3-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+]);
+
+const availDisks = computed<Disk[]>(()=> allDisks.filter(disk => disk.available === true));
 
 const pools = reactive<Pool[]>([
   {
     name: 'tank',
     vdevs: [
       {type: 'mirror',
-      disks: [disks[0], disks[1]],
+      disks: [allDisks[0], allDisks[1]],
       isPrimary: true,
       forceAdd: false,},
       {type: 'cache',
-      disks: [disks[2]],
+      disks: [allDisks[2]],
       isPrimary: false,
       forceAdd: false,},
     ],
-    sector: '4kib',
-    record: '128kib',
-    compression: true,
-    deduplication: false,
-    refreservation: 0.10,
-    autoExpand: true,
-    autoReplace: false,
-    autoTrim: false,
-    forceCreate: false,
+    settings: { 
+      sector: '4kib',
+      record: '128kib',
+      compression: true,
+      deduplication: false,
+      refreservation: 0.10,
+      autoExpand: true,
+      autoReplace: false,
+      autoTrim: false,
+      forceCreate: false,
+    },
     usagePercent: 45,
     status: 'ONLINE',
   },
@@ -64,19 +72,21 @@ const pools = reactive<Pool[]>([
     name: 'battletank',
     vdevs: [
       {type: 'raidz2',
-      disks: [disks[3], disks[4], disks[5]],
+      disks: [allDisks[3], allDisks[4], allDisks[5]],
       isPrimary: true,
       forceAdd: false,},
     ],
-    sector: '4kib',
-    record: '128kib',
-    compression: true,
-    deduplication: false,
-    refreservation: 0.10,
-    autoExpand: true,
-    autoReplace: false,
-    autoTrim: false,
-    forceCreate: false,
+    settings: {
+      sector: '4kib',
+      record: '128kib',
+      compression: true,
+      deduplication: false,
+      refreservation: 0.10,
+      autoExpand: true,
+      autoReplace: false,
+      autoTrim: false,
+      forceCreate: false,
+    },
     usagePercent: 88,
     status: 'WARNING',
   },
@@ -104,6 +114,9 @@ const navigation = reactive<NavigationItem[]>([
   { name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },
 ].filter(item => item.show));
 
+provide("all_disks", allDisks);
+provide("available_disks", availDisks);
+provide("pools", pools);
 </script>
 
   

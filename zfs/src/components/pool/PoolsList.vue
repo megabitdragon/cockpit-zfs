@@ -74,15 +74,6 @@ interface PoolsListProps {
 const props = defineProps<PoolsListProps>();
 
 const pools = props.pools
-// const pools = [
-//   { name: 'Pool1', status: 'ONLINE', spaceUsedPercent: 45,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-//   { name: 'Pool2', status: 'ONLINE', spaceUsedPercent: 88,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-//   { name: 'Pool3', status: 'ONLINE', spaceUsedPercent: 50,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-//   { name: 'Pool4', status: 'ONLINE', spaceUsedPercent: 75,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-//   { name: 'Pool5', status: 'ONLINE', spaceUsedPercent: 13,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-//   { name: 'Pool6', status: 'ONLINE', spaceUsedPercent: 66,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-//   { name: 'Pool7', status: 'ONLINE', spaceUsedPercent: 25,  spaceUsed: "X TB", spaceFree: "Y TB", spaceTotal: "Z TB"},
-// ]
 
 const showConfig = ref(false);
 

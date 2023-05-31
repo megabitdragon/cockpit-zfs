@@ -6,7 +6,7 @@
           <img v-if="spaceUsed <= 85" src="../../../public/icons/success.svg">
           <img v-if="spaceUsed > 85" src="../../../public/icons/warning.svg">
         </td>
-        <td><span>{{ props.name }}</span></td><td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<EllipsisVerticalIcon class="h-3 h-5"/></button></td>
+        <td><span>{{ props.name }}</span></td><td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<EllipsisVerticalIcon class="h-3"/></button></td>
       </tr>
       <tr>
         <span>{{props.status}}</span>

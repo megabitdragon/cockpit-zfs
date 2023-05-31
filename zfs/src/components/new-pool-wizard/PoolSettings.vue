@@ -174,7 +174,7 @@ import Accordion from '../../components/common/Accordion.vue';
 
 const lz4Enabled = ref(false);
 const dedupEnabled = ref(false);
-const autoExpandEnabled = ref(false);
+const autoExpandEnabled = ref(true);
 const autoReplaceEnabled = ref(false);
 const autoTrimEnabled = ref(false);
 const forcefulCreateEnabled = ref(false);
