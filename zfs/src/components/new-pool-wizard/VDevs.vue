@@ -62,7 +62,7 @@
               </div>
               <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p>
             </div>          
-              <input :id="`disk-${disk.id}`" type="checkbox" value="" :name="`disk-${disk.id}`" 
+              <input :id="`disk-${disk.id}`" v-model="checkedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`" 
                 class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
           </div>
@@ -103,16 +103,23 @@ interface VDevsProps {
 
 const props = defineProps<VDevsProps>();
 
+const configuration = inject<Pool>("new_pool_configuration");
+const vDevs = inject<VirtualDevice[]>("virtual_device_array");
+const newVDev = inject<VirtualDevice>("new_virtual_device");
 const availDisks = inject<Disk[]>("available_disks");
 
 const isMirror = ref(false);
 
 const forcefulAddVDevEnabled = ref(false);
 
+const checkedDisks = ref([]);
 
-const configuration = inject<Pool>("new_pool_configuration");
-const vDevs = inject<VirtualDevice[]>("virtual_device_array");
-const newVDev = inject<VirtualDevice>("new_virtual_device");
+console.log(configuration);
+console.log(vDevs);
+console.log(newVDev);
+console.log(checkedDisks);
 
+vDevs!.push(newVDev!);
+configuration!.vdevs = vDevs!;
 
 </script>

@@ -37,6 +37,10 @@ const allDisks =  reactive<Disk[]>([
   {id: 8, name: '3-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
   {id: 9, name: '3-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
   {id: 10, name: '3-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+  {id: 11, name: '4-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+  {id: 12, name: '4-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+  {id: 13, name: '4-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+  {id: 14, name: '4-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
 ]);
 
 const availDisks = computed<Disk[]>(()=> allDisks.filter(disk => disk.available === true));

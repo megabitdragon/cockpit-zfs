@@ -13,7 +13,9 @@
       <br/>
       <button id="save-vdev" class="btn btn-primary object-right justify-end" @click="saveVDev = true">Save VDev</button>
       <br/>
+      <br/>
       <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="anotherVDev = true">Add Another VDev</button>
+      <br/>
     </div>
     <div v-if="anotherVDev">
       <br/>
