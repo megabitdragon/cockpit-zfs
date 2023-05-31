@@ -38,7 +38,6 @@ interface DiskSummaryProps {
   disks: Disk[];
 }
 
-
 const props = defineProps<DiskSummaryProps>();
 
 </script>

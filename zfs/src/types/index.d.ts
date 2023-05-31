@@ -32,6 +32,7 @@ interface VirtualDevice {
 interface Disk {
   id: number;
   name: string;
+  alias?: string;
   type: 'hdd' | 'ssd' | 'm2nvme';
   available: boolean;
   member?: string;

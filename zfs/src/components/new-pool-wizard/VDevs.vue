@@ -3,7 +3,7 @@
     <!-- Virtual Device (Select) -->
     <div v-if="props.isPrimary">
       <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-      <select id="virtual-device" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+      <select id="virtual-device" v-model="newVDev!.type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
         <option>Disk</option>
         <option>Mirror</option>
         <option>RaidZ1</option>
@@ -13,7 +13,7 @@
     </div>
     <div v-if="!props.isPrimary">
       <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-      <select id="virtual-device" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+      <select id="virtual-device" v-model="newVDev!.type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
         <option selected>Cache</option>
         <option>Log</option> 
         <option>Special</option> 
@@ -21,8 +21,8 @@
     </div>
 
     <!-- If (Log, Special) -->
-    <!-- <div>
-      <label for="mirror-enabled" class="mt-1 block text-sm font-medium leading-6 text-gray-900">X (Mirror)</label>
+    <div v-if="newVDev?.type == 'log' || newVDev?.type == 'special'">
+      <label for="mirror-enabled" class="mt-1 block text-sm font-medium leading-6 text-gray-900">{{ newVDev.type }} Mirror</label>
       <Switch v-model="isMirror" :class="[isMirror ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
         <span class="sr-only">Use setting</span>
         <span :class="[isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
@@ -38,7 +38,7 @@
           </span>
         </span>
       </Switch>
-    </div> -->
+    </div>
 
     <!-- Disk ID (Select) -->
     <div>
@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject } from 'vue';
+import { ref, inject, reactive } from 'vue';
 
 interface VDevsProps {
   // idKey: string;
@@ -108,4 +108,11 @@ const availDisks = inject<Disk[]>("available_disks");
 const isMirror = ref(false);
 
 const forcefulAddVDevEnabled = ref(false);
+
+
+const configuration = inject<Pool>("new_pool_configuration");
+const vDevs = inject<VirtualDevice[]>("virtual_device_array");
+const newVDev = inject<VirtualDevice>("new_virtual_device");
+
+
 </script>

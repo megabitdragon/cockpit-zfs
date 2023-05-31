@@ -7,22 +7,22 @@
         <p><b>Pool Details</b></p>
       </template>
       <template v-slot:content>
-        <p class="ml-10">Pool Name</p>
+        <p class="ml-10">Name: {{ poolConfig!.name }}</p>
         <p class="ml-10">TOTAL SPACE in # Virtual Devices</p>
-        <p class="ml-10">Sector Size</p>
-        <p class="ml-10">Record Size</p>
-        <p class="ml-10">Compression On/Off</p>
+        <p class="ml-10">Sector Size: {{poolConfig!.settings.sector}}</p>
+        <p class="ml-10">Record Size: {{poolConfig!.settings.record}}</p>
+        <p class="ml-10">Compression: {{poolConfig!.settings.compression}}</p>
         <p class="ml-10">
           <Accordion class="ml-4">
             <template v-slot:title>
               <p><b>Advanced Settings</b></p>
             </template>
             <template v-slot:content>
-              <p class="ml-10">Deduplication On/Off</p>
-              <p class="ml-10">Refreservation Amount</p>
-              <p class="ml-10">Auto-Expand Pool On/Off</p>
-              <p class="ml-10">Auto-Replace Devices On/Off</p>
-              <p class="ml-10">Automatic TRIM On/Off</p>
+              <p class="ml-10">Deduplication: {{poolConfig!.settings.deduplication}}</p>
+              <p class="ml-10">Refreservation Amount: {{poolConfig!.settings.refreservation}}%</p>
+              <p class="ml-10">Auto-Expand Pool: {{poolConfig!.settings.autoExpand}}</p>
+              <p class="ml-10">Auto-Replace Devices: {{poolConfig!.settings.autoReplace}}</p>
+              <p class="ml-10">Automatic TRIM: {{poolConfig!.settings.autoTrim}}</p>
             </template>
           </Accordion>
         </p>
@@ -36,30 +36,20 @@
       </template>
       <template v-slot:content>
         <p class="ml-8">
-          <Accordion class="ml-4">
-          <template v-slot:title>
-              <p>mirror-0 (2 disks)</p>
-            </template>
-            <template v-slot:content>
-              <p class="ml-10">Type: Mirror</p>
-              <p class="ml-10">Disk 1: 1-11 (480.1 GB)</p>
-              <p class="ml-10">Disk 2: 1-12 (480.1 GB)</p>
-              <br/>
-            </template>
-        </Accordion>
-        
-        </p>
-        <p class="ml-8">
-          <Accordion class="ml-4">
-            <template v-slot:title>
-                <p>mirror-1 (2 disks)</p>
-              </template>
-              <template v-slot:content>
-                <p class="ml-10">Type: Mirror</p>
-                <p class="ml-10">Disk 1: 1-13 (480.1 GB)</p>
-                <p class="ml-10">Disk 2: 1-14 (480.1 GB)</p>
-              </template>
-          </Accordion>
+          <div v-for="(vDev, vDevIdx) in poolConfig!.vdevs" :key="vDevIdx">
+            <Accordion class="ml-4">
+              <template v-slot:title>
+                  <p>{{vDev.type}} ({{ vDev.disks.length }} disks)</p>
+                </template>
+                <template v-slot:content>
+                  <p class="ml-10">Type: {{vDev.type}}</p>
+                  <div v-for="(disk, diskIdx) in vDev.disks" :key="diskIdx">
+                    <p class="ml-10">Disk {{ diskIdx }}: {{disk.name}} (480.1 GB)</p>
+                  </div>
+                  <br/>
+                </template>
+            </Accordion>
+          </div>
         </p>
       </template>
     </Accordion>
@@ -81,7 +71,8 @@
 </template>
 
 <script setup lang="ts">
-
+import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import Accordion from '../../components/common/Accordion.vue';
 
+const poolConfig = inject<Pool>("new_pool_configuration");
 </script>
