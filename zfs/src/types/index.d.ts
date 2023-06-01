@@ -25,14 +25,12 @@ interface PoolSettings {
 interface VirtualDevice {
   type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'special';
   disks: Disk[];
-  isPrimary: boolean;
   forceAdd: boolean;
 }
 
 interface Disk {
   id: number;
   name: string;
-  alias?: string;
   type: 'hdd' | 'ssd' | 'm2nvme';
   available: boolean;
   member?: string;

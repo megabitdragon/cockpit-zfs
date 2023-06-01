@@ -51,11 +51,9 @@ const pools = reactive<Pool[]>([
     vdevs: [
       {type: 'mirror',
       disks: [allDisks[0], allDisks[1]],
-      isPrimary: true,
       forceAdd: false,},
       {type: 'cache',
       disks: [allDisks[2]],
-      isPrimary: false,
       forceAdd: false,},
     ],
     settings: { 
@@ -77,7 +75,6 @@ const pools = reactive<Pool[]>([
     vdevs: [
       {type: 'raidz2',
       disks: [allDisks[3], allDisks[4], allDisks[5]],
-      isPrimary: true,
       forceAdd: false,},
     ],
     settings: {

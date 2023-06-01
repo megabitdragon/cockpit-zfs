@@ -7,21 +7,7 @@
   <div v-if=" props.tag ==='virtual-devices'">
     <div>
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Create a Virtual Device</legend>
-      <VDevs :isPrimary="true" />
-    </div>
-    <div>
-      <br/>
-      <button id="save-vdev" class="btn btn-primary object-right justify-end" @click="saveVDev = true">Save VDev</button>
-      <br/>
-      <br/>
-      <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="anotherVDev = true">Add Another VDev</button>
-      <br/>
-    </div>
-    <div v-if="anotherVDev">
-      <br/>
-      <br/>
-      <button id="remove-vdev" class="btn btn-primary object-right justify-end" @click="anotherVDev = false">Remove VDev</button>
-      <VDevs :isPrimary="false"/>
+      <VDevs/>
     </div>
   </div>
 
@@ -62,19 +48,17 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
-const anotherVDev = ref(false);
-const saveVDev = ref(false);
-
 const newPoolName = ref('');
 
-const vDevConfig = reactive<VirtualDevice>({
-  type: 'disk',
-  disks: [],
-  isPrimary: true,
+const newVDevs = reactive<VirtualDevice[]>([]);
+
+const vDevDisks = reactive<Disk[]>([]);
+
+const newVDevConfig = reactive<VirtualDevice>({
+  type: 'raidz2',
+  disks: vDevDisks,
   forceAdd: false,
 });
-
-const newVDevs = reactive<VirtualDevice[]>([]);
 
 const poolConfig = reactive<Pool>({
   name: newPoolName.value,
@@ -96,6 +80,5 @@ const poolConfig = reactive<Pool>({
 
 provide("new_pool_configuration", poolConfig);
 provide("virtual_device_array", newVDevs);
-provide("new_virtual_device", vDevConfig);
-
+provide("new_virtual_device", newVDevConfig);
 </script>
