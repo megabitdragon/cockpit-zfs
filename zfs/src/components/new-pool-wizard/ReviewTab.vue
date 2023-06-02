@@ -44,7 +44,7 @@
                 <template v-slot:content>
                   <p class="ml-10">Type: {{vDev.type}}</p>
                   <div v-for="(disk, diskIdx) in vDev.disks" :key="diskIdx">
-                    <p class="ml-10">Disk {{ diskIdx }}: {{disk.name}} (480.1 GB)</p>
+                    <p class="ml-10">Disk {{ diskIdx }}: {{disk.name}} ({{disk.totalSize!}} GB)</p>
                   </div>
                   <br/>
                 </template>

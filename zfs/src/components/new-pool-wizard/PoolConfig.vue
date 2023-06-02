@@ -1,6 +1,6 @@
 <template>
   <div v-if=" props.tag ==='name-entry'">
-    <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Name</legend>
+    <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Name this Pool</legend>
     <input type="text" v-model="poolConfig.name" name="pool-name" id="pool-name" class="mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Pool Name" />
   </div>
 
@@ -12,7 +12,7 @@
           <!-- Virtual Device (Select) -->
           <div v-if="isPrimary">
             <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-            <select id="virtual-device" v-model="vDevConfig.type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+            <select id="virtual-device" v-model="vDev.type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
               <option>Disk</option>
               <option>Mirror</option>
               <option>RaidZ1</option>
@@ -20,9 +20,10 @@
               <option>RaidZ3</option>  
             </select>
           </div>
+
           <div v-if="!isPrimary">
             <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-            <select id="virtual-device" v-model="vDevConfig.type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+            <select id="virtual-device" v-model="vDev.type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
               <option selected>Cache</option>
               <option>Log</option> 
               <option>Special</option> 
@@ -63,22 +64,22 @@
           <label for="disk-list" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
           <ul id="disk-list" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="(disk, diskIdx) in availDisks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
-                <div class="flex w-full items-center justify-between space-x-6 p-6 border border-gray-200 rounded dark:border-gray-700">
-                  <div class="flex-1 truncate">
-                    <div class="flex items-center space-x-3">
-                      <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
-                      <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
-                    </div>
-                    <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p>
-                  </div>          
-                    <input :id="`disk-${disk.id}`" v-model="vDevConfig.disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`" 
-                      class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                    />
-                </div>
+              <div class="flex w-full items-center justify-between space-x-6 p-6 border border-gray-200 rounded dark:border-gray-700">
+                <div class="flex-1 truncate">
+                  <div class="flex items-center space-x-3">
+                    <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
+                    <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
+                  </div>
+                  <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p>
+                </div>          
+                  <input :id="`disk-${disk.id}`" :checked="checkedDisks.includes(disk)" @change="handleDiskCheckboxChange(disk)" v-model="checkedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`" 
+                    class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+              </div>
             </li>
           </ul>
 
-          <div><span><p>Selected Disks: {{ vDevConfig.disks }}</p></span></div>
+          <div><span><p>Selected Disks: {{ checkedDisks }}</p></span></div>
 
           <!-- Forcefully Add Virtual Device (Toggle) -->
           <div>
@@ -100,18 +101,20 @@
             </Switch>
           </div>
 
-          <div>
-            <br/>
-            <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="addVDev(false)">Add VDev</button>  
-            <br/>
-          </div>
+          <br/>
 
-          <div v-if="showRemoveButton">
-            <br/>
-            <button id="remove-vdev" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>
-            <br/>
+          <div v-if="showRemoveButton" class="button-group-row">
+            <button id="save-vdev" class="btn btn-primary object-right justify-end" @click="saveVDev()">Save VDev</button>
+            <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
+            <button id="remove-vdev" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
           </div>
-
+          <div v-if="!showRemoveButton" class="button-group-row">
+            <button id="save-vdev" class="btn btn-primary object-right justify-end" @click="saveVDev()">Save VDev</button>
+            <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
+          </div>
+      </div>
+      <div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
+        <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
       </div>
     </fieldset>
   </div>
@@ -306,11 +309,12 @@
 </template>
 
 <script setup lang="ts">
-import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
+import { inject, provide, reactive, ref, Ref, computed, watch, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
+
 
 interface PoolConfigProps {
   tag: string;
@@ -318,20 +322,24 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
-const newVDevArray = reactive<VirtualDevice[]>([]);
-const vDevDisks = reactive<Disk[]>([]);
+const allDisks = inject<Disk[]>("all_disks")!;
 
-const availDisks = inject<Disk[]>("available_disks")!;
+const availDisks = computed<Disk[]>(()=> allDisks.filter(disk => disk.available === true));
+
+const checkedDisks = ref<Disk[]>([]);
+
+const newVDevArray = ref<VirtualDevice[]>([]);
+const newDisksArray = ref<Disk[]>([]);
 
 const vDevConfig = reactive<VirtualDevice>({
-  type: 'raidz2',
-  disks: vDevDisks,
+  type: 'disk',
+  disks: [],
   forceAdd: false,
 });
 
 const poolConfig = reactive<Pool>({
   name: '',
-    vdevs: newVDevArray,
+    vdevs: [],
     settings: { 
       sector: '4kib',
       record: '128kib',
@@ -347,29 +355,93 @@ const poolConfig = reactive<Pool>({
     status: 'ONLINE',
 });
 
-const isPrimary = ref(true);
 const showRemoveButton = ref(false);
+const isPrimary = ref(true);
 
 //const isMirror = ref(false);
 
-const checkedDisks = ref<Disk[]>([]);
+const handleDiskCheckboxChange = (disk: Disk) => {
+  const index = checkedDisks.value.findIndex((d) => d.id === disk.id);
 
-function addVDev(isFirst: boolean) {
-  isPrimary.value = isFirst;
-  poolConfig.vdevs.push(vDevConfig);
-  if(isPrimary.value == false) {
-    showRemoveButton.value = true;
+  if (index !== -1) {
+    checkedDisks.value.splice(index, 1); // Remove the disk from the array
+  } else {
+    checkedDisks.value.push(disk); // Add the disk to the array
   }
+};
+
+const saveVDev = () => {
+  const newVDev: VirtualDevice = {
+    type: vDevConfig.type,
+    disks: checkedDisks.value,
+    forceAdd: vDevConfig.forceAdd,
+  };
+
+  newVDevArray.value.push(newVDev);
+
+  // Reset the vDevConfig to a new blank VirtualDevice
+  vDevConfig.type = 'disk';
+  vDevConfig.disks = [];
+  vDevConfig.forceAdd = false;
+};
+
+function firstVDev() {
+   isPrimary.value = true;
+   //poolConfig.vdevs.push(vDevConfig.value);
+   newVDevArray.value.push(vDevConfig);
+   poolConfig.vdevs = newVDevArray.value;
+}
+
+function addVDev() {
+  isPrimary.value = false;
+  // poolConfig.vdevs.push(vDevConfig);
+  newVDevArray.value.push(vDevConfig);
+  // showRemoveButton.value = true;
 }
 
 function removeVDev(index: number) {
-  poolConfig.vdevs = poolConfig.vdevs.filter((_, idx) => idx !== index) ?? [];
+//   poolConfig.vdevs = poolConfig.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-console.log(checkedDisks);
-console.log(vDevDisks);
+// watch(checkedDisks, () => { 
+//   // newDisksArray.push(...checkedDisks.value);
+//   // console.log("0");
+//   // console.log(newDisksArray);
+//   // vDevConfig.disks = newDisksArray;
+//   // console.log("1");
+//   // console.log(vDevConfig.disks);
+// }, {deep: true, immediate: true});
 
-if (poolConfig.vdevs.length < 1) addVDev(true);
+// watch(vDevConfig, () => {
+//   // newVDevArray.push(vDevConfig);
+//   // console.log("2");
+//   // console.log(newVDevArray);
+// }, {deep: true, immediate: true});
+
+// watch(poolConfig, () => {
+//   // poolConfig.vdevs = newVDevArray;
+//   // console.log("3");
+//   // console.log(poolConfig);
+// }, {deep: true, immediate: true});
+
+function claimDisks() {
+
+  // checkedDisks.value.forEach((disk) => {
+  //   const index = availDisks.value.findIndex((d) => d.id === disk.id);
+  //   if (index !== -1) {
+  //     availDisks.value.splice(index, 1);
+  //     newDisksArray.value.push(disk);
+  //   }
+  // });
+
+  // checkedDisks.value.length = 0;
+}
+
+// console.log(checkedDisks);
+// console.log(vDevConfig);
+// console.log(poolConfig);
+
+if (poolConfig.vdevs.length < 1) firstVDev();
 
 provide("new_pool_configuration", poolConfig);
 </script>

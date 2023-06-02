@@ -27,23 +27,21 @@ const navTag = ref('dashboard');
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
 const allDisks =  reactive<Disk[]>([
-  {id: 1, name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, member: 'tank'},
-  {id: 2, name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, member: 'tank'},
-  {id: 3, name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE', available: false, member: 'tank'},
-  {id: 4, name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE', available: false, member: 'battletank'},
-  {id: 5, name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING', available: false, member: 'battletank'},
-  {id: 6, name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING', available: false, member: 'battletank'},
-  {id: 7, name: '3-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
-  {id: 8, name: '3-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
-  {id: 9, name: '3-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
-  {id: 10, name: '3-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
-  {id: 11, name: '4-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
-  {id: 12, name: '4-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
-  {id: 13, name: '4-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
-  {id: 14, name: '4-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true},
+  {id: 1, name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, member: 'tank', totalSize: 101,},
+  {id: 2, name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, member: 'tank', totalSize: 102,},
+  {id: 3, name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE', available: false, member: 'tank', totalSize: 103,},
+  {id: 4, name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE', available: false, member: 'battletank', totalSize: 104,},
+  {id: 5, name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING', available: false, member: 'battletank', totalSize: 105,},
+  {id: 6, name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING', available: false, member: 'battletank', totalSize: 106,},
+  {id: 7, name: '3-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 107,},
+  {id: 8, name: '3-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 108,},
+  {id: 9, name: '3-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 109,},
+  {id: 10, name: '3-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 110,},
+  {id: 11, name: '4-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 111,},
+  {id: 12, name: '4-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 112,},
+  {id: 13, name: '4-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 113,},
+  {id: 14, name: '4-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 114,},
 ]);
-
-const availDisks = computed<Disk[]>(()=> allDisks.filter(disk => disk.available === true));
 
 const pools = reactive<Pool[]>([
   {
@@ -116,7 +114,6 @@ const navigation = reactive<NavigationItem[]>([
 ].filter(item => item.show));
 
 provide("all_disks", allDisks);
-provide("available_disks", availDisks);
 provide("pools", pools);
 </script>
 
