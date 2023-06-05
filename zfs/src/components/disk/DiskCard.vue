@@ -6,8 +6,7 @@
         <img v-if="spaceUsed <= 85" src="../../../public/icons/success.svg">
         <img v-if="spaceUsed > 85" src="../../../public/icons/warning.svg">
       </td>
-      <td><span>{{ props.name }}</span></td>
-      <td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<DotsVerticalIcon class="h-3"/></button></td>
+      <td><span>{{ props.name }}</span></td><td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<EllipsisVerticalIcon/></button></td>
     </tr>
     <tr>
       <span>{{props.status}}</span>
@@ -36,30 +35,41 @@
   </template>
   <template v-slot:footer>
     <tr>
-      Used&nbsp; &nbsp;&nbsp;X TB
+      Used:  {{ usedSpaceAmount.toFixed(2)}} TB
     </tr>
     <tr>
-      Free&nbsp; &nbsp;&nbsp;Y TB
+      Free:  {{ freeSpaceAmount.toFixed(2)}} TB
     </tr>
     <tr>
-      <b>Total&nbsp; &nbsp;&nbsp;Z TB</b>
+      <b>Total:  {{ props.totalSize }} TB</b>
     </tr>
   </template>
 </Card>
 </template>
 
 <script setup lang="ts">
+import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
-// import {CheckCircleIcon, DotsVerticalIcon, ExclamationCircleIcon, RefreshIcon, QuestionMarkCircleIcon} from '@heroicons/vue/outline';
 import Card from '../common/Card.vue';
 
 interface DiskCardProps {
   name: string,
   status: string,
   spaceUsed: number,
-  type: string;
-  member?: string;
+  type: string,
+  member?: string,
+  totalSize: number,
 }
+
+const usedSpaceAmount = computed(() => {
+  const total = props.totalSize * (props.spaceUsed / 100);
+  return total;
+});
+
+const freeSpaceAmount = computed(() => {
+  const total = props.totalSize - usedSpaceAmount.value;
+  return total;
+});
 
 const props = defineProps<DiskCardProps>();
 

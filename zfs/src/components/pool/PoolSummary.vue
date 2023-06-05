@@ -16,7 +16,7 @@
                 <template v-slot:content>
                     <tr>
                       <td v-for="(pool, index) in props.pools" :key="index">
-                        <PoolCard :name="pool.name" :status="pool.status" :spaceUsed="pool.usagePercent!"/>
+                        <PoolCard :name="pool.name" :status="pool.status" :spaceUsed="pool.usagePercent!" :totalSize="pool.totalSize!"/>
                       </td>
                     </tr>
                 </template>
@@ -26,11 +26,9 @@
 </template>
 
 <script setup lang="ts">
-// import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Accordion from "../common/Accordion.vue";
 import PoolCard from "../pool/PoolCard.vue";
-// import { injectionKeys } from '../../constants/keys';
 
 interface PoolSummaryProps {
   pools: Pool[];

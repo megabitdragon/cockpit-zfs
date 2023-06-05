@@ -113,7 +113,7 @@ const navigation = reactive<NavigationItem[]>([
   { name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },
 ].filter(item => item.show));
 
-provide("all_disks", allDisks);
+provide("all-disks", allDisks);
 provide("pools", pools);
 </script>
 

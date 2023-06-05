@@ -1,32 +1,26 @@
 <template>
-  <div v-if=" props.tag ==='name-entry'">
+  <div v-if="props.tag ==='name-entry'">
     <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Name this Pool</legend>
     <input type="text" v-model="poolConfig.name" name="pool-name" id="pool-name" class="mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Pool Name" />
   </div>
 
-  <div v-if=" props.tag ==='virtual-devices'">
+  <div v-if="props.tag ==='virtual-devices'">
     <fieldset>
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Create a Virtual Device</legend>
       
       <div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
           <!-- Virtual Device (Select) -->
-          <div v-if="isPrimary">
+          <div>
             <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-            <select id="virtual-device" v-model="vDev.type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-              <option>Disk</option>
-              <option>Mirror</option>
-              <option>RaidZ1</option>
-              <option selected>RaidZ2</option>
-              <option>RaidZ3</option>  
-            </select>
-          </div>
-
-          <div v-if="!isPrimary">
-            <label for="virtual-device" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-            <select id="virtual-device" v-model="vDev.type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-              <option selected>Cache</option>
-              <option>Log</option> 
-              <option>Special</option> 
+            <select id="virtual-device" v-model="poolConfig.vdevs[vDevIdx].type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+              <option v-if="vDevIdx === 0">Disk</option>
+              <option v-if="vDevIdx === 0">Mirror</option>
+              <option v-if="vDevIdx === 0">RaidZ1</option>
+              <option v-if="vDevIdx === 0" selected>RaidZ2</option>
+              <option v-if="vDevIdx === 0">RaidZ3</option>  
+              <option v-if="vDevIdx !== 0">Cache</option>
+              <option v-if="vDevIdx !== 0">Log</option> 
+              <option v-if="vDevIdx !== 0">Special</option> 
             </select>
           </div>
 
@@ -61,8 +55,8 @@
             </select>
           </div> -->
 
-          <label for="disk-list" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
-          <ul id="disk-list" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <label for="available-disk-list" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
+          <ul id="available-disk-list" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="(disk, diskIdx) in availDisks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
               <div class="flex w-full items-center justify-between space-x-6 p-6 border border-gray-200 rounded dark:border-gray-700">
                 <div class="flex-1 truncate">
@@ -72,14 +66,34 @@
                   </div>
                   <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p>
                 </div>          
-                  <input :id="`disk-${disk.id}`" :checked="checkedDisks.includes(disk)" @change="handleDiskCheckboxChange(disk)" v-model="checkedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`" 
+                  <input :id="`disk-${disk.id}`" v-model="checkedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`"
+                    class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <!-- *^checkbox^* :checked="checkedDisks.includes(disk)" @change="handleDiskCheckboxChange(disk)" -->
+              </div>
+            </li>
+            <!-- <li v-for="(disk, diskIdx) in unAvailDisks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
+              <div class="flex w-full items-center justify-between space-x-6 p-6 border border-gray-200 rounded dark:border-gray-700">
+                <div class="flex-1 truncate">
+                  <div class="flex items-center space-x-3">
+                    <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
+                    <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
+                  </div>
+                  <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p>
+                </div>          
+                  <input :id="`disk-${disk.id}`" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`"
                     class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                   />
               </div>
-            </li>
+            </li> -->
+            
           </ul>
 
+          <!-- <div><span><p>Available Disks: {{ availDisks }}</p></span></div> -->
           <div><span><p>Selected Disks: {{ checkedDisks }}</p></span></div>
+
+          <div><span><p>Unavailable Disks: {{ unAvailDisks }}</p></span></div>
+          <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div>
 
           <!-- Forcefully Add Virtual Device (Toggle) -->
           <div>
@@ -101,20 +115,11 @@
             </Switch>
           </div>
 
-          <br/>
-
-          <div v-if="showRemoveButton" class="button-group-row">
-            <button id="save-vdev" class="btn btn-primary object-right justify-end" @click="saveVDev()">Save VDev</button>
+          <div class="button-group-row">
             <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
             <button id="remove-vdev" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
           </div>
-          <div v-if="!showRemoveButton" class="button-group-row">
-            <button id="save-vdev" class="btn btn-primary object-right justify-end" @click="saveVDev()">Save VDev</button>
-            <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
-          </div>
-      </div>
-      <div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
-        <button id="add-vdev" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
+
       </div>
     </fieldset>
   </div>
@@ -315,21 +320,24 @@ import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
 
-
 interface PoolConfigProps {
   tag: string;
 }
 
 const props = defineProps<PoolConfigProps>();
 
-const allDisks = inject<Disk[]>("all_disks")!;
-
-const availDisks = computed<Disk[]>(()=> allDisks.filter(disk => disk.available === true));
+const allDisks = inject<Disk[]>("all-disks")!;
+const poolConfig = inject<Pool>("pool-config")!;
 
 const checkedDisks = ref<Disk[]>([]);
 
-const newVDevArray = ref<VirtualDevice[]>([]);
-const newDisksArray = ref<Disk[]>([]);
+const availDisks = computed<Disk[]>(() => {
+  return allDisks.filter((disk) => disk.available && !checkedDisks.value.includes(disk));
+});
+
+const unAvailDisks = computed<Disk[]>(() => {
+  return allDisks.filter((disk) => !availDisks.value.find(availDisk => availDisk.name == disk.name) && allDisks.find(disk => disk.member));
+});
 
 const vDevConfig = reactive<VirtualDevice>({
   type: 'disk',
@@ -337,111 +345,41 @@ const vDevConfig = reactive<VirtualDevice>({
   forceAdd: false,
 });
 
-const poolConfig = reactive<Pool>({
-  name: '',
-    vdevs: [],
-    settings: { 
-      sector: '4kib',
-      record: '128kib',
-      compression: true,
-      deduplication: false,
-      refreservation: 0.10,
-      autoExpand: true,
-      autoReplace: false,
-      autoTrim: false,
-      forceCreate: false,
-    },
-    usagePercent: 0,
-    status: 'ONLINE',
-});
-
-const showRemoveButton = ref(false);
-const isPrimary = ref(true);
-
 //const isMirror = ref(false);
 
-const handleDiskCheckboxChange = (disk: Disk) => {
-  const index = checkedDisks.value.findIndex((d) => d.id === disk.id);
-
-  if (index !== -1) {
-    checkedDisks.value.splice(index, 1); // Remove the disk from the array
-  } else {
-    checkedDisks.value.push(disk); // Add the disk to the array
-  }
-};
-
-const saveVDev = () => {
-  const newVDev: VirtualDevice = {
-    type: vDevConfig.type,
-    disks: checkedDisks.value,
-    forceAdd: vDevConfig.forceAdd,
-  };
-
-  newVDevArray.value.push(newVDev);
-
-  // Reset the vDevConfig to a new blank VirtualDevice
-  vDevConfig.type = 'disk';
-  vDevConfig.disks = [];
-  vDevConfig.forceAdd = false;
-};
-
-function firstVDev() {
-   isPrimary.value = true;
-   //poolConfig.vdevs.push(vDevConfig.value);
-   newVDevArray.value.push(vDevConfig);
-   poolConfig.vdevs = newVDevArray.value;
-}
-
 function addVDev() {
-  isPrimary.value = false;
-  // poolConfig.vdevs.push(vDevConfig);
-  newVDevArray.value.push(vDevConfig);
-  // showRemoveButton.value = true;
+  poolConfig.vdevs.push(vDevConfig);
 }
+
+// const handleDiskCheckboxChange = (disk: Disk) => {
+//   const index = availDisks.value.findIndex((d) => d.id === disk.id);
+
+//   if (index !== -1) {
+//     availDisks.value.find
+//     availDisks.value.splice(index, 1);
+//   } else {
+//     vDevConfig.disks.push(disk);
+//   }
+// };
+
+watch(vDevConfig, () => {
+  // const newVDevDisks = vDevConfig.disks.concat(checkedDisks.value);
+  // vDevConfig.disks = newVDevDisks;
+  checkedDisks.value.forEach(item => {
+    vDevConfig.disks.push(item);
+  });
+},{deep: true});
+
 
 function removeVDev(index: number) {
-//   poolConfig.vdevs = poolConfig.vdevs.filter((_, idx) => idx !== index) ?? [];
+  poolConfig.vdevs = poolConfig.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-// watch(checkedDisks, () => { 
-//   // newDisksArray.push(...checkedDisks.value);
-//   // console.log("0");
-//   // console.log(newDisksArray);
-//   // vDevConfig.disks = newDisksArray;
-//   // console.log("1");
-//   // console.log(vDevConfig.disks);
-// }, {deep: true, immediate: true});
+console.log(checkedDisks.value);
+console.log(poolConfig);
+//console.log(unAvailDisks);
 
-// watch(vDevConfig, () => {
-//   // newVDevArray.push(vDevConfig);
-//   // console.log("2");
-//   // console.log(newVDevArray);
-// }, {deep: true, immediate: true});
-
-// watch(poolConfig, () => {
-//   // poolConfig.vdevs = newVDevArray;
-//   // console.log("3");
-//   // console.log(poolConfig);
-// }, {deep: true, immediate: true});
-
-function claimDisks() {
-
-  // checkedDisks.value.forEach((disk) => {
-  //   const index = availDisks.value.findIndex((d) => d.id === disk.id);
-  //   if (index !== -1) {
-  //     availDisks.value.splice(index, 1);
-  //     newDisksArray.value.push(disk);
-  //   }
-  // });
-
-  // checkedDisks.value.length = 0;
-}
-
-// console.log(checkedDisks);
-// console.log(vDevConfig);
-// console.log(poolConfig);
-
-if (poolConfig.vdevs.length < 1) firstVDev();
+if (poolConfig.vdevs.length < 1) addVDev();
 
 provide("new_pool_configuration", poolConfig);
 </script>

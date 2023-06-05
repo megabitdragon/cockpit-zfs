@@ -22,24 +22,20 @@ import WizardButtons from './WizardButtons.vue';
 
 const poolConfig = reactive<Pool>({
   name: '',
-  vdevs: [
-    {type: 'disk',
-    disks: [],
-    isPrimary: true,
-    forceAdd: false,},
-  ],
-  settings: {
-    sector: '4kib',
-    record: '128kib',
-    compression: true,
-    deduplication: false,
-    refreservation: 0.10,
-    autoExpand: true,
-    autoReplace: false,
-    autoTrim: false,
-    forceCreate: false,
-  },
-  status: '',
+    vdevs: [],
+    settings: { 
+      sector: '4kib',
+      record: '128kib',
+      compression: true,
+      deduplication: false,
+      refreservation: 0.10,
+      autoExpand: true,
+      autoReplace: false,
+      autoTrim: false,
+      forceCreate: false,
+    },
+    usagePercent: 0,
+    status: 'ONLINE',
 });
 
 const show = ref(true);
@@ -97,6 +93,7 @@ watch(navTag, updateStatus);
 
 updateStatus();
 
+provide('pool-config', poolConfig);
 </script>
 
 

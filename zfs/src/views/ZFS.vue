@@ -21,7 +21,7 @@
       </div>
 
       <div v-if="props.tag === 'disks'" class="p-4">
-        
+        <DiskList :disks="props.disks" />
       </div>
 
       <div v-if="props.tag === 'stats'" class="p-4">
@@ -41,6 +41,7 @@ import "@45drives/cockpit-vue-components/dist/style.css";
 import DiskSummary from "../components/disk/DiskSummary.vue";
 import PoolSummary from "../components/pool/PoolSummary.vue";
 import PoolsList from "../components/pool/PoolsList.vue";
+import DiskList from "../components/disk/DiskList.vue";
 
 interface ZFSProps {
   tag: string;
@@ -50,7 +51,6 @@ interface ZFSProps {
 }
 
 const props = defineProps<ZFSProps>();
-
 
 </script>
 
