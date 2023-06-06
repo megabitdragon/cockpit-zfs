@@ -23,6 +23,7 @@ interface PoolSettings {
 }
 
 interface VirtualDevice {
+  name: string;
   type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'special';
   disks: Disk[];
   forceAdd: boolean;
@@ -33,7 +34,8 @@ interface Disk {
   name: string;
   type: 'hdd' | 'ssd' | 'm2nvme';
   available: boolean;
-  member?: string;
+  vDev?: string;
+  pool?: string;
   totalSize?: number;
   used?: number;
   free?: number;

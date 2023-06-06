@@ -28,7 +28,7 @@
                     </a>
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.status }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.member || '~no pool~' }}</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.pool || '~no pool~' }}</td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
                     <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
                         <div v-if="disk.usagePercent! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div>

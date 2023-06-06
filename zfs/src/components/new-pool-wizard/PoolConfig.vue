@@ -313,18 +313,19 @@ const availDisks = computed<Disk[]>(() => {
 });
 
 const unAvailDisks = computed<Disk[]>(() => {
-  return allDisks.filter((disk) => !availDisks.value.find(availDisk => availDisk.name == disk.name) && allDisks.find(disk => disk.member));
+  return allDisks.filter((disk) => !disk.available && disk.pool);
 });
 
 //const isMirror = ref(false);
 
 function addVDev() {
     const vDevConfig: VirtualDevice = {
+    name: '',
     type: 'raidz2',
     disks: [],
     forceAdd: false,
   };
-
+  vDevConfig.name = vDevConfig.type + "-" + poolConfig.vdevs.length; 
   poolConfig.vdevs.push(vDevConfig);
 }
 
