@@ -363,7 +363,7 @@ function addVDev() {
 //   }
 // };
 
-watch(vDevConfig, () => {
+watch(checkedDisks, () => {
   // const newVDevDisks = vDevConfig.disks.concat(checkedDisks.value);
   // vDevConfig.disks = newVDevDisks;
   checkedDisks.value.forEach(item => {
