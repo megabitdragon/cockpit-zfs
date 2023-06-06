@@ -6,11 +6,12 @@
         <img v-if="spaceUsed <= 85" src="../../../public/icons/success.svg">
         <img v-if="spaceUsed > 85" src="../../../public/icons/warning.svg">
       </td>
-      <td><span>{{ props.name }}</span></td><td><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<EllipsisVerticalIcon/></button></td>
+      <td><div>{{ props.name }}</div></td>
+      <td><div><button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<EllipsisVerticalIcon/></button></div></td>
     </tr>
     <tr>
-      <span>{{props.status}}</span>
-      <span>&nbsp;&nbsp;{{props.type}}</span>
+      <div>{{props.status}}</div>
+      <div>{{props.type}}</div>
     </tr>
   </template>
   <template v-slot:content>

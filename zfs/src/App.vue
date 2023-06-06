@@ -1,5 +1,5 @@
 <template>
- <div class="h-full flex flex-col overflow-hidden">
+ <div class="h-full flex flex-col overflow-auto">
     <HoustonHeader moduleName="ZFS" sourceURL=""
       issuesURL="" :pluginVersion="Number(pluginVersion)"
       :infoNudgeScrollbar="true" />
@@ -31,9 +31,9 @@ const allDisks =  reactive<Disk[]>([
   {id: 2, name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, member: 'tank', totalSize: 102,},
   {id: 3, name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE', available: false, member: 'tank', totalSize: 103,},
   {id: 4, name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE', available: false, member: 'battletank', totalSize: 104,},
-  {id: 5, name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING', available: false, member: 'battletank', totalSize: 105,},
-  {id: 6, name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING', available: false, member: 'battletank', totalSize: 106,},
-  {id: 7, name: '3-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 107,},
+  {id: 5, name: '2-12', type: 'ssd', usagePercent: 88, status: 'NEAR CAPACITY', available: false, member: 'battletank', totalSize: 105,},
+  {id: 6, name: '2-13', type: 'ssd', usagePercent: 92, status: 'NEAR CAPACITY', available: false, member: 'battletank', totalSize: 106,},
+  {id: 7, name: '3-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 107, description: "test test test test test"},
   {id: 8, name: '3-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 108,},
   {id: 9, name: '3-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 109,},
   {id: 10, name: '3-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 110,},
@@ -87,7 +87,7 @@ const pools = reactive<Pool[]>([
       forceCreate: false,
     },
     usagePercent: 88,
-    status: 'WARNING',
+    status: 'NEAR CAPACITY',
   },
 ])
 

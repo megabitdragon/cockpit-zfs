@@ -58,17 +58,18 @@
           <label for="available-disk-list" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
           <ul id="available-disk-list" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="(disk, diskIdx) in availDisks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
-              <div class="flex w-full items-center justify-between space-x-6 p-6 border border-gray-200 rounded dark:border-gray-700">
-                <div class="flex-1 truncate">
-                  <div class="flex items-center space-x-3">
-                    <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
-                    <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
-                  </div>
-                  <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p>
-                </div>          
+              <div class="flex w-full h-full border border-gray-200 rounded dark:border-gray-700">
+                     
+                <label :for="`disk-${disk.id}`" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"> 
+                
+                  <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
+                  <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
+                   
+                  <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p> 
                   <input :id="`disk-${disk.id}`" v-model="checkedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`"
-                    class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
+                    class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                </label>  
+                 
                   <!-- *^checkbox^* :checked="checkedDisks.includes(disk)" @change="handleDiskCheckboxChange(disk)" -->
               </div>
             </li>
@@ -92,7 +93,7 @@
           <!-- <div><span><p>Available Disks: {{ availDisks }}</p></span></div> -->
           <div><span><p>Selected Disks: {{ checkedDisks }}</p></span></div>
 
-          <div><span><p>Unavailable Disks: {{ unAvailDisks }}</p></span></div>
+          <!-- <div><span><p>Unavailable Disks: {{ unAvailDisks }}</p></span></div> -->
           <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div>
 
           <!-- Forcefully Add Virtual Device (Toggle) -->
