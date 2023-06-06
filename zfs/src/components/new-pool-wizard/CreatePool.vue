@@ -4,7 +4,7 @@
       <WizardTabs :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
     </template>
     <template v-slot:content>
-      <PoolConfig :tag="navTag"/>
+      <PoolConfig :tag="navTag" idKey="pool-config"/>
     </template>
     <template v-slot:footer>
       <WizardButtons :next="next" :prev="prev"/>
