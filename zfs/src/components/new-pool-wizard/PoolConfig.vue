@@ -95,9 +95,11 @@
 
           <div class="button-group-row">
             <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
-            <button :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
+            <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
           </div>
-
+      </div>
+      <div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
+        <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
       </div>
     </fieldset>
   </div>
@@ -278,7 +280,7 @@
   <div v-if=" props.tag ==='file-system'">
     <fieldset>
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">File System Settings</legend>
-      <FileSystem/>
+      <FileSystem idKey="file-system"/>
     </fieldset>
   </div>
 
@@ -312,9 +314,7 @@ const availDisks = computed<Disk[]>(() => {
   return allDisks.filter((disk) => disk.available);
 });
 
-const unAvailDisks = computed<Disk[]>(() => {
-  return allDisks.filter((disk) => !disk.available && disk.pool);
-});
+const claimedDisks = ref()
 
 //const isMirror = ref(false);
 
@@ -333,8 +333,12 @@ function removeVDev(index: number) {
   poolConfig.vdevs = poolConfig.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-console.log(poolConfig);
-//console.log(unAvailDisks);
+// watch(poolConfig, () => {
+//   console.log(poolConfig);
+// });
+
+
+//console.log(poolConfig);
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 

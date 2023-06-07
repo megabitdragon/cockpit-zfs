@@ -34,6 +34,7 @@ const poolConfig = reactive<Pool>({
       autoTrim: false,
       forceCreate: false,
     },
+    createFileSystem: false,
     usagePercent: 0,
     status: 'ONLINE',
 });

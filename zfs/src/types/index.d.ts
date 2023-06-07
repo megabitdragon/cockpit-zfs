@@ -2,6 +2,7 @@ interface Pool {
   name: string;
   vdevs: VirtualDevice[];
   settings: PoolSettings;
+  createFileSystem: boolean;
   fileSystem?: FileSystem;
   totalSize?: number;
   used?: number;
@@ -47,6 +48,7 @@ interface Disk {
 interface FileSystem {
   name: string;
   encryption: boolean;
+  cipher: string;
   passphrase: string?;
   inherit: boolean;
   accessTime: string;
@@ -56,7 +58,10 @@ interface FileSystem {
   dNodeSize: string;
   extendedAttributes: string;
   recordSize: string;
-  quota: string;
+  quota: {
+    amount: number;
+    size: string;
+  };
   readOnly: boolean;
 }
 

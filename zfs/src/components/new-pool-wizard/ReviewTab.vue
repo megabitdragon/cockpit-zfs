@@ -8,7 +8,7 @@
       </template>
       <template v-slot:content>
         <p class="ml-10">Name: {{ poolConfig.name }}</p>
-        <p class="ml-10">TOTAL SPACE in # Virtual Devices</p>
+        <p class="ml-10">{{poolConfig.vdevs.length}} Virtual Device(s)</p>
         <p class="ml-10">Sector Size: {{poolConfig.settings.sector}}</p>
         <p class="ml-10">Record Size: {{poolConfig.settings.record}}</p>
         <p class="ml-10">Compression: {{poolConfig.settings.compression}}</p>
@@ -54,7 +54,7 @@
       </template>
     </Accordion>
     <br/>
-    <Accordion class="ml-4">
+    <Accordion class="ml-4" v-if="poolConfig.createFileSystem">
     <!-- File System Info? -->
       <template v-slot:title>
           <p><b>File System Details</b></p>
