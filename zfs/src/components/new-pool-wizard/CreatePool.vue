@@ -37,6 +37,7 @@ const poolConfig = reactive<Pool>({
     createFileSystem: false,
     usagePercent: 0,
     status: 'ONLINE',
+    claimedDisks: {},
 });
 
 const show = ref(true);

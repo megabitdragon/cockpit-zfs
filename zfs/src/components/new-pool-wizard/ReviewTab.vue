@@ -43,9 +43,13 @@
                 </template>
                 <template v-slot:content>
                   <p class="ml-10">Type: {{poolConfig.vdevs[vDevIdx].type}}</p>
+
                   <div v-for="(disk, diskIdx) in poolConfig.vdevs[vDevIdx].disks" :key="diskIdx">
-                    <p class="ml-10">Disk {{ poolConfig.vdevs[vDevIdx].disks[diskIdx].id }}: {{disk.name}} ({{disk.totalSize!}} TB)</p>
+                    <p class="ml-10">Disk test a{{ poolConfig.vdevs[vDevIdx].disks[diskIdx].id }}: {{poolConfig.vdevs[vDevIdx].disks[diskIdx].name}} ({{poolConfig.vdevs[vDevIdx].disks[diskIdx].totalSize!}} TB)</p>
+                    <p class="ml-10">Disk test b{{ disk.id }}: {{disk.name}} ({{disk.totalSize!}} TB)</p>
+                    <p class="ml-10">Disk test c{{ vDev.disks[diskIdx].id }}: {{vDev.disks[diskIdx].name}} ({{vDev.disks[diskIdx].totalSize!}} TB)</p>
                   </div>
+
                   <br/>
                 </template>
             </Accordion>
@@ -75,4 +79,6 @@ import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import Accordion from '../../components/common/Accordion.vue';
 
 const poolConfig = inject<Pool>("pool-config")!;
+
+console.log(poolConfig.vdevs)
 </script>

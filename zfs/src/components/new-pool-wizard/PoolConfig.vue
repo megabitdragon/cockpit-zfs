@@ -63,7 +63,7 @@
                   <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
                   <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
                   <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p> 
-                  <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`"
+                  <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`"  :disabled="isDiskClaimed(disk)"
                     class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
                 </label>  
               </div>
@@ -93,7 +93,7 @@
             </Switch>
           </div>
 
-          <div class="button-group-row">
+          <div class="button-group-row mt-2">
             <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
             <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
           </div>
@@ -294,7 +294,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, provide, reactive, ref, Ref, computed, watch, onMounted } from 'vue';
+import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
@@ -314,7 +314,26 @@ const availDisks = computed<Disk[]>(() => {
   return allDisks.filter((disk) => disk.available);
 });
 
-const claimedDisks = ref()
+// const vDevAvailDisks = poolConfig.vdevs.map(idx1 => {
+//   const claimed = poolConfig.vdevs.map(idx2 => {
+//     if (idx2 != idx1) {
+//       return idx1.disks;
+//     }
+//     return idx2.disks.filter(disk => disk.available && !claimed.includes(disk));
+//   });
+// });
+const vDevAvailDisks = computed<Disk[]>(() => {
+  return availDisks.value.filter((disk) => !isDiskClaimed(disk));
+});
+
+function isDiskClaimed(disk: Disk): boolean {
+  for (const vdev of poolConfig.vdevs) {
+    if (vdev.disks.some((claimedDisk) => claimedDisk.name === disk.name)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 //const isMirror = ref(false);
 
@@ -325,18 +344,14 @@ function addVDev() {
     disks: [],
     forceAdd: false,
   };
-  vDevConfig.name = vDevConfig.type + "-" + poolConfig.vdevs.length; 
+  //vDevConfig.name = vDevConfig.type + '-' + vDevIdx;
   poolConfig.vdevs.push(vDevConfig);
+  poolConfig.claimedDisks[vDevConfig.name] = [];
 }
 
 function removeVDev(index: number) {
   poolConfig.vdevs = poolConfig.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
-
-// watch(poolConfig, () => {
-//   console.log(poolConfig);
-// });
-
 
 //console.log(poolConfig);
 
