@@ -28,8 +28,8 @@ interface VirtualDevice {
   name: string;
   type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'special';
   disks: Disk[];
+  selectedDisks: string[];
   forceAdd: boolean;
-  availableDisks: Disk[];
 }
 
 interface Disk {

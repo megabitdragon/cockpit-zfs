@@ -12,7 +12,7 @@
                         <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">0 HDDs</td>
                         <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Maximum Temp. X° C</td>
                         <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Raw Space: 0 TB</td>
-                        <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button><ArrowPathIcon class="h-3 h-5"/></button></td>
+                        <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button><ArrowPathIcon class="h-5 w-5"/></button></td>
                         </tr>
                     </span>
                 </template>

@@ -6,12 +6,12 @@
         <button id="refreshPools" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="h-3 h-5"/></button>
     </div>
 
-    <div class="mt-8 flow-root">
+    <div class="mt-8">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
 
         
-        <div class="inline-block min-w-full py-2 align-middle">
-          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+        <div class="inline-block min-w-full min-h-full py-2 align-middle">
+          <div class="overflow-y-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
               <thead>
                 <tr>
@@ -52,9 +52,27 @@
                       <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">X TB</td>
                       <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Z TB</td>
                       <td scope="col" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                        <a href="#" @onClick="" class="text-btn-primary hover:text-btn-primary">
-                          <EllipsisVerticalIcon class="h-3 h-5"/><span class="sr-only">, {{ pool.name }}</span>
-                        </a>
+                        <Menu as="div" class="relative inline-block text-left">
+                                      <div>
+                                        <MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+                                          <span class="sr-only">Open options</span>
+                                          <EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+                                        </MenuButton>
+                                      </div>
+
+                                      <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                                        <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                          <div class="py-1">
+                                            <MenuItem v-slot="{ active }">
+                                              <a href="#" @onClick="showDiskDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
+                                            </MenuItem>
+                                            <MenuItem v-slot="{ active }">
+                                              <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Configure Settings</a>
+                                            </MenuItem>
+                                          </div>
+                                        </MenuItems>
+                                      </transition>
+                                    </Menu>
                       </td>
                     </template>
 

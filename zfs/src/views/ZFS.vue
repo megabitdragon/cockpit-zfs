@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="w-full px-8 bg-well text-default grow flex flex-col overflow-y-auto py-8">
+    <div class="w-full h-full px-8 bg-well text-default grow flex flex-col overflow-y-auto py-8">
 
       <div v-if="props.tag === 'dashboard'" class="p-4">
           <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">

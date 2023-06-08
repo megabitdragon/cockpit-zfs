@@ -9,7 +9,7 @@
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><img src="../../../public/icons/success.svg"></td>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{props.pools.length}}</td>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Effective Space: 0 TB</td>
-                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button @onClick=""><ArrowPathIcon class="h-3 h-5"/></button></td>
+                          <!-- <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button @onClick=""><ArrowPathIcon class="h-5 w-5"/></button></td> -->
                         </tr>
                     </span>
                 </template>

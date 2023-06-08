@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button
+        <button 
             @click="toggleAccordion()"
             class="flex items-center space-x-3"
             :aria-expanded="isOpen"
@@ -25,8 +25,9 @@
                 stroke-linejoin="round"
             />
             </svg>
+         
             <slot name="title"/>
-        </button>
+          </button>
 
         <div v-show="isOpen" :id="`collapse${_uid}`">
             <slot name="content"/>
