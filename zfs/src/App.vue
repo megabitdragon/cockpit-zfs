@@ -50,11 +50,13 @@ const pools = reactive<Pool[]>([
       {type: 'mirror',
       name: 'mirror-0',
       disks: [allDisks[0], allDisks[1]],
-      forceAdd: false,},
+      forceAdd: false,
+      availableDisks: [allDisks[0], allDisks[1],]},
       {type: 'cache',
       name: 'cache-0',
       disks: [allDisks[2]],
-      forceAdd: false,},
+      forceAdd: false,
+      availableDisks: [allDisks[2],]},
     ],
     settings: { 
       sector: '4kib',
@@ -70,10 +72,10 @@ const pools = reactive<Pool[]>([
     createFileSystem: false,
     usagePercent: 45,
     status: 'ONLINE',
-    claimedDisks: {
-      'mirror-0': [allDisks[0].name, allDisks[1].name],
-      'cache-0': [allDisks[2].name],
-    }
+    // claimedDisks: {
+    //   'mirror-0': [allDisks[0].name, allDisks[1].name],
+    //   'cache-0': [allDisks[2].name],
+    // }
   },
   {
     name: 'battletank',
@@ -81,7 +83,8 @@ const pools = reactive<Pool[]>([
       {type: 'raidz2',
       name: 'raidz2-0',
       disks: [allDisks[3], allDisks[4], allDisks[5]],
-      forceAdd: false,},
+      forceAdd: false,
+      availableDisks: [allDisks[3], allDisks[4], allDisks[5]]},
     ],
     settings: {
       sector: '4kib',
@@ -97,9 +100,9 @@ const pools = reactive<Pool[]>([
     createFileSystem: false,
     usagePercent: 88,
     status: 'WARNING',
-    claimedDisks: {
-      'raidz2-0': [allDisks[3].name, allDisks[4].name, allDisks[5].name],
-    }
+    // claimedDisks: {
+    //   'raidz2-0': [allDisks[3].name, allDisks[4].name, allDisks[5].name],
+    // }
   },
 ])
 

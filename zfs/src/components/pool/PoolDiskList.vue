@@ -52,7 +52,7 @@
                       <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">X TB</td>
                       <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Z TB</td>
                       <td scope="col" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                        <a href="#" class="text-btn-primary hover:text-btn-primary">
+                        <a href="#" @onClick="" class="text-btn-primary hover:text-btn-primary">
                           <EllipsisVerticalIcon class="h-3 h-5"/><span class="sr-only">, {{ pool.name }}</span>
                         </a>
                       </td>
@@ -102,9 +102,27 @@
                                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ (disk.totalSize! - (disk.totalSize! * (disk.usagePercent! / 100))).toFixed(2) }} TB</td>
                                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.totalSize }} TB</td>
                                   <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                                    <a href="#" class="text-btn-primary hover:text-btn-primary">
-                                      <EllipsisVerticalIcon class="h-3 h-5"/><span class="sr-only">, {{ disk.name }}</span>
-                                    </a>
+                                    <Menu as="div" class="relative inline-block text-left">
+                                      <div>
+                                        <MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+                                          <span class="sr-only">Open options</span>
+                                          <EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+                                        </MenuButton>
+                                      </div>
+
+                                      <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                                        <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                          <div class="py-1">
+                                            <MenuItem v-slot="{ active }">
+                                              <a href="#" @onClick="showDiskDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
+                                            </MenuItem>
+                                            <MenuItem v-slot="{ active }">
+                                              <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Configure Settings</a>
+                                            </MenuItem>
+                                          </div>
+                                        </MenuItems>
+                                      </transition>
+                                    </Menu>
                                   </td>
                                 </tr>
                               </tbody>
@@ -128,17 +146,26 @@
 
   <div v-if="showConfig">
     <CreatePool @close="showConfig = false"/>
-  </div>  
+  </div>
+
+  <div v-if="showDiskDetails">
+    <DiskDetail @close="showDiskDetails = false"/>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, inject } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../new-pool-wizard/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
+import DiskDetail from "../disk/DiskDetail.vue";
 
 const pools = inject<Pool[]>("pools")!;
 
 const showConfig = ref(false);
+const showDiskDetails = ref(false);
+
+
 
 </script>

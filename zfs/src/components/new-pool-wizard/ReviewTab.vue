@@ -45,9 +45,10 @@
                   <p class="ml-10">Type: {{poolConfig.vdevs[vDevIdx].type}}</p>
 
                   <div v-for="(disk, diskIdx) in poolConfig.vdevs[vDevIdx].disks" :key="diskIdx">
-                    <p class="ml-10">Disk test a{{ poolConfig.vdevs[vDevIdx].disks[diskIdx].id }}: {{poolConfig.vdevs[vDevIdx].disks[diskIdx].name}} ({{poolConfig.vdevs[vDevIdx].disks[diskIdx].totalSize!}} TB)</p>
+                    <p class="ml-10">Disk {{ diskIdx }} </p>
+                    <!-- <p class="ml-10">Disk test a{{ poolConfig.vdevs[vDevIdx].disks[diskIdx].id }}: {{poolConfig.vdevs[vDevIdx].disks[diskIdx].name}} ({{poolConfig.vdevs[vDevIdx].disks[diskIdx].totalSize!}} TB)</p>
                     <p class="ml-10">Disk test b{{ disk.id }}: {{disk.name}} ({{disk.totalSize!}} TB)</p>
-                    <p class="ml-10">Disk test c{{ vDev.disks[diskIdx].id }}: {{vDev.disks[diskIdx].name}} ({{vDev.disks[diskIdx].totalSize!}} TB)</p>
+                    <p class="ml-10">Disk test c{{ vDev.disks[diskIdx].id }}: {{vDev.disks[diskIdx].name}} ({{vDev.disks[diskIdx].totalSize!}} TB)</p> -->
                   </div>
 
                   <br/>

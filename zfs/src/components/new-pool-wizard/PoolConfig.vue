@@ -63,12 +63,11 @@
                   <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
                   <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
                   <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p> 
-                  <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`"  :disabled="isDiskClaimed(disk)"
+                  <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`" 
                     class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
                 </label>  
               </div>
             </li>
-            
           </ul>
 
           <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div>
@@ -314,39 +313,51 @@ const availDisks = computed<Disk[]>(() => {
   return allDisks.filter((disk) => disk.available);
 });
 
+// const vDevAvailDisks = poolConfig.vdevs.map((vdev, idx1) => {
+//   const claimed = vdev.disks.map((disk, idx2) => {
+//     if (idx2!= idx1) return disk;
+//   });
+//   return availDisks.value.filter(disk => disk.available && !claimed.includes(disk));
+// }).flat();
+
+const vDevAvailDisks = poolConfig.vdevs.flatMap((vdev, idx1) => {
+  const claimed = vdev.disks.map((disk, idx2) => {
+    if (idx2 !== idx1) return disk;
+    return null; // Return null for the disks in the same vdev
+  });
+  return availDisks.value.filter(disk => disk.available && !claimed.includes(disk));
+});
+
+// const vDevAvailDisks = poolConfig.vdevs.map((vdev1, idx1) => {
+//   const claimed = poolConfig.vdevs.map((vdev2, idx2) => {
+//     if (idx2!= idx1) return vdev2.disks;
+//   }).flat();
+//   return availDisks.value.filter(disk => disk.available && !claimed.includes(disk));
+// }).flat();
+
+
 // const vDevAvailDisks = poolConfig.vdevs.map(idx1 => {
 //   const claimed = poolConfig.vdevs.map(idx2 => {
 //     if (idx2 != idx1) {
 //       return idx1.disks;
 //     }
-//     return idx2.disks.filter(disk => disk.available && !claimed.includes(disk));
-//   });
+//   }).flat();
+//   return idx2.disks.filter(disk => disk.available && !claimed.includes(disk));
 // });
-const vDevAvailDisks = computed<Disk[]>(() => {
-  return availDisks.value.filter((disk) => !isDiskClaimed(disk));
-});
-
-function isDiskClaimed(disk: Disk): boolean {
-  for (const vdev of poolConfig.vdevs) {
-    if (vdev.disks.some((claimedDisk) => claimedDisk.name === disk.name)) {
-      return true;
-    }
-  }
-  return false;
-}
 
 //const isMirror = ref(false);
 
 function addVDev() {
-    const vDevConfig: VirtualDevice = {
+  const vDevConfig: VirtualDevice = {
     name: '',
     type: 'raidz2',
     disks: [],
     forceAdd: false,
+    availableDisks: vDevAvailDisks,
   };
-  //vDevConfig.name = vDevConfig.type + '-' + vDevIdx;
+  //vDevConfig.availableDisks = vDevAvailDisks;
   poolConfig.vdevs.push(vDevConfig);
-  poolConfig.claimedDisks[vDevConfig.name] = [];
+  console.log(vDevAvailDisks);
 }
 
 function removeVDev(index: number) {

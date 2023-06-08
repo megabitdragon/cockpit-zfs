@@ -9,7 +9,7 @@ interface Pool {
   free?: number;
   usagePercent?: number;
   status: string;
-  claimedDisks: Record<string, string[]>; // key: vdev name, value: array of claimed disk names
+  // claimedDisks: Record<string, string[]>; // key: vdev name, value: array of claimed disk names
 }
 
 interface PoolSettings {
@@ -29,6 +29,7 @@ interface VirtualDevice {
   type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'special';
   disks: Disk[];
   forceAdd: boolean;
+  availableDisks: Disk[];
 }
 
 interface Disk {
