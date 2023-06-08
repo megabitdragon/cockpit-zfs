@@ -20,7 +20,7 @@ import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import WizardButtons from './WizardButtons.vue';
 
-const poolConfig = reactive<Pool>({
+const poolConfig = ref<Pool>({
   name: '',
     vdevs: [],
     settings: { 
@@ -37,7 +37,6 @@ const poolConfig = reactive<Pool>({
     createFileSystem: false,
     usagePercent: 0,
     status: 'ONLINE',
-    //claimedDisks: {},
 });
 
 const show = ref(true);

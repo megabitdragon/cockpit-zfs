@@ -9,7 +9,6 @@ interface Pool {
   free?: number;
   usagePercent?: number;
   status: string;
-  // claimedDisks: Record<string, string[]>; // key: vdev name, value: array of claimed disk names
 }
 
 interface PoolSettings {

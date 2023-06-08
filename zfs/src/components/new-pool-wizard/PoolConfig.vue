@@ -306,20 +306,20 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
-const allDisks = inject<Disk[]>("all-disks")!;
-const poolConfig = inject<Pool>("pool-config")!;
+const allDisks = inject<Ref<Disk[]>>("all-disks")!;
+const poolConfig = inject<Ref<Pool>>("pool-config")!;
 
-const availDisks = computed<Disk[]>(() => {
-  return allDisks.filter((disk) => disk.available);
-});
+// const availDisks = computed<Disk[]>(() => {
+//   return allDisks.value.filter((disk) => disk.available);
+// });
 
 const vDevAvailDisks = computed<Disk[][]>(() => {
-  return poolConfig.vdevs.map((vdev, idx1) => {
-    const claimed = poolConfig.vdevs.map((vdev2, idx2) => {
+  return poolConfig.value.vdevs.map((vdev, idx1) => {
+    const claimed = poolConfig.value.vdevs.map((vdev2, idx2) => {
       if (idx2!= idx1) return vdev2.selectedDisks;
     }).flat();
     console.log(claimed);
-    return allDisks.filter(disk => disk.available && !claimed.includes(disk.name));
+    return allDisks.value.filter(disk => disk.available && !claimed.includes(disk.name));
   });
 });
 
@@ -334,17 +334,17 @@ function addVDev() {
     selectedDisks: [],
   };
   //vDevConfig.availableDisks = vDevAvailDisks;
-  poolConfig.vdevs.push(vDevConfig);
+  poolConfig.value.vdevs.push(vDevConfig);
 }
 
 function removeVDev(index: number) {
-  poolConfig.vdevs = poolConfig.vdevs.filter((_, idx) => idx !== index) ?? [];
+  poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
 //console.log(poolConfig);
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
-if (poolConfig.vdevs.length < 1) addVDev();
+if (poolConfig.value.vdevs.length < 1) addVDev();
 
 </script>

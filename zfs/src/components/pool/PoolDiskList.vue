@@ -172,14 +172,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject } from "vue";
+import { ref, inject, Ref } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../new-pool-wizard/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import DiskDetail from "../disk/DiskDetail.vue";
 
-const pools = inject<Pool[]>("pools")!;
+const pools = inject<Ref<Pool[]>>("pools")!;
 
 const showConfig = ref(false);
 const showDiskDetails = ref(false);

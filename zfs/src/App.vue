@@ -26,7 +26,7 @@ const navTag = ref('dashboard');
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
-const allDisks =  reactive<Disk[]>([
+const allDisks =  ref<Disk[]>([
   {id: 1, name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, pool: 'tank', totalSize: 101,},
   {id: 2, name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, pool: 'tank', totalSize: 102,},
   {id: 3, name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE', available: false, pool: 'tank', totalSize: 103,},
@@ -43,7 +43,7 @@ const allDisks =  reactive<Disk[]>([
   {id: 14, name: '4-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 114,},
 ]);
 
-const pools = reactive<Pool[]>([
+const pools = ref<Pool[]>([
   {
     name: 'tank',
     vdevs: [
