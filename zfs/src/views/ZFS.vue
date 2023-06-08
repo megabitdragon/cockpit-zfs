@@ -5,13 +5,13 @@
       <div v-if="props.tag === 'dashboard'" class="p-4">
           <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <PoolSummary :pools="props.pools"/>
+              <PoolSummary/>
             </div>
           </div>
 
           <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <DiskSummary :disks="props.disks"/>
+              <DiskSummary/>
             </div>
           </div>
       </div>
@@ -41,15 +41,11 @@ import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import DiskSummary from "../components/disk/DiskSummary.vue";
 import PoolSummary from "../components/pool/PoolSummary.vue";
-import PoolsList from "../components/pool/PoolsList.vue";
-import DiskList from "../components/disk/DiskList.vue";
 import PoolDiskList from "../components/pool/PoolDiskList.vue";
 
 interface ZFSProps {
   tag: string;
   next: any;
-  pools: Pool[];
-  disks: Disk[];
 }
 
 const props = defineProps<ZFSProps>();

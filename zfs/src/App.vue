@@ -4,7 +4,7 @@
       issuesURL="" :pluginVersion="Number(pluginVersion)"
       :infoNudgeScrollbar="true" />
     <Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
-    <ZFS :tag="navTag" :next="next" :pools="pools" :disks="allDisks"/>
+    <ZFS :tag="navTag" :next="next"/>
   </div>
 </template>
 
