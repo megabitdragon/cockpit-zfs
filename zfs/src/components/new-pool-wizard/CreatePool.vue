@@ -22,22 +22,27 @@ import WizardButtons from './WizardButtons.vue';
 
 const poolConfig = ref<Pool>({
   name: '',
-    vdevs: [],
-    settings: { 
-      sector: '4kib',
-      record: '128kib',
-      compression: true,
-      deduplication: false,
-      refreservation: 0.10,
-      autoExpand: true,
-      autoReplace: false,
-      autoTrim: false,
-      forceCreate: false,
-    },
-    createFileSystem: false,
-    usagePercent: 0,
-    status: 'ONLINE',
+  vdevs: [],
+  settings: { 
+    sector: '4kib',
+    record: '128kib',
+    compression: true,
+    deduplication: false,
+    refreservation: 0.10,
+    autoExpand: true,
+    autoReplace: false,
+    autoTrim: false,
+    forceCreate: false,
+  },
+  createFileSystem: false,
+  usagePercent: 0,
+  status: 'ONLINE',
 });
+
+const newPoolConfig = ref<PoolObject>({
+  name: '',
+  vdevs: [],
+})
 
 const show = ref(true);
 const navTag = ref('name-entry');
@@ -95,6 +100,7 @@ watch(navTag, updateStatus);
 updateStatus();
 
 provide('pool-config', poolConfig);
+provide('new-pool-config', newPoolConfig);
 </script>
 
 

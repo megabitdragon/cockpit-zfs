@@ -17,7 +17,8 @@
               <option v-if="vDevIdx === 0" value="mirror">Mirror</option>
               <option v-if="vDevIdx === 0" value="raidz1">RaidZ1</option>
               <option v-if="vDevIdx === 0" value="raidz2">RaidZ2</option>
-              <option v-if="vDevIdx === 0" value="raidz3">RaidZ3</option>  
+              <option v-if="vDevIdx === 0" value="raidz3">RaidZ3</option>
+              <option v-if="vDevIdx !== 0" :value="poolConfig.vdevs[0].type">{{poolConfig.vdevs[0].type}}</option>
               <option v-if="vDevIdx !== 0" value="cache">Cache</option>
               <option v-if="vDevIdx !== 0" value="log">Log</option> 
               <option v-if="vDevIdx !== 0" value="special">Special</option> 
@@ -70,7 +71,7 @@
             </li>
           </ul>
 
-          <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div>
+          <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].selectedDisks }}</p></span></div>
 
           <!-- Forcefully Add Virtual Device (Toggle) -->
           <div>
@@ -308,6 +309,7 @@ const props = defineProps<PoolConfigProps>();
 
 const allDisks = inject<Ref<Disk[]>>("all-disks")!;
 const poolConfig = inject<Ref<Pool>>("pool-config")!;
+const newPoolConfig = inject<Ref<PoolObject>>('new-pool-config'!);
 
 // const availDisks = computed<Disk[]>(() => {
 //   return allDisks.value.filter((disk) => disk.available);

@@ -27,12 +27,12 @@ const navTag = ref('dashboard');
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
 const allDisks =  ref<Disk[]>([
-  {id: 1, name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, pool: 'tank', totalSize: 101,},
-  {id: 2, name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, pool: 'tank', totalSize: 102,},
-  {id: 3, name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE', available: false, pool: 'tank', totalSize: 103,},
-  {id: 4, name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE', available: false, pool: 'battletank', totalSize: 104,},
-  {id: 5, name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING', available: false, pool: 'battletank', totalSize: 105,},
-  {id: 6, name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING', available: false, pool: 'battletank', totalSize: 106,},
+  {id: 1, name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, pool: 'tank', vDev: 'mirror-0', totalSize: 101,},
+  {id: 2, name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, pool: 'tank', vDev: 'mirror-0', totalSize: 102,},
+  {id: 3, name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE', available: false, pool: 'tank', vDev: 'cache-0', totalSize: 103,},
+  {id: 4, name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE', available: false, pool: 'battletank', vDev: 'raidz2-0', totalSize: 104,},
+  {id: 5, name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING', available: false, pool: 'battletank', vDev: 'raidz2-0', totalSize: 105,},
+  {id: 6, name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING', available: false, pool: 'battletank', vDev: 'raidz2-0', totalSize: 106,},
   {id: 7, name: '3-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 107, description: "test test test test test"},
   {id: 8, name: '3-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 108,},
   {id: 9, name: '3-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 109,},
@@ -43,18 +43,50 @@ const allDisks =  ref<Disk[]>([
   {id: 14, name: '4-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 114,},
 ]);
 
+const mirror0Disks = computed<Disk[]>(() => {
+  return allDisks.value.filter(disk => disk.vDev! === "mirror-0")
+});
+
+const cache0Disks = computed<Disk[]>(() => {
+  return allDisks.value.filter(disk => disk.vDev! === "cache-0")
+});
+
+const raidz20Disks = computed<Disk[]>(() => {
+  return allDisks.value.filter(disk => disk.vDev! === "raidz2-0")
+});
+
+// const newPool = ref<PoolObject>({
+//   name: "tanky",
+//   vdevs: [
+//     root: "DATA",
+//     type: "MIRROR",
+//     devices: [
+//       "/dev/disk/by-partuuid/58215170-74e4-4fee-93ce-8549e23adfaf",
+//       "/dev/disk/by-partuuid/1197cf00-1919-4c80-aadf-05fdcd9056b2",
+//     ],
+//   ],
+//   [
+//     root: "DATA",
+//     type: "MIRROR",
+//     devices: [
+//       "/dev/disk/by-partuuid/dda2f964-0dd9-4c2c-b92f-2a3f562dc178",
+//       "/dev/disk/by-partuuid/12d70525-d501-44e6-b344-e9efca8462a8",
+//     ],
+//   ],
+// });
+
 const pools = ref<Pool[]>([
   {
     name: 'tank',
     vdevs: [
       {type: 'mirror',
       name: 'mirror-0',
-      disks: [allDisks[0], allDisks[1]],
+      disks: mirror0Disks.value,
       forceAdd: false,
       selectedDisks: []},
       {type: 'cache',
       name: 'cache-0',
-      disks: [allDisks[2]],
+      disks: cache0Disks.value,
       forceAdd: false,
       selectedDisks: []},
     ],
@@ -78,7 +110,7 @@ const pools = ref<Pool[]>([
     vdevs: [
       {type: 'raidz2',
       name: 'raidz2-0',
-      disks: [allDisks[3], allDisks[4], allDisks[5]],
+      disks: raidz20Disks.value,
       forceAdd: false,
       selectedDisks: []},
     ],
@@ -97,7 +129,8 @@ const pools = ref<Pool[]>([
     usagePercent: 88,
     status: 'WARNING',
   },
-])
+]);
+
 
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;
@@ -123,6 +156,7 @@ const navigation = reactive<NavigationItem[]>([
 
 provide("all-disks", allDisks);
 provide("pools", pools);
+//provide("new-pools", newPool);
 </script>
 
   

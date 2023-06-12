@@ -3,14 +3,14 @@
     <div class="button-group-row">
         <button id="createPool" class="btn btn-primary object-left justify-start" @click="showConfig = true">Create Storage Pool</button>
         <button id="importPool" class="btn btn-secondary object-left justify-start" @click="" disabled>Import Storage Pool</button>
-        <button id="refreshPools" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="h-3 h-5"/></button>
+        <button id="refreshPools" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="w-5 h-5"/></button>
     </div>
 
     <div class="mt-8">
-      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="-mx-4 -my-2 overflow-auto sm:-mx-6 lg:-mx-8">
 
         
-        <div class="inline-block min-w-full min-h-full py-2 align-middle">
+        <!-- <div class="inline-block min-w-full min-h-full py-2 align-middle"> -->
           <div class="overflow-y-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
               <thead>
@@ -64,7 +64,7 @@
                             <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                               <div class="py-1">
                                 <MenuItem v-slot="{ active }">
-                                  <a href="#" @onClick="showDiskDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
+                                  <a href="#" @onClick="showDiskDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
                                 </MenuItem>
                                 <MenuItem v-slot="{ active }">
                                   <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Configure Settings</a>
@@ -159,7 +159,7 @@
           </div>
         </div>
       </div>
-    </div>
+    <!-- </div> -->
   </div>
 
   <div v-if="showConfig">

@@ -12,6 +12,11 @@
   resolved "https://npm.pkg.github.com/download/@45Drives/cockpit-helpers/0.1.19/29920cb9a0866220cfda58b9db4f34c8435f8960"
   integrity sha512-dyS3V+XG/9rLGGhFJEA2b+ohrZiGsHteOEktJk9mM9c6WsXJywrlnrHm0YrKksoTUPwXtBY44QrXJNd3zKtvKQ==
 
+"@45drives/cockpit-typings@^0.1.2":
+  version "0.1.2"
+  resolved "https://npm.pkg.github.com/download/@45drives/cockpit-typings/0.1.2/cc524db063c176fa5179d541398c5cd84140dca3"
+  integrity sha512-fA+Z0yNtAiJFXb3LldOIw7OmWbKZ/FFJ0DSXAjmSrRW6zTWPTrPa/66guuL3JVkBY4StAIH5wiPvTAFYJHY1MA==
+
 "@45drives/cockpit-vue-components@^0.1.0-beta2":
   version "0.1.0-beta2"
   resolved "https://npm.pkg.github.com/download/@45Drives/cockpit-vue-components/0.1.0-beta2/a216666b3e9eb97a30cf47c0b947b4e5661798db"

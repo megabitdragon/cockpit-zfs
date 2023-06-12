@@ -42,6 +42,7 @@ import "@45drives/cockpit-vue-components/dist/style.css";
 import DiskSummary from "../components/disk/DiskSummary.vue";
 import PoolSummary from "../components/pool/PoolSummary.vue";
 import PoolDiskList from "../components/pool/PoolDiskList.vue";
+import { getPools } from "../scripts/pools";
 
 interface ZFSProps {
   tag: string;
@@ -49,6 +50,11 @@ interface ZFSProps {
 }
 
 const props = defineProps<ZFSProps>();
+
+getPools().then(rawJson => {
+  console.log(JSON.parse(rawJson));
+  //console.log(rawJson);
+})
 
 </script>
 

@@ -1,3 +1,14 @@
+// interface PoolObject {
+//   name: string;
+//   vdevs: VDevObject[];
+// }
+
+// interface VDevObject {
+//   root: string;
+//   type: string;
+//   devices: string[];
+// }
+
 interface Pool {
   name: string;
   vdevs: VirtualDevice[];
