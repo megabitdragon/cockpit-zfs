@@ -48,9 +48,9 @@
                             <div v-if="pool.properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.properties.capacity}%`}">{{ pool.properties.capacity }}%</div>
                         </div>
                       </td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.allocated }} TB</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.free }} TB</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.size }} TB</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.allocated }}</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.free }}</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.size }}</td>
                       <td scope="col" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                         <Menu as="div" class="relative inline-block text-left">
                           <div>
@@ -77,78 +77,76 @@
                     </template>
 
                     <template v-slot:content>
-                      <!-- <tr v-for="vDev in pool.vdevs">
-                        <Accordion class="ml-4">
-                          <template v-slot:title>
-                            <td>
-                              {{ vDev.name }}
-                            </td>
-                          </template>
-                          
-                          <template v-slot:content>
-                            <table class="min-w-full divide-y divide-gray-300">
-                              <thead>
-                                <tr>
-                                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Pool</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used (%)</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Free</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total</th>
-                                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
-                                    <span class="sr-only"></span>
-                                  </th>
-                                </tr>
-                              </thead>
-                              
-                              <tbody class="divide-y divide-gray-200 bg-white">
-                                <tr v-for="disk in vDev.disks" :key="disk.name">
-                                  <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
-                                    <a href="#" class="text-btn-primary hover:text-btn-primary">
-                                      {{ disk.name }}
-                                    </a>
-                                  </td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.status }}</td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.pool || '~no pool~' }}</td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
-                                    <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-                                        <div v-if="disk.usagePercent! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div>
-                                        <div v-if="disk.usagePercent! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div>
-                                    </div>
-                                  </td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ (disk.totalSize! * (disk.usagePercent! / 100)).toFixed(2) }} TB</td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ (disk.totalSize! - (disk.totalSize! * (disk.usagePercent! / 100))).toFixed(2) }} TB</td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.totalSize }} TB</td>
-                                  <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                                    <Menu as="div" class="relative inline-block text-left">
-                                      <div>
-                                        <MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-                                          <span class="sr-only">Open options</span>
-                                          <EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
-                                        </MenuButton>
-                                      </div>
+                      <tr v-for="vDev in pool.vdevs">
+                        <tr v-for="device in vDev" :key="device.name">
+                          <Accordion class="ml-4">
+                            <template v-slot:title>
+                              <td>
+                                {{  device.name }}
+                              </td>
+                            </template>
+                            <template v-slot:content>
+                              <table class="min-w-full divide-y divide-gray-300">
+                                <thead>
+                                  <tr>
+                                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used (%)</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Free</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total</th>
+                                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
+                                      <span class="sr-only"></span>
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                  <tr v-for="disk in device.disks" :key="disk.name">
+                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
+                                      <a href="#" class="text-btn-primary hover:text-btn-primary">
+                                        {{ disk.name }}
+                                      </a>
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.status }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
+                                      <!-- <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+                                          <div v-if="disk.usagePercent! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div>
+                                          <div v-if="disk.usagePercent! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div>
+                                      </div> -->
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">used</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">free</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">total</td>
+                                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                                      <Menu as="div" class="relative inline-block text-left">
+                                        <div>
+                                          <MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+                                            <span class="sr-only">Open options</span>
+                                            <EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+                                          </MenuButton>
+                                        </div>
 
-                                      <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                                        <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                          <div class="py-1">
-                                            <MenuItem v-slot="{ active }">
-                                              <a href="#" @onClick="showDiskDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
-                                            </MenuItem>
-                                            <MenuItem v-slot="{ active }">
-                                              <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Configure Settings</a>
-                                            </MenuItem>
-                                          </div>
-                                        </MenuItems>
-                                      </transition>
-                                    </Menu>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </template>
-                        </Accordion>
-                      </tr> -->
+                                        <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                                          <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                            <div class="py-1">
+                                              <MenuItem v-slot="{ active }">
+                                                <a href="#" @onClick="showDiskDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
+                                              </MenuItem>
+                                              <MenuItem v-slot="{ active }">
+                                                <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Configure Settings</a>
+                                              </MenuItem>
+                                            </div>
+                                          </MenuItems>
+                                        </transition>
+                                      </Menu>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </template>
+                          </Accordion>
+                        </tr>
+                      </tr>
                     </template>
 
 

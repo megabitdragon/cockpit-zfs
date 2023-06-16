@@ -9,94 +9,96 @@
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Create a Virtual Device</legend>
       
       <div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
-          <!-- Virtual Device (Select) -->
-          <div>
-            <label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-            <select id="virtual-device" v-model="poolConfig.vdevs[vDevIdx].type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-              <option v-if="vDevIdx === 0" value="disk">Disk</option>
-              <option v-if="vDevIdx === 0" value="mirror">Mirror</option>
-              <option v-if="vDevIdx === 0" value="raidz1">RaidZ1</option>
-              <option v-if="vDevIdx === 0" value="raidz2">RaidZ2</option>
-              <option v-if="vDevIdx === 0" value="raidz3">RaidZ3</option>
-              <option v-if="vDevIdx !== 0" :value="poolConfig.vdevs[0].type">{{poolConfig.vdevs[0].type}}</option>
-              <option v-if="vDevIdx !== 0" value="cache">Cache</option>
-              <option v-if="vDevIdx !== 0" value="log">Log</option> 
-              <option v-if="vDevIdx !== 0" value="special">Special</option> 
-            </select>
-          </div>
+        <div v-for="(device, deviceIdx) in vDev" :key="deviceIdx">
+            <!-- Virtual Device (Select) -->
+            <div>
+              <label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
+              <select id="virtual-device" v-model="device[deviceIdx]" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+                <option v-if="deviceIdx === 0" value="disk">Disk</option>
+                <option v-if="deviceIdx === 0" value="mirror">Mirror</option>
+                <option v-if="deviceIdx === 0" value="raidz1">RaidZ1</option>
+                <option v-if="deviceIdx === 0" value="raidz2">RaidZ2</option>
+                <option v-if="deviceIdx === 0" value="raidz3">RaidZ3</option>
+                <option v-if="deviceIdx !== 0" :value="poolConfig.vdevs[0].type">{{poolConfig.vdevs[0].type}}</option>
+                <option v-if="deviceIdx !== 0" value="cache">Cache</option>
+                <option v-if="deviceIdx !== 0" value="log">Log</option> 
+                <option v-if="deviceIdx !== 0" value="special">Special</option> 
+              </select>
+            </div>
 
-          <!-- If (Log, Special) -->
-          <!-- <div v-if="newVDev?.type == 'log' || newVDev?.type == 'special'">
-            <label :for="getIdKey('mirror-enabled" class="mt-1 block text-sm font-medium leading-6 text-gray-900">{{ newVDev!.type }} Mirror</label>
-            <Switch v-model="isMirror" :class="[isMirror ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-              <span class="sr-only">Use setting</span>
-              <span :class="[isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
-                <span :class="[isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                  <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
-                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
+            <!-- If (Log, Special) -->
+            <!-- <div v-if="newVDev?.type == 'log' || newVDev?.type == 'special'">
+              <label :for="getIdKey('mirror-enabled" class="mt-1 block text-sm font-medium leading-6 text-gray-900">{{ newVDev!.type }} Mirror</label>
+              <Switch v-model="isMirror" :class="[isMirror ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                <span class="sr-only">Use setting</span>
+                <span :class="[isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+                  <span :class="[isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                    <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+                      <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <span :class="[isMirror ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                    <svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+                      <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                    </svg>
+                  </span>
                 </span>
-                <span :class="[isMirror ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                  <svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
-                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-                  </svg>
+              </Switch>
+            </div> -->
+
+            <!-- Disk ID (Select) -->
+            <!-- <div>
+              <label :for="getIdKey('disk-identifier" class="block text-sm font-medium leading-6 text-gray-900">Disk Identifier</label>
+              <select id="disk-identifier" name="disk-identifier" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+                <option>Block Device</option>
+                <option>Disk</option>
+                <option>Hardware Path</option>
+                <option selected>Device Alias</option>
+              </select>
+            </div> -->
+
+            <label :for="getIdKey('available-disk-list')" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
+            <ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <li v-for="(disk, diskIdx) in disks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
+                <div class="flex w-full h-full border border-gray-200 rounded dark:border-gray-700">
+                  <label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"> 
+                    <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
+                    <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
+                    <!-- <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p>  -->
+                    <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`" 
+                      class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                  </label>  
+                </div>
+              </li>
+            </ul>
+
+            <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].selectedDisks }}</p></span></div>
+
+            <!-- Forcefully Add Virtual Device (Toggle) -->
+            <div>
+              <label :for="getIdKey('forcefully-add-vdev')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Forcefully Add Virtual Device</label>
+              <Switch :id="getIdKey('forcefully-add-vdev')" v-model="poolConfig.vdevs[vDevIdx].forceAdd" :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                <span class="sr-only">Use setting</span>
+                <span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+                  <span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                    <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+                      <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                    <svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+                      <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                    </svg>
+                  </span>
                 </span>
-              </span>
-            </Switch>
-          </div> -->
+              </Switch>
+            </div>
 
-          <!-- Disk ID (Select) -->
-          <!-- <div>
-            <label :for="getIdKey('disk-identifier" class="block text-sm font-medium leading-6 text-gray-900">Disk Identifier</label>
-            <select id="disk-identifier" name="disk-identifier" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-              <option>Block Device</option>
-              <option>Disk</option>
-              <option>Hardware Path</option>
-              <option selected>Device Alias</option>
-            </select>
-          </div> -->
-
-          <label :for="getIdKey('available-disk-list')" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
-          <ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
-              <div class="flex w-full h-full border border-gray-200 rounded dark:border-gray-700">
-                <label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"> 
-                  <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
-                  <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
-                  <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p> 
-                  <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`" 
-                    class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                </label>  
-              </div>
-            </li>
-          </ul>
-
-          <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].selectedDisks }}</p></span></div>
-
-          <!-- Forcefully Add Virtual Device (Toggle) -->
-          <div>
-            <label :for="getIdKey('forcefully-add-vdev')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Forcefully Add Virtual Device</label>
-            <Switch :id="getIdKey('forcefully-add-vdev')" v-model="poolConfig.vdevs[vDevIdx].forceAdd" :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-              <span class="sr-only">Use setting</span>
-              <span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
-                <span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                  <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
-                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-                <span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                  <svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
-                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-                  </svg>
-                </span>
-              </span>
-            </Switch>
-          </div>
-
-          <div class="button-group-row mt-2">
-            <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
-            <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
-          </div>
+            <div class="button-group-row mt-2">
+              <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
+              <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
+            </div>
+        </div>
       </div>
       <div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
         <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
@@ -307,46 +309,67 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
-const allDisks = inject<Ref<Disk[]>>("all-disks")!;
-const poolConfig = inject<Ref<Pool>>("pool-config")!;
+//const allDisks = inject<Ref<Disk[]>>("all-disks")!;
+//const poolConfig = inject<Ref<Pool>>("pool-config")!;
 //const newPoolConfig = inject<Ref<PoolObject>>('new-pool-config'!);
 
 // const availDisks = computed<Disk[]>(() => {
 //   return allDisks.value.filter((disk) => disk.available);
 // });
 
-const vDevAvailDisks = computed<Disk[][]>(() => {
-  return poolConfig.value.vdevs.map((vdev, idx1) => {
-    const claimed = poolConfig.value.vdevs.map((vdev2, idx2) => {
-      if (idx2!= idx1) return vdev2.selectedDisks;
-    }).flat();
-    console.log(claimed);
-    return allDisks.value.filter(disk => disk.available && !claimed.includes(disk.name));
-  });
-});
+// const vDevAvailDisks = computed<Disk[][]>(() => {
+//   return poolConfig.value.vdevs.map((vdev, idx1) => {
+//     const claimed = poolConfig.value.vdevs.map((vdev2, idx2) => {
+//       if (idx2!= idx1) return vdev2.selectedDisks;
+//     }).flat();
+//     console.log(claimed);
+//     return allDisks.value.filter(disk => disk.available && !claimed.includes(disk.name));
+//   });
+// });
+
+const disks = inject<Ref<DiskData[]>>('disks')!;
+const poolConfig = inject<Ref<PoolData>>("pool-config-data")!;
 
 //const isMirror = ref(false);
 
 function addVDev() {
-  const vDevConfig: VirtualDevice = {
-    name: '',
-    type: 'raidz2',
-    disks: [],
-    forceAdd: false,
-    selectedDisks: [],
-  };
+  // const vDevConfig: vDevData {
+  //   name: '',
+  //   type: '',
+  //   status: '',
+  //   guid: '',
+  //   stats: {},
+  //   disks: [
+  //     {
+  //       name: '',
+  //       path: '',
+  //       guid: '',
+  //       type: '',
+  //       status: '',
+  //       stats: {},
+  //     }
+  //   ]
+  // }
+
+  // const vDevConfig: VirtualDevice = {
+  //   name: '',
+  //   type: 'raidz2',
+  //   disks: [],
+  //   forceAdd: false,
+  //   selectedDisks: [],
+  // };
   //vDevConfig.availableDisks = vDevAvailDisks;
-  poolConfig.value.vdevs.push(vDevConfig);
+  //poolConfig.value.vdevs.push(vDevConfig);
 }
 
 function removeVDev(index: number) {
-  poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
+  //poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
 //console.log(poolConfig);
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
-if (poolConfig.value.vdevs.length < 1) addVDev();
+//if (poolConfig.value.vdevs.length < 1) addVDev();
 
 </script>

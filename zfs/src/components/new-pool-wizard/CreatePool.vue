@@ -20,24 +20,24 @@ import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import WizardButtons from './WizardButtons.vue';
 
-const poolConfig = ref<Pool>({
-  name: '',
-  vdevs: [],
-  settings: { 
-    sector: '4kib',
-    record: '128kib',
-    compression: true,
-    deduplication: false,
-    refreservation: 0.10,
-    autoExpand: true,
-    autoReplace: false,
-    autoTrim: false,
-    forceCreate: false,
-  },
-  createFileSystem: false,
-  usagePercent: 0,
-  status: 'ONLINE',
-});
+// const poolConfig = ref<Pool>({
+//   name: '',
+//   vdevs: [],
+//   settings: { 
+//     sector: '4kib',
+//     record: '128kib',
+//     compression: true,
+//     deduplication: false,
+//     refreservation: 0.10,
+//     autoExpand: true,
+//     autoReplace: false,
+//     autoTrim: false,
+//     forceCreate: false,
+//   },
+//   createFileSystem: false,
+//   usagePercent: 0,
+//   status: 'ONLINE',
+// });
 
 const poolData = ref<PoolData>({
   name: '',
@@ -59,10 +59,21 @@ const poolData = ref<PoolData>({
   }
 });
 
-// const newPoolConfig = ref<PoolObject>({
-//   name: '',
-//   vdevs: [],
-// })
+const vDev = ref<vDevData>({
+  name: '',
+  type: '',
+  status: '',
+  guid: '',
+  stats: {},
+  disks: [{
+      name: '',
+      path: '',
+      guid: '',
+      type: '',
+      status: '',
+      stats: {},
+  }]
+});
 
 const show = ref(true);
 const navTag = ref('name-entry');
@@ -119,8 +130,8 @@ watch(navTag, updateStatus);
 
 updateStatus();
 
-provide('pool-config', poolConfig);
-// provide('new-pool-config', newPoolConfig);
+//provide('pool-config', poolConfig);
+provide('pool-config-data', poolData);
 </script>
 
 

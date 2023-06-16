@@ -21,6 +21,7 @@ import { HoustonHeader } from "@45drives/cockpit-vue-components";
 import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';
 import { getPools } from "./scripts/pools";
+import { getDisks } from "./scripts/disks";
 
 const show = ref(true);
 const navTag = ref('dashboard');
@@ -28,7 +29,7 @@ const navTag = ref('dashboard');
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
 const pools = ref<PoolData[]>([]);
-
+const disks = ref<DiskData[]>([]);
 
 getPools().then(rawJSON => {
   const parsedJSON = (JSON.parse(rawJSON));
@@ -52,12 +53,33 @@ getPools().then(rawJSON => {
         log: parsedJSON[i].groups.log,
         spare: parsedJSON[i].groups.spare,
         special: parsedJSON[i].groups.special,
+        //root: "DATA"
       },
     }
     pools.value.push(poolData);
   }  
   console.log(pools);
 });
+
+getDisks().then(rawJSON => {
+  const parsedJSON = (JSON.parse(rawJSON));
+  console.log(parsedJSON);
+
+  for (let i = 0; i < parsedJSON.length; i++) {
+    const disk = {
+      name: parsedJSON[i].name,
+      capacity: parsedJSON[i].capacity,
+      model: parsedJSON[i].model,
+      type: parsedJSON[i].type,
+      phy_path: parsedJSON[i].phy_path,
+      sd_path: parsedJSON[i].sd_path,
+      vdev_path: parsedJSON[i].vdev_path,
+      serial: parsedJSON[i].serial,
+    }
+    disks.value.push(disk);
+  }
+  console.log(disks);
+})
 
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;
@@ -82,6 +104,7 @@ const navigation = reactive<NavigationItem[]>([
 ].filter(item => item.show));
 
 provide("pool-data", pools);
+provide("disks", disks);
 </script>
 
   
