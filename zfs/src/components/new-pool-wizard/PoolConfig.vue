@@ -309,7 +309,7 @@ const props = defineProps<PoolConfigProps>();
 
 const allDisks = inject<Ref<Disk[]>>("all-disks")!;
 const poolConfig = inject<Ref<Pool>>("pool-config")!;
-const newPoolConfig = inject<Ref<PoolObject>>('new-pool-config'!);
+//const newPoolConfig = inject<Ref<PoolObject>>('new-pool-config'!);
 
 // const availDisks = computed<Disk[]>(() => {
 //   return allDisks.value.filter((disk) => disk.available);

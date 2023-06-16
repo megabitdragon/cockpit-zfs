@@ -1,13 +1,41 @@
-// interface PoolObject {
-//   name: string;
-//   vdevs: VDevObject[];
-// }
+interface PoolData {
+  name: string;
+  status: string;
+  guid: string;
+  properties: {
+    size: string;
+    capacity: number;
+    allocated: string;
+    free: string;
+  }
+  vdevs: {
+    cache: vDev[],
+    data: vDev[],
+    dedup: vDev[],
+    log: vDev[],
+    spare: vDev[],
+    special: vDev[],
+  };
+}
 
-// interface VDevObject {
-//   root: string;
-//   type: string;
-//   devices: string[];
-// }
+interface vDev {
+  name: string;
+  type: string;
+  status: string;
+  guid: string;
+  stats: {},
+  disks: [
+    {
+      name: string;
+      path: string;
+      guid: string;
+      type: string;
+      status: string;
+      stats: {},
+    }
+  ]
+}
+
 
 interface Pool {
   name: string;

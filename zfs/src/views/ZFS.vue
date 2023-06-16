@@ -4,26 +4,25 @@
 
       <div v-if="props.tag === 'dashboard'" class="p-4">
           <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
               <PoolSummary/>
             </div>
           </div>
 
-          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+          <!-- <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
               <DiskSummary/>
             </div>
-          </div>
+          </div> -->
       </div>
 
       <div v-if="props.tag === 'pools'" class="p-4">
-        <!-- <PoolsList :pools="props.pools"/> -->
         <PoolDiskList/>
       </div>
 
-      <div v-if="props.tag === 'filesystems'" class="p-4">
+      <!-- <div v-if="props.tag === 'filesystems'" class="p-4"> -->
         <!-- <DiskList :disks="props.disks" /> -->
-      </div>
+      <!-- </div> -->
 
       <!-- <div v-if="props.tag === 'stats'" class="p-4">
       
@@ -42,7 +41,6 @@ import "@45drives/cockpit-vue-components/dist/style.css";
 import DiskSummary from "../components/disk/DiskSummary.vue";
 import PoolSummary from "../components/pool/PoolSummary.vue";
 import PoolDiskList from "../components/pool/PoolDiskList.vue";
-import { getPools } from "../scripts/pools";
 
 interface ZFSProps {
   tag: string;
@@ -50,11 +48,6 @@ interface ZFSProps {
 }
 
 const props = defineProps<ZFSProps>();
-
-getPools().then(rawJson => {
-  console.log(JSON.parse(rawJson));
-  //console.log(rawJson);
-})
 
 </script>
 

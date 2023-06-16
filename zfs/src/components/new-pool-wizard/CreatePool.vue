@@ -39,10 +39,30 @@ const poolConfig = ref<Pool>({
   status: 'ONLINE',
 });
 
-const newPoolConfig = ref<PoolObject>({
+const poolData = ref<PoolData>({
   name: '',
-  vdevs: [],
-})
+  status: '',
+  guid: '',
+  properties: {
+    size: '',
+    allocated: '',
+    capacity: 0,
+    free: '',
+  },
+  vdevs: {
+    cache: [],
+    data: [],
+    dedup: [],
+    log: [],
+    spare: [],
+    special: [],
+  }
+});
+
+// const newPoolConfig = ref<PoolObject>({
+//   name: '',
+//   vdevs: [],
+// })
 
 const show = ref(true);
 const navTag = ref('name-entry');
@@ -100,7 +120,7 @@ watch(navTag, updateStatus);
 updateStatus();
 
 provide('pool-config', poolConfig);
-provide('new-pool-config', newPoolConfig);
+// provide('new-pool-config', newPoolConfig);
 </script>
 
 

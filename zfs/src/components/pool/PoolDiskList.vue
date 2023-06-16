@@ -30,7 +30,7 @@
               </thead>
 
               <tbody class="divide-y divide-x divide-gray-200 bg-white">
-                <tr v-for="pool in pools" :key="pool.name">
+                <tr v-for="pool in poolData" :key="pool.name">
                   
                   <Accordion class="ml-4">
 
@@ -44,13 +44,13 @@
                       <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.status }}</td>
                       <td cscope="col" lass="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
                         <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-                            <div v-if="pool.usagePercent! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.usagePercent}%`}">{{ pool.usagePercent }}%</div>
-                            <div v-if="pool.usagePercent! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.usagePercent}%`}">{{ pool.usagePercent }}%</div>
+                            <div v-if="pool.properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.properties.capacity}%`}">{{ pool.properties.capacity }}%</div>
+                            <div v-if="pool.properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.properties.capacity}%`}">{{ pool.properties.capacity }}%</div>
                         </div>
                       </td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Y TB</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">X TB</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Z TB</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.allocated }} TB</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.free }} TB</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.size }} TB</td>
                       <td scope="col" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                         <Menu as="div" class="relative inline-block text-left">
                           <div>
@@ -77,7 +77,7 @@
                     </template>
 
                     <template v-slot:content>
-                      <tr v-for="vDev in pool.vdevs">
+                      <!-- <tr v-for="vDev in pool.vdevs">
                         <Accordion class="ml-4">
                           <template v-slot:title>
                             <td>
@@ -101,6 +101,7 @@
                                   </th>
                                 </tr>
                               </thead>
+                              
                               <tbody class="divide-y divide-gray-200 bg-white">
                                 <tr v-for="disk in vDev.disks" :key="disk.name">
                                   <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
@@ -147,7 +148,7 @@
                             </table>
                           </template>
                         </Accordion>
-                      </tr>
+                      </tr> -->
                     </template>
 
 
@@ -179,9 +180,9 @@ import CreatePool from '../new-pool-wizard/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import DiskDetail from "../disk/DiskDetail.vue";
 
-const pools = inject<Ref<Pool[]>>("pools")!;
+const poolData = inject<Ref<PoolData[]>>("pool-data")!;
 
-console.log(pools.value);
+console.log(poolData.value);
 
 const showConfig = ref(false);
 const showDiskDetails = ref(false);

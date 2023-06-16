@@ -20,117 +20,44 @@ import { HoustonHeader } from "@45drives/cockpit-vue-components";
 
 import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';
+import { getPools } from "./scripts/pools";
 
 const show = ref(true);
 const navTag = ref('dashboard');
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
-const allDisks =  ref<Disk[]>([
-  {id: 1, name: '1-11', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, pool: 'tank', vDev: 'mirror-0', totalSize: 101,},
-  {id: 2, name: '1-12', type: 'ssd', usagePercent: 66, status: 'ONLINE', available: false, pool: 'tank', vDev: 'mirror-0', totalSize: 102,},
-  {id: 3, name: '1-13', type: 'ssd', usagePercent: 23, status: 'ONLINE', available: false, pool: 'tank', vDev: 'cache-0', totalSize: 103,},
-  {id: 4, name: '2-11', type: 'ssd', usagePercent: 75, status: 'ONLINE', available: false, pool: 'battletank', vDev: 'raidz2-0', totalSize: 104,},
-  {id: 5, name: '2-12', type: 'ssd', usagePercent: 88, status: 'WARNING', available: false, pool: 'battletank', vDev: 'raidz2-0', totalSize: 105,},
-  {id: 6, name: '2-13', type: 'ssd', usagePercent: 92, status: 'WARNING', available: false, pool: 'battletank', vDev: 'raidz2-0', totalSize: 106,},
-  {id: 7, name: '3-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 107, description: "test test test test test"},
-  {id: 8, name: '3-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 108,},
-  {id: 9, name: '3-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 109,},
-  {id: 10, name: '3-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 110,},
-  {id: 11, name: '4-11', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 111,},
-  {id: 12, name: '4-12', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 112,},
-  {id: 13, name: '4-13', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 113,},
-  {id: 14, name: '4-14', type: 'ssd', usagePercent: 0, status: 'ONLINE', available: true, totalSize: 114,},
-]);
+const pools = ref<PoolData[]>([]);
 
-const mirror0Disks = computed<Disk[]>(() => {
-  return allDisks.value.filter(disk => disk.vDev! === "mirror-0")
+
+getPools().then(rawJSON => {
+  const parsedJSON = (JSON.parse(rawJSON));
+  console.log(parsedJSON);
+
+  for (let i = 0; i < parsedJSON.length; i++) {
+   const poolData = {
+      name: parsedJSON[i].name,
+      status: parsedJSON[i].status,
+      guid: parsedJSON[i].guid,
+      properties: {
+        size: parsedJSON[i].properties.size.value,
+        allocated: parsedJSON[i].properties.allocated.value,
+        capacity: parsedJSON[i].properties.capacity.rawvalue,
+        free: parsedJSON[i].properties.free.value,
+      },
+      vdevs: {
+        cache: parsedJSON[i].groups.cache,
+        data: parsedJSON[i].groups.data,
+        dedup: parsedJSON[i].groups.dedup,
+        log: parsedJSON[i].groups.log,
+        spare: parsedJSON[i].groups.spare,
+        special: parsedJSON[i].groups.special,
+      },
+    }
+    pools.value.push(poolData);
+  }  
+  console.log(pools);
 });
-
-const cache0Disks = computed<Disk[]>(() => {
-  return allDisks.value.filter(disk => disk.vDev! === "cache-0")
-});
-
-const raidz20Disks = computed<Disk[]>(() => {
-  return allDisks.value.filter(disk => disk.vDev! === "raidz2-0")
-});
-
-// const newPool = ref<PoolObject>({
-//   name: "tanky",
-//   vdevs: [
-//     root: "DATA",
-//     type: "MIRROR",
-//     devices: [
-//       "/dev/disk/by-partuuid/58215170-74e4-4fee-93ce-8549e23adfaf",
-//       "/dev/disk/by-partuuid/1197cf00-1919-4c80-aadf-05fdcd9056b2",
-//     ],
-//   ],
-//   [
-//     root: "DATA",
-//     type: "MIRROR",
-//     devices: [
-//       "/dev/disk/by-partuuid/dda2f964-0dd9-4c2c-b92f-2a3f562dc178",
-//       "/dev/disk/by-partuuid/12d70525-d501-44e6-b344-e9efca8462a8",
-//     ],
-//   ],
-// });
-
-const pools = ref<Pool[]>([
-  {
-    name: 'tank',
-    vdevs: [
-      {type: 'mirror',
-      name: 'mirror-0',
-      disks: mirror0Disks.value,
-      forceAdd: false,
-      selectedDisks: []},
-      {type: 'cache',
-      name: 'cache-0',
-      disks: cache0Disks.value,
-      forceAdd: false,
-      selectedDisks: []},
-    ],
-    settings: { 
-      sector: '4kib',
-      record: '128kib',
-      compression: true,
-      deduplication: false,
-      refreservation: 0.10,
-      autoExpand: true,
-      autoReplace: false,
-      autoTrim: false,
-      forceCreate: false,
-    },
-    createFileSystem: false,
-    usagePercent: 45,
-    status: 'ONLINE',
-  },
-  {
-    name: 'battletank',
-    vdevs: [
-      {type: 'raidz2',
-      name: 'raidz2-0',
-      disks: raidz20Disks.value,
-      forceAdd: false,
-      selectedDisks: []},
-    ],
-    settings: {
-      sector: '4kib',
-      record: '128kib',
-      compression: true,
-      deduplication: false,
-      refreservation: 0.10,
-      autoExpand: true,
-      autoReplace: false,
-      autoTrim: false,
-      forceCreate: false,
-    },
-    createFileSystem: false,
-    usagePercent: 88,
-    status: 'WARNING',
-  },
-]);
-
 
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;
@@ -149,14 +76,12 @@ const next = () => {
 const navigation = reactive<NavigationItem[]>([
 	{ name: 'Dashboard', tag: 'dashboard', current: computed(() => navTag.value == 'dashboard') as unknown as boolean, show: true, },
   { name: 'Pools', tag: 'pools', current: computed(() => navTag.value == 'pools') as unknown as boolean, show: true, },
-  { name: 'File Systems', tag: 'filesystems', current: computed(() => navTag.value == 'filesystems') as unknown as boolean, show: true, },
+  // { name: 'File Systems', tag: 'filesystems', current: computed(() => navTag.value == 'filesystems') as unknown as boolean, show: true, },
   // { name: 'Stats', tag: 'stats', current: computed(() => navTag.value == 'stats') as unknown as boolean, show: true, },
   // { name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },
 ].filter(item => item.show));
 
-provide("all-disks", allDisks);
-provide("pools", pools);
-//provide("new-pools", newPool);
+provide("pool-data", pools);
 </script>
 
   

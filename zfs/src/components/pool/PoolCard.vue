@@ -3,10 +3,12 @@
     <template v-slot:title>
       <tr>
         <td>
-          <img v-if="spaceUsed <= 85" src="../../../public/icons/success.svg">
-          <img v-if="spaceUsed > 85" src="../../../public/icons/warning.svg">
+          <span>{{ props.name }}</span>
         </td>
-        <td><span>{{ props.name }}</span></td>
+        <td>
+          <img v-if="capacity <= 85" src="../../../public/icons/success.svg">
+          <img v-if="capacity > 85" src="../../../public/icons/warning.svg">
+        </td>
         <td>
           <Menu as="div" class="relative inline-block text-left">
             <div>
@@ -37,29 +39,29 @@
     </template>
     <template v-slot:content>
       <tr>
-        <div v-if="spaceUsed <= 85" class="flex justify-between mb-1">
+        <div v-if="capacity <= 85" class="flex justify-between mb-1">
             <span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;&nbsp;&nbsp;</span>
-            <span class="text-sm font-medium text-green-700 dark:text-white">{{props.spaceUsed}}%</span>
+            <span class="text-sm font-medium text-green-700 dark:text-white">{{props.capacity}}%</span>
         </div>
-        <div v-if="spaceUsed > 85" class="flex justify-between mb-1">
+        <div v-if="capacity > 85" class="flex justify-between mb-1">
             <span class="text-base font-medium text-red-700 dark:text-white">Space&nbsp;&nbsp;&nbsp;</span>
-            <span class="text-sm font-medium text-red-700 dark:text-white">{{props.spaceUsed}}%</span>
+            <span class="text-sm font-medium text-red-700 dark:text-white">{{props.capacity}}%</span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-            <div v-if="spaceUsed <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.spaceUsed}%`}"></div>
-            <div v-if="spaceUsed > 85" class="bg-red-600 h-2.5 rounded-full" :style="{width: `${props.spaceUsed}%`}"></div>
+            <div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
+            <div v-if="capacity > 85" class="bg-red-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
         </div>
       </tr>
     </template>
     <template v-slot:footer>
       <tr>
-        Used&nbsp; &nbsp;&nbsp;X TB
+        Used {{ props.allocated }}
       </tr>
       <tr>
-        Free&nbsp; &nbsp;&nbsp;Y TB
+        Free {{ props.free }}
       </tr>
       <tr>
-        <b>Total&nbsp; &nbsp;&nbsp;Z TB</b>
+        <b>Total {{ props.size }}</b>
       </tr>
     </template>
   </Card>
@@ -74,22 +76,12 @@ import Card from '../common/Card.vue';
 interface PoolCardProps {
   name: string,
   status: string,
-  spaceUsed: number,
-  totalSize: number,
+  capacity: number,
+  size: string,
+  free: string;
+  allocated: string;
 }
 
-// const usedSpaceAmount = computed(() => {
-//   const total = props.totalSize * (props.spaceUsed / 100);
-//   return total;
-// });
-
-// const freeSpaceAmount = computed(() => {
-//   const total = props.totalSize - usedSpaceAmount.value;
-//   return total;
-// })
-
 const props = defineProps<PoolCardProps>();
-
-const spaceUsed = props.spaceUsed;
 
 </script>
