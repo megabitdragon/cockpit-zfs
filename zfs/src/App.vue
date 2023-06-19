@@ -32,97 +32,49 @@ const pools = ref<PoolData[]>([]);
 const vDevs = ref<vDevData[]>([]);
 const disks = ref<DiskData[]>([]);
 
-const vDevData : vDevData = {
-  name: '',
-  type: '',
-  status: '',
-  stats: {},
-  guid: '',
-  disks: []
-};
+function parseVDevData(vDev) {
+  const vDevData : vDevData = {
+    name: vDev.name,
+    type: vDev.type,
+    status: vDev.status,
+    stats: vDev.stats,
+    guid: vDev.guid,
+    disks: [],
+  };
+  
+  if (!vDev.children) {return}
 
-const childDisk : ChildDisk = {
-  name: '',
-  path: '',
-  guid: '',
-  type: '',
-  status: '',
-  stats: {},
-};
+  vDev.children.forEach(disk => {
+    const childDisk : ChildDisk = {
+      name: disk.name,
+      path: disk.path,
+      guid: disk.type,
+      type: disk.type,
+      status: disk.status,
+      stats: disk.stats,
+    };
+    
+    console.log(childDisk);
+    vDevData.disks.push(childDisk);
+  });
+  
+  console.log(vDevData);
+  vDevs.value.push(vDevData);
+}
 
 getPools().then(rawJSON => {
   const parsedJSON = (JSON.parse(rawJSON));
   console.log(parsedJSON);
 
   for (let i = 0; i < parsedJSON.length; i++) {
-    parsedJSON[i].groups.data.forEach(vDev => {
-      vDevData.name = vDev.name;
-      vDevData.guid = vDev.guid;
-      vDevData.type = vDev.type;
-      vDevData.status = vDev.status;
-      vDevData.stats = vDev.stats;
-      vDev.children.forEach(disk => {
-        childDisk.name = disk.name;
-        childDisk.guid = disk.guid;
-        childDisk.type = disk.type;
-        childDisk.path = disk.path;
-        childDisk.status = disk.status;
-        childDisk.stats = disk.stats;
-        vDevData.disks.push(childDisk);
-      });
-      vDevs.value.push(vDevData);
-    });
 
-    // parsedJSON[i].groups.cache.forEach(vDev => {
-    //  vDevData.name = vDev.name;
-    //   vDevData.guid = vDev.guid;
-    //   vDevData.type = vDev.type;
-    //   vDevData.status = vDev.status;
-    //   vDevData.stats = vDev.stats;
-    //   vDevData.disks = vDev.children;
-    //   vDevs.value.push(vDevData);
-    // });
-
-    // parsedJSON[i].groups.dedup.forEach(vDev => {
-    //  vDevData.name = vDev.name;
-    //   vDevData.guid = vDev.guid;
-    //   vDevData.type = vDev.type;
-    //   vDevData.status = vDev.status;
-    //   vDevData.stats = vDev.stats;
-    //   vDevData.disks = vDev.children;
-    //   vDevs.value.push(vDevData);
-    // });
-
-    // parsedJSON[i].groups.log.forEach(vDev => {
-    //  vDevData.name = vDev.name;
-    //   vDevData.guid = vDev.guid;
-    //   vDevData.type = vDev.type;
-    //   vDevData.status = vDev.status;
-    //   vDevData.stats = vDev.stats;
-    //   vDevData.disks = vDev.children;
-    //   vDevs.value.push(vDevData);
-    // });
-
-    // parsedJSON[i].groups.spare.forEach(vDev => {
-    //  vDevData.name = vDev.name;
-    //   vDevData.guid = vDev.guid;
-    //   vDevData.type = vDev.type;
-    //   vDevData.status = vDev.status;
-    //   vDevData.stats = vDev.stats;
-    //   vDevData.disks = vDev.children;
-    //   vDevs.value.push(vDevData);
-    // });
-
-    // parsedJSON[i].groups.special.forEach(vDev => {
-    //  vDevData.name = vDev.name;
-    //   vDevData.guid = vDev.guid;
-    //   vDevData.type = vDev.type;
-    //   vDevData.status = vDev.status;
-    //   vDevData.stats = vDev.stats;
-    //   vDevData.disks = vDev.children;
-    //   vDevs.value.push(vDevData);
-    // });
-
+    parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev));
+    parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev));
+    parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev));
+    parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev));
+    parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev));
+    parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev));
+  
     const poolData = {
       name: parsedJSON[i].name,
       status: parsedJSON[i].status,
@@ -136,9 +88,9 @@ getPools().then(rawJSON => {
       vdevs: vDevs.value,
     }
     pools.value.push(poolData);
-    console.log(poolData);
+    // console.log(poolData);
   }
-  console.log(pools);
+  // console.log(pools);
 });
 
 getDisks().then(rawJSON => {
@@ -155,10 +107,12 @@ getDisks().then(rawJSON => {
       sd_path: parsedJSON[i].sd_path,
       vdev_path: parsedJSON[i].vdev_path,
       serial: parsedJSON[i].serial,
+      usable: parsedJSON[i].usable,
     }
     disks.value.push(disk);
+    // console.log(disk);
   }
-  console.log(disks);
+  // console.log(disks);
 })
 
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {

@@ -63,6 +63,7 @@ interface DiskData {
   sd_path: string;
   vdev_path: string;
   serial: string;
+  usable: boolean;
 }
 
 interface FileSystem {

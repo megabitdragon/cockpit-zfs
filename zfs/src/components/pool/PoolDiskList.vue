@@ -77,7 +77,7 @@
                     </template>
 
                     <template v-slot:content>
-                      <tr v-for="vDev in pool.vdevs">
+                      <tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
                         <!-- <tr v-for="device in vDev" :key="device.name"> -->
                           <Accordion class="ml-4">
                             <template v-slot:title>
@@ -101,7 +101,7 @@
                                   </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
-                                  <tr v-for="disk in vDev.disks" :key="disk.name">
+                                  <tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx">
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
                                       <a href="#" class="text-btn-primary hover:text-btn-primary">
                                         {{ disk.name }}
@@ -180,7 +180,7 @@ import DiskDetail from "../disk/DiskDetail.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pool-data")!;
 
-console.log(poolData.value);
+// console.log(poolData.value);
 
 const showConfig = ref(false);
 const showDiskDetails = ref(false);

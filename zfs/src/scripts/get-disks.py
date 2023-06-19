@@ -13,6 +13,8 @@ def main():
             if not disk['occupied']:
                 continue
 
+            partitions = int(disk['partitions'])
+
             disks.append({
                 'vdev_path': f'/dev/disk/by-vdev/{disk["bay-id"]}',
                 'phy_path': disk['dev-by-path'],
@@ -22,6 +24,7 @@ def main():
                 'serial': disk['serial'],
                 'capacity': disk['capacity'],
                 'type': disk['disk_type'],
+                'usable': True if partitions == 0 else False,
             })
 
     print(json.dumps(disks, indent=4))

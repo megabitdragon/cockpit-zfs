@@ -58,7 +58,7 @@
 
             <label :for="getIdKey('available-disk-list')" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
             <ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <li v-for="(disk, diskIdx) in disks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
+              <li v-for="(disk, diskIdx) in usableDisks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
                 <div class="flex w-full h-full border border-gray-200 rounded dark:border-gray-700">
                   <label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"> 
                     <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
@@ -316,6 +316,9 @@ const props = defineProps<PoolConfigProps>();
 // const availDisks = computed<Disk[]>(() => {
 //   return allDisks.value.filter((disk) => disk.available);
 // });
+const usableDisks = computed<DiskData[]>(() => {
+  return disks.value.filter((disk) => disk.usable);
+});
 
 // const vDevAvailDisks = computed<Disk[][]>(() => {
 //   return poolConfig.value.vdevs.map((vdev, idx1) => {
