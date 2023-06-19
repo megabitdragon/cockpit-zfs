@@ -223,7 +223,7 @@ interface FileSystemProps {
 
 const props = defineProps<FileSystemProps>();
 
-const poolConfig = inject<Pool>("pool-config")!;
+const poolConfig = inject<PoolData>("pool-config-data")!;
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 

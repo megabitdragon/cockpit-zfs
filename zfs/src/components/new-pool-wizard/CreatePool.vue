@@ -49,7 +49,19 @@ const poolData = ref<PoolData>({
     capacity: 0,
     free: '',
   },
-  vdevs: []
+  vdevs: [],
+  settings: {
+    sector: '4kib',
+    record: '128kib',
+    compression: true,
+    deduplication: false,
+    refreservation: 0.10,
+    autoExpand: true,
+    autoReplace: false,
+    autoTrim: false,
+    forceCreate: false,
+  },
+  createFileSystem: false,
 });
 
 const vDev = ref<vDevData>({
@@ -58,14 +70,8 @@ const vDev = ref<vDevData>({
   status: '',
   guid: '',
   stats: {},
-  disks: [{
-      name: '',
-      path: '',
-      guid: '',
-      type: '',
-      status: '',
-      stats: {},
-  }]
+  disks: [],
+  forceAdd: false,
 });
 
 const show = ref(true);

@@ -38,14 +38,16 @@ const vDevData : vDevData = {
   status: '',
   stats: {},
   guid: '',
-  disks: [{
-    name: '',
-    guid: '',
-    path: '',
-    type: '',
-    status: '',
-    stats: {},
-  }]
+  disks: []
+};
+
+const childDisk : ChildDisk = {
+  name: '',
+  path: '',
+  guid: '',
+  type: '',
+  status: '',
+  stats: {},
 };
 
 getPools().then(rawJSON => {
@@ -60,7 +62,13 @@ getPools().then(rawJSON => {
       vDevData.status = vDev.status;
       vDevData.stats = vDev.stats;
       vDev.children.forEach(disk => {
-        vDevData.disks
+        childDisk.name = disk.name;
+        childDisk.guid = disk.guid;
+        childDisk.type = disk.type;
+        childDisk.path = disk.path;
+        childDisk.status = disk.status;
+        childDisk.stats = disk.stats;
+        vDevData.disks.push(childDisk);
       });
       vDevs.value.push(vDevData);
     });

@@ -20,18 +20,19 @@ interface PoolData {
     free: string;
   }
   vdevs: vDevData[];
-  // vdevs: {
-  //   cache: vDevData[],
-  //   data: vDevData[],
-  //   dedup: vDevData[],
-  //   log: vDevData[],
-  //   spare: vDevData[],
-  //   special: vDevData[],
-    
-  //   // root: string;
-  //   // type: string;
-  //   // devices: [];
-  // };
+  settings?: {
+    sector: string;
+    record: string;
+    compression: boolean;
+    deduplication: boolean;
+    refreservation: number;
+    autoExpand: boolean;
+    autoReplace: boolean;
+    autoTrim: boolean;
+    forceCreate: boolean;
+  },
+  createFileSystem?: boolean;
+  fileSystem?: FileSystem;
 }
 
 interface vDevData {
@@ -40,16 +41,17 @@ interface vDevData {
   status: string;
   guid: string;
   stats: {};
-  disks: [
-    {
-      name: string;
-      path: string;
-      guid: string;
-      type: string;
-      status: string;
-      stats: {};
-    }
-  ]
+  disks: ChildDisk[];
+  forceAdd?: boolean;
+}
+
+interface ChildDisk {
+  name: string;
+  path: string;
+  guid: string;
+  type: string;
+  status: string;
+  stats: {};
 }
 
 interface DiskData {
@@ -61,6 +63,26 @@ interface DiskData {
   sd_path: string;
   vdev_path: string;
   serial: string;
+}
+
+interface FileSystem {
+  name: string;
+  encryption: boolean;
+  cipher: string;
+  passphrase: string?;
+  inherit: boolean;
+  accessTime: string;
+  caseSensitivity: string;
+  compression: string;
+  deduplication: string;
+  dNodeSize: string;
+  extendedAttributes: string;
+  recordSize: string;
+  quota: {
+    amount: number;
+    size: string;
+  };
+  readOnly: boolean;
 }
 
 // interface Pool {
@@ -109,26 +131,6 @@ interface DiskData {
 //   usagePercent?: number;
 //   status: string;
 //   description?: string;
-// }
-
-// interface FileSystem {
-//   name: string;
-//   encryption: boolean;
-//   cipher: string;
-//   passphrase: string?;
-//   inherit: boolean;
-//   accessTime: string;
-//   caseSensitivity: string;
-//   compression: string;
-//   deduplication: string;
-//   dNodeSize: string;
-//   extendedAttributes: string;
-//   recordSize: string;
-//   quota: {
-//     amount: number;
-//     size: string;
-//   };
-//   readOnly: boolean;
 // }
 
 interface NavigationItem {

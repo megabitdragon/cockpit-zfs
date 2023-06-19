@@ -9,20 +9,20 @@
       <template v-slot:content>
         <p class="ml-10">Name: {{ poolConfig.name }}</p>
         <p class="ml-10">{{poolConfig.vdevs.length}} Virtual Device(s)</p>
-        <p class="ml-10">Sector Size: {{poolConfig.settings.sector}}</p>
-        <p class="ml-10">Record Size: {{poolConfig.settings.record}}</p>
-        <p class="ml-10">Compression: {{poolConfig.settings.compression}}</p>
+        <p class="ml-10">Sector Size: {{poolConfig.settings!.sector}}</p>
+        <p class="ml-10">Record Size: {{poolConfig.settings!.record}}</p>
+        <p class="ml-10">Compression: {{poolConfig.settings!.compression}}</p>
         <p class="ml-10">
           <Accordion class="ml-4">
             <template v-slot:title>
               <p><b>Advanced Settings</b></p>
             </template>
             <template v-slot:content>
-              <p class="ml-10">Deduplication: {{poolConfig.settings.deduplication}}</p>
-              <p class="ml-10">Refreservation Amount: {{poolConfig.settings.refreservation}}%</p>
-              <p class="ml-10">Auto-Expand Pool: {{poolConfig.settings.autoExpand}}</p>
-              <p class="ml-10">Auto-Replace Devices: {{poolConfig.settings.autoReplace}}</p>
-              <p class="ml-10">Automatic TRIM: {{poolConfig.settings.autoTrim}}</p>
+              <p class="ml-10">Deduplication: {{poolConfig.settings!.deduplication}}</p>
+              <p class="ml-10">Refreservation Amount: {{poolConfig.settings!.refreservation}}%</p>
+              <p class="ml-10">Auto-Expand Pool: {{poolConfig.settings!.autoExpand}}</p>
+              <p class="ml-10">Auto-Replace Devices: {{poolConfig.settings!.autoReplace}}</p>
+              <p class="ml-10">Automatic TRIM: {{poolConfig.settings!.autoTrim}}</p>
             </template>
           </Accordion>
         </p>
@@ -79,7 +79,7 @@
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import Accordion from '../../components/common/Accordion.vue';
 
-const poolConfig = inject<Pool>("pool-config")!;
+const poolConfig = inject<PoolData>("pool-config-data")!;
 
 console.log(poolConfig.vdevs)
 </script>
