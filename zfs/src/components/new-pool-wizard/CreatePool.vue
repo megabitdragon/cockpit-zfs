@@ -49,14 +49,7 @@ const poolData = ref<PoolData>({
     capacity: 0,
     free: '',
   },
-  vdevs: {
-    cache: [],
-    data: [],
-    dedup: [],
-    log: [],
-    spare: [],
-    special: [],
-  }
+  vdevs: []
 });
 
 const vDev = ref<vDevData>({

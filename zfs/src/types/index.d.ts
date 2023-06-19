@@ -1,13 +1,13 @@
-interface Pool {
-  name: string;
-  vdevs: [
-    {
-      root: string;
-      type: string;
-      devices: [];
-    }
-  ]
-}
+// interface Pool {
+//   name: string;
+//   vdevs: [
+//     {
+//       root: string;
+//       type: string;
+//       devices: [];
+//     }
+//   ]
+// }
 
 interface PoolData {
   name: string;
@@ -19,17 +19,19 @@ interface PoolData {
     allocated: string;
     free: string;
   }
-  vdevs: {
-    cache: vDev[],
-    data: vDev[],
-    dedup: vDev[],
-    log: vDev[],
-    spare: vDev[],
-    special: vDev[],
-    // root: string;
-    // type: string;
-    // devices: [];
-  };
+  vdevs: vDevData[];
+  // vdevs: {
+  //   cache: vDevData[],
+  //   data: vDevData[],
+  //   dedup: vDevData[],
+  //   log: vDevData[],
+  //   spare: vDevData[],
+  //   special: vDevData[],
+    
+  //   // root: string;
+  //   // type: string;
+  //   // devices: [];
+  // };
 }
 
 interface vDevData {
@@ -37,7 +39,7 @@ interface vDevData {
   type: string;
   status: string;
   guid: string;
-  stats: {},
+  stats: {};
   disks: [
     {
       name: string;
@@ -45,7 +47,7 @@ interface vDevData {
       guid: string;
       type: string;
       status: string;
-      stats: {},
+      stats: {};
     }
   ]
 }

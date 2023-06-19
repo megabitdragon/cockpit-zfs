@@ -29,14 +29,93 @@ const navTag = ref('dashboard');
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
 const pools = ref<PoolData[]>([]);
+const vDevs = ref<vDevData[]>([]);
 const disks = ref<DiskData[]>([]);
+
+const vDevData : vDevData = {
+  name: '',
+  type: '',
+  status: '',
+  stats: {},
+  guid: '',
+  disks: [{
+    name: '',
+    guid: '',
+    path: '',
+    type: '',
+    status: '',
+    stats: {},
+  }]
+};
 
 getPools().then(rawJSON => {
   const parsedJSON = (JSON.parse(rawJSON));
   console.log(parsedJSON);
 
   for (let i = 0; i < parsedJSON.length; i++) {
-   const poolData = {
+    parsedJSON[i].groups.data.forEach(vDev => {
+      vDevData.name = vDev.name;
+      vDevData.guid = vDev.guid;
+      vDevData.type = vDev.type;
+      vDevData.status = vDev.status;
+      vDevData.stats = vDev.stats;
+      vDev.children.forEach(disk => {
+        vDevData.disks
+      });
+      vDevs.value.push(vDevData);
+    });
+
+    // parsedJSON[i].groups.cache.forEach(vDev => {
+    //  vDevData.name = vDev.name;
+    //   vDevData.guid = vDev.guid;
+    //   vDevData.type = vDev.type;
+    //   vDevData.status = vDev.status;
+    //   vDevData.stats = vDev.stats;
+    //   vDevData.disks = vDev.children;
+    //   vDevs.value.push(vDevData);
+    // });
+
+    // parsedJSON[i].groups.dedup.forEach(vDev => {
+    //  vDevData.name = vDev.name;
+    //   vDevData.guid = vDev.guid;
+    //   vDevData.type = vDev.type;
+    //   vDevData.status = vDev.status;
+    //   vDevData.stats = vDev.stats;
+    //   vDevData.disks = vDev.children;
+    //   vDevs.value.push(vDevData);
+    // });
+
+    // parsedJSON[i].groups.log.forEach(vDev => {
+    //  vDevData.name = vDev.name;
+    //   vDevData.guid = vDev.guid;
+    //   vDevData.type = vDev.type;
+    //   vDevData.status = vDev.status;
+    //   vDevData.stats = vDev.stats;
+    //   vDevData.disks = vDev.children;
+    //   vDevs.value.push(vDevData);
+    // });
+
+    // parsedJSON[i].groups.spare.forEach(vDev => {
+    //  vDevData.name = vDev.name;
+    //   vDevData.guid = vDev.guid;
+    //   vDevData.type = vDev.type;
+    //   vDevData.status = vDev.status;
+    //   vDevData.stats = vDev.stats;
+    //   vDevData.disks = vDev.children;
+    //   vDevs.value.push(vDevData);
+    // });
+
+    // parsedJSON[i].groups.special.forEach(vDev => {
+    //  vDevData.name = vDev.name;
+    //   vDevData.guid = vDev.guid;
+    //   vDevData.type = vDev.type;
+    //   vDevData.status = vDev.status;
+    //   vDevData.stats = vDev.stats;
+    //   vDevData.disks = vDev.children;
+    //   vDevs.value.push(vDevData);
+    // });
+
+    const poolData = {
       name: parsedJSON[i].name,
       status: parsedJSON[i].status,
       guid: parsedJSON[i].guid,
@@ -46,18 +125,11 @@ getPools().then(rawJSON => {
         capacity: parsedJSON[i].properties.capacity.rawvalue,
         free: parsedJSON[i].properties.free.value,
       },
-      vdevs: {
-        cache: parsedJSON[i].groups.cache,
-        data: parsedJSON[i].groups.data,
-        dedup: parsedJSON[i].groups.dedup,
-        log: parsedJSON[i].groups.log,
-        spare: parsedJSON[i].groups.spare,
-        special: parsedJSON[i].groups.special,
-        //root: "DATA"
-      },
+      vdevs: vDevs.value,
     }
     pools.value.push(poolData);
-  }  
+    console.log(poolData);
+  }
   console.log(pools);
 });
 

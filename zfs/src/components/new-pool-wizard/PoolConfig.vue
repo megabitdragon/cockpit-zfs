@@ -9,22 +9,21 @@
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Create a Virtual Device</legend>
       
       <div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
-        <div v-for="(device, deviceIdx) in vDev" :key="deviceIdx">
-            <!-- Virtual Device (Select) -->
-            <div>
-              <label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-              <select id="virtual-device" v-model="device[deviceIdx]" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-                <option v-if="deviceIdx === 0" value="disk">Disk</option>
-                <option v-if="deviceIdx === 0" value="mirror">Mirror</option>
-                <option v-if="deviceIdx === 0" value="raidz1">RaidZ1</option>
-                <option v-if="deviceIdx === 0" value="raidz2">RaidZ2</option>
-                <option v-if="deviceIdx === 0" value="raidz3">RaidZ3</option>
-                <option v-if="deviceIdx !== 0" :value="poolConfig.vdevs[0].type">{{poolConfig.vdevs[0].type}}</option>
-                <option v-if="deviceIdx !== 0" value="cache">Cache</option>
-                <option v-if="deviceIdx !== 0" value="log">Log</option> 
-                <option v-if="deviceIdx !== 0" value="special">Special</option> 
-              </select>
-            </div>
+           <!-- Virtual Device (Select) -->
+           <div>
+            <label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
+            <select id="virtual-device" v-model="poolConfig.vdevs[vDevIdx].type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+              <option v-if="vDevIdx === 0" value="disk">Disk</option>
+              <option v-if="vDevIdx === 0" value="mirror">Mirror</option>
+              <option v-if="vDevIdx === 0" value="raidz1">RaidZ1</option>
+              <option v-if="vDevIdx === 0" value="raidz2">RaidZ2</option>
+              <option v-if="vDevIdx === 0" value="raidz3">RaidZ3</option>
+              <option v-if="vDevIdx !== 0" :value="poolConfig.vdevs[0].type">{{poolConfig.vdevs[0].type}}</option>
+              <option v-if="vDevIdx !== 0" value="cache">Cache</option>
+              <option v-if="vDevIdx !== 0" value="log">Log</option> 
+              <option v-if="vDevIdx !== 0" value="special">Special</option> 
+            </select>
+          </div>
 
             <!-- If (Log, Special) -->
             <!-- <div v-if="newVDev?.type == 'log' || newVDev?.type == 'special'">
@@ -65,14 +64,14 @@
                     <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span>
                     <!-- <p class="mt-1 truncate text-sm text-gray-500">{{ disk.description }}</p>  -->
-                    <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.id}`" 
+                    <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
                       class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
                   </label>  
                 </div>
               </li>
             </ul>
 
-            <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].selectedDisks }}</p></span></div>
+            <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div>
 
             <!-- Forcefully Add Virtual Device (Toggle) -->
             <div>
@@ -99,7 +98,6 @@
               <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
             </div>
         </div>
-      </div>
       <div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
         <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
       </div>
@@ -111,7 +109,7 @@
       
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Pool Settings</legend>
       <!-- Sector Size (Select) -->
-      <div>
+      <!-- <div>
         <label :for="getIdKey('sector-size')" class="block text-sm font-medium leading-6 text-gray-900">Sector Size</label>
         <select :id="getIdKey('sector-size')" v-model="poolConfig.settings.sector" name="sector-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
           <option value="auto">Auto Detect</option>
@@ -122,10 +120,10 @@
           <option value="32kib">32 KiB</option>
           <option value="64kib">64 KiB</option>
         </select>
-      </div>
+      </div> -->
 
       <!-- Record Size (Select) -->
-      <div>
+      <!-- <div>
         <label :for="getIdKey('record-size')" class="block text-sm font-medium leading-6 text-gray-900">Record Size</label>
         <select :id="getIdKey('record-size')" v-model="poolConfig.settings.record" name="record-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
           <option value="512b">512 B</option>
@@ -139,10 +137,10 @@
           <option value="512kib">512 KiB</option>
           <option value="1mib">1 MiB</option>
         </select>
-      </div>
+      </div> -->
       
       <!-- LZ4 Compression (Toggle) -->
-      <div>
+      <!-- <div>
         <label :for="getIdKey('lz4-enabled')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">LZ4 Compression</label>
         <Switch :id="getIdKey('lz4-enabled')" v-model="poolConfig.settings.compression" :class="[poolConfig.settings.compression ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
           <span class="sr-only">Use setting</span>
@@ -159,7 +157,7 @@
             </span>
           </span>
         </Switch>
-      </div>
+      </div> -->
 
       <!-- Advanced Settings (Accordion) -->
       <Accordion>
@@ -168,7 +166,7 @@
         </template>
         <template v-slot:content>
           <!-- Deduplication (Toggle) -->
-          <div>
+          <!-- <div>
             <label :for="getIdKey('deduplication-enabled')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Deduplication</label>
             <Switch :id="getIdKey('deduplication-enabled')" v-model="poolConfig.settings.deduplication" :class="[poolConfig.settings.deduplication ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
               <span class="sr-only">Use setting</span>
@@ -185,17 +183,17 @@
                 </span>
               </span>
             </Switch>
-          </div>
+          </div> -->
 
           <!-- Refreservation (Slider) -->
-          <div>
+          <!-- <div>
             <label :for="getIdKey('steps-range')" class="mt-1 block mb-2 text-sm font-medium text-gray-900 dark:text-white">Refreservation</label>
             <input :id="getIdKey('steps-range')" v-model="poolConfig.settings.refreservation" type="range" min="0" max="20" value="10" step="1" class="mt-1 w-3/4 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
             <input :id="getIdKey('steps-range')" v-model="poolConfig.settings.refreservation" type="number" value="10" class="mt-1 w-3/4 block rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
-          </div>
+          </div> -->
 
           <!-- Auto-Expand Pool (Toggle) -->
-          <div>
+          <!-- <div>
             <label :for="getIdKey('auto-expand-enabled')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Auto-Expand Pool (When Larger Devices are Added)</label>
             <Switch v-model="poolConfig.settings.autoExpand" :class="[poolConfig.settings.autoExpand ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
               <span class="sr-only">Use setting</span>
@@ -212,10 +210,10 @@
                 </span>
               </span>
             </Switch>
-          </div>
+          </div> -->
           
           <!-- Auto-Replace Devices (Toggle) -->
-          <div>
+          <!-- <div>
             <label :for="getIdKey('auto-replace-enabled')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Auto-Replace Devices</label>
             <Switch v-model="poolConfig.settings.autoReplace" :class="[poolConfig.settings.autoReplace ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
               <span class="sr-only">Use setting</span>
@@ -232,10 +230,10 @@
                 </span>
               </span>
             </Switch>
-          </div>
+          </div> -->
           
           <!-- Auto-TRIM (Toggle) -->
-          <div>
+          <!-- <div>
             <label :for="getIdKey('auto-trim-enabled')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Automatic TRIM</label>
             <Switch v-model="poolConfig.settings.autoTrim" :class="[poolConfig.settings.autoTrim ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
               <span class="sr-only">Use setting</span>
@@ -252,10 +250,10 @@
                 </span>
               </span>
             </Switch>
-          </div>
+          </div> -->
           
           <!-- Forcefully Create Pool (Toggle) -->
-          <div>
+          <!-- <div>
             <label :for="getIdKey('forcefully-create-pool')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Forcefully Create Storage Pool</label>
             <Switch v-model="poolConfig.settings.forceCreate" :class="[poolConfig.settings.forceCreate ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
               <span class="sr-only">Use setting</span>
@@ -272,7 +270,7 @@
                 </span>
               </span>
             </Switch>
-          </div>
+          </div> -->
         </template>
       </Accordion>
 
@@ -333,43 +331,35 @@ const poolConfig = inject<Ref<PoolData>>("pool-config-data")!;
 //const isMirror = ref(false);
 
 function addVDev() {
-  // const vDevConfig: vDevData {
-  //   name: '',
-  //   type: '',
-  //   status: '',
-  //   guid: '',
-  //   stats: {},
-  //   disks: [
-  //     {
-  //       name: '',
-  //       path: '',
-  //       guid: '',
-  //       type: '',
-  //       status: '',
-  //       stats: {},
-  //     }
-  //   ]
-  // }
+  const vDevConfig: vDevData = {
+    name: '',
+    type: '',
+    status: '',
+    guid: '',
+    stats: {},
+    disks: [
+        {
+          name: '',
+          path: '',
+          guid: '',
+          type: '',
+          status: '',
+          stats: {},
+      }
+    ]
+  }
 
-  // const vDevConfig: VirtualDevice = {
-  //   name: '',
-  //   type: 'raidz2',
-  //   disks: [],
-  //   forceAdd: false,
-  //   selectedDisks: [],
-  // };
-  //vDevConfig.availableDisks = vDevAvailDisks;
-  //poolConfig.value.vdevs.push(vDevConfig);
+  poolConfig.value.vdevs.push(vDevConfig);
 }
 
 function removeVDev(index: number) {
-  //poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
+  poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-//console.log(poolConfig);
+console.log(poolConfig);
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
-//if (poolConfig.value.vdevs.length < 1) addVDev();
+if (poolConfig.value.vdevs.length < 1) addVDev();
 
 </script>

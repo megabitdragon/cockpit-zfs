@@ -78,11 +78,11 @@
 
                     <template v-slot:content>
                       <tr v-for="vDev in pool.vdevs">
-                        <tr v-for="device in vDev" :key="device.name">
+                        <!-- <tr v-for="device in vDev" :key="device.name"> -->
                           <Accordion class="ml-4">
                             <template v-slot:title>
                               <td>
-                                {{  device.name }}
+                                {{  vDev.name }}
                               </td>
                             </template>
                             <template v-slot:content>
@@ -101,7 +101,7 @@
                                   </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
-                                  <tr v-for="disk in device.disks" :key="disk.name">
+                                  <tr v-for="disk in vDev.disks" :key="disk.name">
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
                                       <a href="#" class="text-btn-primary hover:text-btn-primary">
                                         {{ disk.name }}
@@ -109,10 +109,10 @@
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.status }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
-                                      <!-- <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-                                          <div v-if="disk.usagePercent! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div>
-                                          <div v-if="disk.usagePercent! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div>
-                                      </div> -->
+                                      <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+                                          <!-- <div v-if="disk.usagePercent! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div>
+                                          <div v-if="disk.usagePercent! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${disk.usagePercent}%`}">{{ disk.usagePercent }}%</div> -->
+                                      </div>
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">used</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">free</td>
@@ -145,7 +145,7 @@
                               </table>
                             </template>
                           </Accordion>
-                        </tr>
+                        <!-- </tr> -->
                       </tr>
                     </template>
 
