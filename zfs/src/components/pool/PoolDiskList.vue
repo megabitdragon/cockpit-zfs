@@ -30,27 +30,25 @@
               </thead>
 
               <tbody class="divide-y divide-x divide-gray-200 bg-white">
-                <tr v-for="pool in poolData" :key="pool.name">
+                <tr v-for="pool, poolIdx in poolData" :key="poolIdx">
                   
                   <Accordion class="ml-4">
-
-
                     <template v-slot:title>
                       <td scope="col" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
                         <a href="#" class="text-btn-primary hover:text-btn-primary">
-                          {{ pool.name }}
+                          {{ poolData[poolIdx].name }}
                         </a>
                       </td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.status }}</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].status }}</td>
                       <td cscope="col" lass="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
                         <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-                            <div v-if="pool.properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.properties.capacity}%`}">{{ pool.properties.capacity }}%</div>
-                            <div v-if="pool.properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${pool.properties.capacity}%`}">{{ pool.properties.capacity }}%</div>
+                            <div v-if="poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
+                            <div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
                         </div>
                       </td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.allocated }}</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.free }}</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ pool.properties.size }}</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.allocated }}</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.free }}</td>
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.size }}</td>
                       <td scope="col" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                         <Menu as="div" class="relative inline-block text-left">
                           <div>
@@ -77,12 +75,12 @@
                     </template>
 
                     <template v-slot:content>
-                      <tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+                      <tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs" :key="vDevIdx">
                         <!-- <tr v-for="device in vDev" :key="device.name"> -->
                           <Accordion class="ml-4">
                             <template v-slot:title>
                               <td>
-                                {{  vDev.name }}
+                                {{  poolData[poolIdx].vdevs[vDevIdx].name }}
                               </td>
                             </template>
                             <template v-slot:content>
@@ -101,7 +99,7 @@
                                   </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
-                                  <tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx">
+                                  <tr v-for="disk, diskIdx in poolData[poolIdx].vdevs[vDevIdx].disks" :key="diskIdx">
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
                                       <a href="#" class="text-btn-primary hover:text-btn-primary">
                                         {{ disk.name }}

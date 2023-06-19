@@ -88,9 +88,10 @@ getPools().then(rawJSON => {
       vdevs: vDevs.value,
     }
     pools.value.push(poolData);
-    // console.log(poolData);
+    console.log(poolData);
+    vDevs.value = [];
   }
-  // console.log(pools);
+  console.log(pools);
 });
 
 getDisks().then(rawJSON => {

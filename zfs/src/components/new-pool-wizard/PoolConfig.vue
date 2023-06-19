@@ -73,7 +73,7 @@
               </li>
             </ul>
 
-            <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div>
+            <!-- <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div> -->
 
             <!-- Forcefully Add Virtual Device (Toggle) -->
             <div>
@@ -309,29 +309,35 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
-//const allDisks = inject<Ref<Disk[]>>("all-disks")!;
-//const poolConfig = inject<Ref<Pool>>("pool-config")!;
-//const newPoolConfig = inject<Ref<PoolObject>>('new-pool-config'!);
-
-// const availDisks = computed<Disk[]>(() => {
-//   return allDisks.value.filter((disk) => disk.available);
-// });
+const disks = inject<Ref<DiskData[]>>('disks')!;
 const usableDisks = computed<DiskData[]>(() => {
   return disks.value.filter((disk) => disk.usable);
 });
 
-// const vDevAvailDisks = computed<Disk[][]>(() => {
-//   return poolConfig.value.vdevs.map((vdev, idx1) => {
-//     const claimed = poolConfig.value.vdevs.map((vdev2, idx2) => {
-//       if (idx2!= idx1) return vdev2.selectedDisks;
-//     }).flat();
-//     console.log(claimed);
-//     return allDisks.value.filter(disk => disk.available && !claimed.includes(disk.name));
-//   });
-// });
-
-const disks = inject<Ref<DiskData[]>>('disks')!;
-const poolConfig = inject<Ref<PoolData>>("pool-config-data")!;
+const poolConfig = ref<PoolData>({
+  name: '',
+  status: '',
+  guid: '',
+  properties: {
+    size: '',
+    allocated: '',
+    capacity: 0,
+    free: '',
+  },
+  vdevs: [],
+  settings: {
+    sector: '4kib',
+    record: '128kib',
+    compression: true,
+    deduplication: false,
+    refreservation: 0.10,
+    autoExpand: true,
+    autoReplace: false,
+    autoTrim: false,
+    forceCreate: false,
+  },
+  createFileSystem: false,
+});
 
 //const isMirror = ref(false);
 
@@ -358,4 +364,5 @@ const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 if (poolConfig.value.vdevs.length < 1) addVDev();
 
+provide('pool-config-data', poolConfig);
 </script>
