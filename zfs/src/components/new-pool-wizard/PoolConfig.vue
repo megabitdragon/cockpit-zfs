@@ -282,7 +282,8 @@
   <div v-if=" props.tag ==='file-system'">
     <fieldset>
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">File System Settings</legend>
-      <FileSystem idKey="file-system"/>
+      <!-- <FileSystem idKey="file-system"/> -->
+      <p>COMING SOON</p>
     </fieldset>
   </div>
 
@@ -310,6 +311,7 @@ interface PoolConfigProps {
 const props = defineProps<PoolConfigProps>();
 
 const disks = inject<Ref<DiskData[]>>('disks')!;
+
 const usableDisks = computed<DiskData[]>(() => {
   return disks.value.filter((disk) => disk.usable);
 });
