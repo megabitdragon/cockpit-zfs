@@ -37,24 +37,29 @@ interface vDevData {
   status: string;
   guid: string;
   stats: {};
-  disks: ChildDisk[];
+  disks: DiskData[];
+  selectedDisks: string[];
   forceAdd?: boolean;
 }
 
-interface ChildDisk {
-  name: string;
-  path: string;
-  guid: string;
-  type: string;
-  status: string;
-  stats: {};
-}
+// interface ChildDisk {
+//   name: string;
+//   path: string;
+//   guid: string;
+//   type: string;
+//   status: string;
+//   stats: {};
+// }
 
 interface DiskData {
   name: string;
   capacity: string;
   model: string;
+  guid: string;
   type: string;
+  status: string;
+  stats: {};
+  path: string;
   phy_path: string;
   sd_path: string;
   vdev_path: string;

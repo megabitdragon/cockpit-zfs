@@ -39,26 +39,34 @@ function parseVDevData(vDev) {
     status: vDev.status,
     stats: vDev.stats,
     guid: vDev.guid,
+    selectedDisks: [],
     disks: [],
   };
   
   if (!vDev.children) {return}
 
   vDev.children.forEach(disk => {
-    const childDisk : ChildDisk = {
+    const childDisk : DiskData = {
       name: disk.name,
       path: disk.path,
-      guid: disk.type,
+      guid: disk.guid,
       type: disk.type,
       status: disk.status,
       stats: disk.stats,
+      capacity: '',
+      model: '',
+      phy_path: '',
+      sd_path: '',
+      vdev_path: '',
+      serial: '',
+      usable: false,
     };
     
-    console.log(childDisk);
+    //console.log(childDisk);
     vDevData.disks.push(childDisk);
   });
   
-  console.log(vDevData);
+  //console.log(vDevData);
   vDevs.value.push(vDevData);
 }
 
@@ -89,10 +97,10 @@ getPools().then(rawJSON => {
       vdevs: vDevs.value,
     }
     pools.value.push(poolData);
-    console.log(poolData);
+    //console.log(poolData);
     vDevs.value = [];
   }
-  console.log(pools);
+  //console.log(pools);
 });
 
 getDisks().then(rawJSON => {
@@ -110,12 +118,20 @@ getDisks().then(rawJSON => {
       vdev_path: parsedJSON[i].vdev_path,
       serial: parsedJSON[i].serial,
       usable: parsedJSON[i].usable,
+      path: '',
+      guid: '',
+      status: '',
+      stats: {},
     }
     disks.value.push(disk);
     // console.log(disk);
   }
   // console.log(disks);
 })
+
+//const chassisKitPart = computed(() => allParts.value.find(part => part.category_id === 'chassis_kit' && part.name === chassisKitName.value));
+//const model = allParts.value.slice().reverse().find(part => part?.metadata?.disk_brand === brand);
+//allParts.value.filter(part => part?.metadata.disk_brand === brand).map(part => part.metadata.disk_capacity ?? 0).filter(capacity => capacity),
 
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;

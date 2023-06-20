@@ -17,12 +17,12 @@ interface WizardButtonsProps {
 }
 
 const props = defineProps<WizardButtonsProps>();
-
-const newPoolName = inject<Ref>('new-pool-name');
+const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
+const newPoolName = poolConfig.value.name;
 const newVDevs = inject<Ref<newVDev[]>>('new-vdevs');
 
 function finishBtn(newPoolName, newVDevs) {
-  console.log(createPool(newPoolName, newVDevs));
+  createPool(newPoolName, newVDevs);
 }
 
 </script>

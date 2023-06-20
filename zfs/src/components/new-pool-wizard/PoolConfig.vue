@@ -58,7 +58,7 @@
 
             <label :for="getIdKey('available-disk-list')" class="block text-sm font-medium leading-6 text-gray-900">Select Disks</label>
             <ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <li v-for="(disk, diskIdx) in usableDisks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
+              <li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
                 <div class="flex w-full h-full border border-gray-200 rounded dark:border-gray-700">
                   <label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"> 
                     <h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3>
@@ -66,7 +66,7 @@
                     <p class="mt-1 truncate text-sm text-gray-500">{{ disk.type }}</p>
                     <p class="mt-1 truncate text-sm text-gray-500">Serial #: {{ disk.serial }}</p>
                     <p class="mt-1 truncate text-sm text-gray-500">{{ disk.sd_path }}</p> 
-                    <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
+                    <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
                       class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
                   </label>  
                 </div>
@@ -311,58 +311,23 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
+const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
+
 const disks = inject<Ref<DiskData[]>>('disks')!;
 
-const usableDisks = computed<DiskData[]>(() => {
-  return disks.value.filter((disk) => disk.usable);
+// const usableDisks = computed<DiskData[]>(() => {
+//   return disks.value.filter((disk) => disk.usable);
+// });
+
+const vDevAvailDisks = computed<DiskData[][]>(() => {
+  return poolConfig.value.vdevs.map((vdev, idx1) => {
+    const claimed = poolConfig.value.vdevs.map((vdev2, idx2) => {
+      if (idx2! = idx1) return vdev2.selectedDisks;
+    }).flat();
+    console.log(claimed);
+    return disks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
+  })
 });
-
-const poolConfig = ref<PoolData>({
-  name: '',
-  status: '',
-  guid: '',
-  properties: {
-    rawsize: 0,
-    size: '',
-    allocated: '',
-    capacity: 0,
-    free: '',
-  },
-  vdevs: [],
-  settings: {
-    sector: '4kib',
-    record: '128kib',
-    compression: true,
-    deduplication: false,
-    refreservation: 0.10,
-    autoExpand: true,
-    autoReplace: false,
-    autoTrim: false,
-    forceCreate: false,
-  },
-  createFileSystem: false,
-});
-
-const newPoolName = poolConfig.value.name;
-const newVDevs : newVDev[] = [];
-
-poolConfig.value.vdevs.forEach(vdev => {
-  const devicePaths : string[] = [];
-  vdev.disks.forEach(disk => {
-    devicePaths.push(disk.path);
-  });
-  const root = getRoot(vdev);
-  const type = vdev.type.toUpperCase();
-
-  const newVDev = {
-    root: root,
-    type: type,
-    devices: devicePaths,
-  }
-
-  newVDevs.push(newVDev);
-})
-console.log(newVDevs);
 
 //const isMirror = ref(false);
 
@@ -374,6 +339,7 @@ function addVDev() {
     guid: '',
     stats: {},
     disks: [],
+    selectedDisks: [],
   }
 
   poolConfig.value.vdevs.push(vDevConfig);
@@ -383,25 +349,10 @@ function removeVDev(index: number) {
   poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-function getRoot(vDev) {
-  let root = '';
-  if (vDev.type == 'mirror' || vDev.type == 'disk' || vDev.type == 'raidz1'|| vDev.type == 'raidz2'|| vDev.type == 'raidz3') {root = 'DATA';} 
-  else if (vDev.type == 'log') { root = 'LOG' }
-  else if (vDev.type == 'cache') { root = 'CACHE' }
-  else if (vDev.type == 'dedup') { root = 'DEDUP' }
-  else if (vDev.type == 'spare') { root = 'SPARE' }
-  else if (vDev.type == 'special') { root = 'SPECIAL' }
-
-  return root;
-}
-
 console.log(poolConfig);
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 if (poolConfig.value.vdevs.length < 1) addVDev();
 
-provide('pool-config-data', poolConfig);
-provide('new-pool-name', newPoolName);
-provide('new-vdevs', newVDevs);
 </script>

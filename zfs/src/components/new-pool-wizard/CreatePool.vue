@@ -23,6 +23,65 @@ import WizardButtons from './WizardButtons.vue';
 const show = ref(true);
 const navTag = ref('name-entry');
 
+const poolConfig = ref<PoolData>({
+  name: '',
+  status: '',
+  guid: '',
+  properties: {
+    rawsize: 0,
+    size: '',
+    allocated: '',
+    capacity: 0,
+    free: '',
+  },
+  vdevs: [],
+  settings: {
+    sector: '4kib',
+    record: '128kib',
+    compression: true,
+    deduplication: false,
+    refreservation: 0.10,
+    autoExpand: true,
+    autoReplace: false,
+    autoTrim: false,
+    forceCreate: false,
+  },
+  createFileSystem: false,
+});
+
+const newVDevs = computed(() => {
+  return poolConfig.value.vdevs.map(vdev => {
+    const devicePaths : string[] = [];
+    vdev.disks.forEach(disk => {
+      devicePaths.push(disk.path);
+      console.log(disk.path);
+    });
+    
+    const root = getRoot(vdev);
+    const type = vdev.type.toUpperCase();
+
+    const newVDev = {
+      root: root,
+      type: type,
+      devices: devicePaths,
+    }
+
+    return newVDev;
+  })
+});
+
+function getRoot(vDev) {
+  let root = '';
+  if (vDev.type == 'mirror' || vDev.type == 'disk' || vDev.type == 'raidz1'|| vDev.type == 'raidz2'|| vDev.type == 'raidz3') {root = 'DATA';} 
+  else if (vDev.type == 'log') { root = 'LOG' }
+  else if (vDev.type == 'cache') { root = 'CACHE' }
+  else if (vDev.type == 'dedup') { root = 'DEDUP' }
+  else if (vDev.type == 'spare') { root = 'SPARE' }
+  else if (vDev.type == 'special') { root = 'SPECIAL' }
+
+  return root;
+}
+
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));
 
 const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) => {
@@ -81,6 +140,8 @@ watch(navTag, updateStatus);
 
 updateStatus();
 
+provide('pool-config-data', poolConfig);
+provide('new-vdevs', newVDevs);
 </script>
 
 

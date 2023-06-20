@@ -34,6 +34,7 @@ def main():
     vdevs_raw = args.vdev_topology
 
     vdevs = json.loads(vdevs_raw)
+    print(vdevs_raw)
 
     options = {
         'feature@lz4_compress': 'enabled',
