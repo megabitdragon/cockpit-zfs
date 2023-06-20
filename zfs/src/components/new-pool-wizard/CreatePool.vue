@@ -7,7 +7,7 @@
       <PoolConfig :tag="navTag" idKey="pool-config"/>
     </template>
     <template v-slot:footer>
-      <WizardButtons :next="next" :prev="prev"/>
+      <WizardButtons :next="next" :prev="prev" :end="end"/>
     </template>
   </Modal>
 </template>
@@ -28,6 +28,8 @@ const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => na
 const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) => {
 	navTag.value = item.tag;
 };
+
+const end = ref(false);
 
 const next = () => {
 	const currentTag = navTag.value;
@@ -69,6 +71,10 @@ const updateStatus = () => {
       item.status = 'upcoming';
     }
   });
+
+  if (navTag.value == 'review') {
+    end.value = true;
+  }
 };
 
 watch(navTag, updateStatus);

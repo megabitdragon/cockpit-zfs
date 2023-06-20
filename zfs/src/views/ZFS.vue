@@ -44,7 +44,6 @@ import PoolDiskList from "../components/pool/PoolDiskList.vue";
 
 interface ZFSProps {
   tag: string;
-  next: any;
 }
 
 const props = defineProps<ZFSProps>();

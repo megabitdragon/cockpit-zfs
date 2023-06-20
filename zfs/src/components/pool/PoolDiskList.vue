@@ -176,7 +176,7 @@ import CreatePool from '../new-pool-wizard/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import DiskDetail from "../disk/DiskDetail.vue";
 
-const poolData = inject<Ref<PoolData[]>>("pool-data")!;
+const poolData = inject<Ref<PoolData[]>>("pools")!;
 
 // console.log(poolData.value);
 

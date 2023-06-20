@@ -9,8 +9,8 @@
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Create a Virtual Device</legend>
       
       <div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
-           <!-- Virtual Device (Select) -->
-           <div>
+          <!-- Virtual Device (Select) -->
+          <div>
             <label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
             <select id="virtual-device" v-model="poolConfig.vdevs[vDevIdx].type" name="virtual-device" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
               <option v-if="vDevIdx === 0" value="disk">Disk</option>
@@ -108,8 +108,8 @@
 
   <div v-if=" props.tag ==='pool-settings'">
     <fieldset>
-      
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Pool Settings</legend>
+
       <!-- Sector Size (Select) -->
       <div>
         <label :for="getIdKey('sector-size')" class="block text-sm font-medium leading-6 text-gray-900">Sector Size</label>
@@ -299,6 +299,7 @@
 <script setup lang="ts">
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
+
 import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
@@ -321,6 +322,7 @@ const poolConfig = ref<PoolData>({
   status: '',
   guid: '',
   properties: {
+    rawsize: 0,
     size: '',
     allocated: '',
     capacity: 0,
@@ -341,6 +343,27 @@ const poolConfig = ref<PoolData>({
   createFileSystem: false,
 });
 
+const newPoolName = poolConfig.value.name;
+const newVDevs : newVDev[] = [];
+
+poolConfig.value.vdevs.forEach(vdev => {
+  const devicePaths : string[] = [];
+  vdev.disks.forEach(disk => {
+    devicePaths.push(disk.path);
+  });
+  const root = getRoot(vdev);
+  const type = vdev.type.toUpperCase();
+
+  const newVDev = {
+    root: root,
+    type: type,
+    devices: devicePaths,
+  }
+
+  newVDevs.push(newVDev);
+})
+console.log(newVDevs);
+
 //const isMirror = ref(false);
 
 function addVDev() {
@@ -350,7 +373,7 @@ function addVDev() {
     status: '',
     guid: '',
     stats: {},
-    disks: []
+    disks: [],
   }
 
   poolConfig.value.vdevs.push(vDevConfig);
@@ -360,6 +383,18 @@ function removeVDev(index: number) {
   poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
+function getRoot(vDev) {
+  let root = '';
+  if (vDev.type == 'mirror' || vDev.type == 'disk' || vDev.type == 'raidz1'|| vDev.type == 'raidz2'|| vDev.type == 'raidz3') {root = 'DATA';} 
+  else if (vDev.type == 'log') { root = 'LOG' }
+  else if (vDev.type == 'cache') { root = 'CACHE' }
+  else if (vDev.type == 'dedup') { root = 'DEDUP' }
+  else if (vDev.type == 'spare') { root = 'SPARE' }
+  else if (vDev.type == 'special') { root = 'SPECIAL' }
+
+  return root;
+}
+
 console.log(poolConfig);
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
@@ -367,4 +402,6 @@ const getIdKey = (name: string) => `${props.idKey}-${name}`;
 if (poolConfig.value.vdevs.length < 1) addVDev();
 
 provide('pool-config-data', poolConfig);
+provide('new-pool-name', newPoolName);
+provide('new-vdevs', newVDevs);
 </script>

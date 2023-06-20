@@ -8,7 +8,7 @@
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Pools</td>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><img src="../../../public/icons/success.svg"></td>
                           <!-- <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{ pools.length }}</td> -->
-                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Effective Space: X TB</td>
+                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Effective Space: {{ totalEffectiveSpace }} T</td>
                           <!-- <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button @onClick=""><ArrowPathIcon class="h-5 w-5"/></button></td> -->
                         </tr>
                     </span>
@@ -18,8 +18,8 @@
                       <!-- <td v-for="(pool, index) in pools" :key="index">
                         <PoolCard :name="pool.name" :status="pool.status" :spaceUsed="pool.usagePercent!" :totalSize="pool.totalSize!"/>
                       </td> -->
-                      <td v-for="(pool, index) in poolData" :key="index">
-                        <PoolCard :name="poolData[index].name" :status="poolData[index].status" :capacity="poolData[index].properties.capacity" :size="poolData[index].properties.size" :free="poolData[index].properties.free" :allocated="poolData[index].properties.allocated"/>
+                      <td v-for="(pool, index) in pools" :key="index">
+                        <PoolCard :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
                       </td>
                     </tr>
                 </template>
@@ -34,6 +34,16 @@ import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Accordion from "../common/Accordion.vue";
 import PoolCard from "../pool/PoolCard.vue";
 
-const poolData = inject<Ref<PoolData[]>>("pool-data")!;
+const pools = inject<Ref<PoolData[]>>("pools")!;
+
+const totalEffectiveSpace = computed(() => {
+  let totalCapacity = 0;
+  pools.value.forEach(pool => {
+    totalCapacity += pool.properties.rawsize;
+  });
+  const totalBytes = (totalCapacity / 1100000000000);
+  const totalString = totalBytes.toFixed(2).toString();
+  return totalString;
+});
 
 </script>

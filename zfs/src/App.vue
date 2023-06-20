@@ -4,7 +4,7 @@
       issuesURL="" :pluginVersion="Number(pluginVersion)"
       :infoNudgeScrollbar="true" />
     <Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
-    <ZFS :tag="navTag" :next="next"/>
+    <ZFS :tag="navTag"/>
   </div>
 </template>
 
@@ -80,6 +80,7 @@ getPools().then(rawJSON => {
       status: parsedJSON[i].status,
       guid: parsedJSON[i].guid,
       properties: {
+        rawsize: parsedJSON[i].properties.size.parsed,
         size: parsedJSON[i].properties.size.value,
         allocated: parsedJSON[i].properties.allocated.value,
         capacity: parsedJSON[i].properties.capacity.rawvalue,
@@ -120,16 +121,6 @@ const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;
 };
 
-const next = () => {
-	const currentTag = navTag.value;
-	const currentItem = navigation.find(item => item.tag === currentTag);
-	const currentIndex = navigation.indexOf(currentItem!);
-	const nextIndex = currentIndex + 1;
-	if (nextIndex >= navigation.length) return;
-	const nextItem = navigation[nextIndex];
-	navTag.value = nextItem.tag;
-};
-
 const navigation = reactive<NavigationItem[]>([
 	{ name: 'Dashboard', tag: 'dashboard', current: computed(() => navTag.value == 'dashboard') as unknown as boolean, show: true, },
   { name: 'Pools', tag: 'pools', current: computed(() => navTag.value == 'pools') as unknown as boolean, show: true, },
@@ -138,7 +129,7 @@ const navigation = reactive<NavigationItem[]>([
   // { name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },
 ].filter(item => item.show));
 
-provide("pool-data", pools);
+provide("pools", pools);
 provide("disks", disks);
 </script>
 
