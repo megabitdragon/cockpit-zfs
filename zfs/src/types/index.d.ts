@@ -29,6 +29,7 @@ interface PoolData {
   },
   createFileSystem?: boolean;
   fileSystem?: FileSystem;
+  errors: string[];
 }
 
 interface vDevData {

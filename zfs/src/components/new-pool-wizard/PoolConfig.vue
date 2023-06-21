@@ -21,7 +21,9 @@
               <option v-if="vDevIdx !== 0" :value="poolConfig.vdevs[0].type">{{poolConfig.vdevs[0].type}}</option>
               <option v-if="vDevIdx !== 0" value="cache">Cache</option>
               <option v-if="vDevIdx !== 0" value="log">Log</option> 
-              <option v-if="vDevIdx !== 0" value="special">Special</option> 
+              <option v-if="vDevIdx !== 0" value="special">Special</option>
+              <option v-if="vDevIdx !== 0" value="spare">Spare</option>
+              <option v-if="vDevIdx !== 0" value="dedup">Dedup</option>
             </select>
           </div>
 
@@ -191,7 +193,7 @@
           <div>
             <label :for="getIdKey('steps-range')" class="mt-1 block mb-2 text-sm font-medium text-gray-900 dark:text-white">Refreservation</label>
             <input :id="getIdKey('steps-range')" v-model="poolConfig.settings!.refreservation" type="range" min="0" max="20" value="10" step="1" class="mt-1 w-3/4 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-            <input :id="getIdKey('steps-range')" v-model="poolConfig.settings!.refreservation" type="number" value="10" class="mt-1 w-3/4 block rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
+            <input :id="getIdKey('steps-range')" v-model="poolConfig.settings!.refreservation" type="number" value="10" class="mt-1 w-1/4 block rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
           </div>
 
           <!-- Auto-Expand Pool (Toggle) -->
@@ -349,10 +351,22 @@ function removeVDev(index: number) {
   poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-console.log(poolConfig);
+watch(poolConfig, () => {
+  const localErrors: string[] = [];
+
+  if (poolConfig.value.name == '') localErrors.push("Pool Name is required.");
+  if (poolConfig.value.vdevs.length < 1) localErrors.push("Minimum One Virtual Device is required.");
+  poolConfig.value.vdevs.forEach(vdev => {
+    if (vdev.type == 'mirror' && vdev.selectedDisks.length < 2) localErrors.push("Two or more disks are required for Mirror.");
+    if (vdev.type == 'raidz1' && vdev.selectedDisks.length < 2) localErrors.push("Two or more disks are required for RaidZ1.");
+    if (vdev.type == 'raidz2' && vdev.selectedDisks.length < 3) localErrors.push("Three or more disks are required for RaidZ2.");
+    if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) localErrors.push("Four or more disks are required for RaidZ3.");
+  });
+
+  if (localErrors.length !== poolConfig.value.errors.length) poolConfig.value.errors = localErrors;
+}, {immediate: true, deep: true});
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 if (poolConfig.value.vdevs.length < 1) addVDev();
-
 </script>

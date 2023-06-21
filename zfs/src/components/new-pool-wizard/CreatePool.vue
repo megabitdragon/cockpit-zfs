@@ -7,7 +7,7 @@
       <PoolConfig :tag="navTag" idKey="pool-config"/>
     </template>
     <template v-slot:footer>
-      <WizardButtons :next="next" :prev="prev" :end="end"/>
+      <WizardButtons :next="next" :prev="prev" :end="end" :disableButton="disableButton"/>
     </template>
   </Modal>
 </template>
@@ -22,6 +22,11 @@ import WizardButtons from './WizardButtons.vue';
 
 const show = ref(true);
 const navTag = ref('name-entry');
+const disableButton = ref(false);
+
+let globalErrors : string[] = [];
+
+const disks = inject<Ref<DiskData[]>>('disks')!;
 
 const poolConfig = ref<PoolData>({
   name: '',
@@ -40,21 +45,43 @@ const poolConfig = ref<PoolData>({
     record: '128kib',
     compression: true,
     deduplication: false,
-    refreservation: 0.10,
+    refreservation: 10,
     autoExpand: true,
     autoReplace: false,
     autoTrim: false,
     forceCreate: false,
   },
   createFileSystem: false,
+  errors: [],
 });
 
+const fillDisks = () => {
+  poolConfig.value.vdevs.forEach(vdev => {
+    vdev.selectedDisks.forEach(selected => {
+      const selectedDisk = disks.value.find(disk => disk.name === selected);
+      vdev.disks.push(selectedDisk!);
+    });
+  });
+
+  console.log("Pool Config:");
+  console.log(poolConfig);
+};
+
+watch(poolConfig, () => {
+  const poolConfigErrors = poolConfig.value.errors;
+
+  globalErrors = [...new Set(...poolConfigErrors)];
+
+  disableButton.value = globalErrors.length > 0;
+}, {immediate: true, deep: true});
+
 const newVDevs = computed(() => {
+  fillDisks();
   return poolConfig.value.vdevs.map(vdev => {
     const devicePaths : string[] = [];
     vdev.disks.forEach(disk => {
-      devicePaths.push(disk.path);
-      console.log(disk.path);
+      devicePaths.push(disk.vdev_path);
+      console.log(disk.vdev_path);
     });
     
     const root = getRoot(vdev);
@@ -69,6 +96,10 @@ const newVDevs = computed(() => {
     return newVDev;
   })
 });
+
+const newPoolName = computed(() => {
+  return poolConfig.value.name;
+})
 
 function getRoot(vDev) {
   let root = '';
@@ -142,6 +173,7 @@ updateStatus();
 
 provide('pool-config-data', poolConfig);
 provide('new-vdevs', newVDevs);
+provide('new-pool-name', newPoolName);
 </script>
 
 
