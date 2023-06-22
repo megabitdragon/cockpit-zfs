@@ -119,39 +119,40 @@ function finishBtn(newPoolName, newVDevs) {
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));
 
-const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) => {
-  if (item.tag == 'name-entry' && poolConfiguration.value.validateAndProceed('name-entry')) {
-    navTag.value = item.tag;
-  } else if (item!.tag == 'virtual-devices' && poolConfiguration.value.validateAndProceed('virtual-devices')) {
-    navTag.value = item.tag;
-  } else {
-    console.log('Validation failed. Cannot proceed to the next tab.');
-  }
-};
-
 // const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) => {
-//   if (item.tag === 'name-entry') {
-//     // Check validation for the Name tab
-//     if (poolConfiguration.value.validateAndProceed('name-entry')) {
-//       navTag.value = item.tag;
-//     } else {
-//       console.log('Validation failed for the Name tab. Cannot proceed to the next tab.');
-//     }
-//   } else if (item.tag === 'virtual-devices') {
-//     // Check validation for the Virtual Devices tab
-//     if (navTag.value === 'name-entry' && !poolConfiguration.value.validateAndProceed('name-entry')) {
-//       console.log('Validation failed for the Name tab. Cannot proceed to the Virtual Devices tab.');
-//     } else if (poolConfiguration.value.validateAndProceed('virtual-devices')) {
-//       navTag.value = item.tag;
-//     } else {
-//       console.log('Validation failed for the Virtual Devices tab. Cannot proceed to the next tab.');
-//     }
-//   } else {
-//     // Handle other tabs here
+//   if (item.tag == 'name-entry' && poolConfiguration.value.validateAndProceed('name-entry')) {
 //     navTag.value = item.tag;
+//   } else if (item!.tag == 'virtual-devices' && poolConfiguration.value.validateAndProceed('virtual-devices')) {
+//     navTag.value = item.tag;
+//   } else {
 //     //console.log('Validation failed. Cannot proceed to the next tab.');
+//     navTag.value = item.tag;
 //   }
 // };
+
+const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) => {
+  if (item.tag === 'name-entry') {
+    // Check validation for the Name tab
+    if (poolConfiguration.value.validateAndProceed('name-entry')) {
+      navTag.value = item.tag;
+    } else {
+      console.log('Validation failed for the Name tab. Cannot proceed to the next tab.');
+    }
+  } else if (item.tag === 'virtual-devices') {
+    // Check validation for the Virtual Devices tab
+    if (navTag.value === 'name-entry' && !poolConfiguration.value.validateAndProceed('name-entry')) {
+      console.log('Validation failed for the Name tab. Cannot proceed to the Virtual Devices tab.');
+    } else if (poolConfiguration.value.validateAndProceed('virtual-devices')) {
+      navTag.value = item.tag;
+    } else {
+      console.log('Validation failed for the Virtual Devices tab. Cannot proceed to the next tab.');
+    }
+  } else {
+    // Handle other tabs here
+    navTag.value = item.tag;
+    //console.log('Validation failed. Cannot proceed to the next tab.');
+  }
+};
 
 const end = ref(false);
 
@@ -165,12 +166,34 @@ const next = () => {
     
 	const nextItem = navigation[nextIndex];
 
-  if (currentItem!.tag == 'name-entry' && poolConfiguration.value.validateAndProceed('name-entry')) {
-    navTag.value = nextItem.tag;
-  } else if (currentItem!.tag == 'virtual-devices' && poolConfiguration.value.validateAndProceed('virtual-devices')) {
-    navTag.value = nextItem.tag;
+  // if (currentItem!.tag == 'name-entry' && poolConfiguration.value.validateAndProceed('name-entry')) {
+  //   navTag.value = nextItem.tag;
+  // } else if (currentItem!.tag == 'virtual-devices' && poolConfiguration.value.validateAndProceed('virtual-devices')) {
+  //   navTag.value = nextItem.tag;
+  // } else {
+  //   console.log('Validation failed. Cannot proceed to the next tab.');
+  // }
+
+  if (currentItem!.tag === 'name-entry') {
+    // Check validation for the Name tab
+    if (poolConfiguration.value.validateAndProceed('name-entry')) {
+      navTag.value = nextItem.tag;
+    } else {
+      console.log('Validation failed for the Name tab. Cannot proceed to the next tab.');
+    }
+  } else if (currentItem!.tag === 'virtual-devices') {
+    // Check validation for the Virtual Devices tab
+    if (navTag.value === 'name-entry' && !poolConfiguration.value.validateAndProceed('name-entry')) {
+      console.log('Validation failed for the Name tab. Cannot proceed to the Virtual Devices tab.');
+    } else if (poolConfiguration.value.validateAndProceed('virtual-devices')) {
+      navTag.value = nextItem.tag;
+    } else {
+      console.log('Validation failed for the Virtual Devices tab. Cannot proceed to the next tab.');
+    }
   } else {
-    console.log('Validation failed. Cannot proceed to the next tab.');
+    // Handle other tabs here
+    navTag.value = nextItem.tag;
+    //console.log('Validation failed. Cannot proceed to the next tab.');
   }
 };
 
