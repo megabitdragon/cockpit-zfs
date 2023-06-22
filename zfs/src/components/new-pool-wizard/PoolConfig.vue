@@ -1,7 +1,8 @@
 <template>
   <div v-if="props.tag ==='name-entry'">
     <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">Name this Pool</legend>
-    <input type="text" v-model="poolConfig.name" name="pool-name" :id="getIdKey('pool-name')" class="mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Pool Name" />
+    <input type="text" @change="nameCheck" v-model="poolConfig.name" name="pool-name" :id="getIdKey('pool-name')" class="mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Pool Name" />
+    <p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
   </div>
 
   <div v-if="props.tag ==='virtual-devices'">
@@ -68,12 +69,13 @@
                     <p class="mt-1 truncate text-sm text-gray-500">{{ disk.type }}</p>
                     <p class="mt-1 truncate text-sm text-gray-500">Serial #: {{ disk.serial }}</p>
                     <p class="mt-1 truncate text-sm text-gray-500">{{ disk.sd_path }}</p> 
-                    <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
+                    <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" @change="diskCheck" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
                       class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
                   </label>  
                 </div>
               </li>
             </ul>
+            <p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
 
             <!-- <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div> -->
 
@@ -98,14 +100,15 @@
             </div>
 
             <div class="button-group-row mt-2">
-              <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
-              <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
+              <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev(); vDevCheck()">Add VDev</button>
+              <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx); vDevCheck()">Remove VDev</button>  
             </div>
         </div>
       <div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
         <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
       </div>
     </fieldset>
+    <p class="text-danger" v-if="vDevFeedback">{{ vDevFeedback }}</p>
   </div>
 
   <div v-if=" props.tag ==='pool-settings'">
@@ -317,6 +320,15 @@ const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
 
 const disks = inject<Ref<DiskData[]>>('disks')!;
 
+const nameFeedback = ref('');
+const vDevFeedback = ref('');
+const diskFeedback = ref('');
+const nameValid = ref(true);
+const vDevValid = ref(true);
+const diskValid = ref(true);
+
+const disabled = inject<Ref<boolean>>('disabled')!;
+
 // const usableDisks = computed<DiskData[]>(() => {
 //   return disks.value.filter((disk) => disk.usable);
 // });
@@ -326,7 +338,7 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
     const claimed = poolConfig.value.vdevs.map((vdev2, idx2) => {
       if (idx2! = idx1) return vdev2.selectedDisks;
     }).flat();
-    console.log(claimed);
+    //console.log(claimed);
     return disks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
   })
 });
@@ -347,26 +359,94 @@ function addVDev() {
   poolConfig.value.vdevs.push(vDevConfig);
 }
 
+function nameCheck() {
+  let result = true;
+  nameFeedback.value = '';
+  
+  if (poolConfig.value.name == '') {
+    result = false;
+    nameFeedback.value = 'Name cannot be empty.';
+  } else if (poolConfig.value.name.match(/^[0-9]/) ) {
+    result = false;
+    nameFeedback.value = 'Name cannot begin with numbers.';
+  } else if (poolConfig.value.name.match(/^[.]/ )) {
+    result = false;
+    nameFeedback.value = 'Name cannot begin with a period (.).';
+  } else if (poolConfig.value.name.match(/^[_]/)) {
+    result = false;
+    nameFeedback.value = 'Name cannot begin with an underscore (_).';
+  } else if (poolConfig.value.name.match(/^[-]/)) {
+    result = false;
+    nameFeedback.value = 'Name cannot begin with a hyphen (-).';
+  } else if (poolConfig.value.name.match(/^[:]/)) {
+    result = false;
+    nameFeedback.value = 'Name cannot begin with a colon (:).';
+  } else if (poolConfig.value.name.match(/^[ ]/)) {
+    result = false;
+    nameFeedback.value = 'Name cannot begin with whitespace.';
+  } else if (poolConfig.value.name.match(/[ ]$/)) {
+    result = false;
+    nameFeedback.value = 'Name cannot end with whitespace.';
+  } else if (poolConfig.value.name.match(/^c[0-9]|^log|^mirror|^raidz|^raidz1|^raidz2|^raidz3|^spare/)) {
+    result = false;
+    nameFeedback.value = 'Name cannot begin with a reserved name.';
+  } else if (!poolConfig.value.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
+    result = false;
+    nameFeedback.value = 'Name contains invalid characters.';
+  } 
+
+  nameValid.value = result;
+}
+
+function diskCheck() {
+  let result = true;
+  diskFeedback.value = '';
+  
+  poolConfig.value.vdevs.forEach(vdev => {
+    if (vdev.type == 'mirror' && vdev.selectedDisks.length < 2) {
+      result = false;
+      diskFeedback.value = 'Two or more Disks are required for Mirror.';
+    } else if (vdev.type == 'raidz1' && vdev.selectedDisks.length < 2) {
+      result = false;
+      diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
+    } else if (vdev.type == 'raidz2' && vdev.selectedDisks.length < 3) {
+      result = false;
+      diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
+    } else if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) {
+      result = false;
+      diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
+    } 
+  });
+  
+  diskValid.value = result;
+}
+
+function vDevCheck() {
+  let result = true;
+  vDevFeedback.value = '';
+  
+  if (poolConfig.value.vdevs.length < 1) {
+    result = false;
+    vDevFeedback.value = 'At least one Virtual Device is required.';
+  }
+
+  vDevValid.value = result;
+}
+
+function validateData() {
+  nameCheck();
+  diskCheck();
+  vDevCheck();
+}
+
 function removeVDev(index: number) {
   poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-watch(poolConfig, () => {
-  const localErrors: string[] = [];
-
-  if (poolConfig.value.name == '') localErrors.push("Pool Name is required.");
-  if (poolConfig.value.vdevs.length < 1) localErrors.push("Minimum One Virtual Device is required.");
-  poolConfig.value.vdevs.forEach(vdev => {
-    if (vdev.type == 'mirror' && vdev.selectedDisks.length < 2) localErrors.push("Two or more disks are required for Mirror.");
-    if (vdev.type == 'raidz1' && vdev.selectedDisks.length < 2) localErrors.push("Two or more disks are required for RaidZ1.");
-    if (vdev.type == 'raidz2' && vdev.selectedDisks.length < 3) localErrors.push("Three or more disks are required for RaidZ2.");
-    if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) localErrors.push("Four or more disks are required for RaidZ3.");
-  });
-
-  if (localErrors.length !== poolConfig.value.errors.length) poolConfig.value.errors = localErrors;
-}, {immediate: true, deep: true});
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 if (poolConfig.value.vdevs.length < 1) addVDev();
+
+defineExpose({validateData});
 </script>

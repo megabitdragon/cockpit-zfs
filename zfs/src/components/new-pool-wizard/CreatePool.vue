@@ -4,10 +4,14 @@
       <WizardTabs :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
     </template>
     <template v-slot:content>
-      <PoolConfig :tag="navTag" idKey="pool-config"/>
+      <PoolConfig ref="poolConfiguration" :tag="navTag" idKey="pool-config"/>
     </template>
     <template v-slot:footer>
-      <WizardButtons :next="next" :prev="prev" :end="end" :disableButton="disableButton"/>
+      <div class="button-group-row">
+        <button id="back" class="btn btn-secondary object-left justify-start" @click="prev">Back</button>
+        <button v-if="!end" :disabled="disableButton" id="next" class="btn btn-primary object-right justify-end" @click="next poolConfiguration.validateData()">Next</button>
+        <button v-if="end" :disabled="disableButton"  id="finish" class="btn btn-primary object-right justify-end" @click="finishBtn(newPoolName, newVDevs)">Finish</button>
+      </div>
     </template>
   </Modal>
 </template>
@@ -18,13 +22,13 @@ import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
-import WizardButtons from './WizardButtons.vue';
+import { createPool } from "../../scripts/pools";
 
 const show = ref(true);
 const navTag = ref('name-entry');
 const disableButton = ref(false);
 
-let globalErrors : string[] = [];
+const poolConfiguration = ref();
 
 const disks = inject<Ref<DiskData[]>>('disks')!;
 
@@ -52,7 +56,6 @@ const poolConfig = ref<PoolData>({
     forceCreate: false,
   },
   createFileSystem: false,
-  errors: [],
 });
 
 const fillDisks = () => {
@@ -66,14 +69,6 @@ const fillDisks = () => {
   console.log("Pool Config:");
   console.log(poolConfig);
 };
-
-watch(poolConfig, () => {
-  const poolConfigErrors = poolConfig.value.errors;
-
-  globalErrors = [...new Set(...poolConfigErrors)];
-
-  disableButton.value = globalErrors.length > 0;
-}, {immediate: true, deep: true});
 
 const newVDevs = computed(() => {
   fillDisks();
@@ -113,6 +108,10 @@ function getRoot(vDev) {
   return root;
 }
 
+function finishBtn(newPoolName, newVDevs) {
+  createPool(newPoolName, newVDevs);
+}
+
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));
 
 const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) => {
@@ -139,6 +138,7 @@ const prev = () => {
 	if (prevIndex >= navigation.length) return;
 	const prevItem = navigation[prevIndex];
 	navTag.value = prevItem.tag;
+  end.value = false;
 };
 
 const navigation = reactive<StepsNavigationItem[]>([
@@ -172,8 +172,7 @@ watch(navTag, updateStatus);
 updateStatus();
 
 provide('pool-config-data', poolConfig);
-provide('new-vdevs', newVDevs);
-provide('new-pool-name', newPoolName);
+provide('disabled', disableButton);
 </script>
 
 

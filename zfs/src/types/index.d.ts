@@ -29,7 +29,7 @@ interface PoolData {
   },
   createFileSystem?: boolean;
   fileSystem?: FileSystem;
-  errors: string[];
+  //errors: string[];
 }
 
 interface vDevData {
@@ -42,15 +42,6 @@ interface vDevData {
   selectedDisks: string[];
   forceAdd?: boolean;
 }
-
-// interface ChildDisk {
-//   name: string;
-//   path: string;
-//   guid: string;
-//   type: string;
-//   status: string;
-//   stats: {};
-// }
 
 interface DiskData {
   name: string;

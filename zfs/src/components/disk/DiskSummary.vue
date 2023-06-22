@@ -34,6 +34,6 @@ import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Accordion from '../common/Accordion.vue';
 import DiskCard from '../disk/DiskCard.vue';
 
-const disks = inject<Ref<Disk[]>>('all-disks')!;
+const disks = inject<Ref<DiskData[]>>('disks')!;
 
 </script>
