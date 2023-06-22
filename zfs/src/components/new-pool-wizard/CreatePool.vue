@@ -9,8 +9,8 @@
     <template v-slot:footer>
       <div class="button-group-row">
         <button id="back" class="btn btn-secondary object-left justify-start" @click="prev">Back</button>
-        <button v-if="!end" :disabled="disableButton" id="next" class="btn btn-primary object-right justify-end" @click="next poolConfiguration.validateData()">Next</button>
-        <button v-if="end" :disabled="disableButton"  id="finish" class="btn btn-primary object-right justify-end" @click="finishBtn(newPoolName, newVDevs)">Finish</button>
+        <button v-if="!end" id="next" class="btn btn-primary object-right justify-end" @click="next">Next</button>
+        <button v-if="end" :disabled="disabled"  id="finish" class="btn btn-primary object-right justify-end" @click="finishBtn(newPoolName, newVDevs)">Finish</button>
       </div>
     </template>
   </Modal>
@@ -26,7 +26,7 @@ import { createPool } from "../../scripts/pools";
 
 const show = ref(true);
 const navTag = ref('name-entry');
-const disableButton = ref(false);
+const disabled = ref(false);
 
 const poolConfiguration = ref();
 
@@ -112,11 +112,46 @@ function finishBtn(newPoolName, newVDevs) {
   createPool(newPoolName, newVDevs);
 }
 
+// const nameCheck = inject<()=> boolean>('name-check')!;
+// const diskCheck = inject<()=> boolean>('disk-check')!;
+// const vDevCheck = inject<()=> boolean>('vDev-check')!;
+//const validateAndProceed = inject<(tabTag : string)=> boolean>('validate-n-proceed')!;
+
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));
 
 const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) => {
-	navTag.value = item.tag;
+  if (item.tag == 'name-entry' && poolConfiguration.value.validateAndProceed('name-entry')) {
+    navTag.value = item.tag;
+  } else if (item!.tag == 'virtual-devices' && poolConfiguration.value.validateAndProceed('virtual-devices')) {
+    navTag.value = item.tag;
+  } else {
+    console.log('Validation failed. Cannot proceed to the next tab.');
+  }
 };
+
+// const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) => {
+//   if (item.tag === 'name-entry') {
+//     // Check validation for the Name tab
+//     if (poolConfiguration.value.validateAndProceed('name-entry')) {
+//       navTag.value = item.tag;
+//     } else {
+//       console.log('Validation failed for the Name tab. Cannot proceed to the next tab.');
+//     }
+//   } else if (item.tag === 'virtual-devices') {
+//     // Check validation for the Virtual Devices tab
+//     if (navTag.value === 'name-entry' && !poolConfiguration.value.validateAndProceed('name-entry')) {
+//       console.log('Validation failed for the Name tab. Cannot proceed to the Virtual Devices tab.');
+//     } else if (poolConfiguration.value.validateAndProceed('virtual-devices')) {
+//       navTag.value = item.tag;
+//     } else {
+//       console.log('Validation failed for the Virtual Devices tab. Cannot proceed to the next tab.');
+//     }
+//   } else {
+//     // Handle other tabs here
+//     navTag.value = item.tag;
+//     //console.log('Validation failed. Cannot proceed to the next tab.');
+//   }
+// };
 
 const end = ref(false);
 
@@ -125,9 +160,18 @@ const next = () => {
 	const currentItem = navigation.find(item => item.tag === currentTag);
 	const currentIndex = navigation.indexOf(currentItem!);
 	const nextIndex = currentIndex + 1;
+
 	if (nextIndex >= navigation.length) return;
+    
 	const nextItem = navigation[nextIndex];
-	navTag.value = nextItem.tag;
+
+  if (currentItem!.tag == 'name-entry' && poolConfiguration.value.validateAndProceed('name-entry')) {
+    navTag.value = nextItem.tag;
+  } else if (currentItem!.tag == 'virtual-devices' && poolConfiguration.value.validateAndProceed('virtual-devices')) {
+    navTag.value = nextItem.tag;
+  } else {
+    console.log('Validation failed. Cannot proceed to the next tab.');
+  }
 };
 
 const prev = () => {
@@ -172,13 +216,5 @@ watch(navTag, updateStatus);
 updateStatus();
 
 provide('pool-config-data', poolConfig);
-provide('disabled', disableButton);
+provide('disabled', disabled);
 </script>
-
-
-
-
-
-
-
-

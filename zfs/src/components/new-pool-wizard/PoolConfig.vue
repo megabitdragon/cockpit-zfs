@@ -323,9 +323,9 @@ const disks = inject<Ref<DiskData[]>>('disks')!;
 const nameFeedback = ref('');
 const vDevFeedback = ref('');
 const diskFeedback = ref('');
-const nameValid = ref(true);
-const vDevValid = ref(true);
-const diskValid = ref(true);
+// const nameValid = ref(true);
+// const vDevValid = ref(true);
+// const diskValid = ref(true);
 
 const disabled = inject<Ref<boolean>>('disabled')!;
 
@@ -359,7 +359,7 @@ function addVDev() {
   poolConfig.value.vdevs.push(vDevConfig);
 }
 
-function nameCheck() {
+const nameCheck = () => {
   let result = true;
   nameFeedback.value = '';
   
@@ -395,10 +395,11 @@ function nameCheck() {
     nameFeedback.value = 'Name contains invalid characters.';
   } 
 
-  nameValid.value = result;
+  // nameValid.value = result;
+  return result;
 }
 
-function diskCheck() {
+const diskCheck = () => {
   let result = true;
   diskFeedback.value = '';
   
@@ -418,10 +419,11 @@ function diskCheck() {
     } 
   });
   
-  diskValid.value = result;
+  // diskValid.value = result;
+  return result;
 }
 
-function vDevCheck() {
+const vDevCheck = () => {
   let result = true;
   vDevFeedback.value = '';
   
@@ -430,23 +432,34 @@ function vDevCheck() {
     vDevFeedback.value = 'At least one Virtual Device is required.';
   }
 
-  vDevValid.value = result;
+  // vDevValid.value = result;
+  return result;
 }
 
-function validateData() {
-  nameCheck();
-  diskCheck();
-  vDevCheck();
+const validateAndProceed = (tabTag: string): boolean => {
+  if (tabTag === 'name-entry') {
+    return nameCheck();
+  } else if (tabTag == 'virtual-devices') {
+    if (vDevCheck()) {
+      return diskCheck();
+    }
+  }
+
+  return true;
 }
 
 function removeVDev(index: number) {
   poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 if (poolConfig.value.vdevs.length < 1) addVDev();
 
-defineExpose({validateData});
+defineExpose({
+  nameCheck,
+  diskCheck,
+  vDevCheck,
+  validateAndProceed
+});
 </script>
