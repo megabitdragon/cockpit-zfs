@@ -287,8 +287,8 @@
   <div v-if=" props.tag ==='file-system'">
     <fieldset>
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">File System Settings</legend>
-      <FileSystem ref="fileSystemConfiguration" idKey="file-system"/>
-      <!-- <p>COMING SOON</p> -->
+      <!-- <FileSystem ref="fileSystemConfiguration" idKey="file-system"/> -->
+      <p>COMING SOON</p>
     </fieldset>
   </div>
 
@@ -477,7 +477,7 @@ const validateAndProceed = (tabTag: string): boolean => {
     if (nameCheck()) {
       if (vDevCheck()) {
         if (diskCheck()) {
-          fileSystemConfiguration.value.nameCheck();
+          //fileSystemConfiguration.value.nameCheck();
         }
       }
     }

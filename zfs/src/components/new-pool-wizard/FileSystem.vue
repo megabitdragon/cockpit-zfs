@@ -14,7 +14,7 @@
       <!-- Name of File System (Text) -->
       <div>
         <label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium text-gray-900">Name</label>
-        <input :id="getIdKey('filesystem-name')" @change="nameCheck" type="name" name="pool-name" v-model="fileSystemConfig.name" class="mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="File System Name" />
+        <input :id="getIdKey('filesystem-name')" type="name" name="pool-name" v-model="fileSystemConfig.name" class="mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="File System Name" />
         <p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
       </div>
 
@@ -269,6 +269,6 @@ const nameCheck = () => {
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 defineExpose({
-  nameCheck,
+  //nameCheck,
 })
 </script>
