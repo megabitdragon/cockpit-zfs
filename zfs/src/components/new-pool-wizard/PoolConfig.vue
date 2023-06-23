@@ -100,12 +100,12 @@
             </div>
 
             <div class="button-group-row mt-2">
-              <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev(); vDevCheck()">Add VDev</button>
-              <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx); vDevCheck()">Remove VDev</button>  
+              <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
+              <button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
             </div>
         </div>
       <div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
-        <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
+        <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="initialVDev()">Add VDev</button>
       </div>
     </fieldset>
     <p class="text-danger" v-if="vDevFeedback">{{ vDevFeedback }}</p>
@@ -323,15 +323,8 @@ const disks = inject<Ref<DiskData[]>>('disks')!;
 const nameFeedback = ref('');
 const vDevFeedback = ref('');
 const diskFeedback = ref('');
-// const nameValid = ref(true);
-// const vDevValid = ref(true);
-// const diskValid = ref(true);
 
 const disabled = inject<Ref<boolean>>('disabled')!;
-
-// const usableDisks = computed<DiskData[]>(() => {
-//   return disks.value.filter((disk) => disk.usable);
-// });
 
 const vDevAvailDisks = computed<DiskData[][]>(() => {
   return poolConfig.value.vdevs.map((vdev, idx1) => {
@@ -345,10 +338,24 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 
 //const isMirror = ref(false);
 
+function initialVDev() {
+  const vDevConfig: vDevData = {
+    name: '',
+    type: 'mirror',
+    status: '',
+    guid: '',
+    stats: {},
+    disks: [],
+    selectedDisks: [],
+  }
+
+  poolConfig.value.vdevs.push(vDevConfig);
+}
+
 function addVDev() {
   const vDevConfig: vDevData = {
     name: '',
-    type: '',
+    type: poolConfig.value.vdevs[0].type,
     status: '',
     guid: '',
     stats: {},
@@ -394,8 +401,6 @@ const nameCheck = () => {
     result = false;
     nameFeedback.value = 'Name contains invalid characters.';
   } 
-
-  // nameValid.value = result;
   return result;
 }
 
@@ -418,8 +423,6 @@ const diskCheck = () => {
       diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
     } 
   });
-  
-  // diskValid.value = result;
   return result;
 }
 
@@ -431,8 +434,6 @@ const vDevCheck = () => {
     result = false;
     vDevFeedback.value = 'At least one Virtual Device is required.';
   }
-
-  // vDevValid.value = result;
   return result;
 }
 
@@ -440,12 +441,38 @@ const validateAndProceed = (tabTag: string): boolean => {
   if (tabTag === 'name-entry') {
     return nameCheck();
   } else if (tabTag == 'virtual-devices') {
-    if (vDevCheck()) {
-      return diskCheck();
+    if (nameCheck()) {
+      if (vDevCheck()) {
+        return diskCheck();
+      }
+    }
+  } else if (tabTag == 'pool-settings') {
+    if (nameCheck()) {
+      if (vDevCheck()) {
+        if (diskCheck()) {
+          return true;
+        }
+      }
+    }
+  } else if (tabTag == 'file-system') {
+    if (nameCheck()) {
+      if (vDevCheck()) {
+        if (diskCheck()) {
+          return true;
+        }
+      }
+    }
+  } else if (tabTag == 'review') {
+    if (nameCheck()) {
+      if (vDevCheck()) {
+        if (diskCheck()) {
+          return true;
+        }
+      }
     }
   }
 
-  return true;
+  return false;
 }
 
 function removeVDev(index: number) {
@@ -454,7 +481,7 @@ function removeVDev(index: number) {
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
-if (poolConfig.value.vdevs.length < 1) addVDev();
+if (poolConfig.value.vdevs.length < 1) initialVDev();
 
 defineExpose({
   nameCheck,
