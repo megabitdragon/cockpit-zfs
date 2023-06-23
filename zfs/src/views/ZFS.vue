@@ -20,9 +20,9 @@
         <PoolDiskList/>
       </div>
 
-      <!-- <div v-if="props.tag === 'filesystems'" class="p-4"> -->
-        <!-- <DiskList :disks="props.disks" /> -->
-      <!-- </div> -->
+      <div v-if="props.tag === 'filesystems'" class="p-4">
+
+      </div>
 
       <!-- <div v-if="props.tag === 'stats'" class="p-4">
       

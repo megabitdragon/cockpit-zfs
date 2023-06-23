@@ -62,7 +62,7 @@ import { ref, computed } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 interface DiskListProps {
-  disks: Disk[];
+  disks: DiskData[];
 }
 
 const props = defineProps<DiskListProps>();

@@ -29,8 +29,8 @@
           </div>
 
             <!-- If (Log, Special) -->
-            <!-- <div v-if="newVDev?.type == 'log' || newVDev?.type == 'special'">
-              <label :for="getIdKey('mirror-enabled" class="mt-1 block text-sm font-medium leading-6 text-gray-900">{{ newVDev!.type }} Mirror</label>
+            <!-- <div v-if="poolConfig.vdevs[vDevIdx].type == 'log' || poolConfig.vdevs[vDevIdx].type == 'special'">
+              <label :for="getIdKey('mirror-enabled')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">{{ poolConfig.vdevs[vDevIdx].type }} (Mirror)</label>
               <Switch v-model="isMirror" :class="[isMirror ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                 <span class="sr-only">Use setting</span>
                 <span :class="[isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
@@ -50,12 +50,12 @@
 
             <!-- Disk ID (Select) -->
             <!-- <div>
-              <label :for="getIdKey('disk-identifier" class="block text-sm font-medium leading-6 text-gray-900">Disk Identifier</label>
+              <label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-gray-900">Disk Identifier</label>
               <select id="disk-identifier" name="disk-identifier" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
                 <option>Block Device</option>
                 <option>Disk</option>
                 <option>Hardware Path</option>
-                <option selected>Device Alias</option>
+                <option>Device Alias</option>
               </select>
             </div> -->
 
@@ -287,8 +287,8 @@
   <div v-if=" props.tag ==='file-system'">
     <fieldset>
       <legend class="mb-1 text-base font-semibold leading-6 text-gray-900">File System Settings</legend>
-      <!-- <FileSystem idKey="file-system"/> -->
-      <p>COMING SOON</p>
+      <FileSystem ref="fileSystemConfiguration" idKey="file-system"/>
+      <!-- <p>COMING SOON</p> -->
     </fieldset>
   </div>
 
@@ -317,14 +317,16 @@ interface PoolConfigProps {
 const props = defineProps<PoolConfigProps>();
 
 const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
+const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
+const fileSystemConfiguration = ref();
 
 const disks = inject<Ref<DiskData[]>>('disks')!;
+
+//const isMirror = ref(false);
 
 const nameFeedback = ref('');
 const vDevFeedback = ref('');
 const diskFeedback = ref('');
-
-const disabled = inject<Ref<boolean>>('disabled')!;
 
 const vDevAvailDisks = computed<DiskData[][]>(() => {
   return poolConfig.value.vdevs.map((vdev, idx1) => {
@@ -335,8 +337,6 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
     return disks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
   })
 });
-
-//const isMirror = ref(false);
 
 function initialVDev() {
   const vDevConfig: vDevData = {
@@ -458,7 +458,7 @@ const validateAndProceed = (tabTag: string): boolean => {
     if (nameCheck()) {
       if (vDevCheck()) {
         if (diskCheck()) {
-          return true;
+          fileSystemConfiguration.value.nameCheck();
         }
       }
     }
@@ -471,7 +471,6 @@ const validateAndProceed = (tabTag: string): boolean => {
       }
     }
   }
-
   return false;
 }
 
@@ -484,9 +483,6 @@ const getIdKey = (name: string) => `${props.idKey}-${name}`;
 if (poolConfig.value.vdevs.length < 1) initialVDev();
 
 defineExpose({
-  nameCheck,
-  diskCheck,
-  vDevCheck,
   validateAndProceed
 });
 </script>

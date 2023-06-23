@@ -28,8 +28,7 @@ interface PoolData {
     forceCreate: boolean;
   },
   createFileSystem?: boolean;
-  fileSystem?: FileSystem;
-  //errors: string[];
+  fileSystem?: FileSystemData;
 }
 
 interface vDevData {
@@ -59,7 +58,7 @@ interface DiskData {
   usable: boolean;
 }
 
-interface FileSystem {
+interface FileSystemData {
   name: string;
   encryption: boolean;
   cipher: string;

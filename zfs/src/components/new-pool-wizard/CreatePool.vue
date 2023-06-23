@@ -10,7 +10,7 @@
       <div class="button-group-row">
         <button id="back" class="btn btn-secondary object-left justify-start" @click="prev">Back</button>
         <button v-if="!end" id="next" class="btn btn-primary object-right justify-end" @click="next">Next</button>
-        <button v-if="end" :disabled="disabled"  id="finish" class="btn btn-primary object-right justify-end" @click="finishBtn(newPoolName, newVDevs)">Finish</button>
+        <button v-if="end" id="finish" class="btn btn-primary object-right justify-end" @click="finishBtn(newPoolName, newVDevs)">Finish</button>
       </div>
     </template>
   </Modal>
@@ -26,11 +26,30 @@ import { createPool } from "../../scripts/pools";
 
 const show = ref(true);
 const navTag = ref('name-entry');
-const disabled = ref(false);
 
 const poolConfiguration = ref();
 
 const disks = inject<Ref<DiskData[]>>('disks')!;
+
+const fileSystemConfig = ref<FileSystemData>({
+    name: '',
+    encryption: false,
+    cipher: 'aes-256-gcm',
+    passphrase: '',
+    inherit: true,
+    accessTime: 'inherited',
+    caseSensitivity: 'inherited',
+    compression: 'inherited',
+    deduplication: 'inherited',
+    dNodeSize: 'inherited',
+    extendedAttributes: 'inherited',
+    recordSize: 'inherited',
+    quota: {
+      amount: 0,
+      size: 'kib',
+    },
+    readOnly: false,
+})
 
 const poolConfig = ref<PoolData>({
   name: '',
@@ -56,6 +75,8 @@ const poolConfig = ref<PoolData>({
     forceCreate: false,
   },
   createFileSystem: false,
+  fileSystem: fileSystemConfig.value,
+
 });
 
 const fillDisks = () => {
@@ -111,11 +132,6 @@ function getRoot(vDev) {
 function finishBtn(newPoolName, newVDevs) {
   createPool(newPoolName, newVDevs);
 }
-
-// const nameCheck = inject<()=> boolean>('name-check')!;
-// const diskCheck = inject<()=> boolean>('disk-check')!;
-// const vDevCheck = inject<()=> boolean>('vDev-check')!;
-//const validateAndProceed = inject<(tabTag : string)=> boolean>('validate-n-proceed')!;
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));
 
@@ -238,5 +254,5 @@ watch(navTag, updateStatus);
 updateStatus();
 
 provide('pool-config-data', poolConfig);
-provide('disabled', disabled);
+provide('file-system-data', fileSystemConfig);
 </script>
