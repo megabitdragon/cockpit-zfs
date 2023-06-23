@@ -421,6 +421,25 @@ const diskCheck = () => {
     } else if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) {
       result = false;
       diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
+    } else if (vdev.type == 'disk' && vdev.selectedDisks.length < 1) {
+      result = false;
+      diskFeedback.value = 'At least one Disk is required.';
+    } else if (vdev.type == 'log' && vdev.selectedDisks.length < 1) {
+      result = false;
+      diskFeedback.value = 'At least one Disk is required for Log.';
+    } else if (vdev.type == 'cache' && vdev.selectedDisks.length < 1) {
+      result = false;
+      diskFeedback.value = 'At least one Disk is required for Cache.';
+    } else if (vdev.type == 'special' && vdev.selectedDisks.length < 1) {
+      result = false;
+      diskFeedback.value = 'At least one Disk is required for Special.';
+    } else if (vdev.type == 'spare' && vdev.selectedDisks.length < 1) {
+      result = false;
+      diskFeedback.value = 'At least one Disk is required for Spare.';
+    } 
+    else if (vdev.type == 'dedup' && vdev.selectedDisks.length < 1) {
+      result = false;
+      diskFeedback.value = 'At least one Disk is required for Dedup.';
     } 
   });
   return result;
