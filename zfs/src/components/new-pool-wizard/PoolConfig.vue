@@ -329,14 +329,14 @@ const vDevFeedback = ref('');
 const diskFeedback = ref('');
 
 const vDevAvailDisks = computed<DiskData[][]>(() => {
-  return poolConfig.value.vdevs.map((vdev, idx1) => {
-    const claimed = poolConfig.value.vdevs.map((vdev2, idx2) => {
-      if (idx2! = idx1) return vdev2.selectedDisks;
-    }).flat();
-    //console.log(claimed);
+  return poolConfig.value.vdevs.map((vdev, vdevIdx) => {
+    const claimed = poolConfig.value.vdevs
+      .filter((_, idx) => idx !== vdevIdx)
+      .flatMap(vdev => vdev.selectedDisks);
     return disks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
-  })
+  });
 });
+
 
 function initialVDev() {
   const vDevConfig: vDevData = {
