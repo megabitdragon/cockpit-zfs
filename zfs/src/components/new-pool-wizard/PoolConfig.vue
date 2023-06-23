@@ -421,9 +421,9 @@ const diskCheck = () => {
     } else if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) {
       result = false;
       diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
-    } else if (vdev.type == 'disk' && vdev.selectedDisks.length < 1) {
+    } else if (vdev.type == 'disk' && vdev.selectedDisks.length != 1) {
       result = false;
-      diskFeedback.value = 'At least one Disk is required.';
+      diskFeedback.value = 'One Disk per Virtual Device.';
     } else if (vdev.type == 'log' && vdev.selectedDisks.length < 1) {
       result = false;
       diskFeedback.value = 'At least one Disk is required for Log.';

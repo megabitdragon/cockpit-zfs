@@ -77,9 +77,12 @@ getDisks().then(rawJSON => {
       stats: {},
     }
     disks.value.push(disk);
+    // console.log("Disk:");
     // console.log(disk);
   }
+  // console.log("Disks:");
   // console.log(disks);
+  
   getPools().then(rawJSON => {
     const parsedJSON = (JSON.parse(rawJSON));
     console.log('Pools JSON:');
@@ -109,10 +112,12 @@ getDisks().then(rawJSON => {
         errors: [],
       }
       pools.value.push(poolData);
-      //console.log(poolData);
+      console.log("poolData:");
+      console.log(poolData);
       vDevs.value = [];
     }
-    //console.log(pools);
+    console.log("Pools:");
+    console.log(pools);
   });
 });
 
@@ -127,40 +132,63 @@ function parseVDevData(vDev) {
     disks: [],
   };
   
-  if (!vDev.children) {return}
-
-  vDev.children.forEach(disk => {
-    const childDisk : DiskData = {
-      name: disk.name,
-      path: disk.path,
-      guid: disk.guid,
-      type: disk.type,
-      status: disk.status,
-      stats: disk.stats,
-      capacity: '',
-      model: '',
-      phy_path: '',
-      sd_path: '',
-      vdev_path: '',
-      serial: '',
+  if (vDev.children.length < 1) {
+    const diskVDev = disks.value.find(disk => disk.name === vDev.name)!;
+    const notAChildDisk : DiskData = {
+      name: diskVDev.name,
+      path: vDev.path,
+      guid: vDev.guid,
+      type: diskVDev.type,
+      status: vDev.status,
+      stats: vDev.stats,
+      capacity: diskVDev.capacity,
+      model: diskVDev.model,
+      phy_path: diskVDev.phy_path,
+      sd_path: diskVDev.sd_path,
+      vdev_path: diskVDev.vdev_path,
+      serial: diskVDev.serial,
       usable: false,
-    };
+    }
     
-    const fullDiskData = disks.value.find(disk => disk.name === childDisk.name);
-    
-    childDisk.capacity = fullDiskData?.capacity!;
-    childDisk.model = fullDiskData?.model!;
-    childDisk.phy_path = fullDiskData?.phy_path!;
-    childDisk.sd_path = fullDiskData?.sd_path!;
-    childDisk.vdev_path = fullDiskData?.vdev_path!;
-    childDisk.serial = fullDiskData?.serial!;
+    vDevData.disks.push(notAChildDisk);
+    console.log("Not A ChildDisk:");
+    console.log(notAChildDisk);
+  } else {
+    vDev.children.forEach(disk => {
+      const childDisk : DiskData = {
+        name: disk.name,
+        path: disk.path,
+        guid: disk.guid,
+        type: disk.type,
+        status: disk.status,
+        stats: disk.stats,
+        capacity: '',
+        model: '',
+        phy_path: '',
+        sd_path: '',
+        vdev_path: '',
+        serial: '',
+        usable: false,
+      };
+      
+      const fullDiskData = disks.value.find(disk => disk.name === childDisk.name);
+      
+      childDisk.capacity = fullDiskData?.capacity!;
+      childDisk.model = fullDiskData?.model!;
+      childDisk.phy_path = fullDiskData?.phy_path!;
+      childDisk.sd_path = fullDiskData?.sd_path!;
+      childDisk.vdev_path = fullDiskData?.vdev_path!;
+      childDisk.serial = fullDiskData?.serial!;
 
-    //console.log(childDisk);
-    vDevData.disks.push(childDisk);
-  });
+      console.log("ChildDisk:");
+      console.log(childDisk);
+      vDevData.disks.push(childDisk);
+    });
   
-  //console.log(vDevData);
-  vDevs.value.push(vDevData);
+    console.log("vDevData:");
+    console.log(vDevData);
+    vDevs.value.push(vDevData);
+  }
 }
 
 provide("pools", pools);
