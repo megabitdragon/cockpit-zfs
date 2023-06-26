@@ -60,22 +60,30 @@ interface DiskData {
 
 interface FileSystemData {
   name: string;
-  encryption: boolean;
+  id: string;
+  mountpoint: string;
+  pool: string;
+  encrypted: boolean;
   cipher: string;
   passphrase: string?;
+  key_loaded: boolean;
+  type: string;
   inherit: boolean;
-  accessTime: string;
-  caseSensitivity: string;
-  compression: string;
-  deduplication: string;
-  dNodeSize: string;
-  extendedAttributes: string;
-  recordSize: string;
-  quota: {
-    amount: number;
-    size: string;
-  };
-  readOnly: boolean;
+  properties: {
+    accessTime: string;
+    caseSensitivity: string;
+    compression: string;
+    deduplication: string;
+    dNodeSize: string;
+    extendedAttributes: string;
+    recordSize: string;
+    quota: {
+      amount: number;
+      size: string;
+    };
+    readOnly: boolean;
+  }
+
 }
 
 interface NavigationItem {

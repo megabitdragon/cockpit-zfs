@@ -21,7 +21,7 @@
       </div>
 
       <div v-if="props.tag === 'filesystems'" class="p-4">
-
+        <FileSystemSummary/>
       </div>
 
       <!-- <div v-if="props.tag === 'stats'" class="p-4">
@@ -44,6 +44,7 @@ import PoolSummary from "../components/pool/PoolSummary.vue";
 import PoolDiskList from "../components/pool/PoolDiskList.vue";
 import { getPools } from "../scripts/pools";
 import { getDisks } from "../scripts/disks";
+import FileSystemSummary from '../components/file-systems/FileSystemSummary.vue';
 
 interface ZFSProps {
   tag: string;
