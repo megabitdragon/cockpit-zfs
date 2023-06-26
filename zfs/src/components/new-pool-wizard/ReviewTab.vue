@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Recap all settings (Summary of main settings, More Details button for everything) -->
     <Accordion class="ml-4">
       <!-- Pool Info -->
       <template v-slot:title>
@@ -63,10 +62,10 @@
           <p><b>File System Details</b></p>
         </template>
         <template v-slot:content>
-          <p class="ml-10">Name of File System</p>
-          <p class="ml-10">Encryption On/Off</p>
-          <p class="ml-10">Quota Amount</p>
-          <p class="ml-10">Read Only On/Off</p>
+          <p class="ml-10">{{ poolConfig.fileSystem?.name }}</p>
+          <p class="ml-10">Encryption: {{poolConfig.fileSystem?.encryption}}</p>
+          <p class="ml-10">Quota Amount: {{ poolConfig.fileSystem?.quota.amount }}{{ poolConfig.fileSystem?.quota.size }}</p>
+          <p class="ml-10">Read Only: {{ poolConfig.fileSystem?.readOnly }}</p>
         </template>
     </Accordion>
     <br/>

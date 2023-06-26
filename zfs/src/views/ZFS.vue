@@ -153,6 +153,9 @@ function parseVDevData(vDev) {
     vDevData.disks.push(notAChildDisk);
     console.log("Not A ChildDisk:");
     console.log(notAChildDisk);
+    console.log("vDevData after not a child:");
+    console.log(vDevData);
+    vDevs.value.push(vDevData);
   } else {
     vDev.children.forEach(disk => {
       const childDisk : DiskData = {

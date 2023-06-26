@@ -110,7 +110,8 @@ const newVDevs = computed(() => {
       type: type,
       devices: devicePaths,
     }
-
+    console.log("newVDev: ");
+    console.log(newVDev);
     return newVDev;
   })
 });
@@ -144,6 +145,7 @@ const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) =
   if (currentTag === 'name-entry') {
     if(item.tag === 'virtual-devices' && poolConfiguration.value.validateAndProceed(currentTag)) {
       navTag.value = item.tag;
+      tabError.value = false;
     } else {
       tabError.value = true;
       console.log(`Validation failed for ${currentTag} tab. Cannot proceed to the ${item.tag} tab.`);
@@ -151,6 +153,7 @@ const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) =
   } else if (currentTag === 'virtual-devices') {
     if(item.tag === 'name-entry') {
       navTag.value = item.tag;
+      tabError.value = false;
     } else if (item.tag === 'pool-settings' && poolConfiguration.value.validateAndProceed(currentTag)) {
       navTag.value = item.tag;
     } else {
@@ -160,6 +163,7 @@ const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) =
   } else if (currentTag === 'pool-settings') {
     if(item.tag === 'name-entry' || item.tag === 'virtual-devices') {
       navTag.value = item.tag;
+      tabError.value = false;
     } else if (item.tag === 'file-system' && poolConfiguration.value.validateAndProceed(currentTag)) {
       navTag.value = item.tag;
     } else {
@@ -169,9 +173,11 @@ const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) =
   } else if (currentTag === 'file-system') {
     if(item.tag === 'name-entry' || item.tag === 'virtual-devices' || item.tag === 'pool-settings') {
       navTag.value = item.tag;
+      tabError.value = false;
     } else if (item.tag === 'review') {
       // } else if (item.tag === 'review' && poolConfiguration.value.validateAndProceed(currentTag)) {
       navTag.value = item.tag;
+      tabError.value = false;
     } else {
       tabError.value = true;
       console.log(`Validation failed for ${currentTag} tab. Cannot proceed to the ${item.tag} tab.`);
@@ -199,24 +205,28 @@ const next = () => {
   if (currentItem!.tag === 'name-entry') {
     if (poolConfiguration.value.validateAndProceed('name-entry')) {
       navTag.value = nextItem.tag;
+      tabError.value = false;
     } else {
       console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
     }
   } else if (currentItem!.tag === 'virtual-devices') {
     if (poolConfiguration.value.validateAndProceed('virtual-devices')) {
       navTag.value = nextItem.tag;
+      tabError.value = false;
     } else {
       console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
     }
   } else if (currentItem!.tag === 'pool-settings') {
     // if (poolConfiguration.value.validateAndProceed('pool-settings')) {
       navTag.value = nextItem.tag;
+      tabError.value = false;
     // } else {
     //   console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
     // }
   } else if (currentItem!.tag === 'file-system') {
     // if (poolConfiguration.value.validateAndProceed('file-system')) {
       navTag.value = nextItem.tag;
+      tabError.value = false;
     // } else {
     //   console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
     // }

@@ -34,7 +34,6 @@ def main():
     vdevs_raw = args.vdev_topology
 
     vdevs = json.loads(vdevs_raw)
-    print(vdevs_raw)
 
     options = {
         'feature@lz4_compress': 'enabled',
@@ -57,11 +56,36 @@ def main():
         topology = convert_topology(zfs, vdevs)
         try:
             zfs.create(pool_name, topology, options, fsoptions)
-
-            print(json.dumps({ 'status': 'ok' }))
         except:
             print(json.dumps({ 'status': 'error' }))
+            return
 
+        dataset = zfs.get_dataset(pool_name)
+
+        properties = {
+            'mountpoint': {'source': 'INHERIT'},
+        }
+
+        for k, v in properties.items():
+            prop = dataset.properties.get(k)
+
+            if v.get('source') == 'INHERIT':
+                if not prop:
+                    print(json.dumps({ 'status': 'error' }))
+                    return
+            else:
+                if not any(i in v for i in ('parsed', 'value')):
+                    print(json.dumps({ 'status': 'error' }))
+                    return
+                if not prop and ':' not in k:
+                    print(json.dumps({ 'status': 'error' }))
+                    return
+        
+        dataset.update_properties(properties)
+
+        dataset.mount()
+
+        print(json.dumps({ 'status': 'ok' }))
 
 if __name__ == '__main__':
     main()

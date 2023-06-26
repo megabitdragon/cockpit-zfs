@@ -19,7 +19,7 @@ export async function getPools() {
 
 export async function createPool(poolName : string, vDevs: newVDev[]) {
     try {
-      console.log(vDevs);
+      //console.log(vDevs);
       const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
       const output = await state.promise();
       console.log(output)

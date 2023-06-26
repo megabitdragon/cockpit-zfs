@@ -88,7 +88,7 @@
         <div>
           <label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-gray-900">Access Time</label>
           <select v-model="fileSystemConfig.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-            <option selected value="inherited">Inherited (On)</option>
+            <option selected value="inherited">Inherited (-)</option>
             <option value="on">On</option>
             <option value="off">Off</option>
           </select>
@@ -97,7 +97,7 @@
         <div>
           <label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-gray-900">Case Sensitivity</label>
           <select v-model="fileSystemConfig.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-            <option selected value="inherited">Inherited (Sensitive)</option>
+            <option selected value="inherited">Inherited (-)</option>
             <option value="insensitive">Insensitive</option>
             <option value="mixed">Mixed</option>
             <option value="sensitive">Sensitive</option>
@@ -107,7 +107,7 @@
         <div>
           <label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-gray-900">Compression</label>
           <select v-model="fileSystemConfig.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-            <option selected value="inherited">Inherited (LZ4)</option>
+            <option selected value="inherited">Inherited (-)</option>
             <option value="on">On</option>
             <option value="off">Off</option>
             <option value="gzip">GZIP</option>
@@ -120,7 +120,7 @@
         <div>
           <label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-gray-900">Deduplication</label>
           <select v-model="fileSystemConfig.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-            <option selected value="inherited">Inherited (Off)</option>
+            <option selected value="inherited">Inherited (-)</option>
            <option value="on">On</option>
            <option value="off">Off</option>
            <option value="edon-r + verify">Edon-R + Verify</option>
@@ -137,7 +137,7 @@
         <div>
           <label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-gray-900">DNode Size</label>
           <select v-model="fileSystemConfig.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-            <option selected value="inherited">Inherited (Legacy)</option>
+            <option selected value="inherited">Inherited (-)</option>
             <option value="1 kib">1 KiB</option>
             <option value="2 kibi">2 KiB</option>
             <option value="4 kib">4 KiB</option>
@@ -151,7 +151,7 @@
         <div>
           <label :for="getIdKey('fs-extended-attributes')" class="block text-sm font-medium leading-6 text-gray-900">Extended Attributes</label>
           <select v-model="fileSystemConfig.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-            <option selected value="inherited">Inherited (System Attribute)</option>
+            <option selected value="inherited">Inherited (-)</option>
             <option value="on">On</option>
             <option value="off">Off</option>
             <option value="system attribute">System Attribute</option>
@@ -161,7 +161,7 @@
         <div>
           <label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-gray-900">Record Size</label>
           <select v-model="fileSystemConfig.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-            <option selected value="inherited">Inherited (128 KiB)</option>
+            <option selected value="inherited">Inherited (-)</option>
             <option value="512 b">512 B</option>
             <option value="4 kib">4 KiB</option>
             <option value="8 kib">8 KiB</option>
