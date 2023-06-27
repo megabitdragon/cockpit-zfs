@@ -29,12 +29,13 @@
             <tbody class="divide-y divide-x divide-gray-200 bg-white">
 
               <!-- FILE SYSTEMS BY POOLS -->
-              <tr v-for="pool, poolIdx in poolData" :key="poolIdx">
+              <tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
                 <Accordion class="ml-4">
                   <template v-slot:title>
                     <td scope="col" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
                       <a href="#" class="text-btn-primary hover:text-btn-primary">
                         <!-- {{ fileSystem Name }} -->
+                        {{ fileSystem.name }}
                       </a>
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -99,10 +100,11 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Accordion from '../common/Accordion.vue';
 import { getDatasets } from "../../scripts/datasets";
+import { file } from "@45drives/cockpit-typings";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
-const fileSystems = ref<FileSystem[]>([]);
+const fileSystems = ref<FileSystemData[]>([]);
 
 getDatasets().then(rawJSON => {
     const parsedJSON = (JSON.parse(rawJSON));
@@ -110,7 +112,7 @@ getDatasets().then(rawJSON => {
     console.log(parsedJSON);
 
     for (let i = 0; i < parsedJSON.length; i++) {
-      const fileSystem = {
+      const dataset = {
         name: parsedJSON[i].name,
         id: parsedJSON[i].id,
         mountpoint: parsedJSON[i].mountpoint,
@@ -121,7 +123,7 @@ getDatasets().then(rawJSON => {
         passphrase: '',
         key_loaded: parsedJSON[i].key_loaded,
         type: parsedJSON[i].type,
-        inherit: '',
+        inherit: false,
         properties: {
           accessTime: parsedJSON[i].properties.atime.value,
           caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
@@ -138,6 +140,8 @@ getDatasets().then(rawJSON => {
           readOnly: parsedJSON[i].properties.readonly.value,
         }
       }
+
+      fileSystems.value.push(dataset);
     }
 });
 </script>

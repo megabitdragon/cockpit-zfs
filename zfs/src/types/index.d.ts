@@ -63,6 +63,7 @@ interface FileSystemData {
   id: string;
   mountpoint: string;
   pool: string;
+  isEncrypted: boolean
   encrypted: string;
   cipher: string;
   passphrase: string?;
