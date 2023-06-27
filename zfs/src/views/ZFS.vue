@@ -113,12 +113,12 @@ getDisks().then(rawJSON => {
         errors: [],
       }
       pools.value.push(poolData);
-      console.log("poolData:");
-      console.log(poolData);
+      //console.log("poolData:");
+      //console.log(poolData);
       vDevs.value = [];
     }
-    console.log("Pools:");
-    console.log(pools);
+    //console.log("Pools:");
+    //console.log(pools);
   });
 });
 
@@ -152,10 +152,10 @@ function parseVDevData(vDev) {
     }
     
     vDevData.disks.push(notAChildDisk);
-    console.log("Not A ChildDisk:");
-    console.log(notAChildDisk);
-    console.log("vDevData after not a child:");
-    console.log(vDevData);
+    //console.log("Not A ChildDisk:");
+    //console.log(notAChildDisk);
+    //console.log("vDevData after not a child:");
+    //console.log(vDevData);
     vDevs.value.push(vDevData);
   } else {
     vDev.children.forEach(disk => {
@@ -184,13 +184,13 @@ function parseVDevData(vDev) {
       childDisk.vdev_path = fullDiskData?.vdev_path!;
       childDisk.serial = fullDiskData?.serial!;
 
-      console.log("ChildDisk:");
-      console.log(childDisk);
+      //console.log("ChildDisk:");
+      //console.log(childDisk);
       vDevData.disks.push(childDisk);
     });
   
-    console.log("vDevData:");
-    console.log(vDevData);
+    //console.log("vDevData:");
+    //console.log(vDevData);
     vDevs.value.push(vDevData);
   }
 }

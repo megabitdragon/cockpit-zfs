@@ -34,29 +34,26 @@
                   <template v-slot:title>
                     <td scope="col" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
                       <a href="#" class="text-btn-primary hover:text-btn-primary">
-                        <!-- {{ poolData[poolIdx].name }} -->
+                        <!-- {{ fileSystem Name }} -->
                       </a>
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <!-- {{ poolData[poolIdx].status }} -->
+                      <!-- {{ fileSystem Used }} -->
                     </td>
-                    <td cscope="col" lass="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
-                      <!-- <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-                          <div v-if="poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
-                          <div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
-                      </div> -->
+                    <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
+                      <!-- {{ fileSystem Compression(%) }} -->
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <!-- {{ poolData[poolIdx].properties.allocated }} -->
+                      <!-- {{ fileSystem Deduplication }} -->
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <!-- {{ poolData[poolIdx].properties.free }} -->
+                      <!-- {{ fileSystem Encryption }} -->
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <!-- {{ poolData[poolIdx].properties.size }} -->
+                      <!-- {{ fileSystem Snapshots }} -->
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <!-- {{ poolData[poolIdx].properties.size }} -->
+                      <!-- {{ fileSystem ReadOnly }} -->
                     </td>
                     <td scope="col" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                       <Menu as="div" class="relative inline-block text-left">
@@ -84,73 +81,7 @@
                   </template>
 
                   <template v-slot:content>
-                    <!-- <tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs" :key="vDevIdx">
-                        <Accordion class="ml-4">
-                          <template v-slot:title>
-                            <td>
-                              {{  poolData[poolIdx].vdevs[vDevIdx].name }}
-                            </td>
-                          </template>
-                          <template v-slot:content>
-                            <table class="min-w-full divide-y divide-gray-300">
-                              <thead>
-                                <tr>
-                                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used (%)</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Free</th>
-                                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total</th>
-                                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
-                                    <span class="sr-only"></span>
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody class="divide-y divide-gray-200 bg-white">
-                                <tr v-for="disk, diskIdx in poolData[poolIdx].vdevs[vDevIdx].disks" :key="diskIdx">
-                                  <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
-                                    <a href="#" class="text-btn-primary hover:text-btn-primary">
-                                      {{ disk.name }}
-                                    </a>
-                                  </td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.status }}</td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
-                                    <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-
-                                    </div>
-                                  </td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">used</td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">free</td>
-                                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">total</td>
-                                  <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                                    <Menu as="div" class="relative inline-block text-left">
-                                      <div>
-                                        <MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-                                          <span class="sr-only">Open options</span>
-                                          <EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
-                                        </MenuButton>
-                                      </div>
-
-                                      <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                                        <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                          <div class="py-1">
-                                            <MenuItem v-slot="{ active }">
-                                              <a href="#" @onClick="showDiskDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
-                                            </MenuItem>
-                                            <MenuItem v-slot="{ active }">
-                                              <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Configure Settings</a>
-                                            </MenuItem>
-                                          </div>
-                                        </MenuItems>
-                                      </transition>
-                                    </Menu>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </template>
-                        </Accordion>
-                    </tr> -->
+                   <!-- Nested File Systems (If Any) -->
                   </template>
                 </Accordion>
               </tr>
@@ -162,11 +93,11 @@
   </div>
 
   <div v-if="showConfig">
-    <CreatePool @close="showConfig = false"/>
+    <!-- <CreatePool @close="showConfig = false"/> -->
   </div>
 
   <div v-if="showDiskDetails">
-    <DiskDetail @close="showDiskDetails = false"/>
+    <!-- <DiskDetail @close="showDiskDetails = false"/> -->
   </div>
 </template>
 
@@ -175,10 +106,16 @@ import { ref, inject, Ref } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Accordion from '../common/Accordion.vue';
+import { getDatasets } from "../../scripts/datasets";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
 const showConfig = ref(false);
 const showDiskDetails = ref(false);
 
+getDatasets().then(rawJSON => {
+    const parsedJSON = (JSON.parse(rawJSON));
+    console.log('Datasets JSON:');
+    console.log(parsedJSON);
+});
 </script>

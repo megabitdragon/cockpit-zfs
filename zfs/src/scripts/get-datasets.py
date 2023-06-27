@@ -12,17 +12,17 @@ def basic_typed_children(children):
 
 def main():
     with libzfs.ZFS() as zfs:
-        z_pools = []
+        z_datasets = []
 
-        for p in zfs.pools:
-            pool = p.asdict()
+        for p in zfs.datasets:
+            dataset = p.asdict()
 
-            pool['root_dataset']['properties']['creation']['parsed'] = str(pool['root_dataset']['properties']['creation']['parsed'])
+            dataset['properties']['creation']['parsed'] = str(dataset['properties']['creation']['parsed'])
 
-            pool['root_dataset']['children'] = basic_typed_children(pool['root_dataset']['children'])
+            dataset['children'] = basic_typed_children(dataset['children'])
 
-            z_pools.append(pool)
+            z_datasets.append(dataset)
 
-    print(json.dumps(z_pools, indent=4))
+    print(json.dumps(z_datasets, indent=4))
 if __name__ == '__main__':
     main()

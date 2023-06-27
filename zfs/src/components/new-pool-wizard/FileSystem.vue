@@ -21,15 +21,15 @@
       <!-- Encryption (Toggle) -> Reveals extra fields-->
       <div>
         <label :for="getIdKey('encryption')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Encryption</label>
-        <Switch :id="getIdKey('encryption')" v-model="fileSystemConfig.encryption" :class="[fileSystemConfig.encryption ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+        <Switch :id="getIdKey('encryption')" v-model="fileSystemConfig.encrypted" :class="[fileSystemConfig.encrypted ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
           <span class="sr-only">Use setting</span>
-          <span :class="[fileSystemConfig.encryption ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
-            <span :class="[fileSystemConfig.encryption ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+          <span :class="[fileSystemConfig.encrypted ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+            <span :class="[fileSystemConfig.encrypted ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
               <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
                 <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
-            <span :class="[fileSystemConfig.encryption ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+            <span :class="[fileSystemConfig.encrypted ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
               <svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
                 <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
               </svg>
@@ -38,7 +38,7 @@
         </Switch>
       </div>
 
-      <div v-if="fileSystemConfig.encryption">
+      <div v-if="fileSystemConfig.encrypted">
         <!-- Passphrase (Text) -->
           <div>
             <label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Passphrase</label>
@@ -87,7 +87,7 @@
         <!-- Access Time (Select) -->
         <div>
           <label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-gray-900">Access Time</label>
-          <select v-model="fileSystemConfig.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+          <select v-model="fileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
             <option selected value="inherited">Inherited (-)</option>
             <option value="on">On</option>
             <option value="off">Off</option>
@@ -96,7 +96,7 @@
         <!-- Case Sensitivity (Select) -->
         <div>
           <label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-gray-900">Case Sensitivity</label>
-          <select v-model="fileSystemConfig.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+          <select v-model="fileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
             <option selected value="inherited">Inherited (-)</option>
             <option value="insensitive">Insensitive</option>
             <option value="mixed">Mixed</option>
@@ -106,7 +106,7 @@
         <!-- Compression (Select) -->
         <div>
           <label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-gray-900">Compression</label>
-          <select v-model="fileSystemConfig.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+          <select v-model="fileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
             <option selected value="inherited">Inherited (-)</option>
             <option value="on">On</option>
             <option value="off">Off</option>
@@ -119,7 +119,7 @@
         <!-- Deduplication (Select) -->
         <div>
           <label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-gray-900">Deduplication</label>
-          <select v-model="fileSystemConfig.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+          <select v-model="fileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
             <option selected value="inherited">Inherited (-)</option>
            <option value="on">On</option>
            <option value="off">Off</option>
@@ -136,7 +136,7 @@
         <!-- DNode Size (Select) -->
         <div>
           <label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-gray-900">DNode Size</label>
-          <select v-model="fileSystemConfig.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+          <select v-model="fileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
             <option selected value="inherited">Inherited (-)</option>
             <option value="1 kib">1 KiB</option>
             <option value="2 kibi">2 KiB</option>
@@ -150,7 +150,7 @@
         <!-- Extended Attributes (Select) -->
         <div>
           <label :for="getIdKey('fs-extended-attributes')" class="block text-sm font-medium leading-6 text-gray-900">Extended Attributes</label>
-          <select v-model="fileSystemConfig.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+          <select v-model="fileSystemConfig.properties.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
             <option selected value="inherited">Inherited (-)</option>
             <option value="on">On</option>
             <option value="off">Off</option>
@@ -160,7 +160,7 @@
         <!-- Record Size (Select) -->
         <div>
           <label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-gray-900">Record Size</label>
-          <select v-model="fileSystemConfig.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+          <select v-model="fileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
             <option selected value="inherited">Inherited (-)</option>
             <option value="512 b">512 B</option>
             <option value="4 kib">4 KiB</option>
@@ -180,9 +180,9 @@
         <div>
           <label :for="getIdKey('fs-quota')" class="mb-1 block text-sm font-medium leading-6 text-gray-900">Quota</label>
           <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-            <input v-model="fileSystemConfig.quota.amount" :id="getIdKey('fs-quota-amount')" type="range" min="0" max="1000" value="0" step="1" class="block sm:col-span-4 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"/>
-            <input v-model="fileSystemConfig.quota.amount" type="number" name="fs-quota-num" :id="getIdKey('fs-quota-amount')" value="0" class="block sm:col-span-1 rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>          
-            <select v-model="fileSystemConfig.quota.size" :id="getIdKey('fs-quota-size')" name="fs-quota-slider" class="block sm:col-span-1 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+            <input v-model="fileSystemConfig.properties.quota.amount" :id="getIdKey('fs-quota-amount')" type="range" min="0" max="1000" value="0" step="1" class="block sm:col-span-4 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"/>
+            <input v-model="fileSystemConfig.properties.quota.amount" type="number" name="fs-quota-num" :id="getIdKey('fs-quota-amount')" value="0" class="block sm:col-span-1 rounded-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>          
+            <select v-model="fileSystemConfig.properties.quota.size" :id="getIdKey('fs-quota-size')" name="fs-quota-slider" class="block sm:col-span-1 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
               <option selected value="kib">KiB</option>
               <option value="mib">MiB</option>
               <option value="gib">GiB</option>
@@ -193,15 +193,15 @@
         <!-- Read Only (Toggle) -->
         <div>
           <label :for="getIdKey('fs-read-only')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Read Only</label>
-          <Switch v-model="fileSystemConfig.readOnly" :class="[fileSystemConfig.readOnly ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+          <Switch v-model="fileSystemConfig.properties.readOnly" :class="[fileSystemConfig.properties.readOnly ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
             <span class="sr-only">Use setting</span>
-            <span :class="[fileSystemConfig.readOnly ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
-              <span :class="[fileSystemConfig.readOnly ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+            <span :class="[fileSystemConfig.properties.readOnly ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+              <span :class="[fileSystemConfig.properties.readOnly ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                 <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
                   <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
-              <span :class="[fileSystemConfig.readOnly ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+              <span :class="[fileSystemConfig.properties.readOnly ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                 <svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
                   <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
                 </svg>

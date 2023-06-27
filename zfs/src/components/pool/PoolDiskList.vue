@@ -40,7 +40,7 @@
                         </a>
                       </td>
                       <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].status }}</td>
-                      <td cscope="col" lass="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
+                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
                         <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
                             <div v-if="poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
                             <div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>

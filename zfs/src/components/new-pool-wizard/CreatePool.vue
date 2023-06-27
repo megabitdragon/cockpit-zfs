@@ -35,22 +35,29 @@ const disks = inject<Ref<DiskData[]>>('disks')!;
 
 const fileSystemConfig = ref<FileSystemData>({
     name: '',
-    encryption: false,
+    id: '',
+    pool: '',
+    mountpoint: '',
+    type: '',
+    encrypted: false,
     cipher: 'aes-256-gcm',
     passphrase: '',
+    key_loaded: false,
     inherit: true,
-    accessTime: 'inherited',
-    caseSensitivity: 'inherited',
-    compression: 'inherited',
-    deduplication: 'inherited',
-    dNodeSize: 'inherited',
-    extendedAttributes: 'inherited',
-    recordSize: 'inherited',
-    quota: {
-      amount: 0,
-      size: 'kib',
-    },
-    readOnly: false,
+    properties: {
+        accessTime: 'inherited',
+      caseSensitivity: 'inherited',
+      compression: 'inherited',
+      deduplication: 'inherited',
+      dNodeSize: 'inherited',
+      extendedAttributes: 'inherited',
+      recordSize: 'inherited',
+      quota: {
+        amount: 0,
+        size: 'kib',
+      },
+      readOnly: false,
+    }
 })
 
 const poolConfig = ref<PoolData>({
@@ -89,8 +96,8 @@ const fillDisks = () => {
     });
   });
 
-  console.log("Pool Config:");
-  console.log(poolConfig);
+  //console.log("Pool Config:");
+  //console.log(poolConfig);
 };
 
 const newVDevs = computed(() => {
@@ -99,7 +106,7 @@ const newVDevs = computed(() => {
     const devicePaths : string[] = [];
     vdev.disks.forEach(disk => {
       devicePaths.push(disk.vdev_path);
-      console.log(disk.vdev_path);
+      //console.log(disk.vdev_path);
     });
     
     const root = getRoot(vdev);
@@ -110,8 +117,8 @@ const newVDevs = computed(() => {
       type: type,
       devices: devicePaths,
     }
-    console.log("newVDev: ");
-    console.log(newVDev);
+    //console.log("newVDev: ");
+    //console.log(newVDev);
     return newVDev;
   })
 });
