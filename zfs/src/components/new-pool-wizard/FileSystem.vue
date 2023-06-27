@@ -21,7 +21,7 @@
       <!-- Encryption (Toggle) -> Reveals extra fields-->
       <div>
         <label :for="getIdKey('encryption')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Encryption</label>
-        <Switch :id="getIdKey('encryption')" v-model="fileSystemConfig.encrypted" :class="[fileSystemConfig.encrypted ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+        <Switch :id="getIdKey('encryption')" v-model="fileSystemConfig.isEncrypted" :class="[fileSystemConfig.encrypted ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
           <span class="sr-only">Use setting</span>
           <span :class="[fileSystemConfig.encrypted ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
             <span :class="[fileSystemConfig.encrypted ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
@@ -177,7 +177,7 @@
 
       <div>
         <!-- Quota (Slider + Select) -->
-        <div>
+        <!-- <div>
           <label :for="getIdKey('fs-quota')" class="mb-1 block text-sm font-medium leading-6 text-gray-900">Quota</label>
           <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
             <input v-model="fileSystemConfig.properties.quota.amount" :id="getIdKey('fs-quota-amount')" type="range" min="0" max="1000" value="0" step="1" class="block sm:col-span-4 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"/>
@@ -188,10 +188,10 @@
               <option value="gib">GiB</option>
             </select>
           </div>
-        </div>
+        </div> -->
 
         <!-- Read Only (Toggle) -->
-        <div>
+        <!-- <div>
           <label :for="getIdKey('fs-read-only')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Read Only</label>
           <Switch v-model="fileSystemConfig.properties.readOnly" :class="[fileSystemConfig.properties.readOnly ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
             <span class="sr-only">Use setting</span>
@@ -208,7 +208,8 @@
               </span>
             </span>
           </Switch>
-        </div>
+        </div> -->
+
       </div>
     </div>
   </div>

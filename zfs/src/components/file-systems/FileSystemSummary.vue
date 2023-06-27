@@ -102,9 +102,42 @@ import { getDatasets } from "../../scripts/datasets";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
+const fileSystems = ref<FileSystem[]>([]);
+
 getDatasets().then(rawJSON => {
     const parsedJSON = (JSON.parse(rawJSON));
     console.log('Datasets JSON:');
     console.log(parsedJSON);
+
+    for (let i = 0; i < parsedJSON.length; i++) {
+      const fileSystem = {
+        name: parsedJSON[i].name,
+        id: parsedJSON[i].id,
+        mountpoint: parsedJSON[i].mountpoint,
+        pool: parsedJSON[i].pool,
+        encrypted: parsedJSON[i].encrypted,
+        isEncrypted: false,
+        cipher: '',
+        passphrase: '',
+        key_loaded: parsedJSON[i].key_loaded,
+        type: parsedJSON[i].type,
+        inherit: '',
+        properties: {
+          accessTime: parsedJSON[i].properties.atime.value,
+          caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
+          compression: parsedJSON[i].properties.compression.value,
+          deduplication: parsedJSON[i].properties.dedup.value,
+          dNodeSize: parsedJSON[i].properties.dnodesize.value,
+          extendedAttributes: '',
+          recordSize: parsedJSON[i].properties.recordsize.value,
+          quota: {
+            raw: parsedJSON[i].properties.quota.rawvalue,
+            value: parsedJSON[i].properties.quota.value,
+            size: '',
+          },
+          readOnly: parsedJSON[i].properties.readonly.value,
+        }
+      }
+    }
 });
 </script>

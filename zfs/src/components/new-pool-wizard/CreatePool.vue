@@ -34,31 +34,34 @@ const poolConfiguration = ref();
 const disks = inject<Ref<DiskData[]>>('disks')!;
 
 const fileSystemConfig = ref<FileSystemData>({
-    name: '',
-    id: '',
-    pool: '',
-    mountpoint: '',
-    type: '',
-    encrypted: false,
-    cipher: 'aes-256-gcm',
-    passphrase: '',
-    key_loaded: false,
-    inherit: true,
-    properties: {
-        accessTime: 'inherited',
-      caseSensitivity: 'inherited',
-      compression: 'inherited',
-      deduplication: 'inherited',
-      dNodeSize: 'inherited',
-      extendedAttributes: 'inherited',
-      recordSize: 'inherited',
-      quota: {
-        amount: 0,
-        size: 'kib',
-      },
-      readOnly: false,
-    }
-})
+  name: '',
+  id: '',
+  mountpoint: '',
+  pool: '',
+  encrypted: '',
+  isEncrypted: false,
+  cipher: '',
+  passphrase: '',
+  key_loaded: '',
+  type: '',
+  inherit: false,
+  properties: {
+    accessTime: '',
+    caseSensitivity: '',
+    compression: '',
+    deduplication: '',
+    dNodeSize: '',
+    extendedAttributes: '',
+    recordSize: '',
+    quota: {
+      raw: 0,
+      value: '',
+      size: '',
+    },
+    readOnly: '',
+  }
+
+});
 
 const poolConfig = ref<PoolData>({
   name: '',

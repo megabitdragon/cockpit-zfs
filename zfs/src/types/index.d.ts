@@ -63,10 +63,10 @@ interface FileSystemData {
   id: string;
   mountpoint: string;
   pool: string;
-  encrypted: boolean;
+  encrypted: string;
   cipher: string;
   passphrase: string?;
-  key_loaded: boolean;
+  key_loaded: string;
   type: string;
   inherit: boolean;
   properties: {
@@ -78,10 +78,11 @@ interface FileSystemData {
     extendedAttributes: string;
     recordSize: string;
     quota: {
-      amount: number;
+      raw: number;
+      value: string;
       size: string;
     };
-    readOnly: boolean;
+    readOnly: string;
   }
 
 }
