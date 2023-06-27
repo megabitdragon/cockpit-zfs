@@ -34,22 +34,22 @@
                   
                   <Accordion class="ml-4">
                     <template v-slot:title>
-                      <td scope="col" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
+                      <td colspan="3" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
                         <a href="#" class="text-btn-primary hover:text-btn-primary">
                           {{ poolData[poolIdx].name }}
                         </a>
                       </td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].status }}</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
+                      <td colspan="3" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].status }}</td>
+                      <td colspan="3" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
                         <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
                             <div v-if="poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
                             <div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
                         </div>
                       </td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.allocated }}</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.free }}</td>
-                      <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.size }}</td>
-                      <td scope="col" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                      <td colspan="3" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.allocated }}</td>
+                      <td colspan="3" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.free }}</td>
+                      <td colspan="3" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.size }}</td>
+                      <td colspan="3" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                         <Menu as="div" class="relative inline-block text-left">
                           <div>
                             <MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">

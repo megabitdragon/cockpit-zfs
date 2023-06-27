@@ -117,8 +117,8 @@ const newVDevs = computed(() => {
       type: type,
       devices: devicePaths,
     }
-    //console.log("newVDev: ");
-    //console.log(newVDev);
+    console.log("newVDev: ");
+    console.log(newVDev);
     return newVDev;
   })
 });

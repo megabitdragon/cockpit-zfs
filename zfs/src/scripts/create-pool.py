@@ -40,7 +40,7 @@ def main():
         'altroot': '/mnt',
         'failmode': 'continue',
         'autoexpand': 'on',
-        'ashift': 12,
+        'ashift': '12',
     }
 
     fsoptions = {
@@ -57,7 +57,7 @@ def main():
         try:
             zfs.create(pool_name, topology, options, fsoptions)
         except:
-            print(json.dumps({ 'status': 'error' }))
+            print(json.dumps({ 'status': 'error 1' }))
             return
 
         dataset = zfs.get_dataset(pool_name)
@@ -71,14 +71,14 @@ def main():
 
             if v.get('source') == 'INHERIT':
                 if not prop:
-                    print(json.dumps({ 'status': 'error' }))
+                    print(json.dumps({ 'status': 'error 2' }))
                     return
             else:
                 if not any(i in v for i in ('parsed', 'value')):
-                    print(json.dumps({ 'status': 'error' }))
+                    print(json.dumps({ 'status': 'error 3' }))
                     return
                 if not prop and ':' not in k:
-                    print(json.dumps({ 'status': 'error' }))
+                    print(json.dumps({ 'status': 'error 4' }))
                     return
         
         dataset.update_properties(properties)
