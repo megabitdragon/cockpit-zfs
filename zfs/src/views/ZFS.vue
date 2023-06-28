@@ -9,11 +9,11 @@
             </div>
           </div>
 
-          <!-- <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
               <DiskSummary/>
             </div>
-          </div> -->
+          </div>
       </div>
 
       <div v-if="props.tag === 'pools'" class="p-4">
@@ -44,6 +44,7 @@ import PoolSummary from "../components/pool/PoolSummary.vue";
 import PoolDiskList from "../components/pool/PoolDiskList.vue";
 import { getPools } from "../scripts/pools";
 import { getDisks } from "../scripts/disks";
+import { getDatasets } from "../scripts/datasets";
 import FileSystemSummary from '../components/file-systems/FileSystemSummary.vue';
 
 interface ZFSProps {
@@ -55,6 +56,7 @@ const props = defineProps<ZFSProps>();
 const pools = ref<PoolData[]>([]);
 const vDevs = ref<vDevData[]>([]);
 const disks = ref<DiskData[]>([]);
+const fileSystems = ref<FileSystemData[]>([]);
 
 getDisks().then(rawJSON => {
   const parsedJSON = (JSON.parse(rawJSON));
@@ -110,8 +112,17 @@ getDisks().then(rawJSON => {
           free: parsedJSON[i].properties.free.value,
         },
         vdevs: vDevs.value,
-        errors: [],
+        // fileSystems: parsedJSON[i].root_dataset.value,
       }
+
+      if (parsedJSON[i].root_dataset.children.length >= 1) {
+        parsedJSON[i].root_dataset.children.forEach(child => {
+         
+        });
+      }
+
+      
+
       pools.value.push(poolData);
       //console.log("poolData:");
       //console.log(poolData);
@@ -120,6 +131,59 @@ getDisks().then(rawJSON => {
     //console.log("Pools:");
     //console.log(pools);
   });
+});
+
+// function checkChildElements(pool) {
+//   pool.forEach(item => {
+//     if (item.root_dataset.children.length >= 1) {
+//       checkChildElements(item.root_dataset.children);
+//     }
+//   });
+// }
+
+function recursiveChildCheck(dataset) {
+  dataset.children.forEach(child => {
+    
+  });
+}
+
+getDatasets().then(rawJSON => {
+    const parsedJSON = (JSON.parse(rawJSON));
+    console.log('Datasets JSON:');
+    console.log(parsedJSON);
+
+    for (let i = 0; i < parsedJSON.length; i++) {
+      const dataset = {
+        name: parsedJSON[i].name,
+        id: parsedJSON[i].id,
+        mountpoint: parsedJSON[i].mountpoint,
+        pool: parsedJSON[i].pool,
+        encrypted: parsedJSON[i].encrypted,
+        isEncrypted: false,
+        cipher: '',
+        passphrase: '',
+        key_loaded: parsedJSON[i].key_loaded,
+        type: parsedJSON[i].type,
+        inherit: false,
+        properties: {
+          accessTime: parsedJSON[i].properties.atime.value,
+          caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
+          compression: parsedJSON[i].properties.compression.value,
+          deduplication: parsedJSON[i].properties.dedup.value,
+          dNodeSize: parsedJSON[i].properties.dnodesize.value,
+          extendedAttributes: '',
+          recordSize: parsedJSON[i].properties.recordsize.value,
+          quota: {
+            raw: parsedJSON[i].properties.quota.rawvalue,
+            value: parsedJSON[i].properties.quota.value,
+            size: '',
+          },
+          readOnly: parsedJSON[i].properties.readonly.value,
+        }
+      }
+
+      fileSystems.value.push(dataset);
+    }
 });
 
 function parseVDevData(vDev) {
@@ -158,31 +222,23 @@ function parseVDevData(vDev) {
     //console.log(vDevData);
     vDevs.value.push(vDevData);
   } else {
-    vDev.children.forEach(disk => {
+    vDev.children.forEach(disk1 => {
+      const fullDiskData = disks.value.find(disk => disk.name === disk1.name)!;
       const childDisk : DiskData = {
-        name: disk.name,
-        path: disk.path,
-        guid: disk.guid,
-        type: disk.type,
-        status: disk.status,
-        stats: disk.stats,
-        capacity: '',
-        model: '',
-        phy_path: '',
-        sd_path: '',
-        vdev_path: '',
-        serial: '',
+        name: fullDiskData.name,
+        path: fullDiskData.path,
+        guid: fullDiskData.guid,
+        type: fullDiskData.type,
+        status: fullDiskData.status,
+        stats: fullDiskData.stats,
+        capacity: fullDiskData.capacity,
+        model: fullDiskData.model,
+        phy_path: fullDiskData.phy_path,
+        sd_path: fullDiskData.sd_path,
+        vdev_path: fullDiskData.vdev_path,
+        serial: fullDiskData.serial,
         usable: false,
-      };
-      
-      const fullDiskData = disks.value.find(disk => disk.name === childDisk.name);
-      
-      childDisk.capacity = fullDiskData?.capacity!;
-      childDisk.model = fullDiskData?.model!;
-      childDisk.phy_path = fullDiskData?.phy_path!;
-      childDisk.sd_path = fullDiskData?.sd_path!;
-      childDisk.vdev_path = fullDiskData?.vdev_path!;
-      childDisk.serial = fullDiskData?.serial!;
+      }; 
 
       //console.log("ChildDisk:");
       //console.log(childDisk);
@@ -197,5 +253,6 @@ function parseVDevData(vDev) {
 
 provide("pools", pools);
 provide("disks", disks);
+provide("datasets", fileSystems);
 </script>
 

@@ -19,7 +19,7 @@
                 <template v-slot:content>
                   <tr>
                     <td v-for="(disk, index) in disks" :key="index">
-                      <DiskCard :name="disk.name" :member="disk.pool" :type="disk.type" :status="disk.status" :spaceUsed="disk.usagePercent!" :totalSize="disk.totalSize!"/>
+                      <DiskCard :name="disk.name" :type="disk.type" :status="disk.status" :spaceUsed="0" :usable="disk.usable" :totalSize="disk.capacity!"/>
                     </td>
                   </tr>
                 </template>

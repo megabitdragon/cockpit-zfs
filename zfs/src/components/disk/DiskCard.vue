@@ -55,13 +55,13 @@
   </template>
   <template v-slot:footer>
     <tr>
-      Used:  {{ usedSpaceAmount.toFixed(2)}} TB
+      <!-- Used:  {{ usedSpaceAmount.toFixed(2)}} TB -->
     </tr>
     <tr>
-      Free:  {{ freeSpaceAmount.toFixed(2)}} TB
+      <!-- Free:  {{ freeSpaceAmount.toFixed(2)}} TB -->
     </tr>
     <tr>
-      <b>Total:  {{ props.totalSize }} TB</b>
+      <b>Total:  {{ props.totalSize }}</b>
     </tr>
   </template>
 </Card>
@@ -79,18 +79,19 @@ interface DiskCardProps {
   spaceUsed: number,
   type: string,
   member?: string,
-  totalSize: number,
+  totalSize: string,
+  usable: boolean,
 }
 
-const usedSpaceAmount = computed(() => {
-  const total = props.totalSize * (props.spaceUsed / 100);
-  return total;
-});
+// const usedSpaceAmount = computed(() => {
+//   const total = props.totalSize * (props.spaceUsed / 100);
+//   return total;
+// });
 
-const freeSpaceAmount = computed(() => {
-  const total = props.totalSize - usedSpaceAmount.value;
-  return total;
-});
+// const freeSpaceAmount = computed(() => {
+//   const total = props.totalSize - usedSpaceAmount.value;
+//   return total;
+// });
 
 const props = defineProps<DiskCardProps>();
 

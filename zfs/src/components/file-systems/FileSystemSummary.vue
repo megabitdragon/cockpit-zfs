@@ -85,6 +85,7 @@
                   </template>
                 </Accordion>
               </tr>
+
             </tbody>
           </table>
         </div>
@@ -99,49 +100,10 @@ import { ref, inject, Ref } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Accordion from '../common/Accordion.vue';
-import { getDatasets } from "../../scripts/datasets";
-import { file } from "@45drives/cockpit-typings";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
-const fileSystems = ref<FileSystemData[]>([]);
+const fileSystems = inject<FileSystemData[]>('datasets')!;
 
-getDatasets().then(rawJSON => {
-    const parsedJSON = (JSON.parse(rawJSON));
-    console.log('Datasets JSON:');
-    console.log(parsedJSON);
 
-    for (let i = 0; i < parsedJSON.length; i++) {
-      const dataset = {
-        name: parsedJSON[i].name,
-        id: parsedJSON[i].id,
-        mountpoint: parsedJSON[i].mountpoint,
-        pool: parsedJSON[i].pool,
-        encrypted: parsedJSON[i].encrypted,
-        isEncrypted: false,
-        cipher: '',
-        passphrase: '',
-        key_loaded: parsedJSON[i].key_loaded,
-        type: parsedJSON[i].type,
-        inherit: false,
-        properties: {
-          accessTime: parsedJSON[i].properties.atime.value,
-          caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
-          compression: parsedJSON[i].properties.compression.value,
-          deduplication: parsedJSON[i].properties.dedup.value,
-          dNodeSize: parsedJSON[i].properties.dnodesize.value,
-          extendedAttributes: '',
-          recordSize: parsedJSON[i].properties.recordsize.value,
-          quota: {
-            raw: parsedJSON[i].properties.quota.rawvalue,
-            value: parsedJSON[i].properties.quota.value,
-            size: '',
-          },
-          readOnly: parsedJSON[i].properties.readonly.value,
-        }
-      }
-
-      fileSystems.value.push(dataset);
-    }
-});
 </script>

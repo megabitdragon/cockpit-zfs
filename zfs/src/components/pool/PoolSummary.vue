@@ -6,18 +6,13 @@
                     <span class="font-semibold text-xl">
                         <tr>
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Pools</td>
-                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><img src="../../../public/icons/success.svg"></td>
-                          <!-- <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{ pools.length }}</td> -->
+                          <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"></td>                       
                           <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Effective Space: {{ totalEffectiveSpace }} T</td>
-                          <!-- <td scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"><button @onClick=""><ArrowPathIcon class="h-5 w-5"/></button></td> -->
                         </tr>
                     </span>
                 </template>
                 <template v-slot:content>
                     <tr>
-                      <!-- <td v-for="(pool, index) in pools" :key="index">
-                        <PoolCard :name="pool.name" :status="pool.status" :spaceUsed="pool.usagePercent!" :totalSize="pool.totalSize!"/>
-                      </td> -->
                       <td v-for="(pool, index) in pools" :key="index">
                         <PoolCard :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
                       </td>
@@ -26,6 +21,39 @@
             </Accordion>
         </tbody>
     </table>
+
+    <!-- <div class="grid grid-cols-2 gap-x-4">
+        <div>
+            <h2 class="font-semibold text-xl">Pools</h2>
+        </div>
+        <div>
+            <h2 class="font-semibold text-xl">Total Effective Space: {{ totalEffectiveSpace }} T</h2>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-x-4">
+        <div v-for="(pool, index) in pools" :key="index">
+            <PoolCard :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
+        </div>
+    </div> -->
+   
+    <!-- <div class="bg-gray-50">
+      <Accordion class="ml-4">
+        <template v-slot:title>
+          <span class="font-semibold text-xl">
+            Pools <div><img src="../../../public/icons/success.svg"></div>
+            Total Effective Space: {{ totalEffectiveSpace }} T
+          </span>
+        </template>
+        <template v-slot:content>
+          <div class="grid grid-rows-4 grid-flow-col gap-4">
+            <div v-for="(pool, index) in pools" :key="index">
+              <PoolCard :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
+            </div>
+          </div>
+        </template>
+      </Accordion>
+    </div> -->
 </template>
 
 <script setup lang="ts">

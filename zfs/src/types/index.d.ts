@@ -85,7 +85,6 @@ interface FileSystemData {
     };
     readOnly: string;
   }
-
 }
 
 interface NavigationItem {
