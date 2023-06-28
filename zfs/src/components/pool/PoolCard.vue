@@ -25,7 +25,7 @@
                     <a href="#" @onClick="" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
                   </MenuItem>
                   <MenuItem v-slot="{ active }">
-                    <a href="#" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+                    <a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
                   </MenuItem>
                 </div>
               </MenuItems>
@@ -71,6 +71,7 @@
 import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+//import { destroyPool } from '../../scripts/pools';
 import Card from '../common/Card.vue';
 
 interface PoolCardProps {

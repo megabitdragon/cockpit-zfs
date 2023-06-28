@@ -113,6 +113,7 @@ interface Dataset {
     deduplication: string;
     dNodeSize: string;
     extendedAttributes: string;
+    readOnly: string;
     recordSize: string;
     quota: string;
     mounted: string;

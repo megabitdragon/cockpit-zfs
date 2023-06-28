@@ -18,14 +18,26 @@ export async function getPools() {
 }
 
 export async function createPool(poolName : string, vDevs: newVDev[]) {
-    try {
-      //console.log(vDevs);
-      const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
-      const output = await state.promise();
-      console.log(output)
-      return output.stdout;
-    } catch (state) {
-      console.error(errorString(state));
-      return null;
-    }
+  try {
+    //console.log(vDevs);
+    const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
+    const output = await state.promise();
+    console.log(output)
+    return output.stdout;
+  } catch (state) {
+    console.error(errorString(state));
+    return null;
   }
+}
+
+// export async function destroyPool(poolName : string) {
+//   try {
+//     const state = useSpawn(['zpool', 'destroy', poolName], { superuser: 'try', stderr: 'out'});
+//     const output = await state.promise();
+//     console.log(output)
+//     return output.stdout;
+//   } catch (state) {
+//     console.error(errorString(state));
+//     return null;
+//   }
+// }

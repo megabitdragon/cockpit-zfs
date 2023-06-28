@@ -11,7 +11,6 @@
           <table class="min-w-full divide-y divide-gray-300">
             <thead>
               <tr>
-
                 <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
@@ -31,9 +30,15 @@
 
               <!-- FILE SYSTEMS BY POOLS -->
               <tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
-                <Accordion class="ml-4">
-                  <template v-slot:title>
-                    <td scope="col" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
+                <!-- <Accordion class="ml-4">
+                  <template v-slot:title>                  
+                  </template>
+
+                  <template v-slot:content>                  
+                  </template>
+                </Accordion> -->
+
+                <td scope="col" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
                       <a href="#" class="text-btn-primary hover:text-btn-primary">
                         <!-- {{ fileSystem Name }} -->
                         {{ fileSystem.name }}
@@ -41,25 +46,31 @@
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <!-- {{ fileSystem Available }} -->
-                      <!-- {{ fileSystem.properties.available }} -->
+                      {{ fileSystem.properties.available }}
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <!-- {{ fileSystem Used }} -->
+                      {{ fileSystem.properties.used }}
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
                       <!-- {{ fileSystem Compression(%) }} -->
+                      {{ fileSystem.properties.compression }}
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <!-- {{ fileSystem Deduplication }} -->
+                      {{ fileSystem.properties.deduplication }}
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <!-- {{ fileSystem Encryption }} -->
+                      {{ fileSystem.encrypted }}
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <!-- {{ fileSystem Snapshots }} -->
+                      {{ fileSystem.properties.snapshotCount }}
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <!-- {{ fileSystem ReadOnly }} -->
+                      {{ fileSystem.properties.readOnly }}
                     </td>
                     <td scope="col" class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                       <Menu as="div" class="relative inline-block text-left">
@@ -83,15 +94,6 @@
                         </transition>
                       </Menu>
                     </td>
-                  </template>
-
-                  <template v-slot:content>
-                   <!-- Nested File Systems (If Any) -->
-                   <div v-if="fileSystem">
-
-                   </div>
-                  </template>
-                </Accordion>
               </tr>
 
             </tbody>

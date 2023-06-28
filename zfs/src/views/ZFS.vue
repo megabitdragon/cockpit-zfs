@@ -175,7 +175,22 @@ getDatasets().then(rawJSON => {
         encrypted: parsedJSON[i].encrypted,
         key_loaded: parsedJSON[i].key_loaded,
         type: parsedJSON[i].type,
-        properties: parsedJSON[i].properties,
+        properties: {
+          available: parsedJSON[i].properties.available.value,
+          creation: parsedJSON[i].properties.creation.value,
+          snapshotCount: parsedJSON[i].properties.snapshot_count.value,
+          used: parsedJSON[i].properties.used.value,
+          accessTime: parsedJSON[i].properties.atime.value,
+          caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
+          compression: parsedJSON[i].properties.compression.value,
+          deduplication: parsedJSON[i].properties.dedup.value,
+          dNodeSize: parsedJSON[i].properties.dnodesize.value,
+          extendedAttributes: '',
+          readOnly: parsedJSON[i].properties.readonly.value,
+          recordSize: parsedJSON[i].properties.recordsize.value,
+          quota: parsedJSON[i].properties.quota.value,
+          mounted: parsedJSON[i].properties.mounted.value,
+        },
       }
 
       datasets.value.push(dataset);
