@@ -1,5 +1,5 @@
 <template>
-  <Card class="mt-2 mb-4 min-w-12">
+  <Card class="mt-2 mb-4">
     <template v-slot:title>
       <tr>
         <td>

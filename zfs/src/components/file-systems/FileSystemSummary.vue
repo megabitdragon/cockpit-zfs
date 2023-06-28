@@ -13,6 +13,7 @@
               <tr>
 
                 <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Compression</th>
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Deduplication</th>
@@ -37,6 +38,10 @@
                         <!-- {{ fileSystem Name }} -->
                         {{ fileSystem.name }}
                       </a>
+                    </td>
+                    <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <!-- {{ fileSystem Available }} -->
+                      <!-- {{ fileSystem.properties.available }} -->
                     </td>
                     <td scope="col" class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <!-- {{ fileSystem Used }} -->
@@ -82,6 +87,9 @@
 
                   <template v-slot:content>
                    <!-- Nested File Systems (If Any) -->
+                   <div v-if="fileSystem">
+
+                   </div>
                   </template>
                 </Accordion>
               </tr>
@@ -103,7 +111,7 @@ import Accordion from '../common/Accordion.vue';
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
-const fileSystems = inject<FileSystemData[]>('datasets')!;
+const fileSystems = inject<Dataset[]>('datasets')!;
 
 
 </script>

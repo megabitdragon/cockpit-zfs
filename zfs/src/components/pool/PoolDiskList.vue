@@ -30,7 +30,7 @@
               </thead>
 
               <tbody class="divide-y divide-x divide-gray-200 bg-white">
-                <tr colspan="6" v-for="pool, poolIdx in poolData" :key="poolIdx">
+                <tr class="col-span-6" v-for="pool, poolIdx in poolData" :key="poolIdx">
                   
                   <Accordion class="ml-4">
                     <template v-slot:title>

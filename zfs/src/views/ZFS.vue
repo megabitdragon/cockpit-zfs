@@ -3,17 +3,20 @@
     <div class="w-full h-full px-8 bg-well text-default grow flex flex-col overflow-y-auto py-8">
 
       <div v-if="props.tag === 'dashboard'" class="p-4">
-          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <PoolSummary/>
-            </div>
-          </div>
+        <!-- <Dashboard/> -->
 
-          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <DiskSummary/>
-            </div>
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <PoolSummary/>
           </div>
+        </div>
+
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <DiskSummary/>
+          </div>
+        </div>
+
       </div>
 
       <div v-if="props.tag === 'pools'" class="p-4">
@@ -42,6 +45,7 @@ import "@45drives/cockpit-vue-components/dist/style.css";
 import DiskSummary from "../components/disk/DiskSummary.vue";
 import PoolSummary from "../components/pool/PoolSummary.vue";
 import PoolDiskList from "../components/pool/PoolDiskList.vue";
+import Dashboard from '../components/pool/Dashboard.vue';
 import { getPools } from "../scripts/pools";
 import { getDisks } from "../scripts/disks";
 import { getDatasets } from "../scripts/datasets";
@@ -57,6 +61,7 @@ const pools = ref<PoolData[]>([]);
 const vDevs = ref<vDevData[]>([]);
 const disks = ref<DiskData[]>([]);
 const fileSystems = ref<FileSystemData[]>([]);
+const datasets = ref<Dataset[]>([]);
 
 getDisks().then(rawJSON => {
   const parsedJSON = (JSON.parse(rawJSON));
@@ -114,16 +119,15 @@ getDisks().then(rawJSON => {
         vdevs: vDevs.value,
         // fileSystems: parsedJSON[i].root_dataset.value,
       }
-
-      if (parsedJSON[i].root_dataset.children.length >= 1) {
-        parsedJSON[i].root_dataset.children.forEach(child => {
-         
-        });
-      }
-
-      
-
+     
       pools.value.push(poolData);
+
+      // if (parsedJSON[i].root_dataset.children && parsedJSON[i].root_dataset.children.length > 0) {
+      //   parsedJSON[i].root_dataset.children.forEach(child => {
+      //     recursiveChildCheck(child, poolData);
+      //   });
+      // }
+
       //console.log("poolData:");
       //console.log(poolData);
       vDevs.value = [];
@@ -133,19 +137,29 @@ getDisks().then(rawJSON => {
   });
 });
 
-// function checkChildElements(pool) {
-//   pool.forEach(item => {
-//     if (item.root_dataset.children.length >= 1) {
-//       checkChildElements(item.root_dataset.children);
-//     }
-//   });
-// }
+// function recursiveChildCheck(dataset, pool) {
+//   const datasetData = {
+//     name: dataset.name,
+//     children: [],
+//   }
 
-function recursiveChildCheck(dataset) {
-  dataset.children.forEach(child => {
-    
-  });
+//   if (dataset.children.length >= 1) {
+//     dataset.children.forEach(child => {
+//       recursiveChildCheck(child, datasetData)
+//     });
+//   }
+
+//   pool.value.datasets.push(datasetData);
+// };
+
+function recursiveChildData(dataset) {
+  if (dataset.children.length >= 1) {
+    dataset.children.forEach(child => {
+      recursiveChildData(child);
+    });
+  }
 }
+
 
 getDatasets().then(rawJSON => {
     const parsedJSON = (JSON.parse(rawJSON));
@@ -153,36 +167,18 @@ getDatasets().then(rawJSON => {
     console.log(parsedJSON);
 
     for (let i = 0; i < parsedJSON.length; i++) {
-      const dataset = {
+      const dataset : Dataset = {
         name: parsedJSON[i].name,
         id: parsedJSON[i].id,
         mountpoint: parsedJSON[i].mountpoint,
         pool: parsedJSON[i].pool,
         encrypted: parsedJSON[i].encrypted,
-        isEncrypted: false,
-        cipher: '',
-        passphrase: '',
         key_loaded: parsedJSON[i].key_loaded,
         type: parsedJSON[i].type,
-        inherit: false,
-        properties: {
-          accessTime: parsedJSON[i].properties.atime.value,
-          caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
-          compression: parsedJSON[i].properties.compression.value,
-          deduplication: parsedJSON[i].properties.dedup.value,
-          dNodeSize: parsedJSON[i].properties.dnodesize.value,
-          extendedAttributes: '',
-          recordSize: parsedJSON[i].properties.recordsize.value,
-          quota: {
-            raw: parsedJSON[i].properties.quota.rawvalue,
-            value: parsedJSON[i].properties.quota.value,
-            size: '',
-          },
-          readOnly: parsedJSON[i].properties.readonly.value,
-        }
+        properties: parsedJSON[i].properties,
       }
 
-      fileSystems.value.push(dataset);
+      datasets.value.push(dataset);
     }
 });
 
@@ -253,6 +249,6 @@ function parseVDevData(vDev) {
 
 provide("pools", pools);
 provide("disks", disks);
-provide("datasets", fileSystems);
+provide("datasets", datasets);
 </script>
 

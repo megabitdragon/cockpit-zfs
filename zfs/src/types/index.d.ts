@@ -29,6 +29,7 @@ interface PoolData {
   },
   createFileSystem?: boolean;
   fileSystem?: FileSystemData;
+  datasets?: Dataset[];
 }
 
 interface vDevData {
@@ -84,7 +85,39 @@ interface FileSystemData {
       size: string;
     };
     readOnly: string;
+    available: string;
+    creation: string;
+    snapshotCount: string;
+    used: string;
+    mounted: string;
+  },
+  children?: FileSystemData[];
+}
+
+interface Dataset {
+  name: string;
+  id: string;
+  mountpoint: string;
+  pool: string;
+  encrypted: string;
+  key_loaded: string;
+  type: string;
+  properties: {
+    available: string;
+    creation: string;
+    snapshotCount: string;
+    used: string;
+    accessTime: string;
+    caseSensitivity: string;
+    compression: string;
+    deduplication: string;
+    dNodeSize: string;
+    extendedAttributes: string;
+    recordSize: string;
+    quota: string;
+    mounted: string;
   }
+  children?: Dataset[];
 }
 
 interface NavigationItem {
