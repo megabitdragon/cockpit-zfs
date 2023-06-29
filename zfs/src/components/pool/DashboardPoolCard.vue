@@ -21,7 +21,7 @@
               <MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div class="py-1">
                   <MenuItem v-slot="{ active }">
-                    <a href="#" @onClick="" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
+                    <a href="#" @onClick="showPoolDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
                   </MenuItem>
                   <MenuItem v-slot="{ active }">
                     <a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
@@ -59,12 +59,15 @@
       </div>
     </template>
   </Card>
+
 </template>
 
 <script setup lang="ts">
+import { ref, inject, Ref, computed, provide } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Card from '../common/Card.vue';
+import PoolDetail from "./PoolDetail.vue";
 
 interface DashboardPoolCardProps {
   name: string,
@@ -76,5 +79,6 @@ interface DashboardPoolCardProps {
 }
 
 const props = defineProps<DashboardPoolCardProps>();
+const showPoolDetails = inject('show-pool-deets')!;
 
 </script>

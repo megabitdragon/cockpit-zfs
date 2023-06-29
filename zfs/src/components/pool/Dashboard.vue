@@ -51,11 +51,15 @@
     </div>
 
   </div>
+
+  <!-- <div v-if="showPoolDetails">
+    <PoolDetail :pool="selectedPool" @close="showPoolDetails = false"/>
+  </div> -->
 </div>
 </template>
 
 <script setup lang="ts">
-import {computed, ref, Ref, inject} from 'vue';
+import {computed, ref, Ref, inject, provide} from 'vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashboardPoolCard from "../pool/DashboardPoolCard.vue";
 import DashboardDiskCard from '../disk/DashboardDiskCard.vue';
@@ -84,5 +88,14 @@ const disksHDD = computed(() => {
 const totalRawSpace = computed(() => {
   return 
 })
+
+const showPoolDetails = ref(false);
+
+// const selectedPool = computed(() => {
+//   return pools.value.find(pool => pool.name === props.name)!;
+// });
+
+//provide('selected-pool', selectedPool);
+provide('show-pool-deets', showPoolDetails);
 
 </script>
