@@ -59,7 +59,12 @@ const fileSystemConfig = ref<FileSystemData>({
       size: '',
     },
     readOnly: '',
-  }
+    available: '',
+    creation: '',
+    snapshotCount: '',
+    used: '',
+    mounted: '',
+  },
 
 });
 

@@ -3,20 +3,7 @@
     <div class="w-full h-full px-8 bg-well text-default grow flex flex-col overflow-y-auto py-8">
 
       <div v-if="props.tag === 'dashboard'" class="p-4">
-        <!-- <Dashboard/> -->
-
-        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-            <PoolSummary/>
-          </div>
-        </div>
-
-        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-            <DiskSummary/>
-          </div>
-        </div>
-
+        <Dashboard/>
       </div>
 
       <div v-if="props.tag === 'pools'" class="p-4">
@@ -42,8 +29,6 @@
 import { reactive, ref, Ref, inject, computed, provide } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import DiskSummary from "../components/disk/DiskSummary.vue";
-import PoolSummary from "../components/pool/PoolSummary.vue";
 import PoolDiskList from "../components/pool/PoolDiskList.vue";
 import Dashboard from '../components/pool/Dashboard.vue';
 import { getPools } from "../scripts/pools";

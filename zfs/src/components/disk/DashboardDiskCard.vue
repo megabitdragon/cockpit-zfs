@@ -21,10 +21,7 @@
               <MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div class="py-1">
                   <MenuItem v-slot="{ active }">
-                    <a href="#" @onClick="" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
-                  </MenuItem>
-                  <MenuItem v-slot="{ active }">
-                    <a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+                    <a href="#" @onClick="" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
                   </MenuItem>
                 </div>
               </MenuItems>
@@ -32,49 +29,55 @@
           </Menu>
         </div>
       </div>
-   
-
      <div>
       <span>{{props.status}}</span>
      </div>
+     <div>
+      <span>{{ props.type }}</span>
+     </div>
     </template>
     <template v-slot:content>
-      <div class="flex justify-between mb-1">
-        <span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;</span>
-        <span class="text-sm font-medium text-green-700 dark:text-white">{{props.capacity}}%</span>
-      </div>
-      <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-          <div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
-      </div>
+     <div>
+      <span>X° C&nbsp;</span>
+     </div>
+     <div>
+      <span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;&nbsp;&nbsp;</span>
+      <span class="text-sm font-medium text-green-700 dark:text-white">{{props.spaceUsed}}%</span>
+     </div>
     </template>
     <template v-slot:footer>
       <div>
-        Used {{ props.allocated }}
-      </div>
-      <div>
-        Free {{ props.free }}
-      </div>
-      <div>
-        <b>Total {{ props.size }}</b>
+        <b>Total: {{ props.totalSize }}</b>
       </div>
     </template>
   </Card>
 </template>
 
 <script setup lang="ts">
+import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Card from '../common/Card.vue';
 
-interface DashboardPoolCardProps {
+interface DashboardDiskCardProps {
   name: string,
   status: string,
-  capacity: number,
-  size: string,
-  free: string;
-  allocated: string;
+  spaceUsed: number,
+  type: string,
+  totalSize: string,
+  usable: boolean,
 }
 
-const props = defineProps<DashboardPoolCardProps>();
+// const usedSpaceAmount = computed(() => {
+//   const total = props.totalSize * (props.spaceUsed / 100);
+//   return total;
+// });
+
+// const freeSpaceAmount = computed(() => {
+//   const total = props.totalSize - usedSpaceAmount.value;
+//   return total;
+// });
+
+const props = defineProps<DashboardDiskCardProps>();
 
 </script>
