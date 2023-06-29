@@ -7,7 +7,7 @@
 
     <div class="mt-8">
       <div class="-mx-4 -my-2 overflow-auto sm:-mx-6 lg:-mx-8">
-        <div class="overflow-y-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+        <div class="overflow-y-visible shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
           <table class="min-w-full divide-y divide-gray-300">
             <thead>
               <tr>
