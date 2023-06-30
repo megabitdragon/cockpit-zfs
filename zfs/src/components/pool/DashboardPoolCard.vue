@@ -21,10 +21,10 @@
 							<MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 								<div class="py-1">
 									<MenuItem v-slot="{ active }">
-										<a href="#" @onClick="showPoolDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
+										<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
 									</MenuItem>
 									<MenuItem v-slot="{ active }">
-										<a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+										<a href="#" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 									</MenuItem>
 								</div>
 							</MenuItems>
@@ -84,6 +84,8 @@ const pools = inject<Ref<PoolData[]>>('pools')!;
 const selectedPool = computed(() => {
 	return pools.value.find(pool => pool.name === props.name)!;
 });
+
+console.log(selectedPool);
 
 provide('show-pool-deets', showPoolDetails);
 provide('selected-pool', selectedPool);

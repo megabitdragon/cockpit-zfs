@@ -8,7 +8,7 @@
 				<div class="px-1">
 					<img class="w-4 h-4" src="../../../public/icons/success.svg">
 				</div>
-				<!-- <div id="menu-btn" class="">
+				<div id="menu-btn" class="">
 					<Menu as="div" class="relative inline-block text-left">
 						<div>
 							<MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -27,7 +27,7 @@
 							</MenuItems>
 						</transition>
 					</Menu>
-				</div> -->
+				</div>
 			</div>
 		 <div>
 			<span>{{props.status}}</span>
