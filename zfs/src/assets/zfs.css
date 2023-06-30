@@ -1,4 +1,7 @@
-div, td, th, tr, table {
+/* div, td, th, tr, table {
   border: 1px dotted gray;
-  padding: 0.5em;
+} */
+
+.accordion-template {
+  grid-template-columns: 200px 1fr;
 }

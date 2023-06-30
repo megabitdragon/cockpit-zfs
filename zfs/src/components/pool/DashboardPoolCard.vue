@@ -1,65 +1,64 @@
 <template>
-  <Card class="mt-2 mb-4">
-    <template v-slot:title>
-      <div class="grid grid-cols-3 grid-flow-col gap-1">
-        <div class="pr-2">
-          {{ props.name }}
-        </div>
-        <div class="px-1">
-          <img class="w-4 h-4" src="../../../public/icons/success.svg">
-        </div>
-        <div id="menu-btn" class="">
-          <Menu as="div" class="relative inline-block text-left">
-            <div>
-              <MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-                <span class="sr-only">Open options</span>
-                <EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
-              </MenuButton>
-            </div>
+	<Card class="mt-2 mb-4">
+		<template v-slot:title>
+			<div class="grid grid-cols-3 grid-flow-col gap-1">
+				<div class="pr-2">
+					{{ props.name }}
+				</div>
+				<div class="px-1">
+					<img class="w-4 h-4" src="../../../public/icons/success.svg">
+				</div>
+				<div id="menu-btn" class="">
+					<Menu as="div" class="relative inline-block text-left">
+						<div>
+							<MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+								<span class="sr-only">Open options</span>
+								<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+							</MenuButton>
+						</div>
 
-            <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-              <MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <div class="py-1">
-                  <MenuItem v-slot="{ active }">
-                    <a href="#" @onClick="showPoolDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
-                  </MenuItem>
-                  <MenuItem v-slot="{ active }">
-                    <a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
-                  </MenuItem>
-                </div>
-              </MenuItems>
-            </transition>
-          </Menu>
-        </div>
-      </div>
-   
+						<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+							<MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+								<div class="py-1">
+									<MenuItem v-slot="{ active }">
+										<a href="#" @onClick="showPoolDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
+									</MenuItem>
+									<MenuItem v-slot="{ active }">
+										<a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+									</MenuItem>
+								</div>
+							</MenuItems>
+						</transition>
+					</Menu>
+				</div>
+			</div>
+	
 
-     <div>
-      <span>{{props.status}}</span>
-     </div>
-    </template>
-    <template v-slot:content>
-      <div class="flex justify-between mb-1">
-        <span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;</span>
-        <span class="text-sm font-medium text-green-700 dark:text-white">{{props.capacity}}%</span>
-      </div>
-      <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-          <div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
-      </div>
-    </template>
-    <template v-slot:footer>
-      <div>
-        Used {{ props.allocated }}
-      </div>
-      <div>
-        Free {{ props.free }}
-      </div>
-      <div>
-        <b>Total {{ props.size }}</b>
-      </div>
-    </template>
-  </Card>
-
+		<div>
+			<span>{{props.status}}</span>
+		</div>
+		</template>
+		<template v-slot:content>
+			<div class="flex justify-between mb-1">
+				<span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;</span>
+				<span class="text-sm font-medium text-green-700 dark:text-white">{{props.capacity}}%</span>
+			</div>
+			<div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+					<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
+			</div>
+		</template>
+		<template v-slot:footer>
+			<div>
+				Used {{ props.allocated }}
+			</div>
+			<div>
+				Free {{ props.free }}
+			</div>
+			<div>
+				<b>Total {{ props.size }}</b>
+			</div>
+		</template>
+	</Card>
 </template>
 
 <script setup lang="ts">
@@ -70,15 +69,22 @@ import Card from '../common/Card.vue';
 import PoolDetail from "./PoolDetail.vue";
 
 interface DashboardPoolCardProps {
-  name: string,
-  status: string,
-  capacity: number,
-  size: string,
-  free: string;
-  allocated: string;
+	name: string,
+	status: string,
+	capacity: number,
+	size: string,
+	free: string;
+	allocated: string;
 }
 
 const props = defineProps<DashboardPoolCardProps>();
-const showPoolDetails = inject('show-pool-deets')!;
+const showPoolDetails = ref(false);
+const pools = inject<Ref<PoolData[]>>('pools')!;
 
+const selectedPool = computed(() => {
+	return pools.value.find(pool => pool.name === props.name)!;
+});
+
+provide('show-pool-deets', showPoolDetails);
+provide('selected-pool', selectedPool);
 </script>
