@@ -26,7 +26,7 @@
                 </tr>
               </thead>
 
-              <tbody class="divide-y divide-x divide-gray-200 bg-white grid grid-cols-7 grid-flow-col">
+              <tbody class="divide-y divide-x divide-gray-200 bg-white">
                 <template v-for="pool, poolIdx in poolData" :key="poolIdx">
                   <Accordion class="ml-4">
                     <template v-slot:title>
@@ -73,6 +73,7 @@
                         </td>
                       </tr>
                     </template>
+
                     <template v-slot:content>
                       <tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs" :key="vDevIdx">
                         <Accordion class="ml-4">
@@ -123,8 +124,10 @@
                       </tr>
                     </template>
                   </Accordion>
+
                 </template>
               </tbody>
+              
              </table>
           </div>
         </div>

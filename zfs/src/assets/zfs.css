@@ -1,0 +1,4 @@
+div, td, th, tr, table {
+  border: 1px dotted gray;
+  padding: 0.5em;
+}
