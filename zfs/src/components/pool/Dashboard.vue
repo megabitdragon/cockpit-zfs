@@ -16,7 +16,7 @@
 
 			<div class="grid grid-cols-6 grid-flow-col">
 				<div v-for="(pool, index) in pools" :key="index" class="p-2">
-						<DashboardPoolCard  @poolSelected="handlePoolSelected" :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
+						<DashboardPoolCard :showDetails="showDetails" :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
 				</div>
 			</div>
 
@@ -52,10 +52,11 @@
 
 		</div>
 	
-		<!-- <div v-if="showPoolDetails">
-			<PoolDetail :pool="selectedPool" @close="showPoolDetails = false"/>
+		<div v-if="showPoolDetails">
+			<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
 		</div>
-		<div v-if="showDiskDetails">
+		
+		<!-- <div v-if="showDiskDetails">
 			<DiskDetail :disk="selectedDisk" @close="showDiskDetails = false"/>
 		</div> -->
 
@@ -96,16 +97,17 @@ const disksHDD = computed(() => {
 //   return 
 // })
 
-const showPoolDetails = inject('show-pool-deets');
-const showDiskDetails = inject('show-disk-deets');
+const showPoolDetails = ref(false);
 
-const selectedPool = ref<PoolData | null>(null);
+const selectedPool = ref<PoolData>();
 
-const handlePoolSelected = (poolData: PoolData) => {
-  selectedPool.value = poolData;
-};
+function showDetails(poolName) {
+	const selected = pools.value.find(pool => pool.name == poolName)!;
+	selectedPool.value = selected;
+	showPoolDetails.value = true;
+}
 
-// const selectedPool = inject<Ref<PoolData>>('selected-pool')!;
-const selectedDisk = inject<Ref<DiskData>>('selected-disk')!;
-
+defineExpose({
+	showDetails
+});
 </script>

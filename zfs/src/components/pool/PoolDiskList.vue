@@ -62,7 +62,7 @@
 																		<MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																			<div class="py-1">
 																				<MenuItem v-slot="{ active }">
-																					<a href="#" @onClick="showPoolDetails = true" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
+																					<a href="#" @onClick="showDetails(pool[poolIdx].name)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
 																				</MenuItem>
 																				<MenuItem v-slot="{ active }">
 																					<a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
@@ -148,7 +148,7 @@
 	</div> -->
 
 	<div v-if="showPoolDetails">
-		<PoolDetail :pool="selectedPool" @close="showPoolDetails = false"/>
+		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
 	</div>
 </template>
 
@@ -162,12 +162,17 @@ import DiskDetail from "../disk/DiskDetail.vue";
 import PoolDetail from "./PoolDetail.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
-
 // console.log(poolData.value);
 
 const showConfig = ref(false);
-const showDiskDetails = ref(false);
-const showPoolDetails = ref(true);
-// const showPoolDetails = inject('show-pool-deets')!;
-const selectedPool = inject<Ref<PoolData>>('selected-pool')!;
+const showPoolDetails = ref(false);
+
+const selectedPool = ref<PoolData>();
+
+function showDetails(poolName) {
+	const selected = poolData.value.find(pool => pool.name == poolName)!;
+	selectedPool.value = selected;
+	showPoolDetails.value = true;
+}
+
 </script>

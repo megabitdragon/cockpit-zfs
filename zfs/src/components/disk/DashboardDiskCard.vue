@@ -29,21 +29,24 @@
 					</Menu>
 				</div>
 			</div>
-		 <div>
-			<span>{{props.status}}</span>
-		 </div>
-		 <div>
-			<span>{{ props.type }}</span>
-		 </div>
-		</template>
-		<template v-slot:content>
-		 <div>
-			<span>X° C&nbsp;</span>
-		 </div>
-		 <div>
-			<span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;&nbsp;&nbsp;</span>
-			<span class="text-sm font-medium text-green-700 dark:text-white">{{props.spaceUsed}}%</span>
-		 </div>
+			<div>
+				<span>{{props.status}}</span>
+			</div>
+			<div>
+				<span>{{ props.type }}</span>
+			</div>
+			</template>
+			<template v-slot:content>
+			<div>
+				<span>X° C&nbsp;</span>
+			</div>
+			<div>
+				<span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;&nbsp;&nbsp;</span>
+				<span class="text-sm font-medium text-green-700 dark:text-white">{{props.spaceUsed}}%</span>
+			</div>
+			<!-- <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+				<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
+			</div> -->
 		</template>
 		<template v-slot:footer>
 			<div>
