@@ -1,5 +1,6 @@
 <template>
 	<div class="px-4 sm:px-6 lg:px-8">
+		<!-- buttons for creating/importing pools and refreshing list -->
 		<div class="button-group-row">
 				<button id="createPool" class="btn btn-primary object-left justify-start" @click="showConfig = true">Create Storage Pool</button>
 				<button id="importPool" class="btn btn-secondary object-left justify-start" @click="" disabled>Import Storage Pool</button>

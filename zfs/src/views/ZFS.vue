@@ -48,11 +48,13 @@ const disks = ref<DiskData[]>([]);
 const fileSystems = ref<FileSystemData[]>([]);
 const datasets = ref<Dataset[]>([]);
 
+//executes python script to retrieve all disks in server and output a JSON
 getDisks().then(rawJSON => {
   const parsedJSON = (JSON.parse(rawJSON));
   console.log('Disks JSON:');
   console.log(parsedJSON);
 
+  //loops through and adds disk data from JSON to disk data object, pushes objects to disks array
   for (let i = 0; i < parsedJSON.length; i++) {
     const disk = {
       name: parsedJSON[i].name,
@@ -76,13 +78,15 @@ getDisks().then(rawJSON => {
   // console.log("Disks:");
   // console.log(disks);
   
+  //executes a python script to retrieve all zfs pools on server and output a JSON
   getPools().then(rawJSON => {
     const parsedJSON = (JSON.parse(rawJSON));
     console.log('Pools JSON:');
     console.log(parsedJSON);
 
+    //loops through pool JSON
     for (let i = 0; i < parsedJSON.length; i++) {
-
+      //calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
       parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev));
       parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev));
       parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev));
@@ -90,6 +94,7 @@ getDisks().then(rawJSON => {
       parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev));
       parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev));
     
+      //adds pool data from JSON into pool data object, pushes into array 
       const poolData = {
         name: parsedJSON[i].name,
         status: parsedJSON[i].status,
@@ -101,6 +106,7 @@ getDisks().then(rawJSON => {
           capacity: parsedJSON[i].properties.capacity.rawvalue,
           free: parsedJSON[i].properties.free.value,
         },
+        //adds VDev array to Pool data object
         vdevs: vDevs.value,
         // fileSystems: parsedJSON[i].root_dataset.value,
       }
@@ -121,6 +127,8 @@ getDisks().then(rawJSON => {
     //console.log(pools);
   });
 });
+
+//trying to figure out a way to recursively add filesystems + nested filesystems to pool data object
 
 // function recursiveChildCheck(dataset, pool) {
 //   const datasetData = {
@@ -145,12 +153,13 @@ function recursiveChildData(dataset) {
   }
 }
 
-
+//executes a python script to retrieve all dataset data and outputs a JSON
 getDatasets().then(rawJSON => {
     const parsedJSON = (JSON.parse(rawJSON));
     console.log('Datasets JSON:');
     console.log(parsedJSON);
 
+    //loops through JSON data and adds data to a Dataset object
     for (let i = 0; i < parsedJSON.length; i++) {
       const dataset : Dataset = {
         name: parsedJSON[i].name,
@@ -182,6 +191,7 @@ getDatasets().then(rawJSON => {
     }
 });
 
+//method for parsing through VDevs to add to array (VDev array is added to Pool)
 function parseVDevData(vDev) {
   const vDevData : vDevData = {
     name: vDev.name,
@@ -193,6 +203,7 @@ function parseVDevData(vDev) {
     disks: [],
   };
   
+  //checks if VDev has child disks and if not, stores the disk information as the VDev itself (disk-level vdevs) then adds to VDev array
   if (vDev.children.length < 1) {
     const diskVDev = disks.value.find(disk => disk.name === vDev.name)!;
     const notAChildDisk : DiskData = {
@@ -218,6 +229,7 @@ function parseVDevData(vDev) {
     //console.log(vDevData);
     vDevs.value.push(vDevData);
   } else {
+    //if VDev does have child disks, add those disks to the VDev data object + array
     vDev.children.forEach(disk1 => {
       const fullDiskData = disks.value.find(disk => disk.name === disk1.name)!;
       const childDisk : DiskData = {
@@ -247,6 +259,7 @@ function parseVDevData(vDev) {
   }
 }
 
+//provide data for other components to inject
 provide("pools", pools);
 provide("disks", disks);
 provide("datasets", datasets);

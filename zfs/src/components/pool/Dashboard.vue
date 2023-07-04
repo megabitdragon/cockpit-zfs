@@ -2,6 +2,7 @@
 	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
 		<div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg bg-gray-50">
 
+			<!-- showing # of pools with status indicator icon and total space between all pools -->
 			<div class="grid grid-flow-col">
 				<div class="p-2">
 					<span class="font-semibold text-lg">Pools</span>
@@ -14,12 +15,14 @@
 				</div>
 			</div>
 
+			<!-- lists all pools in card format with a summary of details -->
 			<div class="grid grid-cols-6 grid-flow-col">
 				<div v-for="(pool, index) in pools" :key="index" class="p-2">
 						<DashboardPoolCard :showDetails="showDetails" :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
 				</div>
 			</div>
 
+			<!-- showing # of SSDs, # of HDDS, with status indicator icons and maximum temp + total raw space between all disks -->
 			<div class="grid grid-flow-col">
 				<div class="p-2">
 					<span class="font-semibold text-lg">Disks</span>
@@ -44,6 +47,7 @@
 				</div>
 			</div>
 
+			<!-- lists all disks in card format with a summary of details -->
 			<div class="grid grid-cols-6 grid-flow-col">
 				<div v-for="(disk, index) in disks" :key="index" class="p-2">
 					<DashboardDiskCard :name="disk.name" :type="disk.type" :status="disk.status" :spaceUsed="0" :usable="disk.usable" :totalSize="disk.capacity!"/>
@@ -52,6 +56,7 @@
 
 		</div>
 	
+		<!-- showing a modal of pool details (not working yet) -->
 		<div v-if="showPoolDetails">
 			<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
 		</div>
@@ -75,6 +80,7 @@ import DashboardDiskCard from '../disk/DashboardDiskCard.vue';
 const pools = inject<Ref<PoolData[]>>("pools")!;
 const disks = inject<Ref<DiskData[]>>("disks")!;
 
+//determine total effective space of pools
 const totalEffectiveSpace = computed(() => {
 	let totalCapacity = 0;
 	pools.value.forEach(pool => {
@@ -85,10 +91,12 @@ const totalEffectiveSpace = computed(() => {
 	return totalString;
 });
 
+//determine number of SSDs
 const disksSSD = computed(() => {
 	return disks.value.filter(disk => disk.type == 'SSD');
 });
 
+//determine number of HDDs
 const disksHDD = computed(() => {
 	return disks.value.filter(disk => disk.type == 'HDD');
 });
@@ -101,6 +109,7 @@ const showPoolDetails = ref(false);
 
 const selectedPool = ref<PoolData>();
 
+//method to show pool details when button is clicked (not working yet)
 function showDetails(poolName) {
 	const selected = pools.value.find(pool => pool.name == poolName)!;
 	selectedPool.value = selected;

@@ -22,10 +22,12 @@ const navTag = ref('dashboard');
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
+//navigation for tabs
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;
 };
 
+//tabs for navigation
 const navigation = reactive<NavigationItem[]>([
 	{ name: 'Dashboard', tag: 'dashboard', current: computed(() => navTag.value == 'dashboard') as unknown as boolean, show: true, },
 	{ name: 'Pools', tag: 'pools', current: computed(() => navTag.value == 'pools') as unknown as boolean, show: true, },

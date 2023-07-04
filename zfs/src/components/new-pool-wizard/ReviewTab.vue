@@ -63,9 +63,9 @@
 				</template>
 				<template v-slot:content>
 					<p class="ml-10">{{ poolConfig.fileSystem?.name }}</p>
-					<p class="ml-10">Encryption: {{poolConfig.fileSystem?.encryption}}</p>
+					<!-- <p class="ml-10">Encryption: {{poolConfig.fileSystem?.encryption}}</p>
 					<p class="ml-10">Quota Amount: {{ poolConfig.fileSystem?.quota.amount }}{{ poolConfig.fileSystem?.quota.size }}</p>
-					<p class="ml-10">Read Only: {{ poolConfig.fileSystem?.readOnly }}</p>
+					<p class="ml-10">Read Only: {{ poolConfig.fileSystem?.readOnly }}</p> -->
 				</template>
 		</Accordion>
 		<br/>

@@ -1,9 +1,11 @@
+//object for create-pools.py
 interface newVDev {
   root: string;
   type: string;
   devices: string[];
 }
 
+//object for pool
 interface PoolData {
   name: string;
   status: string;
@@ -32,6 +34,7 @@ interface PoolData {
   datasets?: Dataset[];
 }
 
+//object for vdev
 interface vDevData {
   name: string;
   type: string;
@@ -43,6 +46,7 @@ interface vDevData {
   forceAdd?: boolean;
 }
 
+//object for disk
 interface DiskData {
   name: string;
   capacity: string;
@@ -59,6 +63,7 @@ interface DiskData {
   usable: boolean;
 }
 
+//object for filesystem
 interface FileSystemData {
   name: string;
   id: string;
@@ -94,6 +99,7 @@ interface FileSystemData {
   children?: FileSystemData[];
 }
 
+//object for dataset (replace filesystem object?)
 interface Dataset {
   name: string;
   id: string;
@@ -121,6 +127,7 @@ interface Dataset {
   children?: Dataset[];
 }
 
+//object for navigation (generic)
 interface NavigationItem {
   name: string;
   tag: string;
@@ -130,6 +137,7 @@ interface NavigationItem {
 
 type NavigationCallback = (item: NavigationItem) => void;
 
+//object for navigation in wizard
 interface StepsNavigationItem {
   name: string;
   id: string;
