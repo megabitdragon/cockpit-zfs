@@ -3,7 +3,7 @@
 		<template v-slot:title>
 			<div class="grid grid-cols-3 grid-flow-col gap-1">
 				<div class="pr-2">
-					{{ props.name }}
+					{{ props.pool.name }}
 				</div>
 				<div class="px-1">
 					<img class="w-4 h-4" src="../../../public/icons/success.svg">
@@ -21,7 +21,7 @@
 							<MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 								<div class="py-1">
 									<MenuItem v-slot="{ active }">
-										<a href="#" @onClick="" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
+										<a href="#" @click="showDetails(props.pool)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
 									</MenuItem>
 									<MenuItem v-slot="{ active }">
 										<a href="#" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
@@ -35,30 +35,34 @@
 	
 
 		<div>
-			<span>{{props.status}}</span>
+			<span>{{props.pool.status}}</span>
 		</div>
 		</template>
 		<template v-slot:content>
 			<div class="flex justify-between mb-1">
 				<span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;</span>
-				<span class="text-sm font-medium text-green-700 dark:text-white">{{props.capacity}}%</span>
+				<span class="text-sm font-medium text-green-700 dark:text-white">{{props.pool.properties.capacity}}%</span>
 			</div>
 			<div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-					<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
+					<div v-if="props.pool.properties.capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.pool.properties.capacity}%`}"></div>
 			</div>
 		</template>
 		<template v-slot:footer>
 			<div>
-				Used {{ props.allocated }}
+				Used {{ props.pool.properties.allocated }}
 			</div>
 			<div>
-				Free {{ props.free }}
+				Free {{ props.pool.properties.free }}
 			</div>
 			<div>
-				<b>Total {{ props.size }}</b>
+				<b>Total {{ props.pool.properties.size }}</b>
 			</div>
 		</template>
 	</Card>
+
+	<div v-if="showPoolDetails">
+		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -69,16 +73,29 @@ import Card from '../common/Card.vue';
 import PoolDetail from "./PoolDetail.vue";
 
 interface DashboardPoolCardProps {
-	name: string,
-	status: string,
-	capacity: number,
-	size: string,
-	free: string;
-	allocated: string;
+	pool: PoolData;
+	// name: string,
+	// status: string,
+	// capacity: number,
+	// size: string,
+	// free: string;
+	// allocated: string;
 	// showDetails: Function;
 }
 
 const props = defineProps<DashboardPoolCardProps>();
+
+const showPoolDetails = ref(false);
+
+const selectedPool = ref<PoolData>();
+
+function showDetails(pool) {
+	// const selected = poolData.value.find(pool => pool.name == poolName)!;
+	selectedPool.value = pool;
+	console.log(selectedPool);
+	showPoolDetails.value = true;
+}
+
 // const showPoolDetails = ref(false);
 // const pools = inject<Ref<PoolData[]>>('pools')!;
 
