@@ -21,7 +21,7 @@
 							<MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 								<div class="py-1">
 									<MenuItem v-slot="{ active }">
-										<a href="#" @onClick="" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
+										<a href="#" @click="showDetails(props.disk)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
 									</MenuItem>
 								</div>
 							</MenuItems>
@@ -54,12 +54,17 @@
 			</div>
 		</template>
 	</Card>
+
+	<div v-if="showDiskDetails">
+		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false"/>
+	</div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import DiskDetail from './DiskDetail.vue';
 import Card from '../common/Card.vue';
 
 interface DashboardDiskCardProps {
@@ -77,5 +82,17 @@ interface DashboardDiskCardProps {
 // });
 
 const props = defineProps<DashboardDiskCardProps>();
+
+const showDiskDetails = ref(false);
+
+const selectedDisk = ref<DiskData>();
+
+//method to show Disk details when button is clicked
+function showDetails(disk) {
+	selectedDisk.value = disk;
+	console.log(selectedDisk);
+	showDiskDetails.value = true;
+}
+
 
 </script>

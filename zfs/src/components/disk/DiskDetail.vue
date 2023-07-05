@@ -1,60 +1,45 @@
 <template>
-  <Modal>
-	<template v-slot:title>
-	  <Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
-	</template>
-	<template v-slot:content>
-	  <div v-if="navTag == 'profile'">
-		 <!-- DiskName               DiskCapacity Bar/Circle              Avg.Disk Temp per Disk in Disk? or another stat       Refresh Btn-->
-		  <!-- Size: fullsize of Disk storage                               Health: STATUS (checkmark if good)
-			  Used: allocated storage                                       Errors: if any errors show here, if none show 'None currently'
-			  Free: remaining free space                                     @timestamp (to show current time page is accessed)
-			  Fragmentation? 
+	<Modal>
+		<template v-slot:title>
+			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
+		</template>
+		<template v-slot:content>
+			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
+				<!-- DiskName               DiskCapacity Bar/Circle              	Disk Temp       Refresh Btn-->
+				<!-- Size: fullsize of Disk storage                               Health: STATUS (checkmark if good)
+					Used: allocated storage                                       Errors: if any errors show here, if none show 'None currently'
+					Free: remaining free space                                     @timestamp (to show current time page is accessed)
 
-			  # of Devices?                               # of Datasets?
-			  # of Disks?
-		  -->
-	  </div>
+				-->
+					<div class="col-span-2">
+						<div :id="getIdKey('visual-capacity')" class="flex items-center flex-wrap max-w-md px-10 bg-white shadow rounded-2xl h-20">
+							<div class="flex items-center justify-center -m-6 overflow-visible shadow bg-white rounded-full">
+								<svg class="w-32 h-32 transform translate-x-1 translate-y-1" aria-hidden="true">
+									<circle class="text-gray-300" stroke-width="10" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
+									<circle class="text-green-600" stroke-width="10" stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
+								</svg>
+								<span class="absolute text-2xl text-green-700">0%</span>
+							</div>
+							<p class="ml-10 font-medium text-gray-600 sm:text-xl">{{ props.disk.name }}</p>
+							<span class="ml-auto text-xl font-medium text-green-600 hidden sm:block">{{ props.disk.capacity }}</span>
+						</div>
+					</div>
 
-	  <div v-if="navTag == 'topology'">
-		<!-- 
-		  DiskName    DiskCapacity      AvgTemp?
+					<div class="mt-2 col-span-2 col-start-3 row-start-1">
+						<p class="text-lg">Health: <span class="text-green-700">{{ props.disk.status }}</span></p>
+						<p class="text-sm">Errors: None currently detected - {{ getTimestampString }}</p>
+					</div>
+			</div>
 
-		  Virtual Devices (Cards)
-		  with Disks contained underneath
-			Disks have :
-			  alias, name, model/serial, temp, status
-		 -->
-	  
-	  </div>
-	  
-	  <div v-if="navTag == ''">
-	  
-	  
-	  </div>
+			<div v-if="navTag == 'settings'">
+				
+			</div>
 
-	  <div v-if="navTag == 'settings'">
-		
-	  </div>
-
-	  <!-- testing a radial progressbar to show capacity of disk -->
-	  <div class="flex items-center flex-wrap max-w-md px-10 bg-white shadow-xl rounded-2xl h-20">
-		<div class="flex items-center justify-center -m-6 overflow-hidden bg-white rounded-full">
-		  <svg class="w-32 h-32 transform translate-x-1 translate-y-1" aria-hidden="true">
-			<circle class="text-gray-300" stroke-width="10" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
-			<circle class="text-red-600" stroke-width="10" stroke-dasharray="314" stroke-dashoffset="94" stroke-linecap="round" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
-		  </svg>
-		  <span class="absolute text-2xl text-red-700">90%</span>
-		</div>
-		<p class="ml-10 font-medium text-gray-600 sm:text-xl">Storage</p>
-		<span class="ml-auto text-xl font-medium text-red-600 hidden sm:block">20GB</span>
-	  </div>
-
-	</template>
-	<template v-slot:footer>
-	  
-	</template>
-  </Modal>
+			</template>
+			<template v-slot:footer>
+			
+			</template>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -69,8 +54,26 @@ interface DiskDetailsProps {
 
 const props = defineProps<DiskDetailsProps>();
 
+// const visualCapacity = computed(() => {
+// 	return 314 - (props.pool.properties.capacity * 100) / 314;
+// });
+
+const getTimestampString = computed(() => {
+	const currentDateTime = new Date();
+	const timestampString = currentDateTime.toLocaleString('en-US', {
+		hour: 'numeric',
+		minute: 'numeric',
+		second: 'numeric',
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric'
+	});
+
+	return timestampString;
+});
+
 const show = ref(true);
-const navTag = ref('profile');
+const navTag = ref('stats');
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
@@ -79,9 +82,9 @@ const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 };
 
 const navigation = reactive<NavigationItem[]>([
-  { name: 'Profile', tag: 'profile', current: computed(() => navTag.value == 'profile') as unknown as boolean, show: true, },
-	{ name: 'Topology', tag: 'topology', current: computed(() => navTag.value == 'topology') as unknown as boolean, show: true, },
-  { name: 'Snapshots', tag: 'snapshots', current: computed(() => navTag.value == 'snapshots') as unknown as boolean, show: true, },
-  { name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },
+  	{ name: 'Stats', tag: 'stats', current: computed(() => navTag.value == 'stats') as unknown as boolean, show: true, },
+  	{ name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },
 ].filter(item => item.show));
+
+const getIdKey = (name: string) => `${name}`;
 </script>

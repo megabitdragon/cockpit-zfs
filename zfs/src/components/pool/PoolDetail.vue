@@ -111,7 +111,7 @@ const props = defineProps<PoolDetailsProps>();
 
 const visualCapacity = computed(() => {
 	return 314 - (props.pool.properties.capacity * 100) / 314;
-})
+});
 
 const show = ref(true);
 const navTag = ref('stats');
