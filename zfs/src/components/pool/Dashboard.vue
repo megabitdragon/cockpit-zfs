@@ -18,7 +18,7 @@
 			<!-- lists all pools in card format with a summary of details -->
 			<div class="grid grid-cols-6 grid-flow-col">
 				<div v-for="(pool, index) in pools" :key="index" class="p-2">
-						<DashboardPoolCard :pool="pools[index]"/>
+						<DashboardPoolCard :pool="pools[index]!"/>
 				</div>
 			</div>
 
@@ -50,30 +50,18 @@
 			<!-- lists all disks in card format with a summary of details -->
 			<div class="grid grid-cols-6 grid-flow-col">
 				<div v-for="(disk, index) in disks" :key="index" class="p-2">
-					<DashboardDiskCard :name="disk.name" :type="disk.type" :status="disk.status" :spaceUsed="0" :usable="disk.usable" :totalSize="disk.capacity!"/>
+					<DashboardDiskCard :disk="disks[index]!"/>
 				</div>
 			</div>
 
 		</div>
 	
-		<!-- showing a modal of pool details (not working yet) -->
-		<div v-if="showPoolDetails">
-			<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
-		</div>
-		
-		<!-- <div v-if="showDiskDetails">
-			<DiskDetail :disk="selectedDisk" @close="showDiskDetails = false"/>
-		</div> -->
-
-
 	</div>
 </template>
 
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
-import PoolDetail from '../pool/PoolDetail.vue';
-import DiskDetail from '../disk/DiskDetail.vue';
 import DashboardPoolCard from "../pool/DashboardPoolCard.vue";
 import DashboardDiskCard from '../disk/DashboardDiskCard.vue';
 
@@ -101,22 +89,4 @@ const disksHDD = computed(() => {
 	return disks.value.filter(disk => disk.type == 'HDD');
 });
 
-// const totalRawSpace = computed(() => {
-//   return 
-// })
-
-const showPoolDetails = ref(false);
-
-const selectedPool = ref<PoolData>();
-
-//method to show pool details when button is clicked (not working yet)
-function showDetails(poolName) {
-	const selected = pools.value.find(pool => pool.name == poolName)!;
-	selectedPool.value = selected;
-	showPoolDetails.value = true;
-}
-
-defineExpose({
-	showDetails
-});
 </script>

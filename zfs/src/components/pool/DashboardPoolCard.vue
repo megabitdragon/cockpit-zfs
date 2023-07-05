@@ -74,13 +74,6 @@ import PoolDetail from "./PoolDetail.vue";
 
 interface DashboardPoolCardProps {
 	pool: PoolData;
-	// name: string,
-	// status: string,
-	// capacity: number,
-	// size: string,
-	// free: string;
-	// allocated: string;
-	// showDetails: Function;
 }
 
 const props = defineProps<DashboardPoolCardProps>();
@@ -89,22 +82,11 @@ const showPoolDetails = ref(false);
 
 const selectedPool = ref<PoolData>();
 
+//method to show pool details when button is clicked
 function showDetails(pool) {
-	// const selected = poolData.value.find(pool => pool.name == poolName)!;
 	selectedPool.value = pool;
 	console.log(selectedPool);
 	showPoolDetails.value = true;
 }
 
-// const showPoolDetails = ref(false);
-// const pools = inject<Ref<PoolData[]>>('pools')!;
-
-// const selectedPool = computed(() => {
-// 	return pools.value.find(pool => pool.name === props.name)!;
-// });
-
-// console.log(selectedPool);
-
-// provide('show-pool-deets', showPoolDetails);
-// provide('selected-pool', selectedPool);
 </script>

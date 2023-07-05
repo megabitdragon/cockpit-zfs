@@ -3,7 +3,7 @@
 		<template v-slot:title>
 			<div class="grid grid-cols-3 grid-flow-col gap-1">
 				<div class="pr-2">
-					{{ props.name }}
+					{{ props.disk.name }}
 				</div>
 				<div class="px-1">
 					<img class="w-4 h-4" src="../../../public/icons/success.svg">
@@ -30,10 +30,10 @@
 				</div>
 			</div>
 			<div>
-				<span>{{props.status}}</span>
+				<span>{{ props.disk.status }}</span>
 			</div>
 			<div>
-				<span>{{ props.type }}</span>
+				<span>{{ props.disk.type }}</span>
 			</div>
 			</template>
 			<template v-slot:content>
@@ -42,7 +42,7 @@
 			</div>
 			<div>
 				<span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;&nbsp;&nbsp;</span>
-				<span class="text-sm font-medium text-green-700 dark:text-white">{{props.spaceUsed}}%</span>
+				<span class="text-sm font-medium text-green-700 dark:text-white">0%</span>
 			</div>
 			<!-- <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
 				<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
@@ -50,7 +50,7 @@
 		</template>
 		<template v-slot:footer>
 			<div>
-				<b>Total: {{ props.totalSize }}</b>
+				<b>Total: {{ props.disk.capacity }}</b>
 			</div>
 		</template>
 	</Card>
@@ -63,12 +63,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Card from '../common/Card.vue';
 
 interface DashboardDiskCardProps {
-	name: string,
-	status: string,
-	spaceUsed: number,
-	type: string,
-	totalSize: string,
-	usable: boolean,
+	disk: DiskData;
 }
 
 // const usedSpaceAmount = computed(() => {

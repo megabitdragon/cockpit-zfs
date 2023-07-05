@@ -4,7 +4,7 @@
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
 		<template v-slot:content>
-			<div v-if="navTag == 'profile'" class="mt-6 grid grid-cols-4">
+			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
 				 <!-- PoolName               PoolCapacity Bar/Circle              Avg.Disk Temp per Disk in Pool? or another stat       Refresh Btn-->
 					<!-- Size: fullsize of pool storage                               Health: STATUS (checkmark if good)
 							Used: allocated storage                                       Errors: if any errors show here, if none show 'None currently'
@@ -70,21 +70,6 @@
 							</div>
 						</div>
 					</div>
-					<!-- <ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-						<li v-for="(vdev, vDevIdx) in props.pool.vdevs" :key="vDevIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow" >
-							<li v-for="(disk, diskIdx) in props.pool.vdevs[vDevIdx].disks" :key="diskIdx" class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
-								<div class="flex w-full h-full border border-gray-200 rounded dark:border-gray-700">
-									<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"> 
-										<h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3> -->
-										<!-- <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span> -->
-										<!-- <p class="mt-1 truncate text-sm text-gray-500">{{ disk.type }}</p>
-										<p class="mt-1 truncate text-sm text-gray-500">Serial #: {{ disk.serial }}</p>
-										<p class="mt-1 truncate text-sm text-gray-500">{{ disk.sd_path }}</p>
-									</label>  
-								</div>
-							</li>
-						</li>
-					</ul> --> 
 				 </div>
 			
 			</div>
@@ -129,7 +114,7 @@ const visualCapacity = computed(() => {
 })
 
 const show = ref(true);
-const navTag = ref('profile');
+const navTag = ref('stats');
 
 const getTimestampString = computed(() => {
 	const currentDateTime = new Date();
@@ -171,7 +156,7 @@ const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 };
 
 const navigation = reactive<NavigationItem[]>([
-	{ name: 'Profile', tag: 'profile', current: computed(() => navTag.value == 'profile') as unknown as boolean, show: true, },
+	{ name: 'Stats', tag: 'stats', current: computed(() => navTag.value == 'stats') as unknown as boolean, show: true, },
 	{ name: 'Topology', tag: 'topology', current: computed(() => navTag.value == 'topology') as unknown as boolean, show: true, },
 	{ name: 'Snapshots', tag: 'snapshots', current: computed(() => navTag.value == 'snapshots') as unknown as boolean, show: true, },
 	{ name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },

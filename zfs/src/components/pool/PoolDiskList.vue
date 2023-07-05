@@ -164,15 +164,15 @@ import DiskDetail from "../disk/DiskDetail.vue";
 import PoolDetail from "./PoolDetail.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
-// console.log(poolData.value);
 
 const showConfig = ref(false);
+
 const showPoolDetails = ref(false);
 
 const selectedPool = ref<PoolData>();
 
+//method to show pool details when button is clicked
 function showDetails(pool) {
-	// const selected = poolData.value.find(pool => pool.name == poolName)!;
 	selectedPool.value = pool;
 	console.log(selectedPool);
 	showPoolDetails.value = true;
