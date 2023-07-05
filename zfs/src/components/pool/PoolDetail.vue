@@ -15,7 +15,7 @@
 							# of Disks?
 					-->
 					<div>
-						
+						<p>{{ props.pool.name }}</p>
 					</div>
 					<div class="flex items-center flex-wrap max-w-md px-10 bg-white shadow-xl rounded-2xl h-20">
 						<div class="flex items-center justify-center -m-6 overflow-hidden bg-white rounded-full">

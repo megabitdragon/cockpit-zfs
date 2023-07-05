@@ -27,6 +27,7 @@
 								</tr>
 							</thead>
 
+							<!-- table with accordion elements for each pool and nested vdev -->
 							<tbody class="divide-y divide-x divide-gray-200 bg-white">
 								<tr v-for="pool, poolIdx in poolData" :key="poolIdx">
 									<td colspan="7">
@@ -63,7 +64,7 @@
 																		<MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																			<div class="py-1">
 																				<MenuItem v-slot="{ active }">
-																					<a href="#" @onClick="showDetails(pool[poolIdx].name)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
+																					<a href="#" @click.prevent="showDetails(poolData[poolIdx])!" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
 																				</MenuItem>
 																				<MenuItem v-slot="{ active }">
 																					<a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
@@ -170,9 +171,10 @@ const showPoolDetails = ref(false);
 
 const selectedPool = ref<PoolData>();
 
-function showDetails(poolName) {
-	const selected = poolData.value.find(pool => pool.name == poolName)!;
-	selectedPool.value = selected;
+function showDetails(pool) {
+	// const selected = poolData.value.find(pool => pool.name == poolName)!;
+	selectedPool.value = pool;
+	console.log(selectedPool);
 	showPoolDetails.value = true;
 }
 

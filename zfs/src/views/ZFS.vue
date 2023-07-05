@@ -203,7 +203,7 @@ function parseVDevData(vDev) {
     disks: [],
   };
   
-  //checks if VDev has child disks and if not, stores the disk information as the VDev itself (disk-level vdevs) then adds to VDev array
+  //checks if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
   if (vDev.children.length < 1) {
     const diskVDev = disks.value.find(disk => disk.name === vDev.name)!;
     const notAChildDisk : DiskData = {

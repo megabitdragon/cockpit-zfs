@@ -18,7 +18,7 @@
 			<!-- lists all pools in card format with a summary of details -->
 			<div class="grid grid-cols-6 grid-flow-col">
 				<div v-for="(pool, index) in pools" :key="index" class="p-2">
-						<DashboardPoolCard :showDetails="showDetails" :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
+						<DashboardPoolCard :name="pools[index].name" :status="pools[index].status" :capacity="pools[index].properties.capacity" :size="pools[index].properties.size" :free="pools[index].properties.free" :allocated="pools[index].properties.allocated"/>
 				</div>
 			</div>
 
