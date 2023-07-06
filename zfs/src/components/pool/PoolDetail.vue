@@ -5,15 +5,6 @@
 		</template>
 		<template v-slot:content>
 			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
-				 <!-- PoolName               PoolCapacity Bar/Circle              Avg.Disk Temp per Disk in Pool? or another stat       Refresh Btn-->
-					<!-- Size: fullsize of pool storage                               Health: STATUS (checkmark if good)
-							Used: allocated storage                                       Errors: if any errors show here, if none show 'None currently'
-							Free: remaining free space                                     @timestamp (to show current time page is accessed)
-							Fragmentation? 
-
-							# of Devices?                               # of Datasets?
-							# of Disks?
-					-->
 					<div class="col-span-2">
 						<div :id="getIdKey('visual-capacity')" class="flex items-center flex-wrap max-w-md px-10 bg-white shadow rounded-2xl h-20">
 							<div class="flex items-center justify-center -m-6 overflow-visible shadow bg-white rounded-full">
@@ -47,7 +38,7 @@
 				
 			</div>
 
-			<div v-if="navTag == 'topology'" class="mt-2 grid grid-cols-4">
+			<div v-if="navTag == 'topology'" class="mt-2 grid grid-cols-4 grid-flow-col">
 				<!-- 
 					PoolName    PoolCapacity      AvgTemp?
 
@@ -56,21 +47,12 @@
 						Disks have :
 							alias, name, model/serial, temp, status
 				 -->
-				 <div class="mt-2 col-span-4">
-					<div class="grid grid-cols-4">
-						<div v-for="(vdev, vDevIdx) in props.pool.vdevs" :key="vDevIdx" class=" divide-y divide-gray-200 rounded-lg shadow">
-							<label :for="getIdKey(`vdev-${vDevIdx}`)">{{ props.pool.vdevs[vDevIdx].name }}</label>
-							<div v-for="(disk, diskIdx) in props.pool.vdevs[vDevIdx].disks" :key="diskIdx" class="col-span-1 rounded-lg ">
-								<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)">
-									<h3 class="truncate text-sm font-medium text-gray-900">{{ disk.name }}</h3> 
-									<p class="mt-1 truncate text-sm text-gray-500">Serial #: {{ disk.serial }}</p>
-									<p class="mt-1 truncate text-sm text-gray-500">{{ disk.sd_path }}</p>
-								</label>
-
-							</div>
+					<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2">
+						<div>{{ vDev.name }}</div>
+						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="p-2 col-span-1">
+							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
 						</div>
 					</div>
-				 </div>
 			
 			</div>
 			
@@ -78,6 +60,7 @@
 				<!-- PoolName   
 					(NO snapshots found if none found)
 
+					Create Snapshot button
 					Filesystems with snapshots + button for menu (menu should have - clone, rename, roll back, destroy)
 					
 				-->
@@ -85,7 +68,10 @@
 			</div>
 
 			<div v-if="navTag == 'settings'">
-				<!-- not sure what to put here, probably fields so the user can change the configuration of the pool -->
+				<div>
+					<label></label>
+					<input />
+				</div>
 			</div>
 
 			
@@ -102,6 +88,7 @@ import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
 import Navigation from '../common/Navigation.vue';
+import PoolDetailDiskCard from '../disk/PoolDetailDiskCard.vue';
 
 interface PoolDetailsProps {
 	pool: PoolData;
