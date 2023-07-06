@@ -38,7 +38,7 @@
 
 			<div v-if="navTag == 'topology'" class="mt-2 grid grid-cols-4 grid-flow-col">
 				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2 m-2 rounded-md border border-slate-100">
-					<legend class="mb-1 text-base font-semibold leading-6 text-gray-900">{{ vDev.name }}</legend>
+					<legend class="mb-1 text-base font-semibold leading-6 text-gray-700">{{ vDev.name }}</legend>
 					<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-1">
 						<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
 					</div>
@@ -49,16 +49,14 @@
 			<div v-if="navTag == 'snapshots'">
 				<!-- PoolName   
 					(NO snapshots found if none found)
-
 					Create Snapshot button
 					Filesystems with snapshots + button for menu (menu should have - clone, rename, roll back, destroy)
-					
 				-->
-			<p>COMING SOON TO A ZPOOL NEAR YOU</p>
+				<p>COMING SOON TO A ZPOOL NEAR YOU</p>
 			</div>
 
 			<div v-if="navTag == 'settings'">
-				<div class="grid grid-cols-2">
+				<div class="grid grid-cols-2 gap-2">
 					<div class="mt-2 col-span-1 col-start-1 row-start-1">
 						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-gray-700">Pool</p><p>{{ props.pool.name }}</p>
 					</div>
@@ -69,7 +67,7 @@
 						<p :id="getIdKey('settings-pool-guid')" name="settings-pool-guid" class="text-base text-gray-700">GUID</p><p>{{ props.pool.guid }}</p>
 					</div>
 					<div class="mt-2 col-span-1 col-start-2 row-start-2">
-						<button :id="getIdKey('settings-pool-guid-regen-btn')" name="settings-pool-guid-regen-btn" class="mt-1 col-start-3 row-start-1 btn btn-primary">Regenerate Pool GUID</button>
+						<button :id="getIdKey('settings-pool-guid-regen-btn')" name="settings-pool-guid-regen-btn" class="mt-1 col-start-3 row-start-1 btn btn-secondary">Regenerate Pool GUID</button>
 					</div>
 					<div class="mt-2 col-span-1 col-start-1 row-start-3">
 						<label :for="getIdKey('settings-pool-sector-size')" class="block text-base leading-6 text-gray-700">Sector Size</label>
@@ -95,12 +93,32 @@
 						<p :for="getIdKey('settings-pool-comment')" class="text-base text-gray-700">Comment</p>
 						<input :id="getIdKey('settings-pool-comment')" name="setting-pool-comment" placeholder="Enter a comment here" type="text" class="mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
 					</div>
-					
+
+					<!-- Toggle template (Auto Expand, Auto Replace, Auto TRIM, Allow non-priv user based on dataset permissions, display snaps in FS list, multi host) -->
+					<!-- <div>
+						<label :for="getIdKey('forcefully-add-vdev')" class="mt-1 block text-sm font-medium leading-6 text-gray-900">Forcefully Add Virtual Device</label>
+						<Switch :id="getIdKey('forcefully-add-vdev')" v-model="poolConfig.vdevs[vDevIdx].forceAdd" :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+							<span class="sr-only">Use setting</span>
+							<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+								<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+									<svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+									</svg>
+								</span>
+								<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+									<svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+									</svg>
+								</span>
+							</span>
+						</Switch>
+					</div> -->
+
+					<div class="mt-2">
+						<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 col-start-3 row-start-1 btn btn-primary">Save Changes</button>
+					</div>
 				</div>
 			</div>
-
-			
-
 		</template>
 		<template v-slot:footer>
 			
@@ -110,7 +128,6 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed, provide } from 'vue';
-import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
 import Navigation from '../common/Navigation.vue';
 import PoolDetailDiskCard from '../disk/PoolDetailDiskCard.vue';
