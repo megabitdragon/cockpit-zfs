@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="mt-8">
-			<div class="-mx-4 -my-2 overflow-auto sm:-mx-6 lg:-mx-8">
+			<div class="-mx-4 -my-2 overflow-visible sm:-mx-6 lg:-mx-8">
 				<div class="inline-block min-w-full min-h-full py-2 align-middle">
 					<div class="overflow-y-visible shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 						<!-- NEW ATTEMPTS AT TABLE -->

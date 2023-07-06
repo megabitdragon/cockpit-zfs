@@ -29,6 +29,7 @@
 					</Menu>
 				</div>
 			</div>
+			<!-- alias, name, model/serial, temp, status -->
 			<div>
 				<span>{{ props.disk.status }}</span>
 			</div>
@@ -46,6 +47,7 @@
 			</div>
 			<!-- <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
 				<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
+				<div v-if="capacity > 85" class="bg-red-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
 			</div> -->
 		</template>
 		<template v-slot:footer>

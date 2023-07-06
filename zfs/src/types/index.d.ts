@@ -16,6 +16,7 @@ interface PoolData {
     capacity: number;
     allocated: string;
     free: string;
+    readOnly?: string;
   }
   vdevs: vDevData[];
   settings?: {
@@ -32,6 +33,9 @@ interface PoolData {
   createFileSystem?: boolean;
   fileSystem?: FileSystemData;
   datasets?: Dataset[];
+  errors?: string[];
+  comment?: string;
+  failMode?: 'wait' | 'continue' | 'panic';
 }
 
 //object for vdev
