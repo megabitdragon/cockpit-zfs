@@ -37,13 +37,14 @@
 			</div>
 
 			<div v-if="navTag == 'topology'" class="mt-2 grid grid-cols-4 grid-flow-row">
-				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2 m-2 rounded-md border border-slate-100">
+				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2 m-2 rounded-md border border-slate-100 col-span-2 bg-slate-100">
 					<legend class="mb-1 text-base font-medium leading-6 text-gray-700">{{ vDev.name }}</legend>
-					<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-2">
-						<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
+					<div class="grid grid-cols-2">
+						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-1">
+							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
+						</div>
 					</div>
 				</div>
-			
 			</div>
 			
 			<div v-if="navTag == 'snapshots'">
