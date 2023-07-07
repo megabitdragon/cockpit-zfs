@@ -29,6 +29,9 @@ interface PoolData {
     autoReplace: boolean;
     autoTrim: boolean;
     forceCreate: boolean;
+    delegation?: boolean;
+    displaySnapshots?: boolean;
+    multiHost?: boolean;
   },
   createFileSystem?: boolean;
   fileSystem?: FileSystemData;
