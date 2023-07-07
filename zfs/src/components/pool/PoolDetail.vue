@@ -6,17 +6,7 @@
 		<template v-slot:content>
 			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
 				<div class="col-span-2">
-					<div :id="getIdKey('pool-visual-capacity')" name="pool-visual-capacity" class="flex items-center flex-wrap max-w-md px-10 bg-white shadow rounded-2xl h-20">
-						<div class="flex items-center justify-center -m-6 overflow-visible shadow bg-white rounded-full">
-							<svg class="w-32 h-32 transform translate-x-1 translate-y-1" aria-hidden="true">
-								<circle class="text-gray-300" stroke-width="10" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
-								<circle class="text-green-600" stroke-width="10" stroke-dasharray="314" :stroke-dashoffset=visualCapacity stroke-linecap="round" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
-							</svg>
-							<span class="absolute text-2xl text-green-700">{{props.pool.properties.capacity}}%</span>
-						</div>
-						<p class="ml-10 font-medium text-gray-600 sm:text-xl">{{ props.pool.name }}</p>
-						<span class="ml-auto text-xl font-medium text-green-600 hidden sm:block">{{ props.pool.properties.size }}</span>
-					</div>
+					<CircleProgress :id="getIdKey('pool-visual-capacity')" :fillColor="'text-green-600'" :numColor="'text-green-700'" :name="props.pool.name" :totalSize="props.pool.properties.size" :capacity="props.pool.properties.capacity" :radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :strokeDashArr="314"/>
 				</div>
 				
 				<div class="mt-2 col-span-2 col-start-3 row-start-1">
@@ -67,7 +57,7 @@
 					<div class="mt-2 col-span-1 col-start-3 row-start-1">
 						<p :id="getIdKey('settings-pool-guid')" name="settings-pool-guid" class="text-base text-gray-700">GUID</p><p>{{ props.pool.guid }}</p>
 					</div>
-					<div class="mt-2 col-span-1 col-start-4 row-start-1">
+					<div class="mt-2 col-span-1 col-start-4 row-start-1 items-center justify-center">
 						<button :id="getIdKey('settings-pool-guid-regen-btn')" name="settings-pool-guid-regen-btn" class="mt-1 col-start-3 row-start-1 btn btn-secondary">Regenerate Pool GUID</button>
 					</div>
 					<div class="mt-2 col-span-2 col-start-1 row-start-2">
@@ -219,7 +209,7 @@
 						
 
 					<div class="mt-2 col-span-1 col-start-4 row-start-6">
-						<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 col-start-3 row-start-1 btn btn-primary">Save Changes</button>
+						<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
 					</div>
 				</div>
 			</div>
@@ -234,6 +224,7 @@
 import { reactive, ref, computed, provide } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
+import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';
 import PoolDetailDiskCard from '../disk/PoolDetailDiskCard.vue';
 
