@@ -16,8 +16,8 @@
 			</div>
 
 			<!-- lists all pools in card format with a summary of details -->
-			<div class="grid grid-cols-6 grid-flow-col">
-				<div v-for="(pool, index) in pools" :key="index" class="p-2">
+			<div class="grid grid-cols-4 grid-flow-col">
+				<div v-for="(pool, index) in pools" :key="index" class="p-5 m-2 rounded-md border border-slate-200">
 						<DashboardPoolCard :pool="pools[index]!"/>
 				</div>
 			</div>
@@ -48,8 +48,8 @@
 			</div>
 
 			<!-- lists all disks in card format with a summary of details -->
-			<div class="grid grid-cols-6 grid-flow-col">
-				<div v-for="(disk, index) in disks" :key="index" class="p-2">
+			<div class="grid grid-cols-4 grid-flow-col">
+				<div v-for="(disk, index) in disks" :key="index" class="p-5 m-2 rounded-md border border-slate-200">
 					<DashboardDiskCard :disk="disks[index]!"/>
 				</div>
 			</div>

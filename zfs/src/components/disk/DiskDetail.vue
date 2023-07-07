@@ -11,7 +11,7 @@
 					Free: remaining free space                                     @timestamp (to show current time page is accessed)
 
 				-->
-					<div class="col-span-2">
+					<!-- <div class="col-span-2">
 						<div :id="getIdKey('visual-capacity')" class="flex items-center flex-wrap max-w-md px-10 bg-white shadow rounded-2xl h-20">
 							<div class="flex items-center justify-center -m-6 overflow-visible shadow bg-white rounded-full">
 								<svg class="w-32 h-32 transform translate-x-1 translate-y-1" aria-hidden="true">
@@ -23,6 +23,10 @@
 							<p class="ml-10 font-medium text-gray-600 sm:text-xl">{{ props.disk.name }}</p>
 							<span class="ml-auto text-xl font-medium text-green-600 hidden sm:block">{{ props.disk.capacity }}</span>
 						</div>
+					</div> -->
+
+					<div class="col-span-2">
+						<CircleProgress :id="getIdKey('pool-visual-capacity')" :fillColor="'text-green-600'" :numColor="'text-green-700'" :name="props.disk.name" :totalSize="props.disk.capacity" :capacity="0" :radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :strokeDashArr="314"/>
 					</div>
 
 					<div class="mt-2 col-span-2 col-start-3 row-start-1">
@@ -31,7 +35,7 @@
 					</div>
 			</div>
 
-			<div v-if="navTag == 'settings'">
+			<div v-if="navTag == 'options'">
 				
 			</div>
 
@@ -46,6 +50,7 @@
 import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
+import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';
 
 interface DiskDetailsProps {
@@ -54,9 +59,6 @@ interface DiskDetailsProps {
 
 const props = defineProps<DiskDetailsProps>();
 
-// const visualCapacity = computed(() => {
-// 	return 314 - (props.pool.properties.capacity * 100) / 314;
-// });
 
 const getTimestampString = computed(() => {
 	const currentDateTime = new Date();
@@ -83,7 +85,7 @@ const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 
 const navigation = reactive<NavigationItem[]>([
   	{ name: 'Stats', tag: 'stats', current: computed(() => navTag.value == 'stats') as unknown as boolean, show: true, },
-  	{ name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },
+  	{ name: 'Options', tag: 'options', current: computed(() => navTag.value == 'options') as unknown as boolean, show: true, },
 ].filter(item => item.show));
 
 const getIdKey = (name: string) => `${name}`;
