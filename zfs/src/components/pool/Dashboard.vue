@@ -11,13 +11,13 @@
 					<img class="w-4 h-4" src="../../../public/icons/success.svg">
 				</div>
 				<div class="p-2">
-					<h6> Total Effective Space: {{ totalEffectiveSpace }} T</h6>
+					<h6> Total Effective Space: {{ totalEffectiveSpace }} </h6>
 				</div>
 			</div>
 
 			<!-- lists all pools in card format with a summary of details -->
 			<div class="grid grid-cols-4 grid-flow-col">
-				<div v-for="(pool, index) in pools" :key="index" class="p-5 m-2 rounded-md border border-slate-200">
+				<div v-for="(pool, index) in pools" :key="index" class="p-5 m-2 rounded-md border border-slate-200 overflow-visible">
 						<DashboardPoolCard :pool="pools[index]!"/>
 				</div>
 			</div>
@@ -40,16 +40,16 @@
 					{{ disksHDD.length }} HDDs
 				</div>
 				<div class="p-2">
-					<h6> Maximum Temp. X° C</h6>
+					<h6> Maximum Temperature: {{maxTemp}}° C</h6>
 				</div>
 				<div class="p-2">
-					<h6> Total Raw Space: 0 T</h6>
+					<h6> Total Raw Space: {{ totalRawSpace }}</h6>
 				</div>
 			</div>
 
 			<!-- lists all disks in card format with a summary of details -->
 			<div class="grid grid-cols-4 grid-flow-col">
-				<div v-for="(disk, index) in disks" :key="index" class="p-5 m-2 rounded-md border border-slate-200">
+				<div v-for="(disk, index) in disks" :key="index" class="p-5 m-2 rounded-md border border-slate-200 overflow-visible">
 					<DashboardDiskCard :disk="disks[index]!"/>
 				</div>
 			</div>
@@ -74,10 +74,48 @@ const totalEffectiveSpace = computed(() => {
 	pools.value.forEach(pool => {
 		totalCapacity += pool.properties.rawsize;
 	});
-	const totalBytes = (totalCapacity / 1100000000000);
-	const totalString = totalBytes.toFixed(2).toString();
-	return totalString;
+
+	return(convertBytesToSize(totalCapacity));
 });
+
+const convertBytesToSize = (bytes) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
+
+  return `${convertedSize} ${sizes[i]}`;
+};
+
+const convertSizeToBytes = (size) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const [value, unit] = size.split(' ');
+
+  const index = sizes.indexOf(unit);
+  const bytes = parseFloat(value) * Math.pow(1024, index);
+  
+  return bytes;
+};
+
+const maxTemp = computed(() => {
+  let maxTemperature = 0;
+
+  disks.value.forEach((disk) => {
+    const temperature = parseFloat(disk.temp.replace(/\D/g, ''));
+    if (!isNaN(temperature) && temperature > maxTemperature) {
+      maxTemperature = temperature;
+    }
+  });
+
+  return maxTemperature.toString();
+});
+
+const totalRawSpace = computed(() => {
+	let totalRaw = 0;
+	disks.value.forEach(disk => {
+		totalRaw += convertSizeToBytes(disk.capacity);
+	});
+	return (convertBytesToSize(totalRaw));
+})
 
 //determine number of SSDs
 const disksSSD = computed(() => {
