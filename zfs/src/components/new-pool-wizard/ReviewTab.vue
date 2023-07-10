@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<Accordion class="ml-4">
+		<Accordion :isOpen="true" class="ml-4">
 			<!-- Pool Info -->
 			<template v-slot:title>
 				<p><b>Pool Details</b></p>
@@ -12,7 +12,7 @@
 				<p class="ml-10">Record Size: {{poolConfig.settings!.record}}</p>
 				<p class="ml-10">Compression: {{poolConfig.settings!.compression}}</p>
 				<p class="ml-10">
-					<Accordion class="ml-4">
+					<Accordion :isOpen="false" class="ml-4">
 						<template v-slot:title>
 							<p><b>Advanced Settings</b></p>
 						</template>
@@ -28,7 +28,7 @@
 			</template>
 		</Accordion>
 		<br/>
-		<Accordion class="ml-4">
+		<Accordion :isOpen="true" class="ml-4">
 			<!-- Virtual Device Info -->
 			<template v-slot:title>
 				<p><b>VDev Details</b></p>
@@ -36,7 +36,7 @@
 			<template v-slot:content>
 				<p class="ml-8">
 					<div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
-						<Accordion class="ml-4">
+						<Accordion :isOpen="true" class="ml-4">
 							<template v-slot:title>
 									<p>{{poolConfig.vdevs[vDevIdx].type}}-{{ vDevIdx }} ({{ poolConfig.vdevs[vDevIdx].selectedDisks.length }} disks)</p>
 								</template>
@@ -56,7 +56,7 @@
 			</template>
 		</Accordion>
 		<br/>
-		<Accordion class="ml-4" v-if="poolConfig.createFileSystem">
+		<Accordion :isOpen="true" class="ml-4" v-if="poolConfig.createFileSystem">
 		<!-- File System Info? -->
 			<template v-slot:title>
 					<p><b>File System Details</b></p>

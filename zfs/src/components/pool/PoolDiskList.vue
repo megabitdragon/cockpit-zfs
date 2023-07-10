@@ -12,7 +12,7 @@
 				<div class="inline-block min-w-full min-h-full py-2 align-middle">
 					<div class="overflow-y-visible shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 						<!-- NEW ATTEMPTS AT TABLE -->
-						<!-- <table class="min-w-full divide-y divide-gray-300">
+						<table class="min-w-full divide-y divide-gray-300">
 							<thead>
 								<tr>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
@@ -63,7 +63,12 @@
 											</transition>
 										</Menu>
 									</td>
-									<tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs">
+									<table>
+										
+									</table>
+								</tr>
+
+									<!-- <tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs">
 										<td colspan="7">
 											<table class="divide-y divide-x divide-gray-200 bg-white">
 												<tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs">
@@ -113,13 +118,13 @@
 												</tr>
 											</table>
 										</td>
-									</tr>
-								</tr>
+									</tr> -->
+								
 							</tbody>
-						</table> -->
+						</table>
 
 						<!-- OLD BROKEN TABLE WITH ACCORDIONS -->
-						<table class="table-auto min-w-full divide-y divide-gray-300">
+						<!-- <table class="table-auto min-w-full divide-y divide-gray-300">
 							<thead>
 								<tr>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
@@ -237,7 +242,7 @@
 									</td>
 								</tr>
 							</tbody>	
-						</table> 
+						</table>  -->
 					</div>
 				</div>
 			</div>

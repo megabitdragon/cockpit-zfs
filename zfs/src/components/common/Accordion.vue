@@ -38,10 +38,16 @@
 <script setup lang="ts">
 import { ref, getCurrentInstance } from 'vue';
 
+interface AccordionProps {
+	isOpen: boolean;
+}
+
+const props = defineProps<AccordionProps>();
+
 const instance = getCurrentInstance();
 const uid = instance?.uid ?? '';
 
-const isOpen = ref(false);
+const isOpen = ref(props.isOpen);
 
 const toggleAccordion = () => {
 	isOpen.value = !isOpen.value;

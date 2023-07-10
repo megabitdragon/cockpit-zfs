@@ -29,6 +29,7 @@
 			<div v-if="navTag == 'topology'" class="mt-2 grid grid-cols-4 grid-flow-row">
 				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2 m-2 rounded-md border border-slate-100 col-span-2 bg-slate-100">
 					<legend class="mb-1 text-base font-medium leading-6 text-gray-700">{{ vDev.name }}</legend>
+					
 					<div class="grid grid-cols-2">
 						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-1">
 							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
@@ -43,7 +44,7 @@
 					Create Snapshot button
 					Filesystems with snapshots + button for menu (menu should have - clone, rename, roll back, destroy)
 				-->
-				<p>COMING SOON TO A ZPOOL NEAR YOU</p>
+				<p class="p-2 m-2">COMING SOON TO A ZPOOL NEAR YOU</p>
 			</div>
 
 			<div v-if="navTag == 'settings'">
@@ -168,7 +169,7 @@
 
 					<!-- display snapshots in filesystem list -->
 					<div class="col-span-1 col-start-2 row-start-5">
-						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-gray-700">Display Snapshots in File System List</label>
+						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-gray-700">Show Snapshots in File System List</label>
 						<Switch v-model="poolConfig.settings!.displaySnapshots" :id="getIdKey('settings-pool-display-snapshots')" :class="[poolConfig.settings?.displaySnapshots ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span :class="[poolConfig.settings?.displaySnapshots ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
@@ -222,7 +223,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed, provide } from 'vue';
-import { Switch } from '@headlessui/vue';
+import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';

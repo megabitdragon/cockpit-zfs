@@ -2,7 +2,7 @@ import subprocess
 import json
 
 def main():
-    result = subprocess.run(['lsdev', '-jdmtsfcp'], stdout=subprocess.PIPE)
+    result = subprocess.run(['lsdev', '-jdHmtTsfcp'], stdout=subprocess.PIPE)
 
     json_data = json.loads(result.stdout)
 
@@ -25,6 +25,11 @@ def main():
                 'capacity': disk['capacity'],
                 'type': disk['disk_type'],
                 'usable': True if partitions == 0 else False,
+                'temp': disk['temp-c'],
+                'health': disk['health'],
+                'rotation_rate': disk['rotation-rate'],
+                'power_on_count': disk['power-cycle-count'],
+                'power_on_time': disk['power-on-time'],
             })
 
     print(json.dumps(disks, indent=4))
