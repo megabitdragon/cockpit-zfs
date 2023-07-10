@@ -36,9 +36,6 @@
 						</div>
 					</div>
 				</div>
-				<div class="mt-2">
-					<button :id="getIdKey('add-vdev-btn')" name="add-vdev-btn" class="mt-1 btn btn-primary">Add Virtual Device</button>
-				</div>
 			</div>
 			
 			<div v-if="navTag == 'snapshots'">
@@ -210,16 +207,21 @@
 							</span>
 						</Switch>
 					</div>
-						
-
-					<div class="mt-2 col-span-1 col-start-4 row-start-6">
-						<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
-					</div>
+	
 				</div>
 			</div>
 		</template>
 		<template v-slot:footer>
-			
+			<div v-if="navTag == 'settings'" class="mt-2">
+				<div class="mt-2">
+					<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
+				</div>
+			</div>
+			<div v-if="navTag == 'topology'" class="mt-2">
+				<div class="mt-2">
+					<button :id="getIdKey('add-vdev-btn')" name="add-vdev-btn" class="mt-1 btn btn-primary">Add Virtual Device</button>
+				</div>
+			</div>
 		</template>
 	</Modal>
 </template>
