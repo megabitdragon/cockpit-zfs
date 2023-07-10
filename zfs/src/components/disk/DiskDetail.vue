@@ -60,14 +60,6 @@
 						<p class="text-base">Writes: Y</p>
 					</div>
 
-					<div class="mt-2 col-span-4 col-start-1 row-start-4">
-						<p class="text-base">Alias: </p>
-						<p class="text-base">Block Device: </p>
-						<p class="text-base">Disk: </p>
-						<p class="text-base">Hardware Path: </p>
-					</div>
-
-
 			</div>
 
 			</template>

@@ -56,7 +56,25 @@
 															<a href="#" @click="showDetails(poolData[poolIdx])!" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" @onClick="" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Export Pool</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 														</MenuItem>
 													</div>
 												</MenuItems>
