@@ -119,7 +119,8 @@ interface Dataset {
     available: string;
     creation: string;
     snapshotCount: string;
-    used: string;
+    usedbyRefreservation: string;
+    usedByDataset: string;
     accessTime: string;
     caseSensitivity: string;
     compression: string;

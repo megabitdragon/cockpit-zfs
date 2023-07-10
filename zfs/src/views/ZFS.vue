@@ -101,10 +101,10 @@ getDisks().then(rawJSON => {
         guid: parsedJSON[i].guid,
         properties: {
           rawsize: parsedJSON[i].properties.size.parsed,
-          size: parsedJSON[i].properties.size.value,
-          allocated: parsedJSON[i].properties.allocated.value,
+          size: convertBytesToSize(parsedJSON[i].properties.size.parsed),
+          allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
           capacity: parsedJSON[i].properties.capacity.rawvalue,
-          free: parsedJSON[i].properties.free.value,
+          free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
         },
         //adds VDev array to Pool data object
         vdevs: vDevs.value,
@@ -145,13 +145,13 @@ getDisks().then(rawJSON => {
 //   pool.value.datasets.push(datasetData);
 // };
 
-function recursiveChildData(dataset) {
-  if (dataset.children.length >= 1) {
-    dataset.children.forEach(child => {
-      recursiveChildData(child);
-    });
-  }
-}
+// function recursiveChildData(dataset) {
+//   if (dataset.children.length >= 1) {
+//     dataset.children.forEach(child => {
+//       recursiveChildData(child);
+//     });
+//   }
+// }
 
 //executes a python script to retrieve all dataset data and outputs a JSON
 getDatasets().then(rawJSON => {
@@ -170,10 +170,11 @@ getDatasets().then(rawJSON => {
         key_loaded: parsedJSON[i].key_loaded,
         type: parsedJSON[i].type,
         properties: {
-          available: parsedJSON[i].properties.available.value,
+          available: convertBytesToSize(parsedJSON[i].properties.available.parsed),
           creation: parsedJSON[i].properties.creation.value,
           snapshotCount: parsedJSON[i].properties.snapshot_count.value,
-          used: parsedJSON[i].properties.used.value,
+          usedbyRefreservation: convertBytesToSize(parsedJSON[i].properties.usedbyrefreservation.parsed),
+          usedByDataset: convertBytesToSize(parsedJSON[i].properties.usedbydataset.parsed),
           accessTime: parsedJSON[i].properties.atime.value,
           caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
           compression: parsedJSON[i].properties.compression.value,
@@ -259,12 +260,12 @@ function parseVDevData(vDev) {
   }
 }
 
-// const convertBytesToSize = (bytes) => {
-//   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-//   const i = Math.floor(Math.log(bytes) / Math.log(1024));
-//   const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
-//   return `${convertedSize} ${sizes[i]}`;
-// };
+const convertBytesToSize = (bytes) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
+  return `${convertedSize} ${sizes[i]}`;
+};
 
 //provide data for other components to inject
 provide("pools", pools);

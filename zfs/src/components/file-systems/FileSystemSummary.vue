@@ -14,7 +14,8 @@
 								<tr>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used by Dataset</th>
+									<!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used by Refreservation</th> -->
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Compression</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Deduplication</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Encryption</th>
@@ -50,8 +51,11 @@
 									</td>
 									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
 										<!-- {{ fileSystem Used }} -->
-										{{ fileSystem.properties.used }}
+										{{ fileSystem.properties.usedByDataset }}
 									</td>
+									<!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+										{{ fileSystem.properties.usedbyRefreservation }}
+									</td> -->
 									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
 										<!-- {{ fileSystem Compression(%) }} -->
 										{{ fileSystem.properties.compression }}
