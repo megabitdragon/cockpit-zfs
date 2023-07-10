@@ -68,7 +68,11 @@ getDisks().then(rawJSON => {
       usable: parsedJSON[i].usable,
       path: '',
       guid: '',
-      status: '',
+      status: parsedJSON[i].health,
+      powerOnHours: parsedJSON[i].power_on_time,
+      powerOnCount: parsedJSON[i].power_on_count,
+      temp: parsedJSON[i].temp,
+      rotationRate: parsedJSON[i].rotation_rate,
       stats: {},
     }
     disks.value.push(disk);
@@ -221,6 +225,10 @@ function parseVDevData(vDev) {
       vdev_path: diskVDev.vdev_path,
       serial: diskVDev.serial,
       usable: false,
+      powerOnHours: diskVDev.powerOnHours,
+      powerOnCount: diskVDev.powerOnCount,
+      temp: diskVDev.temp,
+      rotationRate: diskVDev.rotationRate,
     }
     
     vDevData.disks.push(notAChildDisk);
@@ -247,6 +255,10 @@ function parseVDevData(vDev) {
         vdev_path: fullDiskData.vdev_path,
         serial: fullDiskData.serial,
         usable: false,
+        powerOnHours: fullDiskData.powerOnHours,
+        powerOnCount: fullDiskData.powerOnCount,
+        temp: fullDiskData.temp,
+        rotationRate: fullDiskData.rotationRate,
       }; 
 
       //console.log("ChildDisk:");

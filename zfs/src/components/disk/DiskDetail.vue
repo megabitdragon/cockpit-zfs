@@ -1,10 +1,10 @@
 <template>
 	<Modal>
 		<template v-slot:title>
-			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
+			<legend class="flex justify-center">Disk {{ disk.name }} Details</legend>
 		</template>
 		<template v-slot:content>
-			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
+			<div class="mt-6 grid grid-cols-4">
 				<!-- DiskName               DiskCapacity Bar/Circle              	Disk Temp       Refresh Btn-->
 				<!-- Size: fullsize of Disk storage                               Health: STATUS (checkmark if good)
 					Used: allocated storage                                       Errors: if any errors show here, if none show 'None currently'
@@ -30,13 +30,44 @@
 					</div>
 
 					<div class="mt-2 col-span-2 col-start-3 row-start-1">
+						<p class="text-lg">Member of *VDev* in *PoolName*</p>
 						<p class="text-lg">Health: <span class="text-green-700">{{ props.disk.status }}</span></p>
 						<p class="text-sm">Errors: None currently detected - {{ getTimestampString }}</p>
 					</div>
-			</div>
 
-			<div v-if="navTag == 'options'">
-				
+					<div class="mt-2 col-span-1 col-start-3 row-start-2">
+						<p class="text-base">Temperature: {{ props.disk.temp }} </p>
+						<p class="text-base">Type: {{ props.disk.type }}</p>
+					</div>
+
+					<div class="mt-2 col-span-1 col-start-4 row-start-2">
+						<p class="text-base">Power Cycles: {{ props.disk.powerOnCount }}</p>
+						<p class="text-base">Power-On Hrs: {{ props.disk.powerOnHours }}</p>
+					</div>
+
+					<div class="mt-2 col-span-2 col-start-1 row-start-3">
+						<p class="text-base">Used: *space used*</p>
+						<p class="text-base">Free: *space free*</p>
+					</div>
+
+					<div class="mt-2 col-span-1 col-start-3 row-start-3">
+						<p class="text-base">Rotation Rate: <span v-if="props.disk.type == 'HDD'">{{ props.disk.rotationRate }}</span><span v-else>N/A</span></p>
+						<p class="text-base">Interface: </p>
+					</div>
+
+					<div class="mt-2 col-span-1 col-start-4 row-start-3">
+						<p class="text-base">Reads: X</p>
+						<p class="text-base">Writes: Y</p>
+					</div>
+
+					<div class="mt-2 col-span-4 col-start-1 row-start-4">
+						<p class="text-base">Alias: </p>
+						<p class="text-base">Block Device: </p>
+						<p class="text-base">Disk: </p>
+						<p class="text-base">Hardware Path: </p>
+					</div>
+
+
 			</div>
 
 			</template>
@@ -59,7 +90,6 @@ interface DiskDetailsProps {
 
 const props = defineProps<DiskDetailsProps>();
 
-
 const getTimestampString = computed(() => {
 	const currentDateTime = new Date();
 	const timestampString = currentDateTime.toLocaleString('en-US', {
@@ -73,20 +103,6 @@ const getTimestampString = computed(() => {
 
 	return timestampString;
 });
-
-const show = ref(true);
-const navTag = ref('stats');
-
-const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
-
-const navigationCallback: NavigationCallback = (item: NavigationItem) => {
-	navTag.value = item.tag;
-};
-
-const navigation = reactive<NavigationItem[]>([
-  	{ name: 'Stats', tag: 'stats', current: computed(() => navTag.value == 'stats') as unknown as boolean, show: true, },
-  	{ name: 'Options', tag: 'options', current: computed(() => navTag.value == 'options') as unknown as boolean, show: true, },
-].filter(item => item.show));
 
 const getIdKey = (name: string) => `${name}`;
 </script>

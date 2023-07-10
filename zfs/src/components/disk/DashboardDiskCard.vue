@@ -30,7 +30,7 @@
 				</div>
 			</div>
 			<div>
-				<span>{{ props.disk.status }}</span>
+				<span class="text-green-700">{{ props.disk.status }}</span>
 			</div>
 			<div>
 				<span>{{ props.disk.type }}</span>
@@ -38,7 +38,7 @@
 			</template>
 			<template v-slot:content>
 			<div>
-				<span>X° C&nbsp;</span>
+				<span>{{props.disk.temp}}</span>
 			</div>
 			<div>
 				<span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;&nbsp;&nbsp;</span>

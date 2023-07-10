@@ -68,6 +68,10 @@ interface DiskData {
   vdev_path: string;
   serial: string;
   usable: boolean;
+  temp: string;
+  powerOnCount: string;
+  powerOnHours: number;
+  rotationRate: number;
 }
 
 //object for filesystem

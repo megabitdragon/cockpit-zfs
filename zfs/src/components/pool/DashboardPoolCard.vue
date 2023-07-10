@@ -35,7 +35,7 @@
 	
 
 		<div>
-			<span>{{props.pool.status}}</span>
+			<span class="text-green-700">{{props.pool.status}}</span>
 		</div>
 		</template>
 		<template v-slot:content>
