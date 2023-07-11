@@ -1,5 +1,5 @@
 <template>
- <div class="h-full flex flex-col overflow-visible">
+ <div class="h-full flex flex-col overflow-visible bg-default">
 		<HoustonHeader moduleName="ZFS" sourceURL=""
 			issuesURL="" :pluginVersion="Number(pluginVersion)"
 			:infoNudgeScrollbar="true" />

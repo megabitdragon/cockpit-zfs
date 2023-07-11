@@ -1,6 +1,6 @@
 <template>
-	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-		<div class="overflow-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg bg-gray-50">
+	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 bg-default">
+		<div class="overflow-auto sm:rounded-lg bg-default">
 
 			<!-- showing # of pools with status indicator icon and total space between all pools -->
 			<div class="grid grid-flow-col">
@@ -16,8 +16,8 @@
 			</div>
 
 			<!-- lists all pools in card format with a summary of details -->
-			<div class="grid grid-cols-4 grid-flow-col">
-				<div v-for="(pool, index) in pools" :key="index" class="p-5 m-2 rounded-md border border-slate-200 overflow-visible">
+			<div class="grid grid-cols-4 grid-flow-col gap-2">
+				<div v-for="(pool, index) in pools" :key="index">
 						<DashboardPoolCard :pool="pools[index]!"/>
 				</div>
 			</div>
@@ -48,8 +48,8 @@
 			</div>
 
 			<!-- lists all disks in card format with a summary of details -->
-			<div class="grid grid-cols-4 grid-flow-col">
-				<div v-for="(disk, index) in disks" :key="index" class="p-5 m-2 rounded-md border border-slate-200 overflow-visible">
+			<div class="grid grid-cols-4 grid-flow-col gap-2">
+				<div v-for="(disk, index) in disks" :key="index">
 					<DashboardDiskCard :disk="disks[index]!"/>
 				</div>
 			</div>

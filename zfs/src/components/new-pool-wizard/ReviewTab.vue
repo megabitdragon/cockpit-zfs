@@ -3,25 +3,25 @@
 		<Accordion :isOpen="true" class="ml-4">
 			<!-- Pool Info -->
 			<template v-slot:title>
-				<p><b>Pool Details</b></p>
+				<p class="text-default"><b>Pool Details</b></p>
 			</template>
 			<template v-slot:content>
-				<p class="ml-10">Name: {{ poolConfig.name }}</p>
-				<p class="ml-10">{{poolConfig.vdevs.length}} Virtual Device(s)</p>
-				<p class="ml-10">Sector Size: {{poolConfig.settings!.sector}}</p>
-				<p class="ml-10">Record Size: {{poolConfig.settings!.record}}</p>
-				<p class="ml-10">Compression: {{poolConfig.settings!.compression}}</p>
-				<p class="ml-10">
+				<p class="ml-10 text-default text-default">Name: {{ poolConfig.name }}</p>
+				<p class="ml-10 text-default">{{poolConfig.vdevs.length}} Virtual Device(s)</p>
+				<p class="ml-10 text-default">Sector Size: {{poolConfig.settings!.sector}}</p>
+				<p class="ml-10 text-default">Record Size: {{poolConfig.settings!.record}}</p>
+				<p class="ml-10 text-default">Compression: {{poolConfig.settings!.compression}}</p>
+				<p class="ml-10 text-default">
 					<Accordion :isOpen="false" class="ml-4">
 						<template v-slot:title>
 							<p><b>Advanced Settings</b></p>
 						</template>
 						<template v-slot:content>
-							<p class="ml-10">Deduplication: {{poolConfig.settings!.deduplication}}</p>
-							<p class="ml-10">Refreservation Amount: {{poolConfig.settings!.refreservation}}%</p>
-							<p class="ml-10">Auto-Expand Pool: {{poolConfig.settings!.autoExpand}}</p>
-							<p class="ml-10">Auto-Replace Devices: {{poolConfig.settings!.autoReplace}}</p>
-							<p class="ml-10">Automatic TRIM: {{poolConfig.settings!.autoTrim}}</p>
+							<p class="ml-10 text-default">Deduplication: {{poolConfig.settings!.deduplication}}</p>
+							<p class="ml-10 text-default">Refreservation Amount: {{poolConfig.settings!.refreservation}}%</p>
+							<p class="ml-10 text-default">Auto-Expand Pool: {{poolConfig.settings!.autoExpand}}</p>
+							<p class="ml-10 text-default">Auto-Replace Devices: {{poolConfig.settings!.autoReplace}}</p>
+							<p class="ml-10 text-default">Automatic TRIM: {{poolConfig.settings!.autoTrim}}</p>
 						</template>
 					</Accordion>
 				</p>
@@ -31,20 +31,20 @@
 		<Accordion :isOpen="true" class="ml-4">
 			<!-- Virtual Device Info -->
 			<template v-slot:title>
-				<p><b>VDev Details</b></p>
+				<p class="text-default"><b>VDev Details</b></p>
 			</template>
 			<template v-slot:content>
 				<p class="ml-8">
 					<div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
 						<Accordion :isOpen="true" class="ml-4">
 							<template v-slot:title>
-									<p>{{poolConfig.vdevs[vDevIdx].type}}-{{ vDevIdx }} ({{ poolConfig.vdevs[vDevIdx].selectedDisks.length }} disks)</p>
+								<p class="text-default">{{poolConfig.vdevs[vDevIdx].type}}-{{ vDevIdx }} ({{ poolConfig.vdevs[vDevIdx].selectedDisks.length }} disks)</p>
 								</template>
 								<template v-slot:content>
-									<p class="ml-10">Type: {{poolConfig.vdevs[vDevIdx].type}}</p>
+									<p class="ml-10 text-default">Type: {{poolConfig.vdevs[vDevIdx].type}}</p>
 
 								 <div v-for="(disk, diskIdx) in poolConfig.vdevs[vDevIdx].selectedDisks" :key="diskIdx">
-										<p class="ml-10">Disk {{ disk }} </p>
+										<p class="ml-10 text-default">Disk {{ disk }} </p>
 
 									</div>
 
@@ -59,13 +59,13 @@
 		<Accordion :isOpen="true" class="ml-4" v-if="poolConfig.createFileSystem">
 		<!-- File System Info? -->
 			<template v-slot:title>
-					<p><b>File System Details</b></p>
+				<p class="text-default"><b>File System Details</b></p>
 				</template>
 				<template v-slot:content>
-					<p class="ml-10">{{ poolConfig.fileSystem?.name }}</p>
-					<!-- <p class="ml-10">Encryption: {{poolConfig.fileSystem?.encryption}}</p>
-					<p class="ml-10">Quota Amount: {{ poolConfig.fileSystem?.quota.amount }}{{ poolConfig.fileSystem?.quota.size }}</p>
-					<p class="ml-10">Read Only: {{ poolConfig.fileSystem?.readOnly }}</p> -->
+					<p class="ml-10 text-default">{{ poolConfig.fileSystem?.name }}</p>
+					<!-- <p class="ml-10 text-default">Encryption: {{poolConfig.fileSystem?.encryption}}</p>
+					<p class="ml-10 text-default">Quota Amount: {{ poolConfig.fileSystem?.quota.amount }}{{ poolConfig.fileSystem?.quota.size }}</p>
+					<p class="ml-10 text-default">Read Only: {{ poolConfig.fileSystem?.readOnly }}</p> -->
 				</template>
 		</Accordion>
 		<br/>

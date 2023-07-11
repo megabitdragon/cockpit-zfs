@@ -1,5 +1,5 @@
 <template>
-	<div class="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">
+	<div class="divide-y divide-default overflow-hidden rounded-lg bg-default shadow">
 		<div class="px-4 py-5 sm:px-6">
 			<slot name="title"/>
 		</div>

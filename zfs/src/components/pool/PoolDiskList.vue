@@ -12,70 +12,70 @@
 				<div class="inline-block min-w-full min-h-full py-2 align-middle">
 					<div class="overflow-y-visible shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 						<!-- NEW ATTEMPTS AT TABLE -->
-						<table class="min-w-full divide-y divide-gray-300">
+						<table class="min-w-full divide-y divide-default">
 							<thead>
 								<tr>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used (%)</th>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Free</th>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Status</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used (%)</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Free</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Total</th>
 									<th scope="col" class="relative px-3 py-3.5 sm:pr-6 lg:pr-8">
 										<span class="sr-only"></span>
 									</th>
 								</tr>
 							</thead>
 							
-							<tbody class="divide-y divide-x divide-gray-200 bg-white">
+							<tbody class="divide-y divide-x divide-default bg-default">
 								<tr v-for="pool, poolIdx in poolData" :key="poolIdx">
-									<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">{{ poolData[poolIdx].name }}</td>
-									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].status }}</td>
-									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-										<div class="w-full bg-gray-200 rounded-full dark:bg-gray-700 text-center">
-											<div v-if="poolData[poolIdx].properties.capacity! < 1" class="text-s font-medium text-gray-900 text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
-											<div v-if="poolData[poolIdx].properties.capacity! >=1 && poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-gray-900 text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
-											<div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-red-600 text-s font-medium text-gray-900 text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
+									<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default sm:pl-6 lg:pl-8">{{ poolData[poolIdx].name }}</td>
+									<td class="whitespace-nowrap px-3 py-4 text-sm text-success">{{ poolData[poolIdx].status }}</td>
+									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+										<div class="w-full bg-well rounded-full text-center">
+											<div v-if="poolData[poolIdx].properties.capacity! < 1" class="text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
+											<div v-if="poolData[poolIdx].properties.capacity! >=1 && poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
+											<div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-danger text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
 										</div>
 									</td>
-									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.allocated }}</td>
-									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.free }}</td>
-									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.size }}</td>
+									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].properties.allocated }}</td>
+									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].properties.free }}</td>
+									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].properties.size }}</td>
 									<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-										<Menu as="div" class="relative inline-block text-left">
+															<Menu as="div" class="relative inline-block text-right">
 											<div>
-												<MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+												<MenuButton class="flex items-center rounded-full bg-default text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 													<span class="sr-only">Open options</span>
 													<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
 												</MenuButton>
 											</div>
 
 											<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-												<MenuItems class="absolute right-0 z-10 mt-2 w-flex origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+												<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 													<div class="py-1">
 														<MenuItem v-slot="{ active }">
-															<a href="#" @click="showDetails(poolData[poolIdx])!" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pool Details</a>
+															<a href="#" @click="showDetails(poolData[poolIdx])!" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Export Pool</a>
+															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-red-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+															<a href="#" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 														</MenuItem>
 													</div>
 												</MenuItems>
@@ -96,12 +96,12 @@
 															<table class="min-w-full divide-y divide-gray-300">
 																<thead>
 																	<tr>
-																		<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
-																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used (%)</th>
-																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
-																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Free</th>
-																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total</th>
+																		<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
+																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Status</th>
+																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used (%)</th>
+																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used</th>
+																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Free</th>
+																		<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Total</th>
 																		<th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
 																			<span class="sr-only"></span>
 																		</th>
@@ -109,20 +109,20 @@
 																</thead>
 																<tbody class="divide-y divide-gray-200 bg-white">
 																	<tr v-for="disk, diskIdx in poolData[poolIdx].vdevs[vDevIdx].disks" :key="diskIdx">
-																		<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"> 
+																		<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default sm:pl-6 lg:pl-8"> 
 																			<a href="#" class="text-btn-primary hover:text-btn-primary">
 																			{{ disk.name }}
 																			</a>
 																		</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.status }}</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ disk.status }}</td>
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted"> 
 																			<div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
 																			
 																			</div>
 																		</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">used</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">free</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">total</td>
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">used</td>
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">free</td>
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">total</td>
 																		<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
 																			
 																		</td>
@@ -143,7 +143,7 @@
 						<!-- <table class="table-auto min-w-full divide-y divide-gray-300">
 							<thead>
 								<tr>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used (%)</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Used</th>
@@ -167,20 +167,20 @@
 																	{{ poolData[poolIdx].name }}
 																</a>
 															</td>
-															<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].status }}</td>
-															<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
+															<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].status }}</td>
+															<td class="whitespace-nowrap px-3 py-4 text-sm text-muted"> 
 															<div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
 																<div v-if="poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
 																<div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
 															</div>
 															</td>
-															<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.allocated }}</td>
-															<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.free }}</td>
-															<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.size }}</td>
+															<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].properties.allocated }}</td>
+															<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].properties.free }}</td>
+															<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].properties.size }}</td>
 															<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
 																<Menu as="div" class="relative inline-block text-left">
 																	<div>
-																		<MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+																		<MenuButton class="flex items-center rounded-full bg-default text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 																			<span class="sr-only">Open options</span>
 																			<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
 																		</MenuButton>
@@ -235,15 +235,15 @@
 																			{{ disk.name }}
 																			</a>
 																		</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ disk.status }}</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"> 
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ disk.status }}</td>
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted"> 
 																			<div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
 																			
 																			</div>
 																		</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">used</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">free</td>
-																		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">total</td>
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">used</td>
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">free</td>
+																		<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">total</td>
 																		<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
 																			
 																		</td>

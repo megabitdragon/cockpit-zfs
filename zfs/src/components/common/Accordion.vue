@@ -1,5 +1,5 @@
 <template>
-	<div class="">
+	<div class="text-default">
 		<button
 			@click="toggleAccordion"
 			class="flex items-center space-x-3"

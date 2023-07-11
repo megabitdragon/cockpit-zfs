@@ -1,13 +1,13 @@
 <template>
-    <div class="flex items-center flex-wrap max-w-sm px-10 bg-white rounded-2xl h-20">
-        <div class="flex items-center justify-center -m-6 overflow-visible bg-white rounded-full">
+    <div class="flex items-center flex-wrap max-w-sm px-10 bg-default rounded-2xl h-20">
+        <div class="flex items-center justify-center -m-6 overflow-visible bg-default rounded-full">
             <svg class="w-32 h-32 transform translate-x-1 translate-y-1" aria-hidden="true">
-                <circle :id="getIdKey('circle-empty')" class="text-gray-300" :stroke-width="props.strokeWidth" stroke="currentColor" fill="transparent" :r="props.radius" :cx="props.coordX" :cy="props.coordY" />
+                <circle :id="getIdKey('circle-empty')" class="text-muted" :stroke-width="props.strokeWidth" stroke="currentColor" fill="transparent" :r="props.radius" :cx="props.coordX" :cy="props.coordY" />
                 <circle :id="getIdKey('circle-filled')" :class="props.fillColor" :stroke-width="props.strokeWidth" :stroke-dasharray="props.strokeDashArr" :stroke-dashoffset="-filledAmount" stroke-linecap="round" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
             </svg>
-            <span :class="['absolute', 'text-2xl', props.numColor]">{{props.capacity}}%</span>
+            <span :class="['absolute', 'text-2xl', props.fillColor]">{{props.capacity}}%</span>
         </div>
-        <p class="ml-10 font-medium text-gray-600 sm:text-xl">{{ props.name }}</p>
+        <p class="ml-10 font-medium text-default sm:text-xl">{{ props.name }}</p>
         <span :class="['ml-auto', 'text-xl', 'font-medium', props.fillColor, 'hidden', 'sm:block']">{{ props.totalSize }}</span>
     </div>
 </template>
@@ -19,7 +19,6 @@ import { reactive, ref, computed, provide } from 'vue';
 interface CircleProgress {
     id: string;
     fillColor: string;
-    numColor: string
 	radius: number;
     coordX: number;
     coordY: number;

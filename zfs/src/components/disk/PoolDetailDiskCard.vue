@@ -1,42 +1,42 @@
 <template>
-	<Card class="mt-2 mb-4 overflow-visible">
+	<Card class="mt-2 mb-4 overflow-visible card bg-accent">
 		<template v-slot:title>
 			<div class="grid grid-cols-3 grid-flow-col gap-1">
-				<div class="pr-2">
+				<div class="pr-2 text-default">
 					{{ props.disk.name }}
 				</div>
 				<div class="px-1">
 					<img class="w-4 h-4" src="../../../public/icons/success.svg">
 				</div>
-				<div id="menu-btn" class="">
-					<Menu as="div" class="relative inline-block text-left ">
+				<div id="menu-btn" class="ml-5">
+					<Menu as="div" class="relative inline-block text-right ">
 						<div>
-							<MenuButton class="flex items-center rounded-full bg-white-100 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+							<MenuButton class="flex items-center rounded-full bg-default text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 								<span class="sr-only">Open options</span>
 								<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
 							</MenuButton>
 						</div>
 
 						<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-							<MenuItems class="absolute left-0 z-10 mt-2 w-max origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+							<MenuItems class="absolute left-0 z-10 mt-2 w-max origin-top-left rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 								<div class="py-1">
 									<MenuItem v-slot="{ active }">
-										<a href="#" @click="showDetails(props.disk)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Disk Details</a>
+										<a href="#" @click="showDetails(props.disk)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Disk Details</a>
 									</MenuItem>
 									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
+										<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 									</MenuItem>
 									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Detach Disk</a>
+										<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach Disk</a>
 									</MenuItem>
 									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Offline Disk</a>
+										<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Offline Disk</a>
 									</MenuItem>
 									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Replace Disk</a>
+										<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace Disk</a>
 									</MenuItem>
 									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">TRIM Disk</a>
+										<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
 									</MenuItem>
 								</div>
 							</MenuItems>
@@ -46,15 +46,15 @@
 			</div>
 			<!-- alias, name, model/serial, temp, status -->
 			<div>
-				<span>{{ props.disk.status }}</span>
+				<span class="text-default">{{ props.disk.status }}</span>
 			</div>
 			<div>
-				<span>{{ props.disk.type }}</span>
+				<span class="text-default">{{ props.disk.type }}</span>
 			</div>
 			</template>
 			<template v-slot:content>
 			<div>
-				<span>X° C&nbsp;</span>
+				<span class="text-default">X° C&nbsp;</span>
 			</div>
 			<div>
 				<span class="text-base font-medium text-green-700 dark:text-white">Space&nbsp;&nbsp;&nbsp;</span>
@@ -66,7 +66,7 @@
 			</div> -->
 		</template>
 		<template v-slot:footer>
-			<div>
+			<div class="text-default">
 				<b>Total: {{ props.disk.capacity }}</b>
 			</div>
 		</template>

@@ -6,11 +6,11 @@
 		<template v-slot:content>
 			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
 				<div class="col-span-2">
-					<CircleProgress :id="getIdKey('pool-visual-capacity')" :fillColor="'text-green-600'" :numColor="'text-green-700'" :name="props.pool.name" :totalSize="props.pool.properties.size" :capacity="props.pool.properties.capacity" :radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :strokeDashArr="314"/>
+					<CircleProgress :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" :name="props.pool.name" :totalSize="props.pool.properties.size" :capacity="props.pool.properties.capacity" :radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :strokeDashArr="314"/>
 				</div>
 				
 				<div class="mt-2 col-span-2 col-start-3 row-start-1">
-					<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span class="text-green-700">{{ props.pool.status }}</span></p>
+					<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span class="text-success">{{ props.pool.status }}</span></p>
 					<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: None currently detected - {{ getTimestampString }}</p>
 				</div>
 
@@ -22,13 +22,13 @@
 				<div class="mt-2 col-span-1 col-start-4 row-start-2">
 					<p :id="getIdKey('pool-devices')" name="pool-devices" class="text-base">Devices: {{ getNumDevices }}</p>
 					<p :id="getIdKey('pool-disks')" name="pool-disks" class="text-base">Disks: {{  getNumDisks}}</p>
-					<p :id="getIdKey('pool-datasets')" name="pool-datasets" class="text-base">Datasets: {{ getNumDatasets }}</p>
+					<p :id="getIdKey('pool-datasets')" name="pool-datasets" class="text-base">Datasets: X</p>
 				</div>
 			</div>
 
 			<div v-if="navTag == 'topology'" class="mt-2 grid grid-cols-4 grid-flow-row">
-				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2 m-2 rounded-md border border-slate-100 col-span-2 bg-slate-100">
-					<legend class="mb-1 text-base font-medium leading-6 text-gray-700">{{ vDev.name }}</legend>
+				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2 m-2 rounded-md border border-default col-span-2 bg-accent">
+					<legend class="mb-1 text-base font-medium leading-6 text-default">{{ vDev.name }}</legend>
 					
 					<div class="grid grid-cols-2">
 						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-1">
@@ -50,20 +50,20 @@
 			<div v-if="navTag == 'settings'">
 				<div class="grid grid-cols-4 gap-2">
 					<div class="mt-2 col-span-1 col-start-1 row-start-1">
-						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-gray-700">Pool</p><p>{{ props.pool.name }}</p>
+						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-default">Pool</p><p>{{ props.pool.name }}</p>
 					</div>
 					<div class="mt-2 col-span-1 col-start-2 row-start-1">
-						<p :id="getIdKey('settings-pool-readonly')" name="settings-pool-readonly" class="text-base text-gray-700">Read Only</p><p>No</p>
+						<p :id="getIdKey('settings-pool-readonly')" name="settings-pool-readonly" class="text-base text-default">Read Only</p><p>No</p>
 					</div>
 					<div class="mt-2 col-span-1 col-start-3 row-start-1">
-						<p :id="getIdKey('settings-pool-guid')" name="settings-pool-guid" class="text-base text-gray-700">GUID</p><p>{{ props.pool.guid }}</p>
+						<p :id="getIdKey('settings-pool-guid')" name="settings-pool-guid" class="text-base text-default">GUID</p><p>{{ props.pool.guid }}</p>
 					</div>
 					<div class="mt-2 col-span-1 col-start-4 row-start-1 items-center justify-center">
 						<button :id="getIdKey('settings-pool-guid-regen-btn')" name="settings-pool-guid-regen-btn" class="mt-1 col-start-3 row-start-1 btn btn-secondary">Regenerate Pool GUID</button>
 					</div>
 					<div class="mt-2 col-span-2 col-start-1 row-start-2">
-						<label :for="getIdKey('settings-pool-sector-size')" class="block text-base leading-6 text-gray-700">Sector Size</label>
-						<select :id="getIdKey('settings-pool-sector-size')" name="pool-sector-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-700 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<label :for="getIdKey('settings-pool-sector-size')" class="bg-default block text-base leading-6 text-default">Sector Size</label>
+						<select :id="getIdKey('settings-pool-sector-size')" name="pool-sector-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
 							<option value="auto">Auto Detect</option>
 							<option value="512b">512 B</option>
 							<option selected value="4kib">4 KiB</option>
@@ -74,31 +74,31 @@
 						</select>
 					</div>
 					<div class="mt-2 col-span-2 col-start-3 row-start-2">
-						<label :for="getIdKey('settings-pool-fail-mode')" class="block text-base leading-6 text-gray-700">Fail Mode</label>
-						<select :id="getIdKey('settings-pool-fail-mode')" name="pool-fail-mode" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-700 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<label :for="getIdKey('settings-pool-fail-mode')" class="bg-default block text-base leading-6 text-default">Fail Mode</label>
+						<select :id="getIdKey('settings-pool-fail-mode')" name="pool-fail-mode" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
 							<option value="wait">Wait</option>
 							<option value="continue">Continue</option>
 							<option value="panic">Panic</option>
 						</select>
 					</div>
 					<div class="mt-2 col-span-4 col-start-1 row-start-3">
-						<p :for="getIdKey('settings-pool-comment')" class="text-base text-gray-700">Comment</p>
-						<input :id="getIdKey('settings-pool-comment')" name="setting-pool-comment" placeholder="Enter a comment here" type="text" class="mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
+						<p :for="getIdKey('settings-pool-comment')" class="text-base text-default">Comment</p>
+						<input :id="getIdKey('settings-pool-comment')" name="setting-pool-comment" placeholder="Enter a comment here" type="text" class="input-textlike mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
 					</div>
 
 					<!-- auto-expand -->
 					<div class="col-span-1 col-start-1 row-start-4">
-						<label :for="getIdKey('settings-pool-auto-expand')" class="mt-1 block text-sm leading-6 text-gray-700">Auto-Expand Pool</label>
-						<Switch v-model="poolConfig.settings!.autoExpand" :id="getIdKey('settings-pool-auto-expand')" :class="[poolConfig.settings?.autoExpand ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<label :for="getIdKey('settings-pool-auto-expand')" class="mt-1 block text-sm leading-6 text-default">Auto-Expand Pool</label>
+						<Switch v-model="poolConfig.settings!.autoExpand" :id="getIdKey('settings-pool-auto-expand')" :class="[poolConfig.settings?.autoExpand ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings?.autoExpand ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.settings?.autoExpand ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
 								<span :class="[poolConfig.settings?.autoExpand ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 									</svg>
 								</span>
 								<span :class="[poolConfig.settings?.autoExpand ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 									</svg>
 								</span>
@@ -108,17 +108,17 @@
 
 					<!-- auto-replace -->
 					<div class="col-span-1 col-start-2 row-start-4">
-						<label :for="getIdKey('settings-pool-auto-replace')" class="mt-1 block text-sm leading-6 text-gray-700">Auto-Replace Drives</label>
-						<Switch v-model="poolConfig.settings!.autoReplace" :id="getIdKey('settings-pool-auto-replace')" :class="[poolConfig.settings?.autoReplace ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<label :for="getIdKey('settings-pool-auto-replace')" class="mt-1 block text-sm leading-6 text-default">Auto-Replace Drives</label>
+						<Switch v-model="poolConfig.settings!.autoReplace" :id="getIdKey('settings-pool-auto-replace')" :class="[poolConfig.settings?.autoReplace ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings?.autoReplace ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.settings?.autoReplace ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
 								<span :class="[poolConfig.settings?.autoReplace ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 									</svg>
 								</span>
 								<span :class="[poolConfig.settings?.autoReplace ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 									</svg>
 								</span>
@@ -129,17 +129,17 @@
 
 					<!-- auto-trim -->
 					<div class="col-span-1 col-start-3 row-start-4">
-						<label :for="getIdKey('settings-pool-auto-trim')" class="mt-1 block text-sm leading-6 text-gray-700">Auto-TRIM Pool</label>
-						<Switch v-model="poolConfig.settings!.autoTrim" :id="getIdKey('settings-pool-auto-trim')" :class="[poolConfig.settings?.autoTrim ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<label :for="getIdKey('settings-pool-auto-trim')" class="mt-1 block text-sm leading-6 text-default">Auto-TRIM Pool</label>
+						<Switch v-model="poolConfig.settings!.autoTrim" :id="getIdKey('settings-pool-auto-trim')" :class="[poolConfig.settings?.autoTrim ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings?.autoTrim ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.settings?.autoTrim ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
 								<span :class="[poolConfig.settings?.autoTrim ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 									</svg>
 								</span>
 								<span :class="[poolConfig.settings?.autoTrim ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 									</svg>
 								</span>
@@ -149,17 +149,17 @@
 
 					<!-- multi-host -->
 					<div class="col-span-1 col-start-4 row-start-4">
-						<label :for="getIdKey('settings-pool-multi-host')" class="mt-1 block text-sm leading-6 text-gray-700">Multi-Host</label>
-						<Switch v-model="poolConfig.settings!.multiHost" :id="getIdKey('settings-pool-multi-host')" :class="[poolConfig.settings?.multiHost ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<label :for="getIdKey('settings-pool-multi-host')" class="mt-1 block text-sm leading-6 text-default">Multi-Host</label>
+						<Switch v-model="poolConfig.settings!.multiHost" :id="getIdKey('settings-pool-multi-host')" :class="[poolConfig.settings?.multiHost ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings?.multiHost ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.settings?.multiHost ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
 								<span :class="[poolConfig.settings?.multiHost ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 									</svg>
 								</span>
 								<span :class="[poolConfig.settings?.multiHost ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 									</svg>
 								</span>
@@ -169,18 +169,18 @@
 
 					<!-- delegation (Allow non-priveleged user access based on the dataset permissions)-->
 					<div class="col-span-2 col-start-1 row-start-5">
-						<label :for="getIdKey('settings-pool-delegation')" class="mt-1 block text-sm leading-6 text-gray-700">Delegation</label>
+						<label :for="getIdKey('settings-pool-delegation')" class="mt-1 block text-sm leading-6 text-default">Delegation</label>
 						<p class="text-xs">(non-privleged access based on dataset permissions)</p>
-						<Switch v-model="poolConfig.settings!.delegation" :id="getIdKey('settings-pool-delegation')" :class="[poolConfig.settings?.delegation ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<Switch v-model="poolConfig.settings!.delegation" :id="getIdKey('settings-pool-delegation')" :class="[poolConfig.settings?.delegation ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings?.delegation ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.settings?.delegation ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
 								<span :class="[poolConfig.settings?.delegation ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 									</svg>
 								</span>
 								<span :class="[poolConfig.settings?.delegation ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 									</svg>
 								</span>
@@ -190,17 +190,17 @@
 
 					<!-- display snapshots in filesystem list -->
 					<div class="col-span-2 col-start-3 row-start-5">
-						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-gray-700">Display Snapshots in File System List</label>
-						<Switch v-model="poolConfig.settings!.displaySnapshots" :id="getIdKey('settings-pool-display-snapshots')" :class="[poolConfig.settings?.displaySnapshots ? 'bg-slate-600' : 'bg-gray-200', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-default">Display Snapshots in File System List</label>
+						<Switch v-model="poolConfig.settings!.displaySnapshots" :id="getIdKey('settings-pool-display-snapshots')" :class="[poolConfig.settings?.displaySnapshots ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings?.displaySnapshots ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.settings?.displaySnapshots ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
 								<span :class="[poolConfig.settings?.displaySnapshots ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 									</svg>
 								</span>
 								<span :class="[poolConfig.settings?.displaySnapshots ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-slate-600" fill="currentColor" viewBox="0 0 12 12">
+									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 									</svg>
 								</span>
