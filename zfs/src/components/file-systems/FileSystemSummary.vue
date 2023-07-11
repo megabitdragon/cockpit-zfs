@@ -7,11 +7,11 @@
 
 		<div class="mt-8">
 			<div class="-mx-4 -my-2 overflow-auto sm:-mx-6 lg:-mx-8">
-				<div class="inline-block min-w-full min-h-full py-2 align-middle">
-					<div class="overflow-y-visible shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+				<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
+					<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 						<table class="min-w-full divide-y divide-default">
 							<thead>
-								<tr>
+								<tr class="rounded-md">
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Available</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used by Dataset</th>

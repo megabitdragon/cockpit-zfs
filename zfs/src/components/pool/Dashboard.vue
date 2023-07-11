@@ -1,5 +1,5 @@
 <template>
-	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 bg-default">
+	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 bg-default rounded-md border border-default">
 		<div class="overflow-auto sm:rounded-lg bg-default">
 
 			<!-- showing # of pools with status indicator icon and total space between all pools -->
