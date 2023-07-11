@@ -42,37 +42,37 @@
 									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].properties.free }}</td>
 									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ poolData[poolIdx].properties.size }}</td>
 									<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-															<Menu as="div" class="relative inline-block text-right">
+										<Menu as="div" class="relative inline-block text-right">
 											<div>
-												<MenuButton class="flex items-center rounded-full bg-default text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+												<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 													<span class="sr-only">Open options</span>
 													<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
 												</MenuButton>
 											</div>
 
 											<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-												<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+												<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 													<div class="py-1">
 														<MenuItem v-slot="{ active }">
-															<a href="#" @click="showDetails(poolData[poolIdx])!" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
+															<a href="#" @click="showDetails(poolData[poolIdx])!" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
 															<a href="#" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>

@@ -6,7 +6,7 @@
 		</div>
 
 		<div class="mt-8">
-			<div class="-mx-4 -my-2 overflow-auto sm:-mx-6 lg:-mx-8">
+			<div class="-mx-4 -my-2 overflow-visible sm:-mx-6 lg:-mx-8">
 				<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
 					<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 						<table class="min-w-full divide-y divide-default">
@@ -79,19 +79,34 @@
 									<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
 										<Menu as="div" class="relative inline-block text-left">
 											<div>
-												<MenuButton class="flex items-center rounded-full bg-default text-muted hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+												<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 													<span class="sr-only">Open options</span>
 													<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
 												</MenuButton>
 											</div>
 											<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-												<MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+												<MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 													<div class="py-1">
 														<MenuItem v-slot="{ active }">
-															<a href="#" @onClick="" :class="[active ? 'bg-accent text-default' : 'text-primary', 'block px-4 py-2 text-sm']">Configure File System</a>
+															<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
 														</MenuItem>
 														<MenuItem v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-accent text-default' : 'text-primary', 'block px-4 py-2 text-sm']">Destroy File System</a>
+															<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Edit Permissions</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 														</MenuItem>
 													</div>
 												</MenuItems>

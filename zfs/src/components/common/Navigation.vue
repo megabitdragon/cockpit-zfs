@@ -11,11 +11,11 @@
 
 		<!--vvv Desktop/Regular version vvv-->
 		<div class="hidden sm:block">
-			<div class="border-b-2 border-default">
+			<div class="border-b border-default">
 				<nav class="-mb-px flex justify-center" aria-label="Tabs">
 					<a v-for="item in props.navigationItems" :key="item.name"
 						@click.prevent="navigationCallback(item)"
-						:class="[item.current ? 'border-default text-default' : 'border-transparent text-secondary hover:border-default hover:text-default', 'whitespace-nowrap border-b-2 py-4 px-4 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
+						:class="[item.current ? 'border-default text-default' : 'border-transparent text-secondary hover:border-default hover:text-default', 'whitespace-nowrap border-b-4 py-4 px-4 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
 				</nav>
 			</div>
 		</div>
