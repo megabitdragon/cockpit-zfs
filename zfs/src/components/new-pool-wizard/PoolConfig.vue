@@ -177,7 +177,7 @@
 			</div>
 
 			<!-- Advanced Settings (hidden under accordion for better UI/UX) -->
-			<Accordion>
+			<Accordion :isOpen="false" class="mt-2 ml-2">
 				<template v-slot:title>
 					<span><b>Advanced Settings</b></span>
 				</template>

@@ -32,9 +32,10 @@
 									<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">{{ poolData[poolIdx].name }}</td>
 									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].status }}</td>
 									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-										<div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-											<div v-if="poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
-											<div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-red-600 text-s font-medium text-white text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
+										<div class="w-full bg-gray-200 rounded-full dark:bg-gray-700 text-center">
+											<div v-if="poolData[poolIdx].properties.capacity! < 1" class="text-s font-medium text-gray-900 text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
+											<div v-if="poolData[poolIdx].properties.capacity! >=1 && poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-gray-900 text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
+											<div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-red-600 text-s font-medium text-gray-900 text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
 										</div>
 									</td>
 									<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ poolData[poolIdx].properties.allocated }}</td>
@@ -81,9 +82,6 @@
 											</transition>
 										</Menu>
 									</td>
-									<table>
-										
-									</table>
 								</tr>
 
 									<!-- <tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs">
