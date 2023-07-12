@@ -76,6 +76,7 @@ interface DiskData {
 
 //object for filesystem
 interface FileSystemData {
+  parentFS?: string;
   name: string;
   id: string;
   mountpoint: string;
