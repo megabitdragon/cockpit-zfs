@@ -88,7 +88,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import DiskDetail from '../pools/DiskDetail.vue';
 import Card from '../common/Card.vue';
 
-interface DashboardDiskCardProps {
+interface DashDiskCardProps {
 	disk: DiskData;
 }
 
@@ -102,7 +102,7 @@ interface DashboardDiskCardProps {
 //   return total;
 // });
 
-const props = defineProps<DashboardDiskCardProps>();
+const props = defineProps<DashDiskCardProps>();
 
 const showDiskDetails = ref(false);
 

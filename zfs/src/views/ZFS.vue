@@ -7,7 +7,7 @@
       </div>
 
       <div v-if="props.tag === 'pools'" class="p-4">
-        <PoolDiskList/>
+        <PoolsList/>
       </div>
 
       <div v-if="props.tag === 'filesystems'" class="p-4">
@@ -29,7 +29,7 @@
 import { reactive, ref, Ref, inject, computed, provide } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import PoolDiskList from "../components/pools/PoolDiskList.vue";
+import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
 import { getPools } from "../scripts/pools";
 import { getDisks } from "../scripts/disks";

@@ -89,11 +89,11 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
 
-interface DashboardPoolCardProps {
+interface DashPoolCardProps {
 	pool: PoolData;
 }
 
-const props = defineProps<DashboardPoolCardProps>();
+const props = defineProps<DashPoolCardProps>();
 
 const showPoolDetails = ref(false);
 

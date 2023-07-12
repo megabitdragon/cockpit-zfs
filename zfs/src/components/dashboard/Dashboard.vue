@@ -18,7 +18,7 @@
 			<!-- lists all pools in card format with a summary of details -->
 			<div class="grid grid-cols-4 grid-flow-col gap-2">
 				<div v-for="(pool, index) in pools" :key="index">
-						<DashboardPoolCard :pool="pools[index]!"/>
+						<DashPoolCard :pool="pools[index]!"/>
 				</div>
 			</div>
 
@@ -50,7 +50,7 @@
 			<!-- lists all disks in card format with a summary of details -->
 			<div class="grid grid-cols-4 grid-flow-col gap-2">
 				<div v-for="(disk, index) in disks" :key="index">
-					<DashboardDiskCard :disk="disks[index]!"/>
+					<DashDiskCard :disk="disks[index]!"/>
 				</div>
 			</div>
 
@@ -62,8 +62,8 @@
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
-import DashboardPoolCard from "./DashboardPoolCard.vue";
-import DashboardDiskCard from './DashboardDiskCard.vue';
+import DashPoolCard from "./DashPoolCard.vue";
+import DashDiskCard from './DashDiskCard.vue';
 
 const pools = inject<Ref<PoolData[]>>("pools")!;
 const disks = inject<Ref<DiskData[]>>("disks")!;
