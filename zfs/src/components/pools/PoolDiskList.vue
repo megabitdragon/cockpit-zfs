@@ -28,6 +28,21 @@
 							</thead>
 							
 							<tbody class="divide-y divide-x divide-default bg-default">
+								<!-- testing rows -->
+								<!-- <tr v-for="pool, poolIdx in poolData" :key="poolIdx">
+									<td colspan="7">
+										{{ poolData[poolIdx].name }}
+									</td>
+								</tr>
+								<tr v-for="pool, poolIdx in poolData">
+									<tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs" :key="vDevIdx">
+										<td colspan="7" class="ml-10">
+											{{ vDev.name }}
+										</td>
+									</tr>
+								</tr> -->
+
+								<!-- proper table row for pool -->
 								<tr v-for="pool, poolIdx in poolData" :key="poolIdx">
 									<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default sm:pl-6 lg:pl-8">{{ poolData[poolIdx].name }}</td>
 									<td class="whitespace-nowrap px-3 py-4 text-sm text-success">{{ poolData[poolIdx].status }}</td>
@@ -83,6 +98,62 @@
 										</Menu>
 									</td>
 								</tr>
+								<!-- <tr v-for="pool, poolIdx in poolData">
+									<tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs" :key="vDevIdx">
+										<table class="divide-y divide-x divide-default bg-default">
+											<thead>
+												<tr>
+													<th>
+														<td colspan="7" class="px-3 py-3.5 text-left text-sm font-semibold text-default">
+															{{ vDev.name }}
+														</td>
+													</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<table class="divide-y divide-x divide-default bg-default">
+														<thead>
+															<tr>
+																<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
+																<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Status</th>
+																<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used (%)</th>
+																<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used</th>
+																<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Free</th>
+																<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Total</th>
+																<th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
+																	<span class="sr-only"></span>
+																</th>
+															</tr>
+														</thead>
+														<tbody class="divide-y divide-default bg-default">
+															<tr v-for="disk, diskIdx in poolData[poolIdx].vdevs[vDevIdx].disks" :key="diskIdx">
+																<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default sm:pl-6 lg:pl-8"> 
+																	<a href="#" class="text-btn-primary hover:text-btn-primary">
+																	{{ disk.name }}
+																	</a>
+																</td>
+																<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">{{ disk.status }}</td>
+																<td class="whitespace-nowrap px-3 py-4 text-sm text-muted"> 
+																	<div class="w-full bg-default rounded-full">
+																	
+																	</div>
+																</td>
+																<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">used</td>
+																<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">free</td>
+																<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">total</td>
+																<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+																	
+																</td>
+															</tr>
+														</tbody>
+													</table>
+												</tr>
+											</tbody>											
+										</table>									
+									</tr>
+								</tr> -->
+
 
 									<!-- <tr v-for="vDev, vDevIdx in poolData[poolIdx].vdevs">
 										<td colspan="7">
@@ -282,7 +353,7 @@
 import { ref, inject, Ref } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import CreatePool from '../new-pool-wizard/CreatePool.vue';
+import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import DiskDetail from "./DiskDetail.vue";
 import PoolDetail from "./PoolDetail.vue";

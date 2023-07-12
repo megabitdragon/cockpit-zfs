@@ -1,15 +1,5 @@
 <template>
 	<div>
-		<!-- Create a File System (Checkbox) -> Enables all fields underneath -->
-		<div class="relative flex items-start">
-			<div class="text-sm mr-3">
-				<label :for="getIdKey('create-filesystem')" class="font-medium text-default">Create a File System?</label>
-			</div>
-			<div class="flex h-6 items-center">
-				<input :id="getIdKey('create-filesystem')" v-model="poolConfig.createFileSystem" aria-describedby="create-filesystem" name="create-filesystem" type="checkbox" class="h-4 w-4 rounded border-default text-primary focus:ring-slate-600" />
-			</div>
-		</div>
-
 		<div v-if="poolConfig.createFileSystem">
 			<!-- Name of File System (Text) -->
 			<div>

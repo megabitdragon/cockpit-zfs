@@ -299,8 +299,16 @@
 	<div v-if=" props.tag ==='file-system'">
 		<fieldset>
 			<legend class="mb-1 text-base font-semibold leading-6 text-default">File System Settings</legend>
-			<FileSystem ref="fileSystemConfiguration" idKey="file-system"/>
-			<!-- <p>COMING SOON</p> -->
+			<!-- Create a File System (Checkbox) -> Enables all fields underneath -->
+			<div class="relative flex items-start">
+				<div class="text-sm mr-3">
+					<label :for="getIdKey('create-filesystem')" class="font-medium text-default">Create a File System?</label>
+				</div>
+				<div class="flex h-6 items-center">
+					<input :id="getIdKey('create-filesystem')" v-model="poolConfig.createFileSystem" aria-describedby="create-filesystem" name="create-filesystem" type="checkbox" class="h-4 w-4 rounded border-default text-primary focus:ring-slate-600" />
+				</div>
+			</div>
+			<FileSystem v-if="poolConfig.createFileSystem" ref="fileSystemConfiguration" idKey="file-system"/>
 		</fieldset>
 	</div>
 
