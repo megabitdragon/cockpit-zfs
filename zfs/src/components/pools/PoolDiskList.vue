@@ -284,7 +284,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../new-pool-wizard/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
-import DiskDetail from "../disk/DiskDetail.vue";
+import DiskDetail from "./DiskDetail.vue";
 import PoolDetail from "./PoolDetail.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;

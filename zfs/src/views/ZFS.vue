@@ -29,8 +29,8 @@
 import { reactive, ref, Ref, inject, computed, provide } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import PoolDiskList from "../components/pool/PoolDiskList.vue";
-import Dashboard from '../components/pool/Dashboard.vue';
+import PoolDiskList from "../components/pools/PoolDiskList.vue";
+import Dashboard from '../components/dashboard/Dashboard.vue';
 import { getPools } from "../scripts/pools";
 import { getDisks } from "../scripts/disks";
 import { getDatasets } from "../scripts/datasets";

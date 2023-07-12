@@ -85,7 +85,7 @@
 import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import DiskDetail from './DiskDetail.vue';
+import DiskDetail from '../pools/DiskDetail.vue';
 import Card from '../common/Card.vue';
 
 interface DashboardDiskCardProps {

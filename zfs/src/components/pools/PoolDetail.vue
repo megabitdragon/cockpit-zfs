@@ -232,7 +232,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';
-import PoolDetailDiskCard from '../disk/PoolDetailDiskCard.vue';
+import PoolDetailDiskCard from '../pools/PoolDetailDiskCard.vue';
 
 interface PoolDetailsProps {
 	pool: PoolData;

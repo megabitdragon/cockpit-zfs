@@ -87,7 +87,7 @@ import { ref, inject, Ref, computed, provide } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Card from '../common/Card.vue';
-import PoolDetail from "./PoolDetail.vue";
+import PoolDetail from "../pools/PoolDetail.vue";
 
 interface DashboardPoolCardProps {
 	pool: PoolData;

@@ -62,8 +62,8 @@
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
-import DashboardPoolCard from "../pool/DashboardPoolCard.vue";
-import DashboardDiskCard from '../disk/DashboardDiskCard.vue';
+import DashboardPoolCard from "./DashboardPoolCard.vue";
+import DashboardDiskCard from './DashboardDiskCard.vue';
 
 const pools = inject<Ref<PoolData[]>>("pools")!;
 const disks = inject<Ref<DiskData[]>>("disks")!;
