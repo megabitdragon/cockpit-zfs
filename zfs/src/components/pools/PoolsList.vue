@@ -11,12 +11,21 @@
 			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
 				<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 
-					<div class="flex flex-col">
-						<div v-for="pool, poolIdx in poolData" :key="poolIdx">
+					<div class="">
+						<div v-for="pool, poolIdx in poolData" :key="poolIdx" class="flex flex-col">
 							<div>{{ pool.name }}</div>
 							<table class="table-auto min-w-full divide-y divide-default">
-								<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
-									{{ vDev.name }}
+								<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" >
+									<td colspan="7" class="ml-4">{{ vDev.name }}</td>
+								</tr>
+								<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" >
+									<td colspan="7" class="ml-8">
+										<table class="table-auto min-w-full divide-y divide-default">
+											<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx">
+												<td>{{ disk.name }}</td>
+											</tr>
+										</table>
+									</td>
 								</tr>
 							</table>
 						</div>

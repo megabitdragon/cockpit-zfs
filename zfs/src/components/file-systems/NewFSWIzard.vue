@@ -214,7 +214,9 @@
             </div>
        </template>
        <template v-slot:footer>
-
+        <div class="mt-2">
+            <button :id="getIdKey('create-file-system')" name="create-file-system" class="mt-1 btn btn-primary">Create File System</button>
+        </div>
        </template> 
     </Modal>
 </template>
@@ -223,7 +225,6 @@
 import { ref, Ref, inject } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { file } from '@45drives/cockpit-typings';
 
 interface NewFSWizardProps {
 	idKey: string;
