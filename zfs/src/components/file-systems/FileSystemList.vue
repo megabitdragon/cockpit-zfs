@@ -1,8 +1,8 @@
 <template>
 	<div class="px-4 sm:px-6 lg:px-8">
 		<div class="button-group-row">
-				<button id="createFS" class="btn btn-primary object-left justify-start" @click="showFSWizard = true">Create File System</button>
-				<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="w-5 h-5"/></button>
+			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showFSWizard = true">Create File System</button>
+			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
 		<div class="mt-8 overflow-visible">
@@ -30,49 +30,32 @@
 
 							<!-- FILE SYSTEMS BY POOLS -->
 							<tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
-								<!-- <Accordion class="ml-4">
-									<template v-slot:title>                  
-									</template>
-
-									<template v-slot:content>                  
-									</template>
-								</Accordion> -->
 
 								<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default sm:pl-6 lg:pl-8"> 
-									<a href="#" class="text-default hover:text-primary">
-										<!-- {{ fileSystem Name }} -->
-										{{ fileSystem.name }}
-									</a>
+									{{ fileSystem.name }}
 								</td>
 								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									<!-- {{ fileSystem Available }} -->
 									{{ fileSystem.properties.available }}
 								</td>
 								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									<!-- {{ fileSystem Used }} -->
 									{{ fileSystem.properties.usedByDataset }}
 								</td>
 								<!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
 									{{ fileSystem.properties.usedbyRefreservation }}
 								</td> -->
 								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted"> 
-									<!-- {{ fileSystem Compression(%) }} -->
 									{{ fileSystem.properties.compression }}
 								</td>
 								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									<!-- {{ fileSystem Deduplication }} -->
 									{{ fileSystem.properties.deduplication }}
 								</td>
 								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									<!-- {{ fileSystem Encryption }} -->
 									{{ fileSystem.encrypted }}
 								</td>
 								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									<!-- {{ fileSystem Snapshots }} -->
 									{{ fileSystem.properties.snapshotCount }}
 								</td>
 								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									<!-- {{ fileSystem ReadOnly }} -->
 									{{ fileSystem.properties.readOnly }}
 								</td>
 								<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
@@ -113,13 +96,11 @@
 									</Menu>
 								</td>
 							</tr>
-
 						</tbody>
 					</table>
 				</div>
 			</div>
 		</div>
-
 	</div>
 
 	<div v-if="showFSWizard">
