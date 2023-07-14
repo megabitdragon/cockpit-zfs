@@ -51,6 +51,7 @@ interface vDevData {
   disks: DiskData[];
   selectedDisks: string[];
   forceAdd?: boolean;
+  poolName?: string;
 }
 
 //object for disk
@@ -72,6 +73,8 @@ interface DiskData {
   powerOnCount: string;
   powerOnHours: number;
   rotationRate: number;
+  vDevName?: string;
+  poolName?: string;
 }
 
 //object for filesystem

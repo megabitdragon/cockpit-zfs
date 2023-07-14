@@ -45,6 +45,9 @@
 				</div>
 			</div>
 			<div>
+				Member of {{ props.disk.vDevName }} in {{ props.disk.poolName }}
+			</div>
+			<div>
 				<span class="text-success">{{ props.disk.status }}</span>
 			</div>
 			<div>
@@ -107,6 +110,9 @@ const props = defineProps<DashDiskCardProps>();
 const showDiskDetails = ref(false);
 
 const selectedDisk = ref<DiskData>();
+
+console.log("Props.Disk");
+console.log(props.disk);
 
 //method to show Disk details when button is clicked
 function showDetails(disk) {

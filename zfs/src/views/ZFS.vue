@@ -91,12 +91,12 @@ getDisks().then(rawJSON => {
     //loops through pool JSON
     for (let i = 0; i < parsedJSON.length; i++) {
       //calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
-      parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev));
-      parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev));
-      parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev));
-      parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev));
-      parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev));
-      parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev));
+      parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name));
+      parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name));
+      parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name));
+      parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name));
+      parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name));
+      parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name));
     
       //adds pool data from JSON into pool data object, pushes into array 
       const poolData = {
@@ -117,14 +117,8 @@ getDisks().then(rawJSON => {
      
       pools.value.push(poolData);
 
-      // if (parsedJSON[i].root_dataset.children && parsedJSON[i].root_dataset.children.length > 0) {
-      //   parsedJSON[i].root_dataset.children.forEach(child => {
-      //     recursiveChildCheck(child, poolData);
-      //   });
-      // }
-
-      //console.log("poolData:");
-      //console.log(poolData);
+      console.log("poolData:");
+      console.log(poolData);
       vDevs.value = [];
     }
     //console.log("Pools:");
@@ -132,30 +126,6 @@ getDisks().then(rawJSON => {
   });
 });
 
-//trying to figure out a way to recursively add filesystems + nested filesystems to pool data object
-
-// function recursiveChildCheck(dataset, pool) {
-//   const datasetData = {
-//     name: dataset.name,
-//     children: [],
-//   }
-
-//   if (dataset.children.length >= 1) {
-//     dataset.children.forEach(child => {
-//       recursiveChildCheck(child, datasetData)
-//     });
-//   }
-
-//   pool.value.datasets.push(datasetData);
-// };
-
-// function recursiveChildData(dataset) {
-//   if (dataset.children.length >= 1) {
-//     dataset.children.forEach(child => {
-//       recursiveChildData(child);
-//     });
-//   }
-// }
 
 //executes a python script to retrieve all dataset data and outputs a JSON
 getDatasets().then(rawJSON => {
@@ -197,7 +167,7 @@ getDatasets().then(rawJSON => {
 });
 
 //method for parsing through VDevs to add to array (VDev array is added to Pool)
-function parseVDevData(vDev) {
+function parseVDevData(vDev, poolName) {
   const vDevData : vDevData = {
     name: vDev.name,
     type: vDev.type,
@@ -206,6 +176,7 @@ function parseVDevData(vDev) {
     guid: vDev.guid,
     selectedDisks: [],
     disks: [],
+    poolName: poolName,
   };
   
   //checks if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
@@ -229,6 +200,8 @@ function parseVDevData(vDev) {
       powerOnCount: diskVDev.powerOnCount,
       temp: diskVDev.temp,
       rotationRate: diskVDev.rotationRate,
+      vDevName: vDev.name,
+      poolName: poolName,
     }
     
     vDevData.disks.push(notAChildDisk);
@@ -259,10 +232,12 @@ function parseVDevData(vDev) {
         powerOnCount: fullDiskData.powerOnCount,
         temp: fullDiskData.temp,
         rotationRate: fullDiskData.rotationRate,
+        vDevName: vDev.name,
+        poolName: poolName,
       }; 
 
-      //console.log("ChildDisk:");
-      //console.log(childDisk);
+      // console.log("ChildDisk:");
+      // console.log(childDisk);
       vDevData.disks.push(childDisk);
     });
   
@@ -272,6 +247,7 @@ function parseVDevData(vDev) {
   }
 }
 
+//convert raw bytes to readable data size
 const convertBytesToSize = (bytes) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
@@ -279,9 +255,15 @@ const convertBytesToSize = (bytes) => {
   return `${convertedSize} ${sizes[i]}`;
 };
 
+//get all disks in use by pools
+const disksInPools = computed<DiskData[]>(() => {
+	return disks.value.filter(disk => disk.usable === false);
+});
+
 //provide data for other components to inject
 provide("pools", pools);
 provide("disks", disks);
+provide("disks-in-pools", disksInPools);
 provide("datasets", datasets);
 </script>
 

@@ -11,7 +11,7 @@
 					<img class="w-4 h-4" src="../../../public/icons/success.svg">
 				</div>
 				<div class="p-2">
-					<h6> Total Effective Space: {{ totalEffectiveSpace }} </h6>
+					<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
 				</div>
 			</div>
 
@@ -43,7 +43,7 @@
 					<h6> Maximum Temperature: {{maxTemp}}° C</h6>
 				</div>
 				<div class="p-2">
-					<h6> Total Raw Space: {{ totalRawSpace }}</h6>
+					<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
 				</div>
 			</div>
 
@@ -68,8 +68,11 @@ import DashDiskCard from './DashDiskCard.vue';
 const pools = inject<Ref<PoolData[]>>("pools")!;
 const disks = inject<Ref<DiskData[]>>("disks")!;
 
+//get all disks in use by pools
+// const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
+
 //determine total effective space of pools
-const totalEffectiveSpace = computed(() => {
+const totalEffectivePoolSpace = computed(() => {
 	let totalCapacity = 0;
 	pools.value.forEach(pool => {
 		totalCapacity += pool.properties.rawsize;
@@ -78,6 +81,7 @@ const totalEffectiveSpace = computed(() => {
 	return(convertBytesToSize(totalCapacity));
 });
 
+//convert raw bytes to readable data size
 const convertBytesToSize = (bytes) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
@@ -86,6 +90,7 @@ const convertBytesToSize = (bytes) => {
   return `${convertedSize} ${sizes[i]}`;
 };
 
+//convert readable data size to raw bytes
 const convertSizeToBytes = (size) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const [value, unit] = size.split(' ');
@@ -96,6 +101,7 @@ const convertSizeToBytes = (size) => {
   return bytes;
 };
 
+//find highest disk temperature
 const maxTemp = computed(() => {
   let maxTemperature = 0;
 
@@ -109,7 +115,8 @@ const maxTemp = computed(() => {
   return maxTemperature.toString();
 });
 
-const totalRawSpace = computed(() => {
+//get total raw space of disks
+const totalRawDiskSpace = computed(() => {
 	let totalRaw = 0;
 	disks.value.forEach(disk => {
 		totalRaw += convertSizeToBytes(disk.capacity);
