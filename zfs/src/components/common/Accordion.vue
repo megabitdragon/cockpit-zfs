@@ -1,5 +1,5 @@
 <template>
-	<div class="text-default">
+	<div class="text-default w-full">
 		<button
 			@click="toggleAccordion"
 			class="flex items-center space-x-3"
@@ -7,7 +7,7 @@
 			:aria-controls="`collapse${uid}`"
 		>
 			<svg
-				class="w-3 transition-all duration-200 transform"
+				class="ml-2 w-3 transition-all duration-200 transform"
 				:class="{
 					'rotate-0': isOpen,
 					'-rotate-90': !isOpen,

@@ -44,9 +44,9 @@
 					</Menu>
 				</div>
 			</div>
-			<div>
+			<!-- <div>
 				Member of {{ props.disk.vDevName }} in {{ props.disk.poolName }}
-			</div>
+			</div> -->
 			<div>
 				<span class="text-success">{{ props.disk.status }}</span>
 			</div>
