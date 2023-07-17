@@ -1,61 +1,56 @@
 <template>
-	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 bg-default rounded-md border border-default">
-		<div class="overflow-auto sm:rounded-lg bg-default">
-
-			<!-- showing # of pools with status indicator icon and total space between all pools -->
-			<div class="grid grid-flow-col">
-				<div class="p-2">
-					<span class="font-semibold text-lg">Pools</span>
-				</div>
-				<div class="p-2">
-					<img class="w-4 h-4" src="../../../public/icons/success.svg">
-				</div>
-				<div class="p-2">
-					<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
-				</div>
+	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
+		<!-- showing # of pools with status indicator icon and total space between all pools -->
+		<div class="grid grid-flow-col">
+			<div class="p-2">
+				<span class="font-semibold text-lg">Pools</span>
 			</div>
-
-			<!-- lists all pools in card format with a summary of details -->
-			<div class="grid grid-cols-4 grid-flow-col gap-2">
-				<div v-for="(pool, index) in pools" :key="index">
-						<DashPoolCard :pool="pools[index]!"/>
-				</div>
+			<div class="p-2">
+				<img class="w-4 h-4" src="../../../public/icons/success.svg">
 			</div>
-
-			<!-- showing # of SSDs, # of HDDS, with status indicator icons and maximum temp + total raw space between all disks -->
-			<div class="grid grid-flow-col">
-				<div class="p-2">
-					<span class="font-semibold text-lg">Disks</span>
-				</div>
-				<div class="p-2">
-					<img class="w-4 h-4" src="../../../public/icons/success.svg">
-				</div>
-				<div class="p-2">
-					{{ disksSSD.length }} SSDs
-				</div>
-				<div class="p-2">
-					<img class="w-4 h-4" src="../../../public/icons/success.svg">
-				</div>
-				<div class="p-2">
-					{{ disksHDD.length }} HDDs
-				</div>
-				<div class="p-2">
-					<h6> Maximum Temperature: {{maxTemp}}° C</h6>
-				</div>
-				<div class="p-2">
-					<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
-				</div>
+			<div class="p-2">
+				<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
 			</div>
-
-			<!-- lists all disks in card format with a summary of details -->
-			<div class="grid grid-cols-4 grid-flow-col gap-2">
-				<div v-for="(disk, index) in disks" :key="index">
-					<DashDiskCard :disk="disks[index]!"/>
-				</div>
-			</div>
-
 		</div>
-	
+
+		<!-- lists all pools in card format with a summary of details -->
+		<div class="grid grid-cols-4 grid-flow-col gap-2">
+			<div v-for="(pool, index) in pools" :key="index">
+					<DashPoolCard :pool="pools[index]!"/>
+			</div>
+		</div>
+
+		<!-- showing # of SSDs, # of HDDS, with status indicator icons and maximum temp + total raw space between all disks -->
+		<div class="grid grid-flow-col">
+			<div class="p-2">
+				<span class="font-semibold text-lg">Disks</span>
+			</div>
+			<div class="p-2">
+				<img class="w-4 h-4" src="../../../public/icons/success.svg">
+			</div>
+			<div class="p-2">
+				{{ disksSSD.length }} SSDs
+			</div>
+			<div class="p-2">
+				<img class="w-4 h-4" src="../../../public/icons/success.svg">
+			</div>
+			<div class="p-2">
+				{{ disksHDD.length }} HDDs
+			</div>
+			<div class="p-2">
+				<h6> Maximum Temperature: {{maxTemp}}° C</h6>
+			</div>
+			<div class="p-2">
+				<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
+			</div>
+		</div>
+
+		<!-- lists all disks in card format with a summary of details -->
+		<div class="grid grid-cols-4 grid-flow-col gap-2">
+			<div v-for="(disk, index) in disks" :key="index">
+				<DashDiskCard :disk="disks[index]!"/>
+			</div>
+		</div>
 	</div>
 </template>
 
