@@ -554,10 +554,15 @@ const newVDevDisks = ref<string[]>([]);
 function fillNewPoolData() {
 	newPoolData.value.name = poolConfig.value.name;
 	newPoolData.value.vdevtype = poolConfig.value.vdevs[0].type;
-	poolConfig.value.vdevs[0].disks.forEach(disk => {
-		newVDevDisks.value.push(disk.sd_path);
-	});
-	newPoolData.value.disks = newVDevDisks.value;
+	// poolConfig.value.vdevs[0].disks.forEach(disk => {
+	// 	console.log("disk sd_path:");
+	// 	console.log(disk.sd_path);
+	// 	newVDevDisks.value.push(disk.sd_path);
+	// });
+	// newPoolData.value.disks = newVDevDisks.value;
+	poolConfig.value.vdevs[0].disks.forEach(disk => 
+		newPoolData.value.disks.push(disk.name)
+	);
 	newPoolData.value.autoexpand = isBoolOnOff(poolConfig.value.settings!.autoTrim);
 	newPoolData.value.autoreplace = isBoolOnOff(poolConfig.value.settings!.autoReplace)
 	newPoolData.value.autotrim = isBoolOnOff(poolConfig.value.settings!.autoTrim)
