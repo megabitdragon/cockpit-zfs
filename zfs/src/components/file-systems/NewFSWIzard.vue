@@ -1,7 +1,7 @@
 <template>
     <Modal>
        <template v-slot:title>
-
+            <legend class="flex justify-center">Create a New File System</legend>
        </template>
        <template v-slot:content>
             <div>

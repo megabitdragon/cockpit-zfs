@@ -111,8 +111,8 @@ const showDiskDetails = ref(false);
 
 const selectedDisk = ref<DiskData>();
 
-console.log("Props.Disk");
-console.log(props.disk);
+// console.log("Props.Disk");
+// console.log(props.disk);
 
 //method to show Disk details when button is clicked
 function showDetails(disk) {

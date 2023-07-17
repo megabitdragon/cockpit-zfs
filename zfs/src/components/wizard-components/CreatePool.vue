@@ -131,7 +131,8 @@ const fillDisks = () => {
 
 
 // Using get-pools.py
-////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
 //getting the array of VDevs (with proper data structure) to use as argument for create-pool python script
 const newVDevs = computed(() => {
 	//calling fillDisks so disk/vdev path is accessible
@@ -177,7 +178,8 @@ function getRoot(vDev: vDevData) {
 
 	return root;
 }
-////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
 
 //finish button method for creating pool
 function finishBtn(newPoolData) {
