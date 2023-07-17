@@ -3,7 +3,7 @@
         <div class="flex items-center justify-center -m-6 overflow-visible bg-default rounded-full">
             <svg class="w-32 h-32 transform translate-x-1 translate-y-1" aria-hidden="true">
                 <circle :id="getIdKey('circle-empty')" class="text-muted" :stroke-width="props.strokeWidth" stroke="currentColor" fill="transparent" :r="props.radius" :cx="props.coordX" :cy="props.coordY" />
-                <circle :id="getIdKey('circle-filled')" :class="props.fillColor" :stroke-width="props.strokeWidth" :stroke-dasharray="props.strokeDashArr" :stroke-dashoffset="-filledAmount" stroke-linecap="round" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
+                <circle :id="getIdKey('circle-filled')" :class="props.fillColor" :stroke-width="props.strokeWidth" :stroke-dasharray="props.strokeDashArr" :stroke-dashoffset="filledAmount" stroke-linecap="round" stroke="currentColor" fill="transparent" r="50" cx="60" cy="60" />
             </svg>
             <span :class="['absolute', 'text-2xl', props.fillColor]">{{props.capacity}}%</span>
         </div>
@@ -32,7 +32,11 @@ interface CircleProgress {
 const props = defineProps<CircleProgress>();
 
 const filledAmount = computed(() => {
-	return (props.capacity / 100) * (2 * Math.PI * props.radius);
+	//return (props.capacity / 100) * (2 * Math.PI * props.radius);
+    const capacity = props.capacity;
+    const circumference = 2 * Math.PI * props.radius;
+    const filledCircumference = (capacity / 100) * circumference;
+    return circumference - filledCircumference;
 });
 
 const getIdKey = (name: string) => `${name}`;
