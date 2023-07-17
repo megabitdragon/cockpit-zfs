@@ -44,7 +44,9 @@
 					Create Snapshot button
 					Filesystems with snapshots + button for menu (menu should have - clone, rename, roll back, destroy)
 				-->
-				<p class="p-2 m-2">COMING SOON TO A ZPOOL NEAR YOU</p>
+				<div class="justify-center">
+					<p class="p-2 m-2">COMING SOON TO A ZPOOL NEAR YOU</p>
+				</div>
 			</div>
 
 			<div v-if="navTag == 'settings'">
@@ -300,7 +302,7 @@ const getNumDisks = computed(() =>  {
 
 const getNumDatasets = computed(() => {
 	let datasets = 0;
-	//use recursion to check root_dataset for children and those children for children etc. 
+	//use recursion to check root_dataset for children and those children for children etc.
 	
 	return datasets;
 });

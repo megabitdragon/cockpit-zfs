@@ -112,6 +112,15 @@
 								<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" >
 									<td colspan="7" class="ml-8">
 										<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5">
+											<!-- <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
+											<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Status</th>
+											<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used (%)</th>
+											<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used</th>
+											<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Free</th>
+											<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Total</th>
+											<th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
+												<span class="sr-only"></span>
+											</th> -->
 											<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-24 bg-accent">
 												<td>{{ disk.name }}</td>
 											</tr>

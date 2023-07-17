@@ -41,6 +41,19 @@ interface PoolData {
   failMode?: 'wait' | 'continue' | 'panic';
 }
 
+//pool object for creating new pool command
+interface newPoolData {
+  name: string;
+  vdevtype: string;
+  disks: string[];
+  autoexpand: string;
+  autoreplace: string;
+  autotrim: string;
+  compression: string;
+  recordsize: number;
+  dedup: string;
+}
+
 //object for vdev
 interface vDevData {
   name: string;

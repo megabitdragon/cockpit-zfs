@@ -162,6 +162,37 @@ function getRoot(vDev) {
 
 	return root;
 }
+////////////////////////////////////////////////////////////
+//const newPoolDisks = ref([]);
+// const newPoolDisks = computed(() => {
+// 	poolConfig.value.vdevs[0].disks.forEach(disk => {
+		
+// 	});
+// });
+
+//convert readable data size to raw bytes
+// const convertSizeToBytes = (size) => {
+//   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+//   const [value, unit] = size.split(' ');
+
+//   const index = sizes.indexOf(unit);
+//   const bytes = parseFloat(value) * Math.pow(1024, index);
+  
+//   return bytes;
+// };
+
+// const newPool : newPoolData  = {
+// 	name: poolConfig.value.name,
+// 	vdevtype: poolConfig.value.vdevs[0].type,
+// 	disks: newPoolDisks.value,
+// 	autoexpand: ,
+// 	autoreplace: ,
+// 	autotrim: ,
+// 	compression: ,
+// 	recordsize: ,
+// 	dedup: ,
+// }
+///////////////////////////////////////////////////////////
 
 //finish button method for executing create pool script
 function finishBtn(newPoolName, newVDevs) {
