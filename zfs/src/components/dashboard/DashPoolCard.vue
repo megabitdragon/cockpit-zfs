@@ -42,7 +42,7 @@
 										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 									</MenuItem>
 									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+										<a href="#" @click="destroyPool(pool.name)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 									</MenuItem>
 								</div>
 							</MenuItems>
@@ -86,6 +86,7 @@
 import { ref, inject, Ref, computed, provide } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import { destroyPool } from "../../scripts/pools";
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
 

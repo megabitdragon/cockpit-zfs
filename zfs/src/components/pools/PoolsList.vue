@@ -74,7 +74,7 @@
 														<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+														<a href="#" @click="destroyPool(poolData[poolIdx].name)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 													</MenuItem>
 												</div>
 											</MenuItems>
@@ -187,7 +187,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
-import DiskDetail from "./DiskDetail.vue";
+import { destroyPool } from "../../scripts/pools";
 import PoolDetail from "./PoolDetail.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
