@@ -79,8 +79,8 @@ getDisks().then(rawJSON => {
     // console.log("Disk:");
     // console.log(disk);
   }
-  // console.log("Disks:");
-  // console.log(disks);
+  console.log("Disks:");
+  console.log(disks);
   
   //executes a python script to retrieve all zfs pools on server and output a JSON
   getPools().then(rawJSON => {
@@ -117,12 +117,12 @@ getDisks().then(rawJSON => {
      
       pools.value.push(poolData);
 
-      console.log("poolData:");
-      console.log(poolData);
+      // console.log("poolData:");
+      // console.log(poolData);
       vDevs.value = [];
     }
-    //console.log("Pools:");
-    //console.log(pools);
+    console.log("Pools:");
+    console.log(pools);
   });
 });
 

@@ -329,10 +329,11 @@ import { Switch } from '@headlessui/vue';
 import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
+import { newPool } from '../../scripts/pools';
 
 interface PoolConfigProps {
-  tag: string;
-  idKey: string;
+	tag: string;
+	idKey: string;
 }
 
 const props = defineProps<PoolConfigProps>();
@@ -353,135 +354,135 @@ const diskFeedback = ref('');
 //This currently ties in to the disk selection UI elements and shows/hides the disks based on whether they are in use or not
 //would like to change this so instead of hiding the in-use disks completely, simply grey them out or disable them from selection for better UI/UX
 const vDevAvailDisks = computed<DiskData[][]>(() => {
-  return poolConfig.value.vdevs.map((vdev, vdevIdx) => {
-	const claimed = poolConfig.value.vdevs
-	  .filter((_, idx) => idx !== vdevIdx)
-	  .flatMap(vdev => vdev.selectedDisks);
-	return disks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
-  });
+	return poolConfig.value.vdevs.map((vdev, vdevIdx) => {
+		const claimed = poolConfig.value.vdevs
+		.filter((_, idx) => idx !== vdevIdx)
+		.flatMap(vdev => vdev.selectedDisks);
+		return disks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
+	});
 });
 
 //method for adding initial vdev with default values 
 function initialVDev() {
-  const vDevConfig: vDevData = {
-	name: '',
-	type: 'mirror',
-	status: '',
-	guid: '',
-	stats: {},
-	disks: [],
-	selectedDisks: [],
-  }
+	const vDevConfig: vDevData = {
+		name: '',
+		type: 'mirror',
+		status: '',
+		guid: '',
+		stats: {},
+		disks: [],
+		selectedDisks: [],
+	}
 
-  poolConfig.value.vdevs.push(vDevConfig);
+	poolConfig.value.vdevs.push(vDevConfig);
 }
 
 //method for adding additional vdev
 function addVDev() {
-  const vDevConfig: vDevData = {
-	name: '',
-	type: poolConfig.value.vdevs[0].type,
-	status: '',
-	guid: '',
-	stats: {},
-	disks: [],
-	selectedDisks: [],
-  }
+	const vDevConfig: vDevData = {
+		name: '',
+		type: poolConfig.value.vdevs[0].type,
+		status: '',
+		guid: '',
+		stats: {},
+		disks: [],
+		selectedDisks: [],
+	}
 
-  poolConfig.value.vdevs.push(vDevConfig);
+  	poolConfig.value.vdevs.push(vDevConfig);
 }
 
 //method for validating pool name fits the criteria
 const nameCheck = () => {
-  let result = true;
-  nameFeedback.value = '';
-  
-  if (poolConfig.value.name == '') {
-	result = false;
-	nameFeedback.value = 'Name cannot be empty.';
-  } else if (poolConfig.value.name.match(/^[0-9]/) ) {
-	result = false;
-	nameFeedback.value = 'Name cannot begin with numbers.';
-  } else if (poolConfig.value.name.match(/^[.]/ )) {
-	result = false;
-	nameFeedback.value = 'Name cannot begin with a period (.).';
-  } else if (poolConfig.value.name.match(/^[_]/)) {
-	result = false;
-	nameFeedback.value = 'Name cannot begin with an underscore (_).';
-  } else if (poolConfig.value.name.match(/^[-]/)) {
-	result = false;
-	nameFeedback.value = 'Name cannot begin with a hyphen (-).';
-  } else if (poolConfig.value.name.match(/^[:]/)) {
-	result = false;
-	nameFeedback.value = 'Name cannot begin with a colon (:).';
-  } else if (poolConfig.value.name.match(/^[ ]/)) {
-	result = false;
-	nameFeedback.value = 'Name cannot begin with whitespace.';
-  } else if (poolConfig.value.name.match(/[ ]$/)) {
-	result = false;
-	nameFeedback.value = 'Name cannot end with whitespace.';
-  } else if (poolConfig.value.name.match(/^c[0-9]|^log|^mirror|^raidz|^raidz1|^raidz2|^raidz3|^spare/)) {
-	result = false;
-	nameFeedback.value = 'Name cannot begin with a reserved name.';
-  } else if (!poolConfig.value.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
-	result = false;
-	nameFeedback.value = 'Name contains invalid characters.';
-  } 
-  return result;
+	let result = true;
+	nameFeedback.value = '';
+	
+	if (poolConfig.value.name == '') {
+		result = false;
+		nameFeedback.value = 'Name cannot be empty.';
+	} else if (poolConfig.value.name.match(/^[0-9]/) ) {
+		result = false;
+		nameFeedback.value = 'Name cannot begin with numbers.';
+	} else if (poolConfig.value.name.match(/^[.]/ )) {
+		result = false;
+		nameFeedback.value = 'Name cannot begin with a period (.).';
+	} else if (poolConfig.value.name.match(/^[_]/)) {
+		result = false;
+		nameFeedback.value = 'Name cannot begin with an underscore (_).';
+	} else if (poolConfig.value.name.match(/^[-]/)) {
+		result = false;
+		nameFeedback.value = 'Name cannot begin with a hyphen (-).';
+	} else if (poolConfig.value.name.match(/^[:]/)) {
+		result = false;
+		nameFeedback.value = 'Name cannot begin with a colon (:).';
+	} else if (poolConfig.value.name.match(/^[ ]/)) {
+		result = false;
+		nameFeedback.value = 'Name cannot begin with whitespace.';
+	} else if (poolConfig.value.name.match(/[ ]$/)) {
+		result = false;
+		nameFeedback.value = 'Name cannot end with whitespace.';
+	} else if (poolConfig.value.name.match(/^c[0-9]|^log|^mirror|^raidz|^raidz1|^raidz2|^raidz3|^spare/)) {
+		result = false;
+		nameFeedback.value = 'Name cannot begin with a reserved name.';
+	} else if (!poolConfig.value.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
+		result = false;
+		nameFeedback.value = 'Name contains invalid characters.';
+	} 
+	return result;
 }
 
 //method for validating disk selection per vdev type
 const diskCheck = () => {
-  let result = true;
-  diskFeedback.value = '';
-  
-  poolConfig.value.vdevs.forEach(vdev => {
-	if (vdev.type == 'mirror' && vdev.selectedDisks.length < 2) {
-	  result = false;
-	  diskFeedback.value = 'Two or more Disks are required for Mirror.';
-	} else if (vdev.type == 'raidz1' && vdev.selectedDisks.length < 2) {
-	  result = false;
-	  diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
-	} else if (vdev.type == 'raidz2' && vdev.selectedDisks.length < 3) {
-	  result = false;
-	  diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
-	} else if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) {
-	  result = false;
-	  diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
-	} else if (vdev.type == 'disk' && vdev.selectedDisks.length != 1) {
-	  result = false;
-	  diskFeedback.value = 'One Disk per Virtual Device.';
-	} else if (vdev.type == 'log' && vdev.selectedDisks.length < 1) {
-	  result = false;
-	  diskFeedback.value = 'At least one Disk is required for Log.';
-	} else if (vdev.type == 'cache' && vdev.selectedDisks.length < 1) {
-	  result = false;
-	  diskFeedback.value = 'At least one Disk is required for Cache.';
-	} else if (vdev.type == 'special' && vdev.selectedDisks.length < 1) {
-	  result = false;
-	  diskFeedback.value = 'At least one Disk is required for Special.';
-	} else if (vdev.type == 'spare' && vdev.selectedDisks.length < 1) {
-	  result = false;
-	  diskFeedback.value = 'At least one Disk is required for Spare.';
-	} 
-	else if (vdev.type == 'dedup' && vdev.selectedDisks.length < 1) {
-	  result = false;
-	  diskFeedback.value = 'At least one Disk is required for Dedup.';
-	} 
-  });
-  return result;
+	let result = true;
+	diskFeedback.value = '';
+	
+	poolConfig.value.vdevs.forEach(vdev => {
+		if (vdev.type == 'mirror' && vdev.selectedDisks.length < 2) {
+		result = false;
+		diskFeedback.value = 'Two or more Disks are required for Mirror.';
+		} else if (vdev.type == 'raidz1' && vdev.selectedDisks.length < 2) {
+		result = false;
+		diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
+		} else if (vdev.type == 'raidz2' && vdev.selectedDisks.length < 3) {
+		result = false;
+		diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
+		} else if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) {
+		result = false;
+		diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
+		} else if (vdev.type == 'disk' && vdev.selectedDisks.length != 1) {
+		result = false;
+		diskFeedback.value = 'One Disk per Virtual Device.';
+		} else if (vdev.type == 'log' && vdev.selectedDisks.length < 1) {
+		result = false;
+		diskFeedback.value = 'At least one Disk is required for Log.';
+		} else if (vdev.type == 'cache' && vdev.selectedDisks.length < 1) {
+		result = false;
+		diskFeedback.value = 'At least one Disk is required for Cache.';
+		} else if (vdev.type == 'special' && vdev.selectedDisks.length < 1) {
+		result = false;
+		diskFeedback.value = 'At least one Disk is required for Special.';
+		} else if (vdev.type == 'spare' && vdev.selectedDisks.length < 1) {
+		result = false;
+		diskFeedback.value = 'At least one Disk is required for Spare.';
+		} 
+		else if (vdev.type == 'dedup' && vdev.selectedDisks.length < 1) {
+		result = false;
+		diskFeedback.value = 'At least one Disk is required for Dedup.';
+		} 
+	});
+	return result;
 }
 
 //method for checking that there is at least 1 vdev selected
 const vDevCheck = () => {
-  let result = true;
-  vDevFeedback.value = '';
-  
-  if (poolConfig.value.vdevs.length < 1) {
-	result = false;
-	vDevFeedback.value = 'At least one Virtual Device is required.';
-  }
-  return result;
+	let result = true;
+	vDevFeedback.value = '';
+	
+	if (poolConfig.value.vdevs.length < 1) {
+		result = false;
+		vDevFeedback.value = 'At least one Virtual Device is required.';
+	}
+	return result;
 }
 
 //method for validating all tabs and allowing user to proceed if valid
@@ -490,33 +491,33 @@ const validateAndProceed = (tabTag: string): boolean => {
 	return nameCheck();
   } else if (tabTag == 'virtual-devices') {
 	if (nameCheck()) {
-	  if (vDevCheck()) {
-		return diskCheck();
-	  }
+		if (vDevCheck()) {
+			return diskCheck();
+		}
 	}
   } else if (tabTag == 'pool-settings') {
 	if (nameCheck()) {
-	  if (vDevCheck()) {
-		if (diskCheck()) {
-		  return true;
+		if (vDevCheck()) {
+			if (diskCheck()) {
+			return true;
+			}
 		}
-	  }
 	}
   } else if (tabTag == 'file-system') {
 	if (nameCheck()) {
-	  if (vDevCheck()) {
-		if (diskCheck()) {
-		  //fileSystemConfiguration.value.nameCheck();
+		if (vDevCheck()) {
+			if (diskCheck()) {
+			//fileSystemConfiguration.value.nameCheck();
+			}
 		}
-	  }
 	}
   } else if (tabTag == 'review') {
 	if (nameCheck()) {
-	  if (vDevCheck()) {
-		if (diskCheck()) {
-		  return true;
+		if (vDevCheck()) {
+			if (diskCheck()) {
+				return true;
+			}
 		}
-	  }
 	}
   }
   return false;
@@ -524,7 +525,45 @@ const validateAndProceed = (tabTag: string): boolean => {
 
 //method for removing vdev
 function removeVDev(index: number) {
-  poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
+  	poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
+}
+
+
+//convert readable data size to raw bytes
+const convertSizeToBytes = (size) => {
+	const sizes = ['B', 'KiB', 'MiB'];
+	const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
+
+	const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
+	const bytes = parseFloat(value) * Math.pow(1024, index);
+	
+	return bytes;
+};
+
+function isBoolOnOff(bool : boolean) {
+	if (bool) {return 'on'} else {return 'off'}
+}
+
+function isBoolCompression(bool : boolean) {
+	if (bool) {return 'lz4'} else {return 'off'}
+}
+
+const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
+const newVDevDisks = ref<string[]>([]);
+
+function fillNewPoolData() {
+	newPoolData.value.name = poolConfig.value.name;
+	newPoolData.value.vdevtype = poolConfig.value.vdevs[0].type;
+	poolConfig.value.vdevs[0].disks.forEach(disk => {
+		newVDevDisks.value.push(disk.sd_path);
+	});
+	newPoolData.value.disks = newVDevDisks.value;
+	newPoolData.value.autoexpand = isBoolOnOff(poolConfig.value.settings!.autoTrim);
+	newPoolData.value.autoreplace = isBoolOnOff(poolConfig.value.settings!.autoReplace)
+	newPoolData.value.autotrim = isBoolOnOff(poolConfig.value.settings!.autoTrim)
+	newPoolData.value.compression = isBoolCompression(poolConfig.value.settings!.compression);
+	newPoolData.value.recordsize = convertSizeToBytes(poolConfig.value.settings!.record);
+	newPoolData.value.dedup = isBoolOnOff(poolConfig.value.settings!.deduplication)
 }
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
@@ -532,6 +571,7 @@ const getIdKey = (name: string) => `${props.idKey}-${name}`;
 if (poolConfig.value.vdevs.length < 1) initialVDev();
 
 defineExpose({
-  validateAndProceed
+	validateAndProceed,
+	fillNewPoolData
 });
 </script>

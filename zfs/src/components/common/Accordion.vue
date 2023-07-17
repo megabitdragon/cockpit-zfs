@@ -7,7 +7,7 @@
 			:aria-controls="`collapse${uid}`"
 		>
 			<svg
-				class="ml-2 w-3 transition-all duration-200 transform"
+				class="ml-4 w-3 transition-all duration-200 transform"
 				:class="{
 					'rotate-0': isOpen,
 					'-rotate-90': !isOpen,

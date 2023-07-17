@@ -15,7 +15,7 @@
 				<button id="back" class="btn btn-secondary object-left justify-start" @click="prev">Back</button>
 				<button v-if="!end" id="next" class="btn btn-primary object-right justify-end" @click="next">Next</button>
 				<!-- only show finish button if currently on the final tab -->
-				<button v-if="end" id="finish" class="btn btn-primary object-right justify-end" @click="finishBtn(newPoolName, newVDevs)">Finish</button>
+				<button v-if="end" id="finish" class="btn btn-primary object-right justify-end" @click="finishBtn(newPoolData)">Finish</button>
 			</div>
 		</template>
 	</Modal>
@@ -27,7 +27,7 @@ import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
-import { createPool } from "../../scripts/pools";
+import { createPool, newPool } from "../../scripts/pools";
 
 const show = ref(true);
 const navTag = ref('name-entry');
@@ -103,6 +103,18 @@ const poolConfig = ref<PoolData>({
 	fileSystem: fileSystemConfig.value,
 });
 
+const newPoolData = ref<newPoolData>({
+	name: '',
+	vdevtype: 'mirror',
+	disks: [''],
+	autoexpand: '',
+	autoreplace: '',
+	autotrim: '',
+	compression: '',
+	recordsize: 0,
+	dedup: '',
+});
+
 //getting the name of the disks that belong to VDevs and comparing those names against the entire disk array, in order to get the full data of the disk 
 //(VDev disks only stores name) and adding the actual full disk object instead of just the name
 const fillDisks = () => {
@@ -117,6 +129,9 @@ const fillDisks = () => {
   //console.log(poolConfig);
 };
 
+
+// Using get-pools.py
+////////////////////////////////////////////////////////////
 //getting the array of VDevs (with proper data structure) to use as argument for create-pool python script
 const newVDevs = computed(() => {
 	//calling fillDisks so disk/vdev path is accessible
@@ -151,7 +166,7 @@ const newPoolName = computed(() => {
 });
 
 //method to check the type of VDev, compare against the root values and outputting the correct one
-function getRoot(vDev) {
+function getRoot(vDev: vDevData) {
 	let root = '';
 	if (vDev.type == 'mirror' || vDev.type == 'disk' || vDev.type == 'raidz1'|| vDev.type == 'raidz2'|| vDev.type == 'raidz3') {root = 'DATA';} 
 	else if (vDev.type == 'log') { root = 'LOG' }
@@ -163,40 +178,13 @@ function getRoot(vDev) {
 	return root;
 }
 ////////////////////////////////////////////////////////////
-//const newPoolDisks = ref([]);
-// const newPoolDisks = computed(() => {
-// 	poolConfig.value.vdevs[0].disks.forEach(disk => {
-		
-// 	});
-// });
 
-//convert readable data size to raw bytes
-// const convertSizeToBytes = (size) => {
-//   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-//   const [value, unit] = size.split(' ');
-
-//   const index = sizes.indexOf(unit);
-//   const bytes = parseFloat(value) * Math.pow(1024, index);
-  
-//   return bytes;
-// };
-
-// const newPool : newPoolData  = {
-// 	name: poolConfig.value.name,
-// 	vdevtype: poolConfig.value.vdevs[0].type,
-// 	disks: newPoolDisks.value,
-// 	autoexpand: ,
-// 	autoreplace: ,
-// 	autotrim: ,
-// 	compression: ,
-// 	recordsize: ,
-// 	dedup: ,
-// }
-///////////////////////////////////////////////////////////
-
-//finish button method for executing create pool script
-function finishBtn(newPoolName, newVDevs) {
-  	createPool(newPoolName, newVDevs);
+//finish button method for creating pool
+function finishBtn(newPoolData) {
+  	//createPool(newPoolName, newVDevs);
+	poolConfiguration.value.fillNewPoolData();
+	console.log(newPoolData);
+	newPool(newPoolData);
 }
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));
@@ -350,6 +338,7 @@ watch(navTag, updateStatus);
 
 updateStatus();
 
+provide('new-pool-data', newPoolData);
 provide('pool-config-data', poolConfig);
 provide('file-system-data', fileSystemConfig);
 </script>

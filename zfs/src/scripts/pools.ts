@@ -30,10 +30,14 @@ export async function createPool(poolName : string, vDevs: newVDev[]) {
   }
 }
 
-export async function newPool(pool: PoolData) {
+export async function newPool(pool: newPoolData) {
   try {
-    //const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
-    const state = useSpawn(['zpool create -o ashift=12 -o', pool.settings?.autoExpand]);
+  //const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
+  //  const state = useSpawn(['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
+  // 'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
+  // 'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name, pool.vdevtype, pool.disks]);
+  const state = useSpawn(['zpool', 'create', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, 
+  '-O', 'compression=' + pool.compression, '-O', 'recordsize=' + pool.recordsize,'-O', 'dedup=' + pool.dedup, pool.name, pool.disks.join()]);
     const output = await state.promise();
     console.log(output)
     return output.stdout;
