@@ -32,23 +32,24 @@ export async function createPool(poolName : string, vDevs: newVDev[]) {
 
 export async function newPool(pool: newPoolData) {
   try {
-    console.log(pool.disks);
-    const state = useSpawn(['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
-    'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
-    'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name, pool.vdevtype, ...pool.disks]);
-
-    // const state = useSpawn(['zpool', 'create', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, 
-    // '-O', 'compression=' + pool.compression, '-O', 'recordsize=' + pool.recordsize,'-O', 'dedup=' + pool.dedup, pool.name, pool.vdevtype, '1-13', '1-14']);
-
-    // const state = useSpawn(['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
-    // 'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
-    // 'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name, pool.vdevtype, '1-7', '1-8']);
-
-    // console.log("command + args: ");
-    // console.log(state);
-    const output = await state.promise();
-    console.log(output)
-    return output.stdout;
+    if (pool.vdevtype == 'disk') {
+      const state = useSpawn(['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
+      'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
+      'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name, ...pool.disks]);
+  
+      const output = await state.promise();
+      console.log(output)
+      return output.stdout;
+    } else {
+      const state = useSpawn(['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
+      'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
+      'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name, pool.vdevtype, ...pool.disks]);
+  
+      const output = await state.promise();
+      console.log(output)
+      return output.stdout;
+    }
+   
   } catch (state) {
     console.error(errorString(state));
     return null;
