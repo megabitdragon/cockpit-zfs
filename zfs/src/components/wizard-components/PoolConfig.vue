@@ -560,8 +560,9 @@ function fillNewPoolData() {
 	// 	newVDevDisks.value.push(disk.sd_path);
 	// });
 	// newPoolData.value.disks = newVDevDisks.value;
-	poolConfig.value.vdevs[0].disks.forEach(disk => 
-		newPoolData.value.disks.push(disk.name)
+	console.log(poolConfig.value.vdevs[0].disks);
+	poolConfig.value.vdevs[0].selectedDisks.forEach(disk => 
+		newPoolData.value.disks.push(disk)
 	);
 	newPoolData.value.autoexpand = isBoolOnOff(poolConfig.value.settings!.autoTrim);
 	newPoolData.value.autoreplace = isBoolOnOff(poolConfig.value.settings!.autoReplace)
