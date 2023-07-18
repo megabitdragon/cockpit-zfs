@@ -17,7 +17,7 @@
 		</div>
 
 		<!-- lists all pools in card format with a summary of details -->
-		<div class="grid grid-cols-4 grid-flow-col gap-2">
+		<div class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(pool, index) in pools" :key="index">
 					<DashPoolCard :pool="pools[index]!"/>
 			</div>
@@ -49,7 +49,7 @@
 		</div>
 
 		<!-- lists all disks in card format with a summary of details -->
-		<div class="grid grid-cols-4 grid-flow-col gap-2">
+		<div class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(disk, index) in disks" :key="index">
 				<DashDiskCard :disk="disks[index]!"/>
 			</div>

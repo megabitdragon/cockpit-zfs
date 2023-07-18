@@ -57,7 +57,7 @@ interface newPoolData {
 //object for vdev
 interface vDevData {
   name: string;
-  type: string;
+  type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
   status: string;
   guid: string;
   stats: {};
@@ -115,8 +115,9 @@ interface FileSystemData {
     quota: {
       raw: number;
       value: string;
-      size: string;
+      size: 'kib' | 'mib' | 'gib';
     };
+    isReadOnly?: boolean;
     readOnly: string;
     available: string;
     creation: string;
