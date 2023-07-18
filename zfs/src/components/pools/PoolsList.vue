@@ -74,7 +74,7 @@
 														<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @click="destroyPool(poolData[poolIdx].name)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+														<a href="#" @click="destroyPool(poolData[poolIdx])!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 													</MenuItem>
 												</div>
 											</MenuItems>

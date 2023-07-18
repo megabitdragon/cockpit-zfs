@@ -56,9 +56,9 @@ export async function newPool(pool: newPoolData) {
   }
 }
 
-export async function destroyPool(poolName : string) {
+export async function destroyPool(pool: PoolData) {
   try {
-    const state = useSpawn(['zpool', 'destroy', poolName]);
+    const state = useSpawn(['zpool', 'destroy', pool.name]);
     const output = await state.promise();
     console.log(output)
     return output.stdout;
