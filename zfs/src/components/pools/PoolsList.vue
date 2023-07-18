@@ -53,7 +53,7 @@
 											<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 												<div class="py-1">
 													<MenuItem v-slot="{ active }">
-														<a href="#" @click="showDetails(poolData[poolIdx])!" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
+														<a href="#" @click="showPoolModal(poolData[poolIdx])!" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
 														<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
@@ -131,7 +131,7 @@
 																<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																	<div class="py-1">
 																		<MenuItem v-slot="{ active }">
-																			<a href="#" @click="showDetails(disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Disk Details</a>
+																			<a href="#" @click="showDiskModal(disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Disk Details</a>
 																		</MenuItem>
 																		<MenuItem v-slot="{ active }">
 																			<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
@@ -172,9 +172,9 @@
 		<CreatePool @close="showConfig = false"/>
 	</div>
 
-	<!-- <div v-if="showDiskDetails">
-		<DiskDetail @close="showDiskDetails = false"/>
-	</div> -->
+	<div v-if="showDiskDetails">
+		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false"/>
+	</div>
 
 	<div v-if="showPoolDetails">
 		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
@@ -189,20 +189,29 @@ import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import { destroyPool } from "../../scripts/pools";
 import PoolDetail from "./PoolDetail.vue";
+import DiskDetail from "./DiskDetail.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
 const showConfig = ref(false);
 
 const showPoolDetails = ref(false);
+const showDiskDetails = ref(false);
 
 const selectedPool = ref<PoolData>();
+const selectedDisk = ref<DiskData>();
 
 //method to show pool details when button is clicked
-function showDetails(pool) {
+function showPoolModal(pool) {
 	selectedPool.value = pool;
 	console.log(selectedPool);
 	showPoolDetails.value = true;
+}
+
+function showDiskModal(disk) {
+	selectedDisk.value = disk;
+	console.log(selectedDisk);
+	showDiskDetails.value = true;
 }
 
 </script>
