@@ -44,8 +44,68 @@
 					Create Snapshot button
 					Filesystems with snapshots + button for menu (menu should have - clone, rename, roll back, destroy)
 				-->
-				<div class="justify-center">
-					<p class="p-2 m-2">COMING SOON TO A ZPOOL NEAR YOU</p>
+				<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
+					<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+						<table class="table-auto min-w-full divide-y divide-default bg-accent">
+							<thead>
+								<tr class="rounded-md">
+									<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
+									<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Created</th>
+									<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used</th>
+									<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Referenced</th>
+									<th class="relative px-3 py-3.5 sm:pr-6 lg:pr-8">
+										<span class="sr-only"></span>
+									</th>
+								</tr>
+								
+							</thead>
+							<tbody class="divide-y divide-x divide-default bg-default">
+								<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4">
+									<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
+										{{ snapshot.name }}
+									</td>
+									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+										{{ snapshot.properties.creation.parsed }}
+									</td>
+									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+										{{ snapshot.properties.used.value }}
+									</td>
+									<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+										{{ snapshot.properties.referenced.value }}
+									</td>
+									<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+										<Menu as="div" class="relative inline-block text-right">
+											<div>
+												<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+													<span class="sr-only">Open options</span>
+													<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+												</MenuButton>
+											</div>
+
+											<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+												<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+													<div class="py-1">
+														<MenuItem v-slot="{ active }">
+															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+														</MenuItem>
+														<MenuItem v-slot="{ active }">
+															<a href="#" @click="" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+														</MenuItem>
+													</div>
+												</MenuItems>
+											</transition>
+										</Menu>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 
@@ -214,14 +274,19 @@
 			</div>
 		</template>
 		<template v-slot:footer>
-			<div v-if="navTag == 'settings'" class="mt-2">
-				<div class="mt-2">
-					<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
-				</div>
-			</div>
 			<div v-if="navTag == 'topology'" class="mt-2">
 				<div class="mt-2">
 					<button :id="getIdKey('add-vdev-btn')" name="add-vdev-btn" class="mt-1 btn btn-primary">Add Virtual Device</button>
+				</div>
+			</div>
+			<div v-if="navTag == 'snapshots'" class="mt-2">
+				<div class="mt-2">
+					<button :id="getIdKey('create-snapshot-btn')" name="create-snapshot-btn" class="mt-1 btn btn-primary">Create Snapshot</button>
+				</div>
+			</div>
+			<div v-if="navTag == 'settings'" class="mt-2">
+				<div class="mt-2">
+					<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
 				</div>
 			</div>
 		</template>
@@ -229,10 +294,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, provide } from 'vue';
+import { reactive, ref, inject, Ref, computed, provide } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
+import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
+import { getSnapshots } from '../../scripts/snapshots';
 import Navigation from '../common/Navigation.vue';
 import PoolDetailDiskCard from '../pools/PoolDetailDiskCard.vue';
 
@@ -267,12 +334,50 @@ const poolConfig = ref<PoolData>({
 
 const props = defineProps<PoolDetailsProps>();
 
-const visualCapacity = computed(() => {
-	return 314 - (props.pool.properties.capacity * 100) / 314;
-});
+const snapshots = ref<Snapshot[]>([]);
 
 const show = ref(true);
 const navTag = ref('stats');
+
+getSnapshots().then(rawJSON => {
+	const parsedJSON = (JSON.parse(rawJSON));
+	console.log('Snapshots JSON:');
+	console.log(parsedJSON);
+
+	parsedJSON[props.pool.name].forEach(snapshot => {
+		const snap : Snapshot = {
+			name: snapshot.name,
+			id: snapshot.id,
+			snapName: snapshot.snapshot_name,
+			dataset: snapshot.dataset,
+			pool: snapshot.pool,
+			mountpoint: snapshot.mountpoint,
+			type: snapshot.type,
+			properties: {
+				clones: snapshot.properties.clones.parsed,
+				creation: {
+					rawTimestamp: snapshot.properties.creation.rawvalue,
+					parsed: snapshot.properties.creation.parsed,
+					value: snapshot.properties.creation.value,
+				},
+				referenced: {
+					value: snapshot.properties.referenced.value,
+					rawNum: snapshot.properties.referenced.parsed,
+				},
+				used: {
+					value: snapshot.properties.used.value,
+					rawNum: snapshot.properties.used.parsed,
+				},
+			},
+  			holds: snapshot.holds
+		}
+
+		//const snap : Snapshot = snapshot;
+		
+		console.log(snap);
+		snapshots.value.push(snap);
+	})
+});
 
 const getTimestampString = computed(() => {
 	const currentDateTime = new Date();

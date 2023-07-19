@@ -157,6 +157,34 @@ interface Dataset {
   children?: Dataset[];
 }
 
+//object for snapshots
+interface Snapshot {
+  name: string;
+  id: string;
+  snapName: string;
+  dataset: string;
+  pool: string;
+  mountpoint: string;
+  type: string;
+  properties: {
+    clones: string;
+    creation: {
+      rawTimestamp: string;
+      parsed: string;
+      value: string;
+    }
+    referenced: {
+      value: string;
+      rawNum: number;
+    }
+    used: {
+      value: string;
+      rawNum: number;
+    }
+  }
+  holds: {}
+}
+
 //object for navigation (generic)
 interface NavigationItem {
   name: string;

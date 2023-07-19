@@ -34,7 +34,6 @@ import Dashboard from '../components/dashboard/Dashboard.vue';
 import { getPools } from "../scripts/pools";
 import { getDisks } from "../scripts/disks";
 import { getDatasets } from "../scripts/datasets";
-import { getSnapshots } from '../scripts/snapshots';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
 
 interface ZFSProps {
@@ -165,12 +164,6 @@ getDatasets().then(rawJSON => {
 
 		datasets.value.push(dataset);
 	}
-});
-
-getSnapshots().then(rawJSON => {
-	const parsedJSON = (JSON.parse(rawJSON));
-	console.log('Snapshots JSON:');
-	console.log(parsedJSON);
 });
 
 //method for parsing through VDevs to add to array (VDev array is added to Pool)
