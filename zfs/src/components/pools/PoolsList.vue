@@ -201,6 +201,19 @@ const showDiskDetails = ref(false);
 const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 
+// // Reactive variable to force component re-render
+// const updateTrigger = ref(0);
+
+// // Method to re-render the component
+// function forceUpdate() {
+//   	updateTrigger.value += 1;
+// }
+
+// function destroyPoolAndUpdate(pool) {
+// 	destroyPool(pool);
+// 	forceUpdate();
+// }
+
 //method to show pool details when button is clicked
 function showPoolModal(pool) {
 	selectedPool.value = pool;

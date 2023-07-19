@@ -63,7 +63,7 @@ const fileSystemConfig = ref<FileSystemData>({
 		quota: {
 		raw: 0,
 		value: '',
-		size: '',
+		size: 'kib',
 		},
 		readOnly: '',
 		available: '',
