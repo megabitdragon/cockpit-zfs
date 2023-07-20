@@ -5,8 +5,8 @@
 				<div class="text-default">
 					{{ props.pool.name }}
 				</div>
-				<div class="aspect-square">
-					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+				<div>
+					<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 				</div>
 				<Menu as="div" class="relative inline-block text-right">
 					<div>
@@ -41,7 +41,7 @@
 									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" @click="destroyPool(pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+									<a href="#" @click="destroyPoolAndUpdate(pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 								</MenuItem>
 							</div>
 						</MenuItems>
@@ -98,6 +98,18 @@ const props = defineProps<DashPoolCardProps>();
 const showPoolDetails = ref(false);
 
 const selectedPool = ref<PoolData>();
+
+const poolData = inject<Ref<PoolData[]>>("pools")!;
+
+const diskData = inject<Ref<DiskData[]>>("disks")!;
+
+function destroyPoolAndUpdate(pool) {
+	destroyPool(pool);
+	poolData.value = [];
+	diskData.value = [];
+	// refreshMethod;
+	loadDisksAndPools(diskData, poolData);
+}
 
 //method to show pool details when button is clicked
 function showDetails(pool) {

@@ -1,12 +1,12 @@
 <template>
 	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- showing # of pools with status indicator icon and total space between all pools -->
-		<div class="grid grid-flow-col">
+		<div v-if="pools.length > 0" class="grid grid-flow-col">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Pools</span>
 			</div>
 			<div class="p-2">
-				<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 			</div>
 			<div class="p-2">
 				<h6> {{ pools.length }} Pool(s) </h6>
@@ -14,10 +14,15 @@
 			<div class="p-2">
 				<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
 			</div>
-			<div class="p-2">
-				<button class="rounded-full bg-accent text-muted hover:text-gray-600">
+			<div class="p-2 flex justify-end">
+				<button class="rounded-full bg-accent text-muted hover:text-gray-600" @click="refreshAllData">
 					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
 				</button>
+			</div>
+		</div>
+		<div v-else>
+			<div class="p-2 flex justify-center">
+				<span class="font-semibold text-lg">No Pools Found</span>
 			</div>
 		</div>
 
@@ -29,18 +34,18 @@
 		</div>
 
 		<!-- showing # of SSDs, # of HDDS, with status indicator icons and maximum temp + total raw space between all disks -->
-		<div class="grid grid-flow-col">
+		<div v-if="disks.length > 0" class="grid grid-flow-col">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Disks</span>
 			</div>
 			<div class="p-2">
-					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 			</div>
 			<div class="p-2">
 				{{ disksSSD.length }} SSDs
 			</div>
 			<div class="p-2">
-					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 			</div>
 			<div class="p-2">
 				{{ disksHDD.length }} HDDs
@@ -51,10 +56,15 @@
 			<div class="p-2">
 				<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
 			</div>
-			<div class="p-2">
-				<button class="rounded-full bg-accent text-muted hover:text-gray-600">
+			<div class="p-2 flex justify-end">
+				<button class="rounded-full bg-accent text-muted hover:text-gray-600" @click="refreshDiskData">
 					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
 				</button>
+			</div>
+		</div>
+		<div v-else>
+			<div class="p-2 flex justify-center">
+				<span class="font-semibold text-lg">No Disks Found</span>
 			</div>
 		</div>
 
@@ -69,6 +79,7 @@
 
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
+import { loadData, loadDisks, loadDisksAndPools } from '../../scripts/loadData';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
@@ -78,6 +89,17 @@ const disks = inject<Ref<DiskData[]>>("disks")!;
 
 //get all disks in use by pools
 // const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
+
+function refreshAllData() {
+	disks.value = [];
+	pools.value = [];
+	loadDisksAndPools(disks, pools);
+}
+
+function refreshDiskData() {
+	disks.value = [];
+	loadDisks(disks);
+}
 
 //determine total effective space of pools
 const totalEffectivePoolSpace = computed(() => {

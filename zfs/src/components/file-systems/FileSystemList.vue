@@ -1,5 +1,5 @@
 <template>
-	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
+	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<div class="button-group-row">
 			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showFSWizard = true">Create File System</button>
 			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="w-5 h-5"/></button>
@@ -8,25 +8,25 @@
 		<div class="mt-8 overflow-visible">
 			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
 				<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-					<table class="min-w-full divide-y divide-default bg-well">
+					<table class="min-w-full divide-y divide-default bg-accent">
 						<thead>
 							<tr class="rounded-md">
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Available</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used by Dataset</th>
-								<!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used by Refreservation</th> -->
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Compression</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Deduplication</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Encryption</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Snapshots</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Read Only</th>
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Available</th>
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Used by Dataset</th>
+								<!-- <th scope="col" class="px-3 py-3.5 font-semibold text-default">Used by Refreservation</th> -->
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Compression</th>
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Deduplication</th>
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Encryption</th>
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Snapshots</th>
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Read Only</th>
 								<th scope="col" class="relative px-3 py-3.5 sm:pr-6 lg:pr-8">
 									<span class="sr-only"></span>
 								</th>
 							</tr>
 						</thead>
 
-						<tbody class="divide-y divide-x divide-default bg-default">
+						<tbody class="divide-y divide-x divide-default bg-default ring-1 ring-black ring-opacity-5">
 
 							<!-- FILE SYSTEMS BY POOLS -->
 							<tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">

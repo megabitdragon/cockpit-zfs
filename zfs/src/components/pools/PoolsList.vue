@@ -1,16 +1,16 @@
 <template>
-	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
+	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- buttons for creating/importing pools and refreshing list -->
 		<div class="button-group-row">
 				<button id="createPool" class="btn btn-primary object-left justify-start" @click="showConfig = true">Create Storage Pool</button>
 				<button id="importPool" class="btn btn-secondary object-left justify-start" @click="" disabled>Import Storage Pool</button>
-				<button id="refreshPools" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="w-5 h-5"/></button>
+				<button id="refreshPools" class="btn btn-secondary object-right justify-end" @click="refreshAllData" ><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
 		<div class="mt-8 overflow-visible">
 			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
 				<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-					<table class="min-w-full divide-y divide-default bg-well">
+					<table class="min-w-full divide-y divide-default bg-accent">
 						<thead>
 							<tr class="rounded-md">
 								<th class="px-6 py-3.5 font-semibold text-default">Name</th>
@@ -87,7 +87,7 @@
 						<template v-slot:content>
 							<table class="table-auto min-w-full divide-y divide-default">
 								<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="indent-14 bg-well">
-									<td colspan="7" class="ml-4">{{ vDev.name }}</td>
+									<td colspan="7" class="ml-5">{{ vDev.name }}</td>
 								</tr>
 								<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" >
 									<td colspan="7" class="ml-7">
@@ -220,6 +220,12 @@ function destroyPoolAndUpdate(pool) {
 	poolData.value = [];
 	diskData.value = [];
 	// refreshMethod;
+	loadDisksAndPools(diskData, poolData);
+}
+
+function refreshAllData() {
+	diskData.value = [];
+	poolData.value = [];
 	loadDisksAndPools(diskData, poolData);
 }
 
