@@ -6,13 +6,18 @@
 				<span class="font-semibold text-lg">Pools</span>
 			</div>
 			<div class="p-2">
-					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+				<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 			</div>
 			<div class="p-2">
 				<h6> {{ pools.length }} Pool(s) </h6>
 			</div>
 			<div class="p-2">
 				<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
+			</div>
+			<div class="p-2">
+				<button class="rounded-full bg-accent text-muted hover:text-gray-600">
+					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
+				</button>
 			</div>
 		</div>
 
@@ -45,6 +50,11 @@
 			</div>
 			<div class="p-2">
 				<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
+			</div>
+			<div class="p-2">
+				<button class="rounded-full bg-accent text-muted hover:text-gray-600">
+					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
+				</button>
 			</div>
 		</div>
 

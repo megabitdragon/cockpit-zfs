@@ -28,6 +28,7 @@ import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import { createPool, newPool } from "../../scripts/pools";
+import { loadData, loadDatasets, loadDisksAndPools } from '../../scripts/loadData';
 
 const show = ref(true);
 const navTag = ref('name-entry');
@@ -134,50 +135,50 @@ const fillDisks = () => {
 //////////////////////////////////////////////////////////////////////////
 
 //getting the array of VDevs (with proper data structure) to use as argument for create-pool python script
-const newVDevs = computed(() => {
-	//calling fillDisks so disk/vdev path is accessible
-	fillDisks();
-	return poolConfig.value.vdevs.map(vdev => {
+// const newVDevs = computed(() => {
+// 	//calling fillDisks so disk/vdev path is accessible
+// 	fillDisks();
+// 	return poolConfig.value.vdevs.map(vdev => {
 
-		const devicePaths : string[] = [];
-		vdev.disks.forEach(disk => {
-			devicePaths.push(disk.vdev_path);
-			//console.log(disk.vdev_path);
-		});
+// 		const devicePaths : string[] = [];
+// 		vdev.disks.forEach(disk => {
+// 			devicePaths.push(disk.vdev_path);
+// 			//console.log(disk.vdev_path);
+// 		});
 		
-		//calling get root method to determine the root used in creation script execution
-		const root = getRoot(vdev);
-		const type = vdev.type.toUpperCase();
+// 		//calling get root method to determine the root used in creation script execution
+// 		const root = getRoot(vdev);
+// 		const type = vdev.type.toUpperCase();
 
-		//data object used to execute creation script
-		const newVDev = {
-			root: root,
-			type: type,
-			devices: devicePaths,
-		}
-		console.log("newVDev: ");
-		console.log(newVDev);
-		return newVDev;
-	})
-});
+// 		//data object used to execute creation script
+// 		const newVDev = {
+// 			root: root,
+// 			type: type,
+// 			devices: devicePaths,
+// 		}
+// 		console.log("newVDev: ");
+// 		console.log(newVDev);
+// 		return newVDev;
+// 	})
+// });
 
-//computing the name of the pool (computed as it can change during wizard use)
-const newPoolName = computed(() => {
-  	return poolConfig.value.name;
-});
+// //computing the name of the pool (computed as it can change during wizard use)
+// const newPoolName = computed(() => {
+//   	return poolConfig.value.name;
+// });
 
-//method to check the type of VDev, compare against the root values and outputting the correct one
-function getRoot(vDev: vDevData) {
-	let root = '';
-	if (vDev.type == 'mirror' || vDev.type == 'disk' || vDev.type == 'raidz1'|| vDev.type == 'raidz2'|| vDev.type == 'raidz3') {root = 'DATA';} 
-	else if (vDev.type == 'log') { root = 'LOG' }
-	else if (vDev.type == 'cache') { root = 'CACHE' }
-	else if (vDev.type == 'dedup') { root = 'DEDUP' }
-	else if (vDev.type == 'spare') { root = 'SPARE' }
-	else if (vDev.type == 'special') { root = 'SPECIAL' }
+// //method to check the type of VDev, compare against the root values and outputting the correct one
+// function getRoot(vDev: vDevData) {
+// 	let root = '';
+// 	if (vDev.type == 'mirror' || vDev.type == 'disk' || vDev.type == 'raidz1'|| vDev.type == 'raidz2'|| vDev.type == 'raidz3') {root = 'DATA';} 
+// 	else if (vDev.type == 'log') { root = 'LOG' }
+// 	else if (vDev.type == 'cache') { root = 'CACHE' }
+// 	else if (vDev.type == 'dedup') { root = 'DEDUP' }
+// 	else if (vDev.type == 'spare') { root = 'SPARE' }
+// 	else if (vDev.type == 'special') { root = 'SPECIAL' }
 
-	return root;
-}
+// 	return root;
+// }
 
 //////////////////////////////////////////////////////////////////////////
 

@@ -25,7 +25,7 @@
 							</tr>
 						</thead>
 					</table>
-					<Accordion :isOpen="false" class="divide-y divide-default bg-default ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="refreshKey">
+					<Accordion :isOpen="false" class="divide-y divide-default bg-default ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="poolIdx">
 						<template v-slot:title>
 							<div class="grid grid-cols-7 grid-flow-cols w-full">
 								<div class="px-3 py-4">{{  poolData[poolIdx].name }}</div>
@@ -74,7 +74,7 @@
 														<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @click="destroyPoolAndUpdate(poolData[poolIdx])!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+														<a href="#" @click="destroyPoolAndUpdate(poolData[poolIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 													</MenuItem>
 												</div>
 											</MenuItems>
@@ -192,10 +192,13 @@ import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import { destroyPool } from "../../scripts/pools";
 import { clearPartitions } from "../../scripts/disks";
+import { loadData, loadDatasets, loadDisksAndPools } from '../../scripts/loadData';
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
+
+const diskData = inject<Ref<DiskData[]>>("disks")!;
 
 const showConfig = ref(false);
 
@@ -205,23 +208,16 @@ const showDiskDetails = ref(false);
 const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 
-const refreshKey = ref(0);
+// const refreshKey = inject<Ref<number>>("refresh-key")!;
 
-const refreshMethod = () => {
-	refreshKey.value += 1;
-};
-
-// // Reactive variable to force component re-render
-// const updateTrigger = ref(0);
-
-// // Method to re-render the component
-// function forceUpdate() {
-//   	updateTrigger.value += 1;
-// }
+// const refreshMethod = () => {
+// 	refreshKey.value += 1;
+// };
 
 function destroyPoolAndUpdate(pool) {
 	destroyPool(pool);
-	refreshMethod;
+	// refreshMethod;
+	loadDisksAndPools(diskData, poolData);
 }
 
 //method to show pool details when button is clicked

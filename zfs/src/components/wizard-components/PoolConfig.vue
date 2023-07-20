@@ -329,7 +329,6 @@ import { Switch } from '@headlessui/vue';
 import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
-import { newPool } from '../../scripts/pools';
 
 interface PoolConfigProps {
 	tag: string;
