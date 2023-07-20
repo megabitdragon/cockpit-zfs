@@ -25,7 +25,7 @@
 							</tr>
 						</thead>
 					</table>
-					<Accordion :isOpen="false" class="divide-y divide-default bg-default ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" key="poolIdx">
+					<Accordion :isOpen="false" class="divide-y divide-default bg-default ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="refreshKey">
 						<template v-slot:title>
 							<div class="grid grid-cols-7 grid-flow-cols w-full">
 								<div class="px-3 py-4">{{  poolData[poolIdx].name }}</div>
@@ -74,7 +74,7 @@
 														<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @click="destroyPool(poolData[poolIdx])!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+														<a href="#" @click="destroyPoolAndUpdate(poolData[poolIdx])!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 													</MenuItem>
 												</div>
 											</MenuItems>
@@ -148,6 +148,9 @@
 																		<MenuItem v-slot="{ active }">
 																			<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
 																		</MenuItem>
+																		<MenuItem v-slot="{ active }">
+																			<a href="#" @click="clearPartitions(disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Partitions</a>
+																		</MenuItem>
 																	</div>
 																</MenuItems>
 															</transition>
@@ -188,6 +191,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import { destroyPool } from "../../scripts/pools";
+import { clearPartitions } from "../../scripts/disks";
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 
@@ -201,6 +205,12 @@ const showDiskDetails = ref(false);
 const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 
+const refreshKey = ref(0);
+
+const refreshMethod = () => {
+	refreshKey.value += 1;
+};
+
 // // Reactive variable to force component re-render
 // const updateTrigger = ref(0);
 
@@ -209,10 +219,10 @@ const selectedDisk = ref<DiskData>();
 //   	updateTrigger.value += 1;
 // }
 
-// function destroyPoolAndUpdate(pool) {
-// 	destroyPool(pool);
-// 	forceUpdate();
-// }
+function destroyPoolAndUpdate(pool) {
+	destroyPool(pool);
+	refreshMethod;
+}
 
 //method to show pool details when button is clicked
 function showPoolModal(pool) {

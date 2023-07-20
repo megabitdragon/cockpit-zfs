@@ -2,53 +2,51 @@
 	<Card class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
 		<template v-slot:title>
 			<div class="grid grid-cols-3 grid-flow-col gap-1">
-				<div class="pr-2 text-default">
+				<div class="text-default">
 					{{ props.pool.name }}
 				</div>
-				<div class="px-1">
-					<img class="w-4 h-4" src="../../../public/icons/success.svg">
+				<div class="aspect-square">
+					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 				</div>
-				<div id="menu-btn" class="ml-10">
-					<Menu as="div" class="relative inline-block text-right">
-						<div>
-							<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-								<span class="sr-only">Open options</span>
-								<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
-							</MenuButton>
-						</div>
+				<Menu as="div" class="relative inline-block text-right">
+					<div>
+						<MenuButton class="rounded-full bg-accent text-muted hover:text-gray-600">
+							<span class="sr-only">Open options</span>
+							<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+						</MenuButton>
+					</div>
 
-						<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-							<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-								<div class="py-1">
-									<MenuItem v-slot="{ active }">
-										<a href="#" @click="showDetails(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" @click="destroyPool(pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
-									</MenuItem>
-								</div>
-							</MenuItems>
-						</transition>
-					</Menu>
-				</div>
+					<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+						<MenuItems class="absolute right-0 z-10 -mt-1 w-max origin-top-left rounded-md bg-accent shadow-lg">
+							<div class="py-1">
+								<MenuItem v-slot="{ active }">
+									<a href="#" @click="showDetails(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" @click="destroyPool(pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+								</MenuItem>
+							</div>
+						</MenuItems>
+					</transition>
+				</Menu>
 			</div>
 	
 		<div>

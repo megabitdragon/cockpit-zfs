@@ -6,7 +6,7 @@
 				<span class="font-semibold text-lg">Pools</span>
 			</div>
 			<div class="p-2">
-				<img class="w-4 h-4" src="../../../public/icons/success.svg">
+					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 			</div>
 			<div class="p-2">
 				<h6> {{ pools.length }} Pool(s) </h6>
@@ -29,13 +29,13 @@
 				<span class="font-semibold text-lg">Disks</span>
 			</div>
 			<div class="p-2">
-				<img class="w-4 h-4" src="../../../public/icons/success.svg">
+					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 			</div>
 			<div class="p-2">
 				{{ disksSSD.length }} SSDs
 			</div>
 			<div class="p-2">
-				<img class="w-4 h-4" src="../../../public/icons/success.svg">
+					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 			</div>
 			<div class="p-2">
 				{{ disksHDD.length }} HDDs

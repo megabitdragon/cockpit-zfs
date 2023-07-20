@@ -6,43 +6,44 @@
 					{{ props.disk.name }}
 				</div>
 				<div class="px-1">
-					<img class="w-4 h-4" src="../../../public/icons/success.svg">
+					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 				</div>
-				<div id="menu-btn" class="ml-10">
-					<Menu as="div" class="relative inline-block text-right">
-						<div>
-							<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-								<span class="sr-only">Open options</span>
-								<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
-							</MenuButton>
-						</div>
+				<Menu as="div" class="relative inline-block text-right">
+					<div>
+						<MenuButton class="rounded-full bg-accent text-muted hover:text-gray-600">
+							<span class="sr-only">Open options</span>
+							<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+						</MenuButton>
+					</div>
 
-						<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-							<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-								<div class="py-1">
-									<MenuItem v-slot="{ active }">
-										<a href="#" @click="showDetails(props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Disk Details</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
-									</MenuItem>
-								</div>
-							</MenuItems>
-						</transition>
-					</Menu>
-				</div>
+					<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+						<MenuItems class="absolute right-0 z-10 -mt-1 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+							<div class="py-1">
+								<MenuItem v-slot="{ active }">
+									<a href="#" @click="showDetails(props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Disk Details</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<a href="#" @click="clearPartitions(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Partitions</a>
+								</MenuItem>
+							</div>
+						</MenuItems>
+					</transition>
+				</Menu>
 			</div>
 			<!-- <div>
 				Member of {{ props.disk.vDevName }} in {{ props.disk.poolName }}
@@ -88,6 +89,7 @@
 import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import { clearPartitions } from "../../scripts/disks";
 import DiskDetail from '../pools/DiskDetail.vue';
 import Card from '../common/Card.vue';
 

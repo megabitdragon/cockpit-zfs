@@ -15,3 +15,15 @@ export async function getDisks() {
     }
 }
 
+export async function clearPartitions(disk) {
+    try {
+        const state = useSpawn(['wipefs', '-a', '/dev/' + disk.name]);
+        const output = await state.promise();
+        console.log(output)
+        return output.stdout;
+      } catch (state) {
+        console.error(errorString(state));
+        return null;
+      }
+}
+
