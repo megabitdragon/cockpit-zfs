@@ -1,5 +1,5 @@
 <template>
-	<div class="px-4 sm:px-6 lg:px-8">
+	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- buttons for creating/importing pools and refreshing list -->
 		<div class="button-group-row">
 				<button id="createPool" class="btn btn-primary object-left justify-start" @click="showConfig = true">Create Storage Pool</button>
@@ -10,7 +10,7 @@
 		<div class="mt-8 overflow-visible">
 			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
 				<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-					<table class="min-w-full divide-y divide-default bg-accent">
+					<table class="min-w-full divide-y divide-default bg-well">
 						<thead>
 							<tr class="rounded-md">
 								<th class="px-6 py-3.5 font-semibold text-default">Name</th>
@@ -101,13 +101,14 @@
 											<th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
 												<span class="sr-only"></span>
 											</th>
-											<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-16 bg-default">
+											<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-16 bg-well">
 												<td>{{ disk.name }}</td>
 												<td>{{ disk.status }}</td>
 												<td>
-													0%
+													
 													<div class="px-3 py-4">
 														<div class="w-full bg-well rounded-full text-center">
+															<p>0%</p>
 															<!-- <div v-if="poolData[poolIdx].properties.capacity! < 1" class="text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
 															<div v-if="poolData[poolIdx].properties.capacity! >=1 && poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
 															<div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-danger text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div> -->
@@ -216,6 +217,8 @@ const selectedDisk = ref<DiskData>();
 
 function destroyPoolAndUpdate(pool) {
 	destroyPool(pool);
+	poolData.value = [];
+	diskData.value = [];
 	// refreshMethod;
 	loadDisksAndPools(diskData, poolData);
 }

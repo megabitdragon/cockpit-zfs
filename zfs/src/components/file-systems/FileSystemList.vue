@@ -1,5 +1,5 @@
 <template>
-	<div class="px-4 sm:px-6 lg:px-8">
+	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
 		<div class="button-group-row">
 			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showFSWizard = true">Create File System</button>
 			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="w-5 h-5"/></button>
@@ -8,7 +8,7 @@
 		<div class="mt-8 overflow-visible">
 			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
 				<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-					<table class="min-w-full divide-y divide-default bg-accent">
+					<table class="min-w-full divide-y divide-default bg-well">
 						<thead>
 							<tr class="rounded-md">
 								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default sm:pl-6 lg:pl-8">Name</th>

@@ -30,6 +30,12 @@ import PoolConfig from './PoolConfig.vue';
 import { createPool, newPool } from "../../scripts/pools";
 import { loadData, loadDatasets, loadDisksAndPools } from '../../scripts/loadData';
 
+// interface CreatePoolProps {
+//   	showConfig: boolean;
+// }
+
+// const props = defineProps<CreatePoolProps>();
+
 const show = ref(true);
 const navTag = ref('name-entry');
 const tabError = ref(false);
@@ -116,23 +122,23 @@ const newPoolData = ref<newPoolData>({
 	dedup: '',
 });
 
-//getting the name of the disks that belong to VDevs and comparing those names against the entire disk array, in order to get the full data of the disk 
-//(VDev disks only stores name) and adding the actual full disk object instead of just the name
-const fillDisks = () => {
-	poolConfig.value.vdevs.forEach(vdev => {
-		vdev.selectedDisks.forEach(selected => {
-			const selectedDisk = disks.value.find(disk => disk.name === selected);
-			vdev.disks.push(selectedDisk!);
-		});
-	});
-
-  //console.log("Pool Config:");
-  //console.log(poolConfig);
-};
-
 
 // Using get-pools.py
 //////////////////////////////////////////////////////////////////////////
+
+//getting the name of the disks that belong to VDevs and comparing those names against the entire disk array, in order to get the full data of the disk 
+//(VDev disks only stores name) and adding the actual full disk object instead of just the name
+// const fillDisks = () => {
+// 	poolConfig.value.vdevs.forEach(vdev => {
+// 		vdev.selectedDisks.forEach(selected => {
+// 			const selectedDisk = disks.value.find(disk => disk.name === selected);
+// 			vdev.disks.push(selectedDisk!);
+// 		});
+// 	});
+
+//   //console.log("Pool Config:");
+//   //console.log(poolConfig);
+// };
 
 //getting the array of VDevs (with proper data structure) to use as argument for create-pool python script
 // const newVDevs = computed(() => {

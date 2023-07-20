@@ -40,11 +40,11 @@
 			
 			<div v-if="navTag == 'snapshots'">
 				<div v-if="snapshots.length < 1" class="flex items-center justify-center">
-					<p class="text-default">No snapshots currently found.</p>
+					<p class="text-default">No snapshots found.</p>
 				</div>
 				<div v-else class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
 					<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-						<table class="table-auto min-w-full divide-y divide-default bg-accent">
+						<table class="table-auto min-w-full divide-y divide-default bg-well">
 							<thead>
 								<tr class="rounded-md">
 									<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
@@ -372,7 +372,7 @@ getSnapshots().then(rawJSON => {
 
 		//const snap : Snapshot = snapshot;
 		
-		console.log(snap);
+		//console.log(snap);
 		snapshots.value.push(snap);
 	})
 });

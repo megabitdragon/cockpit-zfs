@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="w-full h-full px-8 bg-well text-default overflow-y-visible py-8">
+		<div class="w-full h-full px-8 bg-default text-default overflow-y-visible py-8">
 
 			<div v-if="props.tag === 'dashboard'" class="p-4">
 			   <Dashboard :key="refreshKey"/>
