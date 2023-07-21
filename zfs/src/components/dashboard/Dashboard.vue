@@ -2,14 +2,8 @@
 	<!-- shows loading animations but ONLY when the arrays are empty -->
 	<!-- This works fine for updating the arrays as they are empty initially when loading data, but not when they are actually empty it appears to load endlessly but in reality there is no data to be loaded -->
 	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
-
-		<div v-if="isLoadingPools" class="grid grid-cols-4 gap-2 justify-items-center">
-			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
-			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
-		</div>
-
 		<!-- showing # of pools with status indicator icon and total space between all pools -->
-		<div v-if="pools.length > 0 && !isLoadingPools" class="grid grid-flow-col">
+		<div v-if="pools.length > 0" class="grid grid-flow-col">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Pools</span>
 			</div>
@@ -28,27 +22,20 @@
 				</button>
 			</div>
 		</div>
+		<div v-else class="grid grid-cols-4 gap-2 justify-items-center">
+			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
+		</div>
 
 		<!-- lists all pools in card format with a summary of details -->
-		<div v-if="pools.length > 0 && !isLoadingPools" class="grid grid-cols-4 auto-rows-max gap-2">
+		<div class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(pool, index) in pools" :key="index">
 				<DashPoolCard :pool="pools[index]!"/>
 			</div>
 		</div>
 
-		<!-- <div v-if="pools.length < 1 && !isLoadingPools">
-			<div class="p-2 flex justify-center">
-				<span class="font-semibold text-lg">No Pools Found</span>
-			</div>
-		</div> -->
-
-		<div v-if="isLoadingDisks" class="grid grid-cols-4 gap-2 justify-items-center">
-			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
-			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
-		</div>
-
 		<!-- showing # of SSDs, # of HDDS, with status indicator icons and maximum temp + total raw space between all disks -->
-		<div v-if="disks.length > 0 && !isLoadingDisks" class="grid grid-flow-col">
+		<div v-if="disks.length > 0" class="grid grid-flow-col">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Disks</span>
 			</div>
@@ -76,27 +63,24 @@
 				</button>
 			</div>
 		</div>
-	
+		<div v-else class="grid grid-cols-4 gap-2 justify-items-center">
+			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
+		</div>
+
 		<!-- lists all disks in card format with a summary of details -->
-		<div v-if="disks.length > 0 && !isLoadingDisks" class="grid grid-cols-4 auto-rows-max gap-2">
+		<div class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(disk, index) in disks" :key="index">
 				<DashDiskCard :disk="disks[index]!"/>
 			</div>
 		</div>
-
-		<!-- <div v-if="disks.length < 1 && !isLoadingDisks">
-			<div class="p-2 flex justify-center">
-				<span class="font-semibold text-lg">No Disks Found</span>
-			</div>
-		</div> -->
-
 	</div>
-	
+
 </template>
 
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
-import { loadDisks, loadDisksAndPools } from '../../scripts/loadData';
+import { loadData, loadDisks, loadDisksAndPools } from '../../scripts/loadData';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
@@ -106,44 +90,18 @@ import LoadingSpinner from '../common/LoadingSpinner.vue';
 const pools = inject<Ref<PoolData[]>>("pools")!;
 const disks = inject<Ref<DiskData[]>>("disks")!;
 
-const isLoadingPools = ref(false);
-const isLoadingDisks = ref(false);
-
 //get all disks in use by pools
 // const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
 
-// function refreshAllData() {
-// 	disks.value = [];
-// 	pools.value = [];
-// 	loadDisksAndPools(disks, pools);
-// }
-async function refreshAllData() {
-	isLoadingPools.value = true;
-	isLoadingDisks.value = true;
+function refreshAllData() {
 	disks.value = [];
 	pools.value = [];
-	try {
-		await loadDisksAndPools(disks, pools);
-	} catch (error) {
-		console.error("Error while loading pool/disk data:", error);
-	}
-	isLoadingPools.value = false;
-	isLoadingDisks.value = false;
+	loadDisksAndPools(disks, pools);
 }
 
-// function refreshDiskData() {
-// 	disks.value = [];
-// 	loadDisks(disks);
-// }
-async function refreshDiskData() {
-  isLoadingDisks.value = true;
-  disks.value = [];
-  try {
-    await loadDisks(disks);
-  } catch (error) {
-    console.error("Error while loading disk data:", error);
-  }
-  isLoadingDisks.value = false;
+function refreshDiskData() {
+	disks.value = [];
+	loadDisks(disks);
 }
 
 //determine total effective space of pools
