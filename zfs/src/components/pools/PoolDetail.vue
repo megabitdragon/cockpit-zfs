@@ -1,5 +1,5 @@
 <template>
-	<Modal>
+	<Modal :isOpen="open" :marginTop="'mt-28'">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
@@ -331,6 +331,8 @@ const poolConfig = ref<PoolData>({
 });
 
 const props = defineProps<PoolDetailsProps>();
+
+const open = ref(true);
 
 const snapshots = ref<Snapshot[]>([]);
 

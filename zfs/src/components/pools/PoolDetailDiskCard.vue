@@ -73,7 +73,7 @@
 	</Card>
 
 	<div v-if="showDiskDetails">
-		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false"/>
+		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="true"/>
 	</div>
 </template>
 

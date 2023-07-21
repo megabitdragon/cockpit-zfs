@@ -27,7 +27,7 @@
 					</table>
 					<Accordion :isOpen="false" class="divide-y divide-default bg-default ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="poolIdx">
 						<template v-slot:title>
-							<div class="grid grid-cols-7 grid-flow-cols w-full">
+							<div class="grid grid-cols-7 grid-flow-cols w-full hover:border-default hover:border-2">
 								<div class="px-3 py-4">{{  poolData[poolIdx].name }}</div>
 								<div class="px-3 py-4">{{  poolData[poolIdx].status }}</div>
 								<div class="px-3 py-4">
@@ -174,7 +174,7 @@
 	</div>
 
 	<div v-if="showDiskDetails">
-		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false"/>
+		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="false"/>
 	</div>
 
 	<div v-if="showPoolDetails">
