@@ -338,6 +338,7 @@ interface PoolConfigProps {
 const props = defineProps<PoolConfigProps>();
 
 const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
+const allPools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
 const fileSystemConfiguration = ref();
 
@@ -426,8 +427,17 @@ const nameCheck = () => {
 	} else if (!poolConfig.value.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
 		result = false;
 		nameFeedback.value = 'Name contains invalid characters.';
-	} 
+	} else if (nameExists()) {
+		result = false;
+		nameFeedback.value = 'A pool with that name already exists.';
+	}
 	return result;
+}
+
+function nameExists() {
+  return allPools.value.some((pool) => {
+    return poolConfig.value.name === pool.name;
+  });
 }
 
 //method for validating disk selection per vdev type
@@ -437,38 +447,38 @@ const diskCheck = () => {
 	
 	poolConfig.value.vdevs.forEach(vdev => {
 		if (vdev.type == 'mirror' && vdev.selectedDisks.length < 2) {
-		result = false;
-		diskFeedback.value = 'Two or more Disks are required for Mirror.';
+			result = false;
+			diskFeedback.value = 'Two or more Disks are required for Mirror.';
 		} else if (vdev.type == 'raidz1' && vdev.selectedDisks.length < 2) {
-		result = false;
-		diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
+			result = false;
+			diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
 		} else if (vdev.type == 'raidz2' && vdev.selectedDisks.length < 3) {
-		result = false;
-		diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
+			result = false;
+			diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
 		} else if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) {
-		result = false;
-		diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
-		// } else if (vdev.type == 'disk' && vdev.selectedDisks.length != 1) {
-		// result = false;
-		// diskFeedback.value = 'One Disk per Virtual Device.';
+			result = false;
+			diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
+		} else if (vdev.type == 'disk' && vdev.selectedDisks.length < 1) {
+			result = false;
+			diskFeedback.value = 'At least one Disk is required.';
 		} else if (vdev.type == 'log' && vdev.selectedDisks.length < 1) {
-		result = false;
-		diskFeedback.value = 'At least one Disk is required for Log.';
+			result = false;
+			diskFeedback.value = 'At least one Disk is required for Log.';
 		} else if (vdev.type == 'cache' && vdev.selectedDisks.length < 1) {
-		result = false;
-		diskFeedback.value = 'At least one Disk is required for Cache.';
+			result = false;
+			diskFeedback.value = 'At least one Disk is required for Cache.';		
 		} else if (vdev.type == 'special' && vdev.selectedDisks.length < 1) {
-		result = false;
-		diskFeedback.value = 'At least one Disk is required for Special.';
+			result = false;
+			diskFeedback.value = 'At least one Disk is required for Special.';
 		} else if (vdev.type == 'spare' && vdev.selectedDisks.length < 1) {
-		result = false;
-		diskFeedback.value = 'At least one Disk is required for Spare.';
-		} 
-		else if (vdev.type == 'dedup' && vdev.selectedDisks.length < 1) {
-		result = false;
-		diskFeedback.value = 'At least one Disk is required for Dedup.';
+			result = false;
+			diskFeedback.value = 'At least one Disk is required for Spare.';
+		} else if (vdev.type == 'dedup' && vdev.selectedDisks.length < 1) {
+			result = false;
+			diskFeedback.value = 'At least one Disk is required for Dedup.';
 		} 
 	});
+
 	return result;
 }
 
@@ -486,40 +496,40 @@ const vDevCheck = () => {
 
 //method for validating all tabs and allowing user to proceed if valid
 const validateAndProceed = (tabTag: string): boolean => {
-  if (tabTag === 'name-entry') {
-	return nameCheck();
-  } else if (tabTag == 'virtual-devices') {
-	if (nameCheck()) {
-		if (vDevCheck()) {
-			return diskCheck();
-		}
-	}
-  } else if (tabTag == 'pool-settings') {
-	if (nameCheck()) {
-		if (vDevCheck()) {
-			if (diskCheck()) {
-			return true;
+	if (tabTag === 'name-entry') {
+		return nameCheck();
+	} else if (tabTag == 'virtual-devices') {
+		if (nameCheck()) {
+			if (vDevCheck()) {
+				return diskCheck();
 			}
 		}
-	}
-  } else if (tabTag == 'file-system') {
-	if (nameCheck()) {
-		if (vDevCheck()) {
-			if (diskCheck()) {
-			//fileSystemConfiguration.value.nameCheck();
-			}
-		}
-	}
-  } else if (tabTag == 'review') {
-	if (nameCheck()) {
-		if (vDevCheck()) {
-			if (diskCheck()) {
+	} else if (tabTag == 'pool-settings') {
+		if (nameCheck()) {
+			if (vDevCheck()) {
+				if (diskCheck()) {
 				return true;
+				}
+			}
+		}
+	} else if (tabTag == 'file-system') {
+		if (nameCheck()) {
+			if (vDevCheck()) {
+				if (diskCheck()) {
+				//fileSystemConfiguration.value.nameCheck();
+				}
+			}
+		}
+	} else if (tabTag == 'review') {
+		if (nameCheck()) {
+			if (vDevCheck()) {
+				if (diskCheck()) {
+					return true;
+				}
 			}
 		}
 	}
-  }
-  return false;
+	return false;
 }
 
 //method for removing vdev
@@ -553,12 +563,7 @@ const newVDevDisks = ref<string[]>([]);
 function fillNewPoolData() {
 	newPoolData.value.name = poolConfig.value.name;
 	newPoolData.value.vdevtype = poolConfig.value.vdevs[0].type;
-	// poolConfig.value.vdevs[0].disks.forEach(disk => {
-	// 	console.log("disk sd_path:");
-	// 	console.log(disk.sd_path);
-	// 	newVDevDisks.value.push(disk.sd_path);
-	// });
-	// newPoolData.value.disks = newVDevDisks.value;
+
 	console.log(poolConfig.value.vdevs[0].disks);
 	poolConfig.value.vdevs[0].selectedDisks.forEach(disk => 
 		newPoolData.value.disks.push(disk)
