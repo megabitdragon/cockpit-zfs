@@ -38,7 +38,7 @@
 									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" @click="clearPartitions(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Partitions</a>
+									<a href="#" @click="clearPartAndRefreshDisks(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Partitions</a>
 								</MenuItem>
 							</div>
 						</MenuItems>
@@ -86,10 +86,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, provide } from 'vue';
+import { reactive, ref, computed, provide, inject, Ref } from 'vue';
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadData, loadDatasets, loadDisksAndPools } from '../../scripts/loadData';
+import { loadData, loadDisks, loadDatasets, loadDisksAndPools } from '../../scripts/loadData';
 import { clearPartitions } from "../../scripts/disks";
 import DiskDetail from '../pools/DiskDetail.vue';
 import Card from '../common/Card.vue';
@@ -114,6 +114,8 @@ const showDiskDetails = ref(false);
 
 const selectedDisk = ref<DiskData>();
 
+const disks = inject<Ref<DiskData[]>>('disks')!; 
+
 // console.log("Props.Disk");
 // console.log(props.disk);
 
@@ -124,5 +126,10 @@ function showDetails(disk) {
 	showDiskDetails.value = true;
 }
 
+function clearPartAndRefreshDisks(disk) {
+	clearPartitions(disk);
+	disks.value = [];
+	loadDisks(disks);
+}
 
 </script>

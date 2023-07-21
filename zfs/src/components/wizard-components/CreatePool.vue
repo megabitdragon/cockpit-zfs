@@ -1,5 +1,5 @@
 <template>
-	<Modal>
+	<Modal :isOpen="open">
 		<template v-slot:title>
 			<!-- navigation tabs for create pool wizard -->
 			<WizardTabs :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
@@ -27,16 +27,20 @@ import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import { newPool } from "../../scripts/pools";
+import { loadDisksAndPools } from '../../scripts/loadData';
 
 const show = ref(true);
 const navTag = ref('name-entry');
 const tabError = ref(false);
 
+const open = ref(true);
+
 //reference to poolConfiguration component to use its methods
 const poolConfiguration = ref();
 
-//injecting provided disk array
+//injecting provided disk and pools rray
 const disks = inject<Ref<DiskData[]>>('disks')!;
+const pools = inject<Ref<PoolData[]>>('pools')!;
 
 //setting default values for file system object
 const fileSystemConfig = ref<FileSystemData>({
@@ -119,7 +123,16 @@ function finishBtn(newPoolData) {
   	//createPool(newPoolName, newVDevs);
 	poolConfiguration.value.fillNewPoolData();
 	console.log(newPoolData);
-	newPool(newPoolData);
+	newPool(newPoolData).then(() => {
+		open.value = false;
+		refreshAllData(disks, pools);
+	});
+}
+
+function refreshAllData(disks, pools) {
+	pools.value = [];
+	disks.value = [];
+	loadDisksAndPools(disks, pools);
 }
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));

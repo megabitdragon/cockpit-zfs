@@ -149,9 +149,6 @@
 																		<MenuItem v-slot="{ active }">
 																			<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
 																		</MenuItem>
-																		<MenuItem v-slot="{ active }">
-																			<a href="#" @click="clearPartitions(disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Partitions</a>
-																		</MenuItem>
 																	</div>
 																</MenuItems>
 															</transition>
@@ -193,7 +190,7 @@ import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import { destroyPool } from "../../scripts/pools";
 import { clearPartitions } from "../../scripts/disks";
-import { loadData, loadDatasets, loadDisksAndPools } from '../../scripts/loadData';
+import { loadData, loadDatasets, loadDisks, loadDisksAndPools } from '../../scripts/loadData';
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 
