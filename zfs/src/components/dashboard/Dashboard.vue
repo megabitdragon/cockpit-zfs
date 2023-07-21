@@ -20,16 +20,15 @@
 				</button>
 			</div>
 		</div>
-		<div v-else>
-			<div class="p-2 flex justify-center">
-				<span class="font-semibold text-lg">No Pools Found</span>
-			</div>
+		<div v-else class="grid grid-cols-4 gap-2 justify-items-center">
+			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+			<LoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 		</div>
 
 		<!-- lists all pools in card format with a summary of details -->
 		<div class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(pool, index) in pools" :key="index">
-					<DashPoolCard :pool="pools[index]!"/>
+				<DashPoolCard :pool="pools[index]!"/>
 			</div>
 		</div>
 
@@ -62,10 +61,9 @@
 				</button>
 			</div>
 		</div>
-		<div v-else>
-			<div class="p-2 flex justify-center">
-				<span class="font-semibold text-lg">No Disks Found</span>
-			</div>
+		<div v-else class="grid grid-cols-4 gap-2 justify-items-center">
+			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+			<LoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 		</div>
 
 		<!-- lists all disks in card format with a summary of details -->
@@ -83,6 +81,8 @@ import { loadData, loadDisks, loadDisksAndPools } from '../../scripts/loadData';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
+import LoadingSkeleton from '../common/LoadingSkeleton.vue';
+import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const pools = inject<Ref<PoolData[]>>("pools")!;
 const disks = inject<Ref<DiskData[]>>("disks")!;
