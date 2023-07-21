@@ -22,7 +22,7 @@
 		</div>
 		<div v-else class="grid grid-cols-4 gap-2 justify-items-center">
 			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
-			<LoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
+			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 		</div>
 
 		<!-- lists all pools in card format with a summary of details -->
@@ -63,7 +63,7 @@
 		</div>
 		<div v-else class="grid grid-cols-4 gap-2 justify-items-center">
 			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
-			<LoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
+			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 		</div>
 
 		<!-- lists all disks in card format with a summary of details -->
@@ -81,7 +81,7 @@ import { loadData, loadDisks, loadDisksAndPools } from '../../scripts/loadData';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
-import LoadingSkeleton from '../common/LoadingSkeleton.vue';
+import DashboardLoadingSkeleton from './DashboardLoadingSkeleton.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const pools = inject<Ref<PoolData[]>>("pools")!;

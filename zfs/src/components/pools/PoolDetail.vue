@@ -118,8 +118,8 @@
 					<div class="mt-2 col-span-1 col-start-3 row-start-1">
 						<p :id="getIdKey('settings-pool-guid')" name="settings-pool-guid" class="text-base text-default">GUID</p><p>{{ props.pool.guid }}</p>
 					</div>
-					<div class="mt-2 col-span-1 col-start-4 row-start-1 items-end justify-end">
-						<button :id="getIdKey('settings-pool-guid-regen-btn')" name="settings-pool-guid-regen-btn" class="mt-1 col-start-3 row-start-1 btn btn-secondary">Regenerate Pool GUID</button>
+					<div class="mt-2 col-span-1 col-start-4 row-start-1 items-end justify-self-end">
+						<button :id="getIdKey('settings-pool-guid-regen-btn')" name="settings-pool-guid-regen-btn" class="mt-1 btn btn-secondary">Regenerate Pool GUID</button>
 					</div>
 					<div class="mt-2 col-span-2 col-start-1 row-start-2">
 						<label :for="getIdKey('settings-pool-sector-size')" class="bg-default block text-base leading-6 text-default">Sector Size</label>

@@ -12,12 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, provide } from "vue";
 import Card from '../common/Card.vue';
-interface LoadingSkeletonProps {
+interface DashboardLoadingSkeletonProps {
     color: string;
 }
 
-const props = defineProps<LoadingSkeletonProps>();
+const props = defineProps<DashboardLoadingSkeletonProps>();
 
 </script>
