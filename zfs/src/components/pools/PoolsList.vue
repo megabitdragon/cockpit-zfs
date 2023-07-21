@@ -195,8 +195,7 @@ import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { destroyPool } from "../../scripts/pools";
-import { clearPartitions } from "../../scripts/disks";
-import { loadData, loadDatasets, loadDisks, loadDisksAndPools } from '../../scripts/loadData';
+import { loadDisksAndPools } from '../../scripts/loadData';
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 
@@ -211,12 +210,6 @@ const showDiskDetails = ref(false);
 
 const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
-
-// const refreshKey = inject<Ref<number>>("refresh-key")!;
-
-// const refreshMethod = () => {
-// 	refreshKey.value += 1;
-// };
 
 function destroyPoolAndUpdate(pool) {
 	destroyPool(pool);

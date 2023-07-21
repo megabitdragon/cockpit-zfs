@@ -1,4 +1,6 @@
 <template>
+	<!-- shows loading animations but ONLY when the arrays are empty -->
+	<!-- This works fine for updating the arrays as they are empty initially when loading data, but not when they are actually empty it appears to load endlessly but in reality there is no data to be loaded -->
 	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- showing # of pools with status indicator icon and total space between all pools -->
 		<div v-if="pools.length > 0" class="grid grid-flow-col">
@@ -73,6 +75,92 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- attempt at changing loading animations to show via a flag instead of whenever the arrays are empty. -->
+	<!-- <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
+		<div v-if="pools.length > 0 && poolsLoaded" class="grid grid-flow-col">
+			<div class="p-2">
+				<span class="font-semibold text-lg">Pools</span>
+			</div>
+			<div class="p-2">
+				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+			</div>
+			<div class="p-2">
+				<h6> {{ pools.length }} Pool(s) </h6>
+			</div>
+			<div class="p-2">
+				<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
+			</div>
+			<div class="p-2 flex justify-end">
+				<button class="rounded-full bg-accent text-muted hover:text-gray-600" @click="refreshAllData">
+					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
+				</button>
+			</div>
+		</div>
+
+		<div v-if="pools.length > 0 && poolsLoaded" class="grid grid-cols-4 auto-rows-max gap-2">
+			<div v-for="(pool, index) in pools" :key="index">
+				<DashPoolCard :pool="pools[index]!"/>
+			</div>
+		</div>
+
+		<div v-if="!poolsLoaded" class="grid grid-cols-4 gap-2 justify-items-center">
+			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
+		</div>
+
+		<div v-if="pools.length < 1 && poolsLoaded">
+			<div class="p-2 flex justify-center">
+				<span class="font-semibold text-lg">No Pools Found</span>
+			</div>
+		</div>
+
+		<div v-if="disks.length > 0 && disksLoaded" class="grid grid-flow-col">
+			<div class="p-2">
+				<span class="font-semibold text-lg">Disks</span>
+			</div>
+			<div class="p-2">
+				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+			</div>
+			<div class="p-2">
+				{{ disksSSD.length }} SSDs
+			</div>
+			<div class="p-2">
+				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+			</div>
+			<div class="p-2">
+				{{ disksHDD.length }} HDDs
+			</div>
+			<div class="p-2">
+				<h6> Maximum Temperature: {{maxTemp}}° C</h6>
+			</div>
+			<div class="p-2">
+				<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
+			</div>
+			<div class="p-2 flex justify-end">
+				<button class="rounded-full bg-accent text-muted hover:text-gray-600" @click="refreshDiskData">
+					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
+				</button>
+			</div>
+		</div>
+
+		<div v-if="disks.length > 0 && disksLoaded" class="grid grid-cols-4 auto-rows-max gap-2">
+			<div v-for="(disk, index) in disks" :key="index">
+				<DashDiskCard :disk="disks[index]!"/>
+			</div>
+		</div>
+
+		<div v-if="!disksLoaded" class="grid grid-cols-4 gap-2 justify-items-center">
+			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
+		</div>
+
+		<div v-if="disks.length < 1 && disksLoaded">
+			<div class="p-2 flex justify-center">
+				<span class="font-semibold text-lg">No Disks Found</span>
+			</div>
+		</div>
+	</div> -->
 </template>
 
 <script setup lang="ts">
