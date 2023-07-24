@@ -1,5 +1,5 @@
 <template>
-	<Modal :isOpen="open" :marginTop="'mt-28'">
+	<Modal :isOpen="showWizard" :marginTop="'mt-28'">
 		<template v-slot:title>
 			<!-- navigation tabs for create pool wizard -->
 			<WizardTabs :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
@@ -41,7 +41,7 @@ const tabError = ref(false);
 
 const finishPressed =ref(false);
 
-const open = ref(true);
+const showWizard = inject<Ref<boolean>>('show-wizard')!;
 
 //reference to poolConfiguration component to use its methods
 const poolConfiguration = ref();
@@ -132,7 +132,7 @@ function finishBtn(newPoolData) {
 	poolConfiguration.value.fillNewPoolData();
 	console.log(newPoolData);
 	newPool(newPoolData).then(() => {
-		open.value = false;
+		showWizard.value = false;
 		refreshAllData(disks, pools);
 	});
 }

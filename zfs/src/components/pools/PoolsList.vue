@@ -2,9 +2,9 @@
 	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- buttons for creating/importing pools and refreshing list -->
 		<div class="button-group-row">
-			<button id="createPool" class="btn btn-primary object-left justify-start" @click="showConfig = true">Create Storage Pool</button>
-			<button id="importPool" class="btn btn-secondary object-left justify-start" @click="" disabled>Import Storage Pool</button>
-			<button id="refreshPools" class="btn btn-secondary object-right justify-end" @click="refreshAllData" ><ArrowPathIcon class="w-5 h-5"/></button>
+			<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
+			<button id="importPool" class="btn btn-secondary" @click="" disabled>Import Storage Pool</button>
+			<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData" ><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
 		<div class="mt-8 overflow-visible">
@@ -174,8 +174,8 @@
 	</div>
 
 
-	<div v-if="showConfig">
-		<CreatePool @close="showConfig = false"/>
+	<div v-if="showWizard">
+		<CreatePool @close="showWizard = false"/>
 	</div>
 
 	<div v-if="showDiskDetails">
@@ -188,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref } from "vue";
+import { ref, inject, Ref, provide } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
@@ -203,7 +203,7 @@ const poolData = inject<Ref<PoolData[]>>("pools")!;
 
 const diskData = inject<Ref<DiskData[]>>("disks")!;
 
-const showConfig = ref(false);
+const showWizard = ref(false);
 
 const showPoolDetails = ref(false);
 const showDiskDetails = ref(false);
@@ -238,4 +238,14 @@ function showDiskModal(disk) {
 	showDiskDetails.value = true;
 }
 
+function newPoolWizardBtn() {
+	if (!showWizard.value) {
+		showWizard.value = true;	
+	} else {
+		showWizard.value = false;
+	}
+}
+
+
+provide('show-wizard', showWizard);
 </script>

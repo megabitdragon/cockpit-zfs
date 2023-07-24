@@ -10,18 +10,18 @@
 				<p class="ml-10 text-default">{{poolConfig.vdevs.length}} Virtual Device(s)</p>
 				<p class="ml-10 text-default">Sector Size: {{poolConfig.settings!.sector}}</p>
 				<p class="ml-10 text-default">Record Size: {{poolConfig.settings!.record}}</p>
-				<p class="ml-10 text-default">Compression: {{poolConfig.settings!.compression}}</p>
+				<p class="ml-10 text-default">Compression: {{isBoolCompression(poolConfig.settings!.compression)}}</p>
 				<p class="ml-10 text-default">
 					<Accordion :isOpen="false" class="ml-4">
 						<template v-slot:title>
 							<p><b>Advanced Settings</b></p>
 						</template>
 						<template v-slot:content>
-							<p class="ml-10 text-default">Deduplication: {{poolConfig.settings!.deduplication}}</p>
-							<p class="ml-10 text-default">Refreservation Amount: {{poolConfig.settings!.refreservation}}%</p>
-							<p class="ml-10 text-default">Auto-Expand Pool: {{poolConfig.settings!.autoExpand}}</p>
-							<p class="ml-10 text-default">Auto-Replace Devices: {{poolConfig.settings!.autoReplace}}</p>
-							<p class="ml-10 text-default">Automatic TRIM: {{poolConfig.settings!.autoTrim}}</p>
+							<p class="ml-10 text-default">Deduplication: {{isBoolOnOff(poolConfig.settings!.deduplication)}}</p>
+							<p class="ml-10 text-default">Refreservation Amount: {{(poolConfig.settings!.refreservation)}}%</p>
+							<p class="ml-10 text-default">Auto-Expand Pool: {{isBoolOnOff(poolConfig.settings!.autoExpand)}}</p>
+							<p class="ml-10 text-default">Auto-Replace Devices: {{isBoolOnOff(poolConfig.settings!.autoReplace)}}</p>
+							<p class="ml-10 text-default">Automatic TRIM: {{isBoolOnOff(poolConfig.settings!.autoTrim)}}</p>
 						</template>
 					</Accordion>
 				</p>
@@ -78,6 +78,14 @@ import Accordion from '../../components/common/Accordion.vue';
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
 const allDisks = inject<DiskData[]>("disks");
+
+function isBoolOnOff(bool : boolean) {
+	if (bool) {return 'on'} else {return 'off'}
+}
+
+function isBoolCompression(bool : boolean) {
+	if (bool) {return 'lz4'} else {return 'off'}
+}
 
 // console.log(poolConfig.vdevs)
 </script>
