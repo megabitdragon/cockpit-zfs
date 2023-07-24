@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref } from "vue";
+import { ref, inject, Ref, provide } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
@@ -122,4 +122,5 @@ const fileSystems = inject<Dataset[]>('datasets')!;
 
 const showFSWizard = ref(false);
 
+provide('show-fs-wizard', showFSWizard);
 </script>

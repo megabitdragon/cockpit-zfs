@@ -1,10 +1,10 @@
 <template>
-    <Modal>
+    <Modal :isOpen="showFSWizard" :marginTop="'mt-28'">
        <template v-slot:title>
             <legend class="flex justify-center">Create a New File System</legend>
        </template>
        <template v-slot:content>
-            <div>
+            <div class="">
                 <!-- Name of Parent File System (Text) -->
                 <div>
                     <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
@@ -233,6 +233,7 @@ interface NewFSWizardProps {
 }
 
 const props = defineProps<NewFSWizardProps>();
+const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
 
 // const poolConfig = inject<PoolData>("pool-config-data")!;
 const nameFeedback = ref('');
