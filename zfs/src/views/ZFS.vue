@@ -3,13 +3,11 @@
 		<div class="w-full h-full px-8 bg-default text-default overflow-y-visible py-8">
 
 			<div v-if="props.tag === 'dashboard'" class="p-4">
-			   <Dashboard/>
-			   <!-- <Dashboard/> -->
+			   <Dashboard :key="refreshKey" />
 			</div>
 
 			<div v-if="props.tag === 'pools'" class="p-4">
 			  	<PoolsList/>
-				<!-- <PoolsList/> -->
 			</div>
 
 			<div v-if="props.tag === 'filesystems'" class="p-4">
@@ -48,23 +46,15 @@ const disks = ref<DiskData[]>([]);
 // const fileSystems = ref<FileSystemData[]>([]);
 const datasets = ref<Dataset[]>([]);
 
+const refreshKey = ref(0);
 
 const loadingPools = ref(false);
 const loadingDisks = ref(false);
 
-// const handleReload = (pool) => {
-// 	console.log("destroy pool:");
-// 	console.log(pool);
-// 	destroyPool(pool);
-// 	refreshKey.value++;
-// 	console.log("refresh key:");
-// 	console.log(refreshKey);
-// };
-
-function initialLoad(disks, pools, datasets) {
+async function initialLoad(disks, pools, datasets) {
 	loadingDisks.value = true;
 	loadingPools.value = true;
-	loadData(disks, pools, datasets);
+	await loadData(disks, pools, datasets);
 	loadingDisks.value = false;
 	loadingPools.value = false;
 }
@@ -83,5 +73,6 @@ provide("disks", disks);
 provide("datasets", datasets);
 provide('loading-disks', loadingDisks);
 provide('loading-pools', loadingPools);
+provide('refresh-key', refreshKey);
 </script>
 

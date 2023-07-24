@@ -263,3 +263,7 @@ const convertBytesToSize = (bytes) => {
 	const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
 	return `${convertedSize} ${sizes[i]}`;
 };
+
+export function loadSnapshots(snapshots) {
+	
+}

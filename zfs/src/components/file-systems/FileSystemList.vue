@@ -2,7 +2,7 @@
 	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<div class="button-group-row">
 			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showFSWizard = true">Create File System</button>
-			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="" disabled><ArrowPathIcon class="w-5 h-5"/></button>
+			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="" disabled ><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
 		<div class="mt-8 overflow-visible">
@@ -11,7 +11,7 @@
 					<table class="min-w-full divide-y divide-default bg-accent">
 						<thead>
 							<tr class="rounded-md">
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default sm:pl-6 lg:pl-8">Name</th>
+								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Name</th>
 								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Available</th>
 								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Used by Dataset</th>
 								<!-- <th scope="col" class="px-3 py-3.5 font-semibold text-default">Used by Refreservation</th> -->
@@ -31,7 +31,7 @@
 							<!-- FILE SYSTEMS BY POOLS -->
 							<tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
 
-								<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default sm:pl-6 lg:pl-8"> 
+								<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default"> 
 									{{ fileSystem.name }}
 								</td>
 								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
@@ -113,7 +113,7 @@
 import { ref, inject, Ref, provide } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import { loadDatasets } from "../../scripts/loadData";
 import NewFSWIzard from "./NewFSWIzard.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
@@ -121,6 +121,10 @@ const poolData = inject<Ref<PoolData[]>>("pools")!;
 const fileSystems = inject<Dataset[]>('datasets')!;
 
 const showFSWizard = ref(false);
+
+function refreshDatasets(fileSystems) {
+	loadDatasets(fileSystems);
+}
 
 provide('show-fs-wizard', showFSWizard);
 </script>

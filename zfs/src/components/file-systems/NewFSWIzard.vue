@@ -4,7 +4,7 @@
             <legend class="flex justify-center">Create a New File System</legend>
        </template>
        <template v-slot:content>
-            <div class="">
+            <div class="grid grid-cols-4 gap-2">
                 <!-- Name of Parent File System (Text) -->
                 <div>
                     <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>

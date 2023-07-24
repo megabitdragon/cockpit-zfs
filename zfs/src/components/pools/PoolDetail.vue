@@ -1,5 +1,5 @@
 <template>
-	<Modal :isOpen="open" :marginTop="'mt-28'">
+	<Modal @close="open = false" :isOpen="open" :marginTop="'mt-28'">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
@@ -279,7 +279,7 @@
 			</div>
 			<div v-if="navTag == 'snapshots'" class="mt-2">
 				<div class="mt-2">
-					<button :id="getIdKey('create-snapshot-btn')" name="create-snapshot-btn" class="mt-1 btn btn-primary">Create Snapshot</button>
+					<button @click="showSnapshotModal = true" :id="getIdKey('create-snap-wizard-btn')" name="create-snap-wizard-btn" class="mt-1 btn btn-primary">Create Snapshot</button>
 				</div>
 			</div>
 			<div v-if="navTag == 'settings'" class="mt-2">
@@ -289,6 +289,8 @@
 			</div>
 		</template>
 	</Modal>
+
+	<CreateSnapshotModal @close="showSnapshotModal = false"/>
 </template>
 
 <script setup lang="ts">
@@ -297,8 +299,10 @@ import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
+import { loadSnapshots } from '../../scripts/loadData';
 import { getSnapshots } from '../../scripts/snapshots';
 import Navigation from '../common/Navigation.vue';
+import CreateSnapshotModal from './CreateSnapshotModal.vue';
 import PoolDetailDiskCard from '../pools/PoolDetailDiskCard.vue';
 
 interface PoolDetailsProps {
@@ -333,6 +337,7 @@ const poolConfig = ref<PoolData>({
 const props = defineProps<PoolDetailsProps>();
 
 const open = ref(true);
+const showSnapshotModal = ref(false);
 
 const snapshots = ref<Snapshot[]>([]);
 
@@ -426,4 +431,6 @@ const navigation = reactive<NavigationItem[]>([
 ].filter(item => item.show));
 
 const getIdKey = (name: string) => `${name}`;
+
+provide('create-snap-modal', showSnapshotModal);
 </script>

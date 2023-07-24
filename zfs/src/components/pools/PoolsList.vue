@@ -165,9 +165,12 @@
 						</Accordion>
 					</div>
 					<div v-else class="flex justify-center bg-default">
-						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500"/>
+						<LoadingSpinner class="mt-2" baseColor="text-gray-200" fillColor="fill-slate-500"/>
 					</div>
-					
+					<div v-if="poolData.length < 1" class="p-2 flex bg-default justify-center">
+						<span class="font-semibold text-lg">No Pools Found</span>
+					</div>
+	
 				</div>
 			</div>
 		</div>

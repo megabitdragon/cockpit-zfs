@@ -23,11 +23,11 @@
 		<div v-else class="grid grid-cols-4 gap-2 justify-items-center">
 			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
 		</div>
-	<!-- <div v-if="pools.length < 1">
+		<div v-if="pools.length < 1">
 			<div class="p-2 flex justify-center">
 				<span class="font-semibold text-lg">No Pools Found</span>
 			</div>
-		</div> -->
+		</div>
 
 		<div v-if="pools.length > 0" class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(pool, index) in pools" :key="index">
@@ -69,11 +69,11 @@
 		<div v-else class="grid grid-cols-4 gap-2 justify-items-center">
 			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
 		</div>
-	<!-- <div v-if="disks.length < 1">
+		<div v-if="disks.length < 1">
 			<div class="p-2 flex justify-center">
 				<span class="font-semibold text-lg">No Disks Found</span>
 			</div>
-		</div> -->
+		</div>
 
 		<div v-if="disks.length > 0" class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(disk, index) in disks" :key="index">
@@ -103,26 +103,36 @@ const disks = inject<Ref<DiskData[]>>("disks")!;
 const loadingDisks = inject<Ref<boolean>>('loading-disks')!;
 const loadingPools = inject<Ref<boolean>>('loading-pools')!;
 
-
 //get all disks in use by pools
 // const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
 
 function refreshAllData() {
-	loadingDisks.value = true;
-	loadingPools.value = true;
 	disks.value = [];
 	pools.value = [];
 	loadDisksThenPools(disks, pools);
-	loadingDisks.value = false;
-	loadingPools.value = false;
 }
 
 function refreshDiskData() {
-	loadingDisks.value = true;
 	disks.value = [];
 	loadDisks(disks);
-	loadingDisks.value = false;
 }
+
+// async function refreshAllData() {
+// 	// disks.value = [];
+// 	// pools.value = [];
+// 	loadingDisks.value = true;
+// 	loadingPools.value = true;
+// 	await loadDisksThenPools(disks, pools);
+// 	loadingDisks.value = false;
+// 	loadingPools.value = false;
+// }
+
+// async function refreshDiskData() {
+// 	// disks.value = [];
+// 	loadingDisks.value = true;
+// 	await loadDisks(disks);
+// 	loadingDisks.value = false;
+// }
 
 //determine total effective space of pools
 const totalEffectivePoolSpace = computed(() => {
