@@ -3,7 +3,7 @@
         <template v-slot:title>
             <legend class="flex justify-center">Create Snapshot</legend>
         </template>
-        <template v-slot:content>
+        <template v-slot:content></template>
 
         </template>
         <template v-slot:footer>
