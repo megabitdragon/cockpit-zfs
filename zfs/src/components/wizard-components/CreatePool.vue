@@ -33,7 +33,7 @@ import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import { newPool } from "../../scripts/pools";
-import { loadDisksAndPools } from '../../scripts/loadData';
+import { loadDisksThenPools } from '../../scripts/loadData';
 
 const show = ref(true);
 const navTag = ref('name-entry');
@@ -140,7 +140,7 @@ function finishBtn(newPoolData) {
 function refreshAllData(disks, pools) {
 	pools.value = [];
 	disks.value = [];
-	loadDisksAndPools(disks, pools);
+	loadDisksThenPools(disks, pools);
 }
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));

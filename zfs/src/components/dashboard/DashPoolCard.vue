@@ -84,7 +84,7 @@
 import { ref, inject, Ref, computed, provide } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadData, loadDatasets, loadDisksAndPools } from '../../scripts/loadData';
+import { loadData, loadDatasets, loadDisksThenPools } from '../../scripts/loadData';
 import { destroyPool } from "../../scripts/pools";
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
@@ -108,7 +108,7 @@ function destroyPoolAndUpdate(pool) {
 	poolData.value = [];
 	diskData.value = [];
 	// refreshMethod;
-	loadDisksAndPools(diskData, poolData);
+	loadDisksThenPools(diskData, poolData);
 }
 
 //method to show pool details when button is clicked

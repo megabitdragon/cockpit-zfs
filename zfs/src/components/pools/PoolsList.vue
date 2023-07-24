@@ -195,7 +195,7 @@ import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { destroyPool } from "../../scripts/pools";
-import { loadDisksAndPools } from '../../scripts/loadData';
+import { loadDisksThenPools } from '../../scripts/loadData';
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 
@@ -216,13 +216,13 @@ function destroyPoolAndUpdate(pool) {
 	poolData.value = [];
 	diskData.value = [];
 	// refreshMethod;
-	loadDisksAndPools(diskData, poolData);
+	loadDisksThenPools(diskData, poolData);
 }
 
 function refreshAllData() {
 	diskData.value = [];
 	poolData.value = [];
-	loadDisksAndPools(diskData, poolData);
+	loadDisksThenPools(diskData, poolData);
 }
 
 //method to show pool details when button is clicked

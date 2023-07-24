@@ -11,7 +11,7 @@ const vDevs = ref<vDevData[]>([]);
 // const disks = inject<Ref<DiskData[]>>('disks')!;
 //const datasets = inject<Ref<Dataset[]>>('datasets')!;
 
-export function loadDisksAndPools(disks, pools) {
+export function loadDisksThenPools(disks, pools) {
 	//executes python script to retrieve all disks in server and output a JSON
 	getDisks().then(rawJSON => {
 		const parsedJSON = (JSON.parse(rawJSON));
@@ -170,7 +170,7 @@ export function loadDisks(disks) {
 }
 
 export function loadData(disks, pools, datasets) {
-	loadDisksAndPools(disks, pools);
+	loadDisksThenPools(disks, pools);
 	loadDatasets(datasets);
 }
 
