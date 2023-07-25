@@ -103,12 +103,18 @@ const poolData = inject<Ref<PoolData[]>>("pools")!;
 
 const diskData = inject<Ref<DiskData[]>>("disks")!;
 
-function destroyPoolAndUpdate(pool) {
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+
+async function destroyPoolAndUpdate(pool) {
 	destroyPool(pool);
+	disksLoaded.value = false;
+	poolsLoaded.value = false;
 	poolData.value = [];
 	diskData.value = [];
-	// refreshMethod;
-	loadDisksThenPools(diskData, poolData);
+	await loadDisksThenPools(diskData, poolData);
+	disksLoaded.value = true;
+	poolsLoaded.value = true;
 }
 
 //method to show pool details when button is clicked

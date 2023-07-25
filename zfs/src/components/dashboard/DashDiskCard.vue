@@ -127,11 +127,11 @@ function showDetails(disk) {
 	showDiskDetails.value = true;
 }
 
-function clearPartAndRefreshDisks(disk) {
+async function clearPartAndRefreshDisks(disk) {
 	disksLoaded.value = false;
-	clearPartitions(disk);
+	await clearPartitions(disk);
 	disks.value = [];
-	loadDisks(disks);
+	await loadDisks(disks);
 	disksLoaded.value = true;
 }
 
