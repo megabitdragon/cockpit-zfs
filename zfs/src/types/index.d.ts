@@ -185,6 +185,15 @@ interface Snapshot {
   holds: {}
 }
 
+interface NewSnapshot {
+  filesystem: string;
+  isCustomName: boolean;
+  name: string;
+  options: {
+    snapFileSystems: boolean;
+  }
+}
+
 //object for navigation (generic)
 interface NavigationItem {
   name: string;
