@@ -126,6 +126,9 @@ const newPoolData = ref<newPoolData>({
 	dedup: '',
 });
 
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+
 //finish button method for creating pool
 function finishBtn(newPoolData) {
   	finishPressed.value = true;
@@ -133,14 +136,18 @@ function finishBtn(newPoolData) {
 	console.log(newPoolData);
 	newPool(newPoolData).then(() => {
 		showWizard.value = false;
-		refreshAllData(disks, pools);
+		refreshAllData();
 	});
 }
 
-function refreshAllData(disks, pools) {
-	pools.value = [];
+async function refreshAllData() {
+	disksLoaded.value = false;
+	poolsLoaded.value = false;
 	disks.value = [];
-	loadDisksThenPools(disks, pools);
+	pools.value = [];
+	await loadDisksThenPools(disks, pools);
+	disksLoaded.value = true;
+	poolsLoaded.value = true;
 }
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));

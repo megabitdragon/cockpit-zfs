@@ -89,7 +89,7 @@
 import { reactive, ref, computed, provide, inject, Ref } from 'vue';
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadData, loadDisks, loadDatasets, loadDisksThenPools } from '../../scripts/loadData';
+import { loadDisks, loadDatasets, loadDisksThenPools } from '../../scripts/loadData';
 import { clearPartitions } from "../../scripts/disks";
 import DiskDetail from '../pools/DiskDetail.vue';
 import Card from '../common/Card.vue';
@@ -115,6 +115,7 @@ const showDiskDetails = ref(false);
 const selectedDisk = ref<DiskData>();
 
 const disks = inject<Ref<DiskData[]>>('disks')!; 
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 
 // console.log("Props.Disk");
 // console.log(props.disk);
@@ -127,9 +128,11 @@ function showDetails(disk) {
 }
 
 function clearPartAndRefreshDisks(disk) {
+	disksLoaded.value = false;
 	clearPartitions(disk);
 	disks.value = [];
 	loadDisks(disks);
+	disksLoaded.value = true;
 }
 
 </script>
