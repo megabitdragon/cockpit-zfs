@@ -1,7 +1,7 @@
 <template>
 	<Card class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
 		<template v-slot:title>
-			<div class="grid grid-cols-3 grid-flow-col gap-1">
+			<div class="flex flex-row justify-between">
 				<div class="text-default">
 					{{ props.pool.name }}
 				</div>
