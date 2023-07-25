@@ -11,90 +11,97 @@ const vDevs = ref<vDevData[]>([]);
 // const disks = inject<Ref<DiskData[]>>('disks')!;
 //const datasets = inject<Ref<Dataset[]>>('datasets')!;
 
-export function loadDisksThenPools(disks, pools) {
-	//executes python script to retrieve all disks in server and output a JSON
-	getDisks().then(rawJSON => {
-		const parsedJSON = (JSON.parse(rawJSON));
+export async function loadDisksThenPools(disks, pools) {
+	//executes a python script to retrieve all disk data and outputs a JSON
+	try {
+		const rawJSON = await getDisks();
+		const parsedJSON = JSON.parse(rawJSON);
 		console.log('Disks JSON:');
 		console.log(parsedJSON);
-		
+
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
 			const disk = {
-                name: parsedJSON[i].name,
-                capacity: parsedJSON[i].capacity,
-                model: parsedJSON[i].model,
-                type: parsedJSON[i].type,
-                phy_path: parsedJSON[i].phy_path,
-                sd_path: parsedJSON[i].sd_path,
-                vdev_path: parsedJSON[i].vdev_path,
-                serial: parsedJSON[i].serial,
-                usable: parsedJSON[i].usable,
-                path: '',
-                guid: '',
-                status: parsedJSON[i].health,
-                powerOnHours: parsedJSON[i].power_on_time,
-                powerOnCount: parsedJSON[i].power_on_count,
-                temp: parsedJSON[i].temp,
-                rotationRate: parsedJSON[i].rotation_rate,
-                stats: {},
-			}
+				name: parsedJSON[i].name,
+				capacity: parsedJSON[i].capacity,
+				model: parsedJSON[i].model,
+				type: parsedJSON[i].type,
+				phy_path: parsedJSON[i].phy_path,
+				sd_path: parsedJSON[i].sd_path,
+				vdev_path: parsedJSON[i].vdev_path,
+				serial: parsedJSON[i].serial,
+				usable: parsedJSON[i].usable,
+				path: '',
+				guid: '',
+				status: parsedJSON[i].health,
+				powerOnHours: parsedJSON[i].power_on_time,
+				powerOnCount: parsedJSON[i].power_on_count,
+				temp: parsedJSON[i].temp,
+				rotationRate: parsedJSON[i].rotation_rate,
+				stats: {},
+			};
 			disks.value.push(disk);
-			// console.log("Disk:");
-			// console.log(disk);
+		// console.log("Disk:");
+		// console.log(disk);
 		}
 		// console.log("Disks:");
 		// console.log(disks);
 
-		//executes a python script to retrieve all zfs pools on server and output a JSON
-		getPools().then(rawJSON => {
-				const parsedJSON = (JSON.parse(rawJSON));
-				console.log('Pools JSON:');
-				console.log(parsedJSON);
+		//executes a python script to retrieve all pool data and outputs a JSON
+		try {
+			const rawJSON = await getPools();
+			const parsedJSON = JSON.parse(rawJSON);
+			console.log('Pools JSON:');
+			console.log(parsedJSON);
 
-				//loops through pool JSON
-				for (let i = 0; i < parsedJSON.length; i++) {
-					//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
-					parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-					parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-					parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-					parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-					parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-					parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-					
-					//adds pool data from JSON into pool data object, pushes into array 
-					const poolData = {
-						name: parsedJSON[i].name,
-						status: parsedJSON[i].status,
-						guid: parsedJSON[i].guid,
-						properties: {
-						rawsize: parsedJSON[i].properties.size.parsed,
-						size: convertBytesToSize(parsedJSON[i].properties.size.parsed),
-						allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
-						capacity: parsedJSON[i].properties.capacity.rawvalue,
-						free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
-						},
-						//adds VDev array to Pool data object
-						vdevs: vDevs.value,
-						// fileSystems: parsedJSON[i].root_dataset.value,
-					}
-					
-					pools.value.push(poolData);
-
-					// console.log("poolData:");
-					// console.log(poolData);
-					vDevs.value = [];
+			//loops through pool JSON
+			for (let i = 0; i < parsedJSON.length; i++) {
+				//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
+				parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
+				parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
+				parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
+				parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
+				parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
+				parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
+				
+				//adds pool data from JSON into pool data object, pushes into array 
+				const poolData = {
+					name: parsedJSON[i].name,
+					status: parsedJSON[i].status,
+					guid: parsedJSON[i].guid,
+					properties: {
+					rawsize: parsedJSON[i].properties.size.parsed,
+					size: convertBytesToSize(parsedJSON[i].properties.size.parsed),
+					allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
+					capacity: parsedJSON[i].properties.capacity.rawvalue,
+					free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
+					},
+					//adds VDev array to Pool data object
+					vdevs: vDevs.value,
+					// fileSystems: parsedJSON[i].root_dataset.value,
 				}
-				// console.log("Pools:");
-				// console.log(pools);
-		});
-	});
+				
+				pools.value.push(poolData);
+
+				// console.log("poolData:");
+				// console.log(poolData);
+				vDevs.value = [];
+			}
+		} catch (error) {
+			// Handle any errors that may occur during the asynchronous operation
+			console.error("An error occurred getting pools:", error);
+		}
+	} catch (error) {
+		// Handle any errors that may occur during the asynchronous operation
+		console.error("An error occurred getting disks/pools:", error);
+	}
 }
 
-export function loadDatasets(datasets) {
+export async function loadDatasets(datasets) {
 	//executes a python script to retrieve all dataset data and outputs a JSON
-	getDatasets().then(rawJSON => {
-		const parsedJSON = (JSON.parse(rawJSON));
+	try {
+		const rawJSON = await getDatasets();
+		const parsedJSON = JSON.parse(rawJSON);
 		console.log('Datasets JSON:');
 		console.log(parsedJSON);
 
@@ -129,12 +136,18 @@ export function loadDatasets(datasets) {
 
 			datasets.value.push(dataset);
 		}
-	});
+
+	} catch (error) {
+		// Handle any errors that may occur during the asynchronous operation
+		console.error("An error occurred getting datasets:", error);
+	}
 }
 
-export function loadDisks(disks) {
-	getDisks().then(rawJSON => {
-		const parsedJSON = (JSON.parse(rawJSON));
+
+export async function loadDisks(disks) {
+	try {
+		const rawJSON = await getDisks();
+		const parsedJSON = JSON.parse(rawJSON);
 		console.log('Disks JSON:');
 		console.log(parsedJSON);
 		
@@ -166,12 +179,10 @@ export function loadDisks(disks) {
 		// console.log("Disks:");
 		// console.log(disks);
 
-	});
-}
-
-export function loadData(disks, pools, datasets) {
-	loadDisksThenPools(disks, pools);
-	loadDatasets(datasets);
+	} catch (error) {
+		// Handle any errors that may occur during the asynchronous operation
+		console.error("An error occurred getting disks:", error);
+	}
 }
 
 //method for parsing through VDevs to add to array (VDev array is added to Pool)

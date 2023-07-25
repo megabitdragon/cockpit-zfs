@@ -25,7 +25,8 @@
 							</tr>
 						</thead>
 					</table>
-					<div v-if="poolData.length > 0">
+					
+					<div v-if="poolData.length > 0 && poolsLoaded == true">
 						<Accordion :isOpen="false" class="divide-y divide-default bg-default ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="poolIdx">
 							<template v-slot:title>
 								<div class="grid grid-cols-7 grid-flow-cols w-full hover:border-default hover:border-2">
@@ -164,10 +165,11 @@
 							</template>
 						</Accordion>
 					</div>
-					<div v-else class="flex justify-center bg-default">
+					
+					<div v-if="poolsLoaded == false" class="flex justify-center bg-default">
 						<LoadingSpinner class="mt-2" baseColor="text-gray-200" fillColor="fill-slate-500"/>
 					</div>
-					<div v-if="poolData.length < 1" class="p-2 flex bg-default justify-center">
+					<div v-if="poolData.length < 1 && poolsLoaded == true" class="p-2 flex bg-default justify-center">
 						<span class="font-semibold text-lg">No Pools Found</span>
 					</div>
 	
@@ -203,8 +205,10 @@ import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
-
 const diskData = inject<Ref<DiskData[]>>("disks")!;
+
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
 const showWizard = ref(false);
 
@@ -214,18 +218,25 @@ const showDiskDetails = ref(false);
 const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 
-function destroyPoolAndUpdate(pool) {
+async function destroyPoolAndUpdate(pool) {
 	destroyPool(pool);
+	disksLoaded.value = false;
+	poolsLoaded.value = false;
 	poolData.value = [];
 	diskData.value = [];
-	// refreshMethod;
-	loadDisksThenPools(diskData, poolData);
+	await loadDisksThenPools(diskData, poolData);
+	disksLoaded.value = true;
+	poolsLoaded.value = true;
 }
 
-function refreshAllData() {
+async function refreshAllData() {
+	disksLoaded.value = false;
+	poolsLoaded.value = false;
 	diskData.value = [];
 	poolData.value = [];
-	loadDisksThenPools(diskData, poolData);
+	await loadDisksThenPools(diskData, poolData);
+	disksLoaded.value = true;
+	poolsLoaded.value = true;
 }
 
 //method to show pool details when button is clicked
