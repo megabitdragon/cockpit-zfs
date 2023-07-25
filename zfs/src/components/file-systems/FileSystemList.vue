@@ -28,6 +28,15 @@
 
 						<tbody class="divide-y divide-x divide-default bg-default ring-1 ring-black ring-opacity-5">
 
+							<!-- <div v-if="fileSystems.length < 0" class="grid grid-cols-4 gap-2 justify-items-center">
+								<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+							</div>
+							<div v-if="fileSystems.length < 1">
+								<div class="p-2 flex justify-center">
+									<span class="font-semibold text-lg">No Pools Found</span>
+								</div>
+							</div> -->
+							
 							<!-- FILE SYSTEMS BY POOLS -->
 							<tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
 
@@ -114,6 +123,7 @@ import { ref, inject, Ref, provide } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../scripts/loadData";
+import LoadingSpinner from "../common/LoadingSpinner.vue";
 import NewFSWIzard from "./NewFSWIzard.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;

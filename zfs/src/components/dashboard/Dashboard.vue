@@ -1,7 +1,7 @@
 <template>
 	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
 
-		<div v-if="pools.length > 0" class="grid grid-flow-col">
+		<div v-if="pools.length > 0" class="grid grid-flow-col border border-default rounded-md">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Pools</span>
 			</div>
@@ -15,7 +15,7 @@
 				<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
 			</div>
 			<div class="p-2 flex justify-end">
-				<button class="rounded-full bg-accent text-muted hover:text-gray-600" @click="refreshAllData">
+				<button class="btn btn-secondary" @click="refreshAllData">
 					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
 				</button>
 			</div>
@@ -38,7 +38,7 @@
 			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 		</div>
 
-		<div v-if="disks.length > 0" class="grid grid-flow-col">
+		<div v-if="disks.length > 0" class="grid grid-flow-col border border-default rounded-md">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Disks</span>
 			</div>
@@ -61,7 +61,7 @@
 				<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
 			</div>
 			<div class="p-2 flex justify-end">
-				<button class="rounded-full bg-accent text-muted hover:text-gray-600" @click="refreshDiskData">
+				<button class="btn btn-secondary" @click="refreshDiskData">
 					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
 				</button>
 			</div>
