@@ -118,4 +118,5 @@ function showDetails(pool) {
 	showPoolDetails.value = true;
 }
 
+provide('show-pool-deets', showPoolDetails);
 </script>

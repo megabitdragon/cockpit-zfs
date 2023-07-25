@@ -1,5 +1,5 @@
 <template>
-	<Modal @close="open = false" :isOpen="open" :marginTop="'mt-28'">
+	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
@@ -338,6 +338,7 @@ const props = defineProps<PoolDetailsProps>();
 
 const open = ref(true);
 const showSnapshotModal = ref(false);
+const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
 const snapshots = ref<Snapshot[]>([]);
 

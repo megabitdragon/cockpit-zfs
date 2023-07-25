@@ -249,6 +249,6 @@ function newPoolWizardBtn() {
 	}
 }
 
-
 provide('show-wizard', showWizard);
+provide('show-pool-deets', showPoolDetails);
 </script>
