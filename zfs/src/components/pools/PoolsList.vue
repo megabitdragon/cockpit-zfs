@@ -92,7 +92,7 @@
 							<template v-slot:content>
 								<table class="table-auto min-w-full divide-y divide-default rounded-md">
 									<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="indent-14 bg-well rounded-md">
-										<td colspan="7" class="ml-5">{{ vDev.name }}</td>
+										<td colspan="7" class="ml-5">{{ vDev.name }} ({{ vDev.type }})</td>
 									</tr>
 									<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="rounded-md">
 										<td colspan="7" class="ml-7">

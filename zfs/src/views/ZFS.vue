@@ -57,17 +57,6 @@ async function initialLoad(disks, pools, datasets) {
 	poolsLoaded.value = true;
 }
 
-// async function refreshAllData() {
-// 	disksLoaded.value = false;
-// 	poolsLoaded.value = false;
-// 	disks.value = [];
-// 	pools.value = [];
-// 	//loadDisksThenPools(disks, pools);
-// 	await loadDisksAndPools(disks, pools);
-// 	disksLoaded.value = true;
-// 	poolsLoaded.value = true;
-// }
-
 initialLoad(disks, pools, datasets);
 
 //get all disks in use by pools
