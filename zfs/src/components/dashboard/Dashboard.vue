@@ -1,7 +1,7 @@
 <template>
-	<div class="min-w-full max-h-screen overflow-y-auto py-2 align-middle sm:px-6 lg:px-8 sm:rounded-lg bg-accent rounded-md border border-default">
+	<div class="min-w-full max-w-full max-h-full py-2 align-middle sm:px-6 lg:px-8 sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- Pools summary -->
-		<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col">
+		<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-secondary rounded-md shadow text-white">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Pools</span>
 			</div>
@@ -15,7 +15,7 @@
 				<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
 			</div>
 			<div class="p-2 flex justify-end">
-				<button class="btn btn-secondary" @click="refreshAllData">
+				<button class="btn btn-primary" @click="refreshAllData">
 					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
 				</button>
 			</div>
@@ -27,7 +27,7 @@
 		</div>
 
 		<!-- no pools found -->
-		<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3">
+		<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3 bg-secondary rounded-md shadow text-white">
 			<!-- <div class="p-2 -ml-1 flex justify-start">
 				<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
 			</div> -->
@@ -35,7 +35,7 @@
 				<span class="font-semibold text-lg">No Pools Found</span>
 			</div>
 			<div class="p-2 flex justify-end col-start-3">
-				<button class="btn btn-secondary" @click="refreshAllData">
+				<button class="btn btn-primary" @click="refreshAllData">
 					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
 				</button>
 			</div>
@@ -54,7 +54,7 @@
 		</div>
 
 		<!-- disks summary -->
-		<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col">
+		<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-secondary rounded-md shadow text-white">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Disks</span>
 			</div>
@@ -77,7 +77,7 @@
 				<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
 			</div>
 			<div class="p-2 flex justify-end">
-				<button class="btn btn-secondary" @click="refreshDiskData">
+				<button class="btn btn-primary" @click="refreshDiskData">
 					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
 				</button>
 			</div>
@@ -89,12 +89,12 @@
 		</div>
 
 		<!-- no disks found -->
-		<div v-if="disks.length < 1 && disksLoaded == true" class="flex justify-between">
+		<div v-if="disks.length < 1 && disksLoaded == true" class="grid grid-flow-col grid-cols-3 bg-secondary rounded-md shadow text-white">
 			<div class="p-2 flex justify-center">
 				<span class="font-semibold text-lg">No Disks Found</span>
 			</div>
 			<div class="p-2 flex justify-end">
-				<button class="btn btn-secondary" @click="refreshDiskData">
+				<button class="btn btn-primary" @click="refreshDiskData">
 					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
 				</button>
 			</div>
