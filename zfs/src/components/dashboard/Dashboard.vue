@@ -1,18 +1,15 @@
 <template>
 	<div class="min-w-full max-w-full max-h-full py-2 align-middle sm:px-6 lg:px-8 sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- Pools summary -->
-		<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-secondary rounded-md shadow text-white my-2">
-			<div class="p-2">
-				<span class="font-semibold text-lg">Pools</span>
+		<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2">
+			<div class="p-2 flex justify-start mt-0.5">
+				<span class="font-semibold text-lg mt-1 justify-self-start">Pools</span>
 			</div>
-			<div class="p-2">
-				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+			<div class="p-2 flex justify-start">
+				<h6 class="mt-2"> {{ pools.length }} Pool(s) </h6>
 			</div>
-			<div class="p-2">
-				<h6> {{ pools.length }} Pool(s) </h6>
-			</div>
-			<div class="p-2">
-				<h6> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
+			<div class="p-2 flex justify-start">
+				<h6 class="mt-2"> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
 			</div>
 			<div class="p-2 flex justify-end">
 				<button class="btn btn-primary" @click="refreshAllData">
@@ -27,12 +24,12 @@
 		</div>
 
 		<!-- no pools found -->
-		<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3 bg-secondary rounded-md shadow text-white my-2">
+		<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3 bg-well rounded-md shadow text-default my-2">
 			<!-- <div class="p-2 -ml-1 flex justify-start">
 				<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
 			</div> -->
 			<div class="p-2 flex justify-center col-start-2">
-				<span class="font-semibold text-lg">No Pools Found</span>
+				<span class="font-semibold text-lg mt-1">No Pools Found</span>
 			</div>
 			<div class="p-2 flex justify-end col-start-3">
 				<button class="btn btn-primary" @click="refreshAllData">
@@ -54,27 +51,21 @@
 		</div>
 
 		<!-- disks summary -->
-		<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-secondary rounded-md shadow text-white my-2">
-			<div class="p-2">
-				<span class="font-semibold text-lg">Disks</span>
+		<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2">
+			<div class="p-2 flex justify-start mt-0.5">
+				<span class="font-semibold text-lg mt-1 justify-self-start">Disks</span>
 			</div>
-			<div class="p-2">
-				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+			<div class="p-2 flex justify-start">
+				<h6 class="mt-2">{{ disksSSD.length }} SSDs</h6>
 			</div>
-			<div class="p-2">
-				{{ disksSSD.length }} SSDs
+			<div class="p-2 flex justify-start">
+				<h6 class="mt-2">{{ disksHDD.length }} HDDs</h6>
 			</div>
-			<div class="p-2">
-				<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+			<div class="p-2 flex justify-start">
+				<h6 class="mt-2"> Maximum Temperature: {{maxTemp}}° C</h6>
 			</div>
-			<div class="p-2">
-				{{ disksHDD.length }} HDDs
-			</div>
-			<div class="p-2">
-				<h6> Maximum Temperature: {{maxTemp}}° C</h6>
-			</div>
-			<div class="p-2">
-				<h6> Total Raw Space: {{ totalRawDiskSpace }}</h6>
+			<div class="p-2 flex justify-start">
+				<h6 class="mt-2"> Total Raw Space: {{ totalRawDiskSpace }}</h6>
 			</div>
 			<div class="p-2 flex justify-end">
 				<button class="btn btn-primary" @click="refreshDiskData">
@@ -89,9 +80,9 @@
 		</div>
 
 		<!-- no disks found -->
-		<div v-if="disks.length < 1 && disksLoaded == true" class="grid grid-flow-col grid-cols-3 bg-secondary rounded-md shadow text-white my-2">
+		<div v-if="disks.length < 1 && disksLoaded == true" class="grid grid-flow-col grid-cols-3 bg-well rounded-md shadow text-default my-2">
 			<div class="p-2 flex justify-center">
-				<span class="font-semibold text-lg">No Disks Found</span>
+				<span class="font-semibold text-lg mt-1">No Disks Found</span>
 			</div>
 			<div class="p-2 flex justify-end">
 				<button class="btn btn-primary" @click="refreshDiskData">
