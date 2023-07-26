@@ -1,6 +1,6 @@
 <template>
-	<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 overflow-auto sm:rounded-lg bg-accent rounded-md border border-default">
-
+	<div class="min-w-full max-h-screen overflow-y-auto py-2 align-middle sm:px-6 lg:px-8 sm:rounded-lg bg-accent rounded-md border border-default">
+		<!-- Pools summary -->
 		<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Pools</span>
@@ -20,24 +20,40 @@
 				</button>
 			</div>
 		</div>
+
+		<!-- pools summary loading spinner -->
 		<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
-			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 		</div>
-		<div v-if="pools.length < 1 && poolsLoaded == true">
-			<div class="p-2 flex justify-center">
+
+		<!-- no pools found -->
+		<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3">
+			<!-- <div class="p-2 -ml-1 flex justify-start">
+				<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
+			</div> -->
+			<div class="p-2 flex justify-center col-start-2">
 				<span class="font-semibold text-lg">No Pools Found</span>
+			</div>
+			<div class="p-2 flex justify-end col-start-3">
+				<button class="btn btn-secondary" @click="refreshAllData">
+					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
+				</button>
 			</div>
 		</div>
 
+		<!-- pools card layout -->
 		<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(pool, index) in pools" :key="index">
 				<DashPoolCard :pool="pools[index]!"/>
 			</div>
 		</div>
+
+		<!-- pools card loading skeleton -->
 		<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
 			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 		</div>
 
+		<!-- disks summary -->
 		<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Disks</span>
@@ -66,24 +82,40 @@
 				</button>
 			</div>
 		</div>
+
+		<!-- disks summary loading spinner -->
 		<div v-if="disks.length < 1 && disksLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
-			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
+			<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 		</div>
-		<div v-if="disks.length < 1 && disksLoaded == true">
+
+		<!-- no disks found -->
+		<div v-if="disks.length < 1 && disksLoaded == true" class="flex justify-between">
 			<div class="p-2 flex justify-center">
 				<span class="font-semibold text-lg">No Disks Found</span>
 			</div>
+			<div class="p-2 flex justify-end">
+				<button class="btn btn-secondary" @click="refreshDiskData">
+					<ArrowPathIcon class="h-5 w-5" aria-hidden="true"/>
+				</button>
+			</div>
 		</div>
 
+		<!-- disk card layout -->
 		<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-cols-4 auto-rows-max gap-2">
 			<div v-for="(disk, index) in disks" :key="index">
 				<DashDiskCard :disk="disks[index]!"/>
 			</div>
 		</div>
+
+		<!-- disk card loading skeleton -->
 		<div v-if="disks.length < 1 && disksLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
 			<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 		</div>
 	</div>
+
+	<!-- <div v-if="showWizard">
+		<CreatePool @close="showWizard = false"/>
+	</div> -->
 
 </template>
 
@@ -91,6 +123,7 @@
 import {computed, ref, Ref, inject, provide} from 'vue';
 import { loadDisks, loadDisksThenPools } from '../../scripts/loadData';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+// import CreatePool from '../wizard-components/CreatePool.vue';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
 import DashboardLoadingSkeleton from './DashboardLoadingSkeleton.vue';
@@ -122,6 +155,16 @@ async function refreshDiskData() {
 	disksLoaded.value = true;
 }
 
+// const showWizard = ref(false);
+
+// //create new pool button
+// function newPoolWizardBtn() {
+// 	if (!showWizard.value) {
+// 		showWizard.value = true;	
+// 	} else {
+// 		showWizard.value = false;
+// 	}
+// }
 
 //determine total effective space of pools
 const totalEffectivePoolSpace = computed(() => {
