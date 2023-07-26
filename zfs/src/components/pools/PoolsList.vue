@@ -9,10 +9,13 @@
 
 		<div class="mt-8 overflow-visible">
 			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
-				<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+				<div class="overflow-auto ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 					<table class="min-w-full divide-y divide-default bg-accent">
 						<thead>
 							<tr class="rounded-md">
+								<th class="relative px-3 py-3.5">
+									<span class="sr-only"></span>
+								</th>
 								<th class="px-6 py-3.5 font-semibold text-default">Name</th>
 								<th class="px-6 py-3.5 font-semibold text-default">Status</th>
 								<th class="px-6 py-3.5 font-semibold text-default">Used (%)</th>
@@ -27,10 +30,10 @@
 					</table>
 					
 					<div v-if="poolData.length > 0 && poolsLoaded == true">
-						<Accordion :isOpen="false" class="divide-y divide-default bg-default ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="poolIdx">
+						<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="poolIdx">
 							<template v-slot:title>
-								<div class="grid grid-cols-7 grid-flow-cols w-full hover:border-default hover:border-2">
-									<div class="px-3 py-4">{{  poolData[poolIdx].name }}</div>
+								<div class="grid grid-cols-7 grid-flow-cols w-full rounded-md">
+									<div class="pl-6 py-4">{{  poolData[poolIdx].name }}</div>
 									<div class="px-3 py-4">{{  poolData[poolIdx].status }}</div>
 									<div class="px-3 py-4">
 										<div class="w-full bg-well rounded-full text-center">
@@ -87,14 +90,15 @@
 								
 							</template>
 							<template v-slot:content>
-								<table class="table-auto min-w-full divide-y divide-default">
-									<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="indent-14 bg-well">
+								<table class="table-auto min-w-full divide-y divide-default rounded-md">
+									<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="indent-14 bg-well rounded-md">
 										<td colspan="7" class="ml-5">{{ vDev.name }}</td>
 									</tr>
-									<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" >
+									<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="rounded-md">
 										<td colspan="7" class="ml-7">
-											<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-accent">
+											<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-accent rounded-md">
 												<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-default">Name</th>
+												<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Type</th>
 												<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Status</th>
 												<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used (%)</th>
 												<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used</th>
@@ -105,6 +109,7 @@
 												</th>
 												<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-16 bg-well">
 													<td>{{ disk.name }}</td>
+													<td>{{ vDev.type }}</td>
 													<td>{{ disk.status }}</td>
 													<td>
 														

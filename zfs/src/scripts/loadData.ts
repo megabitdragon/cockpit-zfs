@@ -44,8 +44,8 @@ export async function loadDisksThenPools(disks, pools) {
 		// console.log("Disk:");
 		// console.log(disk);
 		}
-		// console.log("Disks:");
-		// console.log(disks);
+		console.log("Disks:");
+		console.log(disks);
 
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
@@ -57,12 +57,12 @@ export async function loadDisksThenPools(disks, pools) {
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
 				//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
-				parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-				parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-				parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-				parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-				parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
-				parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks));
+				parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'data'));
+				parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'cache'));
+				parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'dedup'));
+				parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'log'));
+				parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'spare'));
+				parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'special'));
 				
 				//adds pool data from JSON into pool data object, pushes into array 
 				const poolData = {
@@ -83,8 +83,8 @@ export async function loadDisksThenPools(disks, pools) {
 				
 				pools.value.push(poolData);
 
-				// console.log("poolData:");
-				// console.log(poolData);
+				console.log("poolData:");
+				console.log(poolData);
 				vDevs.value = [];
 			}
 		} catch (error) {
@@ -186,7 +186,7 @@ export async function loadDisks(disks) {
 }
 
 //method for parsing through VDevs to add to array (VDev array is added to Pool)
-export function parseVDevData(vDev, poolName, disks) {
+export function parseVDevData(vDev, poolName, disks, vDevType) {
 	const vDevData : vDevData = {
 		name: vDev.name,
 		type: vDev.type,
@@ -222,12 +222,12 @@ export function parseVDevData(vDev, poolName, disks) {
 			vDevName: vDev.name,
 			poolName: poolName,
 		}
-		
+		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
 		//console.log("Not A ChildDisk:");
 		//console.log(notAChildDisk);
-		//console.log("vDevData after not a child:");
-		//console.log(vDevData);
+		console.log("vDevData after not a child:");
+		console.log(vDevData);
 		vDevs.value.push(vDevData);
 	} else {
 		//if VDev does have child disks, add those disks to the VDev data object + array
