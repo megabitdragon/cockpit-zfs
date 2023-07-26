@@ -558,22 +558,37 @@ function isBoolCompression(bool : boolean) {
 }
 
 const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
+const newVDevs = ref<newVDevData[]>([]);
 const newVDevDisks = ref<string[]>([]);
 
 function fillNewPoolData() {
-	newPoolData.value.name = poolConfig.value.name;
-	newPoolData.value.vdevtype = poolConfig.value.vdevs[0].type;
+	// console.log("poolConfig");
+	// console.log(poolConfig);
 
-	console.log(poolConfig.value.vdevs[0].disks);
-	poolConfig.value.vdevs[0].selectedDisks.forEach(disk => 
-		newPoolData.value.disks.push(disk)
-	);
+	newPoolData.value.name = poolConfig.value.name;
+	poolConfig.value.vdevs.forEach(vDev => {
+		const newVDev : newVDevData = {
+			type: '',
+			disks: [],
+		}
+		newVDev.type = vDev.type;
+		vDev.selectedDisks.forEach(disk => {
+			newVDevDisks.value.push(disk);
+		});
+		newVDev.disks = newVDevDisks.value;
+		newVDevDisks.value = [];
+		newVDevs.value.push(newVDev);
+	});
+	newPoolData.value.vdevs = newVDevs.value;
 	newPoolData.value.autoexpand = isBoolOnOff(poolConfig.value.settings!.autoTrim);
 	newPoolData.value.autoreplace = isBoolOnOff(poolConfig.value.settings!.autoReplace)
 	newPoolData.value.autotrim = isBoolOnOff(poolConfig.value.settings!.autoTrim)
 	newPoolData.value.compression = isBoolCompression(poolConfig.value.settings!.compression);
 	newPoolData.value.recordsize = convertSizeToBytes(poolConfig.value.settings!.record);
 	newPoolData.value.dedup = isBoolOnOff(poolConfig.value.settings!.deduplication)
+
+	// console.log("newPoolData");
+	// console.log(newPoolData);
 }
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;

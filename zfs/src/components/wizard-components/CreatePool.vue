@@ -116,8 +116,7 @@ const poolConfig = ref<PoolData>({
 
 const newPoolData = ref<newPoolData>({
 	name: '',
-	vdevtype: 'mirror',
-	disks: [],
+	vdevs : [],
 	autoexpand: '',
 	autoreplace: '',
 	autotrim: '',

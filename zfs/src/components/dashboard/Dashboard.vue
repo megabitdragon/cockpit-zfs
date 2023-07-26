@@ -1,7 +1,7 @@
 <template>
 	<div class="min-w-full max-w-full max-h-full py-2 align-middle sm:px-6 lg:px-8 sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- Pools summary -->
-		<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-secondary rounded-md shadow text-white">
+		<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-secondary rounded-md shadow text-white my-2">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Pools</span>
 			</div>
@@ -27,7 +27,7 @@
 		</div>
 
 		<!-- no pools found -->
-		<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3 bg-secondary rounded-md shadow text-white">
+		<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3 bg-secondary rounded-md shadow text-white my-2">
 			<!-- <div class="p-2 -ml-1 flex justify-start">
 				<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
 			</div> -->
@@ -54,7 +54,7 @@
 		</div>
 
 		<!-- disks summary -->
-		<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-secondary rounded-md shadow text-white">
+		<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-secondary rounded-md shadow text-white my-2">
 			<div class="p-2">
 				<span class="font-semibold text-lg">Disks</span>
 			</div>
@@ -89,7 +89,7 @@
 		</div>
 
 		<!-- no disks found -->
-		<div v-if="disks.length < 1 && disksLoaded == true" class="grid grid-flow-col grid-cols-3 bg-secondary rounded-md shadow text-white">
+		<div v-if="disks.length < 1 && disksLoaded == true" class="grid grid-flow-col grid-cols-3 bg-secondary rounded-md shadow text-white my-2">
 			<div class="p-2 flex justify-center">
 				<span class="font-semibold text-lg">No Disks Found</span>
 			</div>

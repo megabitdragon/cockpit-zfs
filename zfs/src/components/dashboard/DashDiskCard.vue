@@ -1,5 +1,5 @@
 <template>
-	<Card class="mt-2 mb-4 overflow-visible bg-plugin-header rounded-md border border-default">
+	<Card class="overflow-visible bg-plugin-header rounded-md border border-default">
 		<template v-slot:title>
 			<div class="flex flex-row justify-between">
 				<div class="pr-2 text-default">

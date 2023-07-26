@@ -44,14 +44,18 @@ interface PoolData {
 //pool object for creating new pool command
 interface newPoolData {
   name: string;
-  vdevtype: string;
-  disks: string[];
+  vdevs: newVDevData[];
   autoexpand: string;
   autoreplace: string;
   autotrim: string;
   compression: string;
   recordsize: number;
   dedup: string;
+}
+
+interface newVDevData {
+  type: string;
+  disks: string[];
 }
 
 //object for vdev
