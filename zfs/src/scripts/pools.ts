@@ -32,29 +32,61 @@ export async function getPools() {
 // }
 
 const newPoolDisks = ref<string[]>([]);
+const newVDevs = ref<newVDevData[]>([]);
+const newVDevData = ref<newVDevData>({
+	type: '',
+	disks: [],
+});
 
 export async function newPool(pool: newPoolData) {
 	try {
+		newVDevs.value = [];
+		newPoolDisks.value = [];
 
 		let cmdString = ['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
 			'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
 			'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name];
 
-		pool.vdevs.forEach(vDev => {
-			if (vDev.type == 'disk') {
-				vDev.disks.forEach(disk => {
-					cmdString.push(disk);
-				});
-				// cmdString.push(...newPoolDisks.value);
-			} else {
+		if (pool.vdevs[0].type != 'disk') {
+			pool.vdevs.forEach(vDev => {
 				cmdString.push(vDev.type);
 				vDev.disks.forEach(disk => {
 					cmdString.push(disk);
 				});
+			});
+			
+		} else {
+			pool.vdevs.forEach(vDev => {
+				if (vDev.type == 'disk') {
+					vDev.disks.forEach(disk => {
+						if (!newPoolDisks.value.includes(disk)) {
+							newPoolDisks.value.push(disk);
+						}
+					});
+				} else if (vDev.type == 'cache' || vDev.type == 'log' || vDev.type == 'special' || vDev.type == 'spare' || vDev.type == 'dedup') {
+					newVDevData.value.type = vDev.type;
+					vDev.disks.forEach(disk => {
+						newVDevData.value.disks.push(disk);
+					});
+					newVDevs.value.push(newVDevData.value);
+					newVDevData.value = {type: '', disks: []};
+				}
+			});
+
+			if (newPoolDisks.value.length > 0) {
+				cmdString.push(...newPoolDisks.value);
+				if (newVDevs.value.length > 0) {
+					newVDevs.value.forEach(vDev => {
+						cmdString.push(vDev.type);
+						cmdString.push(...vDev.disks);
+					});
+				}
 			}
-		});
+		}
+		
 		console.log("cmdString");
 		console.log(cmdString);
+		
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
 		console.log(output)
