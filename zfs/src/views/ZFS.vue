@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="w-full h-full px-8 bg-default text-default py-8">
+		<div class="w-full h-full overflow-visible px-8 bg-default text-default">
 
 			<div v-if="props.tag === 'dashboard'" class="p-4">
 			   <Dashboard />

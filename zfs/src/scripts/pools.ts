@@ -49,6 +49,8 @@ export async function newPool(pool: newPoolData) {
 		
 			const output = await state.promise();
 			console.log(output)
+			newPoolDisks.value = [];
+
 			return output.stdout;
 			
 		} else {

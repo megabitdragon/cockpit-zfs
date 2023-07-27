@@ -22,7 +22,7 @@
 								<MenuItem v-slot="{ active }">
 									<a href="#" @click="showDetails(props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Disk Details</a>
 								</MenuItem>
-								<MenuItem v-slot="{ active }">
+								<!-- <MenuItem v-slot="{ active }">
 									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
@@ -36,7 +36,7 @@
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
 									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
-								</MenuItem>
+								</MenuItem> -->
 								<MenuItem v-slot="{ active }">
 									<a href="#" @click="clearPartAndRefreshDisks(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Partitions</a>
 								</MenuItem>
