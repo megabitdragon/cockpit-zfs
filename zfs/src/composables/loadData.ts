@@ -70,11 +70,11 @@ export async function loadDisksThenPools(disks, pools) {
 					status: parsedJSON[i].status,
 					guid: parsedJSON[i].guid,
 					properties: {
-					rawsize: parsedJSON[i].properties.size.parsed,
-					size: convertBytesToSize(parsedJSON[i].properties.size.parsed),
-					allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
-					capacity: parsedJSON[i].properties.capacity.rawvalue,
-					free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
+						rawsize: parsedJSON[i].properties.size.parsed,
+						size: convertBytesToSize(parsedJSON[i].properties.size.parsed),
+						allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
+						capacity: parsedJSON[i].properties.capacity.rawvalue,
+						free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
 					},
 					//adds VDev array to Pool data object
 					vdevs: vDevs.value,
@@ -83,10 +83,13 @@ export async function loadDisksThenPools(disks, pools) {
 				
 				pools.value.push(poolData);
 
-				console.log("poolData:");
-				console.log(poolData);
+				// console.log("poolData:");
+				// console.log(poolData);
 				vDevs.value = [];
 			}
+
+			console.log("Pools:");
+			console.log(pools);
 		} catch (error) {
 			// Handle any errors that may occur during the asynchronous operation
 			console.error("An error occurred getting pools:", error);
@@ -224,10 +227,10 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		}
 		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
-		//console.log("Not A ChildDisk:");
-		//console.log(notAChildDisk);
-		// console.log("vDevData after not a child:");
-		// console.log(vDevData);
+		console.log("Not A ChildDisk:");
+		console.log(notAChildDisk);
+		console.log("vDevData after not a child:");
+		console.log(vDevData);
 		vDevs.value.push(vDevData);
 	} else {
 		//if VDev does have child disks, add those disks to the VDev data object + array
@@ -261,11 +264,22 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 
 		});
 	
-		//console.log("vDevData:");
-		//console.log(vDevData);
+		console.log("vDevData:");
+		console.log(vDevData);
 		vDevs.value.push(vDevData);
 	}
 }
+
+// export async function getDiskParentInfo(pools, disks) {
+// 	pools.forEach(pool => {
+// 		pool.vdevs.forEach(vDev => {
+// 			vDev.disks.forEach(disk => {
+// 				const diskData = disks.value.find(disk2 => disk2.name === disk.name)!;
+// 			});
+// 		});
+// 	});
+// }
+
 
 //convert raw bytes to readable data size
 const convertBytesToSize = (bytes) => {
