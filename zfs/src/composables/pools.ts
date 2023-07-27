@@ -1,7 +1,7 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 // @ts-ignore
-import get_pools_script from "./get-pools.py?raw";
+import get_pools_script from "../scripts/get-pools.py?raw";
 // @ts-ignore
 import create_pools_script from "./create-pool.py?raw";
 

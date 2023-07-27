@@ -32,8 +32,8 @@ import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
-import { newPool } from "../../scripts/pools";
-import { loadDisksThenPools } from '../../scripts/loadData';
+import { newPool } from "../../composables/pools";
+import { loadDisksThenPools } from '../../composables/loadData';
 
 const show = ref(true);
 const navTag = ref('name-entry');

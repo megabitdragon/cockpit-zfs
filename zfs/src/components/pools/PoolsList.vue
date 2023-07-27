@@ -204,8 +204,8 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { destroyPool } from "../../scripts/pools";
-import { loadDisksThenPools } from '../../scripts/loadData';
+import { destroyPool } from "../../composables/pools";
+import { loadDisksThenPools } from '../../composables/loadData';
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 

@@ -1,6 +1,6 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
 // @ts-ignore
-import script_py from "./get-disks.py?raw";
+import script_py from "../scripts/get-disks.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 

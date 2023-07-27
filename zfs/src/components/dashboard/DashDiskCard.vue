@@ -89,8 +89,8 @@
 import { reactive, ref, computed, provide, inject, Ref } from 'vue';
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadDisks, loadDatasets, loadDisksThenPools } from '../../scripts/loadData';
-import { clearPartitions } from "../../scripts/disks";
+import { loadDisks, loadDatasets, loadDisksThenPools } from '../../composables/loadData';
+import { clearPartitions } from "../../composables/disks";
 import DiskDetail from '../pools/DiskDetail.vue';
 import Card from '../common/Card.vue';
 

@@ -66,8 +66,8 @@
 import { reactive, ref, inject, Ref, computed, provide } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { loadSnapshots, loadDatasets } from '../../scripts/loadData';
-import { getSnapshots } from '../../scripts/snapshots';
+import { loadSnapshots, loadDatasets } from '../../composables/loadData';
+import { getSnapshots } from '../../composables/snapshots';
 
 const datasets = inject<Ref<Dataset[]>>('datasets')!;
 

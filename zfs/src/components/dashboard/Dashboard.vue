@@ -116,7 +116,7 @@
 
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
-import { loadDisks, loadDisksThenPools } from '../../scripts/loadData';
+import { loadDisks, loadDisksThenPools } from '../../composables/loadData';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 // import CreatePool from '../wizard-components/CreatePool.vue';
 import DashPoolCard from "./DashPoolCard.vue";
@@ -131,7 +131,7 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
 //get all disks in use by pools
-// const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
+const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;

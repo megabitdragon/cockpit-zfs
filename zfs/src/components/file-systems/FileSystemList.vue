@@ -122,7 +122,7 @@
 import { ref, inject, Ref, provide } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadDatasets } from "../../scripts/loadData";
+import { loadDatasets } from "../../composables/loadData";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import NewFSWIzard from "./NewFSWIzard.vue";
 

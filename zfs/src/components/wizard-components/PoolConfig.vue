@@ -28,7 +28,7 @@
 						<option v-if="vDevIdx !== 0" value="log">Log</option> 
 						<option v-if="vDevIdx !== 0 && poolConfig.vdevs[0].type == 'disk'" value="special">Special</option>
 						<option v-if="vDevIdx !== 0" value="spare">Spare</option>
-						<option v-if="vDevIdx !== 0" value="dedup">Dedup</option>
+						<option v-if="vDevIdx !== 0 && poolConfig.vdevs[0].type == 'disk'" value="dedup">Dedup</option>
 					</select>
 				</div>
 

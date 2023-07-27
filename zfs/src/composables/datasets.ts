@@ -1,6 +1,6 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
 // @ts-ignore
-import get_datasets_script from "./get-datasets.py?raw";
+import get_datasets_script from "../scripts/get-datasets.py?raw";
 
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]

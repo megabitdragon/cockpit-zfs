@@ -31,7 +31,7 @@ import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
-import { loadDisksThenPools, loadDatasets } from '../scripts/loadData';
+import { loadDisksThenPools, loadDatasets } from '../composables/loadData';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
 
 interface ZFSProps {
@@ -60,14 +60,15 @@ async function initialLoad(disks, pools, datasets) {
 initialLoad(disks, pools, datasets);
 
 //get all disks in use by pools
-// const disksInPools = computed<DiskData[]>(() => {
-// 	return disks.value.filter(disk => disk.usable === false);
-// });
+const disksInPools = computed<DiskData[]>(() => {
+	return disks.value.filter(disk => disk.usable === false);
+});
 
 //provide data for other components to inject
 provide("pools", pools);
 provide("disks", disks);
 provide("datasets", datasets);
+provide("disks-in-pools", disksInPools);
 provide('disks-loaded', disksLoaded);
 provide('pools-loaded', poolsLoaded);
 </script>

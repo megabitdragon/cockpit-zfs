@@ -104,7 +104,6 @@ import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
-import Navigation from '../common/Navigation.vue';
 
 interface DiskDetailsProps {
   disk: DiskData;
