@@ -35,42 +35,30 @@ const newPoolDisks = ref<string[]>([]);
 
 export async function newPool(pool: newPoolData) {
 	try {
-		if (pool.vdevs[0].type == 'disk') {
 
-			pool.vdevs.forEach(vDev => {
-				vDev.disks.forEach(disk => {
-					newPoolDisks.value.push(disk);
-				});
-			});
-
-			const state = useSpawn(['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
-			'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
-			'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name, ...newPoolDisks.value]);
-		
-			const output = await state.promise();
-			console.log(output)
-			newPoolDisks.value = [];
-
-			return output.stdout;
-			
-		} else {
-	
-			let cmdString = ['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
+		let cmdString = ['zpool', 'create', '-o', 'ashift=12', '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
 			'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
 			'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name];
 
-			pool.vdevs.forEach(vDev => {
+		pool.vdevs.forEach(vDev => {
+			if (vDev.type == 'disk') {
+				vDev.disks.forEach(disk => {
+					cmdString.push(disk);
+				});
+				// cmdString.push(...newPoolDisks.value);
+			} else {
 				cmdString.push(vDev.type);
 				vDev.disks.forEach(disk => {
 					cmdString.push(disk);
 				});
-			});
-
-			const state = useSpawn(cmdString);
-			const output = await state.promise();
-			console.log(output)
-			return output.stdout;
-		}
+			}
+		});
+		console.log("cmdString");
+		console.log(cmdString);
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
 	
 	} catch (state) {
 		console.error(errorString(state));
