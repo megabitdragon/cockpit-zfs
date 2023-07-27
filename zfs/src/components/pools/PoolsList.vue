@@ -9,7 +9,7 @@
 
 		<div class="mt-8 overflow-visible">
 			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
-				<div class="overflow-auto ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
+				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 					<table class="min-w-full divide-y divide-default bg-accent">
 						<thead>
 							<tr class="rounded-md">
