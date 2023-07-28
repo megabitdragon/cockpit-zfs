@@ -11,7 +11,7 @@
 				</div>
 
 				<div class="mt-2 col-span-2 col-start-3 row-start-1">
-					<p class="text-lg">Member of *VDev* in *PoolName*</p>
+					<p class="text-lg">Member of pool: '{{props.disk.poolName}}'</p>
 					<p class="text-lg">Health: <span class="text-green-700">{{ props.disk.status }}</span></p>
 					<p class="text-sm">Errors: None currently detected - {{ getTimestampString }}</p>
 				</div>
@@ -60,7 +60,7 @@
 				</div>
 
 				<div class="mt-2 col-span-2 col-start-3 row-start-1">
-					<p class="text-lg">Member of *VDev* in *PoolName*</p>
+					<p class="text-lg">Member of pool: '{{props.disk.poolName}}'</p>
 					<p class="text-lg">Health: <span class="text-green-700">{{ props.disk.status }}</span></p>
 					<p class="text-sm">Errors: None currently detected - {{ getTimestampString }}</p>
 				</div>

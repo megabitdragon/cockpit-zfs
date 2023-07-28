@@ -114,6 +114,7 @@ const showDiskDetails = ref(false);
 
 const selectedDisk = ref<DiskData>();
 
+const pools = inject<Ref<PoolData[]>>('pools')!;
 const disks = inject<Ref<DiskData[]>>('disks')!; 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 
@@ -122,9 +123,24 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 
 //method to show Disk details when button is clicked
 function showDetails(disk) {
+	getDiskFromPool(disk);
 	selectedDisk.value = disk;
 	console.log(selectedDisk);
 	showDiskDetails.value = true;
+}
+
+function getDiskFromPool(disk) {
+  pools.value.some((pool) => {
+    return pool.vdevs.some((vDev) => {
+      return vDev.disks.some((vDisk) => {
+        if (vDisk.name === disk.name) {
+          disk.poolName = vDisk.poolName;
+          disk.vDevName = vDisk.vDevName;
+          return true; // To break the loop once a matching disk is found
+        }
+      });
+    });
+  });
 }
 
 async function clearPartAndRefreshDisks(disk) {

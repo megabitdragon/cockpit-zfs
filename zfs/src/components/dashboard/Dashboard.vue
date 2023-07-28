@@ -52,7 +52,7 @@
 			
 			</div>
 		</div>
-		<div name="disks">
+		<div name="disks" class="">
 			<!-- disks summary -->
 			<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2">
 				<div class="p-2 flex justify-start mt-0.5">

@@ -138,6 +138,8 @@ export async function loadDatasets(datasets) {
 			}
 
 			datasets.value.push(dataset);
+			console.log("Datasets");
+			console.log(datasets);
 		}
 
 	} catch (error) {
@@ -179,8 +181,8 @@ export async function loadDisks(disks) {
 			// console.log("Disk:");
 			// console.log(disk);
 		}
-		// console.log("Disks:");
-		// console.log(disks);
+		console.log("Disks:");
+		console.log(disks);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
@@ -229,8 +231,8 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		vDevData.disks.push(notAChildDisk);
 		// console.log("Not A ChildDisk:");
 		// console.log(notAChildDisk);
-		// console.log("vDevData after not a child:");
-		// console.log(vDevData);
+		console.log("vDevData (disk device):");
+		console.log(vDevData);
 		vDevs.value.push(vDevData);
 	} else {
 		//if VDev does have child disks, add those disks to the VDev data object + array
@@ -279,7 +281,6 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 // 		});
 // 	});
 // }
-
 
 //convert raw bytes to readable data size
 const convertBytesToSize = (bytes) => {
