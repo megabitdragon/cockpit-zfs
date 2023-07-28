@@ -23,96 +23,118 @@
 						<option v-if="vDevIdx === 0" value="raidz1">RaidZ1</option>
 						<option v-if="vDevIdx === 0" value="raidz2">RaidZ2</option>
 						<option v-if="vDevIdx === 0" value="raidz3">RaidZ3</option>
-						<option v-if="vDevIdx !== 0" :value="poolConfig.vdevs[0].type">{{poolConfig.vdevs[0].type}}</option>
+						<option v-if="vDevIdx !== 0" :value="poolConfig.vdevs[0].type">{{upperCaseWord(poolConfig.vdevs[vDevIdx].type)}}</option>
 						<option v-if="vDevIdx !== 0" value="cache">Cache</option>
 						<option v-if="vDevIdx !== 0" value="log">Log</option> 
-						<option v-if="vDevIdx !== 0 && poolConfig.vdevs[0].type == 'disk'" value="special">Special</option>
+						<option v-if="vDevIdx !== 0" value="special">Special</option>
 						<option v-if="vDevIdx !== 0" value="spare">Spare</option>
-						<option v-if="vDevIdx !== 0 && poolConfig.vdevs[0].type == 'disk'" value="dedup">Dedup</option>
+						<option v-if="vDevIdx !== 0" value="dedup">Dedup</option>
 					</select>
 				</div>
 
-					<!-- If (Log, Special) -->
-					<!-- If secondary VDev is LOG or SPECIAL, have option for them to be MIRROR also -->
-				<!-- <div v-if="poolConfig.vdevs[vDevIdx].type == 'log' || poolConfig.vdevs[vDevIdx].type == 'special'">
-					<label :for="getIdKey('mirror-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">{{ poolConfig.vdevs[vDevIdx].type }} (Mirror)</label>
-					<Switch v-model="isMirror" :class="[isMirror ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+				<!-- If (Log, Special, Dedup) -->
+				<!-- If secondary VDev is LOG or SPECIAL or DEDUP, have option for them to be MIRROR also -->
+				<!-- If Primary VDev is MIRROR or RAIDZ(x) then SPECIAL and DEDUP must be MIRROR -->
+				<div v-if="poolConfig.vdevs[vDevIdx].type == 'log' || poolConfig.vdevs[vDevIdx].type == 'special' || poolConfig.vdevs[vDevIdx].type == 'dedup'">
+					<label :for="getIdKey('mirror-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">{{ upperCaseWord(poolConfig.vdevs[vDevIdx].type) }} (Mirror)</label>
+
+					<Switch v-model="poolConfig.vdevs[vDevIdx].isMirror" :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 						<span class="sr-only">Use setting</span>
-						<span :class="[isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-							<span :class="[isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+						<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
 								<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 									<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 								</svg>
 							</span>
-							<span :class="[isMirror ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+							<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
 								<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 									<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 								</svg>
 							</span>
 						</span>
 					</Switch>
-					</div> -->
+				</div>
 
-					<!-- Disk ID (Select) -->
-					<!-- Select option for sorting/displaying disks by BLOCK DEVICE, DISK NAME, HARDWARE PATH, or DEVICE ALIAS -->
+				<!-- Disk ID (Select) -->
+				<!-- Select option for sorting/displaying disks by BLOCK DEVICE, DISK NAME, HARDWARE PATH, or DEVICE ALIAS -->
 				<!-- <div>
 					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
-						<select id="disk-identifier" name="disk-identifier" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option>Block Device</option>
-							<option>Disk</option>
-							<option>Hardware Path</option>
-							<option>Device Alias</option>
-						</select>
-					</div> -->
+					<select id="disk-identifier" name="disk-identifier" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<option>Block Device</option>
+						<option>Disk</option>
+						<option>Hardware Path</option>
+						<option>Device Alias</option>
+					</select>
+				</div> -->
 
-					<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
-					<label :for="getIdKey('available-disk-list')" class="block text-sm font-medium leading-6 text-default">Select Disks</label>
-					<ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-						<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="col-span-1 divide-y divide-default rounded-lg bg-default shadow">
-							<div class="flex w-full h-full border border-default rounded">
-								<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-default"> 
-									<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
-									<!-- <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span> -->
-									<p class="mt-1 truncate text-sm text-muted">{{ disk.type }}</p>
-									<p class="mt-1 truncate text-sm text-muted">Serial #: {{ disk.serial }}</p>
-									<p class="mt-1 truncate text-sm text-muted">{{ disk.sd_path }}</p> 
-									<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" @change="diskCheck" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
-									class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-								</label>  
-							</div>
-						</li>
-					</ul>
-					<p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
+				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
+				<label :for="getIdKey('available-disk-list')" class="block text-sm font-medium leading-6 text-default">Select Disks</label>
+				<ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="col-span-1 divide-y divide-default rounded-lg bg-default shadow">
+						<div class="flex w-full h-full border border-default rounded">
+							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-default"> 
+								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
+								<!-- <span class="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{{ disk.status }}</span> -->
+								<p class="mt-1 truncate text-sm text-muted">{{ disk.type }}</p>
+								<p class="mt-1 truncate text-sm text-muted">Serial #: {{ disk.serial }}</p>
+								<p class="mt-1 truncate text-sm text-muted">{{ disk.sd_path }}</p> 
+								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" @change="diskCheck" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
+								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
+							</label>  
+						</div>
+					</li>
+				</ul>
+				<p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
 
-					<!-- <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div> -->
+				<!-- <div><span><p>VDev Disks: {{ poolConfig.vdevs[vDevIdx].disks }}</p></span></div> -->
 
-					<!-- Forcefully Add Virtual Device (Toggle) -->
-					<div>
-						<label :for="getIdKey('forcefully-add-vdev')" class="mt-1 block text-sm font-medium leading-6 text-default">Forcefully Add Virtual Device</label>
-						<Switch :id="getIdKey('forcefully-add-vdev')" v-model="poolConfig.vdevs[vDevIdx].forceAdd" :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-								<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-									</svg>
-								</span>
-								<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-									</svg>
-								</span>
+				<!-- Forcefully Add Virtual Device (Toggle) -->
+				<!-- <div>
+					<label :for="getIdKey('forcefully-add-vdev')" class="mt-1 block text-sm font-medium leading-6 text-default">Forcefully Add Virtual Device</label>
+					<Switch :id="getIdKey('forcefully-add-vdev')" v-model="poolConfig.vdevs[vDevIdx].forceAdd" :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<span class="sr-only">Use setting</span>
+						<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+								<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+									<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
 							</span>
-						</Switch>
-					</div>
-
-					<!-- buttons to add/remove vdevs -->
-					<div class="button-group-row mt-2">
-						<button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
-						<button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
-					</div>
+							<span :class="[poolConfig.vdevs[vDevIdx].forceAdd ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+								<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+									<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+								</svg>
+							</span>
+						</span>
+					</Switch>
+				</div> -->
+				<!-- Forcefully Create Pool (Toggle) -->
+				<div>
+					<label :for="getIdKey('forcefully-create-pool')" class="mt-1 block text-sm font-medium leading-6 text-default">Forcefully Create</label>
+					<Switch v-model="poolConfig.settings!.forceCreate" :class="[poolConfig.settings!.forceCreate ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<span class="sr-only">Use setting</span>
+						<span :class="[poolConfig.settings!.forceCreate ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+							<span :class="[poolConfig.settings!.forceCreate ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+								<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+									<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</span>
+							<span :class="[poolConfig.settings!.forceCreate ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+								<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+									<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+								</svg>
+							</span>
+						</span>
+					</Switch>
 				</div>
-			<!-- if user accidentally removes all vdevs, shows add vdev button to add another (would like to change this so its impossible to remove 1st vDev and ensure there is always at least 1) -->
+				<p class="text-danger" v-if="isProperReplicationFeedback">{{ isProperReplicationFeedback }}</p>
+
+				<!-- buttons to add/remove vdevs -->
+				<div class="button-group-row mt-2">
+					<button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
+					<button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
+				</div>
+			</div>
+				<!-- if user accidentally removes all vdevs, shows add vdev button to add another (would like to change this so its impossible to remove 1st vDev and ensure there is always at least 1) -->
 			<div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
 				<button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="initialVDev()">Add VDev</button>
 			</div>
@@ -269,25 +291,6 @@
 						</Switch>
 					</div>
 					
-					<!-- Forcefully Create Pool (Toggle) -->
-					<div>
-						<label :for="getIdKey('forcefully-create-pool')" class="mt-1 block text-sm font-medium leading-6 text-default">Forcefully Create Storage Pool</label>
-						<Switch v-model="poolConfig.settings!.forceCreate" :class="[poolConfig.settings!.forceCreate ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings!.forceCreate ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-								<span :class="[poolConfig.settings!.forceCreate ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-									</svg>
-								</span>
-								<span :class="[poolConfig.settings!.forceCreate ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-									</svg>
-								</span>
-							</span>
-						</Switch>
-					</div>
 				</template>
 			</Accordion>
 
@@ -344,15 +347,15 @@ const fileSystemConfiguration = ref();
 
 const disks = inject<Ref<DiskData[]>>('disks')!;
 
-//const isMirror = ref(false);
-
 const nameFeedback = ref('');
 const vDevFeedback = ref('');
 const diskFeedback = ref('');
+const isProperReplicationFeedback = ref('');
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection
 //This currently ties in to the disk selection UI elements and shows/hides the disks based on whether they are in use or not
-//would like to change this so instead of hiding the in-use disks completely, simply grey them out or disable them from selection for better UI/UX
+//would like to change this so instead of hiding the in-use disks completely, simply grey them out or disable them from selection for better UI/UX.
+//Also need to find a better way to determine if disk is "usable" or not
 const vDevAvailDisks = computed<DiskData[][]>(() => {
 	return poolConfig.value.vdevs.map((vdev, vdevIdx) => {
 		const claimed = poolConfig.value.vdevs
@@ -440,6 +443,30 @@ function nameExists() {
   });
 }
 
+const upperCaseWord = (word => {
+	let firstLetter  = word.charAt(0);
+	let remainingLetters = word.substring(1);
+	let firstLetterCap = firstLetter.toUpperCase();
+	return firstLetterCap + remainingLetters;
+});
+
+const replicationLevelCheck = () => {
+	let result = true;
+	isProperReplicationFeedback.value = '';
+
+	poolConfig.value.vdevs.forEach(vDev => {
+		if ((vDev.type == 'dedup' || vDev.type == 'special') && poolConfig.value.vdevs[0].type != 'disk' && !poolConfig.value.settings!.forceCreate && !vDev.isMirror) {
+			result = false;
+			isProperReplicationFeedback.value = 'Mismatched replication level. Forcefully create to override.';
+		} else if (vDev.isMirror && (vDev.type == 'special' || vDev.type == 'dedup') && vDev.selectedDisks.length < 2) {
+			result = false;
+			isProperReplicationFeedback.value = `Two or more Disks are required for Mirror (${upperCaseWord(vDev.type)}).`;
+		}
+	});
+
+	return result;
+}
+
 //method for validating disk selection per vdev type
 const diskCheck = () => {
 	let result = true;
@@ -501,7 +528,9 @@ const validateAndProceed = (tabTag: string): boolean => {
 	} else if (tabTag == 'virtual-devices') {
 		if (nameCheck()) {
 			if (vDevCheck()) {
-				return diskCheck();
+				if (diskCheck()) {
+					return replicationLevelCheck();
+				}
 			}
 		}
 	} else if (tabTag == 'pool-settings') {
@@ -572,6 +601,8 @@ function fillNewPoolData() {
 			disks: [],
 		}
 		newVDev.type = vDev.type;
+		//newVDev.forceAdd = vDev.forceAdd;
+		newVDev.isMirror = vDev.isMirror;
 		vDev.selectedDisks.forEach(disk => {
 			newVDevDisks.value.push(disk);
 		});
@@ -581,14 +612,15 @@ function fillNewPoolData() {
 	});
 	newPoolData.value.vdevs = newVDevs.value;
 	newPoolData.value.autoexpand = isBoolOnOff(poolConfig.value.settings!.autoTrim);
-	newPoolData.value.autoreplace = isBoolOnOff(poolConfig.value.settings!.autoReplace)
-	newPoolData.value.autotrim = isBoolOnOff(poolConfig.value.settings!.autoTrim)
+	newPoolData.value.autoreplace = isBoolOnOff(poolConfig.value.settings!.autoReplace);
+	newPoolData.value.autotrim = isBoolOnOff(poolConfig.value.settings!.autoTrim);
 	newPoolData.value.compression = isBoolCompression(poolConfig.value.settings!.compression);
 	newPoolData.value.recordsize = convertSizeToBytes(poolConfig.value.settings!.record);
-	newPoolData.value.dedup = isBoolOnOff(poolConfig.value.settings!.deduplication)
+	newPoolData.value.dedup = isBoolOnOff(poolConfig.value.settings!.deduplication);
+	newPoolData.value.forceCreate = poolConfig.value.settings!.forceCreate;
 
-	// console.log("newPoolData");
-	// console.log(newPoolData);
+	console.log("newPoolData");
+	console.log(newPoolData);
 }
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;

@@ -51,11 +51,14 @@ interface newPoolData {
   compression: string;
   recordsize: number;
   dedup: string;
+  forceCreate?: boolean;
 }
 
 interface newVDevData {
   type: string;
   disks: string[];
+  isMirror?: boolean;
+  // forceAdd?: boolean;
 }
 
 //object for vdev
@@ -67,8 +70,9 @@ interface vDevData {
   stats: {};
   disks: DiskData[];
   selectedDisks: string[];
-  forceAdd?: boolean;
+  //forceAdd?: boolean;
   poolName?: string;
+  isMirror?: boolean;
 }
 
 //object for disk
