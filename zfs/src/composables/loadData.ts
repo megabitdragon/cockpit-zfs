@@ -57,7 +57,7 @@ export async function loadDisksThenPools(disks, pools) {
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
 				//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
-				parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'disk'));
+				parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'data'));
 				parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'cache'));
 				parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'dedup'));
 				parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'log'));
@@ -192,7 +192,7 @@ export async function loadDisks(disks) {
 export function parseVDevData(vDev, poolName, disks, vDevType) {
 	const vDevData : vDevData = {
 		name: vDev.name,
-		type: vDev.type,
+		type: vDevType,
 		status: vDev.status,
 		stats: vDev.stats,
 		guid: vDev.guid,
@@ -209,7 +209,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			path: vDev.path,
 			guid: vDev.guid,
 			type: diskVDev.type,
-			status: vDev.status,
+			status: diskVDev.health,
 			stats: vDev.stats,
 			capacity: diskVDev.capacity,
 			model: diskVDev.model,
@@ -227,10 +227,10 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		}
 		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
-		console.log("Not A ChildDisk:");
-		console.log(notAChildDisk);
-		console.log("vDevData after not a child:");
-		console.log(vDevData);
+		// console.log("Not A ChildDisk:");
+		// console.log(notAChildDisk);
+		// console.log("vDevData after not a child:");
+		// console.log(vDevData);
 		vDevs.value.push(vDevData);
 	} else {
 		//if VDev does have child disks, add those disks to the VDev data object + array

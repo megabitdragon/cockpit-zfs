@@ -38,13 +38,14 @@
 					<div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
 						<Accordion :isOpen="true" class="ml-4">
 							<template v-slot:title>
-								<p class="text-default">{{poolConfig.vdevs[vDevIdx].type}}-{{ vDevIdx }} ({{ poolConfig.vdevs[vDevIdx].selectedDisks.length }} disks)</p>
+								<p class="text-default">{{poolConfig.vdevs[vDevIdx].name}} - ({{poolConfig.vdevs[vDevIdx].type}})</p>
+								<p class="text-default">({{ poolConfig.vdevs[vDevIdx].selectedDisks.length }} disks)</p>
 								</template>
 								<template v-slot:content>
 									<p class="ml-10 text-default">Type: {{poolConfig.vdevs[vDevIdx].type}}</p>
 
 								 <div v-for="(disk, diskIdx) in poolConfig.vdevs[vDevIdx].selectedDisks" :key="diskIdx">
-										<p class="ml-10 text-default">Disk {{ disk }} </p>
+										<p class="ml-10 text-default">{{ disk }} </p>
 
 									</div>
 
