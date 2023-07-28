@@ -16,12 +16,12 @@
 								<th class="relative px-3 py-3.5">
 									<span class="sr-only"></span>
 								</th>
-								<th class="px-6 py-3.5 font-semibold text-default">Name</th>
-								<th class="px-6 py-3.5 font-semibold text-default">Status</th>
-								<th class="px-6 py-3.5 font-semibold text-default">Used (%)</th>
-								<th class="px-6 py-3.5 font-semibold text-default">Used</th>
-								<th class="px-6 py-3.5 font-semibold text-default">Free</th>
-								<th class="px-6 py-3.5 font-semibold text-default">Total</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Name</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Status</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Used (%)</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Used</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Free</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Total</th>
 								<th class="relative px-3 py-3.5 sm:pr-6 lg:pr-8">
 									<span class="sr-only"></span>
 								</th>
@@ -33,7 +33,7 @@
 						<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="poolIdx">
 							<template v-slot:title>
 								<div class="grid grid-cols-7 grid-flow-cols w-full rounded-md">
-									<div class="pl-6 py-4">{{  poolData[poolIdx].name }}</div>
+									<div class="px-3 py-4">{{  poolData[poolIdx].name }}</div>
 									<div class="px-3 py-4">{{  poolData[poolIdx].status }}</div>
 									<div class="px-3 py-4">
 										<div class="w-full bg-well rounded-full text-center">
