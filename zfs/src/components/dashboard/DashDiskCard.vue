@@ -38,7 +38,7 @@
 									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
 								</MenuItem> -->
 								<MenuItem v-slot="{ active }">
-									<a href="#" @click="clearPartAndRefreshDisks(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Partitions</a>
+									<a href="#" @click="clearPartAndRefreshDisks(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">wipefs -a</a>
 								</MenuItem>
 							</div>
 						</MenuItems>

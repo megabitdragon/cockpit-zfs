@@ -272,16 +272,6 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	}
 }
 
-// export async function getDiskParentInfo(pools, disks) {
-// 	pools.forEach(pool => {
-// 		pool.vdevs.forEach(vDev => {
-// 			vDev.disks.forEach(disk => {
-// 				const diskData = disks.value.find(disk2 => disk2.name === disk.name)!;
-// 			});
-// 		});
-// 	});
-// }
-
 //convert raw bytes to readable data size
 const convertBytesToSize = (bytes) => {
 	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

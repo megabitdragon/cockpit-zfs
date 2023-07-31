@@ -26,9 +26,6 @@
 
 			<!-- no pools found -->
 			<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3 bg-well rounded-md shadow text-default my-2">
-				<!-- <div class="p-2 -ml-1 flex justify-start">
-					<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
-				</div> -->
 				<div class="p-2 flex justify-center col-start-2">
 					<span class="font-semibold text-lg mt-1">No Pools Found</span>
 				</div>
@@ -108,17 +105,12 @@
 		</div>
 	</div>
 
-	<!-- <div v-if="showWizard">
-		<CreatePool @close="showWizard = false"/>
-	</div> -->
-
 </template>
 
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
 import { loadDisks, loadDisksThenPools } from '../../composables/loadData';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
-// import CreatePool from '../wizard-components/CreatePool.vue';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
 import DashboardLoadingSkeleton from './DashboardLoadingSkeleton.vue';
@@ -149,17 +141,6 @@ async function refreshDiskData() {
 	await loadDisks(disks);
 	disksLoaded.value = true;
 }
-
-// const showWizard = ref(false);
-
-// //create new pool button
-// function newPoolWizardBtn() {
-// 	if (!showWizard.value) {
-// 		showWizard.value = true;	
-// 	} else {
-// 		showWizard.value = false;
-// 	}
-// }
 
 //determine total effective space of pools
 const totalEffectivePoolSpace = computed(() => {
