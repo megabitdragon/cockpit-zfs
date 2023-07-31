@@ -47,14 +47,17 @@ const datasets = ref<Dataset[]>([]);
 
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
+const fileSystemsLoaded = ref(false);
 
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
+	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
+	fileSystemsLoaded.value = true;
 }
 
 initialLoad(disks, pools, datasets);
@@ -70,6 +73,7 @@ provide("disks", disks);
 provide("datasets", datasets);
 provide("disks-in-pools", disksInPools);
 provide('disks-loaded', disksLoaded);
+provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
 </script>
 

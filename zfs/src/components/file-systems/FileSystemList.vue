@@ -2,11 +2,12 @@
 	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<div class="button-group-row">
 			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showFSWizard = true">Create File System</button>
-			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="" disabled ><ArrowPathIcon class="w-5 h-5"/></button>
+			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="refreshDatasets" ><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
 		<div class="mt-8 overflow-visible">
 			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
+
 				<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 					<table class="min-w-full divide-y divide-default bg-accent">
 						<thead>
@@ -27,15 +28,6 @@
 						</thead>
 
 						<tbody class="divide-y divide-x divide-default bg-default ring-1 ring-black ring-opacity-5">
-
-							<!-- <div v-if="fileSystems.length < 0" class="grid grid-cols-4 gap-2 justify-items-center">
-								<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4"/>
-							</div>
-							<div v-if="fileSystems.length < 1">
-								<div class="p-2 flex justify-center">
-									<span class="font-semibold text-lg">No Pools Found</span>
-								</div>
-							</div> -->
 							
 							<!-- FILE SYSTEMS BY POOLS -->
 							<tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
@@ -97,7 +89,7 @@
 														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+														<a href="#" @onClick="" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 													</MenuItem>
 												</div>
 											</MenuItems>
@@ -108,6 +100,15 @@
 						</tbody>
 					</table>
 				</div>
+
+
+				<div v-if="fileSystemsLoaded == false" class="p-2 flex justify-center bg-default">
+					<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
+				</div>
+				<div v-if="fileSystems.length < 1 && fileSystemsLoaded == true" class="p-2 flex bg-default justify-center">
+					<span class="font-semibold text-lg my-2">No Pools Found</span>
+				</div>
+
 			</div>
 		</div>
 	</div>
@@ -128,12 +129,16 @@ import NewFSWIzard from "./NewFSWIzard.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
-const fileSystems = inject<Dataset[]>('datasets')!;
+const fileSystems = inject<Ref<Dataset[]>>('datasets')!;
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const showFSWizard = ref(false);
 
-function refreshDatasets(fileSystems) {
-	loadDatasets(fileSystems);
+async function refreshDatasets() {
+	fileSystemsLoaded.value = false;
+	fileSystems.value = [];
+	await loadDatasets(fileSystems);
+	fileSystemsLoaded.value = true;
 }
 
 provide('show-fs-wizard', showFSWizard);
