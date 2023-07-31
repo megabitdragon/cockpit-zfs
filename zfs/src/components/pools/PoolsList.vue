@@ -94,11 +94,8 @@
 								<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md ring-1 ring-black ring-opacity-5" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
 									<template v-slot:title>
 										<div class="grid grid-cols-3 grid-flow-cols bg-well w-full rounded-l-sm">
-											<div class="text-center py-4">
-												{{ vDev.name }}
-											</div>
-											<div class="text-left py-4">
-												({{ vDev.type }})
+											<div class="col-start-2 text-center -mx-4 py-4">
+												{{ vDev.name }} ({{ vDev.type }})
 											</div>
 											<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 												<Menu as="div" class="relative inline-block text-right">

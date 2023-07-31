@@ -62,7 +62,7 @@ const fileSystemConfig = ref<FileSystemData>({
 	passphrase: '',
 	key_loaded: '',
 	type: '',
-	inherit: false,
+	inherit: true,
 	properties: {
 		accessTime: '',
 		caseSensitivity: '',
