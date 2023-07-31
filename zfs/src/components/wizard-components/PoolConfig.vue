@@ -56,13 +56,13 @@
 				</div>
 
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
-				<label :for="getIdKey('available-disk-list')" class="block text-sm font-medium leading-6 text-default">Select Disks</label>
+				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
 				<ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="col-span-1 divide-y divide-default rounded-lg bg-default shadow">
 						<div class="flex w-full h-full border border-default rounded">
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-default"> 
 								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
-								<p class="mt-1 truncate text-sm text-muted">{{ disk.sd_path }}</p> 
+								<p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p> 
 								<p class="mt-1 truncate text-sm text-muted">{{ disk.type }}</p>
 								<p class="mt-1 truncate text-sm text-muted">Capacity: {{ disk.capacity }}</p>
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
