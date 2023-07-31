@@ -278,7 +278,7 @@
 					<input :id="getIdKey('create-filesystem')" v-model="poolConfig.createFileSystem" aria-describedby="create-filesystem" name="create-filesystem" type="checkbox" class="h-4 w-4 rounded border-default text-primary focus:ring-slate-600" />
 				</div>
 			</div>
-			<FileSystem v-if="poolConfig.createFileSystem" ref="fileSystemConfiguration" idKey="file-system"/>
+			<FileSystem v-if="poolConfig.createFileSystem" ref="fileSystemConfiguration" idKey="file-system" :isStandalone="false"/>
 		</fieldset>
 	</div>
 

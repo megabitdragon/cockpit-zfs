@@ -9,6 +9,7 @@
 
 		<div class="mt-8 overflow-visible">
 			<div class="inline-block min-w-full min-h-full align-middle rounded-sm border border-default">
+
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 					<table class="min-w-full divide-y divide-default bg-accent">
 						<thead>
@@ -92,15 +93,43 @@
 							<template v-slot:content>
 								<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md ring-1 ring-black ring-opacity-5" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
 									<template v-slot:title>
-										<div class="bg-well w-full rounded-l-sm">
-											{{ vDev.name }} ({{ vDev.type }})
+										<div class="grid grid-cols-3 grid-flow-cols bg-well w-full rounded-l-sm">
+											<div class="text-center py-4">
+												{{ vDev.name }}
+											</div>
+											<div class="text-left py-4">
+												({{ vDev.type }})
+											</div>
+											<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+												<Menu as="div" class="relative inline-block text-right">
+													<div>
+														<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+															<span class="sr-only">Open options</span>
+															<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+														</MenuButton>
+													</div>
+
+													<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+														<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+															<div class="py-1">												
+																<MenuItem v-slot="{ active }">
+																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
+																</MenuItem>
+																<MenuItem v-slot="{ active }">
+																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
+																</MenuItem>
+															</div>
+														</MenuItems>
+													</transition>
+												</Menu>
+											</div>
 										</div>
 									</template>
 									<template v-slot:content>
-										<table class="table-auto min-w-full divide-y divide-default rounded-md">
-											<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="rounded-md">
+										<table class="table-auto min-w-full divide-y divide-default ">
+											<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="">
 												<td colspan="8" class="ml-7">
-													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-accent rounded-md">
+													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-accent ">
 														<th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-default">Name</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">State</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Reads</th>

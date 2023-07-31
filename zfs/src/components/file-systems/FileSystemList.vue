@@ -6,60 +6,47 @@
 		</div>
 
 		<div class="mt-8 overflow-visible">
-			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
+			<div class="inline-block min-w-full min-h-full align-middle rounded-sm border border-default">
 
-				<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 					<table class="min-w-full divide-y divide-default bg-accent">
 						<thead>
 							<tr class="rounded-md">
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Name</th>
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Available</th>
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Used by Dataset</th>
-								<!-- <th scope="col" class="px-3 py-3.5 font-semibold text-default">Used by Refreservation</th> -->
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Compression</th>
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Deduplication</th>
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Encryption</th>
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Snapshots</th>
-								<th scope="col" class="px-3 py-3.5 font-semibold text-default">Read Only</th>
-								<th scope="col" class="relative px-3 py-3.5 sm:pr-6 lg:pr-8">
+								<th class="relative px-3 py-3.5">
+									<span class="sr-only"></span>
+								</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Name</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Available</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Used</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Refreservation</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Compression</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Deduplication</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Encryption</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Snapshots</th>
+								<th class="px-3 py-3.5 font-semibold text-default">Read Only</th>
+								<th class="relative px-3 py-3.5 sm:pr-6 lg:pr-8">
 									<span class="sr-only"></span>
 								</th>
 							</tr>
 						</thead>
 
-						<tbody class="divide-y divide-x divide-default bg-default ring-1 ring-black ring-opacity-5">
+						<tbody class="divide-y divide-x divide-default bg-default rounded-b-md ring-1 ring-black ring-opacity-5">
 							
 							<!-- FILE SYSTEMS BY POOLS -->
 							<tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
-
-								<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default"> 
-									{{ fileSystem.name }}
+								<td class="py-4 pl-4 pr-3 text-sm font-medium text-default"> 
+									<span class="sr-only"></span>
 								</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									{{ fileSystem.properties.available }}
-								</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									{{ fileSystem.properties.usedByDataset }}
-								</td>
-								<!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									{{ fileSystem.properties.usedbyRefreservation }}
-								</td> -->
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted"> 
-									{{ fileSystem.properties.compression }}
-								</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									{{ fileSystem.properties.deduplication }}
-								</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									{{ fileSystem.encrypted }}
-								</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									{{ fileSystem.properties.snapshotCount }}
-								</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
-									{{ fileSystem.properties.readOnly }}
-								</td>
-								<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+								<td class="py-4 pl-4 pr-3 text-sm font-medium text-default"> {{ fileSystem.name }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.available }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedByDataset }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedbyRefreservation }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.compression }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.deduplication }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.encrypted }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.snapshotCount }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.readOnly }}</td>
+								<td class="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
 									<Menu as="div" class="relative inline-block text-left">
 										<div>
 											<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -114,7 +101,7 @@
 	</div>
 
 	<div v-if="showFSWizard">
-		<NewFSWIzard idKey="fs-wizard" @close="showFSWizard = false"/>
+		<FileSystem :isStandalone="true" idKey="fs-wizard" @close="showFSWizard = false"/>
 	</div>
 
 </template>
@@ -125,7 +112,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
-import NewFSWIzard from "./NewFSWIzard.vue";
+import FileSystem from "../wizard-components/FileSystem.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
