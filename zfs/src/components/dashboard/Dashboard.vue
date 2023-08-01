@@ -154,36 +154,36 @@ const totalEffectivePoolSpace = computed(() => {
 
 //convert raw bytes to readable data size
 const convertBytesToSize = (bytes) => {
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
+	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+	const i = Math.floor(Math.log(bytes) / Math.log(1024));
+	const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
 
-  return `${convertedSize} ${sizes[i]}`;
+	return `${convertedSize} ${sizes[i]}`;
 };
 
 //convert readable data size to raw bytes
 const convertSizeToBytes = (size) => {
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  const [value, unit] = size.split(' ');
+	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+	const [value, unit] = size.split(' ');
 
-  const index = sizes.indexOf(unit);
-  const bytes = parseFloat(value) * Math.pow(1024, index);
-  
-  return bytes;
+	const index = sizes.indexOf(unit);
+	const bytes = parseFloat(value) * Math.pow(1024, index);
+	
+	return bytes;
 };
 
 //find highest disk temperature
 const maxTemp = computed(() => {
-  let maxTemperature = 0;
+	let maxTemperature = 0;
 
-  disks.value.forEach((disk) => {
-    const temperature = parseFloat(disk.temp.replace(/\D/g, ''));
-    if (!isNaN(temperature) && temperature > maxTemperature) {
-      maxTemperature = temperature;
-    }
-  });
+	disks.value.forEach((disk) => {
+		const temperature = parseFloat(disk.temp.replace(/\D/g, ''));
+		if (!isNaN(temperature) && temperature > maxTemperature) {
+		maxTemperature = temperature;
+		}
+	});
 
-  return maxTemperature.toString();
+	return maxTemperature.toString();
 });
 
 //get total raw space of disks
