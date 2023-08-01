@@ -1,4 +1,5 @@
 <template>
+	<!-- POOL CONFIG FILE SYSTEM CREATION -->
 	<div v-if="isStandalone == false">
 		<div v-if="poolConfig.createFileSystem">
 			<!-- Name of Parent File System (Text) -->
@@ -56,7 +57,7 @@
 						<option value="aes-256-ccm">AES-256-CCM</option>
 						<option value="aes-128-gcm">AES-128-GCM</option>
 						<option value="aes-192-gcm">AES-192-GCM</option>
-						<option selected value="aes-256-gcm">AES-256-GCM</option>
+						<option value="aes-256-gcm">AES-256-GCM</option>
 					</select>
 				</div>
 			</div>
@@ -87,7 +88,7 @@
 				<div>
 					<label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-default">Compression</label>
 					<select v-model="fileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
+						<option value="inherited">Inherited ({{isBoolCompression(poolConfig.settings!.compression)}})</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 						<option value="gzip">GZIP</option>
@@ -100,33 +101,34 @@
 				<div>
 					<label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-default">Deduplication</label>
 					<select v-model="fileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
-					 <option value="on">On</option>
-					 <option value="off">Off</option>
-					 <option value="edon-r + verify">Edon-R + Verify</option>
-					 <option value="sha-256">SHA-256</option>
-					 <option value="sha-256 + verify">SHA-256 + Verify</option>
-					 <option value="sha-512">SHA-512</option>
-					 <option value="sha-512 + verify">SHA-512 + Verify</option>
-					 <option value="skein">Skein</option>
-					 <option value="skein + verify">Skein + Verify</option>
-					 <option value="verify">Verify</option>
+						<option value="inherited">Inherited ({{isBoolOnOff(poolConfig.settings!.deduplication)}})</option>
+						<option value="on">On</option>
+						<option value="off">Off</option>
+						<option value="edon-r + verify">Edon-R + Verify</option>
+						<option value="sha-256">SHA-256</option>
+						<option value="sha-256 + verify">SHA-256 + Verify</option>
+						<option value="sha-512">SHA-512</option>
+						<option value="sha-512 + verify">SHA-512 + Verify</option>
+						<option value="skein">Skein</option>
+						<option value="skein + verify">Skein + Verify</option>
+						<option value="verify">Verify</option>
 					</select>
 				</div>
 				<!-- Record Size (Select) -->
 				<div>
 					<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
 					<select v-model="fileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
-						<option value="512 b">512 B</option>
-						<option value="4 kib">4 KiB</option>
-						<option value="8 kib">8 KiB</option>
-						<option value="16 kib">16 KiB</option>
-						<option value="32 kib">32 KiB</option>
-						<option value="64 kib">64 KiB</option>
-						<option value="256 kib">256 KiB</option>
-						<option value="512 kib">512 KiB</option>
-						<option value="1 mib">1 MiB</option>
+						<option value="inherited">Inherited ({{ poolConfig.settings!.record }})</option>
+						<option value="512b">512 B</option>
+						<option value="4kib">4 KiB</option>
+						<option value="8kib">8 KiB</option>
+						<option value="16kib">16 KiB</option>
+						<option value="32kib">32 KiB</option>
+						<option value="64kib">64 KiB</option>
+						<option value="256kib">128 KiB</option>
+						<option value="256kib">256 KiB</option>
+						<option value="512kib">512 KiB</option>
+						<option value="1mib">1 MiB</option>
 					</select>
 				</div>
 
@@ -135,7 +137,7 @@
 				<div>
 					<label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-default">Access Time</label>
 					<select v-model="fileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
+						<option value="inherited">Inherited</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 					</select>
@@ -144,7 +146,7 @@
 				<div>
 					<label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-default">Case Sensitivity</label>
 					<select v-model="fileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
+						<option value="inherited">Inherited</option>
 						<option value="insensitive">Insensitive</option>
 						<option value="mixed">Mixed</option>
 						<option value="sensitive">Sensitive</option>
@@ -154,12 +156,12 @@
 				<div>
 					<label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-default">DNode Size</label>
 					<select v-model="fileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
-						<option value="1 kib">1 KiB</option>
-						<option value="2 kibi">2 KiB</option>
-						<option value="4 kib">4 KiB</option>
-						<option value="8 kib">8 KiB</option>
-						<option value="16 kib">16 KiB</option>
+						<option value="inherited">Inherited</option>
+						<option value="1kib">1 KiB</option>
+						<option value="2kib">2 KiB</option>
+						<option value="4kib">4 KiB</option>
+						<option value="8kib">8 KiB</option>
+						<option value="16kib">16 KiB</option>
 						<option value="auto">Auto</option>
 						<option value="legacy">Legacy</option>
 					</select>
@@ -168,7 +170,7 @@
 				<div>
 					<label :for="getIdKey('fs-extended-attributes')" class="block text-sm font-medium leading-6 text-default">Extended Attributes</label>
 					<select v-model="fileSystemConfig.properties.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
+						<option value="inherited">Inherited</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 						<option value="system attribute">System Attribute</option>
@@ -184,10 +186,10 @@
 						<input v-model="fileSystemConfig.properties.quota.raw" :id="getIdKey('fs-quota-amount')" type="range" min="0" max="1000" value="0" step="1" class="block sm:col-span-4 h-2 bg-accent rounded-lg appearance-none cursor-pointer dark:bg-gray-700"/>
 						<input v-model="fileSystemConfig.properties.quota.raw" type="number" name="fs-quota-num" :id="getIdKey('fs-quota-amount')" value="0" class="block sm:col-span-1 bg-default rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>          
 						<select v-model="fileSystemConfig.properties.quota.size" :id="getIdKey('fs-quota-size')" name="fs-quota-slider" class="block sm:col-span-1 bg-default rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option selected value="kib">KiB</option>
+							<option value="kib">KiB</option>
 							<option value="mib">MiB</option>
 							<option value="gib">GiB</option>
-							<option value="gib">TiB</option>
+							<option value="tib">TiB</option>
 						</select>
 					</div>
 				</div>
@@ -212,11 +214,12 @@
 					</Switch>
 				</div>
 
-				
+
 			</div>
 		</div>
 	</div>
 
+	<!-- STANDALONE FILE SYSTEM CREATION -->
 	<div v-if="isStandalone == true">
 		<Modal :isOpen="showFSWizard" @close="showFSWizard = false" :marginTop="'mt-28'">
 			<template v-slot:title>
@@ -278,7 +281,7 @@
 							<option value="aes-256-ccm">AES-256-CCM</option>
 							<option value="aes-128-gcm">AES-128-GCM</option>
 							<option value="aes-192-gcm">AES-192-GCM</option>
-							<option selected value="aes-256-gcm">AES-256-GCM</option>
+							<option value="aes-256-gcm">AES-256-GCM</option>
 						</select>
 					</div>
 				</div>
@@ -308,7 +311,7 @@
 					<div>
 						<label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-default">Access Time</label>
 						<select v-model="newFileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option selected value="inherited">Inherited (-)</option>
+							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
 						</select>
@@ -317,7 +320,7 @@
 					<div>
 						<label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-default">Case Sensitivity</label>
 						<select v-model="newFileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option selected value="inherited">Inherited (-)</option>
+							<option value="inherited">Inherited</option>
 							<option value="insensitive">Insensitive</option>
 							<option value="mixed">Mixed</option>
 							<option value="sensitive">Sensitive</option>
@@ -327,7 +330,7 @@
 					<div>
 						<label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-default">Compression</label>
 						<select v-model="newFileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option selected value="inherited">Inherited (-)</option>
+							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
 							<option value="gzip">GZIP</option>
@@ -340,7 +343,7 @@
 					<div>
 						<label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-default">Deduplication</label>
 						<select v-model="newFileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option selected value="inherited">Inherited (-)</option>
+							<option value="inherited">Inherited</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 						<option value="edon-r + verify">Edon-R + Verify</option>
@@ -357,7 +360,7 @@
 					<div>
 						<label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-default">DNode Size</label>
 						<select v-model="newFileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option selected value="inherited">Inherited (-)</option>
+							<option value="inherited">Inherited</option>
 							<option value="1 kib">1 KiB</option>
 							<option value="2 kibi">2 KiB</option>
 							<option value="4 kib">4 KiB</option>
@@ -371,7 +374,7 @@
 					<div>
 						<label :for="getIdKey('fs-extended-attributes')" class="block text-sm font-medium leading-6 text-default">Extended Attributes</label>
 						<select v-model="newFileSystemConfig.properties.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option selected value="inherited">Inherited (-)</option>
+							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
 							<option value="system attribute">System Attribute</option>
@@ -381,7 +384,7 @@
 					<div>
 						<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
 						<select v-model="newFileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option selected value="inherited">Inherited (-)</option>
+							<option value="inherited">Inherited</option>
 							<option value="512 b">512 B</option>
 							<option value="4 kib">4 KiB</option>
 							<option value="8 kib">8 KiB</option>
@@ -403,7 +406,7 @@
 							<input v-model="newFileSystemConfig.properties.quota.raw" :id="getIdKey('fs-quota-amount')" type="range" min="0" max="1000" value="0" step="1" class="block sm:col-span-4 h-2 bg-accent rounded-lg appearance-none cursor-pointer dark:bg-gray-700"/>
 							<input v-model="newFileSystemConfig.properties.quota.raw" type="number" name="fs-quota-num" :id="getIdKey('fs-quota-amount')" value="0" class="block sm:col-span-1 bg-default rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>          
 							<select v-model="newFileSystemConfig.properties.quota.size" :id="getIdKey('fs-quota-size')" name="fs-quota-slider" class="block sm:col-span-1 bg-default rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-								<option selected value="kib">KiB</option>
+								<option value="kib">KiB</option>
 								<option value="mib">MiB</option>
 								<option value="gib">GiB</option>
 							</select>
@@ -559,6 +562,34 @@ const nameCheck = () => {
 		nameFeedback.value = 'Name contains invalid characters.';
 	} 
 	return result;
+}
+
+//convert raw bytes to readable data size
+const convertBytesToSize = (bytes) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
+
+  return `${convertedSize} ${sizes[i]}`;
+};
+
+//convert readable data size to raw bytes
+const convertSizeToBytes = (size) => {
+	const sizes = ['B', 'KiB', 'MiB'];
+	const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
+
+	const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
+	const bytes = parseFloat(value) * Math.pow(1024, index);
+	
+	return bytes;
+};
+
+function isBoolOnOff(bool : boolean) {
+	if (bool) {return 'on'} else {return 'off'}
+}
+
+function isBoolCompression(bool : boolean) {
+	if (bool) {return 'lz4'} else {return 'off'}
 }
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;

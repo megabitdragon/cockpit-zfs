@@ -3,7 +3,6 @@
 	<div v-if="props.tag ==='name-entry'">
 		<legend class="mb-1 text-base font-semibold leading-6 text-default">Name this Pool</legend>
 		<input type="text" @change="nameCheck" v-model="poolConfig.name" name="pool-name" :id="getIdKey('pool-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="Pool Name" />
-		<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
 	</div>
 
   	<!-- second tab: vDev + disk selection -->
@@ -59,7 +58,7 @@
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
 				<ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="col-span-1 divide-y divide-default rounded-lg bg-default shadow">
-						<div class="flex w-full h-full border border-default rounded">
+						<div class="flex w-full h-full border border-default rounded ">
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-default"> 
 								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
 								<p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p> 
@@ -71,29 +70,6 @@
 						</div>
 					</li>
 				</ul>
-				<p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
-				<p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
-
-				<!-- Forcefully Create Pool (Toggle) -->
-				<div>
-					<label :for="getIdKey('forcefully-create-pool')" class="mt-1 block text-sm font-medium leading-6 text-default">Forcefully Create</label>
-					<Switch v-model="poolConfig.settings!.forceCreate" :class="[poolConfig.settings!.forceCreate ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-						<span class="sr-only">Use setting</span>
-						<span :class="[poolConfig.settings!.forceCreate ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-							<span :class="[poolConfig.settings!.forceCreate ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-								<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-									<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-								</svg>
-							</span>
-							<span :class="[poolConfig.settings!.forceCreate ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-								<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-									<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-								</svg>
-							</span>
-						</span>
-					</Switch>
-				</div>
-				<p class="text-danger" v-if="isProperReplicationFeedback">{{ isProperReplicationFeedback }}</p>
 
 				<!-- buttons to add/remove vdevs -->
 				<div class="button-group-row mt-2">
@@ -106,7 +82,6 @@
 				<button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="initialVDev()">Add VDev</button>
 			</div>
 		</fieldset>
-		<p class="text-danger" v-if="vDevFeedback">{{ vDevFeedback }}</p>
 	</div>
 
 	<!-- third tab: pool settings + advanced settings -->
@@ -120,7 +95,7 @@
 				<select :id="getIdKey('sector-size')" v-model="poolConfig.settings!.sector" name="sector-size" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
 					<option value="auto">Auto Detect</option>
 					<option value="512b">512 B</option>
-					<option selected value="4kib">4 KiB</option>
+					<option value="4kib">4 KiB</option>
 					<option value="8kib">8 KiB</option>
 					<option value="16kib">16 KiB</option>
 					<option value="32kib">32 KiB</option>
@@ -138,7 +113,7 @@
 					<option value="16kib">16 KiB</option>
 					<option value="32kib">32 KiB</option>
 					<option value="64kib">64 KiB</option>
-					<option selected value="128kib">128 KiB</option>
+					<option value="128kib">128 KiB</option>
 					<option value="256kib">256 KiB</option>
 					<option value="512kib">512 KiB</option>
 					<option value="1mib">1 MiB</option>
@@ -295,7 +270,6 @@
 <script setup lang="ts">
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
-
 import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
@@ -314,11 +288,11 @@ const fileSystemConfiguration = ref();
 
 const disks = inject<Ref<DiskData[]>>('disks')!;
 
-const nameFeedback = ref('');
-const vDevFeedback = ref('');
-const diskFeedback = ref('');
-const diskSizeFeedback = ref('');
-const isProperReplicationFeedback = ref('');
+const nameFeedback = inject<Ref<string>>('feedback-name')!;
+const vDevFeedback = inject<Ref<string>>('feedback-vdev')!;
+const diskFeedback = inject<Ref<string>>('feedback-disk')!;
+const diskSizeFeedback = inject<Ref<string>>('feedback-disk-size')!;
+const isProperReplicationFeedback = inject<Ref<string>>('feedback-replication-level')!;
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection
 //This currently ties in to the disk selection UI elements and shows/hides the disks based on whether they are in use or not
