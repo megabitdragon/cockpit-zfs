@@ -221,7 +221,7 @@
 
 	<!-- STANDALONE FILE SYSTEM CREATION -->
 	<div v-if="isStandalone == true">
-		<Modal :isOpen="showFSWizard" @close="showFSWizard = false" :marginTop="'mt-28'">
+		<Modal :isOpen="showFSWizard" @close="showFSWizard = false" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
 			<template v-slot:title>
 				<legend class="flex justify-center">Create a New File System</legend>
 			</template>

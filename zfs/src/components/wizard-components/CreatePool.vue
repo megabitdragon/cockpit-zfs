@@ -1,5 +1,5 @@
 <template>
-	<Modal :isOpen="showWizard" :marginTop="'mt-28'">
+	<Modal :isOpen="showWizard" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
 		<template v-slot:title>
 			<!-- navigation tabs for create pool wizard -->
 			<WizardTabs :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>

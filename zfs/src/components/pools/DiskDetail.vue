@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="props.isModalChild" :isOpen="open" :marginTop="'mt-48'">
+	<Modal v-if="props.isModalChild" :isOpen="open" :marginTop="'mt-48'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
 		<template v-slot:title>
 			<legend class="flex justify-center">Disk {{ disk.name }} Details</legend>
 		</template>
@@ -48,7 +48,7 @@
 		
 		</template>
 	</Modal>
-	<Modal v-else :isOpen="open" :marginTop="'mt-28'">
+	<Modal v-else :isOpen="open" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
 		<template v-slot:title>
 			<legend class="flex justify-center">Disk {{ disk.name }} Details</legend>
 		</template>
