@@ -426,7 +426,7 @@ const replicationLevelCheck = () => {
 		if ((vDev.type == 'dedup' || vDev.type == 'special') && poolConfig.value.vdevs[0].type != 'disk' && !poolConfig.value.settings!.forceCreate && !vDev.isMirror) {
 			result = false;
 			isProperReplicationFeedback.value = 'Mismatched replication level. Forcefully create to override.';
-		} else if (vDev.isMirror && (vDev.type == 'special' || vDev.type == 'dedup') && vDev.selectedDisks.length < 2) {
+		} else if (vDev.isMirror && (vDev.type == 'special' || vDev.type == 'dedup' || vDev.type == 'log') && vDev.selectedDisks.length < 2) {
 			result = false;
 			isProperReplicationFeedback.value = `Two or more Disks are required for Mirror (${upperCaseWord(vDev.type)}).`;
 		}

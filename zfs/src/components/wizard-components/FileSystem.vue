@@ -82,25 +82,7 @@
 			</div>
 			
 			<div v-if="!fileSystemConfig.inherit">
-				<!-- Access Time (Select) -->
-				<div>
-					<label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-default">Access Time</label>
-					<select v-model="fileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
-						<option value="on">On</option>
-						<option value="off">Off</option>
-					</select>
-				</div>
-				<!-- Case Sensitivity (Select) -->
-				<div>
-					<label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-default">Case Sensitivity</label>
-					<select v-model="fileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
-						<option value="insensitive">Insensitive</option>
-						<option value="mixed">Mixed</option>
-						<option value="sensitive">Sensitive</option>
-					</select>
-				</div>
+			
 				<!-- Compression (Select) -->
 				<div>
 					<label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-default">Compression</label>
@@ -131,6 +113,43 @@
 					 <option value="verify">Verify</option>
 					</select>
 				</div>
+				<!-- Record Size (Select) -->
+				<div>
+					<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
+					<select v-model="fileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<option selected value="inherited">Inherited (-)</option>
+						<option value="512 b">512 B</option>
+						<option value="4 kib">4 KiB</option>
+						<option value="8 kib">8 KiB</option>
+						<option value="16 kib">16 KiB</option>
+						<option value="32 kib">32 KiB</option>
+						<option value="64 kib">64 KiB</option>
+						<option value="256 kib">256 KiB</option>
+						<option value="512 kib">512 KiB</option>
+						<option value="1 mib">1 MiB</option>
+					</select>
+				</div>
+
+
+				<!-- Access Time (Select) -->
+				<div>
+					<label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-default">Access Time</label>
+					<select v-model="fileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<option selected value="inherited">Inherited (-)</option>
+						<option value="on">On</option>
+						<option value="off">Off</option>
+					</select>
+				</div>
+				<!-- Case Sensitivity (Select) -->
+				<div>
+					<label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-default">Case Sensitivity</label>
+					<select v-model="fileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<option selected value="inherited">Inherited (-)</option>
+						<option value="insensitive">Insensitive</option>
+						<option value="mixed">Mixed</option>
+						<option value="sensitive">Sensitive</option>
+					</select>
+				</div>
 				<!-- DNode Size (Select) -->
 				<div>
 					<label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-default">DNode Size</label>
@@ -154,23 +173,7 @@
 						<option value="off">Off</option>
 						<option value="system attribute">System Attribute</option>
 					</select>
-				</div>
-				<!-- Record Size (Select) -->
-				<div>
-					<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
-					<select v-model="fileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option selected value="inherited">Inherited (-)</option>
-						<option value="512 b">512 B</option>
-						<option value="4 kib">4 KiB</option>
-						<option value="8 kib">8 KiB</option>
-						<option value="16 kib">16 KiB</option>
-						<option value="32 kib">32 KiB</option>
-						<option value="64 kib">64 KiB</option>
-						<option value="256 kib">256 KiB</option>
-						<option value="512 kib">512 KiB</option>
-						<option value="1 mib">1 MiB</option>
-					</select>
-				</div>
+				</div>	
 			</div>
 
 			<div>
@@ -184,6 +187,7 @@
 							<option selected value="kib">KiB</option>
 							<option value="mib">MiB</option>
 							<option value="gib">GiB</option>
+							<option value="gib">TiB</option>
 						</select>
 					</div>
 				</div>
@@ -207,6 +211,8 @@
 						</span>
 					</Switch>
 				</div>
+
+				
 			</div>
 		</div>
 	</div>
@@ -451,7 +457,7 @@ const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
 const poolConfig = inject<PoolData>("pool-config-data")!;
 const nameFeedback = ref('');
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
-const datasets = inject<Ref<Dataset[]>>('datasets');
+const datasets = inject<Ref<Dataset[]>>('datasets')!;
 
 const newFileSystemConfig : FileSystemData = {
     parentFS: '',
@@ -467,13 +473,13 @@ const newFileSystemConfig : FileSystemData = {
     type: '',
     inherit: true,
     properties: {
-        accessTime: '',
+        accessTime: false,
         caseSensitivity: '',
         compression: '',
         deduplication: '',
         dNodeSize: '',
         extendedAttributes: '',
-        recordSize: '',
+        recordSize: 0,
         quota: {
             raw: 0,
             value: '',
@@ -487,6 +493,34 @@ const newFileSystemConfig : FileSystemData = {
         mounted: '',
     },
     children: [],
+}
+
+const inheritedProperties : InheritedProperties = {
+	id: '',
+	atime: false,
+	casesensitivity: '',
+	compression: '',
+	dedup: '',
+	dnodesize: '',
+	recordsize: 0,
+	xattr: '',
+}
+
+const getInheritedProperties = () => {
+
+	if (props.isStandalone == true) {
+		const poolProperties = datasets.value.find(dataset => dataset.name == newFileSystemConfig.parentFS)!;
+		inheritedProperties.id = poolProperties.id;
+		inheritedProperties.atime = poolProperties.properties.accessTime;
+		inheritedProperties.casesensitivity = poolProperties.properties.caseSensitivity;
+		inheritedProperties.compression = poolProperties.properties.compression;
+		inheritedProperties.dedup = poolProperties.properties.deduplication;
+		inheritedProperties.dnodesize = poolProperties.properties.dNodeSize;
+		inheritedProperties.recordsize = poolProperties.properties.recordSize;
+		inheritedProperties.xattr = poolProperties.properties.extendedAttributes;
+	} else {
+
+	}
 }
 
 const nameCheck = () => {
