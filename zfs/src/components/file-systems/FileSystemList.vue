@@ -116,7 +116,7 @@ import FileSystem from "../wizard-components/FileSystem.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 
-const fileSystems = inject<Ref<Dataset[]>>('datasets')!;
+const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const showFSWizard = ref(false);

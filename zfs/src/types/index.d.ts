@@ -100,19 +100,16 @@ interface DiskData {
 
 //object for filesystem
 interface FileSystemData {
-	parentFS?: string;
 	name: string;
 	id: string;
 	mountpoint: string;
 	pool: string;
-	isEncrypted: boolean
-	encrypted: string;
-	cipher: string;
-	passphrase: string?;
+	encrypted: boolean;
 	key_loaded: string;
 	type: string;
 	inherit: boolean;
 	properties: {
+		encryption: string;
 		accessTime: boolean;
 		caseSensitivity: string;
 		compression: string;
@@ -123,17 +120,19 @@ interface FileSystemData {
 		quota: {
 			raw: number;
 			value: string;
-			size: 'kib' | 'mib' | 'gib';
+			size?: 'kib' | 'mib' | 'gib' | 'tib';
 		};
 		isReadOnly?: boolean;
 		readOnly: string;
 		available: string;
 		creation: string;
 		snapshotCount: string;
-		used: string;
 		mounted: string;
+		usedbyRefreservation: string;
+		usedByDataset: string;
 	},
 	children?: FileSystemData[];
+	parentFS?: string;
 }
 
 interface InheritedProperties {
@@ -145,35 +144,6 @@ interface InheritedProperties {
 	dnodesize: string;
 	recordsize: number;
 	xattr: string;
-}
-
-//object for dataset (replace filesystem object?)
-interface Dataset {
-	name: string;
-	id: string;
-	mountpoint: string;
-	pool: string;
-	encrypted: string;
-	key_loaded: string;
-	type: string;
-	properties: {
-		available: string;
-		creation: string;
-		snapshotCount: string;
-		usedbyRefreservation: string;
-		usedByDataset: string;
-		accessTime: boolean;
-		caseSensitivity: string;
-		compression: string;
-		deduplication: string;
-		dNodeSize: string;
-		extendedAttributes: string;
-		readOnly: string;
-		recordSize: number;
-		quota: string;
-		mounted: string;
-	}
-	children?: Dataset[];
 }
 
 //object for snapshots

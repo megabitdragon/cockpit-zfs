@@ -110,31 +110,37 @@ export async function loadDatasets(datasets) {
 
 		//loops through JSON data and adds data to a Dataset object
 		for (let i = 0; i < parsedJSON.length; i++) {
-			const dataset : Dataset = {
-					name: parsedJSON[i].name,
-					id: parsedJSON[i].id,
-					mountpoint: parsedJSON[i].mountpoint,
-					pool: parsedJSON[i].pool,
-					encrypted: parsedJSON[i].encrypted,
-					key_loaded: parsedJSON[i].key_loaded,
-					type: parsedJSON[i].type,
-					properties: {
-						available: convertBytesToSize(parsedJSON[i].properties.available.parsed),
-						creation: parsedJSON[i].properties.creation.value,
-						snapshotCount: parsedJSON[i].properties.snapshot_count.value,
-						usedbyRefreservation: convertBytesToSize(parsedJSON[i].properties.usedbyrefreservation.parsed),
-						usedByDataset: convertBytesToSize(parsedJSON[i].properties.usedbydataset.parsed),
-						accessTime: parsedJSON[i].properties.atime.value,
-						caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
-						compression: parsedJSON[i].properties.compression.value,
-						deduplication: parsedJSON[i].properties.dedup.value,
-						dNodeSize: parsedJSON[i].properties.dnodesize.value,
-						extendedAttributes: '',
-						readOnly: parsedJSON[i].properties.readonly.value,
-						recordSize: parsedJSON[i].properties.recordsize.value,
-						quota: parsedJSON[i].properties.quota.value,
-						mounted: parsedJSON[i].properties.mounted.value,
+			const dataset : FileSystemData = {
+				name: parsedJSON[i].name,
+				id: parsedJSON[i].id,
+				mountpoint: parsedJSON[i].mountpoint,
+				pool: parsedJSON[i].pool,
+				encrypted: parsedJSON[i].encrypted,
+				key_loaded: parsedJSON[i].key_loaded,
+				type: parsedJSON[i].type,
+				inherit: false,
+				properties: {
+					encryption: parsedJSON[i].properties.encryption.parsed,
+					available: convertBytesToSize(parsedJSON[i].properties.available.parsed),
+					creation: parsedJSON[i].properties.creation.value,
+					snapshotCount: parsedJSON[i].properties.snapshot_count.value,
+					usedbyRefreservation: convertBytesToSize(parsedJSON[i].properties.usedbyrefreservation.parsed),
+					usedByDataset: convertBytesToSize(parsedJSON[i].properties.usedbydataset.parsed),
+					accessTime: parsedJSON[i].properties.atime.value,
+					caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
+					compression: parsedJSON[i].properties.compression.value,
+					deduplication: parsedJSON[i].properties.dedup.value,
+					dNodeSize: parsedJSON[i].properties.dnodesize.value,
+					extendedAttributes: parsedJSON[i].properties.xattr.value,
+					readOnly: parsedJSON[i].properties.readonly.value,
+					recordSize: parsedJSON[i].properties.recordsize.value,
+					quota: {
+						value: parsedJSON[i].properties.quota.value,
+						raw: parsedJSON[i].properties.quota.parsed,
 					},
+					mounted: parsedJSON[i].properties.mounted.value,
+				},
+				children: parsedJSON[i].children,
 			}
 
 			datasets.value.push(dataset);

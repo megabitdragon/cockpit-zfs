@@ -20,15 +20,15 @@
 			<!-- Encryption (Toggle) -> Reveals extra fields-->
 			<div>
 				<label :for="getIdKey('encryption')" class="mt-1 block text-sm font-medium leading-6 text-default">Encryption</label>
-				<Switch :id="getIdKey('encryption')" v-model="fileSystemConfig.isEncrypted" :class="[fileSystemConfig.isEncrypted ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+				<Switch :id="getIdKey('encryption')" v-model="fileSystemConfig.encrypted" :class="[fileSystemConfig.encrypted ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 					<span class="sr-only">Use setting</span>
-					<span :class="[fileSystemConfig.isEncrypted ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-						<span :class="[fileSystemConfig.isEncrypted ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+					<span :class="[fileSystemConfig.encrypted ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+						<span :class="[fileSystemConfig.encrypted ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
 							<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 								<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 							</svg>
 						</span>
-						<span :class="[fileSystemConfig.isEncrypted ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+						<span :class="[fileSystemConfig.encrypted ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
 							<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 								<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 							</svg>
@@ -37,11 +37,11 @@
 				</Switch>
 			</div>
 
-			<div v-if="fileSystemConfig.isEncrypted">
+			<div v-if="fileSystemConfig.encrypted">
 				<!-- Passphrase (Text) -->
 					<div>
 						<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
-						<input :id="getIdKey('passphrase')" type="password" v-model="fileSystemConfig.passphrase" name="passphrase" class="input-textlike bg-default mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Passphrase" />
+						<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="input-textlike bg-default mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Passphrase" />
 					</div>
 				<!-- Confirm Passphrase (Text) -->
 				<div>
@@ -51,7 +51,7 @@
 				<!-- Cipher (Select) -->
 				<div>
 					<label :for="getIdKey('cipher')" class="block text-sm font-medium leading-6 text-default">Cipher</label>
-					<select :id="getIdKey('cipher')" name="cipher" v-model="fileSystemConfig.cipher" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+					<select :id="getIdKey('cipher')" name="cipher" v-model="fileSystemConfig.properties.encryption" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
 						<option value="aes-128-ccm">AES-128-CCM</option>
 						<option value="aes-192-ccm">AES-192-CCM</option>
 						<option value="aes-256-ccm">AES-256-CCM</option>
@@ -244,7 +244,7 @@
 				<!-- Encryption (Toggle) -> Reveals extra fields-->
 				<div>
 					<label :for="getIdKey('encryption')" class="mt-1 block text-sm font-medium leading-6 text-default">Encryption</label>
-					<Switch :id="getIdKey('encryption')" v-model="newFileSystemConfig.isEncrypted" :class="[newFileSystemConfig.encrypted ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+					<Switch :id="getIdKey('encryption')" v-model="newFileSystemConfig.encrypted" :class="[newFileSystemConfig.encrypted ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 						<span class="sr-only">Use setting</span>
 						<span :class="[newFileSystemConfig.encrypted ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
 							<span :class="[newFileSystemConfig.encrypted ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
@@ -265,7 +265,7 @@
 					<!-- Passphrase (Text) -->
 						<div>
 							<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
-							<input :id="getIdKey('passphrase')" type="password" v-model="newFileSystemConfig.passphrase" name="passphrase" class="input-textlike bg-default mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Passphrase" />
+							<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="input-textlike bg-default mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6" placeholder="Passphrase" />
 						</div>
 					<!-- Confirm Passphrase (Text) -->
 					<div>
@@ -275,7 +275,7 @@
 					<!-- Cipher (Select) -->
 					<div>
 						<label :for="getIdKey('cipher')" class="block text-sm font-medium leading-6 text-default">Cipher</label>
-						<select :id="getIdKey('cipher')" name="cipher" v-model="newFileSystemConfig.cipher" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<select :id="getIdKey('cipher')" name="cipher" v-model="newFileSystemConfig.properties.encryption" class="bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
 							<option value="aes-128-ccm">AES-128-CCM</option>
 							<option value="aes-192-ccm">AES-192-CCM</option>
 							<option value="aes-256-ccm">AES-256-CCM</option>
@@ -460,7 +460,9 @@ const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
 const poolConfig = inject<PoolData>("pool-config-data")!;
 const nameFeedback = ref('');
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
-const datasets = inject<Ref<Dataset[]>>('datasets')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+
+const passphrase = ref('');
 
 const newFileSystemConfig : FileSystemData = {
     parentFS: '',
@@ -468,14 +470,12 @@ const newFileSystemConfig : FileSystemData = {
     id: '',
     mountpoint: '',
     pool: '',
-    isEncrypted: false,
-    encrypted: '',
-    cipher: '',
-    passphrase: '',
+    encrypted: false,
     key_loaded: '',
     type: '',
     inherit: true,
     properties: {
+		encryption: '',
         accessTime: false,
         caseSensitivity: '',
         compression: '',
@@ -488,11 +488,12 @@ const newFileSystemConfig : FileSystemData = {
             value: '',
             size: 'kib',
         },
+		usedByDataset: '',
+		usedbyRefreservation: '',
         readOnly: '',
         available: '',
         creation: '',
         snapshotCount: '',
-        used: '',
         mounted: '',
     },
     children: [],

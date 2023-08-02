@@ -43,7 +43,7 @@ const props = defineProps<ZFSProps>();
 const pools = ref<PoolData[]>([]);
 const vDevs = ref<vDevData[]>([]);
 const disks = ref<DiskData[]>([]);
-const datasets = ref<Dataset[]>([]);
+const datasets = ref<FileSystemData[]>([]);
 
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);

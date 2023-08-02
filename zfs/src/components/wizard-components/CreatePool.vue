@@ -90,7 +90,7 @@ const isProperReplicationFeedback = ref('');
 //injecting provided disk and pools rray
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const pools = inject<Ref<PoolData[]>>('pools')!;
-const datasets = inject<Ref<Dataset[]>>('datasets')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 //setting default values for file system object
 const fileSystemConfig = ref<FileSystemData>({
@@ -98,14 +98,12 @@ const fileSystemConfig = ref<FileSystemData>({
 	id: '',
 	mountpoint: '',
 	pool: '',
-	encrypted: '',
-	isEncrypted: false,
-	cipher: '',
-	passphrase: '',
+	encrypted: false,
 	key_loaded: '',
 	type: '',
 	inherit: true,
 	properties: {
+		encryption: '',
 		accessTime: false,
 		caseSensitivity: '',
 		compression: '',
@@ -114,16 +112,17 @@ const fileSystemConfig = ref<FileSystemData>({
 		extendedAttributes: '',
 		recordSize: 0,
 		quota: {
-		raw: 0,
-		value: '',
-		size: 'kib',
-		},
+            raw: 0,
+            value: '',
+            size: 'kib',
+        },
 		readOnly: '',
 		available: '',
 		creation: '',
 		snapshotCount: '',
-		used: '',
 		mounted: '',
+		usedByDataset: '',
+		usedbyRefreservation: '',
 	},
 
 });
