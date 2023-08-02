@@ -2,7 +2,7 @@
 	<div class="min-w-full max-w-full max-h-full py-2 align-middle sm:px-6 lg:px-8 sm:rounded-lg bg-accent rounded-md border border-default">
 		<div name="pools">
 			<!-- Pools summary -->
-			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2">
+			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-start mt-0.5">
 					<span class="font-semibold text-lg mt-1 justify-self-start">Pools</span>
 				</div>
@@ -25,7 +25,7 @@
 			</div>
 
 			<!-- no pools found -->
-			<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3 bg-well rounded-md shadow text-default my-2">
+			<div v-if="pools.length < 1 && poolsLoaded == true" class="grid grid-flow-col grid-cols-3 bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-center col-start-2">
 					<span class="font-semibold text-lg mt-1">No Pools Found</span>
 				</div>
@@ -51,7 +51,7 @@
 		</div>
 		<div name="disks" class="">
 			<!-- disks summary -->
-			<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2">
+			<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-start mt-0.5">
 					<span class="font-semibold text-lg mt-1 justify-self-start">Disks</span>
 				</div>
@@ -80,7 +80,7 @@
 			</div>
 
 			<!-- no disks found -->
-			<div v-if="disks.length < 1 && disksLoaded == true" class="grid grid-flow-col grid-cols-3 bg-well rounded-md shadow text-default my-2">
+			<div v-if="disks.length < 1 && disksLoaded == true" class="grid grid-flow-col grid-cols-3 bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-center">
 					<span class="font-semibold text-lg mt-1">No Disks Found</span>
 				</div>

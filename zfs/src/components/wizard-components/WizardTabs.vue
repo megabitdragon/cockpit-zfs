@@ -1,5 +1,5 @@
 <template>
-	<nav class="mx-auto max-w-full px-4" aria-label="Pool Creation Progress">
+	<nav class="max-w-full mx-auto" aria-label="Pool Creation Progress">
 		<ol role="list" class="divide-y divide-default rounded-md border border-default md:flex md:divide-y-0">
 			<li v-for="(step, stepIdx) in props.navigationItems" :key="step.id" class="relative overflow-hidden lg:flex-1">
 				<a v-if="step.status === 'completed'" @click.prevent="navigationCallback(step)" class="group flex w-full items-center">

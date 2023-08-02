@@ -8,12 +8,12 @@
 		</div>
 
 		<div class="mt-8 overflow-visible">
-			<div class="inline-block min-w-full min-h-full align-middle rounded-sm border border-default">
+			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-sm border border-default">
 
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
-					<table class="min-w-full divide-y divide-default bg-accent">
+					<table class="min-w-full divide-y divide-default">
 						<thead>
-							<tr class="rounded-md">
+							<tr class="rounded-md bg-well">
 								<th class="relative px-3 py-3.5">
 									<span class="sr-only"></span>
 								</th>
@@ -91,9 +91,9 @@
 								
 							</template>
 							<template v-slot:content>
-								<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md ring-1 ring-black ring-opacity-5" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+								<Accordion :isOpen="false" class="divide-y divide-default bg-accent rounded-b-md ring-1 ring-black ring-opacity-5" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
 									<template v-slot:title>
-										<div class="grid grid-cols-3 grid-flow-cols bg-well w-full rounded-l-sm">
+										<div class="grid grid-cols-3 grid-flow-cols bg-accent w-full rounded-l-sm">
 											<div class="col-start-2 text-center -mx-4 py-4">
 												{{ vDev.name }} ({{ vDev.type }})
 											</div>
@@ -123,11 +123,11 @@
 										</div>
 									</template>
 									<template v-slot:content>
-										<table class="table-auto min-w-full divide-y divide-default ">
+										<table class="table-auto min-w-full divide-y divide-default">
 											<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="">
 												<td colspan="8" class="ml-7">
-													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-accent ">
-														<th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-default">Name</th>
+													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-well">
+														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">State</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Reads</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Writes</th>
@@ -137,7 +137,7 @@
 														<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
 															<span class="sr-only"></span>
 														</th>
-														<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-16 bg-well">
+														<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-16 bg-default">
 															<td>{{ disk.name }}</td>
 															<td>{{ disk.status }}</td>
 															<td>W</td>

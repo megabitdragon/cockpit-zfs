@@ -1,12 +1,12 @@
 <template>
-	<Modal :isOpen="showWizard" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+	<Modal :isOpen="showWizard" :marginTop="'mt-28'" :width="'w-5/6'" :minWidth="'min-w-5/6'">
 		<template v-slot:title>
 			<!-- navigation tabs for create pool wizard -->
 			<WizardTabs :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
 		<template v-slot:content>
 			<!-- actual content for create pool wizard -->
-			<PoolConfig ref="poolConfiguration" :tag="navTag" idKey="pool-config"/>
+			<PoolConfig ref="poolConfiguration" :tag="navTag" idKey="pool-config" class="mx-4"/>
 		</template>
 		<template v-slot:footer>
 			<!-- buttons for next, back & also finish (if at last tab) -->
