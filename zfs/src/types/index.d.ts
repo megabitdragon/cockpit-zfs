@@ -110,13 +110,13 @@ interface FileSystemData {
 	inherit: boolean;
 	properties: {
 		encryption: string;
-		accessTime: boolean;
+		accessTime: string;
 		caseSensitivity: string;
 		compression: string;
 		deduplication: string;
 		dNodeSize: string;
 		extendedAttributes: string;
-		recordSize: number;
+		recordSize: string;
 		quota: {
 			raw: number;
 			value: string;
@@ -136,13 +136,12 @@ interface FileSystemData {
 }
 
 interface InheritedProperties {
-	id: string;
-	atime: boolean;
+	atime: string;
 	casesensitivity: string;
 	compression: string;
 	dedup: string;
 	dnodesize: string;
-	recordsize: number;
+	recordsize: string;
 	xattr: string;
 }
 

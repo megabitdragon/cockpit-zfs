@@ -16,7 +16,7 @@
 					<label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-default">Type</label>
 					<!-- if first VDev, always either DISK, MIRROR, RAIDZ1-3 -->
 					<!-- if NOT first VDev, always either CACHE, LOG, SPECIAL, SPARE, DEDUP, or TYPE OF FIRST VDEV -->
-					<select id="virtual-device" v-model="poolConfig.vdevs[vDevIdx].type" name="virtual-device" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+					<select id="virtual-device" v-model="poolConfig.vdevs[vDevIdx].type" name="virtual-device" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
 						<option v-if="vDevIdx === 0" value="disk">Disk</option>
 						<option v-if="vDevIdx === 0" value="mirror">Mirror</option>
 						<option v-if="vDevIdx === 0" value="raidz1">RaidZ1</option>
@@ -33,7 +33,7 @@
 
 				<!-- If (Log, Special, Dedup) -->
 				<!-- If secondary VDev is LOG or SPECIAL or DEDUP, have option for them to be MIRROR also -->
-				<!-- If Primary VDev is MIRROR or RAIDZ(x) then SPECIAL and DEDUP must be MIRROR -->
+				<!-- If Primary VDev is MIRROR or RAIDZ(x) then SPECIAL, LOG and DEDUP must be MIRROR -->
 				<div v-if="poolConfig.vdevs[vDevIdx].type == 'log' || poolConfig.vdevs[vDevIdx].type == 'special' || poolConfig.vdevs[vDevIdx].type == 'dedup'">
 					<label :for="getIdKey('mirror-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">{{ upperCaseWord(poolConfig.vdevs[vDevIdx].type) }} (Mirror)</label>
 
@@ -56,7 +56,7 @@
 
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
-				<ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+				<!-- <ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="col-span-1 divide-y divide-default rounded-lg bg-default shadow">
 						<div class="flex w-full h-full border border-default rounded ">
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-default"> 
@@ -67,6 +67,20 @@
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
 								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
 							</label>  
+						</div> -->
+
+				<!-- FIX DISK DISPLAY (COLOR ENTIRE CARD NOT JUST CHECKBOX) (USE EMPTY SPACE) -->
+				<ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="">
+						<div class="flex w-full h-full border border-default rounded-lg">
+							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
+								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
+								<p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p>
+								<p class="mt-1 truncate text-sm text-muted">{{ disk.type }}</p>
+								<p class="mt-1 truncate text-sm text-muted">Capacity: {{ disk.capacity }}</p>
+								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
+								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
+							</label>
 						</div>
 					</li>
 				</ul>
@@ -92,7 +106,7 @@
 			<!-- Sector Size (Select) -->
 			<div>
 				<label :for="getIdKey('sector-size')" class="block text-sm font-medium leading-6 text-default">Sector Size</label>
-				<select :id="getIdKey('sector-size')" v-model="poolConfig.settings!.sector" name="sector-size" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+				<select :id="getIdKey('sector-size')" v-model="poolConfig.settings!.sector" name="sector-size" class="text-default bg-default mt-1 block w-full py-1.5 pl-3 pr-10 input-textlike sm:text-sm sm:leading-6">
 					<option value="auto">Auto Detect</option>
 					<option value="512b">512 B</option>
 					<option value="4kib">4 KiB</option>
@@ -106,7 +120,7 @@
 			<!-- Record Size (Select) -->
 			<div>
 				<label :for="getIdKey('record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
-				<select :id="getIdKey('record-size')" v-model="poolConfig.settings!.record" name="record-size" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+				<select :id="getIdKey('record-size')" v-model="poolConfig.settings!.record" name="record-size" class="text-default bg-default mt-1 block w-full py-1.5 pl-3 pr-10 input-textlike sm:text-sm sm:leading-6">
 					<option value="512b">512 B</option>
 					<option value="4kib">4 KiB</option>
 					<option value="8kib">8 KiB</option>
@@ -141,98 +155,103 @@
 			</div>
 
 			<!-- Advanced Settings (hidden under accordion for better UI/UX) -->
-			<Accordion :isOpen="false" class="mt-2 ml-2">
+			<Accordion :isOpen="false" class="mt-2 -ml-3 bg-well rounded-md p-2">
 				<template v-slot:title>
 					<span><b>Advanced Settings</b></span>
 				</template>
 				<template v-slot:content>
-					<!-- Deduplication (Toggle) -->
-					<div>
-						<label :for="getIdKey('deduplication-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Deduplication</label>
-						<Switch :id="getIdKey('deduplication-enabled')" v-model="poolConfig.settings!.deduplication" :class="[poolConfig.settings!.deduplication ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings!.deduplication ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-								<span :class="[poolConfig.settings!.deduplication ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-									</svg>
-								</span>
-								<span :class="[poolConfig.settings!.deduplication ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-									</svg>
-								</span>
-							</span>
-						</Switch>
-					</div>
+					<div class="bg-default rounded-md my-2 py-2">
 
-					<!-- Refreservation (Slider) -->
-					<div>
-						<label :for="getIdKey('steps-range')" class="mt-1 block mb-2 text-sm font-medium text-default">Refreservation</label>
-						<input :id="getIdKey('steps-range')" v-model="poolConfig.settings!.refreservation" type="range" min="0" max="20" value="10" step="1" class="text-default bg-default mt-1 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer ">
-						<input :id="getIdKey('steps-range')" v-model="poolConfig.settings!.refreservation" type="number" value="10" class="text-default bg-default mt-1 w-1/4 block rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
-					</div>
+						<!-- Deduplication (Toggle) -->
+						<div class="ml-3">
+							<label :for="getIdKey('deduplication-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Deduplication</label>
+							<Switch :id="getIdKey('deduplication-enabled')" v-model="poolConfig.settings!.deduplication" :class="[poolConfig.settings!.deduplication ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+								<span class="sr-only">Use setting</span>
+								<span :class="[poolConfig.settings!.deduplication ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+									<span :class="[poolConfig.settings!.deduplication ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+										<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+											<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+									</span>
+									<span :class="[poolConfig.settings!.deduplication ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+										<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+											<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+										</svg>
+									</span>
+								</span>
+							</Switch>
+						</div>
 
-					<!-- Auto-Expand Pool (Toggle) -->
-					<div>
-						<label :for="getIdKey('auto-expand-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Auto-Expand Pool (When Larger Devices are Added)</label>
-						<Switch v-model="poolConfig.settings!.autoExpand" :class="[poolConfig.settings!.autoExpand ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings!.autoExpand ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-								<span :class="[poolConfig.settings!.autoExpand ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-									</svg>
+						<!-- Refreservation (Slider) -->
+						<div class="ml-3">
+							<label :for="getIdKey('steps-range')" class="mt-1 block text-sm font-medium text-default">Refreservation</label>
+							<div class="flex flex-row">
+								<input :id="getIdKey('steps-range')" v-model="poolConfig.settings!.refreservation" type="range" min="0" max="20" value="10" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer ">
+								<input :id="getIdKey('steps-range')" v-model="poolConfig.settings!.refreservation" type="number" min="0" max="20" value="10" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-2 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
+								<p class="mt-3">%</p>
+							</div>
+						</div>
+
+						<!-- Auto-Expand Pool (Toggle) -->
+						<div class="ml-3">
+							<label :for="getIdKey('auto-expand-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Auto-Expand Pool (When Larger Devices are Added)</label>
+							<Switch v-model="poolConfig.settings!.autoExpand" :class="[poolConfig.settings!.autoExpand ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+								<span class="sr-only">Use setting</span>
+								<span :class="[poolConfig.settings!.autoExpand ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+									<span :class="[poolConfig.settings!.autoExpand ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+										<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+											<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+									</span>
+									<span :class="[poolConfig.settings!.autoExpand ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+										<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+											<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+										</svg>
+									</span>
 								</span>
-								<span :class="[poolConfig.settings!.autoExpand ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-									</svg>
+							</Switch>
+						</div>
+						
+						<!-- Auto-Replace Devices (Toggle) -->
+						<div class="ml-3">
+							<label :for="getIdKey('auto-replace-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Auto-Replace Devices</label>
+							<Switch v-model="poolConfig.settings!.autoReplace" :class="[poolConfig.settings!.autoReplace ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+								<span class="sr-only">Use setting</span>
+								<span :class="[poolConfig.settings!.autoReplace ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+									<span :class="[poolConfig.settings!.autoReplace ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+										<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+											<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+									</span>
+									<span :class="[poolConfig.settings!.autoReplace ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+										<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+											<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+										</svg>
+									</span>
 								</span>
-							</span>
-						</Switch>
-					</div>
-					
-					<!-- Auto-Replace Devices (Toggle) -->
-					<div>
-						<label :for="getIdKey('auto-replace-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Auto-Replace Devices</label>
-						<Switch v-model="poolConfig.settings!.autoReplace" :class="[poolConfig.settings!.autoReplace ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings!.autoReplace ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-								<span :class="[poolConfig.settings!.autoReplace ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-									</svg>
+							</Switch>
+						</div>
+						
+						<!-- Auto-TRIM (Toggle) -->
+						<div class="ml-3">
+							<label :for="getIdKey('auto-trim-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Automatic TRIM</label>
+							<Switch v-model="poolConfig.settings!.autoTrim" :class="[poolConfig.settings!.autoTrim ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+								<span class="sr-only">Use setting</span>
+								<span :class="[poolConfig.settings!.autoTrim ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+									<span :class="[poolConfig.settings!.autoTrim ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+										<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+											<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+									</span>
+									<span :class="[poolConfig.settings!.autoTrim ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+										<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+											<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+										</svg>
+									</span>
 								</span>
-								<span :class="[poolConfig.settings!.autoReplace ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-									</svg>
-								</span>
-							</span>
-						</Switch>
-					</div>
-					
-					<!-- Auto-TRIM (Toggle) -->
-					<div>
-						<label :for="getIdKey('auto-trim-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Automatic TRIM</label>
-						<Switch v-model="poolConfig.settings!.autoTrim" :class="[poolConfig.settings!.autoTrim ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.settings!.autoTrim ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-								<span :class="[poolConfig.settings!.autoTrim ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-									</svg>
-								</span>
-								<span :class="[poolConfig.settings!.autoTrim ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-									</svg>
-								</span>
-							</span>
-						</Switch>
-					</div>
-					
+							</Switch>
+						</div>
+					</div>	
 				</template>
 			</Accordion>
 

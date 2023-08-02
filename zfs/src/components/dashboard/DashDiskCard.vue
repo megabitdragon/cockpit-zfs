@@ -1,12 +1,12 @@
 <template>
-	<Card class="overflow-visible bg-plugin-header rounded-md border border-default">
+	<Card class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
 		<template v-slot:title>
 			<div class="flex flex-row justify-between">
 				<div class="pr-2 text-default">
 					{{ props.disk.name }}
 				</div>
-				<div class="px-1">
-					<img class="w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+				<div>
+					<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 				</div>
 				<Menu as="div" class="relative inline-block text-right">
 					<div>

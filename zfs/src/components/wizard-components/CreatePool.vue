@@ -11,7 +11,7 @@
 		<template v-slot:footer>
 			<!-- buttons for next, back & also finish (if at last tab) -->
 			<div class="button-group-row w-full justify-between mx-4">
-				<div class="button-group-row">
+				<div class="button-group-row mt-2">
 					<div v-if="navTag == 'virtual-devices'" class="justify-self-start">
 						<div class="flex flex-row">
 							<label :for="'forcefully-create-pool'" class="mt-1 mr-3 block text-sm font-medium leading-6 text-default">Forcefully Create</label>
@@ -33,11 +33,11 @@
 						</div>
 					</div>
 
-					<div v-if="navTag == 'name-entry'" class="justify-self-center">
+					<div v-if="navTag == 'name-entry'" class="justify-self-center mt-1">
 						<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
 					</div>
 
-					<div v-if="navTag == 'virtual-devices'" class="justify-self-center">
+					<div v-if="navTag == 'virtual-devices'" class="justify-self-center mt-1">
 						<p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
 						<p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
 						<p class="text-danger" v-if="isProperReplicationFeedback">{{ isProperReplicationFeedback }}</p>
@@ -94,37 +94,38 @@ const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 //setting default values for file system object
 const fileSystemConfig = ref<FileSystemData>({
-  	name: '',
-	id: '',
-	mountpoint: '',
-	pool: '',
-	encrypted: false,
-	key_loaded: '',
-	type: '',
-	inherit: true,
-	properties: {
-		encryption: '',
-		accessTime: false,
-		caseSensitivity: '',
-		compression: '',
-		deduplication: '',
-		dNodeSize: '',
-		extendedAttributes: '',
-		recordSize: 0,
-		quota: {
+	parentFS: '',
+    name: '',
+    id: '',
+    mountpoint: '',
+    pool: '',
+    encrypted: false,
+    key_loaded: '',
+    type: '',
+    inherit: true,
+    properties: {
+		encryption: 'aes-256-gcm',
+        accessTime: 'inherited',
+        caseSensitivity: 'inherited',
+        compression: 'inherited',
+        deduplication: 'inherited',
+        dNodeSize: 'inherited',
+        extendedAttributes: 'inherited',
+        recordSize: 'inherited',
+        quota: {
             raw: 0,
             value: '',
             size: 'kib',
         },
-		readOnly: '',
-		available: '',
-		creation: '',
-		snapshotCount: '',
-		mounted: '',
 		usedByDataset: '',
 		usedbyRefreservation: '',
-	},
-
+        readOnly: '',
+        available: '',
+        creation: '',
+        snapshotCount: '',
+        mounted: '',
+    },
+    children: [],
 });
 
 //setting defaults for pool object
