@@ -43,7 +43,7 @@
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedbyRefreservation }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.compression }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.deduplication }}</td>
-								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.encrypted }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ isBoolOnOff(fileSystem.encrypted) }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.snapshotCount }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.readOnly }}</td>
 								<td class="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
@@ -126,6 +126,10 @@ async function refreshDatasets() {
 	fileSystems.value = [];
 	await loadDatasets(fileSystems);
 	fileSystemsLoaded.value = true;
+}
+
+function isBoolOnOff(bool : boolean) {
+	if (bool) {return 'on'} else {return 'off'}
 }
 
 provide('show-fs-wizard', showFSWizard);

@@ -144,9 +144,10 @@ export async function loadDatasets(datasets) {
 			}
 
 			datasets.value.push(dataset);
-			console.log("Datasets");
-			console.log(datasets);
 		}
+
+		console.log("Datasets");
+		console.log(datasets);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
