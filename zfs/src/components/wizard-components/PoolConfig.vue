@@ -2,7 +2,7 @@
 	<!-- first tab: name entry -->
 	<div v-if="props.tag ==='name-entry'">
 		<legend class="mb-1 text-base font-semibold leading-6 text-default">Name this Pool</legend>
-		<input type="text" @change="nameCheck" v-model="poolConfig.name" name="pool-name" :id="getIdKey('pool-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="Pool Name" />
+		<input type="text" v-model="poolConfig.name" name="pool-name" :id="getIdKey('pool-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="Pool Name" />
 	</div>
 
   	<!-- second tab: vDev + disk selection -->
@@ -56,30 +56,18 @@
 
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
-				<!-- <ul :id="getIdKey('available-disk-list')" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="col-span-1 divide-y divide-default rounded-lg bg-default shadow">
-						<div class="flex w-full h-full border border-default rounded ">
-							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="w-full py-4 ml-2 text-sm font-medium text-default"> 
-								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
-								<p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p> 
-								<p class="mt-1 truncate text-sm text-muted">{{ disk.type }}</p>
-								<p class="mt-1 truncate text-sm text-muted">Capacity: {{ disk.capacity }}</p>
-								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" 
-								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-							</label>  
-						</div> -->
 
-				<!-- FIX DISK DISPLAY (COLOR ENTIRE CARD NOT JUST CHECKBOX) (USE EMPTY SPACE) -->
-				<ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 grid-cols-3">
 					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="">
-						<div class="flex w-full h-full border border-default rounded-lg">
+						<div class="flex min-w-fit w-full h-full border border-default rounded-lg"
+						:class="diskCardClass(disk.name, vDevIdx)">
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
 								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
 								<p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p>
-								<p class="mt-1 truncate text-sm text-muted">{{ disk.type }}</p>
-								<p class="mt-1 truncate text-sm text-muted">Capacity: {{ disk.capacity }}</p>
+								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
+								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
-								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
+								class="hidden w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
 							</label>
 						</div>
 					</li>
@@ -326,6 +314,12 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 	});
 });
 
+//change color of disk when selected
+const diskCardClass = (diskName, vDevIdx) => {
+  const isSelected = poolConfig.value.vdevs[vDevIdx].selectedDisks.includes(diskName);
+  return isSelected ? 'bg-green-600 ' : '';
+};
+
 //method for adding initial vdev with default values 
 function initialVDev() {
 	const vDevConfig: vDevData = {
@@ -557,7 +551,6 @@ const validateAndProceed = (tabTag: string): boolean => {
 function removeVDev(index: number) {
   	poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
-
 
 //convert readable data size to raw bytes
 const convertSizeToBytes = (size) => {

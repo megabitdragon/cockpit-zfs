@@ -136,16 +136,6 @@ interface FileSystemData {
 	parentFS?: string;
 }
 
-interface InheritedProperties {
-	atime: string;
-	casesensitivity: string;
-	compression: string;
-	dedup: string;
-	dnodesize: string;
-	recordsize: string;
-	xattr: string;
-}
-
 //object for snapshots
 interface Snapshot {
 	name: string;

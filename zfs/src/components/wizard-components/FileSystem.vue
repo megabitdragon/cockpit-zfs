@@ -6,7 +6,7 @@
 			<div>
 				<label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
 				<select :id="getIdKey('parent-filesystem')" v-model="fileSystemConfig.parentFS" disabled name="parent-filesystem" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-					<option :value="poolConfig.name" class=text-default>{{ poolConfig.name }}</option>
+					<option :value="poolConfig.name!" class=text-default>{{ poolConfig.name! }}</option>
 				</select>
 			</div>
 
@@ -230,7 +230,7 @@
 				<div>
                     <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
                     <select :id="getIdKey('parent-filesystem')" name="parent-filesystem" v-model="newFileSystemConfig.parentFS" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-                        <option v-for="dataset, datasetIdx in datasets" :key="datasetIdx" :value="dataset[datasetIdx]">{{ dataset.name }}</option>
+                        <option v-for="dataset, datasetIdx in datasets" :key="datasetIdx" :value="dataset.name">{{ dataset.name }}</option>
                     </select>
                 </div>
 
@@ -263,10 +263,10 @@
 
 				<div v-if="newFileSystemConfig.encrypted">
 					<!-- Passphrase (Text) -->
-						<div>
-							<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
-							<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="Passphrase" />
-						</div>
+					<div>
+						<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
+						<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="Passphrase" />
+					</div>
 					<!-- Confirm Passphrase (Text) -->
 					<div>
 						<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
@@ -500,84 +500,67 @@ const newFileSystemConfig = ref<FileSystemData>({
     children: [],
 });
 
-const inheritedProperties = ref<InheritedProperties>({
-	atime: '',
-	casesensitivity: '',
-	compression: '',
-	dedup: '',
-	dnodesize: '',
-	recordsize: '',
-	xattr: '',	
-});
+console.log('poolConfig', poolConfig);
 
-const getInheritedProperties = () => {
+function getInheritedProperties() {
 	if (props.isStandalone) {
 
-		console.log('datasets.value:', datasets.value);
-		console.log('newFileSystemConfig.value.parentFS:', newFileSystemConfig.value.parentFS);
+		// console.log('datasets.value:', datasets.value);
+		// console.log('newFileSystemConfig.value.parentFS:', newFileSystemConfig.value.parentFS);
 
-		const selectedDataset = datasets.value.find(dataset => dataset.id === newFileSystemConfig.value.parentFS);
+		const selectedDataset = datasets.value.find(dataset => {
+			// console.log('Comparing:', dataset.id, newFileSystemConfig.value);
+			return dataset.id === newFileSystemConfig.value.parentFS;
+		});
 
 		console.log('selectedDataset:', selectedDataset);
-
-		console.log("selectedDataset");
-		console.log(selectedDataset);
-
-		inheritedProperties.value.atime = selectedDataset?.properties.accessTime!;
-		inheritedProperties.value.casesensitivity = selectedDataset?.properties.caseSensitivity!;
-		inheritedProperties.value.compression = selectedDataset?.properties.compression!;
-		inheritedProperties.value.dedup = selectedDataset?.properties.deduplication!;
-		inheritedProperties.value.dnodesize = selectedDataset?.properties.dNodeSize!;
-		inheritedProperties.value.recordsize = selectedDataset?.properties.recordSize!;
-		inheritedProperties.value.xattr = selectedDataset?.properties.extendedAttributes!;
-
-		console.log("inheritedProperties");
-		console.log(inheritedProperties);
 		
-		if (newFileSystemConfig.value.properties.deduplication == 'inherit') {
-			newFileSystemConfig.value.properties.deduplication = inheritedProperties.value.dedup;
+		if (newFileSystemConfig.value.properties.deduplication == 'inherited') {
+			newFileSystemConfig.value.properties.deduplication = selectedDataset?.properties.deduplication!;
 		}
-		if (newFileSystemConfig.value.properties.compression == 'inherit') {
-			newFileSystemConfig.value.properties.compression = inheritedProperties.value.compression;
+		if (newFileSystemConfig.value.properties.compression == 'inherited') {
+			newFileSystemConfig.value.properties.compression = selectedDataset?.properties.compression!;
 		}
-		if (newFileSystemConfig.value.properties.recordSize == 'inherit') {
-			newFileSystemConfig.value.properties.recordSize = inheritedProperties.value.recordsize;
+		if (newFileSystemConfig.value.properties.recordSize == 'inherited') {
+			newFileSystemConfig.value.properties.recordSize = selectedDataset?.properties.recordSize!;
 		}
-		if (newFileSystemConfig.value.properties.accessTime == 'inherit') {
-			newFileSystemConfig.value.properties.accessTime = inheritedProperties.value.atime;
+		if (newFileSystemConfig.value.properties.accessTime == 'inherited') {
+			newFileSystemConfig.value.properties.accessTime =  selectedDataset?.properties.accessTime!;
 		}
-		if (newFileSystemConfig.value.properties.caseSensitivity == 'inherit') {
-			newFileSystemConfig.value.properties.caseSensitivity = inheritedProperties.value.casesensitivity;
+		if (newFileSystemConfig.value.properties.caseSensitivity == 'inherited') {
+			newFileSystemConfig.value.properties.caseSensitivity = selectedDataset?.properties.caseSensitivity!;
 		}
-		if (newFileSystemConfig.value.properties.dNodeSize == 'inherit') {
-			newFileSystemConfig.value.properties.dNodeSize = inheritedProperties.value.dnodesize;
+		if (newFileSystemConfig.value.properties.dNodeSize == 'inherited') {
+			newFileSystemConfig.value.properties.dNodeSize = selectedDataset?.properties.dNodeSize!;
 		}
-		if (newFileSystemConfig.value.properties.extendedAttributes == 'inherit') {
-			newFileSystemConfig.value.properties.extendedAttributes = inheritedProperties.value.xattr;
+		if (newFileSystemConfig.value.properties.extendedAttributes == 'inherited') {
+			newFileSystemConfig.value.properties.extendedAttributes = selectedDataset?.properties.extendedAttributes!;
 		}
 
 		console.log("newFileSystemConfig");
 		console.log(newFileSystemConfig);
 	} else {
-		if (fileSystemConfig.value.properties.deduplication == 'inherit') {
+		fileSystemConfig.value.parentFS = poolConfig.name;
+
+		if (fileSystemConfig.value.properties.deduplication == 'inherited') {
 			fileSystemConfig.value.properties.deduplication = isBoolOnOff(poolConfig.settings?.deduplication!);
 		}
-		if (fileSystemConfig.value.properties.compression == 'inherit') {
+		if (fileSystemConfig.value.properties.compression == 'inherited') {
 			fileSystemConfig.value.properties.compression = isBoolCompression(poolConfig.settings?.compression!);
 		}
-		if (fileSystemConfig.value.properties.recordSize == 'inherit') {
+		if (fileSystemConfig.value.properties.recordSize == 'inherited') {
 			fileSystemConfig.value.properties.recordSize = poolConfig.settings?.record!;
 		}
-		if (fileSystemConfig.value.properties.accessTime == 'inherit') {
+		if (fileSystemConfig.value.properties.accessTime == 'inherited') {
 			fileSystemConfig.value.properties.accessTime = 'on';
 		}
-		if (fileSystemConfig.value.properties.caseSensitivity == 'inherit') {
+		if (fileSystemConfig.value.properties.caseSensitivity == 'inherited') {
 			fileSystemConfig.value.properties.caseSensitivity = 'sensitive';
 		}
-		if (fileSystemConfig.value.properties.dNodeSize == 'inherit') {
+		if (fileSystemConfig.value.properties.dNodeSize == 'inherited') {
 			fileSystemConfig.value.properties.dNodeSize = 'legacy';
 		}
-		if (fileSystemConfig.value.properties.extendedAttributes == 'inherit') {
+		if (fileSystemConfig.value.properties.extendedAttributes == 'inherited') {
 			fileSystemConfig.value.properties.extendedAttributes = 'sa';
 		}
 
