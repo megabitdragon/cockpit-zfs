@@ -41,7 +41,6 @@ interface ZFSProps {
 const props = defineProps<ZFSProps>();
 
 const pools = ref<PoolData[]>([]);
-const vDevs = ref<vDevData[]>([]);
 const disks = ref<DiskData[]>([]);
 const datasets = ref<FileSystemData[]>([]);
 

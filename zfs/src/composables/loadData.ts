@@ -3,13 +3,7 @@ import { getPools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 
-// const pools = ref<PoolData[]>([]);
 const vDevs = ref<vDevData[]>([]);
-// const disks = ref<DiskData[]>([]);
-// const datasets = ref<Dataset[]>([]);
-// const pools = inject<Ref<PoolData[]>>('pools')!;
-// const disks = inject<Ref<DiskData[]>>('disks')!;
-//const datasets = inject<Ref<Dataset[]>>('datasets')!;
 
 export async function loadDisksThenPools(disks, pools) {
 	//executes a python script to retrieve all disk data and outputs a JSON
@@ -154,7 +148,6 @@ export async function loadDatasets(datasets) {
 		console.error("An error occurred getting datasets:", error);
 	}
 }
-
 
 export async function loadDisks(disks) {
 	try {

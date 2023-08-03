@@ -108,6 +108,7 @@ interface FileSystemData {
 	key_loaded: string;
 	type: string;
 	inherit: boolean;
+	passphrase?: string;
 	properties: {
 		encryption: string;
 		accessTime: string;

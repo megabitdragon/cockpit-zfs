@@ -5,7 +5,7 @@
 			<!-- Name of Parent File System (Text) -->
 			<div>
 				<label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-				<select :id="getIdKey('parent-filesystem')" disabled name="parent-filesystem" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+				<select :id="getIdKey('parent-filesystem')" v-model="fileSystemConfig.parentFS" disabled name="parent-filesystem" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
 					<option :value="poolConfig.name" class=text-default>{{ poolConfig.name }}</option>
 				</select>
 			</div>
@@ -64,7 +64,7 @@
 
 			<!-- Inherit Pool Settings (Toggle) -> On by Default, if Off then reveals all fields to set -->
 			<div>
-				<label :for="getIdKey('inherit')" class="mt-1 block text-sm font-medium leading-6 text-default">Inherit Parent Settings</label>
+				<label :for="getIdKey('inherit')" class="mt-1 block text-sm font-medium leading-6 text-default">Inherit Parent/Default Settings</label>
 				<Switch :id="getIdKey('inherit')" v-model="fileSystemConfig.inherit" :class="[fileSystemConfig.inherit ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 					<span class="sr-only">Use setting</span>
 					<span :class="[fileSystemConfig.inherit ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -137,7 +137,7 @@
 				<div>
 					<label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-default">Access Time</label>
 					<select v-model="fileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited</option>
+						<option value="inherited">Default (On)</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 					</select>
@@ -146,7 +146,7 @@
 				<div>
 					<label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-default">Case Sensitivity</label>
 					<select v-model="fileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited</option>
+						<option value="inherited">Default (Sensitive)</option>
 						<option value="insensitive">Insensitive</option>
 						<option value="mixed">Mixed</option>
 						<option value="sensitive">Sensitive</option>
@@ -156,7 +156,7 @@
 				<div>
 					<label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-default">DNode Size</label>
 					<select v-model="fileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited</option>
+						<option value="inherited">Default (Legacy)</option>
 						<option value="1kib">1 KiB</option>
 						<option value="2kib">2 KiB</option>
 						<option value="4kib">4 KiB</option>
@@ -170,7 +170,7 @@
 				<div>
 					<label :for="getIdKey('fs-extended-attributes')" class="block text-sm font-medium leading-6 text-default">Extended Attributes</label>
 					<select v-model="fileSystemConfig.properties.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited</option>
+						<option value="inherited">Default (System Attribute)</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 						<option value="system attribute">System Attribute</option>
@@ -437,7 +437,7 @@
 			</template>
 			<template v-slot:footer>
 				<div class="mt-2">
-					<button :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary">Create File System</button>
+					<button @click="fsCreateBtn" :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary">Create File System</button>
 				</div>
 			</template>
 		</Modal>
@@ -500,37 +500,91 @@ const newFileSystemConfig = ref<FileSystemData>({
     children: [],
 });
 
-const inheritedProperties : InheritedProperties = {
+const inheritedProperties = ref<InheritedProperties>({
 	atime: '',
 	casesensitivity: '',
 	compression: '',
 	dedup: '',
 	dnodesize: '',
 	recordsize: '',
-	xattr: '',
+	xattr: '',	
+});
+
+const getInheritedProperties = () => {
+	if (props.isStandalone) {
+
+		console.log('datasets.value:', datasets.value);
+		console.log('newFileSystemConfig.value.parentFS:', newFileSystemConfig.value.parentFS);
+
+		const selectedDataset = datasets.value.find(dataset => dataset.id === newFileSystemConfig.value.parentFS);
+
+		console.log('selectedDataset:', selectedDataset);
+
+		console.log("selectedDataset");
+		console.log(selectedDataset);
+
+		inheritedProperties.value.atime = selectedDataset?.properties.accessTime!;
+		inheritedProperties.value.casesensitivity = selectedDataset?.properties.caseSensitivity!;
+		inheritedProperties.value.compression = selectedDataset?.properties.compression!;
+		inheritedProperties.value.dedup = selectedDataset?.properties.deduplication!;
+		inheritedProperties.value.dnodesize = selectedDataset?.properties.dNodeSize!;
+		inheritedProperties.value.recordsize = selectedDataset?.properties.recordSize!;
+		inheritedProperties.value.xattr = selectedDataset?.properties.extendedAttributes!;
+
+		console.log("inheritedProperties");
+		console.log(inheritedProperties);
+		
+		if (newFileSystemConfig.value.properties.deduplication == 'inherit') {
+			newFileSystemConfig.value.properties.deduplication = inheritedProperties.value.dedup;
+		}
+		if (newFileSystemConfig.value.properties.compression == 'inherit') {
+			newFileSystemConfig.value.properties.compression = inheritedProperties.value.compression;
+		}
+		if (newFileSystemConfig.value.properties.recordSize == 'inherit') {
+			newFileSystemConfig.value.properties.recordSize = inheritedProperties.value.recordsize;
+		}
+		if (newFileSystemConfig.value.properties.accessTime == 'inherit') {
+			newFileSystemConfig.value.properties.accessTime = inheritedProperties.value.atime;
+		}
+		if (newFileSystemConfig.value.properties.caseSensitivity == 'inherit') {
+			newFileSystemConfig.value.properties.caseSensitivity = inheritedProperties.value.casesensitivity;
+		}
+		if (newFileSystemConfig.value.properties.dNodeSize == 'inherit') {
+			newFileSystemConfig.value.properties.dNodeSize = inheritedProperties.value.dnodesize;
+		}
+		if (newFileSystemConfig.value.properties.extendedAttributes == 'inherit') {
+			newFileSystemConfig.value.properties.extendedAttributes = inheritedProperties.value.xattr;
+		}
+
+		console.log("newFileSystemConfig");
+		console.log(newFileSystemConfig);
+	} else {
+		if (fileSystemConfig.value.properties.deduplication == 'inherit') {
+			fileSystemConfig.value.properties.deduplication = isBoolOnOff(poolConfig.settings?.deduplication!);
+		}
+		if (fileSystemConfig.value.properties.compression == 'inherit') {
+			fileSystemConfig.value.properties.compression = isBoolCompression(poolConfig.settings?.compression!);
+		}
+		if (fileSystemConfig.value.properties.recordSize == 'inherit') {
+			fileSystemConfig.value.properties.recordSize = poolConfig.settings?.record!;
+		}
+		if (fileSystemConfig.value.properties.accessTime == 'inherit') {
+			fileSystemConfig.value.properties.accessTime = 'on';
+		}
+		if (fileSystemConfig.value.properties.caseSensitivity == 'inherit') {
+			fileSystemConfig.value.properties.caseSensitivity = 'sensitive';
+		}
+		if (fileSystemConfig.value.properties.dNodeSize == 'inherit') {
+			fileSystemConfig.value.properties.dNodeSize = 'legacy';
+		}
+		if (fileSystemConfig.value.properties.extendedAttributes == 'inherit') {
+			fileSystemConfig.value.properties.extendedAttributes = 'sa';
+		}
+
+		console.log("fileSystemConfig");
+		console.log(fileSystemConfig);
+	}
 }
-
-// const getInheritedProperties = () => {
-
-// 	if (props.isStandalone == true) {
-// 		const poolProperties = datasets.value.find(dataset => dataset.name == newFileSystemConfig.value.parentFS)!;
-// 		inheritedProperties.atime = poolProperties.properties.accessTime;
-// 		inheritedProperties.casesensitivity = poolProperties.properties.caseSensitivity;
-// 		inheritedProperties.compression = poolProperties.properties.compression;
-// 		inheritedProperties.dedup = poolProperties.properties.deduplication;
-// 		inheritedProperties.dnodesize = poolProperties.properties.dNodeSize;
-// 		inheritedProperties.recordsize = poolProperties.properties.recordSize;
-// 		inheritedProperties.xattr = poolProperties.properties.extendedAttributes;
-// 	} else {
-// 		inheritedProperties.atime = 'on';
-// 		inheritedProperties.casesensitivity = 'sensitive';
-// 		inheritedProperties.compression = isBoolCompression(poolConfig.settings?.compression!);
-// 		inheritedProperties.dedup = isBoolOnOff(poolConfig.settings?.deduplication!);
-// 		inheritedProperties.dnodesize = 'legacy';
-// 		inheritedProperties.recordsize = poolConfig.settings?.record!;
-// 		inheritedProperties.xattr = 'sa';
-// 	}
-// }
 
 const nameCheck = () => {
 	let result = true;
@@ -570,6 +624,10 @@ const nameCheck = () => {
 	return result;
 }
 
+function fsCreateBtn() {
+	getInheritedProperties();
+}
+
 //convert raw bytes to readable data size
 const convertBytesToSize = (bytes) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -601,6 +659,7 @@ function isBoolCompression(bool : boolean) {
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 defineExpose({
-	//nameCheck,
+	nameCheck,
+	getInheritedProperties
 })
 </script>
