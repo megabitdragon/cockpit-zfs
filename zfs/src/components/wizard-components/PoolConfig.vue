@@ -56,8 +56,7 @@
 
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
-
-				<ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 grid-cols-3">
+				<ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 grid-cols-4">
 					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="">
 						<div class="flex min-w-fit w-full h-full border border-default rounded-lg"
 						:class="diskCardClass(disk.name, vDevIdx)">
@@ -75,10 +74,11 @@
 
 				<!-- buttons to add/remove vdevs -->
 				<div class="button-group-row mt-2">
-					<button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button>
+					<!-- <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button> -->
 					<button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
 				</div>
 			</div>
+			
 				<!-- if user accidentally removes all vdevs, shows add vdev button to add another (would like to change this so its impossible to remove 1st vDev and ensure there is always at least 1) -->
 			<div v-if="poolConfig.vdevs.length < 1" class="button-group-row">
 				<button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="initialVDev()">Add VDev</button>
@@ -614,6 +614,7 @@ if (poolConfig.value.vdevs.length < 1) initialVDev();
 
 defineExpose({
 	validateAndProceed,
-	fillNewPoolData
+	fillNewPoolData,
+	addVDev
 });
 </script>

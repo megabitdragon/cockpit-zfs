@@ -12,10 +12,14 @@
 			<!-- buttons for next, back & also finish (if at last tab) -->
 			<div class="button-group-row w-full justify-between mx-4">
 				<div class="button-group-row mt-2">
-					<div v-if="navTag == 'virtual-devices'" class="justify-self-start">
+					<div v-if="navTag == 'virtual-devices'" class="justify-self-start flex flex-row">
+						<div class="button-group-row">
+							<button v-if="poolConfig.vdevs.length > 0" id="add-vdev-btn" class="btn btn-primary object-left justify-start mr-4 h-fit w-full" @click="poolConfiguration.addVDev()">Add VDev</button>
+						</div>
+
 						<div class="flex flex-row">
-							<label :for="'forcefully-create-pool'" class="mt-1 mr-3 block text-sm font-medium leading-6 text-default">Forcefully Create</label>
-							<Switch v-model="poolConfig.settings!.forceCreate" :class="[poolConfig.settings!.forceCreate ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+							<label :for="'forcefully-create-pool'" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully Create</label>
+							<Switch v-model="poolConfig.settings!.forceCreate" :class="[poolConfig.settings!.forceCreate ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 								<span class="sr-only">Use setting</span>
 								<span :class="[poolConfig.settings!.forceCreate ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
 									<span :class="[poolConfig.settings!.forceCreate ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
@@ -45,8 +49,8 @@
 					</div>
 				</div>			
 				<div class="button-group-row">
-					<button id="back" class="btn btn-secondary object-left justify-start" @click="prev">Back</button>
-					<button v-if="!end" id="next" class="btn btn-primary object-right justify-end" @click="next">Next</button>
+					<button id="back" class="btn btn-secondary object-left justify-start h-fit" @click="prev">Back</button>
+					<button v-if="!end" id="next" class="btn btn-primary object-right justify-end h-fit" @click="next">Next</button>
 					<!-- only show finish button if currently on the final tab -->
 					<button v-if="end && !finishPressed" id="finish" class="btn btn-primary object-right justify-end" @click="finishBtn(newPoolData)">Finish</button>
 					<button disabled v-if="end && finishPressed" id="finish" type="button" class="btn btn-primary object-right justify-end">
@@ -81,6 +85,7 @@ const showWizard = inject<Ref<boolean>>('show-wizard')!;
 
 //reference to poolConfiguration component to use its methods
 const poolConfiguration = ref();
+
 const nameFeedback = ref('');
 const vDevFeedback = ref('');
 const diskFeedback = ref('');

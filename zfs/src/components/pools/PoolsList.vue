@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="mt-8 overflow-visible">
-			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-sm border border-default">
+			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
 
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 					<table class="min-w-full divide-y divide-default">
