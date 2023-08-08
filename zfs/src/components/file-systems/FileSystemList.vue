@@ -1,7 +1,7 @@
 <template>
 	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<div class="button-group-row">
-			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showFSWizard = true">Create File System</button>
+			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showNewFSWizard = true">Create File System</button>
 			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="refreshDatasets" ><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
@@ -34,7 +34,7 @@
 							
 							<!-- FILE SYSTEMS BY POOLS -->
 							<tr v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
-								<td class="py-4 pl-4 pr-3 text-sm font-medium text-default"> 
+								<td class="py-4 pl-4 pr-5 text-sm font-medium text-default"> 
 									<span class="sr-only"></span>
 								</td>
 								<td class="py-4 pl-4 pr-3 text-sm font-medium text-default"> {{ fileSystem.name }}</td>
@@ -58,33 +58,32 @@
 											<MenuItems class="absolute right-0 z-10 mt-1 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 												<div class="py-1">
 													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
+														<a href="#" @click="loadFileSystemConfig(fileSystem)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Edit Permissions</a>
+														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Edit Permissions</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
+														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
+														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+														<a href="#" @click="" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
+														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 													</MenuItem>
 													<MenuItem v-if="fileSystem.encrypted" v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
+														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
+														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
-													</MenuItem>
-													
+														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
+													</MenuItem>													
 												</div>
 											</MenuItems>
 										</transition>
@@ -107,8 +106,12 @@
 		</div>
 	</div>
 
-	<div v-if="showFSWizard">
-		<FileSystem :isStandalone="true" idKey="fs-wizard" @close="showFSWizard = false"/>
+	<div v-if="showNewFSWizard">
+		<FileSystem :isStandalone="true" idKey="fs-wizard" @close="showNewFSWizard = false"/>
+	</div>
+
+	<div v-if="showFSConfig">
+		<FSConfigModal :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
 	</div>
 
 </template>
@@ -120,13 +123,13 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
-
-const poolData = inject<Ref<PoolData[]>>("pools")!;
+import FSConfigModal from "./FSConfigModal.vue";
 
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
-const showFSWizard = ref(false);
+const showNewFSWizard = ref(false);
+const showFSConfig = ref(false);
 
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
@@ -135,9 +138,18 @@ async function refreshDatasets() {
 	fileSystemsLoaded.value = true;
 }
 
+const selectedDataset = ref<FileSystemData>();
+
+function loadFileSystemConfig(fileSystem) {
+	selectedDataset.value = fileSystem;
+	console.log(selectedDataset);
+	showFSConfig.value = true
+}
+
 function isBoolOnOff(bool : boolean) {
 	if (bool) {return 'on'} else {return 'off'}
 }
 
-provide('show-fs-wizard', showFSWizard);
+provide('show-fs-wizard', showNewFSWizard);
+provide('show-fs-config', showFSConfig);
 </script>

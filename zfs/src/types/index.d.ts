@@ -110,6 +110,7 @@ interface FileSystemData {
 	inherit: boolean;
 	passphrase?: string;
 	properties: {
+		guid: string;
 		encryption: string;
 		accessTime: string;
 		caseSensitivity: string;
@@ -131,6 +132,15 @@ interface FileSystemData {
 		mounted: string;
 		usedbyRefreservation: string;
 		usedByDataset: string;
+		canMount?: string;
+		aclInheritance?: string;
+		aclType?: string;
+		checksum?: string;
+		refreservation?: {
+			raw?: number;
+			value?: string;
+			size?: 'kib' | 'mib' | 'gib' | 'tib';
+		}
 	},
 	children?: FileSystemData[];
 	parentFS?: string;

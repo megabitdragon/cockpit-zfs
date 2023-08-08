@@ -58,17 +58,17 @@
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
 				<ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 grid-cols-4">
 					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="">
-						<div class="flex min-w-fit w-full h-full border border-default rounded-lg"
+						<button class="flex min-w-fit w-full h-full border border-default rounded-lg"
 						:class="diskCardClass(disk.name, vDevIdx)">
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
+								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
+								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
 								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
 								<p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
-								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
-								class="hidden w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
 							</label>
-						</div>
+						</button>
 					</li>
 				</ul>
 
@@ -317,7 +317,7 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 //change color of disk when selected
 const diskCardClass = (diskName, vDevIdx) => {
   const isSelected = poolConfig.value.vdevs[vDevIdx].selectedDisks.includes(diskName);
-  return isSelected ? 'bg-green-600 ' : '';
+  return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
 //method for adding initial vdev with default values 

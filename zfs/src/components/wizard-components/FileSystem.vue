@@ -343,16 +343,16 @@
 						<label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-default">Deduplication</label>
 						<select v-model="newFileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
 							<option value="inherited">Inherited</option>
-						<option value="on">On</option>
-						<option value="off">Off</option>
-						<option value="edon-r + verify">Edon-R + Verify</option>
-						<option value="sha-256">SHA-256</option>
-						<option value="sha-256 + verify">SHA-256 + Verify</option>
-						<option value="sha-512">SHA-512</option>
-						<option value="sha-512 + verify">SHA-512 + Verify</option>
-						<option value="skein">Skein</option>
-						<option value="skein + verify">Skein + Verify</option>
-						<option value="verify">Verify</option>
+							<option value="on">On</option>
+							<option value="off">Off</option>
+							<option value="edon-r + verify">Edon-R + Verify</option>
+							<option value="sha-256">SHA-256</option>
+							<option value="sha-256 + verify">SHA-256 + Verify</option>
+							<option value="sha-512">SHA-512</option>
+							<option value="sha-512 + verify">SHA-512 + Verify</option>
+							<option value="skein">Skein</option>
+							<option value="skein + verify">Skein + Verify</option>
+							<option value="verify">Verify</option>
 						</select>
 					</div>
 					<!-- DNode Size (Select) -->
@@ -361,7 +361,7 @@
 						<select v-model="newFileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
 							<option value="inherited">Inherited</option>
 							<option value="1 kib">1 KiB</option>
-							<option value="2 kibi">2 KiB</option>
+							<option value="2 kib">2 KiB</option>
 							<option value="4 kib">4 KiB</option>
 							<option value="8 kib">8 KiB</option>
 							<option value="16 kib">16 KiB</option>
@@ -486,6 +486,7 @@ const newFileSystemConfig = ref<FileSystemData>({
     type: '',
     inherit: true,
     properties: {
+		guid: '',
 		encryption: 'aes-256-gcm',
         accessTime: 'inherited',
         caseSensitivity: 'inherited',
@@ -506,6 +507,11 @@ const newFileSystemConfig = ref<FileSystemData>({
         creation: '',
         snapshotCount: '',
         mounted: '',
+		refreservation: {
+            raw: 0,
+            value: '',
+            size: 'kib',
+        }
     },
     children: [],
 });

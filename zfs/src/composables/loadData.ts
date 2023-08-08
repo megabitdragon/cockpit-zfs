@@ -114,6 +114,7 @@ export async function loadDatasets(datasets) {
 				type: parsedJSON[i].type,
 				inherit: false,
 				properties: {
+					guid: parsedJSON[i].properties.guid.parsed,
 					encryption: parsedJSON[i].properties.encryption.parsed,
 					available: convertBytesToSize(parsedJSON[i].properties.available.parsed),
 					creation: parsedJSON[i].properties.creation.value,
