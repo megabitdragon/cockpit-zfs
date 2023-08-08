@@ -148,7 +148,7 @@
 					<span><b>Advanced Settings</b></span>
 				</template>
 				<template v-slot:content>
-					<div class="bg-default rounded-md my-2 py-2">
+					<div class="bg-default rounded-md my-2 py-2 mx-2">
 
 						<!-- Deduplication (Toggle) -->
 						<div class="ml-3">

@@ -70,14 +70,21 @@
 														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
+														<a href="#" @onClick="" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+													</MenuItem>
+													<MenuItem v-slot="{ active }">
+														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
+													</MenuItem>
+													<MenuItem v-if="fileSystem.encrypted" v-slot="{ active }">
+														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
+													</MenuItem>
+													<MenuItem v-slot="{ active }">
 														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
 														<a href="#" @onClick="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
 													</MenuItem>
-													<MenuItem v-slot="{ active }">
-														<a href="#" @onClick="" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
-													</MenuItem>
+													
 												</div>
 											</MenuItems>
 										</transition>
