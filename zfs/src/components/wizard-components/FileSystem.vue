@@ -237,8 +237,7 @@
 				<!-- Name of File System (Text) -->
 				<div>
 					<label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium text-default">Name</label>
-					<input :id="getIdKey('filesystem-name')" type="name" name="pool-name" v-model="newFileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default" placeholder="File System Name" />
-					<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
+					<input :id="getIdKey('filesystem-name')" type="name" name="pool-name" v-model="newFileSystemConfig.name" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="File System Name" />
 				</div>
 
 				<!-- Encryption (Toggle) -> Reveals extra fields-->
@@ -270,7 +269,7 @@
 					<!-- Confirm Passphrase (Text) -->
 					<div>
 						<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
-						<input :id="getIdKey('passphrase-confirm')" type="password" name="passphrase-confirm" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="Confirm Passphrase" />
+						<input :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="Confirm Passphrase" />
 					</div>
 					<!-- Cipher (Select) -->
 					<div>
@@ -436,9 +435,17 @@
 				</div>
 			</template>
 			<template v-slot:footer>
-				<div class="mt-2">
-					<button @click="fsCreateBtn" :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary">Create File System</button>
+
+				<div class="button-group-row w-full justify-between mx-4">
+					<div class="button-group-row mt-2 justify-self-center">
+						<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
+						<p class="text-danger" v-if="passFeedback">{{ passFeedback }}</p>		
+					</div>
+					<div class="button-group-row mt-2">
+						<button @click="fsCreateBtn(newFileSystemConfig)" :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary object-right justify-end">Create File System</button>
+					</div>
 				</div>
+
 			</template>
 		</Modal>
 	</div>
@@ -460,10 +467,13 @@ const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
 const nameFeedback = ref('');
+
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 const passphrase = ref('');
+const passphraseConfirm = ref('');
+const passFeedback = ref('');
 
 const newFileSystemConfig = ref<FileSystemData>({
     parentFS: '',
@@ -569,46 +579,76 @@ function getInheritedProperties() {
 	}
 }
 
-const nameCheck = () => {
+const nameCheck = (fileSystem : FileSystemData) => {
 	let result = true;
 	nameFeedback.value = '';
 	
-	if (fileSystemConfig.value.name == '') {
+	if (fileSystem.name == '') {
 		result = false;
 		nameFeedback.value = 'Name cannot be empty.';
-	} else if (fileSystemConfig.value.name.match(/^[0-9]/) ) {
+	} else if (fileSystem.name.match(/^[0-9]/) ) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with numbers.';
-	} else if (fileSystemConfig.value.name.match(/^[.]/ )) {
+	} else if (fileSystem.name.match(/^[.]/ )) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with a period (.).';
-	} else if (fileSystemConfig.value.name.match(/^[_]/)) {
+	} else if (fileSystem.name.match(/^[_]/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with an underscore (_).';
-	} else if (fileSystemConfig.value.name.match(/^[-]/)) {
+	} else if (fileSystem.name.match(/^[-]/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with a hyphen (-).';
-	} else if (fileSystemConfig.value.name.match(/^[:]/)) {
+	} else if (fileSystem.name.match(/^[:]/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with a colon (:).';
-	} else if (fileSystemConfig.value.name.match(/^[ ]/)) {
+	} else if (fileSystem.name.match(/^[ ]/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with whitespace.';
-	} else if (fileSystemConfig.value.name.match(/[ ]$/)) {
+	} else if (fileSystem.name.match(/[ ]$/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot end with whitespace.';
-	} else if (fileSystemConfig.value.name.match(/^c[0-9]|^log|^mirror|^raidz|^raidz1|^raidz2|^raidz3|^spare/)) {
+	} else if (fileSystem.name.match(/^c[0-9]|^log|^mirror|^raidz|^raidz1|^raidz2|^raidz3|^spare/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with a reserved name.';
-	} else if (!fileSystemConfig.value.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
+	} else if (!fileSystem.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
 		result = false;
 		nameFeedback.value = 'Name contains invalid characters.';
 	} 
 	return result;
 }
 
-function fsCreateBtn() {
-	getInheritedProperties();
+const encryptPasswordCheck = (fileSystem : FileSystemData) => {
+	let result = true;
+	passFeedback.value = '';
+
+	if (fileSystem.encrypted) {
+		if (passphraseConfirm.value != passphrase.value) {
+			result = false;
+			passFeedback.value = 'Passphrase does not match.';
+			//8 chars min
+			 //cannot be empty
+		} else if (passphrase.value == '') {
+			result = false;
+			passFeedback.value = 'Passphrase cannot be empty.';
+		} else if (passphrase.value.length < 8) {
+			result = false;
+			passFeedback.value = 'Passphrase requires a minimum of 8 characters.';
+		}
+	}
+
+	return result;
+}
+
+function fsCreateBtn(fileSystem : FileSystemData) {
+	if (nameCheck(fileSystem)) {
+		if (fileSystem.encrypted) {
+			if (encryptPasswordCheck(fileSystem)) {
+				getInheritedProperties();
+			}
+		} else {
+			getInheritedProperties();
+		}
+	}
 }
 
 //convert raw bytes to readable data size

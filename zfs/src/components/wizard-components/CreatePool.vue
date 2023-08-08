@@ -37,18 +37,18 @@
 						</div>
 					</div>
 
-					<div v-if="navTag == 'name-entry'" class="justify-self-center mt-1">
+					<div v-if="navTag == 'name-entry'" class="justify-self-center mt-2">
 						<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
 					</div>
 
-					<div v-if="navTag == 'virtual-devices'" class="justify-self-center mt-1">
+					<div v-if="navTag == 'virtual-devices'" class="justify-self-center mt-2">
 						<p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
 						<p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
 						<p class="text-danger" v-if="isProperReplicationFeedback">{{ isProperReplicationFeedback }}</p>
 						<p class="text-danger" v-if="vDevFeedback">{{ vDevFeedback }}</p>
 					</div>
 				</div>			
-				<div class="button-group-row">
+				<div class="button-group-row mt-2">
 					<button id="back" class="btn btn-secondary object-left justify-start h-fit" @click="prev">Back</button>
 					<button v-if="!end" id="next" class="btn btn-primary object-right justify-end h-fit" @click="next">Next</button>
 					<!-- only show finish button if currently on the final tab -->
