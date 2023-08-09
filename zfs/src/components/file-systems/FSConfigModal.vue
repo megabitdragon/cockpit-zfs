@@ -4,38 +4,45 @@
             <legend class="flex justify-center">Configure File System</legend>
         </template>
         <template v-slot:content>
-            <div class="grid grid-cols-3 gap-2">
-                <div class="mt-2 col-span-1 col-start-1 row-start-1">
-                    <label :for="getIdKey('fs-config-name')" name="fs-config-name" class="mt-1 block text-sm leading-6 text-default">File System Name</label>
-                    <p>{{ props.filesystem.name }}</p>
-                </div>
-                <div class="mt-2 col-span-1 col-start-2 row-start-1">
-                    <label for="fs-pool-readonly" :id="getIdKey('fs-config-readonly')" name="fs-pool-readonly" class="mt-1 block text-sm leading-6 text-default">Read Only</label>
-                    <Switch v-model="isReadOnly" :id="getIdKey('fs-config-readonly')" :class="[isReadOnly! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-                        <span class="sr-only">Use setting</span>
-                        <span :class="[isReadOnly! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-                            <span :class="[isReadOnly! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                                <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-                                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
+            <div>
+                <div class="grid grid-cols-4 gap-2">
+                    <div class="mt-2 ">
+                        <label :for="getIdKey('fs-config-name')" name="fs-config-name" class="mt-1 block text-sm leading-6 text-default">File System Name</label>
+                        <p>{{ props.filesystem.name }}</p>
+                    </div>
+                    <div class="mt-2">
+                        <label :for="getIdKey('fs-config-guid')" name="fs-config-guid" class="mt-1 block text-sm leading-6 text-default">GUID</label>
+                        <p>{{ props.filesystem.properties.guid }}</p>
+                    </div>
+                    <div class="mt-2">
+                        <label :for="getIdKey('fs-config-case-sensitivity')" name="fs-config-case-sensitivity" class="mt-1 block text-sm leading-6 text-default">Case Sensitivity</label>
+                        <p>{{ upperCaseWord(props.filesystem.properties.caseSensitivity) }}</p>
+                    </div>
+                    <div class="mt-2">
+                        <label for="fs-config-readonly" :id="getIdKey('fs-config-readonly')" name="fs-config-readonly" class="mt-1 block text-sm leading-6 text-default">Read Only</label>
+                        <Switch v-model="fileSystemConfig.properties.isReadOnly" :id="getIdKey('fs-config-readonly')" :class="[fileSystemConfig.properties.isReadOnly! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <span class="sr-only">Use setting</span>
+                            <span :class="[fileSystemConfig.properties.isReadOnly! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[fileSystemConfig.properties.isReadOnly! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                        <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                <span :class="[fileSystemConfig.properties.isReadOnly! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    </svg>
+                                </span>
                             </span>
-                            <span :class="[isReadOnly! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                                <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-                                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-                                </svg>
-                            </span>
-                        </span>
-                    </Switch>
+                        </Switch>
+                    </div>
                 </div>
-                <div class="mt-2 col-span-1 col-start-3 row-start-1">
-                    <label :for="getIdKey('fs-config-guid')" name="fs-config-guid" class="mt-1 block text-sm leading-6 text-default">GUID</label>
-                    <p>{{ props.filesystem.properties.guid }}</p>
-                </div>
-                <div class="mt-2 col-span-2 col-start-1 row-start-2">
+              
+                <div class="mt-2">
                     <label :for="getIdKey('fs-config-mountpoint')" name="fs-config-mountpoint" class="mt-1 block text-sm leading-6 text-default">Mountpoint</label>
                     <input type="text" v-model="fileSystemConfig.mountpoint" name="fs-config-mountpoint" :id="getIdKey('fs-config-mountpoint')" class="mt-1 block w-full input-textlike bg-default" placeholder="Mountpoint" />
                 </div>
-                <div class="mt-2 col-span-1 col-start-3 row-start-2">
+               <div class="mt-2">
                     <label :for="getIdKey('fs-config-can-mount')" class="bg-default block text-base leading-6 text-default">Can Mount</label>
                     <select :id="getIdKey('fs-config-can-mount')" v-model="fileSystemConfig.properties.canMount" name="fs-config-can-mount" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
@@ -43,7 +50,7 @@
                         <option value="no auto">No Auto</option>
                     </select>
                 </div>
-                <div class="mt-2 col-span-1 col-start-1 row-start-3">
+                <div class="mt-2">
                     <label :for="getIdKey('fs-config-recordsize')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
                     <select :id="getIdKey('fs-config-recordsize')" v-model="fileSystemConfig.properties.recordSize" name="fs-config-recordsize" class="mt-1 block w-full input-textlike bg-default">
                         <option value="512b">512 B</option>
@@ -58,7 +65,7 @@
                         <option value="1mib">1 MiB</option>
                     </select>
                 </div>
-                <div class="mt-2 col-span-2 col-start-2 row-start-3">
+               <div class="mt-2">
                     <label :for="getIdKey('fs-config-quota')" class="mb-1 block text-sm font-medium leading-6 text-default">Quota</label>
                     <div class="flex flex-row">
                         <input v-model="fileSystemConfig.properties.quota.raw" :id="getIdKey('fs-config-quota-amount')" name="fs-config-quota-slider" type="range" min="0" max="1000" value="0" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
@@ -71,7 +78,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="mt-2 col-span-1 col-start-1 row-start-4">
+                 <div class="mt-2">
                     <label :for="getIdKey('fs-config-acl-inherit')" class="bg-default block text-base leading-6 text-default">ACL Inheritance</label>
                     <select :id="getIdKey('fs-config-acl-inherit')" v-model="fileSystemConfig.properties.aclInheritance" name="fs-config-acl-inherit" class="mt-1 block w-full input-textlike bg-default">
                         <option value="restricted">Restricted</option>
@@ -81,22 +88,22 @@
                         <option value="passthrough-x">Passthrough-X</option>
                     </select>
                 </div>
-                <div class="mt-2 col-span-1 col-start-2 row-start-4">
+                <div class="mt-2">
                     <label :for="getIdKey('fs-config-acl-type')" class="bg-default block text-base leading-6 text-default">ACL Type</label>
                     <select :id="getIdKey('fs-config-acl-type')" v-model="fileSystemConfig.properties.aclType" name="fs-config-acl-type" class="mt-1 block w-full input-textlike bg-default">
                         <option value="off">Off</option>
-                        <option value=""></option>
-                        <option value=""></option>
+                        <option value="no acl">No ACL</option>
+                        <option value="posix acl">POSIX ACL</option>
                     </select>
                 </div>
-                <div class="mt-2 col-span-1 col-start-3 row-start-4">
+                <div class="mt-2">
                     <label :for="getIdKey('fs-config-access-time')" class="bg-default block text-base leading-6 text-default">Access Time</label>
                     <select :id="getIdKey('fs-config-access-time')" v-model="fileSystemConfig.properties.accessTime" name="fs-config-access-time" class="mt-1 block w-full input-textlike bg-default">
-                        <option value=""></option>
-                        <option value=""></option>
+                        <option value="on">On</option>
+                        <option value="off">Off</option>
                     </select>
                 </div>
-                <div class="mt-2 col-span-1 col-start-1 row-start-5">
+                <div class="mt-2">
                     <label :for="getIdKey('fs-config-dedup')" class="bg-default block text-base leading-6 text-default">Deduplication</label>
                     <select :id="getIdKey('fs-config-dedup')" v-model="fileSystemConfig.properties.deduplication" name="fs-config-dedup" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
@@ -111,7 +118,7 @@
 						<option value="verify">Verify</option>
                     </select>
                 </div>
-                <div class="mt-2 col-span-2 col-start-2 row-start-5">
+                <div class="mt-2">
                     <label :for="getIdKey('fs-config-refreservation')" class="mb-1 block text-sm font-medium leading-6 text-default">Refreservation</label>
                     <div class="flex flex-row">
                         <input v-model="fileSystemConfig.properties.refreservation!.raw" :id="getIdKey('fs-config-refreservation-amount')"  name="fs-config-refreservation-slider" type="range" min="0" max="1000" value="0" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
@@ -124,7 +131,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="mt-2 col-span-1 col-start-1 row-start-6">
+              <div class="mt-2">
                     <label :for="getIdKey('fs-config-compression')" class="bg-default block text-base leading-6 text-default">Compression</label>
                     <select :id="getIdKey('fs-config-compression')" v-model="fileSystemConfig.properties.compression" name="fs-config-compression" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
@@ -135,7 +142,7 @@
                         <option value="zle">ZLE</option>
                     </select>
                 </div> 
-                <div class="mt-2 col-span-1 col-start-2 row-start-6">
+                <div class="mt-2">
                     <label :for="getIdKey('fs-config-checksum')" class="bg-default block text-base leading-6 text-default">Checksum</label>
                     <select :id="getIdKey('fs-config-checksum')" v-model="fileSystemConfig.properties.checksum" name="fs-config-checksum" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
@@ -149,11 +156,8 @@
                         <option value="skein">Skein</option>
                     </select>
                 </div>
-                <div class="mt-2 col-span-1 col-start-3 row-start-6">
-                    <label :for="getIdKey('fs-config-case-sensitivity')" name="fs-config-case-sensitivity" class="mt-1 block text-sm leading-6 text-default">Case Sensitivity</label>
-                    <p>{{ props.filesystem.properties.caseSensitivity }}</p>
-                </div>
-                <div class="mt-2 col-span-1 col-start-1 row-start-7">
+               
+               <div class="mt-2">
                     <label :for="getIdKey('fs-config-dnode-size')" class="bg-default block text-base leading-6 text-default">DNode Size</label>
                     <select :id="getIdKey('fs-config-dnode-size')" v-model="fileSystemConfig.properties.dNodeSize" name="fs-config-dnode-size" class="mt-1 block w-full input-textlike bg-default">
                         <option value="1 kib">1 KiB</option>
@@ -165,7 +169,7 @@
                         <option value="legacy">Legacy</option>
                     </select>
                 </div>
-                <div class="mt-2 col-span-2 col-start-2 row-start-7">
+               <div class="mt-2">
                     <label :for="getIdKey('fs-config-xattr')" class="bg-default block text-base leading-6 text-default">Extended Attributes</label>
                     <select :id="getIdKey('fs-config-xattr')" v-model="fileSystemConfig.properties.extendedAttributes" name="fs-config-xattr" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
@@ -173,8 +177,8 @@
                         <option value="system attribute">System Attribute</option>
                     </select>
                 </div>
-
             </div>
+     
         </template>
         <template v-slot:footer>
 
@@ -184,6 +188,7 @@
 
 <script setup lang="ts">
 import { ref, Ref, inject, watch } from 'vue';
+import { onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes } from '../../composables/helpers';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 
@@ -196,55 +201,46 @@ const props = defineProps<FSConfigModalProps>();
 
 const showFSConfig = inject<Ref<boolean>>('show-fs-config')!;
 
-const newReadOnly = ref();
-
 const fileSystemConfig = ref<FileSystemData>({
-    parentFS: '',
-    name: '',
-    id: '',
-    mountpoint: '',
-    pool: '',
-    encrypted: false,
-    key_loaded: '',
-    type: '',
-    inherit: true,
+    parentFS: props.filesystem.parentFS,
+    name: props.filesystem.name,
+    id: props.filesystem.id,
+    mountpoint: props.filesystem.mountpoint,
+    pool: props.filesystem.pool,
+    encrypted: props.filesystem.encrypted,
+    key_loaded: props.filesystem.key_loaded,
+    type: props.filesystem.type,
+    inherit: props.filesystem.inherit,
     properties: {
-        guid: '',
-		encryption: 'aes-256-gcm',
-        accessTime: 'inherited',
-        caseSensitivity: 'inherited',
-        compression: 'inherited',
-        deduplication: 'inherited',
-        dNodeSize: 'inherited',
-        extendedAttributes: 'inherited',
-        recordSize: 'inherited',
+        guid: props.filesystem.properties.guid,
+		encryption: props.filesystem.properties.encryption,
+        accessTime: props.filesystem.properties.accessTime,
+        caseSensitivity: props.filesystem.properties.caseSensitivity,
+        compression: props.filesystem.properties.compression,
+        deduplication: props.filesystem.properties.deduplication,
+        dNodeSize: props.filesystem.properties.dNodeSize,
+        extendedAttributes: props.filesystem.properties.extendedAttributes,
+        recordSize: props.filesystem.properties.recordSize,
         quota: {
-            raw: 0,
-            value: '',
-            size: 'kib',
+            raw: props.filesystem.properties.quota.raw,
+            value: props.filesystem.properties.quota.value,
+            size: props.filesystem.properties.quota.size,
         },
-		usedByDataset: '',
-		usedbyRefreservation: '',
-        readOnly: newReadOnly.value,
-        available: '',
-        creation: '',
-        snapshotCount: '',
-        mounted: '',
+		usedByDataset: props.filesystem.properties.usedByDataset,
+		usedbyRefreservation: props.filesystem.properties.usedbyRefreservation,
+        readOnly: props.filesystem.properties.readOnly,
+        isReadOnly: onOffToBool(props.filesystem.properties.readOnly),
+        available: props.filesystem.properties.available,
+        creation: props.filesystem.properties.creation,
+        snapshotCount: props.filesystem.properties.snapshotCount,
+        mounted: props.filesystem.properties.mounted,
         refreservation: {
-            raw: 0,
-            value: '',
-            size: 'kib',
+            raw: props.filesystem.properties.refreservation?.raw,
+            value: props.filesystem.properties.refreservation?.value,
+            size: props.filesystem.properties.refreservation?.size,
         }
     },
-    children: [],
-});
-
-const originalReadOnly = ref(props.filesystem.properties.isReadOnly);
-
-const isReadOnly = ref(originalReadOnly.value);
-
-watch(isReadOnly, (newValue) => {
-    newReadOnly.value = newValue;
+    children: props.filesystem.children,
 });
 
 const getIdKey = (name: string) => `${name}`;

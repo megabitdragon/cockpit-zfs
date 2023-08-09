@@ -81,14 +81,11 @@
 
 <script setup lang="ts">
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
+import { isBoolOnOff } from '../../composables/helpers';
 import Accordion from '../../components/common/Accordion.vue';
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
 const allDisks = inject<DiskData[]>("disks");
-
-function isBoolOnOff(bool : boolean) {
-	if (bool) {return 'on'} else {return 'off'}
-}
 
 function isBoolCompression(bool : boolean) {
 	if (bool) {return 'lz4'} else {return 'off'}

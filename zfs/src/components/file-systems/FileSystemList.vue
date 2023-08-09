@@ -121,6 +121,7 @@ import { ref, inject, Ref, provide } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
+import { isBoolOnOff } from '../../composables/helpers';
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
@@ -144,10 +145,6 @@ function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log(selectedDataset);
 	showFSConfig.value = true
-}
-
-function isBoolOnOff(bool : boolean) {
-	if (bool) {return 'on'} else {return 'off'}
 }
 
 provide('show-fs-wizard', showNewFSWizard);

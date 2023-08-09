@@ -110,6 +110,7 @@
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
 import { loadDisks, loadDisksThenPools } from '../../composables/loadData';
+import { convertBytesToSize, convertSizeToBytes } from '../../composables/helpers';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
@@ -151,26 +152,6 @@ const totalEffectivePoolSpace = computed(() => {
 
 	return(convertBytesToSize(totalCapacity));
 });
-
-//convert raw bytes to readable data size
-const convertBytesToSize = (bytes) => {
-	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-	const i = Math.floor(Math.log(bytes) / Math.log(1024));
-	const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
-
-	return `${convertedSize} ${sizes[i]}`;
-};
-
-//convert readable data size to raw bytes
-const convertSizeToBytes = (size) => {
-	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-	const [value, unit] = size.split(' ');
-
-	const index = sizes.indexOf(unit);
-	const bytes = parseFloat(value) * Math.pow(1024, index);
-	
-	return bytes;
-};
 
 //find highest disk temperature
 const maxTemp = computed(() => {

@@ -277,6 +277,7 @@
 <script setup lang="ts">
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
+import { isBoolOnOff, convertSizeToBytes, upperCaseWord } from '../../composables/helpers';
 import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
@@ -397,13 +398,6 @@ function nameExists() {
     return poolConfig.value.name === pool.name;
   });
 }
-
-const upperCaseWord = (word => {
-	let firstLetter  = word.charAt(0);
-	let remainingLetters = word.substring(1);
-	let firstLetterCap = firstLetter.toUpperCase();
-	return firstLetterCap + remainingLetters;
-});
 
 const replicationLevelCheck = () => {
 	let result = true;
@@ -550,21 +544,6 @@ const validateAndProceed = (tabTag: string): boolean => {
 //method for removing vdev
 function removeVDev(index: number) {
   	poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
-}
-
-//convert readable data size to raw bytes
-const convertSizeToBytes = (size) => {
-	const sizes = ['B', 'KiB', 'MiB'];
-	const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
-
-	const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
-	const bytes = parseFloat(value) * Math.pow(1024, index);
-	
-	return bytes;
-};
-
-function isBoolOnOff(bool : boolean) {
-	if (bool) {return 'on'} else {return 'off'}
 }
 
 function isBoolCompression(bool : boolean) {

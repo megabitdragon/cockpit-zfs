@@ -454,6 +454,7 @@
 <script setup lang="ts">
 import { ref, Ref, inject } from 'vue';
 import { Switch } from '@headlessui/vue';
+import { convertSizeToBytes, convertBytesToSize, isBoolOnOff } from '../../composables/helpers';
 import Modal from '../common/Modal.vue';
 
 interface FileSystemProps {
@@ -655,30 +656,6 @@ function fsCreateBtn(fileSystem : FileSystemData) {
 			getInheritedProperties();
 		}
 	}
-}
-
-//convert raw bytes to readable data size
-const convertBytesToSize = (bytes) => {
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
-
-  return `${convertedSize} ${sizes[i]}`;
-};
-
-//convert readable data size to raw bytes
-const convertSizeToBytes = (size) => {
-	const sizes = ['B', 'KiB', 'MiB'];
-	const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
-
-	const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
-	const bytes = parseFloat(value) * Math.pow(1024, index);
-	
-	return bytes;
-};
-
-function isBoolOnOff(bool : boolean) {
-	if (bool) {return 'on'} else {return 'off'}
 }
 
 function isBoolCompression(bool : boolean) {

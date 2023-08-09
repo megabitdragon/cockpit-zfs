@@ -300,6 +300,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
 import { getSnapshots } from '../../composables/snapshots';
+import { getTimestampString } from '../../composables/helpers';
 import Navigation from '../common/Navigation.vue';
 import CreateSnapshotModal from './CreateSnapshotModal.vue';
 import PoolDetailDiskCard from '../pools/PoolDetailDiskCard.vue';
@@ -382,20 +383,6 @@ getSnapshots().then(rawJSON => {
 		//console.log(snap);
 		snapshots.value.push(snap);
 	})
-});
-
-const getTimestampString = computed(() => {
-	const currentDateTime = new Date();
-	const timestampString = currentDateTime.toLocaleString('en-US', {
-		hour: 'numeric',
-		minute: 'numeric',
-		second: 'numeric',
-		day: '2-digit',
-		month: '2-digit',
-		year: 'numeric'
-	});
-
-	return timestampString;
 });
 
 const getNumDevices = props.pool.vdevs.length;

@@ -102,6 +102,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed, provide } from 'vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { getTimestampString } from '../../composables/helpers';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
 
@@ -113,20 +114,6 @@ interface DiskDetailsProps {
 const props = defineProps<DiskDetailsProps>();
 
 const open = ref(true);
-
-const getTimestampString = computed(() => {
-	const currentDateTime = new Date();
-	const timestampString = currentDateTime.toLocaleString('en-US', {
-		hour: 'numeric',
-		minute: 'numeric',
-		second: 'numeric',
-		day: '2-digit',
-		month: '2-digit',
-		year: 'numeric'
-	});
-
-	return timestampString;
-});
 
 const getIdKey = (name: string) => `${name}`;
 </script>

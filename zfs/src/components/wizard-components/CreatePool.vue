@@ -109,6 +109,7 @@ const fileSystemConfig = ref<FileSystemData>({
     type: '',
     inherit: true,
     properties: {
+		guid: '',
 		encryption: 'aes-256-gcm',
         accessTime: 'inherited',
         caseSensitivity: 'inherited',
@@ -129,6 +130,11 @@ const fileSystemConfig = ref<FileSystemData>({
         creation: '',
         snapshotCount: '',
         mounted: '',
+		refreservation: {
+            raw: 0,
+            value: '',
+            size: 'kib',
+        }
     },
     children: [],
 });
