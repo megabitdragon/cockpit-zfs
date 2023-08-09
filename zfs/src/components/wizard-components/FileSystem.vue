@@ -345,13 +345,13 @@
 							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
-							<option value="edon-r + verify">Edon-R + Verify</option>
-							<option value="sha-256">SHA-256</option>
-							<option value="sha-256 + verify">SHA-256 + Verify</option>
-							<option value="sha-512">SHA-512</option>
-							<option value="sha-512 + verify">SHA-512 + Verify</option>
+							<option value="edonr,verify">Edon-R + Verify</option>
+							<option value="sha256">SHA-256</option>
+							<option value="sha256,verify">SHA-256 + Verify</option>
+							<option value="sha512">SHA-512</option>
+							<option value="sha512,verify">SHA-512 + Verify</option>
 							<option value="skein">Skein</option>
-							<option value="skein + verify">Skein + Verify</option>
+							<option value="skein,verify">Skein + Verify</option>
 							<option value="verify">Verify</option>
 						</select>
 					</div>
@@ -360,11 +360,11 @@
 						<label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-default">DNode Size</label>
 						<select v-model="newFileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
 							<option value="inherited">Inherited</option>
-							<option value="1 kib">1 KiB</option>
-							<option value="2 kib">2 KiB</option>
-							<option value="4 kib">4 KiB</option>
-							<option value="8 kib">8 KiB</option>
-							<option value="16 kib">16 KiB</option>
+							<option value="1k">1 KiB</option>
+							<option value="2k">2 KiB</option>
+							<option value="4k">4 KiB</option>
+							<option value="8k">8 KiB</option>
+							<option value="16k">16 KiB</option>
 							<option value="auto">Auto</option>
 							<option value="legacy">Legacy</option>
 						</select>
@@ -376,7 +376,7 @@
 							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
-							<option value="system attribute">System Attribute</option>
+							<option value="sa">System Attribute</option>
 						</select>
 					</div>
 					<!-- Record Size (Select) -->
@@ -384,15 +384,15 @@
 						<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
 						<select v-model="newFileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
 							<option value="inherited">Inherited</option>
-							<option value="512 b">512 B</option>
-							<option value="4 kib">4 KiB</option>
-							<option value="8 kib">8 KiB</option>
-							<option value="16 kib">16 KiB</option>
-							<option value="32 kib">32 KiB</option>
-							<option value="64 kib">64 KiB</option>
-							<option value="256 kib">256 KiB</option>
-							<option value="512 kib">512 KiB</option>
-							<option value="1 mib">1 MiB</option>
+							<option value="512">512 B</option>
+							<option value="4K">4 KiB</option>
+							<option value="8K">8 KiB</option>
+							<option value="16K">16 KiB</option>
+							<option value="32K">32 KiB</option>
+							<option value="64K">64 KiB</option>
+							<option value="256K">256 KiB</option>
+							<option value="512K">512 KiB</option>
+							<option value="1M">1 MiB</option>
 						</select>
 					</div>
 				</div>

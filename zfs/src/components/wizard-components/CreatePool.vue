@@ -176,6 +176,7 @@ const newPoolData = ref<newPoolData>({
 	compression: '',
 	recordsize: 0,
 	dedup: '',
+	refreservation: 0,
 });
 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;

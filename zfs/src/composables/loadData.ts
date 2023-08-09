@@ -2,6 +2,7 @@ import { reactive, ref, Ref, inject, computed, provide } from 'vue';
 import { getPools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
+import { getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord } from "./helpers";
 
 const vDevs = ref<vDevData[]>([]);
 
@@ -116,24 +117,34 @@ export async function loadDatasets(datasets) {
 				properties: {
 					guid: parsedJSON[i].properties.guid.parsed,
 					encryption: parsedJSON[i].properties.encryption.parsed,
-					available: convertBytesToSize(parsedJSON[i].properties.available.parsed),
-					creation: parsedJSON[i].properties.creation.value,
-					snapshotCount: parsedJSON[i].properties.snapshot_count.value,
-					usedbyRefreservation: convertBytesToSize(parsedJSON[i].properties.usedbyrefreservation.parsed),
-					usedByDataset: convertBytesToSize(parsedJSON[i].properties.usedbydataset.parsed),
 					accessTime: parsedJSON[i].properties.atime.value,
 					caseSensitivity: parsedJSON[i].properties.casesensitivity.value,
 					compression: parsedJSON[i].properties.compression.value,
 					deduplication: parsedJSON[i].properties.dedup.value,
 					dNodeSize: parsedJSON[i].properties.dnodesize.value,
 					extendedAttributes: parsedJSON[i].properties.xattr.value,
-					readOnly: parsedJSON[i].properties.readonly.value,
 					recordSize: parsedJSON[i].properties.recordsize.value,
 					quota: {
 						value: parsedJSON[i].properties.quota.value,
 						raw: parsedJSON[i].properties.quota.parsed,
 					},
+					readOnly: parsedJSON[i].properties.readonly.value,
+					isReadOnly: onOffToBool(parsedJSON[i].properties.readonly.value),
+					available: convertBytesToSize(parsedJSON[i].properties.available.parsed),
+					creation: parsedJSON[i].properties.creation.value,
+					snapshotCount: parsedJSON[i].properties.snapshot_count.value,
 					mounted: parsedJSON[i].properties.mounted.value,
+					usedbyRefreservation: convertBytesToSize(parsedJSON[i].properties.usedbyrefreservation.parsed),
+					usedByDataset: convertBytesToSize(parsedJSON[i].properties.usedbydataset.parsed),
+					canMount: parsedJSON[i].properties.canmount.value,
+					aclInheritance: parsedJSON[i].properties.aclinherit.value,
+					aclType: parsedJSON[i].properties.acltype.value,
+					checksum: parsedJSON[i].properties.checksum.value,
+					refreservation: {
+						raw: parsedJSON[i].properties.refreservation.parsed,
+						value: parsedJSON[i].properties.refreservation.value,
+					}
+					
 				},
 				children: parsedJSON[i].children,
 			}
@@ -272,14 +283,6 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		vDevs.value.push(vDevData);
 	}
 }
-
-//convert raw bytes to readable data size
-const convertBytesToSize = (bytes) => {
-	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-	const i = Math.floor(Math.log(bytes) / Math.log(1024));
-	const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
-	return `${convertedSize} ${sizes[i]}`;
-};
 
 export function loadSnapshots(snapshots) {
 	

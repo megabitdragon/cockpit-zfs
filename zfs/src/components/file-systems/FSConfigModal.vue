@@ -47,22 +47,21 @@
                     <select :id="getIdKey('fs-config-can-mount')" v-model="fileSystemConfig.properties.canMount" name="fs-config-can-mount" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
                         <option value="off">Off</option>
-                        <option value="no auto">No Auto</option>
+                        <option value="noauto">No Auto</option>
                     </select>
                 </div>
                 <div class="mt-2">
                     <label :for="getIdKey('fs-config-recordsize')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
                     <select :id="getIdKey('fs-config-recordsize')" v-model="fileSystemConfig.properties.recordSize" name="fs-config-recordsize" class="mt-1 block w-full input-textlike bg-default">
-                        <option value="512b">512 B</option>
-                        <option value="4kib">4 KiB</option>
-                        <option value="8kib">8 KiB</option>
-                        <option value="16kib">16 KiB</option>
-                        <option value="32kib">32 KiB</option>
-                        <option value="64kib">64 KiB</option>
-                        <option value="128kib">128 KiB</option>
-                        <option value="256kib">256 KiB</option>
-                        <option value="512kib">512 KiB</option>
-                        <option value="1mib">1 MiB</option>
+                    	<option value="512">512 B</option>
+                        <option value="4K">4 KiB</option>
+                        <option value="8K">8 KiB</option>
+                        <option value="16K">16 KiB</option>
+                        <option value="32K">32 KiB</option>
+                        <option value="64K">64 KiB</option>
+                        <option value="256K">256 KiB</option>
+                        <option value="512K">512 KiB</option>
+                        <option value="1M">1 MiB</option>
                     </select>
                 </div>
                <div class="mt-2">
@@ -80,20 +79,19 @@
                 </div>
                  <div class="mt-2">
                     <label :for="getIdKey('fs-config-acl-inherit')" class="bg-default block text-base leading-6 text-default">ACL Inheritance</label>
-                    <select :id="getIdKey('fs-config-acl-inherit')" v-model="fileSystemConfig.properties.aclInheritance" name="fs-config-acl-inherit" class="mt-1 block w-full input-textlike bg-default">
-                        <option value="restricted">Restricted</option>
+                    <select :id="getIdKey('fs-config-acl-inherit')" v-model="fileSystemConfig.properties.aclInheritance" name="fs-config-acl-inherit" class="mt-1 block w-full input-textlike bg-default">           
                         <option value="discard">Discard</option>
-                        <option value="no allow">No Allow</option>
+                        <option value="noallow">No Allow</option>
+                        <option value="restricted">Restricted</option>
                         <option value="passthrough">Passthrough</option>
-                        <option value="passthrough-x">Passthrough-X</option>
+                        <option value="passthrough-x">Passthrough-X</option>                       
                     </select>
                 </div>
                 <div class="mt-2">
                     <label :for="getIdKey('fs-config-acl-type')" class="bg-default block text-base leading-6 text-default">ACL Type</label>
                     <select :id="getIdKey('fs-config-acl-type')" v-model="fileSystemConfig.properties.aclType" name="fs-config-acl-type" class="mt-1 block w-full input-textlike bg-default">
-                        <option value="off">Off</option>
-                        <option value="no acl">No ACL</option>
-                        <option value="posix acl">POSIX ACL</option>
+                        <option value="off">Off/No ACL</option>
+                        <option value="posix">POSIX ACL</option>
                     </select>
                 </div>
                 <div class="mt-2">
@@ -107,15 +105,15 @@
                     <label :for="getIdKey('fs-config-dedup')" class="bg-default block text-base leading-6 text-default">Deduplication</label>
                     <select :id="getIdKey('fs-config-dedup')" v-model="fileSystemConfig.properties.deduplication" name="fs-config-dedup" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
-						<option value="off">Off</option>
-						<option value="edon-r + verify">Edon-R + Verify</option>
-						<option value="sha-256">SHA-256</option>
-						<option value="sha-256 + verify">SHA-256 + Verify</option>
-						<option value="sha-512">SHA-512</option>
-						<option value="sha-512 + verify">SHA-512 + Verify</option>
-						<option value="skein">Skein</option>
-						<option value="skein + verify">Skein + Verify</option>
-						<option value="verify">Verify</option>
+                        <option value="off">Off</option>
+                        <option value="edonr,verify">Edon-R + Verify</option>
+                        <option value="sha256">SHA-256</option>
+                        <option value="sha256,verify">SHA-256 + Verify</option>
+                        <option value="sha512">SHA-512</option>
+                        <option value="sha512,verify">SHA-512 + Verify</option>
+                        <option value="skein">Skein</option>
+                        <option value="skein,verify">Skein + Verify</option>
+                        <option value="verify">Verify</option>
                     </select>
                 </div>
                 <div class="mt-2">
@@ -147,12 +145,12 @@
                     <select :id="getIdKey('fs-config-checksum')" v-model="fileSystemConfig.properties.checksum" name="fs-config-checksum" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
                         <option value="off">Off</option>
-                        <option value="edon-r">Edon-R</option>
+                        <option value="edonr">Edon-R</option>
                         <option value="fletcher2">Fletcher2</option>
                         <option value="fletcher4">Fletcher4</option>
-                        <option value="no parity">No Parity</option>
-                        <option value="sha-256">SHA-256</option>
-                        <option value="sha-512">SHA-512</option>
+                        <option value="noparity">No Parity</option>
+                        <option value="sha256">SHA-256</option>
+                        <option value="sha512">SHA-512</option>
                         <option value="skein">Skein</option>
                     </select>
                 </div>
@@ -160,11 +158,11 @@
                <div class="mt-2">
                     <label :for="getIdKey('fs-config-dnode-size')" class="bg-default block text-base leading-6 text-default">DNode Size</label>
                     <select :id="getIdKey('fs-config-dnode-size')" v-model="fileSystemConfig.properties.dNodeSize" name="fs-config-dnode-size" class="mt-1 block w-full input-textlike bg-default">
-                        <option value="1 kib">1 KiB</option>
-                        <option value="2 kib">2 KiB</option>
-                        <option value="4 kib">4 KiB</option>
-                        <option value="8 kib">8 KiB</option>
-                        <option value="16 kib">16 KiB</option>
+                        <option value="1k">1 KiB</option>
+                        <option value="2k">2 KiB</option>
+                        <option value="4k">4 KiB</option>
+                        <option value="8k">8 KiB</option>
+                        <option value="16k">16 KiB</option>
                         <option value="auto">Auto</option>
                         <option value="legacy">Legacy</option>
                     </select>
@@ -174,7 +172,7 @@
                     <select :id="getIdKey('fs-config-xattr')" v-model="fileSystemConfig.properties.extendedAttributes" name="fs-config-xattr" class="mt-1 block w-full input-textlike bg-default">
                         <option value="on">On</option>
                         <option value="off">Off</option>
-                        <option value="system attribute">System Attribute</option>
+                        <option value="sa">System Attribute</option>
                     </select>
                 </div>
             </div>
@@ -188,7 +186,7 @@
 
 <script setup lang="ts">
 import { ref, Ref, inject, watch } from 'vue';
-import { onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes } from '../../composables/helpers';
+import { onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from '../../composables/helpers';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 
@@ -222,9 +220,9 @@ const fileSystemConfig = ref<FileSystemData>({
         extendedAttributes: props.filesystem.properties.extendedAttributes,
         recordSize: props.filesystem.properties.recordSize,
         quota: {
-            raw: props.filesystem.properties.quota.raw,
+            raw: getSizeNumberFromString(convertBytesToSize(props.filesystem.properties.quota.raw)),
             value: props.filesystem.properties.quota.value,
-            size: props.filesystem.properties.quota.size,
+            size: getSizeUnitFromString(getQuotaRefreservUnit(props.filesystem.properties.quota.raw)),
         },
 		usedByDataset: props.filesystem.properties.usedByDataset,
 		usedbyRefreservation: props.filesystem.properties.usedbyRefreservation,
@@ -235,10 +233,14 @@ const fileSystemConfig = ref<FileSystemData>({
         snapshotCount: props.filesystem.properties.snapshotCount,
         mounted: props.filesystem.properties.mounted,
         refreservation: {
-            raw: props.filesystem.properties.refreservation?.raw,
-            value: props.filesystem.properties.refreservation?.value,
-            size: props.filesystem.properties.refreservation?.size,
-        }
+            raw: getSizeNumberFromString(convertBytesToSize(props.filesystem.properties.refreservation!.raw)),
+            value: props.filesystem.properties.refreservation!.value,
+            size: getSizeUnitFromString(getQuotaRefreservUnit(props.filesystem.properties.refreservation!.raw)),
+        },
+        canMount: props.filesystem.properties.canMount,
+        aclInheritance: props.filesystem.properties.aclInheritance,
+        aclType: props.filesystem.properties.aclType,
+        checksum: props.filesystem.properties.checksum,
     },
     children: props.filesystem.children,
 });
