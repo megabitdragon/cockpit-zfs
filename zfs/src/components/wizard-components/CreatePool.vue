@@ -127,7 +127,7 @@ const fileSystemConfig = ref<FileSystemData>({
 		usedByDataset: '',
 		usedbyRefreservation: '',
         readOnly: '',
-        available: '',
+        available: 0,
         creation: '',
         snapshotCount: '',
         mounted: '',
@@ -135,7 +135,8 @@ const fileSystemConfig = ref<FileSystemData>({
             raw: 0,
             value: '',
             unit: 'kib',
-        }
+        },
+		used: 0,
     },
     children: [],
 });

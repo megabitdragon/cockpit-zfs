@@ -131,7 +131,7 @@ export async function loadDatasets(datasets) {
 					},
 					readOnly: parsedJSON[i].properties.readonly.value,
 					isReadOnly: onOffToBool(parsedJSON[i].properties.readonly.value),
-					available: convertBytesToSize(parsedJSON[i].properties.available.parsed),
+					available: parsedJSON[i].properties.available.parsed,
 					creation: parsedJSON[i].properties.creation.value,
 					snapshotCount: parsedJSON[i].properties.snapshot_count.value,
 					mounted: parsedJSON[i].properties.mounted.value,
@@ -145,7 +145,8 @@ export async function loadDatasets(datasets) {
 						raw: parsedJSON[i].properties.refreservation.parsed,
 						value: parsedJSON[i].properties.refreservation.value,
 						unit: getSizeUnitFromString(getQuotaRefreservUnit(parsedJSON[i].properties.refreservation.parsed)),
-					}
+					},
+					used: parsedJSON[i].properties.used.parsed,
 					
 				},
 				children: parsedJSON[i].children,

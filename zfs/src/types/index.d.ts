@@ -127,7 +127,7 @@ interface FileSystemData {
 		};
 		isReadOnly?: boolean;
 		readOnly: string;
-		available: string;
+		available: number;
 		creation: string;
 		snapshotCount: string;
 		mounted: string;
@@ -141,7 +141,8 @@ interface FileSystemData {
 			raw: number;
 			value: string;
 			unit: 'kib' | 'mib' | 'gib' | 'tib';
-		}
+		},
+		used: number;
 	},
 	children?: FileSystemData[];
 	parentFS?: string;

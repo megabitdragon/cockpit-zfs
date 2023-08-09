@@ -38,14 +38,14 @@
 									<span class="sr-only"></span>
 								</td>
 								<td class="py-4 pl-4 pr-3 text-sm font-medium text-default"> {{ fileSystem.name }}</td>
-								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.available }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ convertBytesToSize(fileSystem.properties.available) }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedByDataset }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedbyRefreservation }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.compression }}</td>
-								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.deduplication }}</td>
-								<td class="px-3 py-4 text-sm text-muted">{{ isBoolOnOff(fileSystem.encrypted) }}</td>
-								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.snapshotCount }}</td>
-								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.readOnly }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.deduplication) }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.snapshotCount) }}</td>
+								<td class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.readOnly) }}</td>
 								<td class="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
 									<Menu as="div" class="relative inline-block text-left">
 										<div>
@@ -121,7 +121,7 @@ import { ref, inject, Ref, provide } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
-import { isBoolOnOff } from '../../composables/helpers';
+import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
