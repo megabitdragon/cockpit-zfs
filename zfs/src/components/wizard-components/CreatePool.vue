@@ -122,7 +122,7 @@ const fileSystemConfig = ref<FileSystemData>({
         quota: {
             raw: 0,
             value: '',
-            size: 'kib',
+            unit: 'kib',
         },
 		usedByDataset: '',
 		usedbyRefreservation: '',
@@ -134,7 +134,7 @@ const fileSystemConfig = ref<FileSystemData>({
 		refreservation: {
             raw: 0,
             value: '',
-            size: 'kib',
+            unit: 'kib',
         }
     },
     children: [],
@@ -209,11 +209,11 @@ async function finishBtn(newPoolData) {
 		if (newPoolFound) {
 			console.log('newPoolFound:', newPoolFound);
 			setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
-			refreshAllData();
+			await refreshAllData();
 			showWizard.value = false;
 		} else {
 			console.log("Pool not found, refreservation unsuccessful");
-			refreshAllData();
+			await refreshAllData();
 			showWizard.value = false;
 		}
 	});

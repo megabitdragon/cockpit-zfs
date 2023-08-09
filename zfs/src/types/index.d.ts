@@ -123,7 +123,7 @@ interface FileSystemData {
 		quota: {
 			raw: number;
 			value: string;
-			size?: 'kib' | 'mib' | 'gib' | 'tib';
+			unit: 'kib' | 'mib' | 'gib' | 'tib';
 		};
 		isReadOnly?: boolean;
 		readOnly: string;
@@ -138,9 +138,9 @@ interface FileSystemData {
 		aclType?: string;
 		checksum?: string;
 		refreservation?: {
-			raw?: number;
-			value?: string;
-			size?: 'kib' | 'mib' | 'gib' | 'tib';
+			raw: number;
+			value: string;
+			unit: 'kib' | 'mib' | 'gib' | 'tib';
 		}
 	},
 	children?: FileSystemData[];

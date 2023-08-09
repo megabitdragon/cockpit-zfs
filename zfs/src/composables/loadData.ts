@@ -2,7 +2,7 @@ import { reactive, ref, Ref, inject, computed, provide } from 'vue';
 import { getPools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
-import { getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord } from "./helpers";
+import { getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString } from "./helpers";
 
 const vDevs = ref<vDevData[]>([]);
 
@@ -127,6 +127,7 @@ export async function loadDatasets(datasets) {
 					quota: {
 						value: parsedJSON[i].properties.quota.value,
 						raw: parsedJSON[i].properties.quota.parsed,
+						unit: getSizeUnitFromString(getQuotaRefreservUnit(parsedJSON[i].properties.quota.parsed)),
 					},
 					readOnly: parsedJSON[i].properties.readonly.value,
 					isReadOnly: onOffToBool(parsedJSON[i].properties.readonly.value),
@@ -143,6 +144,7 @@ export async function loadDatasets(datasets) {
 					refreservation: {
 						raw: parsedJSON[i].properties.refreservation.parsed,
 						value: parsedJSON[i].properties.refreservation.value,
+						unit: getSizeUnitFromString(getQuotaRefreservUnit(parsedJSON[i].properties.refreservation.parsed)),
 					}
 					
 				},

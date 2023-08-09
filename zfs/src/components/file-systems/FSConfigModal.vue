@@ -70,7 +70,7 @@
                     <div class="flex flex-row">
                         <input v-model="fileSystemConfig.properties.quota.raw" :id="getIdKey('fs-config-quota-amount')" name="fs-config-quota-slider" type="range" min="0" max="1000" value="0" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
                         <input v-model="fileSystemConfig.properties.quota.raw" type="number" name="fs-config-quota-num" :id="getIdKey('fs-config-quota-num')" min="0" max="1000" value="0" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
-                        <select v-model="fileSystemConfig.properties.quota.size" :id="getIdKey('fs-config-quota-size')" name="fs-config-quota-size" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
+                        <select v-model="fileSystemConfig.properties.quota.unit" :id="getIdKey('fs-config-quota-size')" name="fs-config-quota-size" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
                             <option value="kib">KiB</option>
                             <option value="mib">MiB</option>
                             <option value="gib">GiB</option>
@@ -122,7 +122,7 @@
                     <div class="flex flex-row">
                         <input v-model="fileSystemConfig.properties.refreservation!.raw" :id="getIdKey('fs-config-refreservation-amount')"  name="fs-config-refreservation-slider" type="range" min="0" max="1000" value="0" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
                         <input v-model="fileSystemConfig.properties.refreservation!.raw" type="number" name="fs-config-refreservation-num" :id="getIdKey('fs-config-refreservation-num')" min="0" max="1000" value="0" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
-                        <select v-model="fileSystemConfig.properties.refreservation!.size" :id="getIdKey('fs-config-refreservation-size')" name="fs-config-refreservation-size" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
+                        <select v-model="fileSystemConfig.properties.refreservation!.unit" :id="getIdKey('fs-config-refreservation-size')" name="fs-config-refreservation-size" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
                             <option value="kib">KiB</option>
                             <option value="mib">MiB</option>
                             <option value="gib">GiB</option>
@@ -180,7 +180,15 @@
      
         </template>
         <template v-slot:footer>
-
+            <!-- <div class="button-group-row w-full justify-between mx-4">
+                <div class="button-group-row mt-2 justify-self-center">
+                    <p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
+                    <p class="text-danger" v-if="passFeedback">{{ passFeedback }}</p>		
+                </div>
+                <div class="button-group-row mt-2">
+                    <button @click="fsCreateBtn(newFileSystemConfig)" :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary object-right justify-end">Create File System</button>
+                </div>
+            </div> -->
         </template>
     </Modal>
 </template>
@@ -223,7 +231,7 @@ const fileSystemConfig = ref<FileSystemData>({
         quota: {
             raw: getSizeNumberFromString(convertBytesToSize(props.filesystem.properties.quota.raw)),
             value: props.filesystem.properties.quota.value,
-            size: getSizeUnitFromString(getQuotaRefreservUnit(props.filesystem.properties.quota.raw)),
+            unit: getSizeUnitFromString(getQuotaRefreservUnit(props.filesystem.properties.quota.raw)),
         },
 		usedByDataset: props.filesystem.properties.usedByDataset,
 		usedbyRefreservation: props.filesystem.properties.usedbyRefreservation,
@@ -236,7 +244,7 @@ const fileSystemConfig = ref<FileSystemData>({
         refreservation: {
             raw: getSizeNumberFromString(convertBytesToSize(props.filesystem.properties.refreservation!.raw)),
             value: props.filesystem.properties.refreservation!.value,
-            size: getSizeUnitFromString(getQuotaRefreservUnit(props.filesystem.properties.refreservation!.raw)),
+            unit: getSizeUnitFromString(getQuotaRefreservUnit(props.filesystem.properties.refreservation!.raw)),
         },
         canMount: props.filesystem.properties.canMount,
         aclInheritance: props.filesystem.properties.aclInheritance,

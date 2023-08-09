@@ -62,7 +62,7 @@ export const getQuotaRefreservUnit = (bytes) => {
     
     const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
   
-    return `${convertedSize} ${sizes[i]}`;
+    return `${convertedSize} ${sizes[i-1]}`;
 };
 
 //get a string output of the current timestamp
