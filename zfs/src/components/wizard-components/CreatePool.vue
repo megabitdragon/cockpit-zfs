@@ -74,6 +74,7 @@ import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import { newPool } from "../../composables/pools";
 import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
+import { setRefreservation } from '../../composables/pools';
 
 const show = ref(true);
 const navTag = ref('name-entry');
@@ -176,22 +177,8 @@ const newPoolData = ref<newPoolData>({
 	compression: '',
 	recordsize: 0,
 	dedup: '',
-	refreservation: 0,
+	refreservationPercent: 0,
 });
-
-const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
-const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
-
-//finish button method for creating pool
-function finishBtn(newPoolData) {
-  	finishPressed.value = true;
-	poolConfiguration.value.fillNewPoolData();
-	console.log(newPoolData);
-	newPool(newPoolData).then(() => {
-		showWizard.value = false;
-		refreshAllData();
-	});
-}
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -202,6 +189,34 @@ async function refreshAllData() {
 	await loadDatasets(datasets);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
+}
+
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+//const newPoolName = ref('');
+
+//finish button method for creating pool
+async function finishBtn(newPoolData) {
+  	finishPressed.value = true;
+	poolConfiguration.value.fillNewPoolData();
+	console.log('newPoolData received:', newPoolData);
+	//console.log('newPoolName received:', newPoolName.value);
+
+	newPool(newPoolData).then(async() => {
+		await refreshAllData();
+		const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
+
+		if (newPoolFound) {
+			console.log('newPoolFound:', newPoolFound);
+			setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
+			refreshAllData();
+			showWizard.value = false;
+		} else {
+			console.log("Pool not found, refreservation unsuccessful");
+			refreshAllData();
+			showWizard.value = false;
+		}
+	});
 }
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));
@@ -359,6 +374,7 @@ watch(navTag, updateStatus);
 updateStatus();
 
 provide('new-pool-data', newPoolData);
+//provide('new-pool-name', newPoolName);
 provide('pool-config-data', poolConfig);
 provide('file-system-data', fileSystemConfig);
 provide('feedback-name', nameFeedback);

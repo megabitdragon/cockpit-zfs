@@ -4,6 +4,7 @@ import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import get_pools_script from "../scripts/get-pools.py?raw";
 // @ts-ignore
 import create_pools_script from "./create-pool.py?raw";
+import { convertSizeToBytes } from './helpers';
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -114,6 +115,27 @@ export async function newPool(pool: newPoolData) {
 			}
 		}
 		
+		console.log("cmdString");
+		console.log(cmdString);
+		
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function setRefreservation(pool: PoolData, refreservationPercent: number) {
+	try {
+		const size = convertSizeToBytes(pool.properties.size);
+	
+		const refreservation = (size / 100) * refreservationPercent;
+
+		const cmdString = ['zfs', 'set', 'refreservation='+ refreservation, pool.name];
 		console.log("cmdString");
 		console.log(cmdString);
 		

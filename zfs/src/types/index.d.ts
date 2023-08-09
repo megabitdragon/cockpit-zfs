@@ -52,7 +52,7 @@ interface newPoolData {
 	recordsize: number;
 	dedup: string;
 	forceCreate?: boolean;
-	refreservation: number;
+	refreservationPercent: number;
 }
 
 interface newVDevData {

@@ -553,12 +553,15 @@ function isBoolCompression(bool : boolean) {
 const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
 const newVDevs = ref<newVDevData[]>([]);
 const newVDevDisks = ref<string[]>([]);
+//const newPoolName = inject<Ref<string>>('new-pool-name')!;
 
 function fillNewPoolData() {
 	// console.log("poolConfig");
 	// console.log(poolConfig);
 
 	newPoolData.value.name = poolConfig.value.name;
+	//newPoolName.value = poolConfig.value.name;
+	//console.log("newPoolName sent:", newPoolName);
 	poolConfig.value.vdevs.forEach(vDev => {
 		const newVDev : newVDevData = {
 			type: '',
@@ -582,9 +585,9 @@ function fillNewPoolData() {
 	newPoolData.value.recordsize = convertSizeToBytes(poolConfig.value.settings!.record);
 	newPoolData.value.dedup = isBoolOnOff(poolConfig.value.settings!.deduplication);
 	newPoolData.value.forceCreate = poolConfig.value.settings!.forceCreate;
+	newPoolData.value.refreservationPercent = poolConfig.value.settings!.refreservation;
 
-	console.log("newPoolData");
-	console.log(newPoolData);
+	console.log("newPoolData sent:", newPoolData);
 }
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;

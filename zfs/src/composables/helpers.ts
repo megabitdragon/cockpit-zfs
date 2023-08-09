@@ -29,7 +29,7 @@ export const convertBytesToSize = (bytes) => {
   
 //convert readable data size to raw bytes
 export const convertSizeToBytes = (size) => {
-    const sizes = ['B', 'KiB', 'MiB'];
+    const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
     const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
 
     const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());

@@ -390,6 +390,7 @@
 							<option value="16K">16 KiB</option>
 							<option value="32K">32 KiB</option>
 							<option value="64K">64 KiB</option>
+							<option value="128K">128 KiB</option>
 							<option value="256K">256 KiB</option>
 							<option value="512K">512 KiB</option>
 							<option value="1M">1 MiB</option>
@@ -522,11 +523,7 @@ console.log('poolConfig', poolConfig);
 function getInheritedProperties() {
 	if (props.isStandalone) {
 
-		// console.log('datasets.value:', datasets.value);
-		// console.log('newFileSystemConfig.value.parentFS:', newFileSystemConfig.value.parentFS);
-
 		const selectedDataset = datasets.value.find(dataset => {
-			// console.log('Comparing:', dataset.id, newFileSystemConfig.value);
 			return dataset.id === newFileSystemConfig.value.parentFS;
 		});
 

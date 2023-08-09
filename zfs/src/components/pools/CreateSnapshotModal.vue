@@ -69,7 +69,7 @@ import Modal from '../common/Modal.vue';
 import { loadSnapshots, loadDatasets } from '../../composables/loadData';
 import { getSnapshots } from '../../composables/snapshots';
 
-const datasets = inject<Ref<Dataset[]>>('datasets')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 const newSnapshot : NewSnapshot = {
     name: '',
