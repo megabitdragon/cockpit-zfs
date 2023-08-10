@@ -20,7 +20,11 @@ export const upperCaseWord = (word => {
 
 //convert raw bytes to readable data size
 export const convertBytesToSize = (bytes) => {
-    const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB'];
+	if (bytes === 0) {
+        return `0 B`;
+    }
+
+    const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
   
