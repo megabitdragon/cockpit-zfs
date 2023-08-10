@@ -49,6 +49,7 @@ interface newPoolData {
 	autotrim: string;
 	compression: string;
 	recordsize: number;
+	sectorsize: number;
 	dedup: string;
 	forceCreate?: boolean;
 	refreservationPercent: number;

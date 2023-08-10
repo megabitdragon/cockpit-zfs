@@ -96,12 +96,12 @@
 				<label :for="getIdKey('sector-size')" class="block text-sm font-medium leading-6 text-default">Sector Size</label>
 				<select :id="getIdKey('sector-size')" v-model="poolConfig.properties.sector" name="sector-size" class="text-default bg-default mt-1 block w-full py-1.5 pl-3 pr-10 input-textlike sm:text-sm sm:leading-6">
 					<option value="auto">Auto Detect</option>
-					<option value="512b">512 B</option>
-					<option value="4kib">4 KiB</option>
-					<option value="8kib">8 KiB</option>
-					<option value="16kib">16 KiB</option>
-					<option value="32kib">32 KiB</option>
-					<option value="64kib">64 KiB</option>
+					<option value="9">512 B</option>
+					<option value="12">4 KiB</option>
+					<option value="13">8 KiB</option>
+					<option value="14">16 KiB</option>
+					<option value="15">32 KiB</option>
+					<option value="16">64 KiB</option>
 				</select>
 			</div>
 
@@ -586,6 +586,7 @@ function fillNewPoolData() {
 	newPoolData.value.dedup = isBoolOnOff(poolConfig.value.properties.deduplication);
 	newPoolData.value.forceCreate = poolConfig.value.properties.forceCreate;
 	newPoolData.value.refreservationPercent = poolConfig.value.properties.refreservationPercent!;
+	newPoolData.value.sectorsize = Number(poolConfig.value.properties.sector!);
 
 	console.log("newPoolData sent:", newPoolData);
 }

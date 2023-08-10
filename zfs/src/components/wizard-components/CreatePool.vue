@@ -152,7 +152,7 @@ const poolConfig = ref<PoolData>({
 		allocated: '',
 		capacity: 0,
 		free: '',
-		sector: '4kib',
+		sector: '12',
 		record: '128kib',
 		compression: true,
 		deduplication: false,
@@ -176,6 +176,7 @@ const newPoolData = ref<newPoolData>({
 	autotrim: '',
 	compression: '',
 	recordsize: 0,
+	sectorsize: 0,
 	dedup: '',
 	refreservationPercent: 0,
 });

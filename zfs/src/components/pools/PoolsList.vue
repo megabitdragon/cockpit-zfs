@@ -7,13 +7,13 @@
 			<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData" ><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
-		<div class="mt-8 overflow-visible">
+		<div class="mt-8 overflow-visible rounded-md">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
 
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
-					<table class="min-w-full divide-y divide-default">
+					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead>
-							<tr class="rounded-md bg-well">
+							<tr class="bg-well">
 								<th class="relative px-3 py-3.5">
 									<span class="sr-only"></span>
 								</th>
@@ -31,9 +31,9 @@
 					</table>
 					
 					<div v-if="poolData.length > 0 && poolsLoaded == true">
-						<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md ring-1 ring-black ring-opacity-5" v-for="pool, poolIdx in poolData" :key="poolIdx">
+						<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md border border-solid border-spacing-1 border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
 							<template v-slot:title>
-								<div class="grid grid-cols-7 grid-flow-cols w-full rounded-md">
+								<div class="grid grid-cols-7 grid-flow-cols w-full rounded-md ml-5">
 									<div class="px-3 py-4">{{  poolData[poolIdx].name }}</div>
 									<div class="px-3 py-4">{{  poolData[poolIdx].status }}</div>
 									<div class="px-3 py-4">
@@ -91,9 +91,9 @@
 								
 							</template>
 							<template v-slot:content>
-								<Accordion :isOpen="false" class="divide-y divide-default bg-accent rounded-b-md ring-1 ring-black ring-opacity-5" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+								<Accordion :isOpen="false" class="divide-y divide-default bg-accent rounded-md border border-solid border-default p-2" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
 									<template v-slot:title>
-										<div class="grid grid-cols-3 grid-flow-cols bg-accent w-full rounded-l-sm">
+										<div class="grid grid-cols-3 grid-flow-cols bg-accent w-full rounded-md">
 											<div class="col-start-2 text-center -mx-4 py-4">
 												{{ vDev.name }} ({{ vDev.type }})
 											</div>
@@ -123,10 +123,10 @@
 										</div>
 									</template>
 									<template v-slot:content>
-										<table class="table-auto min-w-full divide-y divide-default">
-											<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="">
+										<table class="table-auto min-w-full divide-y divide-default rounded-md">
+											<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="rounded-md">
 												<td colspan="8" class="ml-7">
-													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-well">
+													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-well rounded-md">
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">State</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Reads</th>
@@ -137,7 +137,7 @@
 														<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
 															<span class="sr-only"></span>
 														</th>
-														<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-16 bg-default">
+														<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-16 bg-default rounded-md">
 															<td>{{ disk.name }}</td>
 															<td>{{ disk.status }}</td>
 															<td>W</td>
@@ -193,10 +193,10 @@
 						</Accordion>
 					</div>
 					
-					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default">
+					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default rounded-md">
 						<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
 					</div>
-					<div v-if="poolData.length < 1 && poolsLoaded == true" class="p-2 flex bg-default justify-center">
+					<div v-if="poolData.length < 1 && poolsLoaded == true" class="p-2 flex bg-default justify-center rounded-md">
 						<span class="font-semibold text-lg my-2">No Pools Found</span>
 					</div>
 	
