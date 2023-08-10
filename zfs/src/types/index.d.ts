@@ -59,7 +59,7 @@ interface newVDevData {
 	type: string;
 	disks: string[];
 	isMirror?: boolean;
-	// forceAdd?: boolean;
+	forceAdd?: boolean;
 }
 
 //object for vdev

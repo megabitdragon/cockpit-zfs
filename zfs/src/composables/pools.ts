@@ -41,7 +41,6 @@ const newVDevData = ref<newVDevData>({
 	type: '',
 	disks: [],
 	isMirror: false,
-	//forceAdd: false,
 });
 
 export async function newPool(pool: newPoolData) {
