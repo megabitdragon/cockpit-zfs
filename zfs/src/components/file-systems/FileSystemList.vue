@@ -41,7 +41,8 @@
 								<td class="px-3 py-4 text-sm text-muted">{{ convertBytesToSize(fileSystem.properties.available) }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedByDataset }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedbyRefreservation }}</td>
-								<td class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.compression }}</td>
+								<td v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.compression) }}</td>
+								<td v-else class="px-3 py-4 text-sm text-muted">{{ (fileSystem.properties.compression).toUpperCase() }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.deduplication) }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</td>
 								<td class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.snapshotCount) }}</td>

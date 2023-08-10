@@ -22,7 +22,7 @@
 				<div class="mt-2 col-span-1 col-start-4 row-start-2">
 					<p :id="getIdKey('pool-devices')" name="pool-devices" class="text-base">Devices: {{ getNumDevices }}</p>
 					<p :id="getIdKey('pool-disks')" name="pool-disks" class="text-base">Disks: {{  getNumDisks}}</p>
-					<p :id="getIdKey('pool-datasets')" name="pool-datasets" class="text-base">Datasets: X</p>
+					<!-- <p :id="getIdKey('pool-datasets')" name="pool-datasets" class="text-base">Datasets: X</p> -->
 				</div>
 			</div>
 
@@ -291,6 +291,7 @@
 	</Modal>
 
 	<CreateSnapshotModal @close="showSnapshotModal = false"/>
+	<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="props.pool"/>
 </template>
 
 <script setup lang="ts">
@@ -303,6 +304,7 @@ import { getSnapshots } from '../../composables/snapshots';
 import { getTimestampString } from '../../composables/helpers';
 import Navigation from '../common/Navigation.vue';
 import CreateSnapshotModal from './CreateSnapshotModal.vue';
+import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../pools/PoolDetailDiskCard.vue';
 
 interface PoolDetailsProps {
@@ -338,6 +340,7 @@ const props = defineProps<PoolDetailsProps>();
 
 const open = ref(true);
 const showSnapshotModal = ref(false);
+const showAddVDevModal = ref(false);
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
 const snapshots = ref<Snapshot[]>([]);
@@ -420,4 +423,5 @@ const navigation = reactive<NavigationItem[]>([
 const getIdKey = (name: string) => `${name}`;
 
 provide('create-snap-modal', showSnapshotModal);
+provide('add-vdev-modal', showAddVDevModal);
 </script>

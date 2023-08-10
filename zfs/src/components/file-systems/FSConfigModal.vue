@@ -50,21 +50,7 @@
                         <option value="noauto">No Auto</option>
                     </select>
                 </div>
-                <div class="mt-2">
-                    <label :for="getIdKey('fs-config-recordsize')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
-                    <select :id="getIdKey('fs-config-recordsize')" v-model="fileSystemConfig.properties.recordSize" name="fs-config-recordsize" class="mt-1 block w-full input-textlike bg-default">
-                    	<option value="512">512 B</option>
-                        <option value="4K">4 KiB</option>
-                        <option value="8K">8 KiB</option>
-                        <option value="16K">16 KiB</option>
-                        <option value="32K">32 KiB</option>
-                        <option value="64K">64 KiB</option>
-                        <option value="128K">128 KiB</option>
-                        <option value="256K">256 KiB</option>
-                        <option value="512K">512 KiB</option>
-                        <option value="1M">1 MiB</option>
-                    </select>
-                </div>
+                
                <div class="mt-2">
                     <label :for="getIdKey('fs-config-quota')" class="mb-1 block text-sm font-medium leading-6 text-default">Quota</label>
                     <div class="flex flex-row">
@@ -81,12 +67,52 @@
                         <div v-if="fileSystemConfig.properties.quota.raw !== null" class="mt-2 justify-self-start">
                             <p class="text-muted">Used Space: {{ convertBytesToSize(fileSystemConfig.properties.used) }}</p>
                         </div>
-                        <div v-if="fileSystemConfig.properties.quota.raw === null || fileSystemConfig.properties.quota.value === 'none'" class="mt-2 justify-self-end">
+                        <div v-if="fileSystemConfig.properties.quota.raw === null || !fileSystemConfig.properties.quota.raw" class="mt-2 justify-self-end">
                             <p class="text-muted">There is no quota currently set.</p>
                         </div>
                     </div>
                     
                 </div>
+
+                <div class="mt-2">
+                    <label :for="getIdKey('fs-config-recordsize')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
+                    <select :id="getIdKey('fs-config-recordsize')" v-model="fileSystemConfig.properties.recordSize" name="fs-config-recordsize" class="mt-1 block w-full input-textlike bg-default">
+                    	<option value="512">512 B</option>
+                        <option value="4K">4 KiB</option>
+                        <option value="8K">8 KiB</option>
+                        <option value="16K">16 KiB</option>
+                        <option value="32K">32 KiB</option>
+                        <option value="64K">64 KiB</option>
+                        <option value="128K">128 KiB</option>
+                        <option value="256K">256 KiB</option>
+                        <option value="512K">512 KiB</option>
+                        <option value="1M">1 MiB</option>
+                    </select>
+                </div>
+
+                <div class="mt-2">
+                    <label :for="getIdKey('fs-config-refreservation')" class="mb-1 block text-sm font-medium leading-6 text-default">Refreservation</label>
+                    <div class="flex flex-row">
+                        <input v-model="fileSystemConfig.properties.refreservation!.raw" :id="getIdKey('fs-config-refreservation-amount')"  name="fs-config-refreservation-slider" type="range" min="0" max="1000" value="0" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
+                        <input v-model="fileSystemConfig.properties.refreservation!.raw" type="number" name="fs-config-refreservation-num" :id="getIdKey('fs-config-refreservation-num')" min="0" max="1000" value="0" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
+                        <select v-model="fileSystemConfig.properties.refreservation!.unit" :id="getIdKey('fs-config-refreservation-size')" name="fs-config-refreservation-size" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
+                            <option value="kib">KiB</option>
+                            <option value="mib">MiB</option>
+                            <option value="gib">GiB</option>
+                            <option value="tib">TiB</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-row justify-between">
+                       
+                        <div v-if="fileSystemConfig.properties.refreservation!.raw !== null" class="mt-2 justify-self-start">
+                            <p class="text-muted">Available Space: {{ convertBytesToSize(fileSystemConfig.properties.available) }}</p>
+                        </div>
+                        <div v-if="fileSystemConfig.properties.refreservation!.raw === null || !fileSystemConfig.properties.refreservation!.raw" class="mt-2 justify-self-end">
+                            <p class="text-muted">There is no refreservation currently set.</p>
+                        </div>
+                    </div>
+                </div>
+
                  <div class="mt-2">
                     <label :for="getIdKey('fs-config-acl-inherit')" class="bg-default block text-base leading-6 text-default">ACL Inheritance</label>
                     <select :id="getIdKey('fs-config-acl-inherit')" v-model="fileSystemConfig.properties.aclInheritance" name="fs-config-acl-inherit" class="mt-1 block w-full input-textlike bg-default">           
@@ -126,28 +152,7 @@
                         <option value="verify">Verify</option>
                     </select>
                 </div>
-                <div class="mt-2">
-                    <label :for="getIdKey('fs-config-refreservation')" class="mb-1 block text-sm font-medium leading-6 text-default">Refreservation</label>
-                    <div class="flex flex-row">
-                        <input v-model="fileSystemConfig.properties.refreservation!.raw" :id="getIdKey('fs-config-refreservation-amount')"  name="fs-config-refreservation-slider" type="range" min="0" max="1000" value="0" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
-                        <input v-model="fileSystemConfig.properties.refreservation!.raw" type="number" name="fs-config-refreservation-num" :id="getIdKey('fs-config-refreservation-num')" min="0" max="1000" value="0" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
-                        <select v-model="fileSystemConfig.properties.refreservation!.unit" :id="getIdKey('fs-config-refreservation-size')" name="fs-config-refreservation-size" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
-                            <option value="kib">KiB</option>
-                            <option value="mib">MiB</option>
-                            <option value="gib">GiB</option>
-                            <option value="tib">TiB</option>
-                        </select>
-                    </div>
-                    <div class="flex flex-row">
-                        <div v-if="fileSystemConfig.properties.refreservation!.raw === null" class="mt-2 justify-self-center">
-                            <p class="text-muted">There is no refreservation currently set.</p>
-                        </div>
-                        <div v-if="fileSystemConfig.properties.refreservation!.raw !== null" class="mt-2 justify-self-center">
-                            <p class="text-muted">Available Space: {{ convertBytesToSize(fileSystemConfig.properties.available) }}</p>
-                        </div>
-                    </div>
-                    
-                </div>
+                
               <div class="mt-2">
                     <label :for="getIdKey('fs-config-compression')" class="bg-default block text-base leading-6 text-default">Compression</label>
                     <select :id="getIdKey('fs-config-compression')" v-model="fileSystemConfig.properties.compression" name="fs-config-compression" class="mt-1 block w-full input-textlike bg-default">

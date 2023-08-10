@@ -71,7 +71,7 @@ interface vDevData {
 	stats: {};
 	disks: DiskData[];
 	selectedDisks: string[];
-	//forceAdd?: boolean;
+	forceAdd?: boolean;
 	poolName?: string;
 	isMirror?: boolean;
 }

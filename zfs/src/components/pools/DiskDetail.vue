@@ -75,20 +75,20 @@
 					<p class="text-base">Power-On Hrs: {{ props.disk.powerOnHours }}</p>
 				</div>
 
-				<div class="mt-2 col-span-2 col-start-1 row-start-3">
+				<!-- <div class="mt-2 col-span-2 col-start-1 row-start-3">
 					<p class="text-base">Used: *space used*</p>
 					<p class="text-base">Free: *space free*</p>
-				</div>
+				</div> -->
 
 				<div class="mt-2 col-span-1 col-start-3 row-start-3">
 					<p class="text-base">Rotation Rate: <span v-if="props.disk.type == 'HDD'">{{ props.disk.rotationRate }}</span><span v-else>N/A</span></p>
-					<p class="text-base">Interface: </p>
+					<!-- <p class="text-base">Interface: </p> -->
 				</div>
 
-				<div class="mt-2 col-span-1 col-start-4 row-start-3">
+				<!-- <div class="mt-2 col-span-1 col-start-4 row-start-3">
 					<p class="text-base">Reads: X</p>
 					<p class="text-base">Writes: Y</p>
-				</div>
+				</div> -->
 
 			</div>
 
