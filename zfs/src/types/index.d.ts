@@ -16,23 +16,22 @@ interface PoolData {
 		capacity: number;
 		allocated: string;
 		free: string;
-		readOnly?: string;
-	}
-	vdevs: vDevData[];
-	settings?: {
+		readOnly: boolean;
 		sector: string;
 		record: string;
 		compression: boolean;
 		deduplication: boolean;
-		refreservation: number;
+		refreservationPercent?: number;
+		refreservationRawSize?: number;
 		autoExpand: boolean;
 		autoReplace: boolean;
 		autoTrim: boolean;
-		forceCreate: boolean;
+		forceCreate?: boolean;
 		delegation?: boolean;
 		displaySnapshots?: boolean;
 		multiHost?: boolean;
-	},
+	}
+	vdevs: vDevData[];
 	createFileSystem?: boolean;
 	fileSystem?: FileSystemData;
 	datasets?: Dataset[];

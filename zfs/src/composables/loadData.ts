@@ -70,9 +70,26 @@ export async function loadDisksThenPools(disks, pools) {
 						allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
 						capacity: parsedJSON[i].properties.capacity.rawvalue,
 						free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
+						readOnly: parsedJSON[i].properties.readonly.parsed,
+						sector: parsedJSON[i].properties.ashift.rawvalue,
+						record: parsedJSON[i].root_dataset.properties.recordsize.value,
+						compression: parsedJSON[i].root_dataset.properties.compression.parsed,
+						deduplication: isBoolOnOff(parsedJSON[i].root_dataset.properties.dedup.parsed),
+						refreservationRawSize: parsedJSON[i].root_dataset.properties.refreservation.parsed,
+						autoExpand: parsedJSON[i].properties.autoexpand.parsed,
+						autoReplace: parsedJSON[i].properties.autoreplace.parsed,
+						autoTrim: isBoolOnOff(parsedJSON[i].properties.autotrim.parsed),
+						forceCreate: false,
+						delegation: parsedJSON[i].properties.delegation.parsed,
+						displaySnapshots: parsedJSON[i].properties.listsnapshots.parsed,
+						multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
 					},
+					failmode: parsedJSON[i].properties.failmode.parsed,
+					comment: parsedJSON[i].properties.comment.value,
+					
 					//adds VDev array to Pool data object
 					vdevs: vDevs.value,
+
 					// fileSystems: parsedJSON[i].root_dataset.value,
 				}
 				

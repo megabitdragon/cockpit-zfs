@@ -8,20 +8,20 @@
 			<template v-slot:content>
 				<p class="ml-10 text-default text-default">Name: {{ poolConfig.name }}</p>
 				<p class="ml-10 text-default">{{poolConfig.vdevs.length}} Virtual Device(s)</p>
-				<p class="ml-10 text-default">Sector Size: {{poolConfig.settings!.sector}}</p>
-				<p class="ml-10 text-default">Record Size: {{poolConfig.settings!.record}}</p>
-				<p class="ml-10 text-default">Compression: {{isBoolCompression(poolConfig.settings!.compression)}}</p>
+				<p class="ml-10 text-default">Sector Size: {{poolConfig.properties.sector}}</p>
+				<p class="ml-10 text-default">Record Size: {{poolConfig.properties.record}}</p>
+				<p class="ml-10 text-default">Compression: {{isBoolCompression(poolConfig.properties.compression)}}</p>
 				<p class="ml-10 text-default">
 					<Accordion :isOpen="false" class="ml-4">
 						<template v-slot:title>
 							<p><b>Advanced Settings</b></p>
 						</template>
 						<template v-slot:content>
-							<p class="ml-10 text-default">Deduplication: {{isBoolOnOff(poolConfig.settings!.deduplication)}}</p>
-							<p class="ml-10 text-default">Refreservation Amount: {{(poolConfig.settings!.refreservation)}}%</p>
-							<p class="ml-10 text-default">Auto-Expand Pool: {{isBoolOnOff(poolConfig.settings!.autoExpand)}}</p>
-							<p class="ml-10 text-default">Auto-Replace Devices: {{isBoolOnOff(poolConfig.settings!.autoReplace)}}</p>
-							<p class="ml-10 text-default">Automatic TRIM: {{isBoolOnOff(poolConfig.settings!.autoTrim)}}</p>
+							<p class="ml-10 text-default">Deduplication: {{isBoolOnOff(poolConfig.properties.deduplication)}}</p>
+							<p class="ml-10 text-default">Refreservation Amount: {{(poolConfig.properties.refreservation)}}%</p>
+							<p class="ml-10 text-default">Auto-Expand Pool: {{isBoolOnOff(poolConfig.properties.autoExpand)}}</p>
+							<p class="ml-10 text-default">Auto-Replace Devices: {{isBoolOnOff(poolConfig.properties.autoReplace)}}</p>
+							<p class="ml-10 text-default">Automatic TRIM: {{isBoolOnOff(poolConfig.properties.autoTrim)}}</p>
 						</template>
 					</Accordion>
 				</p>
