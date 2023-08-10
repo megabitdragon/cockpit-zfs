@@ -88,7 +88,7 @@
 				<div>
 					<label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-default">Compression</label>
 					<select v-model="fileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited ({{isBoolCompression(poolConfig.settings!.compression)}})</option>
+						<option value="inherited">Inherited ({{isBoolCompression(poolConfig.properties.compression)}})</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 						<option value="gzip">GZIP</option>
@@ -101,7 +101,7 @@
 				<div>
 					<label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-default">Deduplication</label>
 					<select v-model="fileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited ({{isBoolOnOff(poolConfig.settings!.deduplication)}})</option>
+						<option value="inherited">Inherited ({{isBoolOnOff(poolConfig.properties.deduplication)}})</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 						<option value="edon-r + verify">Edon-R + Verify</option>
@@ -118,7 +118,7 @@
 				<div>
 					<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
 					<select v-model="fileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited ({{ poolConfig.settings!.record }})</option>
+						<option value="inherited">Inherited ({{ poolConfig.properties.record }})</option>
 						<option value="512b">512 B</option>
 						<option value="4kib">4 KiB</option>
 						<option value="8kib">8 KiB</option>
@@ -558,13 +558,13 @@ function getInheritedProperties() {
 		fileSystemConfig.value.parentFS = poolConfig.name;
 
 		if (fileSystemConfig.value.properties.deduplication == 'inherited') {
-			fileSystemConfig.value.properties.deduplication = isBoolOnOff(poolConfig.settings?.deduplication!);
+			fileSystemConfig.value.properties.deduplication = isBoolOnOff(poolConfig.properties.deduplication!);
 		}
 		if (fileSystemConfig.value.properties.compression == 'inherited') {
-			fileSystemConfig.value.properties.compression = isBoolCompression(poolConfig.settings?.compression!);
+			fileSystemConfig.value.properties.compression = isBoolCompression(poolConfig.properties.compression!);
 		}
 		if (fileSystemConfig.value.properties.recordSize == 'inherited') {
-			fileSystemConfig.value.properties.recordSize = poolConfig.settings?.record!;
+			fileSystemConfig.value.properties.recordSize = poolConfig.properties.record!;
 		}
 		if (fileSystemConfig.value.properties.accessTime == 'inherited') {
 			fileSystemConfig.value.properties.accessTime = 'on';

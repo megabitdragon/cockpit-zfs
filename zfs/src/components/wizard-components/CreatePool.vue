@@ -186,6 +186,7 @@ async function refreshAllData() {
 	poolsLoaded.value = false;
 	disks.value = [];
 	pools.value = [];
+	datasets.value = [];
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
 	disksLoaded.value = true;

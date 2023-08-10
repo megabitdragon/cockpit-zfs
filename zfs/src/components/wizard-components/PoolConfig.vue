@@ -251,15 +251,17 @@
 	<div v-if=" props.tag ==='file-system'">
 		<fieldset>
 			<legend class="mb-1 text-base font-semibold leading-6 text-default">File System Settings</legend>
+
 			<!-- Create a File System (Checkbox) -> Enables all fields underneath -->
-			<div class="relative flex items-start">
-				<div class="text-sm mr-3">
-					<label :for="getIdKey('create-filesystem')" class="font-medium text-default">Create a File System?</label>
-				</div>
-				<div class="flex h-6 items-center">
-					<input :id="getIdKey('create-filesystem')" v-model="poolConfig.createFileSystem" aria-describedby="create-filesystem" name="create-filesystem" type="checkbox" class="h-4 w-4 rounded border-default text-primary focus:ring-slate-600" />
-				</div>
-			</div>
+			<button :class="createFileSystemCardClass(poolConfig.createFileSystem!)" 
+			class="box-border rounded-lg shadow-md focus:outline-none focus:ring-0 w-full h-full bg-45d mb-2">
+				<label :for="getIdKey('create-filesystem')" :class="createFileSystemCardClass(poolConfig.createFileSystem!)" 
+				class="block py-3 w-full h-full font-medium text-default justify-center">
+					Create a File System?
+					<input :id="getIdKey('create-filesystem')" v-model="poolConfig.createFileSystem" aria-describedby="create-filesystem" name="create-filesystem" type="checkbox" class="ml-2 h-4 w-4 rounded text-success"/>
+				</label>
+			</button>
+			<!-- box-border py-2 px-4 font-medium rounded-lg shadow-md focus:outline-none focus:ring-0 -->
 			<FileSystem v-if="poolConfig.createFileSystem" ref="fileSystemConfiguration" idKey="file-system" :isStandalone="false"/>
 		</fieldset>
 	</div>
@@ -320,6 +322,12 @@ const diskCardClass = (diskName, vDevIdx) => {
   const isSelected = poolConfig.value.vdevs[vDevIdx].selectedDisks.includes(diskName);
   return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
+
+const createFileSystemCardClass = (createFileSystem : boolean) => {
+	const isCreateFS = createFileSystem;
+	return isCreateFS ? 'bg-green-300 dark:bg-green-700' : '';
+};
+
 
 //method for adding initial vdev with default values 
 function initialVDev() {

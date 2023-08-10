@@ -19,18 +19,21 @@ export async function getPools() {
 	}
 }
 
-// export async function createPool(poolName : string, vDevs: newVDev[]) {
-//   try {
-//     //console.log(vDevs);
-//     const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
-//     const output = await state.promise();
-//     console.log(output)
-//     return output.stdout;
-//   } catch (state) {
-//     console.error(errorString(state));
-//     return null;
-//   }
-// }
+/*	OLD METHOD USING py-libzfs API
+
+export async function createPool(poolName : string, vDevs: newVDev[]) {
+	try {
+		//console.log(vDevs);
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+*/
 
 const newPoolDisks = ref<string[]>([]);
 const newVDevs = ref<newVDevData[]>([]);
