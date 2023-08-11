@@ -20,7 +20,6 @@ export async function getPools() {
 }
 
 /*	OLD METHOD USING py-libzfs API
-
 export async function createPool(poolName : string, vDevs: newVDev[]) {
 	try {
 		//console.log(vDevs);

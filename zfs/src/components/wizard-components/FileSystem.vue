@@ -632,8 +632,6 @@ const encryptPasswordCheck = (fileSystem : FileSystemData) => {
 		if (passphraseConfirm.value != passphrase.value) {
 			result = false;
 			passFeedback.value = 'Passphrase does not match.';
-			//8 chars min
-			 //cannot be empty
 		} else if (passphrase.value == '') {
 			result = false;
 			passFeedback.value = 'Passphrase cannot be empty.';
