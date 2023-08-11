@@ -19,9 +19,9 @@
 					<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 						<MenuItems class="absolute right-0 z-10 -mt-1 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 							<div class="py-1">
-								<MenuItem v-slot="{ active }">
+								<!-- <MenuItem v-slot="{ active }">
 									<a href="#" @click="showDetails(props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Disk Details</a>
-								</MenuItem>
+								</MenuItem> -->
 								<!-- <MenuItem v-slot="{ active }">
 									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 								</MenuItem>
@@ -81,7 +81,7 @@
 	</Card>
 
 	<div v-if="showDiskDetails">
-		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="false"/>
+		<!-- <DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="false"/> -->
 	</div>
 </template>
 

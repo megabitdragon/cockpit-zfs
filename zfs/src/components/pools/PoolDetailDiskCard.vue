@@ -1,14 +1,14 @@
 <template>
 	<Card class="mt-2 mb-4 overflow-visible card bg-default">
 		<template v-slot:title>
-			<div class="grid grid-cols-3 grid-flow-col gap-1">
+			<div class="flex flex-row justify-between gap-1">
 				<div class="pr-2 text-default text-medium">
-					{{ props.disk.name }}
+					{{ props.disk.name }} ({{ props.disk.type }})
 				</div>
 				<div class="px-1">
 					<img class="w-4 h-4" src="../../../public/icons/success.svg">
 				</div>
-				<div id="menu-btn" class="ml-5">
+				<!-- <div id="menu-btn" class="ml-5">
 					<Menu as="div" class="relative inline-block text-right ">
 						<div>
 							<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -42,28 +42,27 @@
 							</MenuItems>
 						</transition>
 					</Menu>
-				</div>
+				</div> -->
 			</div>
-			<!-- alias, name, model/serial, temp, status -->
-			<div>
-				<span class="text-success">{{ props.disk.status }}</span>
-			</div>
-			<div>
-				<span class="text-default">{{ props.disk.type }}</span>
-			</div>
-			</template>
-			<template v-slot:content>
-			<div>
-				<span class="text-default">{{ props.disk.temp }}&nbsp;</span>
-			</div>
-			<div>
-				<span class="text-base font-medium text-success">Space&nbsp;&nbsp;&nbsp;</span>
-				<span class="text-sm font-medium text-success">0%</span>
-			</div>
-			<!-- <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-				<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
-				<div v-if="capacity > 85" class="bg-red-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
-			</div> -->
+
+		</template>
+					<!-- alias, name, model/serial, temp, status -->	
+		<template v-slot:content>
+		<div>
+			<span class="text-success">{{ props.disk.status }}</span>
+		</div>
+		<div>
+			<span class="text-default">{{ props.disk.temp }}&nbsp;</span>
+		</div>
+		
+		<!-- <div>
+			<span class="text-base font-medium text-success">Space&nbsp;&nbsp;&nbsp;</span>
+			<span class="text-sm font-medium text-success">0%</span>
+		</div> -->
+		<!-- <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+			<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
+			<div v-if="capacity > 85" class="bg-red-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
+		</div> -->
 		</template>
 		<template v-slot:footer>
 			<div class="text-default">
@@ -73,7 +72,7 @@
 	</Card>
 
 	<div v-if="showDiskDetails">
-		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="true"/>
+		<!-- <DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="true"/> -->
 	</div>
 </template>
 
