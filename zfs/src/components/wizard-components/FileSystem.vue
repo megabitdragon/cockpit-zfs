@@ -663,6 +663,7 @@ function fillDatasetData() {
 	newDataset.value.name = newFileSystemConfig.value.name;
 	newDataset.value.parent = newFileSystemConfig.value.parentFS!;
 	newDataset.value.encrypted = newFileSystemConfig.value.encrypted;
+	newDataset.value.encryption = newFileSystemConfig.value.properties.encryption;
 	newDataset.value.atime = newFileSystemConfig.value.properties.accessTime;
 	newDataset.value.casesensitivity = newFileSystemConfig.value.properties.caseSensitivity;
 	newDataset.value.compression = newFileSystemConfig.value.properties.compression;

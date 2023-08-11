@@ -424,8 +424,10 @@
 <script setup lang="ts">
 import { ref, Ref, inject, watch } from 'vue';
 import { onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from '../../composables/helpers';
+import { configureDataset } from '../../composables/datasets';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
+import { loadDatasets } from '../../composables/loadData';
 
 interface FSConfigModalProps {
     idKey: string;
@@ -435,6 +437,7 @@ interface FSConfigModalProps {
 const props = defineProps<FSConfigModalProps>();
 
 const showFSConfig = inject<Ref<boolean>>('show-fs-config')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 const sizeFeedback = ref('');
 
@@ -485,18 +488,70 @@ const fileSystemConfig = ref<FileSystemData>({
     children: props.filesystem.children,
 });
 
-function fsConfigureBtn(filesystem) {
+// const newFileSystemSettings = ref<FileSystemData>({
+//      name: '',
+//     	id: '',
+//     	mountpoint: '',
+//     	pool: '',
+//     	encrypted: false,
+//     	key_loaded: '',
+//     	type: '',
+//     	inherit: false,
+//     	properties: {
+//     		guid: '',
+//     		encryption: '',
+//     		accessTime: '',
+//     		caseSensitivity: '',
+//     		compression: '',
+//     		deduplication: '',
+//     		dNodeSize: '',
+//     		extendedAttributes: '',
+//     		recordSize: '',
+//     		quota: {
+//     			raw: 0,
+//     			value: '',
+//     			unit: 'kib',
+//     		},
+//     		isReadOnly: false,
+//     		readOnly: '',
+//     		available: 0,
+//     		creation: '',
+//     		snapshotCount: '',
+//     		mounted: '',
+//     		usedbyRefreservation: '',
+//     		usedByDataset: '',
+//     		canMount: '',
+//     		aclInheritance: '',
+//     		aclType: '',
+//     		checksum: '',
+//     		refreservation: {
+//     			raw: 0,
+//     			value: '',
+//     			unit: 'kib',
+//     		},
+//     		used: 0,
+//     	},
+//     	parentFS: '',
 
+//     });
+
+async function fsConfigureBtn(filesystem) {
+    quotaRefreservationSizeCheck;
+    configureDataset(filesystem);
+    datasets.value = [];
+    await loadDatasets(datasets);
+    showFSConfig.value = false;
 }
 
 const quotaRefreservationSizeCheck = () => {
 	let result = true;
 	sizeFeedback.value = '';
 
-
-    if (fileSystemConfig.value.properties.quota.raw < fileSystemConfig.value.properties.refreservation?.raw!)
+    if (fileSystemConfig.value.properties.quota.raw < fileSystemConfig.value.properties.refreservation?.raw!) {
+        result = false;
+        sizeFeedback.value = 'Refreservation cannot be greater than quota/available size.';
+    }
 	
-
 	return result;
 }
 
