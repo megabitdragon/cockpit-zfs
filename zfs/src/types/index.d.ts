@@ -148,6 +148,23 @@ interface FileSystemData {
 	parentFS?: string;
 }
 
+//dataset command data object
+interface NewDataset {
+	name: string;
+	parent: string;
+	encrypted: boolean;
+	encryption?: string;
+	atime: string;
+	casesensitivity: string;
+	compression: string;
+	dedup: string;
+	dnodesize: string;
+	xattr: string;
+	recordsize: string;
+	quota: string;
+	readonly: string;
+}
+
 //object for snapshots
 interface Snapshot {
 	name: string;

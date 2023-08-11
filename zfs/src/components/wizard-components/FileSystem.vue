@@ -456,7 +456,9 @@
 import { ref, Ref, inject } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, convertBytesToSize, isBoolOnOff } from '../../composables/helpers';
+import { createDataset } from '../../composables/datasets';
 import Modal from '../common/Modal.vue';
+import { loadDatasets } from '../../composables/loadData';
 
 interface FileSystemProps {
 	idKey: string;
@@ -644,14 +646,58 @@ const encryptPasswordCheck = (fileSystem : FileSystemData) => {
 	return result;
 }
 
-function fsCreateBtn(fileSystem : FileSystemData) {
+const newDataset = ref<NewDataset>({
+	name: '',
+	parent: '',
+	encrypted: false,
+	atime: '',
+	casesensitivity: '',
+	compression: '',
+	dedup: '',
+	dnodesize: '',
+	xattr: '',
+	recordsize: '',
+	quota: '',
+	readonly: '',
+});
+
+function fillDatasetData() {
+	newDataset.value.name = newFileSystemConfig.value.name;
+	newDataset.value.parent = newFileSystemConfig.value.parentFS!;
+	newDataset.value.encrypted = newFileSystemConfig.value.encrypted;
+	newDataset.value.atime = newFileSystemConfig.value.properties.accessTime;
+	newDataset.value.casesensitivity = newFileSystemConfig.value.properties.caseSensitivity;
+	newDataset.value.compression = newFileSystemConfig.value.properties.compression;
+	newDataset.value.dedup = newFileSystemConfig.value.properties.deduplication;
+	newDataset.value.dnodesize = newFileSystemConfig.value.properties.dNodeSize;
+	newDataset.value.xattr = newFileSystemConfig.value.properties.extendedAttributes;
+	newDataset.value.recordsize = newFileSystemConfig.value.properties.recordSize;
+	newDataset.value.quota = convertSizeToBytes((newFileSystemConfig.value.properties.quota.raw.toString() + newFileSystemConfig.value.properties.quota.unit)).toString();
+	newDataset.value.readonly = isBoolOnOff(newFileSystemConfig.value.properties.isReadOnly!);
+
+	console.log("newDataSetData sent:", newDataset);
+}
+
+async function fsCreateBtn(fileSystem) {
 	if (nameCheck(fileSystem)) {
 		if (fileSystem.encrypted) {
 			if (encryptPasswordCheck(fileSystem)) {
 				getInheritedProperties();
+				fillDatasetData();
+				createDataset(newDataset.value).then(async() => {
+					datasets.value = [];
+					await loadDatasets(datasets);
+					showFSWizard.value = false;
+				});
 			}
 		} else {
 			getInheritedProperties();
+			fillDatasetData();
+			createDataset(newDataset.value).then(async() => {
+				datasets.value = [];
+				await loadDatasets(datasets);
+				showFSWizard.value = false;
+			});
 		}
 	}
 }
