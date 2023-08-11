@@ -47,7 +47,7 @@ export async function createDataset(fileSystemData : NewDataset, passphrase? : s
 	*/
 			cmdString.push(fileSystemData.parent + '/' + fileSystemData.name);
 
-			console.log("cmdString:" , cmdString);
+			console.log("create cmdString:" , cmdString);
 			
 			const state = useSpawn(cmdString);
 			const output = await state.promise();
@@ -93,7 +93,7 @@ export async function configureDataset(fileSystemData : FileSystemData) {
 
 		cmdString.push(fileSystemData.name);
 
-		console.log("cmdString:" , cmdString);
+		console.log("configure cmdString:" , cmdString);
 		
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
@@ -104,4 +104,15 @@ export async function configureDataset(fileSystemData : FileSystemData) {
 		console.error(errorString(state));
 		return null;
 	}
+}
+
+export async function destroyDataset(fileSystemData : FileSystemData) {
+	let cmdString = ['zfs', 'destroy', fileSystemData.name];
+
+	console.log("destroy cmdString:" , cmdString);
+		
+	const state = useSpawn(cmdString);
+	const output = await state.promise();
+	console.log(output)
+	return output.stdout;
 }

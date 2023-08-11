@@ -71,7 +71,7 @@
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
-														<a href="#" @click="" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+														<a href="#" @click="deleteFileSystem(fileSystem)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
@@ -112,7 +112,7 @@
 	</div>
 
 	<div v-if="showFSConfig">
-		<FSConfigModal :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
+		<FSConfigModal ref="fileSystemConfiguration" :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
 	</div>
 
 </template>
@@ -123,12 +123,15 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
+import { destroyDataset } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
 
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+
+const fileSystemConfiguration = ref();
 
 const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
@@ -146,6 +149,11 @@ function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log(selectedDataset);
 	showFSConfig.value = true
+}
+
+function deleteFileSystem(fileSystem) {
+	destroyDataset(fileSystem);
+	refreshDatasets();
 }
 
 provide('show-fs-wizard', showNewFSWizard);
