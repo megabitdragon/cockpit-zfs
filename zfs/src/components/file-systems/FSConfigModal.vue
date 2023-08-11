@@ -488,53 +488,6 @@ const fileSystemConfig = ref<FileSystemData>({
     children: props.filesystem.children,
 });
 
-// const newFileSystemSettings = ref<FileSystemData>({
-//      name: '',
-//     	id: '',
-//     	mountpoint: '',
-//     	pool: '',
-//     	encrypted: false,
-//     	key_loaded: '',
-//     	type: '',
-//     	inherit: false,
-//     	properties: {
-//     		guid: '',
-//     		encryption: '',
-//     		accessTime: '',
-//     		caseSensitivity: '',
-//     		compression: '',
-//     		deduplication: '',
-//     		dNodeSize: '',
-//     		extendedAttributes: '',
-//     		recordSize: '',
-//     		quota: {
-//     			raw: 0,
-//     			value: '',
-//     			unit: 'kib',
-//     		},
-//     		isReadOnly: false,
-//     		readOnly: '',
-//     		available: 0,
-//     		creation: '',
-//     		snapshotCount: '',
-//     		mounted: '',
-//     		usedbyRefreservation: '',
-//     		usedByDataset: '',
-//     		canMount: '',
-//     		aclInheritance: '',
-//     		aclType: '',
-//     		checksum: '',
-//     		refreservation: {
-//     			raw: 0,
-//     			value: '',
-//     			unit: 'kib',
-//     		},
-//     		used: 0,
-//     	},
-//     	parentFS: '',
-
-//     });
-
 async function fsConfigureBtn(filesystem) {
     quotaRefreservationSizeCheck;
     configureDataset(filesystem);

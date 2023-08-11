@@ -1,4 +1,5 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from './helpers';
 // @ts-ignore
 import get_datasets_script from "../scripts/get-datasets.py?raw";
 
@@ -20,7 +21,6 @@ export async function createDataset(fileSystemData : NewDataset, passphrase? : s
     try {
         let cmdString = ['zfs', 'create', '-o', 'atime=' + fileSystemData.atime, '-o', 'casesensitivity=' + fileSystemData.casesensitivity, '-o', 'compression=' + fileSystemData.compression, '-o', 'dedup=' + fileSystemData.dedup, '-o', 'dnodesize=' + fileSystemData.dnodesize, '-o', 'xattr=' + fileSystemData.xattr, '-o', 'recordsize=' + fileSystemData.recordsize, '-o', 'readonly=' + fileSystemData.readonly]
 		
-		// '-o', 'quota=' + fileSystemData.quota,fileSystemData.parent + '/' + fileSystemData.name
 		if (Number(fileSystemData.quota) == 0) {
 			cmdString.push('-o', 'quota=none');
 		} else {
@@ -76,19 +76,22 @@ export async function configureDataset(fileSystemData : FileSystemData) {
 	try {
 		let cmdString = ['zfs', 'set', 'mountpoint=' + fileSystemData.mountpoint, 'canmount=' + fileSystemData.properties.canMount, 'recordsize=' + fileSystemData.properties.recordSize, 'aclinherit=' + fileSystemData.properties.aclInheritance!, 'acltype=' + fileSystemData.properties.aclType!, 'atime=' + fileSystemData.properties.accessTime, 'dedup=' + fileSystemData.properties.deduplication, 'compression=' + fileSystemData.properties.compression, 'checksum=' + fileSystemData.properties.checksum!, 'dnodesize=' + fileSystemData.properties.dNodeSize, 'xattr=' + fileSystemData.properties.extendedAttributes];
 
+		//size example
+		//convertSizeToBytes((newFileSystemConfig.value.properties.quota.raw.toString() + newFileSystemConfig.value.properties.quota.unit)).toString();
+
 		if (Number(fileSystemData.properties.quota.raw) == 0) {
-			cmdString.push('-o', 'quota=none');
+			cmdString.push('quota=none');
 		} else {
-			cmdString.push('-o', 'quota=' + fileSystemData.properties.quota.raw);
+			cmdString.push('quota=' + convertSizeToBytes(fileSystemData.properties.quota.raw + fileSystemData.properties.quota.unit));
 		}
 
 		if (Number(fileSystemData.properties.refreservation!.raw) == 0) {
-			cmdString.push('-o', 'refreservation=off');
+			cmdString.push('refreservation=off');
 		} else {
-			cmdString.push('-o', 'refreservation=' + fileSystemData.properties.refreservation!.raw);
+			cmdString.push('refreservation=' + convertSizeToBytes(fileSystemData.properties.refreservation!.raw + fileSystemData.properties.refreservation!.unit));
 		}
 
-		cmdString.push(fileSystemData.parentFS + '/' + fileSystemData.name);
+		cmdString.push(fileSystemData.name);
 
 		console.log("cmdString:" , cmdString);
 		
