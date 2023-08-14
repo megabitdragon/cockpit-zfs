@@ -116,7 +116,7 @@
 	</div>
 
 	<div v-if="showDeleteConfirm">
-		<ConfirmDeleteModal ref="fileSystemDestroyConfirm" item="filesystem" :idKey="'delete-filesystem'" @close="showDeleteConfirm = false"/>
+		<ConfirmDeleteModal item="filesystem" :name="selectedDataset!.name" :idKey="'delete-filesystem'" @close="showDeleteConfirm = false"/>
 	</div>
 
 </template>
@@ -137,11 +137,10 @@ const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const fileSystemConfiguration = ref();
-// const fileSystemDestroyConfirm = ref();
 
 const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
-const showDeleteConfirm = ref(false);
+const showDeleteConfirm = inject<Ref<boolean>>('show-delete-modal')!;
 const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
 
 async function refreshDatasets() {
@@ -159,25 +158,32 @@ function loadFileSystemConfig(fileSystem) {
 	showFSConfig.value = true
 }
 
- function deleteFileSystem(fileSystem) {
+const poolDataset = fileSystems.value.find(dataset => {
+	return dataset.name === selectedDataset.value?.name;
+});
+
+// const poolDataset = fileSystems.value.find(dataset => {
+// 	return dataset.id === selectedDataset.value.name;
+// });
+
+function deleteFileSystem(fileSystem) {
 	showDeleteConfirm.value = true;
 	selectedDataset.value = fileSystem;
-	console.log('deleting:', selectedDataset);
+	console.log('deleting:', selectedDataset.value);
 
 	watch(confirmDelete, (newValue, oldValue) => {
 	
 		console.log('confirmDelete.value changed:', newValue);
 
 		if (confirmDelete.value == true) {
-			destroyDataset(fileSystem);
+			destroyDataset(selectedDataset.value!);
 			showDeleteConfirm.value = false;
 			refreshDatasets();
 			confirmDelete.value = false;
 		}
 	});
 
-	console.log('deleted:', selectedDataset);
-	
+	console.log('deleted:', fileSystem);
 }
 
 provide('show-fs-wizard', showNewFSWizard);

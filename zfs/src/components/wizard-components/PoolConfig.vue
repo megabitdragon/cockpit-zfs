@@ -143,7 +143,7 @@
 			</div>
 
 			<!-- Advanced Settings (hidden under accordion for better UI/UX) -->
-			<Accordion :isOpen="false" class="mt-2 -ml-3 bg-well rounded-md p-2">
+			<Accordion :isOpen="false" class="mt-2 mx-2 -ml-2 bg-well rounded-md p-2">
 				<template v-slot:title>
 					<span><b>Advanced Settings</b></span>
 				</template>
@@ -256,7 +256,7 @@
 			<button :class="createFileSystemCardClass(poolConfig.createFileSystem!)" 
 			class="box-border rounded-lg shadow-md focus:outline-none focus:ring-0 w-full h-full bg-45d mb-2">
 				<label :for="getIdKey('create-filesystem')" :class="createFileSystemCardClass(poolConfig.createFileSystem!)" 
-				class="block py-3 w-full h-full font-medium text-default justify-center">
+				class="block py-3 w-full h-full font-medium text-default justify-center rounded">
 					Create a File System?
 					<input :id="getIdKey('create-filesystem')" v-model="poolConfig.createFileSystem" aria-describedby="create-filesystem" name="create-filesystem" type="checkbox" class="ml-2 h-4 w-4 rounded text-success"/>
 				</label>

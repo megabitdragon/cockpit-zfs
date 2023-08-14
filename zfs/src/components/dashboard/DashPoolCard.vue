@@ -78,16 +78,21 @@
 	<div v-if="showPoolDetails">
 		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
 	</div>
+
+	<div v-if="showDeleteConfirm">
+		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="'delete-pool'" @close="showDeleteConfirm = false"/>
+	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, provide } from "vue";
+import { ref, inject, Ref, computed, provide, watch } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { destroyPool } from "../../composables/pools";
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
+import ConfirmDeleteModal from "../common/ConfirmDeleteModal.vue";
 
 interface DashPoolCardProps {
 	pool: PoolData;
@@ -106,15 +111,44 @@ const diskData = inject<Ref<DiskData[]>>("disks")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
+const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
+const showDeleteConfirm = inject<Ref<boolean>>('show-delete-modal')!;
+
+// async function destroyPoolAndUpdate(pool) {
+// 	destroyPool(pool);
+// 	disksLoaded.value = false;
+// 	poolsLoaded.value = false;
+// 	poolData.value = [];
+// 	diskData.value = [];
+// 	await loadDisksThenPools(diskData, poolData);
+// 	disksLoaded.value = true;
+// 	poolsLoaded.value = true;
+// }
+
 async function destroyPoolAndUpdate(pool) {
-	destroyPool(pool);
-	disksLoaded.value = false;
-	poolsLoaded.value = false;
-	poolData.value = [];
-	diskData.value = [];
-	await loadDisksThenPools(diskData, poolData);
-	disksLoaded.value = true;
-	poolsLoaded.value = true;
+	showDeleteConfirm.value = true;
+	selectedPool.value = pool;
+	console.log('deleting:', selectedPool.value);
+
+	watch(confirmDelete, async (newValue, oldValue) => {
+	
+		console.log('confirmDelete.value changed:', newValue);
+
+		if (confirmDelete.value == true) {	
+			destroyPool(selectedPool.value!);
+			disksLoaded.value = false;
+			poolsLoaded.value = false;
+			poolData.value = [];
+			diskData.value = [];
+			await loadDisksThenPools(diskData, poolData);
+			disksLoaded.value = true;
+			poolsLoaded.value = true;
+			confirmDelete.value = false;
+			showDeleteConfirm.value = false;
+		}
+	});
+
+	console.log('deleted:', selectedPool.value);
 }
 
 //method to show pool details when button is clicked
