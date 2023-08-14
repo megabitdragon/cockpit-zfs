@@ -119,7 +119,7 @@ function getDiskFromPool(disk) {
         if (vDisk.name === disk.name) {
           disk.poolName = vDisk.poolName;
           disk.vDevName = vDisk.vDevName;
-          return true; // To break the loop once a matching disk is found
+          return true; 
         }
       });
     });

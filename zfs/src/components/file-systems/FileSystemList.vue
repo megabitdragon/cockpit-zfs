@@ -61,19 +61,19 @@
 													<MenuItem v-slot="{ active }">
 														<a href="#" @click="loadFileSystemConfig(fileSystem)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
 													</MenuItem>
-													<MenuItem v-slot="{ active }">
+													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Edit Permissions</a>
 													</MenuItem>
-													<MenuItem v-slot="{ active }">
+													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 													</MenuItem>
 													<MenuItem v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 													</MenuItem>
-													<MenuItem v-slot="{ active }">
+													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="deleteFileSystem(fileSystem)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 													</MenuItem>
-													<MenuItem v-slot="{ active }">
+													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 													</MenuItem>
 													<MenuItem v-if="fileSystem.encrypted" v-slot="{ active }">
@@ -82,7 +82,7 @@
 													<MenuItem v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 													</MenuItem>
-													<MenuItem v-slot="{ active }">
+													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
 													</MenuItem>													
 												</div>
@@ -94,7 +94,6 @@
 						</tbody>
 					</table>
 				</div>
-
 
 				<div v-if="fileSystemsLoaded == false" class="p-2 flex justify-center bg-default">
 					<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
@@ -122,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch } from "vue";
+import { ref, inject, Ref, provide, watch, computed } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
@@ -133,6 +132,7 @@ import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal.vue";
 
+const pools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
@@ -158,12 +158,20 @@ function loadFileSystemConfig(fileSystem) {
 	showFSConfig.value = true
 }
 
-const poolDataset = fileSystems.value.find(dataset => {
-	return dataset.name === selectedDataset.value?.name;
-});
+function findPoolDataset(fileSystem) {
+	try {
+		return pools.value.find(pool => pool.name == fileSystem.name);
+	} catch {
+		console.log('error finding pool');
+	}
+}
 
-// const poolDataset = fileSystems.value.find(dataset => {
-// 	return dataset.id === selectedDataset.value.name;
+// const poolDataset = pools.value.find(pool => {
+// 	return pool.name === selectedDataset.value?.name;
+// });
+
+// const disksSSD = computed(() => {
+// 	return disks.value.filter(disk => disk.type == 'SSD');
 // });
 
 function deleteFileSystem(fileSystem) {
