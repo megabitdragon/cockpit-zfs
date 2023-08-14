@@ -408,13 +408,17 @@
                 
             </div> -->
         </template>
+
         <template v-slot:footer>
-            <div class="button-group-row w-full justify-between mx-4">
-                <div class="button-group-row mt-2 justify-self-center">
-                    <p class="text-danger" v-if="sizeFeedback">{{ sizeFeedback }}</p>
+            <div class="w-full grid grid-rows-2">
+                <div class="w-full row-start-1">
+                    <div class="button-group-row mt-2 justify-self-center">
+                        <p class="text-danger" v-if="sizeFeedback">{{ sizeFeedback }}</p>
+                    </div>
                 </div>
-                <div class="button-group-row mt-2">
-                    <button @click="fsConfigureBtn(fileSystemConfig)" :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary object-right justify-end">Configure</button>
+                <div class="button-group-row w-full row-start-2 justify-between mt-2">
+                    <button @click="showFSConfig = false" :id="getIdKey('cancel-configure-btn')" name="cancel-configure-btn" class="mt-1 btn btn-danger object-left justify-start h-fit">Cancel</button>
+                    <button @click="fsConfigureBtn(fileSystemConfig)" :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Configure</button>
                 </div>
             </div>
         </template>
@@ -489,24 +493,24 @@ const fileSystemConfig = ref<FileSystemData>({
 });
 
 async function fsConfigureBtn(filesystem) {
-    quotaRefreservationSizeCheck;
+    //quotaRefreservationSizeCheck;
     configureDataset(filesystem);
     datasets.value = [];
     await loadDatasets(datasets);
     showFSConfig.value = false;
 }
 
-const quotaRefreservationSizeCheck = () => {
-	let result = true;
-	sizeFeedback.value = '';
+// const quotaRefreservationSizeCheck = () => {
+// 	let result = true;
+// 	sizeFeedback.value = '';
 
-    if (fileSystemConfig.value.properties.quota.raw < fileSystemConfig.value.properties.refreservation?.raw!) {
-        result = false;
-        sizeFeedback.value = 'Refreservation cannot be greater than quota/available size.';
-    }
+//     if (fileSystemConfig.value.properties.quota.raw < fileSystemConfig.value.properties.refreservation?.raw!) {
+//         result = false;
+//         sizeFeedback.value = 'Refreservation cannot be greater than quota/available size.';
+//     }
 	
-	return result;
-}
+// 	return result;
+// }
 
 const getIdKey = (name: string) => `${name}`;
 </script>

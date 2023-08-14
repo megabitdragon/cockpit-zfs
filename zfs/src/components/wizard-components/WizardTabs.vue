@@ -35,9 +35,11 @@
 			</li>
 		</ol>
 	</nav>
+	
 </template>
 
 <script setup lang="ts">
+import { inject, Ref } from 'vue';
 import { CheckCircleIcon } from '@heroicons/vue/24/outline';
 
 interface WizardTabsProps {
@@ -48,5 +50,6 @@ interface WizardTabsProps {
 }
 
 const props = defineProps<WizardTabsProps>();
+
 
 </script>

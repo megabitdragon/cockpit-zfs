@@ -47,6 +47,9 @@ const datasets = ref<FileSystemData[]>([]);
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
+const confirmDelete = ref(false);
+
+const modalControl = ref(false);
 
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
@@ -74,5 +77,7 @@ provide("disks-in-pools", disksInPools);
 provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
+provide('confirm-delete', confirmDelete);
+provide('modal-control', modalControl);
 </script>
 

@@ -115,10 +115,14 @@
 		<FSConfigModal ref="fileSystemConfiguration" :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
 	</div>
 
+	<div v-if="showDeleteConfirm">
+		<ConfirmDeleteModal ref="fileSystemDestroyConfirm" item="filesystem" :idKey="'delete-filesystem'" @close="showDeleteConfirm = false"/>
+	</div>
+
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide } from "vue";
+import { ref, inject, Ref, provide, watch } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
@@ -127,14 +131,18 @@ import { destroyDataset } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
+import ConfirmDeleteModal from "../common/ConfirmDeleteModal.vue";
 
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const fileSystemConfiguration = ref();
+// const fileSystemDestroyConfirm = ref();
 
 const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
+const showDeleteConfirm = ref(false);
+const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
 
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
@@ -147,15 +155,33 @@ const selectedDataset = ref<FileSystemData>();
 
 function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
-	console.log(selectedDataset);
+	console.log('loading:', selectedDataset);
 	showFSConfig.value = true
 }
 
-function deleteFileSystem(fileSystem) {
-	destroyDataset(fileSystem);
-	refreshDatasets();
+ function deleteFileSystem(fileSystem) {
+	showDeleteConfirm.value = true;
+	selectedDataset.value = fileSystem;
+	console.log('deleting:', selectedDataset);
+
+	watch(confirmDelete, (newValue, oldValue) => {
+	
+		console.log('confirmDelete.value changed:', newValue);
+
+		if (confirmDelete.value == true) {
+			destroyDataset(fileSystem);
+			showDeleteConfirm.value = false;
+			refreshDatasets();
+			confirmDelete.value = false;
+		}
+	});
+
+	console.log('deleted:', selectedDataset);
+	
 }
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
+provide('show-delete-confirm', showDeleteConfirm);
+provide('confirm-delete', confirmDelete);
 </script>

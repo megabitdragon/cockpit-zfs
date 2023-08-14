@@ -272,21 +272,29 @@
 			</div>
 		</template>
 		<template v-slot:footer>
-			<div v-if="navTag == 'topology'" class="mt-2">
-				<div class="mt-2">
-					<button @click="showAddVDevModal = true" :id="getIdKey('add-vdev-btn')" name="add-vdev-btn" class="mt-1 btn btn-primary">Add Virtual Device</button>
+			<div class="button-group-row w-full justify-between">
+				<div class="mt-2 justify-self-start">
+					<button @click="showPoolDetails = false" :id="getIdKey('close-details-btn')" name="close-details-btn" class="mt-1 btn btn-danger">Close</button>
+				</div>
+				<div class="justify-self-end">
+					<div v-if="navTag == 'topology'" >
+						<div class="mt-2">
+							<button @click="showAddVDevModal = true" :id="getIdKey('add-vdev-btn')" name="add-vdev-btn" class="mt-1 btn btn-primary">Add Virtual Device</button>
+						</div>
+					</div>
+					<div v-if="navTag == 'snapshots'" >
+						<div class="mt-2">
+							<button @click="showSnapshotModal = true" :id="getIdKey('create-snap-wizard-btn')" name="create-snap-wizard-btn" class="mt-1 btn btn-primary">Create Snapshot</button>
+						</div>
+					</div>
+					<div v-if="navTag == 'settings'" >
+						<div class="mt-2">
+							<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div v-if="navTag == 'snapshots'" class="mt-2">
-				<div class="mt-2">
-					<button @click="showSnapshotModal = true" :id="getIdKey('create-snap-wizard-btn')" name="create-snap-wizard-btn" class="mt-1 btn btn-primary">Create Snapshot</button>
-				</div>
-			</div>
-			<div v-if="navTag == 'settings'" class="mt-2">
-				<div class="mt-2">
-					<button :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
-				</div>
-			</div>
+			
 		</template>
 	</Modal>
 
