@@ -418,7 +418,7 @@
                 </div>
                 <div class="button-group-row w-full row-start-2 justify-between mt-2">
                     <button @click="showFSConfig = false" :id="getIdKey('cancel-configure-btn')" name="cancel-configure-btn" class="mt-1 btn btn-danger object-left justify-start h-fit">Cancel</button>
-                    <button @click="fsConfigureBtn(fileSystemConfig)" :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Configure</button>
+                    <button @click="fsConfigureBtn()" :id="getIdKey('create-fs-btn')" name="create-fs-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Configure</button>
                 </div>
             </div>
         </template>
@@ -492,12 +492,101 @@ const fileSystemConfig = ref<FileSystemData>({
     children: props.filesystem.children,
 });
 
-async function fsConfigureBtn(filesystem) {
+const newChangesToFileSystem = ref<FileSystemEditConfig>({
+	name: fileSystemConfig.value.name,
+	guid: fileSystemConfig.value.properties.guid,
+	casesensitivity: fileSystemConfig.value.properties.caseSensitivity,
+});
+
+const updatedProperties: Partial<FileSystemEditConfig> = {
+	name: fileSystemConfig.value.name,
+	guid: fileSystemConfig.value.properties.guid,
+	casesensitivity: fileSystemConfig.value.properties.caseSensitivity,
+};
+
+async function checkForChanges(fileSystemCheck) {
+    //readonly
+    if (fileSystemCheck.properties.isReadOnly != props.filesystem.properties.isReadOnly) {
+        updatedProperties.readonly = fileSystemCheck.properties.isReadOnly;
+    }
+    //mountpoint
+    if (fileSystemCheck.mountpoint != props.filesystem.mountpoint) {
+        updatedProperties.mountpoint = fileSystemCheck.mountpoint;
+    }
+    //canmount
+    if (fileSystemCheck.properties.canMount != props.filesystem.properties.canMount) {
+        updatedProperties.canmount = fileSystemCheck.properties.canMount;
+    }
+    //record
+    if (fileSystemCheck.properties.recordSize != props.filesystem.properties.recordSize) {
+        updatedProperties.record = fileSystemCheck.properties.recordSize;
+    }
+    //aclinherit
+    if (fileSystemCheck.properties.aclInheritance != props.filesystem.properties.aclInheritance) {
+        updatedProperties.acltype = fileSystemCheck.properties.aclInheritance;
+    }
+    //acltype
+    if (fileSystemCheck.properties.aclType != props.filesystem.properties.aclType) {
+        updatedProperties.acltype = fileSystemCheck.properties.aclType;
+    }
+    //atime
+    if (fileSystemCheck.properties.accessTime != props.filesystem.properties.accessTime) {
+        updatedProperties.atime = fileSystemCheck.properties.accessTime;
+    }
+    //dedup
+    if (fileSystemCheck.properties.deduplication != props.filesystem.properties.deduplication) {
+        updatedProperties.dedup = fileSystemCheck.properties.deduplication;
+    }
+    //compression
+    if (fileSystemCheck.properties.compression != props.filesystem.properties.compression) {
+        updatedProperties.compression = fileSystemCheck.properties.compression;
+    }
+    //checksum
+    if (fileSystemCheck.properties.checksum != props.filesystem.properties.checksum) {
+        updatedProperties.checksum = fileSystemCheck.properties.checksum;
+    }
+    //dnodesize
+    if (fileSystemCheck.properties.dNodeSize != props.filesystem.properties.dNodeSize) {
+        updatedProperties.dnodesize = fileSystemCheck.properties.dNodeSize;
+    }
+    //xattr
+    if (fileSystemCheck.properties.extendedAttributes != props.filesystem.properties.extendedAttributes) {
+        updatedProperties.xattr = fileSystemCheck.properties.extendedAttributes;
+    }
+    //quota
+    if (Number(fileSystemCheck.properties.quota.raw)) {
+        if (fileSystemCheck.properties.quota.raw != props.filesystem.properties.quota.raw) {
+            updatedProperties.quota = convertSizeToBytes(fileSystemCheck.properties.quota.raw + fileSystemCheck.properties.quota.unit);
+        }
+    }
+    //refreservation
+    if (Number(fileSystemCheck.properties.refreservation.raw)) {
+        if (fileSystemCheck.properties.refreservation.raw != props.filesystem.properties.refreservation!.raw) {
+            updatedProperties.refreservation = convertSizeToBytes(fileSystemCheck.properties.refreservation.raw + fileSystemCheck.properties.refreservation.unit)
+        }
+    }
+
+    const newChanges = {
+        ...newChangesToFileSystem.value,
+        ...updatedProperties,
+    }
+
+    newChangesToFileSystem.value = newChanges;
+}
+
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+   
+async function fsConfigureBtn() {
     //quotaRefreservationSizeCheck;
-    configureDataset(filesystem);
+    console.log('filesystem:', fileSystemConfig.value);
+    await checkForChanges(fileSystemConfig.value);
+    console.log('newChanges:', newChangesToFileSystem.value);
+    configureDataset(newChangesToFileSystem.value);
     datasets.value = [];
+    fileSystemsLoaded.value = false;
     await loadDatasets(datasets);
     showFSConfig.value = false;
+    fileSystemsLoaded.value = true;
 }
 
 // const quotaRefreservationSizeCheck = () => {

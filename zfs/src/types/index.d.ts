@@ -124,7 +124,7 @@ interface FileSystemData {
 			raw: number;
 			value: string;
 			unit: 'kib' | 'mib' | 'gib' | 'tib';
-		};
+		}
 		isReadOnly?: boolean;
 		readOnly: string;
 		available: number;
@@ -141,11 +141,41 @@ interface FileSystemData {
 			raw: number;
 			value: string;
 			unit: 'kib' | 'mib' | 'gib' | 'tib';
-		},
+		}
 		used: number;
 	},
 	children?: FileSystemData[];
 	parentFS?: string;
+}
+
+interface FileSystemEditConfig {
+	name: string;
+	guid: string;
+	casesensitivity: string;
+	readonly?: boolean;
+	mountpoint?: string;
+	canmount?: string;
+	atime?: string;
+	record?: string;
+	aclinherit?: string;
+	acltype?: string;
+	dedup?: string;
+	compression?: string;
+	checksum?: string;
+	dnodesize?: string;
+	xattr?: string;
+	quota?: number;
+	refreservation?: number;
+	// quota?:{
+	// 	raw: number;
+	// 	value: string;
+	// 	unit: 'kib' | 'mib' | 'gib' | 'tib';
+	// }
+	// refreservation?: {
+	// 	raw: number;
+	// 	value: string;
+	// 	unit: 'kib' | 'mib' | 'gib' | 'tib';
+	// }
 }
 
 //dataset command data object

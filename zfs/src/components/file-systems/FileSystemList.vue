@@ -71,9 +71,6 @@
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 													</MenuItem>
 													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
-														<a href="#" @click="deleteFileSystem(fileSystem)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
-													</MenuItem>
-													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 													</MenuItem>
 													<MenuItem v-if="fileSystem.encrypted" v-slot="{ active }">
@@ -84,7 +81,10 @@
 													</MenuItem>
 													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
-													</MenuItem>													
+													</MenuItem>
+													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+														<a href="#" @click="deleteFileSystem(fileSystem)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+													</MenuItem>											
 												</div>
 											</MenuItems>
 										</transition>

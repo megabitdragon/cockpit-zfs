@@ -72,33 +72,121 @@ export async function createDataset(fileSystemData : NewDataset, passphrase? : s
 
 // }
 
-export async function configureDataset(fileSystemData : FileSystemData) {
-	try {
-		let cmdString = ['zfs', 'set', 'mountpoint=' + fileSystemData.mountpoint, 'canmount=' + fileSystemData.properties.canMount, 'recordsize=' + fileSystemData.properties.recordSize, 'aclinherit=' + fileSystemData.properties.aclInheritance!, 'acltype=' + fileSystemData.properties.aclType!, 'atime=' + fileSystemData.properties.accessTime, 'dedup=' + fileSystemData.properties.deduplication, 'compression=' + fileSystemData.properties.compression, 'checksum=' + fileSystemData.properties.checksum!, 'dnodesize=' + fileSystemData.properties.dNodeSize, 'xattr=' + fileSystemData.properties.extendedAttributes];
+// export async function configureDataset(fileSystemData : FileSystemData) {
+// 	try {
+// 		let cmdString = ['zfs', 'set', 'mountpoint=' + fileSystemData.mountpoint, 'canmount=' + fileSystemData.properties.canMount, 'recordsize=' + fileSystemData.properties.recordSize, 'aclinherit=' + fileSystemData.properties.aclInheritance!, 'acltype=' + fileSystemData.properties.aclType!, 'atime=' + fileSystemData.properties.accessTime, 'dedup=' + fileSystemData.properties.deduplication, 'compression=' + fileSystemData.properties.compression, 'checksum=' + fileSystemData.properties.checksum!, 'dnodesize=' + fileSystemData.properties.dNodeSize, 'xattr=' + fileSystemData.properties.extendedAttributes];
 
-		//size example
-		//convertSizeToBytes((newFileSystemConfig.value.properties.quota.raw.toString() + newFileSystemConfig.value.properties.quota.unit)).toString();
+// 		//size example
+// 		//convertSizeToBytes((newFileSystemConfig.value.properties.quota.raw.toString() + newFileSystemConfig.value.properties.quota.unit)).toString();
 
-		if (Number(fileSystemData.properties.quota.raw) == 0) {
-			cmdString.push('quota=none');
-		} else {
-			cmdString.push('quota=' + convertSizeToBytes(fileSystemData.properties.quota.raw + fileSystemData.properties.quota.unit));
-		}
+// 		if (Number(fileSystemData.properties.quota.raw) == 0) {
+// 			cmdString.push('quota=none');
+// 		} else {
+// 			cmdString.push('quota=' + convertSizeToBytes(fileSystemData.properties.quota.raw + fileSystemData.properties.quota.unit));
+// 		}
 
-		if (Number(fileSystemData.properties.refreservation!.raw) == 0) {
-			cmdString.push('refreservation=off');
-		} else {
-			cmdString.push('refreservation=' + convertSizeToBytes(fileSystemData.properties.refreservation!.raw + fileSystemData.properties.refreservation!.unit));
-		}
+// 		if (Number(fileSystemData.properties.refreservation!.raw) == 0) {
+// 			cmdString.push('refreservation=off');
+// 		} else {
+// 			cmdString.push('refreservation=' + convertSizeToBytes(fileSystemData.properties.refreservation!.raw + fileSystemData.properties.refreservation!.unit));
+// 		}
 
-		cmdString.push(fileSystemData.name);
+// 		cmdString.push(fileSystemData.name);
 
-		console.log("configure cmdString:" , cmdString);
+// 		console.log("configure cmdString:" , cmdString);
 		
-		const state = useSpawn(cmdString);
-		const output = await state.promise();
-		console.log(output)
-		return output.stdout;
+// 		const state = useSpawn(cmdString);
+// 		const output = await state.promise();
+// 		console.log(output)
+// 		return output.stdout;
+
+// 	} catch (state) {
+// 		console.error(errorString(state));
+// 		return null;
+// 	}
+// }
+
+export async function configureDataset(fileSystemData : FileSystemEditConfig) {
+	try {
+		let cmdString = ['zfs', 'set'];
+	/*
+		'mountpoint=' + fileSystemData.mountpoint
+		'canmount=' + fileSystemData.canmount
+		'recordsize=' + fileSystemData.record
+		'aclinherit=' + fileSystemData.aclinherit
+		'acltype=' + fileSystemData.acltype
+		'atime=' + fileSystemData.atime
+		'dedup=' + fileSystemData.dedup
+		'compression=' + fileSystemData.compression
+		'checksum=' + fileSystemData.checksum
+		'dnodesize=' + fileSystemData.dnodesize
+		'xattr=' + fileSystemData.xattr
+	*/
+		const hasProperties = hasChanges(fileSystemData);
+
+		if (hasProperties) {
+
+			if (fileSystemData.mountpoint) {
+				cmdString.push('mountpoint=' + fileSystemData.mountpoint);
+			}
+			if (fileSystemData.canmount) {
+				cmdString.push('canmount=' + fileSystemData.canmount);
+			}
+			if (fileSystemData.record) {
+				cmdString.push('recordsize=' + fileSystemData.record);
+			}
+			if (fileSystemData.aclinherit) {
+				cmdString.push('aclinherit=' + fileSystemData.aclinherit);
+			}
+			if (fileSystemData.acltype) {
+				cmdString.push('acltype=' + fileSystemData.acltype);
+			}
+			if (fileSystemData.atime) {
+				cmdString.push('atime=' + fileSystemData.atime);
+			}
+			if (fileSystemData.dedup) {
+				cmdString.push('dedup=' + fileSystemData.dedup);
+			}
+			if (fileSystemData.compression) {
+				cmdString.push('compression=' + fileSystemData.compression);
+			}
+			if (fileSystemData.checksum) {
+				cmdString.push('checksum=' + fileSystemData.checksum);
+			}
+			if (fileSystemData.dnodesize) {
+				cmdString.push('dnodesize=' + fileSystemData.dnodesize);
+			}
+			if (fileSystemData.xattr) {
+				cmdString.push('xattr=' + fileSystemData.xattr);
+			}
+			if (fileSystemData.quota) {
+				if (Number(fileSystemData.quota) == 0) {
+					cmdString.push('quota=none');
+				} else {
+					cmdString.push('quota=' + fileSystemData.quota);
+				}
+		
+			}
+			if (fileSystemData.refreservation) {
+				if (Number(fileSystemData.refreservation) == 0) {
+					cmdString.push('refreservation=off');
+				} else {
+					cmdString.push('refreservation=' + fileSystemData.refreservation);
+				}
+			}
+	
+			cmdString.push(fileSystemData.name);
+	
+			console.log("configure cmdString:" , cmdString);
+			
+			const state = useSpawn(cmdString);
+			const output = await state.promise();
+			console.log(output)
+			return output.stdout;
+
+		} else {
+			console.log("There are no selected properties to change.");
+		}
 
 	} catch (state) {
 		console.error(errorString(state));
@@ -115,4 +203,31 @@ export async function destroyDataset(fileSystemData : FileSystemData) {
 	const output = await state.promise();
 	console.log(output)
 	return output.stdout;
+}
+
+function hasChanges(fileSystemData) {
+	const properties = [
+		'readonly',
+        'mountpoint',
+        'canmount',
+        'atime',
+        'quota',
+        'record',
+        'refreservation',
+        'aclinherit',
+        'acltype',
+        'dedup',
+        'compression',
+        'checksum',
+        'dnodesize',
+        'xattr',
+	]
+
+	for (const property of properties) {
+		if (property in fileSystemData) {
+			return true;
+		}
+	}
+
+	return false;
 }
