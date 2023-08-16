@@ -114,17 +114,6 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
 const showDeleteConfirm = inject<Ref<boolean>>('show-delete-modal')!;
 
-// async function destroyPoolAndUpdate(pool) {
-// 	destroyPool(pool);
-// 	disksLoaded.value = false;
-// 	poolsLoaded.value = false;
-// 	poolData.value = [];
-// 	diskData.value = [];
-// 	await loadDisksThenPools(diskData, poolData);
-// 	disksLoaded.value = true;
-// 	poolsLoaded.value = true;
-// }
-
 async function destroyPoolAndUpdate(pool) {
 	showDeleteConfirm.value = true;
 	selectedPool.value = pool;

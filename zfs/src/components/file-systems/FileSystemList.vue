@@ -99,7 +99,7 @@
 					<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
 				</div>
 				<div v-if="fileSystems.length < 1 && fileSystemsLoaded == true" class="p-2 flex bg-default justify-center">
-					<span class="font-semibold text-lg my-2">No Pools Found</span>
+					<span class="font-semibold text-lg my-2">No File Systems Found</span>
 				</div>
 
 			</div>
@@ -126,7 +126,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
-import { destroyDataset } from "../../composables/datasets";
+import { destroyDataset, unmountChildren } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
@@ -166,36 +166,49 @@ function findPoolDataset(fileSystem) {
 	}
 }
 
-// const poolDataset = pools.value.find(pool => {
-// 	return pool.name === selectedDataset.value?.name;
-// });
-
-// const disksSSD = computed(() => {
-// 	return disks.value.filter(disk => disk.type == 'SSD');
-// });
+// const deleting = inject<Ref<boolean>>('deleting')!;
+const hasChildren = inject<Ref<boolean>>('has-children')!;
+const forceDestroy = inject<Ref<boolean>>('force-destroy')!;
 
 function deleteFileSystem(fileSystem) {
+
+	if (!findPoolDataset(fileSystem) && fileSystem.children.length > 0) {
+		hasChildren.value = true;
+	} else { 
+		hasChildren.value = false;
+	}
+
 	showDeleteConfirm.value = true;
 	selectedDataset.value = fileSystem;
-	console.log('deleting:', selectedDataset.value);
+	console.log('selected for deletion:', selectedDataset.value);
 
 	watch(confirmDelete, (newValue, oldValue) => {
-	
+		if (hasChildren.value) {
+			watch(forceDestroy, (newValue, oldValue) => {
+					console.log('forceDestroy.value changed:', newValue);
+					if (forceDestroy.value) {
+						unmountChildren(fileSystem);
+					}
+			});
+		}
 		console.log('confirmDelete.value changed:', newValue);
 
 		if (confirmDelete.value == true) {
-			destroyDataset(selectedDataset.value!);
+			// deleting.value = true;
+			destroyDataset(selectedDataset.value!, forceDestroy.value);
 			showDeleteConfirm.value = false;
-			refreshDatasets();
 			confirmDelete.value = false;
+			// deleting.value = false;
+			hasChildren.value = false;
+			forceDestroy.value = false;
 		}
 	});
-
 	console.log('deleted:', fileSystem);
+	refreshDatasets();
 }
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 provide('show-delete-confirm', showDeleteConfirm);
-provide('confirm-delete', confirmDelete);
+
 </script>

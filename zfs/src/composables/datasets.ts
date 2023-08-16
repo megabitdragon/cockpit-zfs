@@ -126,9 +126,6 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 
 		if (hasProperties) {
 
-			if (fileSystemData.mountpoint) {
-				cmdString.push('mountpoint=' + fileSystemData.mountpoint);
-			}
 			if (fileSystemData.canmount) {
 				cmdString.push('canmount=' + fileSystemData.canmount);
 			}
@@ -174,6 +171,9 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 					cmdString.push('refreservation=' + fileSystemData.refreservation);
 				}
 			}
+			if (fileSystemData.mountpoint) {
+				cmdString.push('mountpoint=' + fileSystemData.mountpoint);
+			}
 	
 			cmdString.push(fileSystemData.name);
 	
@@ -181,6 +181,16 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 			
 			const state = useSpawn(cmdString);
 			const output = await state.promise();
+			
+			if (fileSystemData.mountpoint) {
+				let newCmdString = 'zfs mount' + fileSystemData.name;
+				console.log("mounting newCmdString:" , newCmdString);
+				const newState = useSpawn(newCmdString);
+				const newOutput = await newState.promise();
+				console.log(newOutput)
+				return newOutput.stdout;
+			}
+
 			console.log(output)
 			return output.stdout;
 
@@ -194,8 +204,15 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 	}
 }
 
-export async function destroyDataset(fileSystemData : FileSystemData) {
-	let cmdString = ['zfs', 'destroy', fileSystemData.name];
+export async function destroyDataset(fileSystemData : FileSystemData, forceDestroy? : boolean) {
+
+	let cmdString = ['zfs', 'destroy'];
+
+	if (forceDestroy) {
+		cmdString.push('-r');
+	}
+
+	cmdString.push(fileSystemData.name)
 
 	console.log("destroy cmdString:" , cmdString);
 		
@@ -203,6 +220,23 @@ export async function destroyDataset(fileSystemData : FileSystemData) {
 	const output = await state.promise();
 	console.log(output)
 	return output.stdout;
+}
+
+export async function unmountChildren(fileSystemData: FileSystemData) {
+	for (const child of fileSystemData.children!) {
+        if (child.children!) {
+            await unmountChildren(child);
+        } else {
+            let cmdString = ['zfs', 'unmount', child.name];
+            console.log("unmount cmdString:", cmdString);
+
+            const state = useSpawn(cmdString);
+            const output = await state.promise();
+            console.log(output);
+            return output.stdout;
+        }
+    }
+	
 }
 
 function hasChanges(fileSystemData) {

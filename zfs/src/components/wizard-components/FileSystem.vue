@@ -412,6 +412,9 @@
 								<option value="tib">TiB</option>
 							</select>
 						</div>
+						<!-- <div class="mt-2 justify-self-start">
+                            <p class="text-muted">Used Space: {{ convertBytesToSize(newFileSystemConfig.properties.used) }}</p>
+                        </div> -->
 					</div>
 
 					<!-- Read Only (Toggle) -->
@@ -440,7 +443,8 @@
 					<div class="w-full row-start-1">
 						<div class="button-group-row mt-2 justify-self-center">
 							<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
-							<p class="text-danger" v-if="passFeedback">{{ passFeedback }}</p>		
+							<p class="text-danger" v-if="passFeedback">{{ passFeedback }}</p>
+							<p class="text-danger" v-if="quotaFeedback">{{ quotaFeedback }}</p>
 						</div>
 					</div>
 					<div class="button-group-row w-full row-start-2 justify-between mt-2">
@@ -471,14 +475,18 @@ const props = defineProps<FileSystemProps>();
 const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
-const nameFeedback = ref('');
 
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
+const nameFeedback = ref('');
 const passphrase = ref('');
 const passphraseConfirm = ref('');
 const passFeedback = ref('');
+
+const quotaFeedback = ref('');
+
+const parentPool = ref<PoolData>();
 
 const newFileSystemConfig = ref<FileSystemData>({
     parentFS: '',
@@ -645,6 +653,18 @@ const encryptPasswordCheck = (fileSystem : FileSystemData) => {
 	return result;
 }
 
+const checkQuota = (filesystem) => {
+    let result = true;
+    quotaFeedback.value = '';
+
+    if (filesystem.properties.quota.raw !< filesystem.properties.available) {
+        result = false;
+        quotaFeedback.value = 'Quota cannot be more than available space.';
+    }
+
+    return result;
+}
+
 const newDataset = ref<NewDataset>({
 	name: '',
 	parent: '',
@@ -682,6 +702,18 @@ async function fsCreateBtn(fileSystem) {
 	if (nameCheck(fileSystem)) {
 		if (fileSystem.encrypted) {
 			if (encryptPasswordCheck(fileSystem)) {
+				if (checkQuota(fileSystem)) {
+					getInheritedProperties();
+					fillDatasetData();
+					createDataset(newDataset.value).then(async() => {
+						datasets.value = [];
+						await loadDatasets(datasets);
+						showFSWizard.value = false;
+					});
+				}
+			}
+		} else {
+			if (checkQuota(fileSystem)) {
 				getInheritedProperties();
 				fillDatasetData();
 				createDataset(newDataset.value).then(async() => {
@@ -690,14 +722,6 @@ async function fsCreateBtn(fileSystem) {
 					showFSWizard.value = false;
 				});
 			}
-		} else {
-			getInheritedProperties();
-			fillDatasetData();
-			createDataset(newDataset.value).then(async() => {
-				datasets.value = [];
-				await loadDatasets(datasets);
-				showFSWizard.value = false;
-			});
 		}
 	}
 }

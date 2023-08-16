@@ -206,8 +206,9 @@
         <template v-slot:footer>
             <div class="w-full grid grid-rows-2">
                 <div class="w-full row-start-1">
-                    <div class="button-group-row mt-2 justify-self-center">
-                        <p class="text-danger" v-if="sizeFeedback">{{ sizeFeedback }}</p>
+                    <div class="mt-2">
+                        <p class="text-danger" v-if="quotaFeedback">{{ quotaFeedback }}</p>
+                        <p class="text-danger" v-if="refreservationFeedback">{{ refreservationFeedback }}</p>
                     </div>
                 </div>
                 <div class="button-group-row w-full row-start-2 justify-between mt-2">
@@ -237,7 +238,10 @@ const props = defineProps<FSConfigModalProps>();
 const showFSConfig = inject<Ref<boolean>>('show-fs-config')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
-const sizeFeedback = ref('');
+const pools = inject<Ref<PoolData[]>>('pools')!;
+
+const quotaFeedback = ref('');
+const refreservationFeedback = ref('');
 
 const fileSystemConfig = ref<FileSystemData>({
     parentFS: props.filesystem.parentFS,
@@ -349,11 +353,6 @@ async function checkForChanges(fileSystemCheck) {
     }
     //quota
     if (Number(fileSystemCheck.properties.quota.raw)) {
-        // console.log('fileSystemCheck.properties.quota.raw ', Number(fileSystemCheck.properties.quota.raw) );
-        // console.log('fileSystemCheck.quota.raw', fileSystemCheck.properties.quota.raw);
-        // console.log('props.filesystem.properties.quota.raw', props.filesystem.properties.quota.raw);
-        // console.log('fileSystemCheck.quota.unit', fileSystemCheck.properties.quota.unit);
-
         if (convertSizeToBytes(fileSystemCheck.properties.quota.raw + fileSystemCheck.properties.quota.unit) != props.filesystem.properties.quota.raw) {
             updatedProperties.quota = convertSizeToBytes(fileSystemCheck.properties.quota.raw + fileSystemCheck.properties.quota.unit);
         }
@@ -376,29 +375,51 @@ async function checkForChanges(fileSystemCheck) {
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
    
 async function fsConfigureBtn() {
-    //quotaRefreservationSizeCheck;
-    console.log('filesystem:', fileSystemConfig.value);
-    await checkForChanges(fileSystemConfig.value);
-    console.log('newChanges:', newChangesToFileSystem.value);
-    configureDataset(newChangesToFileSystem.value);
-    datasets.value = [];
-    fileSystemsLoaded.value = false;
-    await loadDatasets(datasets);
-    showFSConfig.value = false;
-    fileSystemsLoaded.value = true;
+    if (checkSizes()) {
+        console.log('filesystem:', fileSystemConfig.value);
+        await checkForChanges(fileSystemConfig.value);
+        console.log('newChanges:', newChangesToFileSystem.value);
+        configureDataset(newChangesToFileSystem.value);
+        datasets.value = [];
+        fileSystemsLoaded.value = false;
+        await loadDatasets(datasets);
+        showFSConfig.value = false;
+        fileSystemsLoaded.value = true;
+    }
+
 }
 
-// const quotaRefreservationSizeCheck = () => {
-// 	let result = true;
-// 	sizeFeedback.value = '';
+const checkSizes = () => {
+    let result = true;
+    quotaFeedback.value = '';
+    refreservationFeedback.value = '';
 
-//     if (fileSystemConfig.value.properties.quota.raw < fileSystemConfig.value.properties.refreservation?.raw!) {
-//         result = false;
-//         sizeFeedback.value = 'Refreservation cannot be greater than quota/available size.';
-//     }
-	
-// 	return result;
-// }
+    //console.log('pools.value', pools.value);
+    //console.log('filesystem.config.pool', fileSystemConfig.value.pool);
+    const parentPool = pools.value.find(pool => pool.name == fileSystemConfig.value.pool)!;
+    //console.log('parentPool', parentPool);
+
+    if (!parentPool) {
+        console.log("Pool not found", fileSystemConfig.value.pool);
+        return;
+    }
+
+    if (fileSystemConfig.value.properties.quota.raw != null) {
+        if (convertSizeToBytes(fileSystemConfig.value.properties.quota.raw + fileSystemConfig.value.properties.quota.unit) > convertSizeToBytes(parentPool.properties.free)) {
+            result = false;
+            quotaFeedback.value = 'Quota cannot be greater than available space in pool.';
+        }
+    }
+
+    if (fileSystemConfig.value.properties.refreservation!.raw != null) {
+        if (convertSizeToBytes(fileSystemConfig.value.properties.refreservation!.raw + fileSystemConfig.value.properties.refreservation!.unit) > convertSizeToBytes(parentPool.properties.free)) {
+            result = false;
+            refreservationFeedback.value = 'Refreservation cannot be greater than available space in pool.';
+        }
+    }
+
+    return result;
+}
 
 const getIdKey = (name: string) => `${name}`;
 </script>

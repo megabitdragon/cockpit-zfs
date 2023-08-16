@@ -50,6 +50,9 @@ const fileSystemsLoaded = ref(false);
 
 const confirmDelete = ref(false);
 const showDeleteConfirmModal = ref(false);
+const deleting = ref(false);
+const forceDestroy = ref(false);
+const hasChildren = ref(false);
 
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
@@ -79,5 +82,8 @@ provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
 provide('confirm-delete', confirmDelete);
 provide('show-delete-modal', showDeleteConfirmModal);
+provide('deleting', deleting);
+provide('force-destroy', forceDestroy);
+provide('has-children', hasChildren);
 </script>
 
