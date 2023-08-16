@@ -182,12 +182,12 @@ function deleteFileSystem(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log('selected for deletion:', selectedDataset.value);
 
-	watch(confirmDelete, (newValue, oldValue) => {
+	watch(confirmDelete, async (newValue, oldValue) => {
 		if (hasChildren.value) {
-			watch(forceDestroy, (newValue, oldValue) => {
+			watch(forceDestroy,  (newValue, oldValue) => {
 					console.log('forceDestroy.value changed:', newValue);
 					if (forceDestroy.value) {
-						unmountChildren(fileSystem);
+						 unmountChildren(fileSystem);
 					}
 			});
 		}
@@ -195,16 +195,16 @@ function deleteFileSystem(fileSystem) {
 
 		if (confirmDelete.value == true) {
 			// deleting.value = true;
-			destroyDataset(selectedDataset.value!, forceDestroy.value);
+			await destroyDataset(selectedDataset.value!, forceDestroy.value);
 			showDeleteConfirm.value = false;
 			confirmDelete.value = false;
 			// deleting.value = false;
 			hasChildren.value = false;
 			forceDestroy.value = false;
+			await refreshDatasets();
 		}
 	});
 	console.log('deleted:', fileSystem);
-	refreshDatasets();
 }
 
 provide('show-fs-wizard', showNewFSWizard);
