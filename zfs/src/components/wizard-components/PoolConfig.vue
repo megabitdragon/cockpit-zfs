@@ -10,7 +10,7 @@
 		<fieldset>
 			<legend class="mb-1 text-base font-semibold leading-6 text-default">Create a Virtual Device</legend>
 			
-			<div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
+			<div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx" class="my-1 py-1">
 				<!-- Virtual Device (Select) -->
 				<div>
 					<label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-default">Type</label>
@@ -29,29 +29,6 @@
 						<option v-if="vDevIdx !== 0" value="spare">Spare</option>
 						<option v-if="vDevIdx !== 0" value="dedup">Dedup</option>
 					</select>
-				</div>
-
-				<!-- If (Log, Special, Dedup) -->
-				<!-- If secondary VDev is LOG or SPECIAL or DEDUP, have option for them to be MIRROR also -->
-				<!-- If Primary VDev is MIRROR or RAIDZ(x) then SPECIAL, LOG and DEDUP must be MIRROR -->
-				<div v-if="poolConfig.vdevs[vDevIdx].type == 'log' || poolConfig.vdevs[vDevIdx].type == 'special' || poolConfig.vdevs[vDevIdx].type == 'dedup'">
-					<label :for="getIdKey('mirror-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">{{ upperCaseWord(poolConfig.vdevs[vDevIdx].type) }} (Mirror)</label>
-
-					<Switch v-model="poolConfig.vdevs[vDevIdx].isMirror" :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-						<span class="sr-only">Use setting</span>
-						<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-							<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-								<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-									<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-								</svg>
-							</span>
-							<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-								<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-									<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-								</svg>
-							</span>
-						</span>
-					</Switch>
 				</div>
 
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
@@ -75,7 +52,30 @@
 				<!-- buttons to add/remove vdevs -->
 				<div class="button-group-row mt-2">
 					<!-- <button :id="getIdKey('add-vdev')" class="btn btn-primary object-right justify-end" @click="addVDev()">Add VDev</button> -->
-					<button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-end" @click="removeVDev(vDevIdx)">Remove VDev</button>  
+					<button v-if="poolConfig.vdevs.length > 0" :id="getIdKey('remove-vdev')" class="btn btn-primary object-right justify-start mt-0.5" @click="removeVDev(vDevIdx)">Remove VDev</button>
+					
+					<!-- If (Log, Special, Dedup) -->
+					<!-- If secondary VDev is LOG or SPECIAL or DEDUP, have option for them to be MIRROR also -->
+					<!-- If Primary VDev is MIRROR or RAIDZ(x) then SPECIAL, LOG and DEDUP must be MIRROR -->
+					<div v-if="poolConfig.vdevs[vDevIdx].type == 'log' || poolConfig.vdevs[vDevIdx].type == 'special' || poolConfig.vdevs[vDevIdx].type == 'dedup'" class="flex flex-row">
+						<label :for="getIdKey('mirror-enabled')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Mirror ({{ upperCaseWord(poolConfig.vdevs[vDevIdx].type) }})</label>
+
+						<Switch v-model="poolConfig.vdevs[vDevIdx].isMirror" :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+							<span class="sr-only">Use setting</span>
+							<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+								<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+									</svg>
+								</span>
+								<span :class="[poolConfig.vdevs[vDevIdx].isMirror ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+									</svg>
+								</span>
+							</span>
+						</Switch>
+					</div>  
 				</div>
 			</div>
 			
@@ -143,7 +143,7 @@
 			</div>
 
 			<!-- Advanced Settings (hidden under accordion for better UI/UX) -->
-			<Accordion :isOpen="false" class="mt-2 mx-2 -ml-2 bg-well rounded-md p-2">
+			<Accordion :isOpen="false" class="mt-2 -ml-1 bg-well rounded-md p-2">
 				<template v-slot:title>
 					<span><b>Advanced Settings</b></span>
 				</template>

@@ -12,8 +12,8 @@
 
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 					<table class="min-w-full divide-y divide-default rounded-md">
-						<thead>
-							<tr class="bg-well">
+						<thead class="rounded-md">
+							<tr class="bg-well rounded-t-md">
 								<th class="relative px-3 py-3.5">
 									<span class="sr-only"></span>
 								</th>
@@ -91,16 +91,16 @@
 								
 							</template>
 							<template v-slot:content>
-								<Accordion :isOpen="false" class="divide-y divide-default bg-accent rounded-md border border-solid border-default p-2" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+								<Accordion :isOpen="false" class="btn-secondary rounded-md border border-solid border-default p-2" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
 									<template v-slot:title>
-										<div class="grid grid-cols-3 grid-flow-cols bg-accent w-full rounded-md">
+										<div class="grid grid-cols-3 grid-flow-cols btn-secondary w-full rounded-md">
 											<div class="col-start-2 text-center -mx-4 py-4">
 												{{ vDev.name }} ({{ vDev.type }})
 											</div>
 											<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 												<Menu as="div" class="relative inline-block text-right">
 													<div>
-														<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+														<MenuButton class="flex items-center rounded-full btn-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 															<span class="sr-only">Open options</span>
 															<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
 														</MenuButton>
@@ -123,7 +123,7 @@
 										</div>
 									</template>
 									<template v-slot:content>
-										<table class="table-auto min-w-full divide-y divide-default rounded-md">
+										<table class="table-auto min-w-full divide-y divide-default rounded-md bg-secondary text-default">
 											<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="rounded-md">
 												<td colspan="8" class="ml-7">
 													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-well rounded-md">
