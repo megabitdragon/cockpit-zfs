@@ -79,7 +79,6 @@ export async function loadDisksThenPools(disks, pools) {
 						autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 						autoReplace: parsedJSON[i].properties.autoreplace.parsed,
 						autoTrim: isBoolOnOff(parsedJSON[i].properties.autotrim.parsed),
-						forceCreate: false,
 						delegation: parsedJSON[i].properties.delegation.parsed,
 						displaySnapshots: parsedJSON[i].properties.listsnapshots.parsed,
 						multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),

@@ -40,6 +40,21 @@ interface PoolData {
 	failMode?: 'wait' | 'continue' | 'panic';
 }
 
+interface PoolEditConfig {
+	name: string;
+	readonly: string;
+	guid: string;
+	ashift?: string;
+	failmode?: string;
+	comment?: string;
+	autoexpand?: string;
+	autoreplace?: string;
+	autotrim?: string;
+	multihost?: string;
+	delegation?: string;
+	listsnapshots?: string;
+}
+
 //pool object for creating new pool command
 interface newPoolData {
 	name: string;

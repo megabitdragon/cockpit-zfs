@@ -151,7 +151,21 @@ export async function setRefreservation(pool: PoolData, refreservationPercent: n
 	}
 }
 
-export async function destroyPool(pool: PoolData) {
+export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
+	// let cmdString = ['zfs', 'destroy'];
+
+	// if (forceDestroy) {
+	// 	cmdString.push('-r');
+	// }
+
+	// cmdString.push(fileSystemData.name)
+
+	// console.log("destroy cmdString:" , cmdString);
+		
+	// const state = useSpawn(cmdString);
+	// const output = await state.promise();
+	// console.log(output)
+	// return output.stdout;
 	try {
 		const state = useSpawn(['zpool', 'destroy', pool.name]);
 		const output = await state.promise();
@@ -162,3 +176,109 @@ export async function destroyPool(pool: PoolData) {
 		return null;
 	}
 }
+
+/*
+export async function unmountChildren(fileSystemData: FileSystemData) {
+for (const child of fileSystemData.children!) {
+	if (child.children!) {
+		await unmountChildren(child);
+	} else {
+		let cmdString = ['zfs', 'unmount', child.name];
+		console.log("unmount cmdString:", cmdString);
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output);
+		return output.stdout;
+	}
+}
+ */
+
+const properties = [
+	"sector",
+	"failmode",
+	"comment",
+	"autoexpand",
+	"autoreplace",
+	"autotrim",
+	"multihost",
+	"delegation",
+	"listsnapshots",
+]
+
+export async function configurePool(poolData : PoolEditConfig) {
+	try {
+		let cmdString = ['zpool', 'set'];
+		const hasProperties = hasChanges(poolData);
+
+		if (hasProperties) {
+
+			//for (const property of properties) {
+				// 	if (property in poolData) {
+				// 		let cmdString = ['zpool', 'set'];
+				// 		cmdString.push(`${property}=${poolData[property]}`);
+				// 		cmdString.push(poolData.name);
+				// 		console.log('configure pool cmdstring:', ...cmdString);
+				// 		const state = useSpawn(cmdString);
+				// 		const output = await state.promise();
+				// 		console.log(output);
+				// 		//return output.stdout;
+				// 	}
+			// }
+			
+			if (poolData.ashift) {
+				cmdString.push('ashift=' + poolData.ashift);
+			}
+			if (poolData.failmode) {
+				cmdString.push('failmode=' + poolData.failmode);
+			}
+			if (poolData.comment) {
+				cmdString.push('comment=' + poolData.comment);
+			}
+			if (poolData.autoexpand) {
+				cmdString.push('autoexpand=' + poolData.autoexpand);
+			}
+			if (poolData.autoreplace) {
+				cmdString.push('autoreplace=' + poolData.autoreplace);
+			}
+			if (poolData.autotrim) {
+				cmdString.push('autotrim=' + poolData.autotrim);
+			}
+			if (poolData.multihost) {
+				cmdString.push('multihost=' + poolData.multihost);
+			}
+			if (poolData.delegation) {
+				cmdString.push('delegation=' + poolData.delegation);
+			}
+			if (poolData.listsnapshots) {
+				cmdString.push('listsnapshots=' + poolData.listsnapshots);
+			}
+
+			cmdString.push(poolData.name);
+			console.log('configure pool cmdstring:', ...cmdString);
+			const state = useSpawn(cmdString);
+			const output = await state.promise();
+
+			console.log(output);
+			return output.stdout;
+		} else {
+			console.log("There are no selected properties to change.");
+		}
+	
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+function hasChanges(poolData) {
+	
+	for (const property of properties) {
+		if (property in poolData) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+	
