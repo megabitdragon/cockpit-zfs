@@ -218,7 +218,7 @@ export async function configurePool(poolData : PoolEditConfig) {
 					let cmdString = ['zpool', 'set'];
 					cmdString.push(`${property}=${poolData[property]}`);
 					cmdString.push(poolData.name);
-					console.log('configure pool cmdstring:', ...cmdString);
+					console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 					
 					const state = useSpawn(cmdString);
 					const output = await state.promise();

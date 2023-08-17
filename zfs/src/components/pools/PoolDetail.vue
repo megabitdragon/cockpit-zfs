@@ -355,15 +355,14 @@ const poolConfig = ref<PoolData>({
 		forceCreate: props.pool.properties.forceCreate,
 		delegation: props.pool.properties.delegation,
 		displaySnapshots: props.pool.properties.displaySnapshots,
-		multiHost: props.pool.properties.multiHost,
+		multiHost: false,
 		readOnly: props.pool.properties.readOnly,
 	},
 	vdevs: props.pool.vdevs,
-	failMode: 'wait',
-	comment: '',
+	failMode: props.pool.failMode,
+	comment: props.pool.comment,
 });
 
-const open = ref(true);
 const showSnapshotModal = ref(false);
 const showAddVDevModal = ref(false);
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
@@ -377,6 +376,8 @@ const show = ref(true);
 const navTag = ref('stats');
 
 const saving = inject<Ref<boolean>>('saving')!;
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
 const commentFeedback = ref('');
 
@@ -450,6 +451,8 @@ async function checkForChanges(poolDataCheck) {
 		updatedProperties.ashift = poolDataCheck.properties.sector;
 	}
 	//failmode
+	console.log('poolDataCheck.failmode\n', poolDataCheck.failmode);
+	console.log('props.pool.failMode\n', props.pool.failMode);
 	if (poolDataCheck.failMode != props.pool.failMode) {
 		updatedProperties.failmode = poolDataCheck.failMode;
 	}
@@ -457,7 +460,6 @@ async function checkForChanges(poolDataCheck) {
 	if (poolDataCheck.comment != props.pool.comment) {
 		updatedProperties.comment = poolDataCheck.comment;
 	}
-	
 	//autoexpand
 	if (poolDataCheck.properties.autoExpand != props.pool.properties.autoExpand) {
 		updatedProperties.autoexpand = isBoolOnOff(poolDataCheck.properties.autoExpand);
@@ -471,9 +473,9 @@ async function checkForChanges(poolDataCheck) {
 		updatedProperties.autotrim = isBoolOnOff(poolDataCheck.properties.autoTrim);
 	}
 	//multihost
-	if (poolDataCheck.properties.multiHost != props.pool.properties.multiHost) {
-		updatedProperties.multihost = isBoolOnOff(poolDataCheck.properties.multiHost);
-	}
+	// if (poolDataCheck.properties.multiHost != props.pool.properties.multiHost) {
+	// 	updatedProperties.multihost = isBoolOnOff(poolDataCheck.properties.multiHost);
+	// }
 	//delegation
 	if (poolDataCheck.properties.delegation != props.pool.properties.delegation) {
 		updatedProperties.delegation = isBoolOnOff(poolDataCheck.properties.delegation);
@@ -492,18 +494,21 @@ async function checkForChanges(poolDataCheck) {
 }
 
 async function poolConfigureBtn() {
-	console.log('pool:', poolConfig.value);
-	await checkForChanges(poolConfig.value);
-	console.log('newChanges:', newChangesToPool.value);
 	if (commentLengthCheck(poolConfig.value)) {
+		console.log('pool:', poolConfig.value);
+		await checkForChanges(poolConfig.value);
+		console.log('newChanges:', newChangesToPool.value);
 		saving.value = true;
 		await configurePool(newChangesToPool.value);
+		disksLoaded.value = false;
+		poolsLoaded.value = false;
 		pools.value = [];
+		disks.value = [];
 		await loadDisksThenPools(disks, pools);
+		disksLoaded.value = true;
+		poolsLoaded.value = true;
 		saving.value = false;
 		showPoolDetails.value = false;
-	} else {
-		console.log('error');
 	}
 }
 

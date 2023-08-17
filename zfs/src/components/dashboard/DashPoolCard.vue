@@ -143,7 +143,7 @@ async function destroyPoolAndUpdate(pool) {
 //method to show pool details when button is clicked
 function showDetails(pool) {
 	selectedPool.value = pool;
-	//console.log(selectedPool);
+	console.log('loading:', selectedPool);
 	showPoolDetails.value = true;
 }
 
