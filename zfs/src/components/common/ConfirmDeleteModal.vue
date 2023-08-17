@@ -77,32 +77,7 @@ const deleting = inject<Ref<boolean>>('deleting')!;
 const hasChildren = inject<Ref<boolean>>('has-children')!;
 
 const forceDestroy = inject<Ref<boolean>>('force-destroy')!;
-//const forceDestroy = ref(false);
-
-
-// if (confirmDelete.value = true) {
-//     deleting.value = true;
-// } else {
-//     deleting.value = false;
-// }
-// watch(confirmDelete, (newValue, oldValue) => {
-	
-//     if () {
-
-//     }
-//     // console.log('confirmDelete.value changed:', newValue);
-
-//     // if (confirmDelete.value == true) {
-//     //     deleting.value = true;
-//     //     destroyDataset(selectedDataset.value!);
-//     //     showDeleteConfirm.value = false;
-//     //     refreshDatasets();
-//     //     confirmDelete.value = false;
-//     //     deleting.value = false;
-//     // }
-// });
 
 const getIdKey = (name: string) => `${name}`;
 
-//provide('force-destroy', forceDestroy);
 </script>

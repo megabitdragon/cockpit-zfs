@@ -72,44 +72,11 @@ export async function createDataset(fileSystemData : NewDataset, passphrase? : s
 
 // }
 
-// export async function configureDataset(fileSystemData : FileSystemData) {
-// 	try {
-// 		let cmdString = ['zfs', 'set', 'mountpoint=' + fileSystemData.mountpoint, 'canmount=' + fileSystemData.properties.canMount, 'recordsize=' + fileSystemData.properties.recordSize, 'aclinherit=' + fileSystemData.properties.aclInheritance!, 'acltype=' + fileSystemData.properties.aclType!, 'atime=' + fileSystemData.properties.accessTime, 'dedup=' + fileSystemData.properties.deduplication, 'compression=' + fileSystemData.properties.compression, 'checksum=' + fileSystemData.properties.checksum!, 'dnodesize=' + fileSystemData.properties.dNodeSize, 'xattr=' + fileSystemData.properties.extendedAttributes];
-
-// 		//size example
-// 		//convertSizeToBytes((newFileSystemConfig.value.properties.quota.raw.toString() + newFileSystemConfig.value.properties.quota.unit)).toString();
-
-// 		if (Number(fileSystemData.properties.quota.raw) == 0) {
-// 			cmdString.push('quota=none');
-// 		} else {
-// 			cmdString.push('quota=' + convertSizeToBytes(fileSystemData.properties.quota.raw + fileSystemData.properties.quota.unit));
-// 		}
-
-// 		if (Number(fileSystemData.properties.refreservation!.raw) == 0) {
-// 			cmdString.push('refreservation=off');
-// 		} else {
-// 			cmdString.push('refreservation=' + convertSizeToBytes(fileSystemData.properties.refreservation!.raw + fileSystemData.properties.refreservation!.unit));
-// 		}
-
-// 		cmdString.push(fileSystemData.name);
-
-// 		console.log("configure cmdString:" , cmdString);
-		
-// 		const state = useSpawn(cmdString);
-// 		const output = await state.promise();
-// 		console.log(output)
-// 		return output.stdout;
-
-// 	} catch (state) {
-// 		console.error(errorString(state));
-// 		return null;
-// 	}
-// }
-
 export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 	try {
 		let cmdString = ['zfs', 'set'];
 	/*
+		'readonly=' + fileSystemData.readonly
 		'mountpoint=' + fileSystemData.mountpoint
 		'canmount=' + fileSystemData.canmount
 		'recordsize=' + fileSystemData.record
@@ -125,9 +92,8 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 		const hasProperties = hasChanges(fileSystemData);
 
 		if (hasProperties) {
-
-			if (fileSystemData.canmount) {
-				cmdString.push('canmount=' + fileSystemData.canmount);
+			if (fileSystemData.readonly) {
+				cmdString.push('readonly=' + fileSystemData.readonly);
 			}
 			if (fileSystemData.record) {
 				cmdString.push('recordsize=' + fileSystemData.record);
@@ -162,7 +128,6 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 				} else {
 					cmdString.push('quota=' + fileSystemData.quota);
 				}
-		
 			}
 			if (fileSystemData.refreservation) {
 				if (Number(fileSystemData.refreservation) == 0) {
@@ -174,6 +139,9 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 			if (fileSystemData.mountpoint) {
 				cmdString.push('mountpoint=' + fileSystemData.mountpoint);
 			}
+			if (fileSystemData.canmount) {
+				cmdString.push('canmount=' + fileSystemData.canmount);
+			}
 	
 			cmdString.push(fileSystemData.name);
 	
@@ -183,7 +151,7 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 			const output = await state.promise();
 			
 			if (fileSystemData.mountpoint) {
-				let newCmdString = 'zfs mount' + fileSystemData.name;
+				let newCmdString = 'zfs mount ' + fileSystemData.name;
 				console.log("mounting newCmdString:" , newCmdString);
 				const newState = useSpawn(newCmdString);
 				const newOutput = await newState.promise();

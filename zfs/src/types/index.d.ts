@@ -152,7 +152,7 @@ interface FileSystemEditConfig {
 	name: string;
 	guid: string;
 	casesensitivity: string;
-	readonly?: boolean;
+	readonly?: string;
 	mountpoint?: string;
 	canmount?: string;
 	atime?: string;

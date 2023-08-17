@@ -231,16 +231,18 @@ import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { destroyPool } from "../../composables/pools";
-import { loadDisksThenPools } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
+const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const showWizard = ref(false);
 
@@ -264,13 +266,7 @@ async function destroyPoolAndUpdate(pool) {
 
 		if (confirmDelete.value == true) {	
 			destroyPool(selectedPool.value!);
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
+			refreshAllData();
 			confirmDelete.value = false;
 			showDeleteConfirm.value = false;
 		}
@@ -282,11 +278,15 @@ async function destroyPoolAndUpdate(pool) {
 async function refreshAllData() {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
+	fileSystemsLoaded.value = false;
 	diskData.value = [];
 	poolData.value = [];
+	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
+	await loadDatasets(filesystemData);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
+	fileSystemsLoaded.value = true;
 }
 
 //method to show pool details when button is clicked
