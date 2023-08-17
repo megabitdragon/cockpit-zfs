@@ -54,6 +54,8 @@ const deleting = ref(false);
 const forceDestroy = ref(false);
 const hasChildren = ref(false);
 
+const saving = ref(false);
+
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
@@ -85,5 +87,6 @@ provide('show-delete-modal', showDeleteConfirmModal);
 provide('deleting', deleting);
 provide('force-destroy', forceDestroy);
 provide('has-children', hasChildren);
+provide("saving", saving);
 </script>
 

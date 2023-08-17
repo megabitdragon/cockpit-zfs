@@ -208,59 +208,26 @@ const properties = [
 
 export async function configurePool(poolData : PoolEditConfig) {
 	try {
-		let cmdString = ['zpool', 'set'];
+		//let cmdString = ['zpool', 'set'];
 		const hasProperties = hasChanges(poolData);
 
 		if (hasProperties) {
 
-			//for (const property of properties) {
-				// 	if (property in poolData) {
-				// 		let cmdString = ['zpool', 'set'];
-				// 		cmdString.push(`${property}=${poolData[property]}`);
-				// 		cmdString.push(poolData.name);
-				// 		console.log('configure pool cmdstring:', ...cmdString);
-				// 		const state = useSpawn(cmdString);
-				// 		const output = await state.promise();
-				// 		console.log(output);
-				// 		//return output.stdout;
-				// 	}
-			// }
+			for (const property of properties) {
+				if (property in poolData) {
+					let cmdString = ['zpool', 'set'];
+					cmdString.push(`${property}=${poolData[property]}`);
+					cmdString.push(poolData.name);
+					console.log('configure pool cmdstring:', ...cmdString);
+					
+					const state = useSpawn(cmdString);
+					const output = await state.promise();
+					console.log(output);
+					
+					await new Promise(resolve => setTimeout(resolve, 250));
+				}
+			}
 			
-			if (poolData.ashift) {
-				cmdString.push('ashift=' + poolData.ashift);
-			}
-			if (poolData.failmode) {
-				cmdString.push('failmode=' + poolData.failmode);
-			}
-			if (poolData.comment) {
-				cmdString.push('comment=' + poolData.comment);
-			}
-			if (poolData.autoexpand) {
-				cmdString.push('autoexpand=' + poolData.autoexpand);
-			}
-			if (poolData.autoreplace) {
-				cmdString.push('autoreplace=' + poolData.autoreplace);
-			}
-			if (poolData.autotrim) {
-				cmdString.push('autotrim=' + poolData.autotrim);
-			}
-			if (poolData.multihost) {
-				cmdString.push('multihost=' + poolData.multihost);
-			}
-			if (poolData.delegation) {
-				cmdString.push('delegation=' + poolData.delegation);
-			}
-			if (poolData.listsnapshots) {
-				cmdString.push('listsnapshots=' + poolData.listsnapshots);
-			}
-
-			cmdString.push(poolData.name);
-			console.log('configure pool cmdstring:', ...cmdString);
-			const state = useSpawn(cmdString);
-			const output = await state.promise();
-
-			console.log(output);
-			return output.stdout;
 		} else {
 			console.log("There are no selected properties to change.");
 		}
