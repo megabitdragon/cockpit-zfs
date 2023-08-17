@@ -125,7 +125,7 @@ export async function loadDatasets(datasets) {
 			const dataset : FileSystemData = {
 				name: parsedJSON[i].name,
 				id: parsedJSON[i].id,
-				mountpoint: parsedJSON[i].mountpoint,
+				mountpoint: parsedJSON[i].properties.mountpoint.value,
 				pool: parsedJSON[i].pool,
 				encrypted: parsedJSON[i].encrypted,
 				key_loaded: parsedJSON[i].key_loaded,

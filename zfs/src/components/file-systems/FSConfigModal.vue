@@ -386,14 +386,13 @@ async function fsConfigureBtn() {
         console.log('filesystem:', fileSystemConfig.value);
         await checkForChanges(fileSystemConfig.value);
         console.log('newChanges:', newChangesToFileSystem.value);
-        configureDataset(newChangesToFileSystem.value);
+        await configureDataset(newChangesToFileSystem.value);
         datasets.value = [];
         fileSystemsLoaded.value = false;
         await loadDatasets(datasets);
         showFSConfig.value = false;
         fileSystemsLoaded.value = true;
     }
-
 }
 
 const checkSizes = () => {
