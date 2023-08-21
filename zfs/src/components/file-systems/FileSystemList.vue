@@ -130,7 +130,7 @@ import { destroyDataset, unmountChildren } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
-import ConfirmDeleteModal from "../common/ConfirmDeleteModal.vue";
+import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
 
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;

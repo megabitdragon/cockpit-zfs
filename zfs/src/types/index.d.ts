@@ -38,6 +38,7 @@ interface PoolData {
 	errors?: string[];
 	comment?: string;
 	failMode?: 'wait' | 'continue' | 'panic';
+	diskType?: 'SSD' | 'HDD' | 'Hybrid';
 }
 
 interface PoolEditConfig {

@@ -83,3 +83,30 @@ export const getTimestampString = computed(() => {
 
 	return timestampString;
 });
+
+export const getPoolDiskType = (pool) => {
+	let hasSSD = false;
+	let hasHDD = false;
+  
+	pool.vdevs.forEach((vdev) => {
+	  vdev.disks.forEach((disk) => {
+		if (disk.type === "SSD") {
+		  hasSSD = true;
+		} else if (disk.type === "HDD") {
+		  hasHDD = true;
+		}
+	  });
+	});
+  
+	// Determine the disk configuration based on the flags.
+	if (hasSSD && hasHDD) {
+	  return "Hybrid";
+	} else if (hasSSD) {
+	  return "SSD";
+	} else if (hasHDD) {
+	  return "HDD";
+	} else {
+	  return "Unknown"; // No disks found
+	}
+};
+  

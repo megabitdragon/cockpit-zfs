@@ -1,17 +1,16 @@
 <template>
 	<Modal :isOpen="showDeleteConfirmModal" @close="showDeleteConfirmModal = false" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-96'">
         <template v-slot:title>
-            <legend class="flex justify-center">Are you sure?</legend>
+            <legend class="flex justify-center">Destroy {{upperCaseWord(props.item)}}</legend>
         </template>
         <template v-slot:content>
             <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
-                <p class="text-default row-start-1">Destroy {{upperCaseWord(props.item)}} <span class="text-danger">{{ props.name }}</span>?</p>
+                <p class="text-default row-start-1">Are you sure you wish to <span class="text-danger">destroy</span> {{ props.name }}?</p>
                 <div v-if="hasChildren" class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center">
                     <p class="text-danger font-medium row-start-1">WARNING!!!</p>
                     <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} {{ props.name }} has children.</p>
                     <p class="text-default row-start-3">If you wish to destroy, use <span class="text-danger">Force Destroy</span>.</p>
                 </div>
-
                
             </div>
         </template>
@@ -58,9 +57,9 @@
 
 <script setup lang="ts">
 import { Switch } from '@headlessui/vue';
-import { Ref, inject, ref, watch, provide  } from 'vue';
-import { upperCaseWord } from '../../composables/helpers';
-import Modal from '../common/Modal.vue';
+import { Ref, inject  } from 'vue';
+import { upperCaseWord } from '../../../composables/helpers';
+import Modal from '../../common/Modal.vue';
 
 interface ConfirmDeleteModalProps {
     idKey: string;

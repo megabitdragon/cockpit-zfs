@@ -451,8 +451,6 @@ async function checkForChanges(poolDataCheck) {
 		updatedProperties.ashift = poolDataCheck.properties.sector;
 	}
 	//failmode
-	console.log('poolDataCheck.failmode\n', poolDataCheck.failmode);
-	console.log('props.pool.failMode\n', props.pool.failMode);
 	if (poolDataCheck.failMode != props.pool.failMode) {
 		updatedProperties.failmode = poolDataCheck.failMode;
 	}

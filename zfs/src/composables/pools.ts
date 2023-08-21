@@ -206,18 +206,18 @@ const properties = [
 	"listsnapshots",
 ]
 
-export async function configurePool(poolData : PoolEditConfig) {
+export async function configurePool(pool : PoolEditConfig) {
 	try {
 		//let cmdString = ['zpool', 'set'];
-		const hasProperties = hasChanges(poolData);
+		const hasProperties = hasChanges(pool);
 
 		if (hasProperties) {
 
 			for (const property of properties) {
-				if (property in poolData) {
+				if (property in pool) {
 					let cmdString = ['zpool', 'set'];
-					cmdString.push(`${property}=${poolData[property]}`);
-					cmdString.push(poolData.name);
+					cmdString.push(`${property}=${pool[property]}`);
+					cmdString.push(pool.name);
 					console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 					
 					const state = useSpawn(cmdString);
@@ -238,14 +238,91 @@ export async function configurePool(poolData : PoolEditConfig) {
 	}
 }
 
-function hasChanges(poolData) {
+function hasChanges(pool) {
 	
 	for (const property of properties) {
-		if (property in poolData) {
+		if (property in pool) {
 			return true;
 		}
 	}
 	
 	return false;
 }
-	
+
+export async function clearPoolErrors(pool) {
+	try {
+		const state = useSpawn(['zpool', 'clear', pool.name]);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+
+export async function clearDiskLabels(pool) {
+	try {
+		pool.vdevs.forEach(vDev => {
+			
+		});
+		
+		const state = useSpawn(['zpool', 'labelclear', ]);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function trimPool(pool) {
+	try {
+		const state = useSpawn(['zpool', 'trim', pool.name]);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function scrubPool(pool) {
+	try {
+		const state = useSpawn(['zpool', 'scrub', pool.name]);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function resilverPool(pool) {
+	try {
+		const state = useSpawn(['zpool', 'resilver', pool.name]);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+
+export async function exportPool(pool) {
+	try {
+		const state = useSpawn(['zpool', 'export', pool.name]);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}

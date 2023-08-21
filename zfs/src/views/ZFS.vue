@@ -54,6 +54,10 @@ const deleting = ref(false);
 const forceDestroy = ref(false);
 const hasChildren = ref(false);
 
+const confirmResilver = ref(false);
+const showResilverModal = ref(false);
+const resilvering = ref(false);
+
 const saving = ref(false);
 
 async function initialLoad(disks, pools, datasets) {
@@ -88,5 +92,8 @@ provide('deleting', deleting);
 provide('force-destroy', forceDestroy);
 provide('has-children', hasChildren);
 provide("saving", saving);
+provide("resilvering", resilvering);
+provide("show-resilver-modal", showResilverModal);
+provide("confirm-resilver", confirmResilver);
 </script>
 

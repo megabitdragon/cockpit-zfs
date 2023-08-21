@@ -86,7 +86,7 @@ const show = ref(true);
 const navTag = ref('name-entry');
 const tabError = ref(false);
 
-const finishPressed =ref(false);
+const finishPressed = ref(false);
 
 const showWizard = inject<Ref<boolean>>('show-wizard')!;
 

@@ -23,22 +23,22 @@
 									<a href="#" @click="showDetails(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+									<a href="#" @click="clearThisPoolErrors(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+									<a href="#" @click="resilverThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+									<a href="#" @click="scrubThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+									<a href="#" @click="trimThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+									<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+									<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
 									<a href="#" @click="destroyPoolAndUpdate(pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
@@ -82,6 +82,10 @@
 	<div v-if="showDeleteConfirm">
 		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="'delete-pool'" @close="showDeleteConfirm = false"/>
 	</div>
+
+	<div v-if="showResilverModal">
+		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="'resilver-pool'" @close="showResilverModal = false"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -89,10 +93,11 @@ import { ref, inject, Ref, computed, provide, watch } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
-import { destroyPool } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors } from "../../composables/pools";
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
-import ConfirmDeleteModal from "../common/ConfirmDeleteModal.vue";
+import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
+import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
 
 interface DashPoolCardProps {
 	pool: PoolData;
@@ -113,17 +118,22 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
 const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
 const showDeleteConfirm = inject<Ref<boolean>>('show-delete-modal')!;
+const deleting = inject<Ref<boolean>>('deleting')!;
+
+const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
+const showResilverModal = inject<Ref<boolean>>('show-resilver-modal')!;	
+const resilvering = inject<Ref<boolean>>('resilvering')!;
 
 async function destroyPoolAndUpdate(pool) {
+
 	showDeleteConfirm.value = true;
 	selectedPool.value = pool;
-	console.log('deleting:', selectedPool.value);
 
 	watch(confirmDelete, async (newValue, oldValue) => {
 	
-		console.log('confirmDelete.value changed:', newValue);
-
 		if (confirmDelete.value == true) {	
+			deleting.value = true;
+			console.log('deleting:', selectedPool.value);
 			destroyPool(selectedPool.value!);
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
@@ -134,10 +144,61 @@ async function destroyPoolAndUpdate(pool) {
 			poolsLoaded.value = true;
 			confirmDelete.value = false;
 			showDeleteConfirm.value = false;
+			deleting.value = false;
 		}
 	});
 
 	console.log('deleted:', selectedPool.value);
+}
+
+async function resilverThisPool(pool) {
+	
+	showResilverModal.value = true;
+	selectedPool.value = pool;
+	
+	watch(confirmResilver, async (newValue, oldValue) => {
+		resilvering.value = true;
+		if (confirmResilver.value = true) {
+			console.log('resilvering:', selectedPool.value);
+			
+			await resilverPool(pool);
+
+			disksLoaded.value = false;
+			poolsLoaded.value = false;
+			poolData.value = [];
+			diskData.value = [];
+			await loadDisksThenPools(diskData, poolData);
+			disksLoaded.value = true;
+			poolsLoaded.value = true;
+			confirmResilver.value = false;
+			showResilverModal.value = false;
+			resilvering.value = false;
+		}
+	});
+
+	console.log('resilvered:', selectedPool.value);
+}
+
+
+async function clearThisPoolErrors(pool) {
+	await clearPoolErrors(pool);
+}
+
+async function trimThisPool(pool) {
+	await trimPool(pool);
+}
+
+async function scrubThisPool(pool) {
+	await scrubPool(pool);
+}
+
+
+async function addNewVDev(pool) {
+
+}
+
+async function exportThisPool(pool) {
+
 }
 
 //method to show pool details when button is clicked

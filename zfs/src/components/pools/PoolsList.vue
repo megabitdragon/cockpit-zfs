@@ -234,7 +234,7 @@ import { destroyPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
-import ConfirmDeleteModal from "../common/ConfirmDeleteModal.vue";
+import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
