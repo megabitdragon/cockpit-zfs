@@ -276,7 +276,9 @@ const resilvering = inject<Ref<boolean>>('resilvering')!;
 
 const showTrimModal = inject<Ref<boolean>>('show-trim-modal')!;
 const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
-const trimming = inject<Ref<boolean>>('triming')!;
+const trimming = inject<Ref<boolean>>('trimming')!;
+const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
+
 
 async function destroyPoolAndUpdate(pool) {
 
@@ -333,7 +335,34 @@ async function clearThisPoolErrors(pool) {
 }
 
 async function trimThisPool(pool) {
+	showTrimModal.value = true;
+	selectedPool.value = pool;
 
+	watch(confirmTrim, async (newValue, oldValue) => {
+		if (confirmTrim.value == true) {
+			trimming.value = true;
+			if (secureTRIM.value) {
+				await trimPool(pool, secureTRIM.value);
+			} else {
+				await trimPool(pool);
+			}
+			
+			disksLoaded.value = false;
+			poolsLoaded.value = false;
+			poolData.value = [];
+			diskData.value = [];
+			await loadDisksThenPools(diskData, poolData);
+			disksLoaded.value = true;
+			poolsLoaded.value = true;
+			confirmTrim.value = false;
+			showTrimModal.value = false;
+			trimming.value = false;
+			console.log('trimmed:', selectedPool.value);
+		}
+	});
+
+	console.log("trimming:", selectedPool.value);
+	
 }
 
 async function scrubThisPool(pool) {
