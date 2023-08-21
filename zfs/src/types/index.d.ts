@@ -90,6 +90,7 @@ interface vDevData {
 	forceAdd?: boolean;
 	poolName?: string;
 	isMirror?: boolean;
+	diskType?: 'SSD' | 'HDD' | 'Hybrid';
 }
 
 //object for disk

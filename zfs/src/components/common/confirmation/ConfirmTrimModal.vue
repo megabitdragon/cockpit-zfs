@@ -61,7 +61,7 @@ const props = defineProps<ConfirmTrimModalProps>();
 
 const showTrimModal = inject<Ref<boolean>>('show-trim-modal')!;
 const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
-const trimming = inject<Ref<boolean>>('triming')!;
+const trimming = inject<Ref<boolean>>('trimming')!;
 const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
 
 const getIdKey = (name: string) => `${name}`;

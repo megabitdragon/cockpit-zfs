@@ -32,7 +32,7 @@
 									<a href="#" @click="scrubThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
-									<a href="#" @click="trimThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+									<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 								</MenuItem>
 								<MenuItem v-slot="{ active }">
 									<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
@@ -131,7 +131,8 @@ const resilvering = inject<Ref<boolean>>('resilvering')!;
 
 const showTrimModal = inject<Ref<boolean>>('show-trim-modal')!;
 const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
-const trimming = inject<Ref<boolean>>('triming')!;
+const trimming = inject<Ref<boolean>>('trimming')!;
+const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
 
 async function destroyPoolAndUpdate(pool) {
 
@@ -169,7 +170,7 @@ async function resilverThisPool(pool) {
 
 		if (confirmResilver.value == true) {
 			resilvering.value = true;
-			console.log('resilvering:', selectedPool.value);
+			
 		 	await resilverPool(pool);
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
@@ -181,10 +182,11 @@ async function resilverThisPool(pool) {
 			confirmResilver.value = false;
 			showResilverModal.value = false;
 			resilvering.value = false;
+			console.log('resilvered:', selectedPool.value);
 		}
 	});
 
-	console.log('resilvered:', selectedPool.value);
+	console.log('resilvering', selectedPool.value);
 }
 
 async function clearThisPoolErrors(pool) {
@@ -192,29 +194,34 @@ async function clearThisPoolErrors(pool) {
 }
 
 async function trimThisPool(pool) {
-	// showResilverModal.value = true;
-	// selectedPool.value = pool;
+	showTrimModal.value = true;
+	selectedPool.value = pool;
+
+	watch(confirmTrim, async (newValue, oldValue) => {
+		if (confirmTrim.value == true) {
+			trimming.value = true;
+			if (secureTRIM.value) {
+				await trimPool(pool, secureTRIM.value);
+			} else {
+				await trimPool(pool);
+			}
+			
+			disksLoaded.value = false;
+			poolsLoaded.value = false;
+			poolData.value = [];
+			diskData.value = [];
+			await loadDisksThenPools(diskData, poolData);
+			disksLoaded.value = true;
+			poolsLoaded.value = true;
+			confirmTrim.value = false;
+			showTrimModal.value = false;
+			trimming.value = false;
+			console.log('trimmed:', selectedPool.value);
+		}
+	});
+
+	console.log("trimming:", selectedPool.value);
 	
-	// watch(confirmResilver, async (newValue, oldValue) => {
-
-	// 	if (confirmResilver.value == true) {
-	// 		resilvering.value = true;
-	// 		console.log('resilvering:', selectedPool.value);
-	// 	 	await resilverPool(pool);
-	// 		disksLoaded.value = false;
-	// 		poolsLoaded.value = false;
-	// 		poolData.value = [];
-	// 		diskData.value = [];
-	// 		await loadDisksThenPools(diskData, poolData);
-	// 		disksLoaded.value = true;
-	// 		poolsLoaded.value = true;
-	// 		confirmResilver.value = false;
-	// 		showResilverModal.value = false;
-	// 		resilvering.value = false;
-	// 	}
-	// });
-
-	// console.log('resilvered:', selectedPool.value);
 }
 
 async function scrubThisPool(pool) {

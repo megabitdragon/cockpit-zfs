@@ -116,8 +116,7 @@ export async function newPool(pool: newPoolData) {
 			}
 		}
 		
-		console.log("cmdString");
-		console.log(cmdString);
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
@@ -137,9 +136,8 @@ export async function setRefreservation(pool: PoolData, refreservationPercent: n
 		const refreservation = (size / 100) * refreservationPercent;
 
 		const cmdString = ['zfs', 'set', 'refreservation='+ refreservation, pool.name];
-		console.log("cmdString");
-		console.log(cmdString);
-		
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
 		console.log(output)
@@ -162,7 +160,6 @@ export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
 		return null;
 	}
 }
-
 
 const properties = [
 	"sector",
@@ -248,9 +245,18 @@ export async function clearPoolErrors(pool) {
 // 	}
 // }
 
-export async function trimPool(pool) {
+export async function trimPool(pool, isSecure?) {
 	try {
-		const state = useSpawn(['zpool', 'trim', pool.name]);
+		let cmdString = ['zpool', 'trim'];
+
+		if(isSecure) {
+			cmdString.push('-d');
+		}
+
+		cmdString.push(pool.name);
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		
+		const state = useSpawn(cmdString);
 		const output = await state.promise();
 		console.log(output)
 		return output.stdout;

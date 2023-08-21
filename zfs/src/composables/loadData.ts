@@ -87,7 +87,7 @@ export async function loadDisksThenPools(disks, pools) {
 					comment: parsedJSON[i].properties.comment.value,
 					
 					//adds VDev array to Pool data object
-					vdevs: vDevs.value,					
+					vdevs: vDevs.value,
 
 					// fileSystems: parsedJSON[i].root_dataset.value,
 				}
@@ -98,6 +98,22 @@ export async function loadDisksThenPools(disks, pools) {
 				// console.log(poolData);
 				vDevs.value = [];
 			}
+
+			const poolDiskTypes = pools.value.map(pool => {
+				const vDevDiskTypes = pool.vdevs.map(vDev => vDev.diskType);
+				const allSameDiskType = vDevDiskTypes.every(type => type === vDevDiskTypes[0]);
+
+				// Determine the pool's diskType based on VDev diskTypes
+				if (allSameDiskType) {
+					return vDevDiskTypes[0];
+				} else {
+					return 'Hybrid'; 
+				}
+			});
+
+			pools.value.forEach((pool, index) => {
+				pool.diskType = poolDiskTypes[index];
+			});
 
 			console.log("Pools:");
 			console.log(pools);
@@ -232,6 +248,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		selectedDisks: [],
 		disks: [],
 		poolName: poolName,
+		diskType: determineDiskType(vDev, disks),
 	};
 	
 	//checks if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
@@ -305,4 +322,22 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 
 export function loadSnapshots(snapshots) {
 	
+}
+
+function determineDiskType(vDev, disks) {
+    const childDisks = vDev.children.map(child => child.name);
+
+    const diskTypes = childDisks.map(diskName => {
+        const disk = disks.value.find(disk => disk.name === diskName);
+        return disk ? disk.type : 'unknown'; // Default to 'unknown' if disk not found
+    });
+
+    // Determine the disk type based on the types of child disks in the VDev
+    if (diskTypes.every(type => type === 'SSD')) {
+        return 'SSD';
+    } else if (diskTypes.every(type => type === 'HDD')) {
+        return 'HDD';
+    } else {
+        return 'Hybrid'; // Mixed SSD and HDD
+    }
 }
