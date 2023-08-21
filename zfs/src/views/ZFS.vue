@@ -60,6 +60,11 @@ const resilvering = ref(false);
 
 const saving = ref(false);
 
+const showTrimModal = ref(false);
+const confirmTrim = ref(false);
+const trimming = ref(false);
+const secureTRIM = ref(false);
+
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
@@ -95,5 +100,9 @@ provide("saving", saving);
 provide("resilvering", resilvering);
 provide("show-resilver-modal", showResilverModal);
 provide("confirm-resilver", confirmResilver);
+provide("show-trim-modal", showTrimModal);
+provide("confirm-trim", confirmTrim);
+provide("trimming", trimming);
+provide("secure-trim", secureTRIM);
 </script>
 

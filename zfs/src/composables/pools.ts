@@ -262,21 +262,21 @@ export async function clearPoolErrors(pool) {
 }
 
 
-export async function clearDiskLabels(pool) {
-	try {
-		pool.vdevs.forEach(vDev => {
+// export async function clearDiskLabels(pool) {
+// 	try {
+// 		pool.vdevs.forEach(vDev => {
 			
-		});
+// 		});
 		
-		const state = useSpawn(['zpool', 'labelclear', ]);
-		const output = await state.promise();
-		console.log(output)
-		return output.stdout;
-	} catch (state) {
-		console.error(errorString(state));
-		return null;
-	}
-}
+// 		const state = useSpawn(['zpool', 'labelclear', ]);
+// 		const output = await state.promise();
+// 		console.log(output)
+// 		return output.stdout;
+// 	} catch (state) {
+// 		console.error(errorString(state));
+// 		return null;
+// 	}
+// }
 
 export async function trimPool(pool) {
 	try {

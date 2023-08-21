@@ -86,6 +86,10 @@
 	<div v-if="showResilverModal">
 		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="'resilver-pool'" @close="showResilverModal = false"/>
 	</div>
+
+	<div v-if="showTrimModal">
+		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="'trim-pool'" @close="showTrimModal = false"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -98,6 +102,7 @@ import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
 import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
+import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 
 interface DashPoolCardProps {
 	pool: PoolData;
@@ -124,6 +129,10 @@ const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
 const showResilverModal = inject<Ref<boolean>>('show-resilver-modal')!;	
 const resilvering = inject<Ref<boolean>>('resilvering')!;
 
+const showTrimModal = inject<Ref<boolean>>('show-trim-modal')!;
+const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
+const trimming = inject<Ref<boolean>>('triming')!;
+
 async function destroyPoolAndUpdate(pool) {
 
 	showDeleteConfirm.value = true;
@@ -134,7 +143,7 @@ async function destroyPoolAndUpdate(pool) {
 		if (confirmDelete.value == true) {	
 			deleting.value = true;
 			console.log('deleting:', selectedPool.value);
-			destroyPool(selectedPool.value!);
+			await destroyPool(selectedPool.value!);
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
 			poolData.value = [];
@@ -157,12 +166,11 @@ async function resilverThisPool(pool) {
 	selectedPool.value = pool;
 	
 	watch(confirmResilver, async (newValue, oldValue) => {
-		resilvering.value = true;
-		if (confirmResilver.value = true) {
-			console.log('resilvering:', selectedPool.value);
-			
-			await resilverPool(pool);
 
+		if (confirmResilver.value == true) {
+			resilvering.value = true;
+			console.log('resilvering:', selectedPool.value);
+		 	await resilverPool(pool);
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
 			poolData.value = [];
@@ -179,13 +187,34 @@ async function resilverThisPool(pool) {
 	console.log('resilvered:', selectedPool.value);
 }
 
-
 async function clearThisPoolErrors(pool) {
 	await clearPoolErrors(pool);
 }
 
 async function trimThisPool(pool) {
-	await trimPool(pool);
+	// showResilverModal.value = true;
+	// selectedPool.value = pool;
+	
+	// watch(confirmResilver, async (newValue, oldValue) => {
+
+	// 	if (confirmResilver.value == true) {
+	// 		resilvering.value = true;
+	// 		console.log('resilvering:', selectedPool.value);
+	// 	 	await resilverPool(pool);
+	// 		disksLoaded.value = false;
+	// 		poolsLoaded.value = false;
+	// 		poolData.value = [];
+	// 		diskData.value = [];
+	// 		await loadDisksThenPools(diskData, poolData);
+	// 		disksLoaded.value = true;
+	// 		poolsLoaded.value = true;
+	// 		confirmResilver.value = false;
+	// 		showResilverModal.value = false;
+	// 		resilvering.value = false;
+	// 	}
+	// });
+
+	// console.log('resilvered:', selectedPool.value);
 }
 
 async function scrubThisPool(pool) {
