@@ -83,7 +83,7 @@ export async function loadDisksThenPools(disks, pools) {
 						displaySnapshots: parsedJSON[i].properties.listsnapshots.parsed,
 						multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
 					},
-					failmode: parsedJSON[i].properties.failmode.parsed,
+					failMode: parsedJSON[i].properties.failmode.parsed,
 					comment: parsedJSON[i].properties.comment.value,
 					
 					//adds VDev array to Pool data object
