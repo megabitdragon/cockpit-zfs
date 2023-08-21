@@ -328,7 +328,7 @@ async function checkForChanges(fileSystemCheck) {
     }
     //aclinherit
     if (fileSystemCheck.properties.aclInheritance != props.filesystem.properties.aclInheritance) {
-        updatedProperties.acltype = fileSystemCheck.properties.aclInheritance;
+        updatedProperties.aclinherit = fileSystemCheck.properties.aclInheritance;
     }
     //acltype
     if (fileSystemCheck.properties.aclType != props.filesystem.properties.aclType) {

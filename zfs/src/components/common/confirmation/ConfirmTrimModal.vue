@@ -13,7 +13,7 @@
                 <div class="button-group-row mt-2 justify-between">
                     <button @click="showTrimModal = false" :id="getIdKey('confirm-trim-no')" name="trim-button-no" class="mt-1 btn btn-danger object-left justify-start h-fit">Cancel</button>
 
-                    <div class="flex flex-row">
+                    <!-- <div class="flex flex-row">
                         <label :for="'forcefully-destroy'" class="mt-2 mr-2 block text-sm font-medium text-default">Secure TRIM</label>
                         <Switch v-model="secureTRIM" :class="[secureTRIM ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
@@ -30,7 +30,7 @@
                                 </span>
                             </span>
                         </Switch>
-                    </div>
+                    </div> -->
 
                     <button v-if="!trimming" @click="confirmTrim = true;" :id="getIdKey('confirm-trim-yes-B')" name="trim-button-yes-B" class="mt-1 btn btn-primary object-right justify-end h-fit">Trim</button>
                     <button disabled v-if="trimming" :id="getIdKey('confirm-trim-spinner')" type="button" class="btn btn-primary object-right justify-end h-fit">
