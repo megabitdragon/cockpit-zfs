@@ -30,6 +30,18 @@ export const convertBytesToSize = (bytes) => {
   
     return `${convertedSize} ${sizes[i]}`;
 };
+
+export const convertBytesToSizeDecimal = (bytes) => {
+	if (bytes === 0) {
+        return `0 B`;
+    }
+
+	const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    const convertedSize = (bytes / Math.pow(1000, i)).toFixed(2);
+  
+    return `${convertedSize} ${sizes[i]}`;
+};
   
 //convert readable data size to raw bytes
 export const convertSizeToBytes = (size) => {
@@ -41,6 +53,17 @@ export const convertSizeToBytes = (size) => {
     
     return bytes;
 };
+
+export const convertSizeToBytesDecimal = (size) => {
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
+
+    const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
+    const bytes = parseFloat(value) * Math.pow(1000, index); // Use 1000 for decimal prefixes
+
+    return bytes;
+};
+
 
 //get size number from data size string
 export const getSizeNumberFromString = (sizeString) => {

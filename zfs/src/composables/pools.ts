@@ -152,20 +152,6 @@ export async function setRefreservation(pool: PoolData, refreservationPercent: n
 }
 
 export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
-	// let cmdString = ['zfs', 'destroy'];
-
-	// if (forceDestroy) {
-	// 	cmdString.push('-r');
-	// }
-
-	// cmdString.push(fileSystemData.name)
-
-	// console.log("destroy cmdString:" , cmdString);
-		
-	// const state = useSpawn(cmdString);
-	// const output = await state.promise();
-	// console.log(output)
-	// return output.stdout;
 	try {
 		const state = useSpawn(['zpool', 'destroy', pool.name]);
 		const output = await state.promise();
@@ -177,22 +163,6 @@ export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
 	}
 }
 
-/*
-export async function unmountChildren(fileSystemData: FileSystemData) {
-for (const child of fileSystemData.children!) {
-	if (child.children!) {
-		await unmountChildren(child);
-	} else {
-		let cmdString = ['zfs', 'unmount', child.name];
-		console.log("unmount cmdString:", cmdString);
-
-		const state = useSpawn(cmdString);
-		const output = await state.promise();
-		console.log(output);
-		return output.stdout;
-	}
-}
- */
 
 const properties = [
 	"sector",

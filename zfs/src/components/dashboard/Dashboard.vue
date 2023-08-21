@@ -110,7 +110,7 @@
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
 import { loadDisks, loadDisksThenPools } from '../../composables/loadData';
-import { convertBytesToSize, convertSizeToBytes } from '../../composables/helpers';
+import { convertBytesToSize, convertSizeToBytes, convertSizeToBytesDecimal, convertBytesToSizeDecimal } from '../../composables/helpers';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
@@ -171,9 +171,9 @@ const maxTemp = computed(() => {
 const totalRawDiskSpace = computed(() => {
 	let totalRaw = 0;
 	disks.value.forEach(disk => {
-		totalRaw += convertSizeToBytes(disk.capacity);
+		totalRaw += convertSizeToBytesDecimal(disk.capacity);
 	});
-	return (convertBytesToSize(totalRaw));
+	return (convertBytesToSizeDecimal(totalRaw));
 })
 
 //determine number of SSDs
