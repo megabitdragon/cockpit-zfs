@@ -3,7 +3,7 @@
 		<!-- buttons for creating/importing pools and refreshing list -->
 		<div class="button-group-row">
 			<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
-			<button id="importPool" class="btn btn-secondary" @click="">Import Storage Pool</button>
+			<button id="importPool" class="btn btn-secondary" @click="" disabled>Import Storage Pool</button>
 			<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData" ><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 

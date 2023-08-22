@@ -70,6 +70,8 @@ const confirmExport = ref(false);
 const exporting = ref(false);
 const forceUnmount = ref(false);
 
+const showImportModal = ref(false);
+
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
@@ -113,5 +115,6 @@ provide("show-export-modal", showExportModal);
 provide("confirm-export", confirmExport);
 provide("exporting", exporting);
 provide("force-unmount", forceUnmount);
+provide("show-import-modal", showImportModal);
 </script>
 
