@@ -59,6 +59,10 @@ const showResilverModal = ref(false);
 const resilvering = ref(false);
 
 const saving = ref(false);
+const scrubbing = ref(false);
+const scrubbed = ref(false);
+const resilvered = ref(false);
+const trimmed = ref(false);
 
 const showTrimModal = ref(false);
 const confirmTrim = ref(false);
@@ -114,6 +118,10 @@ provide("secure-trim", secureTRIM);
 provide("show-export-modal", showExportModal);
 provide("confirm-export", confirmExport);
 provide("exporting", exporting);
+provide("scrubbing", scrubbing);
+provide("scrubbed", scrubbed);
+provide("resilvered", resilvered);
+provide("trimmed", trimmed);
 provide("force-unmount", forceUnmount);
 provide("show-import-modal", showImportModal);
 </script>

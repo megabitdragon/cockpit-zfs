@@ -285,6 +285,9 @@ const confirmExport = inject<Ref<boolean>>('confirm-export')!;
 const exporting = inject<Ref<boolean>>('exporting')!;
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
 
+const scrubbed = inject<Ref<boolean>>('scrubbed')!;
+const scrubbing = inject<Ref<boolean>>('scrubbing')!;
+
 async function destroyPoolAndUpdate(pool) {
 	showDeleteConfirm.value = true;
 	selectedPool.value = pool;

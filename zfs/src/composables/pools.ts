@@ -251,7 +251,7 @@ export async function trimPool(pool, isSecure?) {
 		if(isSecure) {
 			cmdString.push('-d');
 		}
-
+		cmdString.push('-w');
 		cmdString.push(pool.name);
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
@@ -267,7 +267,16 @@ export async function trimPool(pool, isSecure?) {
 
 export async function scrubPool(pool) {
 	try {
-		const state = useSpawn(['zpool', 'scrub', pool.name]);
+		let cmdString = ['zpool', 'scrub'];
+
+		// if(isSecure) {
+		// 	cmdString.push('-d');
+		// }
+		cmdString.push('-w');
+		cmdString.push(pool.name);
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		
+		const state = useSpawn(cmdString);
 		const output = await state.promise();
 		console.log(output)
 		return output.stdout;

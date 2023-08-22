@@ -5,9 +5,6 @@
 				<div class="text-default">
 					{{ props.pool.name }}
 				</div>
-				<div>
-					<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
-				</div>
 				<Menu as="div" class="relative inline-block text-right">
 					<div>
 						<MenuButton class="rounded-full bg-accent text-muted hover:text-gray-600">
@@ -15,7 +12,6 @@
 							<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
 						</MenuButton>
 					</div>
-
 					<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 						<MenuItems class="absolute right-0 z-10 -mt-1 w-max origin-top-left rounded-md bg-accent shadow-lg">
 							<div class="py-1">
@@ -48,33 +44,53 @@
 					</transition>
 				</Menu>
 			</div>
-	
-		<div>
-			<span class="text-success">{{props.pool.status}}</span>
-		</div>
-
-		<div v-if="scrubbed">
-			<span class="text-default">{{ props.pool.scan?.function }} finished at <br/>{{ props.pool.scan?.end_time }}</span>
-		</div>
+			<div class="flex flex-row w-full h-max border border-default rounded-sm bg-accent justify-center">
+				<div v-if="trimming">
+					<h3 class="text-muted">Trimming...</h3>
+					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+				</div>
+				<div v-else-if="scrubbing">
+					<h3 class="text-muted">Scrubbing...</h3>
+					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+				</div>
+				<div v-else-if="resilvering">
+					<h3 class="text-muted">Resilvering...</h3>
+					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+				</div>
+				<div v-else-if="trimmed">
+					<span class="text-success">Trim completed.</span>
+				</div>
+				<div v-else-if="scrubbed">
+					<span class="text-success">Scrub completed at <br/>{{ props.pool.scan?.end_time }}</span>
+				</div>
+				<div v-else-if="resilvered">
+					<span class="text-success">Resilver completed.</span>
+				</div>
+				<div v-else>
+					<span class="text-muted">No Alerts</span>
+				</div>
+			</div>
 		</template>
 		<template v-slot:content>
-			<div class="flex justify-between mb-1">
-				<span class="text-base font-medium text-success">Space</span>
-				<span class="text-sm font-medium text-success ">{{props.pool.properties.capacity}}%</span>
+			<div class="flex flex-row justify-between">
+				<div>
+					<span class="text-success">{{props.pool.status}}</span>
+				</div>
+				<div>
+					<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+				</div>					
 			</div>
-			<div class="w-full bg-well rounded-full h-2.5 ">
-					<div v-if="props.pool.properties.capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.pool.properties.capacity}%`}"></div>
+			<div class="w-full bg-well rounded-full text-center mt-2 flex justify-center">
+				<div v-if="props.pool.properties.capacity! < 1" class="text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${props.pool.properties.capacity}%`}">{{ props.pool.properties.capacity }}%</div>
+				<div v-if="props.pool.properties.capacity! >=1 && props.pool.properties.capacity! <= 99" class="bg-green-600 text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${props.pool.properties.capacity}%`}">{{ props.pool.properties.capacity }}%</div>
+				<div v-if="props.pool.properties.capacity! > 99" class="bg-danger text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${props.pool.properties.capacity}%`}">{{ props.pool.properties.capacity }}%</div>
 			</div>
 		</template>
 		<template v-slot:footer>
-			<div>
-				Used {{ props.pool.properties.allocated }}
-			</div>
-			<div>
-				Free {{ props.pool.properties.free }}
-			</div>
-			<div>
-				<b>Total {{ props.pool.properties.size }}</b>
+			<div class="grid grid-rows-3">
+				<p class="row-start-1">Used {{ props.pool.properties.allocated }}</p>
+				<p class="row-start-2">Free {{ props.pool.properties.free }}</p>
+				<p class="row-start-3"><b>Total {{ props.pool.properties.size }}</b></p>
 			</div>
 		</template>
 	</Card>
@@ -112,6 +128,7 @@ import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
+import LoadingSpinner from "../common/LoadingSpinner.vue";
 
 interface DashPoolCardProps {
 	pool: PoolData;
@@ -148,7 +165,10 @@ const confirmExport = inject<Ref<boolean>>('confirm-export')!;
 const exporting = inject<Ref<boolean>>('exporting')!;
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
 
-const scrubbed = ref(false);
+const trimmed = inject<Ref<boolean>>('trimmed')!;
+const resilvered = inject<Ref<boolean>>('resilvered')!;
+const scrubbed = inject<Ref<boolean>>('scrubbed')!;
+const scrubbing = inject<Ref<boolean>>('scrubbing')!;
 
 async function destroyPoolAndUpdate(pool) {
 
@@ -186,17 +206,18 @@ async function resilverThisPool(pool) {
 
 		if (confirmResilver.value == true) {
 			resilvering.value = true;
-			
-		 	await resilverPool(pool);
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
+			resilvered.value = false;
 			confirmResilver.value = false;
 			showResilverModal.value = false;
+		 	await resilverPool(pool);
+			// disksLoaded.value = false;
+			// poolsLoaded.value = false;
+			// poolData.value = [];
+			// diskData.value = [];
+			// await loadDisksThenPools(diskData, poolData);
+			// disksLoaded.value = true;
+			// poolsLoaded.value = true;
+			resilvered.value = true;
 			resilvering.value = false;
 			console.log('resilvered:', selectedPool.value);
 		}
@@ -216,22 +237,28 @@ async function trimThisPool(pool) {
 	watch(confirmTrim, async (newValue, oldValue) => {
 		if (confirmTrim.value == true) {
 			trimming.value = true;
+			trimmed.value = false;
 			if (secureTRIM.value) {
+				confirmTrim.value = false;
+				showTrimModal.value = false;
 				await trimPool(pool, secureTRIM.value);
 			} else {
+				confirmTrim.value = false;
+				showTrimModal.value = false;
 				await trimPool(pool);
 			}
 			
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			confirmTrim.value = false;
-			showTrimModal.value = false;
+			// disksLoaded.value = false;
+			// poolsLoaded.value = false;
+			// poolData.value = [];
+			// diskData.value = [];
+			// await loadDisksThenPools(diskData, poolData);
+			// disksLoaded.value = true;
+			// poolsLoaded.value = true;
+			// confirmTrim.value = false;
+			// showTrimModal.value = false;
 			trimming.value = false;
+			trimmed.value = true;
 			console.log('trimmed:', selectedPool.value);
 		}
 	});
@@ -271,7 +298,9 @@ async function exportThisPool(pool) {
 
 async function scrubThisPool(pool) {
 	scrubbed.value = false;
+	scrubbing.value = true;
 	await scrubPool(pool);
+	scrubbing.value = false;
 	scrubbed.value = true;
 }
 

@@ -115,12 +115,10 @@
 					<div class="mt-2 col-span-1 col-start-2 row-start-1">
 						<p :id="getIdKey('settings-pool-readonly')" name="settings-pool-readonly" class="text-base text-default">Read Only</p><p>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.readOnly)) }}</p>
 					</div>
-					<div class="mt-2 col-span-1 col-start-3 row-start-1">
+					<div class="mt-2 col-span-2 col-start-3 row-start-1">
 						<p :id="getIdKey('settings-pool-guid')" name="settings-pool-guid" class="text-base text-default">GUID</p><p>{{ poolConfig.guid }}</p>
 					</div>
-					<div class="mt-2 col-span-1 col-start-4 row-start-1 items-end justify-self-end">
-						<button @click="" :id="getIdKey('settings-pool-guid-regen-btn')" name="settings-pool-guid-regen-btn" class="mt-1 btn btn-secondary">Regenerate Pool GUID</button>
-					</div>
+
 					<div class="mt-2 col-span-2 col-start-1 row-start-2">
 						<label :for="getIdKey('settings-pool-sector-size')" class="bg-default block text-base leading-6 text-default">Sector Size</label>
 						<select :id="getIdKey('settings-pool-sector-size')" v-model="poolConfig.properties.sector" name="pool-sector-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
@@ -206,26 +204,6 @@
 						</Switch>
 					</div>
 
-					<!-- multi-host -->
-					<div class="col-span-1 col-start-4 row-start-4">
-						<label :for="getIdKey('settings-pool-multi-host')" class="mt-1 block text-sm leading-6 text-default">Multi-Host (disabled)</label>
-						<Switch disabled v-model="poolConfig.properties.multiHost" :id="getIdKey('settings-pool-multi-host')" :class="[poolConfig.properties.multiHost ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.properties.multiHost ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-								<span :class="[poolConfig.properties.multiHost ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-									</svg>
-								</span>
-								<span :class="[poolConfig.properties.multiHost ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-									</svg>
-								</span>
-							</span>
-						</Switch>				
-					</div>
-
 					<!-- delegation (Allow non-priveleged user access based on the dataset permissions)-->
 					<div class="col-span-2 col-start-1 row-start-5">
 						<label :for="getIdKey('settings-pool-delegation')" class="mt-1 block text-sm leading-6 text-default">Delegation</label>
@@ -249,7 +227,7 @@
 
 					<!-- display snapshots in filesystem list -->
 					<div class="col-span-2 col-start-3 row-start-5">
-						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-default">Display Snapshots in File System List</label>
+						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-default">List Snapshots With File Systems</label>
 						<Switch v-model="poolConfig.properties.displaySnapshots" :id="getIdKey('settings-pool-display-snapshots')" :class="[poolConfig.properties.displaySnapshots ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span :class="[poolConfig.properties.displaySnapshots ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
