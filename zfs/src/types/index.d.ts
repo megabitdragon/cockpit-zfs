@@ -39,6 +39,14 @@ interface PoolData {
 	comment?: string;
 	failMode?: 'wait' | 'continue' | 'panic';
 	diskType?: 'SSD' | 'HDD' | 'Hybrid';
+	scan?: {
+		function: string;
+		start_time: string;
+		end_time: string;
+		state: string;
+		errors: number;
+		percentage: number;
+	}
 }
 
 interface PoolEditConfig {

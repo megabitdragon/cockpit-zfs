@@ -3,7 +3,7 @@
 		<!-- buttons for creating/importing pools and refreshing list -->
 		<div class="button-group-row">
 			<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
-			<button id="importPool" class="btn btn-secondary" @click="" disabled>Import Storage Pool</button>
+			<button id="importPool" class="btn btn-secondary" @click="">Import Storage Pool</button>
 			<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData" ><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
@@ -58,28 +58,28 @@
 											<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 												<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 													<div class="py-1">
-														<MenuItem v-slot="{ active }">
+														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="showPoolModal(poolData[poolIdx])!" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 														</MenuItem>
-														<MenuItem v-slot="{ active }">
+														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="clearThisPoolErrors(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 														</MenuItem>
-														<MenuItem v-slot="{ active }">
+														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="resilverThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 														</MenuItem>
-														<MenuItem v-slot="{ active }">
+														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="scrubThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 														</MenuItem>
-														<MenuItem v-slot="{ active }">
+														<MenuItem as="div" v-slot="{ active }">
 															<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 														</MenuItem>
-														<MenuItem v-slot="{ active }">
+														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 														</MenuItem>
-														<MenuItem v-slot="{ active }">
-															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+														<MenuItem as="div" v-slot="{ active }">
+															<a href="#" @click="exportThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 														</MenuItem>
-														<MenuItem v-slot="{ active }">
+														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="destroyPoolAndUpdate(poolData[poolIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 														</MenuItem>
 													</div>
@@ -109,10 +109,10 @@
 													<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 														<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 															<div class="py-1">												
-																<MenuItem v-slot="{ active }">
+																<MenuItem as="div" v-slot="{ active }">
 																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 																</MenuItem>
-																<MenuItem v-slot="{ active }">
+																<MenuItem as="div" v-slot="{ active }">
 																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
 																</MenuItem>
 															</div>
@@ -158,22 +158,22 @@
 																		<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 																			<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																				<div class="py-1">
-																					<MenuItem v-slot="{ active }">
+																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" @click="showDiskModal(disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Disk Details</a>
 																					</MenuItem>
-																					<MenuItem v-slot="{ active }">
+																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 																					</MenuItem>
-																					<MenuItem v-slot="{ active }">
+																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
 																					</MenuItem>
-																					<MenuItem v-slot="{ active }">
+																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
 																					</MenuItem>
-																					<MenuItem v-slot="{ active }">
+																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
 																					</MenuItem>
-																					<MenuItem v-slot="{ active }">
+																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
 																					</MenuItem>
 																				</div>
@@ -229,6 +229,10 @@
 	<div v-if="showTrimModal">
 		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="'trim-pool'" @close="showTrimModal = false"/>
 	</div>
+
+	<div v-if="showExportModal">
+		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="'export-pool'" @close="showExportModal = false"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -238,13 +242,14 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors, exportPool, importPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
+import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
@@ -275,9 +280,12 @@ const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
 const trimming = inject<Ref<boolean>>('trimming')!;
 const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
 
+const showExportModal = inject<Ref<boolean>>('show-export-modal')!;
+const confirmExport = inject<Ref<boolean>>('confirm-export')!;
+const exporting = inject<Ref<boolean>>('exporting')!;
+const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
 
 async function destroyPoolAndUpdate(pool) {
-
 	showDeleteConfirm.value = true;
 	selectedPool.value = pool;
 
@@ -302,7 +310,6 @@ async function destroyPoolAndUpdate(pool) {
 }
 
 async function resilverThisPool(pool) {
-
 	showResilverModal.value = true;
 	selectedPool.value = pool;
 
@@ -358,13 +365,45 @@ async function trimThisPool(pool) {
 	});
 
 	console.log("trimming:", selectedPool.value);
-	
+}
+
+async function exportThisPool(pool) {
+	showExportModal.value = true;
+	selectedPool.value = pool;
+
+	watch(confirmExport, async (newVal, oldVal) => {
+		if (confirmExport.value == true) {
+			exporting.value = true;
+			if (forceUnmount.value) {
+				await exportPool(pool, forceUnmount.value);
+			} else {
+				await exportPool(pool);
+			}
+
+			disksLoaded.value = false;
+			poolsLoaded.value = false;
+			poolData.value = [];
+			diskData.value = [];
+			await loadDisksThenPools(diskData, poolData);
+			disksLoaded.value = true;
+			poolsLoaded.value = true;
+			confirmExport.value = false;
+			showExportModal.value = false;
+			exporting.value = false;
+			console.log('exported:', selectedPool.value);
+		}
+	});
+
+	console.log('exporting', selectedPool.value);
+}
+
+async function importNewPool() {
+
 }
 
 async function scrubThisPool(pool) {
 	await scrubPool(pool);
 }
-
 
 async function refreshAllData() {
 	disksLoaded.value = false;

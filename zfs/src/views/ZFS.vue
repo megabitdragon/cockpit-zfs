@@ -65,6 +65,11 @@ const confirmTrim = ref(false);
 const trimming = ref(false);
 const secureTRIM = ref(false);
 
+const showExportModal = ref(false);
+const confirmExport = ref(false);
+const exporting = ref(false);
+const forceUnmount = ref(false);
+
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
@@ -104,5 +109,9 @@ provide("show-trim-modal", showTrimModal);
 provide("confirm-trim", confirmTrim);
 provide("trimming", trimming);
 provide("secure-trim", secureTRIM);
+provide("show-export-modal", showExportModal);
+provide("confirm-export", confirmExport);
+provide("exporting", exporting);
+provide("force-unmount", forceUnmount);
 </script>
 

@@ -58,31 +58,31 @@
 										<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 											<MenuItems class="absolute right-0 z-10 mt-1 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 												<div class="py-1">
-													<MenuItem v-slot="{ active }">
+													<MenuItem as="div" v-slot="{ active }">
 														<a href="#" @click="loadFileSystemConfig(fileSystem)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
 													</MenuItem>
-													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Edit Permissions</a>
 													</MenuItem>
-													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 													</MenuItem>
-													<MenuItem v-slot="{ active }">
+													<MenuItem as="div" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 													</MenuItem>
-													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 													</MenuItem>
-													<MenuItem v-if="fileSystem.encrypted" v-slot="{ active }">
+													<MenuItem as="div" v-if="fileSystem.encrypted" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 													</MenuItem>
-													<MenuItem v-slot="{ active }">
+													<MenuItem as="div" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 													</MenuItem>
-													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
 													</MenuItem>
-													<MenuItem v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
 														<a href="#" @click="deleteFileSystem(fileSystem)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 													</MenuItem>											
 												</div>

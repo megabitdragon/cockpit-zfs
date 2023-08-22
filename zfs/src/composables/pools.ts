@@ -228,7 +228,6 @@ export async function clearPoolErrors(pool) {
 	}
 }
 
-
 // export async function clearDiskLabels(pool) {
 // 	try {
 // 		pool.vdevs.forEach(vDev => {
@@ -290,10 +289,39 @@ export async function resilverPool(pool) {
 	}
 }
 
-
-export async function exportPool(pool) {
+export async function exportPool(pool, force?) {
 	try {
-		const state = useSpawn(['zpool', 'export', pool.name]);
+		let cmdString = ['zpool', 'export'];
+
+		if(force) {
+			cmdString.push('-f');
+		}
+
+		cmdString.push(pool.name);
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function importPool(pool, force?) {
+	try {
+		let cmdString = ['zpool', 'import'];
+
+		if(force) {
+			cmdString.push('-f');
+		}
+
+		cmdString.push(pool.name);
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		
+		const state = useSpawn(cmdString);
 		const output = await state.promise();
 		console.log(output)
 		return output.stdout;
