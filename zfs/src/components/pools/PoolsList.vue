@@ -273,20 +273,22 @@ const deleting = inject<Ref<boolean>>('deleting')!;
 
 const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
 const showResilverModal = inject<Ref<boolean>>('show-resilver-modal')!;	
-const resilvering = inject<Ref<boolean>>('resilvering')!;
 
 const showTrimModal = inject<Ref<boolean>>('show-trim-modal')!;
 const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
-const trimming = inject<Ref<boolean>>('trimming')!;
+
 const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
 
 const showExportModal = inject<Ref<boolean>>('show-export-modal')!;
 const confirmExport = inject<Ref<boolean>>('confirm-export')!;
-const exporting = inject<Ref<boolean>>('exporting')!;
+
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
 
 const scrubbed = inject<Ref<boolean>>('scrubbed')!;
 const scrubbing = inject<Ref<boolean>>('scrubbing')!;
+const resilvering = inject<Ref<boolean>>('resilvering')!;
+const trimming = inject<Ref<boolean>>('trimming')!;
+const exporting = inject<Ref<boolean>>('exporting')!;
 
 async function destroyPoolAndUpdate(pool) {
 	showDeleteConfirm.value = true;

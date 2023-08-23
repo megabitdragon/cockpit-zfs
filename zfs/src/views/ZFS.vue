@@ -56,22 +56,23 @@ const hasChildren = ref(false);
 
 const confirmResilver = ref(false);
 const showResilverModal = ref(false);
-const resilvering = ref(false);
 
 const saving = ref(false);
-const scrubbing = ref(false);
-const scrubbed = ref(false);
-const resilvered = ref(false);
-const trimmed = ref(false);
+// const cleared = ref(false);
+// const resilvering = ref(false);
+// const scrubbing = ref(false);
+// const scrubbed = ref(false);
+// const resilvered = ref(false);
+// const trimmed = ref(false);
+// const trimming = ref(false);
+// const exporting = ref(false);
 
 const showTrimModal = ref(false);
 const confirmTrim = ref(false);
-const trimming = ref(false);
 const secureTRIM = ref(false);
 
 const showExportModal = ref(false);
 const confirmExport = ref(false);
-const exporting = ref(false);
 const forceUnmount = ref(false);
 
 const showImportModal = ref(false);
@@ -108,20 +109,21 @@ provide('deleting', deleting);
 provide('force-destroy', forceDestroy);
 provide('has-children', hasChildren);
 provide("saving", saving);
-provide("resilvering", resilvering);
+// provide("cleared", cleared);
+// provide("resilvering", resilvering);
 provide("show-resilver-modal", showResilverModal);
 provide("confirm-resilver", confirmResilver);
 provide("show-trim-modal", showTrimModal);
 provide("confirm-trim", confirmTrim);
-provide("trimming", trimming);
+// provide("trimming", trimming);
 provide("secure-trim", secureTRIM);
 provide("show-export-modal", showExportModal);
 provide("confirm-export", confirmExport);
-provide("exporting", exporting);
-provide("scrubbing", scrubbing);
-provide("scrubbed", scrubbed);
-provide("resilvered", resilvered);
-provide("trimmed", trimmed);
+// provide("exporting", exporting);
+// provide("scrubbing", scrubbing);
+// provide("scrubbed", scrubbed);
+// provide("resilvered", resilvered);
+// provide("trimmed", trimmed);
 provide("force-unmount", forceUnmount);
 provide("show-import-modal", showImportModal);
 </script>
