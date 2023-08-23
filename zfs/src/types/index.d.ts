@@ -49,6 +49,21 @@ interface PoolData {
 	}
 }
 
+//object for importing pools
+interface ImportedPool {
+	pool: PoolData;
+	altRoot: string;
+	renamePool: boolean;
+	newPoolName?: string;
+	identifier: 'device alias' | 'hardware path' | 'disk/wwn' | 'block device';
+	forceImport: boolean;
+	recoveryMode: boolean;
+	ignoreMissingLog: boolean;
+	mountFileSystems: boolean;
+	readOnly: boolean;
+}
+
+//object for pool configuration (pool details)
 interface PoolEditConfig {
 	name: string;
 	readonly: string;
