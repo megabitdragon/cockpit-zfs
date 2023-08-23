@@ -3,6 +3,8 @@ import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 // @ts-ignore
 import get_pools_script from "../scripts/get-pools.py?raw";
 // @ts-ignore
+import get_importable_pools_script from "../scripts/get-importable-pools.py?raw";
+// @ts-ignore
 import create_pools_script from "./create-pool.py?raw";
 import { convertSizeToBytes } from './helpers';
 
@@ -313,6 +315,17 @@ export async function exportPool(pool, force?) {
 		const output = await state.promise();
 		console.log(output)
 		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function getImportablePools() {
+	try {
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_importable_pools_script], { superuser: 'try' });
+		const pools = (await state.promise()).stdout;
+		return pools;
 	} catch (state) {
 		console.error(errorString(state));
 		return null;

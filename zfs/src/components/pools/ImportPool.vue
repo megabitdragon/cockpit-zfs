@@ -23,15 +23,15 @@
                                     </div>
                                 </li> -->
 
-                            <!-- <li class="">
+                            <li  v-for="pool in pools" :key="pool.id" class="">
                                 <button class="flex min-w-fit w-full h-full border border-default rounded-md">
                                     <label :for="getIdKey(`pool-`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
-                                        <input :id="getIdKey(`pool-`)" type="checkbox" :value="`{}`" :name="`pool-`" 
+                                        <input v-model="selectedPool" :id="getIdKey(`pool-`)" type="checkbox" :value="`{}`" :name="`pool-`" 
                                         class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
                                         <h3>Pool</h3>
                                     </label>                          
                                 </button>
-                            </li> -->
+                            </li>
 
                             <!-- <li v-for="(pool, poolIdx) in vDevAvailPools[vDevIdx]" :key="poolIdx" class="">
                                 <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
@@ -133,6 +133,7 @@
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
+import { loadImportablePools } from '../../composables/loadData';
 
 interface ImportPoolProps {
     // importedPool: ImportedPool;
@@ -144,13 +145,9 @@ const showDeletedPools = ref(false);
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 
 const selectedPool = ref<PoolData>();
-const getAvailablePools = computed(() => {
+//const importablePools = ref<PoolData[]>([]);
 
-});
-
-const getAvailableDestroyedPools = computed(() => {
-
-});
+loadImportablePools();
 
 // const importedPool = ref<ImportedPool>({
 // 	pool: selectedPool.value,
@@ -165,7 +162,11 @@ const getAvailableDestroyedPools = computed(() => {
 // 	readOnly: false,
 // });
 
-
+const pools = [
+  { id: 'small', name: 'Small', description: '4 GB RAM / 2 CPUS / 80 GB SSD Storage' },
+  { id: 'medium', name: 'Medium', description: '8 GB RAM / 4 CPUS / 160 GB SSD Storage' },
+  { id: 'large', name: 'Large', description: '16 GB RAM / 8 CPUS / 320 GB SSD Storage' },
+]
 
 const getIdKey = (name: string) => `${name}`;
 </script>

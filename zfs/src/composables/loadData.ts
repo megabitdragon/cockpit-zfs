@@ -1,5 +1,5 @@
 import { reactive, ref, Ref, inject, computed, provide } from 'vue';
-import { getPools } from "./pools";
+import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString } from "./helpers";
@@ -348,4 +348,56 @@ function determineDiskType(vDev, disks) {
     } else {
         return 'Hybrid'; // Mixed SSD and HDD
     }
+}
+
+export async function loadImportablePools() {
+	try {
+		const rawJSON = await getImportablePools();
+		const parsedJSON = JSON.parse(rawJSON);
+		console.log('Importable Pools JSON:', parsedJSON);
+
+		// for (let i = 0; i < parsedJSON.length; i++) {
+		// 	const pool = parsedJSON[i];
+	/* 		const pool = {
+				name: parsedJSON[i].name;
+			}
+	*/ 
+
+		// const rawJSON = await getDisks();
+		// const parsedJSON = JSON.parse(rawJSON);
+		// console.log('Disks JSON:');
+		// console.log(parsedJSON);
+		
+		// //loops through and adds disk data from JSON to disk data object, pushes objects to disks array
+		// for (let i = 0; i < parsedJSON.length; i++) {
+		// 	const disk = {
+        //         name: parsedJSON[i].name,
+        //         capacity: parsedJSON[i].capacity,
+        //         model: parsedJSON[i].model,
+        //         type: parsedJSON[i].type,
+        //         phy_path: parsedJSON[i].phy_path,
+        //         sd_path: parsedJSON[i].sd_path,
+        //         vdev_path: parsedJSON[i].vdev_path,
+        //         serial: parsedJSON[i].serial,
+        //         usable: parsedJSON[i].usable,
+        //         path: '',
+        //         guid: '',
+        //         status: parsedJSON[i].health,
+        //         powerOnHours: parsedJSON[i].power_on_time,
+        //         powerOnCount: parsedJSON[i].power_on_count,
+        //         temp: parsedJSON[i].temp,
+        //         rotationRate: parsedJSON[i].rotation_rate,
+        //         stats: {},
+		// 	}
+		// 	disks.value.push(disk);
+		// 	// console.log("Disk:");
+		// 	// console.log(disk);
+		// }
+		// console.log("Disks:");
+		// console.log(disks);
+
+	} catch (error) {
+		// Handle any errors that may occur during the asynchronous operation
+		console.error("An error occurred getting disks:", error);
+	}
 }
