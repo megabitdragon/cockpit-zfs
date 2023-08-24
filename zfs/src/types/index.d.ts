@@ -51,7 +51,7 @@ interface PoolData {
 
 //object for importing pools
 interface ImportedPool {
-	pool: PoolData;
+	pool: ImportablePoolData;
 	altRoot: string;
 	renamePool: boolean;
 	newPoolName?: string;
@@ -61,6 +61,27 @@ interface ImportedPool {
 	ignoreMissingLog: boolean;
 	mountFileSystems: boolean;
 	readOnly: boolean;
+}
+
+//object for importablePoolsData
+interface ImportablePoolData {
+	name: string;
+	status: string;
+	guid: string;
+	properties: {}
+	vdevs: ImportablePoolvDevData[];
+	scan: {}
+}
+
+//object for vdev
+interface ImportablePoolvDevData {
+	name: string;
+	type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
+	status: string;
+	guid: string;
+	stats: {};
+	disks: [{}];
+	poolName?: string;
 }
 
 //object for pool configuration (pool details)

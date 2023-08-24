@@ -23,7 +23,7 @@
                                     </div>
                                 </li> -->
 
-                            <li  v-for="pool in pools" :key="pool.id" class="">
+                            <li  v-for="pool, idx in importablePools" :key="idx" class="">
                                 <button class="flex min-w-fit w-full h-full border border-default rounded-md">
                                     <label :for="getIdKey(`pool-`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
                                         <input v-model="selectedPool" :id="getIdKey(`pool-`)" type="checkbox" :value="`{}`" :name="`pool-`" 
@@ -133,7 +133,7 @@
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { loadImportablePools } from '../../composables/loadData';
+import { loadImportablePools } from '../../composables/loadImportables';
 
 interface ImportPoolProps {
     // importedPool: ImportedPool;
@@ -144,29 +144,24 @@ const props = defineProps<ImportPoolProps>();
 const showDeletedPools = ref(false);
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 
-const selectedPool = ref<PoolData>();
-//const importablePools = ref<PoolData[]>([]);
+const selectedPool = ref<ImportablePoolData>();
+const importablePools = inject<Ref<ImportablePoolData>>('importable-pools')!;
 
-loadImportablePools();
+loadImportablePools(importablePools.value);
 
-// const importedPool = ref<ImportedPool>({
-// 	pool: selectedPool.value,
-// 	altRoot: '',
-// 	renamePool: false,
-// 	newPoolName: '',
-// 	identifier: 'device alias',
-// 	forceImport: false,
-// 	recoveryMode: false,
-// 	ignoreMissingLog: false,
-// 	mountFileSystems: true,
-// 	readOnly: false,
-// });
+const importedPool = ref<ImportedPool>({
+	pool: selectedPool.value,
+	altRoot: '',
+	renamePool: false,
+	newPoolName: '',
+	identifier: 'device alias',
+	forceImport: false,
+	recoveryMode: false,
+	ignoreMissingLog: false,
+	mountFileSystems: true,
+	readOnly: false,
+});
 
-const pools = [
-  { id: 'small', name: 'Small', description: '4 GB RAM / 2 CPUS / 80 GB SSD Storage' },
-  { id: 'medium', name: 'Medium', description: '8 GB RAM / 4 CPUS / 160 GB SSD Storage' },
-  { id: 'large', name: 'Large', description: '16 GB RAM / 8 CPUS / 320 GB SSD Storage' },
-]
 
 const getIdKey = (name: string) => `${name}`;
 </script>

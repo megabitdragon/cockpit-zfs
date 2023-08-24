@@ -43,6 +43,7 @@ const props = defineProps<ZFSProps>();
 const pools = ref<PoolData[]>([]);
 const disks = ref<DiskData[]>([]);
 const datasets = ref<FileSystemData[]>([]);
+const importablePools = ref<ImportablePoolData[]>([]);
 
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
@@ -97,6 +98,7 @@ const disksInPools = computed<DiskData[]>(() => {
 
 //provide data for other components to inject
 provide("pools", pools);
+provide("importable-pools", importablePools);
 provide("disks", disks);
 provide("datasets", datasets);
 provide("disks-in-pools", disksInPools);
