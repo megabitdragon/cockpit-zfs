@@ -47,17 +47,17 @@
 					</transition>
 				</Menu>
 			</div>
-			<div class="flex flex-row w-full h-max border border-default rounded-sm bg-accent justify-items-center">
-				<div v-if="!cleared && trimming " class="">
-					<h3 class="text-muted">Trimming...</h3>
+			<div class="flex flex-row w-full h-max border border-default rounded-sm bg-accent justify-center">
+				<div v-if="!cleared && trimming " class="grid grid-cols-4 gap-0.5 justify-items-center">
+					<h3 class="text-muted col-span-4 mt-2">Trimming...</h3>
 					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 				</div>
-				<div v-else-if="!cleared && scrubbing " class="">
-					<h3 class="text-muted">Scrubbing...</h3>
+				<div v-else-if="!cleared && scrubbing " class="grid grid-cols-4 gap-0.5 justify-items-center">
+					<h3 class="text-muted col-span-4 mt-2">Scrubbing...</h3>
 					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 				</div>
-				<div v-else-if="!cleared && resilvering " class="">
-					<h3 class="text-muted">Resilvering...</h3>
+				<div v-else-if="!cleared && resilvering " class="grid grid-cols-4 gap-0.5 justify-items-center">
+					<h3 class="text-muted col-span-4 mt-2">Resilvering...</h3>
 					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 				</div>
 				<div v-else-if="!cleared && trimmed ">
