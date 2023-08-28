@@ -1,11 +1,22 @@
 <template>
 	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<!-- buttons for creating/importing pools and refreshing list -->
-		<div class="button-group-row">
-			<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
-			<button id="importPool" class="btn btn-secondary" @click="importNewPoolBtn" >Import Storage Pool</button>
-			<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData" ><ArrowPathIcon class="w-5 h-5"/></button>
+		<div class="flex">
+			<div class="button-group-row">
+				<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
+				<button id="importPool" class="btn btn-secondary" @click="importNewPoolBtn">Import Storage Pool</button>
+				<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData"><ArrowPathIcon class="w-5 h-5"/></button>
+			</div>
+			<div class="ml-6">
+				<div v-if="loading" class="text-muted mt-2 animate-pulse flex flex-row w-full h-max bg-accent justify-center">
+					{{ loadingMessage }}
+				</div>
+				<div v-else class="text-success mt-2 flex flex-row w-full h-max bg-accent justify-center">
+					{{ message }}
+				</div>
+			</div>
 		</div>
+		
 
 		<div class="mt-8 overflow-visible rounded-md">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
@@ -34,8 +45,8 @@
 						<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md border border-solid border-spacing-1 border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
 							<template v-slot:title>
 								<div class="grid grid-cols-7 grid-flow-cols w-full rounded-md ml-5">
-									<div class="px-3 py-4">{{  poolData[poolIdx].name }}</div>
-									<div class="px-3 py-4">{{  poolData[poolIdx].status }}</div>
+									<div class="px-3 py-4">{{ poolData[poolIdx].name }}</div>
+									<div class="px-3 py-4">{{ poolData[poolIdx].status }}</div>
 									<div class="px-3 py-4">
 										<div class="w-full bg-well rounded-full text-center">
 											<div v-if="poolData[poolIdx].properties.capacity! < 1" class="text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
@@ -193,7 +204,7 @@
 						</Accordion>
 					</div>
 					
-					<div v-if="poolsLoaded == false || trimming == true" class="p-2 flex justify-center bg-default rounded-md">
+					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default rounded-md">
 						<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
 					</div>
 					<div v-if="poolData.length < 1 && poolsLoaded == true" class="p-2 flex bg-default justify-center rounded-md">
@@ -204,7 +215,6 @@
 			</div>
 		</div>
 	</div>
-
 
 	<div v-if="showWizard">
 		<CreatePool @close="showWizard = false"/>
@@ -248,6 +258,7 @@ import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors, exportPool, importPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
+import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
@@ -289,27 +300,29 @@ const confirmExport = inject<Ref<boolean>>('confirm-export')!;
 
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
 
-// const scrubbed = inject<Ref<boolean>>('scrubbed')!;
-// const scrubbing = inject<Ref<boolean>>('scrubbing')!;
-// const resilvering = inject<Ref<boolean>>('resilvering')!;
-// const trimming = inject<Ref<boolean>>('trimming')!;
-// const exporting = inject<Ref<boolean>>('exporting')!;
 const exporting = ref(false);
+const trimmed = ref(false);
 const trimming = ref(false);
+const resilvered = ref(false);
 const resilvering = ref(false);
+const scrubbed = ref(false);
 const scrubbing = ref(false);
+const cleared = ref(false);
+const message = ref('No Alerts');
+const loadingMessage = ref('');
+const loading = ref(false);
 
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 
 async function destroyPoolAndUpdate(pool) {
-	showDeleteConfirm.value = true;
 	selectedPool.value = pool;
-
+	showDeleteConfirm.value = true;
+	
 	watch(confirmDelete, async (newValue, oldValue) => {
-
+	
 		if (confirmDelete.value == true) {	
 			deleting.value = true;
-			console.log('deleting:', selectedPool.value);
+			console.log('now deleting:', selectedPool.value);
 			await destroyPool(selectedPool.value!);
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
@@ -321,101 +334,121 @@ async function destroyPoolAndUpdate(pool) {
 			confirmDelete.value = false;
 			showDeleteConfirm.value = false;
 			deleting.value = false;
+			message.value = "Destroyed " + pool.name + " at " + getTimestampString();
 		}
 	});
+
+	console.log('preparing to delete:', selectedPool.value);
 }
 
 async function resilverThisPool(pool) {
+	scrubbed.value = false;
+	trimmed.value = false;
+	cleared.value = false;
 	selectedPool.value = pool;
 	showResilverModal.value = true;
-
+	
 	watch(confirmResilver, async (newValue, oldValue) => {
 
 		if (confirmResilver.value == true) {
 			resilvering.value = true;
-			
+			resilvered.value = false;
+			console.log('now resilvering:', selectedPool.value);
+
+			loading.value = true;
+			loadingMessage.value = `Resilvering ${pool.name}...`;
+
 			showResilverModal.value = false;
-			await resilverPool(pool);
+		 	await resilverPool(pool);
 			confirmResilver.value = false;
+			resilvered.value = true;
 			resilvering.value = false;
 
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			// confirmResilver.value = false;
-			// showResilverModal.value = false;
-			console.log('resilvered:', selectedPool.value);
+			loading.value = false;
+			loadingMessage.value = "";
+			message.value = "Resilver on " + pool.name + " completed at " + getTimestampString();
 		}
 	});
 
-	console.log('resilvering:', selectedPool.value);
-}
-
-async function clearThisPoolErrors(pool) {
-	await clearPoolErrors(pool);
+	console.log('preparing to resilver:', selectedPool.value);
 }
 
 async function trimThisPool(pool) {
+	cleared.value = false;
 	selectedPool.value = pool;
 	showTrimModal.value = true;
 
 	watch(confirmTrim, async (newValue, oldValue) => {
 		if (confirmTrim.value == true) {
 			trimming.value = true;
+			trimmed.value = false;
+			console.log('now trimming:', selectedPool.value);
 			if (secureTRIM.value) {
 				confirmTrim.value = false;
+
+				loading.value = true;
+				loadingMessage.value = `Trimming ${pool.name}...`;
+
 				showTrimModal.value = false;
 				await trimPool(pool, secureTRIM.value);
 			} else {
+
+				loading.value = true;
+				loadingMessage.value = `Trimming ${pool.name}...`;
+				
 				confirmTrim.value = false;
 				showTrimModal.value = false;
 				await trimPool(pool);
 			}
 			
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			// confirmTrim.value = false;
-			// showTrimModal.value = false;
 			trimming.value = false;
-			console.log('trimmed:', selectedPool.value);
+			trimmed.value = true;
+
+			loading.value = false;
+			loadingMessage.value = "";
+			message.value = "Trim on " + pool.name + " completed at " + getTimestampString();
+
 		}
 	});
 
-	console.log("trimming:", selectedPool.value);
+	console.log("preparing to trim:", selectedPool.value);
 }
 
 async function scrubThisPool(pool) {
+	cleared.value = false;
 	selectedPool.value = pool;
+	console.log('preparing to scrub:', selectedPool.value);
+	scrubbed.value = false;
 	scrubbing.value = true;
+	console.log('now scrubbing:', selectedPool.value);
+
+	loading.value = true;
+	loadingMessage.value = `Scrubbing ${pool.name}...`;
+
 	await scrubPool(pool);
 
-	disksLoaded.value = false;
-	poolsLoaded.value = false;
-	poolData.value = [];
-	diskData.value = [];
-	await loadDisksThenPools(diskData, poolData);
-	disksLoaded.value = true;
-	poolsLoaded.value = true;
-
 	scrubbing.value = false;
+	scrubbed.value = true;
+
+	loading.value = false;
+	loadingMessage.value = "";
+	message.value = "Scrub on " + pool.name + " completed at " + getTimestampString();
+}
+
+async function clearThisPoolErrors(pool) {
+	cleared.value = false;
+	await clearPoolErrors(pool);
+	cleared.value = true;
 }
 
 async function exportThisPool(pool) {
-	showExportModal.value = true;
+	cleared.value = false;
 	selectedPool.value = pool;
-
+	showExportModal.value = true;
 	watch(confirmExport, async (newVal, oldVal) => {
 		if (confirmExport.value == true) {
 			exporting.value = true;
+			console.log('now exporting:', selectedPool.value);
 			if (forceUnmount.value) {
 				await exportPool(pool, forceUnmount.value);
 			} else {
@@ -432,11 +465,11 @@ async function exportThisPool(pool) {
 			confirmExport.value = false;
 			showExportModal.value = false;
 			exporting.value = false;
-			console.log('exported:', selectedPool.value);
+			message.value = "Exported " + pool.name + " at " + getTimestampString();
 		}
 	});
 
-	console.log('exporting', selectedPool.value);
+	console.log('preparing to export:', selectedPool.value);
 }
 
 async function importNewPool() {

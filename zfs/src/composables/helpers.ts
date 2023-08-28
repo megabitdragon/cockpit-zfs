@@ -103,7 +103,9 @@ export function getTimestampString() {
 	  month: '2-digit',
 	  year: 'numeric'
 	});
-	console.log("timestampString:", timestampString);
+
+	//console.log("timestampString:", timestampString);
+	
 	return timestampString;
   }
 

@@ -170,14 +170,6 @@ const showExportModal = inject<Ref<boolean>>('show-export-modal')!;
 const confirmExport = inject<Ref<boolean>>('confirm-export')!;
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
 
-// const exporting = inject<Ref<boolean>>('exporting')!;
-// const trimmed = inject<Ref<boolean>>('trimmed')!;
-// const trimming = inject<Ref<boolean>>('trimming')!;
-// const resilvered = inject<Ref<boolean>>('resilvered')!;
-// const resilvering = inject<Ref<boolean>>('resilvering')!;
-// const scrubbed = inject<Ref<boolean>>('scrubbed')!;
-// const scrubbing = inject<Ref<boolean>>('scrubbing')!;
-// const cleared = inject<Ref<boolean>>('cleared')!
 const exporting = ref(false);
 const trimmed = ref(false);
 const trimming = ref(false);
@@ -203,7 +195,7 @@ async function destroyPoolAndUpdate(pool) {
 	
 		if (confirmDelete.value == true) {	
 			deleting.value = true;
-			console.log('deleting:', selectedPool.value);
+			console.log('now deleting:', selectedPool.value);
 			await destroyPool(selectedPool.value!);
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
@@ -218,7 +210,7 @@ async function destroyPoolAndUpdate(pool) {
 		}
 	});
 
-	console.log('deleted:', selectedPool.value);
+	console.log('preparing to delete:', selectedPool.value);
 }
 
 async function exportThisPool(pool) {
@@ -228,6 +220,7 @@ async function exportThisPool(pool) {
 	watch(confirmExport, async (newVal, oldVal) => {
 		if (confirmExport.value == true) {
 			exporting.value = true;
+			console.log('now exporting:', selectedPool.value);
 			if (forceUnmount.value) {
 				await exportPool(pool, forceUnmount.value);
 			} else {
@@ -244,11 +237,11 @@ async function exportThisPool(pool) {
 			confirmExport.value = false;
 			showExportModal.value = false;
 			exporting.value = false;
-			console.log('exported:', selectedPool.value);
+
 		}
 	});
 
-	console.log('exporting', selectedPool.value);
+	console.log('preparing to export:', selectedPool.value);
 }
 
 async function resilverThisPool(pool) {
@@ -263,7 +256,7 @@ async function resilverThisPool(pool) {
 		if (confirmResilver.value == true) {
 			resilvering.value = true;
 			resilvered.value = false;
-
+			console.log('now resilvering:', selectedPool.value);
 			showResilverModal.value = false;
 		 	await resilverPool(pool);
 			confirmResilver.value = false;
@@ -271,11 +264,10 @@ async function resilverThisPool(pool) {
 			resilvering.value = false;
 			messageTimestamp.value = getTimestampString();
 
-			console.log('resilvered:', selectedPool.value);
 		}
 	});
 
-	console.log('resilvering', selectedPool.value);
+	console.log('preparing to resilver:', selectedPool.value);
 }
 
 async function trimThisPool(pool) {
@@ -287,6 +279,7 @@ async function trimThisPool(pool) {
 		if (confirmTrim.value == true) {
 			trimming.value = true;
 			trimmed.value = false;
+			console.log('now trimming:', selectedPool.value);
 			if (secureTRIM.value) {
 				confirmTrim.value = false;
 				showTrimModal.value = false;
@@ -300,25 +293,25 @@ async function trimThisPool(pool) {
 			trimming.value = false;
 			trimmed.value = true;
 			messageTimestamp.value = getTimestampString();
-
-			console.log('trimmed:', selectedPool.value);
 		}
 	});
 
-	console.log("trimming:", selectedPool.value);
+	console.log("preparing to trim:", selectedPool.value);
 }
 
 async function scrubThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
-
+	console.log('preparing to scrub:', selectedPool.value);
 	scrubbed.value = false;
 	scrubbing.value = true;
+	console.log('now scrubbing:', selectedPool.value);
 	await scrubPool(pool);
 
 	scrubbing.value = false;
 	scrubbed.value = true;
 	messageTimestamp.value = getTimestampString();
+	
 }
 
 async function clearThisPoolErrors(pool) {
