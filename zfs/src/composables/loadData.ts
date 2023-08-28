@@ -108,20 +108,28 @@ export async function loadDisksThenPools(disks, pools) {
 			}
 
 			const poolDiskTypes = pools.value.map(pool => {
-				const vDevDiskTypes = pool.vdevs.map(vDev => vDev.diskType);
+				const vDevDiskTypes = pool.vdevs.map(vDev => {
+					// Map over the disks within each VDev and extract their types
+					const diskTypes = vDev.disks.map(disk => disk.type);
+					
+					// Check if all disk types within this VDev are the same
+					const allSameDiskType = diskTypes.every(type => type === diskTypes[0]);
+				
+					// Return the disk type for this VDev
+					return allSameDiskType ? diskTypes[0] : 'Hybrid';
+				});
+			
+				// Check if all VDev disk types within the pool are the same
 				const allSameDiskType = vDevDiskTypes.every(type => type === vDevDiskTypes[0]);
-
+			
 				// Determine the pool's diskType based on VDev diskTypes
-				if (allSameDiskType) {
-					return vDevDiskTypes[0];
-				} else {
-					return 'Hybrid'; 
-				}
+				return allSameDiskType ? vDevDiskTypes[0] : 'Hybrid';
 			});
-
+			
 			pools.value.forEach((pool, index) => {
 				pool.diskType = poolDiskTypes[index];
 			});
+			  
 
 			console.log("Pools:");
 			console.log(pools);
