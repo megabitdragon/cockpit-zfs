@@ -46,11 +46,12 @@
 			<!-- pools card loading skeleton -->
 			<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
 				<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
-			
 			</div>
 		</div>
+
+
+		<!-- DISKS SECTION (FOR DEVELOPMENT ONLY) -->
 		<div name="disks" class="">
-			<!-- disks summary -->
 			<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-start mt-0.5">
 					<span class="font-semibold text-lg mt-1 justify-self-start">Disks</span>
@@ -74,12 +75,10 @@
 				</div>
 			</div>
 
-			<!-- disks summary loading spinner -->
 			<div v-if="disks.length < 1 && disksLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
 				<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 			</div>
 
-			<!-- no disks found -->
 			<div v-if="disks.length < 1 && disksLoaded == true" class="grid grid-flow-col grid-cols-3 bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-center">
 					<span class="font-semibold text-lg mt-1">No Disks Found</span>
@@ -91,18 +90,18 @@
 				</div>
 			</div>
 
-			<!-- disk card layout -->
 			<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-cols-4 auto-rows-max gap-2">
 				<div v-for="(disk, index) in disks" :key="index">
 					<DashDiskCard :disk="disks[index]!"/>
 				</div>
 			</div>
 
-			<!-- disk card loading skeleton -->
 			<div v-if="disks.length < 1 && disksLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
 				<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 			</div>
 		</div>
+
+
 	</div>
 
 </template>

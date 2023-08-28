@@ -37,7 +37,7 @@ export async function loadImportablePools(pools) {
       
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
-		console.error("An error occurred getting disks:", error);
+		console.error("An error occurred getting importable pools:", error);
 	}
 }
 

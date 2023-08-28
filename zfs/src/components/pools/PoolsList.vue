@@ -492,6 +492,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
+	message.value = 'No Alerts';
 }
 
 //method to show pool details when button is clicked

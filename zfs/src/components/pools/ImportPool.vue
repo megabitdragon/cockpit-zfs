@@ -10,11 +10,11 @@
                      <!-- Pool selection box (select box or checkbox?) -->
                      <div class="mt-2 col-span-3">
                         <label :for="getIdKey('available-pool-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Pool</label>
-                        <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-4 grid-cols-4">                                             
-                            <li v-for="pool, idx in importablePools" :key="idx" class="">
+                        <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-2 grid-cols-1 border border-default rounded-md bg-default overflow-y-auto">                                             
+                            <li v-for="pool, idx in importablePools" :key="idx" class="col-span-1">
                                 <button class="flex min-w-fit w-full h-full border border-default rounded-md">
-                                    <label :for="getIdKey(`pool-`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
-                                        <input v-model="importedPool.pool" :id="getIdKey(`pool-`)" type="checkbox" :value="`{}`" :name="`pool-`" 
+                                    <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-4 mx-2 text-sm">
+                                        <input v-model="importedPool.pool" :id="getIdKey(`pool-${idx}`)" type="checkbox" :value="`${pool.name}`" :name="`pool-${pool.name}`" 
                                         class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
                                         <h3>{{pool.name}}</h3>
                                     </label>                          
@@ -232,7 +232,7 @@ function loadImports() {
     importablePools.value = [];
     loadImportablePools(importablePools.value);    
 }
-loadImportablePools(importablePools.value);
+loadImports();
 
 // const importedPool = ref<ImportedPool>({
 // 	pool: selectedPool.value,
