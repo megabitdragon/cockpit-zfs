@@ -93,19 +93,19 @@ export const getQuotaRefreservUnit = (bytes) => {
 };
 
 //get a string output of the current timestamp
-export const getTimestampString = computed(() => {
+export function getTimestampString() {
 	const currentDateTime = new Date();
 	const timestampString = currentDateTime.toLocaleString('en-US', {
-		hour: 'numeric',
-		minute: 'numeric',
-		second: 'numeric',
-		day: '2-digit',
-		month: '2-digit',
-		year: 'numeric'
+	  hour: 'numeric',
+	  minute: 'numeric',
+	  second: 'numeric',
+	  day: '2-digit',
+	  month: '2-digit',
+	  year: 'numeric'
 	});
-
+	console.log("timestampString:", timestampString);
 	return timestampString;
-});
+  }
 
 export const getPoolDiskType = (pool) => {
 	let hasSSD = false;

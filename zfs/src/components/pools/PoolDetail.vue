@@ -11,7 +11,7 @@
 				
 				<div class="mt-2 col-span-2 col-start-3 row-start-1">
 					<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span class="text-success">{{ props.pool.status }}</span></p>
-					<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: None currently detected - {{ getTimestampString }}</p>
+					<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: None currently detected - {{ getTimestampString() }}</p>
 				</div>
 
 				<div class="mt-2 col-span-1 col-start-3 row-start-2">

@@ -47,27 +47,27 @@
 					</transition>
 				</Menu>
 			</div>
-			<div class="flex flex-row w-full h-max border border-default rounded-sm bg-accent justify-center">
-				<div v-if="!cleared && trimming ">
+			<div class="flex flex-row w-full h-max border border-default rounded-sm bg-accent justify-items-center">
+				<div v-if="!cleared && trimming " class="">
 					<h3 class="text-muted">Trimming...</h3>
 					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 				</div>
-				<div v-else-if="!cleared && scrubbing ">
+				<div v-else-if="!cleared && scrubbing " class="">
 					<h3 class="text-muted">Scrubbing...</h3>
 					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 				</div>
-				<div v-else-if="!cleared && resilvering ">
+				<div v-else-if="!cleared && resilvering " class="">
 					<h3 class="text-muted">Resilvering...</h3>
 					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
 				</div>
 				<div v-else-if="!cleared && trimmed ">
-					<span class="text-success">Trim completed.</span>
+					<span class="text-success">Trim completed at <br/> {{ messageTimestamp }}.</span>
 				</div>
 				<div v-else-if="!cleared && scrubbed ">
-					<span class="text-success">Scrub completed at <br/>{{ props.pool.scan?.end_time }}</span>
+					<span class="text-success">Scrub completed at <br/> {{ messageTimestamp }}.</span>
 				</div>
 				<div v-else-if="!cleared && resilvered ">
-					<span class="text-success">Resilver completed.</span>
+					<span class="text-success">Resilver completed at <br/> {{ messageTimestamp }}.</span>
 				</div>
 				<div v-else-if="cleared == true || !trimming && !scrubbing && !resilvering && !trimmed && !scrubbed && !resilvered">
 					<span class="text-muted">No Alerts</span>
@@ -129,6 +129,7 @@ import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors, exportPool } from "../../composables/pools";
+import { getTimestampString } from "../../composables/helpers";
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
 import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
@@ -185,6 +186,7 @@ const resilvering = ref(false);
 const scrubbed = ref(false);
 const scrubbing = ref(false);
 const cleared = ref(false);
+const messageTimestamp = ref('');
 
 //method to show pool details when button is clicked
 function showDetails(pool) {
@@ -267,6 +269,8 @@ async function resilverThisPool(pool) {
 			confirmResilver.value = false;
 			resilvered.value = true;
 			resilvering.value = false;
+			messageTimestamp.value = getTimestampString();
+
 			console.log('resilvered:', selectedPool.value);
 		}
 	});
@@ -295,6 +299,8 @@ async function trimThisPool(pool) {
 			
 			trimming.value = false;
 			trimmed.value = true;
+			messageTimestamp.value = getTimestampString();
+
 			console.log('trimmed:', selectedPool.value);
 		}
 	});
@@ -309,8 +315,10 @@ async function scrubThisPool(pool) {
 	scrubbed.value = false;
 	scrubbing.value = true;
 	await scrubPool(pool);
+
 	scrubbing.value = false;
 	scrubbed.value = true;
+	messageTimestamp.value = getTimestampString();
 }
 
 async function clearThisPoolErrors(pool) {
