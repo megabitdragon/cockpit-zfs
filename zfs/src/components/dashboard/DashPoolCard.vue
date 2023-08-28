@@ -264,14 +264,7 @@ async function resilverThisPool(pool) {
 
 			showResilverModal.value = false;
 		 	await resilverPool(pool);
-			 confirmResilver.value = false;
-			// disksLoaded.value = false;
-			// poolsLoaded.value = false;
-			// poolData.value = [];
-			// diskData.value = [];
-			// await loadDisksThenPools(diskData, poolData);
-			// disksLoaded.value = true;
-			// poolsLoaded.value = true;
+			confirmResilver.value = false;
 			resilvered.value = true;
 			resilvering.value = false;
 			console.log('resilvered:', selectedPool.value);
@@ -300,15 +293,6 @@ async function trimThisPool(pool) {
 				await trimPool(pool);
 			}
 			
-			// disksLoaded.value = false;
-			// poolsLoaded.value = false;
-			// poolData.value = [];
-			// diskData.value = [];
-			// await loadDisksThenPools(diskData, poolData);
-			// disksLoaded.value = true;
-			// poolsLoaded.value = true;
-			// confirmTrim.value = false;
-			// showTrimModal.value = false;
 			trimming.value = false;
 			trimmed.value = true;
 			console.log('trimmed:', selectedPool.value);

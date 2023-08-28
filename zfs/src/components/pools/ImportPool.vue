@@ -10,48 +10,22 @@
                      <!-- Pool selection box (select box or checkbox?) -->
                      <div class="mt-2 col-span-3">
                         <label :for="getIdKey('available-pool-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Pool</label>
-                        <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-4 grid-cols-4">
-                          
-                                <!-- <li v-for="plan in plans" :key="plan.id" class="relative flex items-start">
-                                    <div class="flex h-6 items-center">
-                                        <input :id="plan.id" :aria-describedby="`${plan.id}-description`" name="plan" type="radio" :checked="plan.id === 'small'" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" />
-                                    </div>
-                                    <div class="ml-3 text-sm leading-6">
-                                        <label :for="plan.id" class="font-medium text-gray-900">{{ plan.name }}</label>
-                                        {{ ' ' }}
-                                        <span :id="`${plan.id}-description`" class="text-gray-500">{{ plan.description }}</span>
-                                    </div>
-                                </li> -->
-
-                            <li  v-for="pool, idx in importablePools" :key="idx" class="">
+                        <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-4 grid-cols-4">                                             
+                            <li v-for="pool, idx in importablePools" :key="idx" class="">
                                 <button class="flex min-w-fit w-full h-full border border-default rounded-md">
                                     <label :for="getIdKey(`pool-`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
-                                        <input v-model="selectedPool" :id="getIdKey(`pool-`)" type="checkbox" :value="`{}`" :name="`pool-`" 
+                                        <input v-model="importedPool.pool" :id="getIdKey(`pool-`)" type="checkbox" :value="`{}`" :name="`pool-`" 
                                         class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-                                        <h3>Pool</h3>
+                                        <h3>{{pool.name}}</h3>
                                     </label>                          
                                 </button>
                             </li>
-
-                            <!-- <li v-for="(pool, poolIdx) in vDevAvailPools[vDevIdx]" :key="poolIdx" class="">
-                                <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
-                                :class="poolCardClass(pool.name, vDevIdx)">
-                                    <label :for="getIdKey(`vdev-${vDevIdx}-pool-${poolIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
-                                        <input :id="getIdKey(`vdev-${vDevIdx}-pool-${poolIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedpools" type="checkbox" :value="`${pool.name}`" :name="`pool-${pool.name}`"
-                                        class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-                                        <h3 class="truncate text-sm font-medium text-default">{{ pool.name }}</h3>
-                                        <p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p>
-                                        <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
-                                        <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
-                                    </label>
-                                </button>
-                            </li> -->
                         </ul>
                     </div>
 
                     <!-- Switch for showing exported pools or showing deleted pools -->
                     <div class="mt-2 col-span-1">
-                        <label for="show-destroyed-pools-switch" :id="getIdKey('show-destroyed-pools-label')" class="mt-1 block text-sm leading-6 text-default">Show Destroyed Pools</label>
+                        <label for="show-destroyed-pools-switch" class="mt-1 block text-sm leading-6 text-default">Show Destroyed Pools</label>
                         <Switch v-model="showDeletedPools" :id="getIdKey('show-destroyed-pools-switch')" :class="[showDeletedPools! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[showDeletedPools! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -70,39 +44,146 @@
                     </div>
 
                     <!-- Disk Identifier -->
-                    <div class="mt-2">
-                        <!-- <label :for="getIdKey('')" class="bg-default block text-base leading-6 text-default">Can Mount</label>
-                        <select :id="getIdKey('')" v-model="fileSystemConfig.properties.canMount" name="" class="mt-1 block w-full input-textlike bg-default">
-                            <option value="on">On</option>
-                            <option value="off">Off</option>
-                            <option value="noauto">No Auto</option>
-                        </select> -->
+                    <div class="mt-2 col-span-2">
+                        <label :for="getIdKey('disk-identifier')" class="bg-default block text-sm leading-6 text-default">Disk Identifier</label>
+                        <select :id="getIdKey('disk-identifier')" v-model="importedPool.identifier" name="" class="mt-1 block w-full input-textlike bg-default">
+                            <option value="device alias">Device Alias</option>
+                            <option value="block device">Block Device</option>
+                            <option value="disk/wwn">Disk/WWN</option>
+                            <option value="hardware path">Hardware Path</option>
+                        </select>
                     </div>
 
                     <!-- Switch for renaming imported pool -->
+                    <div class="mt-2 col-span-1">
+                        <label for="rename-pool-switch" class="mt-1 block text-sm leading-6 text-default">Rename Pool</label>
+                        <Switch v-model="importedPool.renamePool" :id="getIdKey('rename-pool-switch')" :class="[importedPool.renamePool! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <span class="sr-only">Use setting</span>
+                            <span :class="[importedPool.renamePool! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[importedPool.renamePool! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                        <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                <span :class="[importedPool.renamePool! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    </svg>
+                                </span>
+                            </span>
+                        </Switch>
+                    </div>
                     <!-- If Switch is ON, show text input for new pool name -->
-          
+                    <div v-if="importedPool.renamePool" class="mt-2 col-span-2">
+                        <label :for="getIdKey('new-pool-name')" class="bg-default block text-sm leading-6 text-default">New Name</label>
+                        <input type="text" v-model="importedPool.newPoolName" name="pool-name" :id="getIdKey('new-pool-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="New Pool Name" />
+                    </div>
 
                     <!-- Alt Root -->
-
-
-                
-
-
-                    <!-- Switch for Recovery Mode -->
-
+                    <div class="mt-2 col-span-3">
+                        <label :for="getIdKey('alt-root')" class="bg-default block text-sm leading-6 text-default">Alt Root</label>
+                        <input type="text" v-model="importedPool.altRoot" name="pool-name" :id="getIdKey('alt-root')" class="mt-1 block w-full input-textlike bg-default" placeholder="Alt Root" />
+                    </div>
 
                     <!-- Switch for Read Only -->
+                    <div class="mt-2 col-span-1">
+                        <label for="read-only" class="mt-1 block text-sm leading-6 text-default">Read Only</label>
+                        <Switch v-model="importedPool.readOnly" :id="getIdKey('read-only')" :class="[importedPool.readOnly! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <span class="sr-only">Use setting</span>
+                            <span :class="[importedPool.readOnly! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[importedPool.readOnly! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                        <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                <span :class="[importedPool.readOnly! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    </svg>
+                                </span>
+                            </span>
+                        </Switch>
+                    </div>
 
+                    <!-- Switch for Recovery Mode -->
+                    <div class="mt-2 col-span-1">
+                        <label for="recovery-mode" class="mt-1 block text-sm leading-6 text-default">Recovery Mode</label>
+                        <Switch v-model="importedPool.recoveryMode" :id="getIdKey('recovery-mode')" :class="[importedPool.recoveryMode! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <span class="sr-only">Use setting</span>
+                            <span :class="[importedPool.recoveryMode! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[importedPool.recoveryMode! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                        <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                <span :class="[importedPool.recoveryMode! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    </svg>
+                                </span>
+                            </span>
+                        </Switch>
+                    </div>
 
                     <!-- Switch for Ignore Missing Log Devices -->
-
+                    <div class="mt-2 col-span-1">
+                        <label for="ignore-missing-logs" class="mt-1 block text-sm leading-6 text-default">Ignore Missing Log Devices</label>
+                        <Switch v-model="importedPool.ignoreMissingLog" :id="getIdKey('ignore-missing-logs')" :class="[importedPool.ignoreMissingLog! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <span class="sr-only">Use setting</span>
+                            <span :class="[importedPool.ignoreMissingLog! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[importedPool.ignoreMissingLog! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                        <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                <span :class="[importedPool.ignoreMissingLog! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    </svg>
+                                </span>
+                            </span>
+                        </Switch>
+                    </div>
 
                     <!-- Switch for Mount Filesystems (ON by default, if OFF then execute command) -->
-
+                    <div class="mt-2 col-span-1">
+                        <label for="mount-filesystems" class="mt-1 block text-sm leading-6 text-default">Mount File Systems</label>
+                        <Switch v-model="importedPool.mountFileSystems" :id="getIdKey('mount-filesystems')" :class="[importedPool.mountFileSystems! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <span class="sr-only">Use setting</span>
+                            <span :class="[importedPool.mountFileSystems! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[importedPool.mountFileSystems! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                        <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                <span :class="[importedPool.mountFileSystems! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    </svg>
+                                </span>
+                            </span>
+                        </Switch>
+                    </div>
 
                     <!-- Switch for Force Import -->
-
+                    <div class="mt-2 col-span-1">
+                        <label for="force-import" class="mt-1 block text-sm leading-6 text-default">Forcefully Import</label>
+                        <Switch v-model="importedPool.forceImport" :id="getIdKey('force-import')" :class="[importedPool.forceImport! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <span class="sr-only">Use setting</span>
+                            <span :class="[importedPool.forceImport! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[importedPool.forceImport! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                        <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                <span :class="[importedPool.forceImport! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    </svg>
+                                </span>
+                            </span>
+                        </Switch>
+                    </div>
 
                 </div>
             </div>
@@ -144,13 +225,36 @@ const props = defineProps<ImportPoolProps>();
 const showDeletedPools = ref(false);
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 
-const selectedPool = ref<ImportablePoolData>();
-const importablePools = inject<Ref<ImportablePoolData>>('importable-pools')!;
+const selectedPool = ref<ImportablePoolData>()!;
+const importablePools = inject<Ref<ImportablePoolData[]>>('importable-pools')!;
 
+function loadImports() {
+    importablePools.value = [];
+    loadImportablePools(importablePools.value);    
+}
 loadImportablePools(importablePools.value);
 
+// const importedPool = ref<ImportedPool>({
+// 	pool: selectedPool.value,
+// 	altRoot: '',
+// 	renamePool: false,
+// 	newPoolName: '',
+// 	identifier: 'device alias',
+// 	forceImport: false,
+// 	recoveryMode: false,
+// 	ignoreMissingLog: false,
+// 	mountFileSystems: true,
+// 	readOnly: false,
+// });
 const importedPool = ref<ImportedPool>({
-	pool: selectedPool.value,
+	pool: {
+        name: '',
+        status: '',
+        guid: '',
+        properties: {},
+        vdevs: [],
+        scan: {},
+    },
 	altRoot: '',
 	renamePool: false,
 	newPoolName: '',
