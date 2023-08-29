@@ -12,11 +12,12 @@
                         <label :for="getIdKey('available-pool-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Pool</label>
                         <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-1 grid-cols-1 p-1 border border-default rounded-md bg-accent overflow-y-auto h-56 min-h-min">                                             
                             <li v-for="pool, idx in importablePools" :key="idx" class="col-span-1">
-                                <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md">
+                                <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md"
+                                :class="poolSelectedClass(pool.guid)">
                                     <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-2 mb-1 mx-2 text-default">
                                         <input v-model="selectedPool" :id="getIdKey(`pool-${idx}`)" type="radio" :value="`${pool.guid}`" :name="`pool-${pool.name}-${pool.guid}`" 
                                         class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-1"/>
-                                        <h3>Name: {{pool.name}}</h3>
+                                        <p>Name: {{pool.name}}</p>
                                         <p>GUID: {{ pool.guid }}</p>
                                         <p>Status: {{ pool.status }}</p>
                                     </label>                          
@@ -219,7 +220,6 @@ import Modal from '../common/Modal.vue';
 import { loadImportablePools } from '../../composables/loadImportables';
 
 interface ImportPoolProps {
-    // importedPool: ImportedPool;
     idKey: string;
 }
 
@@ -230,10 +230,15 @@ const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 const selectedPool = ref<ImportablePoolData>();
 const importablePools = inject<Ref<ImportablePoolData[]>>('importable-pools')!;
 
+const poolSelectedClass = (poolGUID) => {
+   return poolGUID === selectedPool.value ? 'bg-green-300 dark:bg-green-700' : '';
+}
+
 function loadImports() {
     importablePools.value = [];
     loadImportablePools(importablePools.value);    
 }
+
 loadImports();
 
 const importedPool = ref<ImportedPool>({
@@ -248,26 +253,6 @@ const importedPool = ref<ImportedPool>({
 	mountFileSystems: true,
 	readOnly: false,
 });
-// const importedPool = ref<ImportedPool>({
-// 	pool: {
-//         name: '',
-//         status: '',
-//         guid: '',
-//         properties: {},
-//         vdevs: [],
-//         scan: {},
-//     },
-// 	altRoot: '',
-// 	renamePool: false,
-// 	newPoolName: '',
-// 	identifier: 'device alias',
-// 	forceImport: false,
-// 	recoveryMode: false,
-// 	ignoreMissingLog: false,
-// 	mountFileSystems: true,
-// 	readOnly: false,
-// });
-
 
 const getIdKey = (name: string) => `${name}`;
 </script>

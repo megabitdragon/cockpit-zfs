@@ -383,31 +383,25 @@ async function trimThisPool(pool) {
 			trimming.value = true;
 			trimmed.value = false;
 			console.log('now trimming:', selectedPool.value);
+
+			loading.value = true;
+			loadingMessage.value = `Trimming ${pool.name}...`;
+
 			if (secureTRIM.value) {
-				confirmTrim.value = false;
-
-				loading.value = true;
-				loadingMessage.value = `Trimming ${pool.name}...`;
-
+				confirmTrim.value = false;	
 				showTrimModal.value = false;
 				await trimPool(pool, secureTRIM.value);
 			} else {
-
-				loading.value = true;
-				loadingMessage.value = `Trimming ${pool.name}...`;
-				
 				confirmTrim.value = false;
 				showTrimModal.value = false;
 				await trimPool(pool);
 			}
-			
 			trimming.value = false;
 			trimmed.value = true;
 
 			loading.value = false;
 			loadingMessage.value = "";
 			message.value = "Trim on " + pool.name + " completed at " + getTimestampString();
-
 		}
 	});
 
