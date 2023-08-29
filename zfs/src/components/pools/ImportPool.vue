@@ -12,10 +12,10 @@
                         <label :for="getIdKey('available-pool-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Pool</label>
                         <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-1 grid-cols-1 p-1 border border-default rounded-md bg-accent overflow-y-auto h-56 min-h-min">                                             
                             <li v-for="pool, idx in importablePools" :key="idx" class="col-span-1">
-                                <button class="flex min-w-fit w-full h-fit border border-default bg-well rounded-md">
-                                    <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-4 mx-2 text-sm text-default">
-                                        <input v-model="importedPool.pool" :id="getIdKey(`pool-${idx}`)" type="checkbox" :value="`${pool.name}`" :name="`pool-${pool.name}`" 
-                                        class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
+                                <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md">
+                                    <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-2 mb-1 mx-2 text-default">
+                                        <input v-model="selectedPool" :id="getIdKey(`pool-${idx}`)" type="radio" :value="`${pool.guid}`" :name="`pool-${pool.name}-${pool.guid}`" 
+                                        class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-1"/>
                                         <h3>Name: {{pool.name}}</h3>
                                         <p>GUID: {{ pool.guid }}</p>
                                         <p>Status: {{ pool.status }}</p>
@@ -227,7 +227,7 @@ const props = defineProps<ImportPoolProps>();
 const showDeletedPools = ref(false);
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 
-const selectedPool = ref<ImportablePoolData>()!;
+const selectedPool = ref<ImportablePoolData>();
 const importablePools = inject<Ref<ImportablePoolData[]>>('importable-pools')!;
 
 function loadImports() {
