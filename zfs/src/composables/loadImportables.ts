@@ -29,7 +29,7 @@ export async function loadImportablePools(pools) {
                 scan: parsedJSON[i].scan,
                 vdevs: vDevs.value,
             }
-            console.log("PoolData to push:", poolData);
+            console.log("ImportablePoolData", i , ": ", poolData);
             pools.push(poolData);
             vDevs.value = [];
 		}
