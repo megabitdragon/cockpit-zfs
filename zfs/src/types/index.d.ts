@@ -46,6 +46,10 @@ interface PoolData {
 		state: string;
 		errors: number;
 		percentage: number;
+		total_secs_left: number;
+		bytes_issued: number;
+		bytes_processed: number;
+		bytes_to_process: number;
 	}
 }
 

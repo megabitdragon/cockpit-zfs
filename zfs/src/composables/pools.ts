@@ -1,4 +1,5 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { convertSizeToBytes } from './helpers';
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 // @ts-ignore
 import get_pools_script from "../scripts/get-pools.py?raw";
@@ -6,7 +7,9 @@ import get_pools_script from "../scripts/get-pools.py?raw";
 import get_importable_pools_script from "../scripts/get-importable-pools.py?raw";
 // @ts-ignore
 import create_pools_script from "./create-pool.py?raw";
-import { convertSizeToBytes } from './helpers';
+
+// @ts-ignore
+import get_scan_progress from "../scripts/get-scan-progress.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -35,6 +38,17 @@ export async function createPool(poolName : string, vDevs: newVDev[]) {
 	}
 }
 */
+
+export async function checkStatus(poolName: string) {
+	try {
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_scan_progress, poolName], { superuser: 'try', stderr: 'out'});
+		const output = await state.promise();
+		console.log(output);
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+	}
+}
 
 const newPoolDisks = ref<string[]>([]);
 const newVDevs = ref<newVDevData[]>([]);

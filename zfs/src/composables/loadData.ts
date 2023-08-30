@@ -92,6 +92,10 @@ export async function loadDisksThenPools(disks, pools) {
 						state: parsedJSON[i].scan.state,
 						errors: parsedJSON[i].scan.errors,
 						percentage: parsedJSON[i].scan.percentage,
+						total_secs_left: parsedJSON[i].scan.total_secs_left,
+						bytes_issued: parsedJSON[i].scan.bytes_issued,
+						bytes_processed: parsedJSON[i].scan.bytes_processed,
+						bytes_to_process: parsedJSON[i].scan.bytes_to_process,
 					},
 					
 					//adds VDev array to Pool data object

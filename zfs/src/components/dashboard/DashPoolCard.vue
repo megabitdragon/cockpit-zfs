@@ -72,6 +72,32 @@
 				<div v-else-if="cleared == true || !trimming && !scrubbing && !resilvering && !trimmed && !scrubbed && !resilvered">
 					<span class="text-muted">No Alerts</span>
 				</div>
+
+				<!-- <div v-if="runningOperation" class="grid grid-cols-4 gap-0.5 justify-items-center">
+					<h3 class="text-muted col-span-4 mt-2">{{ props.pool.scan!.function }} in progress...</h3>
+					<h3 class="text-muted col-span-4 mt-2">{{ props.pool.scan!.percentage }}%</h3>
+					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+				</div>
+				<div v-else-if="!runningOperation && completedOperation">
+					<span class="text-success">{{props.pool.scan!.function}} {{props.pool.scan!.state}} at <br/> {{ props.pool.scan!.end_time }}.</span>
+				</div>
+				<div v-else-if="!completedOperation && !runningOperation">
+					<span class="text-muted">No Alerts</span>
+				</div> -->
+
+				<!-- <div v-if="runningOperation" class="grid grid-cols-4 gap-0.5 justify-items-center">
+					<h3 class="text-muted col-span-4 mt-2">Scrubbing...</h3>
+					<h3 class="text-muted col-span-4 mt-2">{{ progressPercentage }}%</h3>
+					<h3 class="text-muted col-span-4 mt-2">{{ timeRemaining }}</h3>
+					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+				</div>
+				<div v-else-if="!runningOperation && completedOperation">
+					<span class="text-success">{{props.pool.scan!.function}} {{props.pool.scan!.state}} at <br/> {{ props.pool.scan!.end_time }}.</span>
+				</div>
+				<div v-else-if="!completedOperation && !runningOperation">
+					<span class="text-muted">No Alerts</span>
+				</div> -->
+
 			</div>
 		</template>
 		<template v-slot:content>
@@ -134,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, provide, watch } from "vue";
+import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
@@ -147,6 +173,7 @@ import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vu
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
+import { checkStatus } from '../../composables/pools';
 
 interface DashPoolCardProps {
 	pool: PoolData;
@@ -189,6 +216,36 @@ const scrubbed = ref(false);
 const scrubbing = ref(false);
 const cleared = ref(false);
 const messageTimestamp = ref('');
+
+const completedOperation = ref(false);
+const runningOperation = ref(false);
+
+// const progressPercentage = ref(null);
+// const timeRemaining = ref(null);
+// const updateInterval = 3000;
+// const stopUpdatingProgress = ref(false);
+
+// const updateProgress = async (poolName) => {
+// 	try {
+// 		const response = await checkStatus(poolName);
+// 		progressPercentage.value = response.percentage_done;
+// 		timeRemaining.value = response.time_remaining
+
+// 		if (scrubbed) {
+// 			stopUpdatingProgress.value = true; // Set the flag to stop updating
+// 		}
+// 	} catch (error) {
+// 		console.error("Error:", error);
+// 	}
+// }
+
+// watchEffect(() => {
+// 	const interval = setInterval(updateProgress, updateInterval);
+
+// 	return () => {
+// 		clearInterval(interval);
+// 	};
+// });
 
 //method to show pool details when button is clicked
 function showDetails(pool) {
@@ -317,11 +374,17 @@ async function scrubThisPool(pool) {
 	scrubbing.value = true;
 	console.log('now scrubbing:', selectedPool.value);
 	await scrubPool(pool);
-
 	scrubbing.value = false;
 	scrubbed.value = true;
 	messageTimestamp.value = getTimestampString();
-	
+
+	// completedOperation.value = false;
+	// runningOperation.value = true;
+	// console.log('now scrubbing:', selectedPool.value);
+	// await scrubPool(pool);
+	// runningOperation.value = false;
+	// completedOperation.value = true;
+
 }
 
 async function clearThisPoolErrors(pool) {
