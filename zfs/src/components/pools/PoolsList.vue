@@ -49,10 +49,19 @@
 									<div class="px-3 py-4">{{ poolData[poolIdx].status }}</div>
 									<div class="px-3 py-4">
 										<div class="w-full bg-well rounded-full text-center">
-											<div v-if="poolData[poolIdx].properties.capacity! < 1" class="text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
-											<div v-if="poolData[poolIdx].properties.capacity! >=1 && poolData[poolIdx].properties.capacity! <= 85" class="bg-green-600 text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
-											<div v-if="poolData[poolIdx].properties.capacity! > 85" class="bg-danger text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${poolData[poolIdx].properties.capacity}%`}">{{ poolData[poolIdx].properties.capacity }}%</div>
-										</div>	
+											<div v-if="poolData[poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
+												<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
+													{{ poolData[poolIdx].properties.capacity }}%
+												</div>
+											</div>
+											<div v-if="poolData[poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-6 mt-0.5 min-h-min max-h-max overflow-hidden">
+												<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${poolData[poolIdx].properties.capacity}%` }">
+													<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+														{{ poolData[poolIdx].properties.capacity }}%
+													</div>
+												</div>
+											</div>
+										</div>
 									</div>
 									<div class="px-3 py-4">{{ poolData[poolIdx].properties.allocated }}</div>
 									<div class="px-3 py-4">{{ poolData[poolIdx].properties.free }}</div>

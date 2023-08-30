@@ -83,11 +83,21 @@
 					<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
 				</div>					
 			</div>
-			<div class="w-full bg-well rounded-full text-center mt-2 flex justify-center">
-				<div v-if="props.pool.properties.capacity! < 1" class="text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${props.pool.properties.capacity}%`}">{{ props.pool.properties.capacity }}%</div>
-				<div v-if="props.pool.properties.capacity! >=1 && props.pool.properties.capacity! <= 99" class="bg-green-600 text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${props.pool.properties.capacity}%`}">{{ props.pool.properties.capacity }}%</div>
-				<div v-if="props.pool.properties.capacity! > 99" class="bg-danger text-s font-medium text-default text-center p-0.5 leading-none rounded-full" :style="{width: `${props.pool.properties.capacity}%`}">{{ props.pool.properties.capacity }}%</div>
+
+			<div v-if="props.pool.properties.capacity >= 1" class="w-full bg-well rounded-full mt-2 relative flex h-6 min-h-min max-h-max overflow-hidden">
+				<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${props.pool.properties.capacity}%` }">
+					<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+						{{ props.pool.properties.capacity }}%
+					</div>
+				</div>
 			</div>
+
+			<div v-if="props.pool.properties.capacity! < 1" class="w-full bg-well rounded-full h-6 text-center mt-2 relative flex">
+				<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
+					{{ props.pool.properties.capacity }}%
+				</div>
+			</div>
+			
 		</template>
 		<template v-slot:footer>
 			<div class="grid grid-rows-3">
