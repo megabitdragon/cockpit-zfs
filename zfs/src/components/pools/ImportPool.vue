@@ -10,31 +10,41 @@
                     <!-- Pool selection box (select box or checkbox?) -->
                     <div class="mt-2 col-span-3">
                         <label :for="getIdKey('available-pool-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Pool</label>
-                        <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-1 grid-cols-1 p-1 border border-default rounded-md bg-accent overflow-y-auto h-56 min-h-min">                                             
-                            <li v-if="!showDeletedPools" v-for="pool, idx in importablePools" :key="idx" class="col-span-1">
-                                <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md"
-                                :class="poolSelectedClass(pool.guid)">
-                                    <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-2 mb-1 mx-2 text-default">
-                                        <input v-model="importedPool.poolGUID" :id="getIdKey(`pool-${idx}`)" type="radio" :value="`${pool.guid}`" :name="`pool-${pool.name}-${pool.guid}`" 
-                                        class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-1"/>
-                                        <p>Name: {{pool.name}}</p>
-                                        <p>GUID: {{ pool.guid }}</p>
-                                        <p>Status: {{ pool.status }}</p>
-                                    </label>                          
-                                </button>
-                            </li>
-                            <!-- <li v-if="showDeletedPools" v-for="pool, idx in importableDestroyedPools" :key="idx" class="col-span-1">
-                                <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md"
-                                :class="poolSelectedClass(pool.guid)">
-                                    <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-2 mb-1 mx-2 text-default">
-                                        <input v-model="selectedPool" :id="getIdKey(`pool-${idx}`)" type="radio" :value="`${pool.guid}`" :name="`pool-${pool.name}-${pool.guid}`" 
-                                        class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-1"/>
-                                        <p>Name: {{pool.name}}</p>
-                                        <p>GUID: {{ pool.guid }}</p>
-                                        <p>Status: {{ pool.status }}</p>
-                                    </label>                          
-                                </button>
-                            </li> -->
+                        <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-1 grid-cols-1 p-1 border border-default rounded-md bg-accent overflow-y-auto h-56 min-h-min">
+                            <div v-if="!showDeletedPools">
+                                <li v-if="importablePools.length > 0" v-for="pool, idx in importablePools" :key="idx" class="col-span-1">
+                                    <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md"
+                                    :class="poolSelectedClass(pool.guid)">
+                                        <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-2 mb-1 mx-2 text-default">
+                                            <input v-model="importedPool.poolGUID" :id="getIdKey(`pool-${idx}`)" type="radio" :value="`${pool.guid}`" :name="`pool-${pool.name}-${pool.guid}`" 
+                                            class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-1"/>
+                                            <p>Name: {{pool.name}}</p>
+                                            <p>GUID: {{ pool.guid }}</p>
+                                            <p>Status: {{ pool.status }}</p>
+                                        </label>                          
+                                    </button>
+                                </li>
+                                <div v-else class="relative flex justify-center items-stretch">
+                                    <p class="absolute inset-0 grow text-center text-xl font-medium text-default p-14">No Importable Pools Found</p>
+                                </div>
+                            </div>
+                            <div v-if="showDeletedPools">
+                                <li v-if="importableDestroyedPools.length > 0" v-for="pool, idx in importableDestroyedPools" :key="idx" class="col-span-1">
+                                    <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md"
+                                    :class="poolSelectedClass(pool.guid)">
+                                        <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-2 mb-1 mx-2 text-default">
+                                            <input v-model="importedPool.poolGUID" :id="getIdKey(`pool-${idx}`)" type="radio" :value="`${pool.guid}`" :name="`pool-${pool.name}-${pool.guid}`" 
+                                            class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-1"/>
+                                            <p>Name: {{pool.name}}</p>
+                                            <p>GUID: {{ pool.guid }}</p>
+                                            <p>Status: {{ pool.status }}</p>
+                                        </label>                          
+                                    </button>
+                                </li>
+                                <div v-else class="relative flex">
+                                    <p class="absolute inset-0 grow text-center text-xl font-medium text-default p-14">No Destroyed Pools Found</p>
+                                </div>
+                            </div>                 
                         </ul>
                     </div>
 
