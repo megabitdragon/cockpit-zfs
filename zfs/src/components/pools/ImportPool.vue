@@ -7,11 +7,23 @@
             <div>
                 <div class="grid grid-cols-3">
 
-                     <!-- Pool selection box (select box or checkbox?) -->
-                     <div class="mt-2 col-span-3">
+                    <!-- Pool selection box (select box or checkbox?) -->
+                    <div class="mt-2 col-span-3">
                         <label :for="getIdKey('available-pool-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Pool</label>
                         <ul :id="getIdKey('available-pool-list')" role="list" class="grid gap-1 grid-cols-1 p-1 border border-default rounded-md bg-accent overflow-y-auto h-56 min-h-min">                                             
-                            <li v-for="pool, idx in importablePools" :key="idx" class="col-span-1">
+                            <li v-if="!showDeletedPools" v-for="pool, idx in importablePools" :key="idx" class="col-span-1">
+                                <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md"
+                                :class="poolSelectedClass(pool.guid)">
+                                    <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-2 mb-1 mx-2 text-default">
+                                        <input v-model="importedPool.poolGUID" :id="getIdKey(`pool-${idx}`)" type="radio" :value="`${pool.guid}`" :name="`pool-${pool.name}-${pool.guid}`" 
+                                        class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-1"/>
+                                        <p>Name: {{pool.name}}</p>
+                                        <p>GUID: {{ pool.guid }}</p>
+                                        <p>Status: {{ pool.status }}</p>
+                                    </label>                          
+                                </button>
+                            </li>
+                            <!-- <li v-if="showDeletedPools" v-for="pool, idx in importableDestroyedPools" :key="idx" class="col-span-1">
                                 <button class="flex min-w-fit w-full h-fit min-h-fit border border-default bg-well rounded-md"
                                 :class="poolSelectedClass(pool.guid)">
                                     <label :for="getIdKey(`pool-${idx}`)" class="flex flex-col w-full py-2 mb-1 mx-2 text-default">
@@ -22,13 +34,13 @@
                                         <p>Status: {{ pool.status }}</p>
                                     </label>                          
                                 </button>
-                            </li>
+                            </li> -->
                         </ul>
                     </div>
 
                     <!-- Switch for showing exported pools or showing deleted pools -->
                     <div class="mt-2 col-span-1">
-                        <label for="show-destroyed-pools-switch" class="mt-1 block text-sm leading-6 text-default">Show Destroyed Pools</label>
+                     <label :for="getIdKey('show-destroyed-pools-switch')" class="mt-1 bg-default block text-sm leading-6 text-default">Show Destroyed Pools</label>
                         <Switch v-model="showDeletedPools" :id="getIdKey('show-destroyed-pools-switch')" :class="[showDeletedPools! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[showDeletedPools! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -48,7 +60,7 @@
 
                     <!-- Disk Identifier -->
                     <div class="mt-2 col-span-2">
-                        <label :for="getIdKey('disk-identifier')" class="bg-default block text-sm leading-6 text-default">Disk Identifier</label>
+                        <label :for="getIdKey('disk-identifier')" class="mt-1 bg-default block text-sm leading-6 text-default">Disk Identifier</label>
                         <select :id="getIdKey('disk-identifier')" v-model="importedPool.identifier" name="" class="mt-1 block w-full input-textlike bg-default">
                             <option value="device alias">Device Alias</option>
                             <option value="block device">Block Device</option>
@@ -59,7 +71,7 @@
 
                     <!-- Switch for renaming imported pool -->
                     <div class="mt-2 col-span-1">
-                        <label for="rename-pool-switch" class="mt-1 block text-sm leading-6 text-default">Rename Pool</label>
+                        <label :for="getIdKey('rename-pool-switch')" class="mt-1 bg-default block text-sm leading-6 text-default">Rename Pool</label>
                         <Switch v-model="importedPool.renamePool" :id="getIdKey('rename-pool-switch')" :class="[importedPool.renamePool! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[importedPool.renamePool! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -78,19 +90,19 @@
                     </div>
                     <!-- If Switch is ON, show text input for new pool name -->
                     <div v-if="importedPool.renamePool" class="mt-2 col-span-2">
-                        <label :for="getIdKey('new-pool-name')" class="bg-default block text-sm leading-6 text-default">New Name</label>
+                        <label :for="getIdKey('new-pool-name')" class="mt-1 bg-default block text-sm leading-6 text-default">New Name</label>
                         <input type="text" v-model="importedPool.newPoolName" name="pool-name" :id="getIdKey('new-pool-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="New Pool Name" />
                     </div>
 
                     <!-- Alt Root -->
                     <div class="mt-2 col-span-3">
-                        <label :for="getIdKey('alt-root')" class="bg-default block text-sm leading-6 text-default">Alt Root</label>
+                        <label :for="getIdKey('alt-root')" class="mt-1 bg-default block text-sm leading-6 text-default">Alt Root</label>
                         <input type="text" v-model="importedPool.altRoot" name="pool-name" :id="getIdKey('alt-root')" class="mt-1 block w-full input-textlike bg-default" placeholder="Alt Root" />
                     </div>
 
                     <!-- Switch for Read Only -->
                     <div class="mt-2 col-span-1">
-                        <label for="read-only" class="mt-1 block text-sm leading-6 text-default">Read Only</label>
+                        <label :for="getIdKey('read-only')" class="mt-1 bg-default block text-sm leading-6 text-default">Read Only</label>
                         <Switch v-model="importedPool.readOnly" :id="getIdKey('read-only')" :class="[importedPool.readOnly! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[importedPool.readOnly! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -110,7 +122,7 @@
 
                     <!-- Switch for Recovery Mode -->
                     <div class="mt-2 col-span-1">
-                        <label for="recovery-mode" class="mt-1 block text-sm leading-6 text-default">Recovery Mode</label>
+                     <label :for="getIdKey('recovery-mode')" class="mt-1 bg-default block text-sm leading-6 text-default">Recovery Mode</label>
                         <Switch v-model="importedPool.recoveryMode" :id="getIdKey('recovery-mode')" :class="[importedPool.recoveryMode! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[importedPool.recoveryMode! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -130,7 +142,7 @@
 
                     <!-- Switch for Ignore Missing Log Devices -->
                     <div class="mt-2 col-span-1">
-                        <label for="ignore-missing-logs" class="mt-1 block text-sm leading-6 text-default">Ignore Missing Log Devices</label>
+                     <label :for="getIdKey('ignore-missing-logs')" class="mt-1 bg-default block text-sm leading-6 text-default">Ignore Missing Log Devices</label>
                         <Switch v-model="importedPool.ignoreMissingLog" :id="getIdKey('ignore-missing-logs')" :class="[importedPool.ignoreMissingLog! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[importedPool.ignoreMissingLog! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -150,7 +162,7 @@
 
                     <!-- Switch for Mount Filesystems (ON by default, if OFF then execute command) -->
                     <div class="mt-2 col-span-1">
-                        <label for="mount-filesystems" class="mt-1 block text-sm leading-6 text-default">Mount File Systems</label>
+                     <label :for="getIdKey('mount-filesystems')" class="mt-1 bg-default block text-sm leading-6 text-default">Mount File Systems</label>
                         <Switch v-model="importedPool.mountFileSystems" :id="getIdKey('mount-filesystems')" :class="[importedPool.mountFileSystems! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[importedPool.mountFileSystems! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -170,7 +182,7 @@
 
                     <!-- Switch for Force Import -->
                     <div class="mt-2 col-span-1">
-                        <label for="force-import" class="mt-1 block text-sm leading-6 text-default">Forcefully Import</label>
+                     <label :for="getIdKey('force-import')" class="mt-1 bg-default block text-sm leading-6 text-default">Forcefully Import</label>
                         <Switch v-model="importedPool.forceImport" :id="getIdKey('force-import')" :class="[importedPool.forceImport! ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[importedPool.forceImport! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -200,14 +212,14 @@
                 </div>
                 <div class="button-group-row w-full row-start-2 justify-between mt-2">
                     <button @click="showImportModal = false" :id="getIdKey('cancel-import')" name="cancel-import" class="mt-1 btn btn-danger object-left justify-start h-fit">Cancel</button>
-                    <button  @click="" :id="getIdKey('import-pool-btn')" name="import-pool-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Import</button>
-                    <!-- <button disabled  :id="getIdKey('import-pool-spinner')" type="button" class="btn btn-danger object-right justify-end">
+                    <button v-if="!importing" @click="importPoolBtn()" :id="getIdKey('import-pool-btn')" name="import-pool-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Import</button>
+                    <button v-if="importing" disabled :id="getIdKey('import-pool-spinner')" type="button" class="btn btn-danger object-right justify-end">
 							<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
 								<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="text-success"/>
 							</svg>
 							Importing...
-					</button> -->
+					</button>
                 </div>
             </div>
         </template>
@@ -218,6 +230,8 @@ import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { loadImportablePools } from '../../composables/loadImportables';
+import { importPool } from '../../composables/pools';
+import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 
 interface ImportPoolProps {
     idKey: string;
@@ -227,11 +241,18 @@ const props = defineProps<ImportPoolProps>();
 const showDeletedPools = ref(false);
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 
-const selectedPool = ref<ImportablePoolData>();
+const disks = inject<Ref<DiskData[]>>('disks')!;
+const pools = inject<Ref<PoolData[]>>('pools')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+
+// const selectedPool = ref<ImportablePoolData>();
 const importablePools = inject<Ref<ImportablePoolData[]>>('importable-pools')!;
+const importableDestroyedPools = inject<Ref<ImportablePoolData[]>>('importable-destroyed-pools')!;
+
+const importing = ref(false);
 
 const poolSelectedClass = (poolGUID) => {
-   return poolGUID === selectedPool.value ? 'bg-green-300 dark:bg-green-700' : '';
+   return poolGUID === importedPool.value.poolGUID ? 'bg-green-300 dark:bg-green-700' : '';
 }
 
 function loadImports() {
@@ -242,7 +263,7 @@ function loadImports() {
 loadImports();
 
 const importedPool = ref<ImportedPool>({
-	pool: '',
+	poolGUID: '',
 	altRoot: '',
 	renamePool: false,
 	newPoolName: '',
@@ -253,6 +274,19 @@ const importedPool = ref<ImportedPool>({
 	mountFileSystems: true,
 	readOnly: false,
 });
+
+async function importPoolBtn() {
+    console.log(importedPool.value);
+    importing.value = true;
+    await importPool(importedPool.value);
+    disks.value = [];
+    pools.value = [];
+    datasets.value = [];
+    await loadDisksThenPools(disks, pools);
+    await loadDatasets(datasets);
+    importing.value = false;
+    showImportModal.value = false;
+}
 
 const getIdKey = (name: string) => `${name}`;
 </script>

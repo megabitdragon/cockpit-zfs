@@ -346,15 +346,45 @@ export async function getImportablePools() {
 	}
 }
 
-export async function importPool(pool, force?) {
+export async function importPool(pool) {
 	try {
 		let cmdString = ['zpool', 'import'];
+		//import specific pool
+		//zpool import [-Dflmt] [-F [-nTX]] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s] pool|id [newpool]
 
-		if(force) {
+		//import all pools in dir
+		//zpool import -a [-DflmN] [-F [-nTX]] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s]
+
+		//show all available importable pools
+		//zpool import [-D] [-d dir|device]…
+
+		if(pool.forceImport) {
 			cmdString.push('-f');
 		}
 
-		cmdString.push(pool.name);
+		if(pool.ignoreMissingLog) {
+			cmdString.push('-m');
+		}
+
+		if(pool.recoveryMode) {
+			cmdString.push('-F');
+		}
+
+		if(!pool.mountFileSystems) {
+			
+		}
+
+		if(pool.readOnly) {
+			cmdString.push('-o', 'readonly=on')
+		}
+
+		cmdString.push(pool.poolGUID);
+
+		//if rename
+		if(pool.renamePool) {
+			cmdString.push(pool.newPoolName);
+		}
+
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
 		const state = useSpawn(cmdString);

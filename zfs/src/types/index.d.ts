@@ -55,7 +55,7 @@ interface PoolData {
 
 //object for importing pools
 interface ImportedPool {
-	pool: string;
+	poolGUID: string;
 	altRoot: string;
 	renamePool: boolean;
 	newPoolName?: string;

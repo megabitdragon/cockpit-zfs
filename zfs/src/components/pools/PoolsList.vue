@@ -475,10 +475,6 @@ async function exportThisPool(pool) {
 	console.log('preparing to export:', selectedPool.value);
 }
 
-async function importNewPool() {
-	
-}
-
 function importNewPoolBtn() {
 	showImportModal.value = true;
 }
