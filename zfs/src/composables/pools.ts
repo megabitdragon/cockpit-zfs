@@ -366,12 +366,16 @@ export async function importPool(pool) {
 			cmdString.push('-m');
 		}
 
+		if(!pool.mountFileSystems) {
+			cmdString.push('-N');
+		}
+	
 		if(pool.recoveryMode) {
 			cmdString.push('-F');
 		}
 
-		if(!pool.mountFileSystems) {
-			
+		if(pool.altRoot != '') {
+			cmdString.push('-o', 'altroot=' + pool.altRoot);
 		}
 
 		if(pool.readOnly) {
