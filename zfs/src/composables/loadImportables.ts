@@ -28,8 +28,9 @@ export async function loadImportablePools(pools) {
                 properties: parsedJSON[i].properties,
                 scan: parsedJSON[i].scan,
                 vdevs: vDevs.value,
+                isDestroyed: false,
             }
-            console.log("ImportablePoolData", i , ": ", poolData);
+           console.log("ImportablePoolData", i , ": ", poolData);
             pools.push(poolData);
             vDevs.value = [];
 		}
@@ -77,8 +78,9 @@ export async function loadImportableDestroyedPools(pools) {
                 properties: parsedJSON[i].properties,
                 scan: parsedJSON[i].scan,
                 vdevs: vDevs.value,
+                isDestroyed: true,
             }
-            console.log("DestroyedImportablePoolData", i , ": ", poolData);
+           console.log("DestroyedImportablePoolData", i , ": ", poolData);
             pools.push(poolData);
             vDevs.value = [];
 		}

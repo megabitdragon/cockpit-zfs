@@ -59,12 +59,13 @@ interface ImportedPool {
 	altRoot: string;
 	renamePool: boolean;
 	newPoolName?: string;
-	identifier: 'device alias' | 'hardware path' | 'disk/wwn' | 'block device';
+	identifier: 'device-alias' | 'hardware-path' | 'disk' | 'block-device';
 	forceImport: boolean;
 	recoveryMode: boolean;
 	ignoreMissingLog: boolean;
 	mountFileSystems: boolean;
 	readOnly: boolean;
+	isDestroyed: boolean;
 }
 
 //object for importablePoolsData
@@ -75,6 +76,7 @@ interface ImportablePoolData {
 	properties: {}
 	vdevs: ImportablePoolvDevData[];
 	scan: {}
+	isDestroyed?: boolean;
 }
 
 //object for vdev

@@ -6,8 +6,7 @@ def main():
     with libzfs.ZFS() as zfs:
         z_pools = []
 
-# Need to figure out how to get destroyed importable pools
-        for p in zfs.find_import(destroyed='True'):
+        for p in zfs.find_import(destroyed='True', search_paths=['/dev', '/dev/disk/by-id', '/dev/disk/by-path', '/dev/disk/by-vdev']):
             pool = p.asdict()
 
             pool['scan']['start_time'] = str(pool['scan']['start_time'])

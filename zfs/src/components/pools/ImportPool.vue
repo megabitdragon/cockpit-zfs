@@ -22,6 +22,7 @@
                                                 <p>Name: {{pool.name}}</p>
                                                 <p>GUID: {{ pool.guid }}</p>
                                                 <p>Status: {{ pool.status }}</p>
+                                                <p>Destroyed: {{ pool.isDestroyed }}</p>
                                             </label>                          
                                         </button>
                                     </li>
@@ -39,6 +40,7 @@
                                                 <p>Name: {{pool.name}}</p>
                                                 <p>GUID: {{ pool.guid }}</p>
                                                 <p>Status: {{ pool.status }}</p>
+                                                <p>Destroyed: {{ pool.isDestroyed }}</p>
                                             </label>                          
                                         </button>
                                     </li>
@@ -78,10 +80,10 @@
                     <div class="mt-2 col-span-2">
                         <label :for="getIdKey('disk-identifier')" class="mt-1 bg-default block text-sm leading-6 text-default">Disk Identifier</label>
                         <select :id="getIdKey('disk-identifier')" v-model="importedPool.identifier" name="" class="mt-1 block w-full input-textlike bg-default">
-                            <option value="device alias">Device Alias</option>
-                            <option value="block device">Block Device</option>
-                            <option value="disk/wwn">Disk/WWN</option>
-                            <option value="hardware path">Hardware Path</option>
+                            <option value="device-alias">Device Alias</option>
+                            <option value="block-device">Block Device</option>
+                            <option value="disk">Disk/WWN</option>
+                            <option value="hardware-path">Hardware Path</option>
                         </select>
                     </div>
 
@@ -263,7 +265,13 @@ const pools = inject<Ref<PoolData[]>>('pools')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 const importablePools = inject<Ref<ImportablePoolData[]>>('importable-pools')!;
-const importableDestroyedPools = inject<Ref<ImportablePoolData[]>>('importable-destroyed-pools')!;
+const allImportableDestroyedPools = inject<Ref<ImportablePoolData[]>>('importable-destroyed-pools')!;
+
+const importableDestroyedPools = computed<ImportablePoolData[]>(() => {
+    return allImportableDestroyedPools.value.filter((destroyedPool) => {
+        return !importablePools.value.some((importablePool) => destroyedPool.guid === importablePool.guid);
+    });
+});
 
 const importing = ref(false);
 const loading = ref(true);
@@ -281,8 +289,8 @@ function loadImports() {
 
 function loadDestroyedImports() {
     loading.value = true;
-    importableDestroyedPools.value = [];
-    loadImportableDestroyedPools(importableDestroyedPools.value);    
+    //importableDestroyedPools.value = [];
+    loadImportableDestroyedPools(allImportableDestroyedPools.value);    
     loading.value = false;
 }
 
@@ -301,16 +309,21 @@ const importedPool = ref<ImportedPool>({
 	altRoot: '',
 	renamePool: false,
 	newPoolName: '',
-	identifier: 'device alias',
+	identifier: 'device-alias',
 	forceImport: false,
 	recoveryMode: false,
 	ignoreMissingLog: false,
 	mountFileSystems: true,
 	readOnly: false,
+    isDestroyed: false,
 });
 
 async function importPoolBtn() {
-    console.log(importedPool.value);
+    // if (importableDestroyedPools.value.some((pool) => {pool.guid === importedPool.value.poolGUID;})) {
+    //     importedPool.value.isDestroyed = true;
+    // }
+    
+    console.log('importing pool:', importedPool.value);
     importing.value = true;
     await importPool(importedPool.value);
     disks.value = [];
