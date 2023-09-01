@@ -65,7 +65,6 @@ interface ConfirmDeleteModalProps {
     idKey: string;
     item: string;
     name: string;
-    //pool: PoolData;
 }
 
 const props = defineProps<ConfirmDeleteModalProps>();

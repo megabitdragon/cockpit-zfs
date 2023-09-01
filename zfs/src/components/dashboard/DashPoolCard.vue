@@ -19,28 +19,28 @@
 									<a href="#" @click="showDetails(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 								</MenuItem>
 								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="clearThisPoolErrors(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+									<a href="#" @click="clearThisPoolErrors(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 								</MenuItem>
 								<!-- <MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="clearAlerts(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Alerts</a>
+									<a href="#" @click="clearAlerts(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Alerts</a>
 								</MenuItem> -->
 								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="resilverThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+									<a href="#" @click="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 								</MenuItem>
 								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="scrubThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+									<a href="#" @click="scrubThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 								</MenuItem>
 								<MenuItem as="div" v-slot="{ active }">
-									<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+									<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 								</MenuItem>
 								<MenuItem as="div" v-slot="{ active }">
 									<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 								</MenuItem>
 								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="exportThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+									<a href="#" @click="exportThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 								</MenuItem>
 								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="destroyPoolAndUpdate(pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+									<a href="#" @click="destroyPoolAndUpdate(props.pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 								</MenuItem>
 							</div>
 						</MenuItems>
@@ -139,22 +139,18 @@
 	</div>
 
 	<div v-if="showDeleteConfirm">
-		<!-- <ConfirmDeleteModal item="pool" :pool="selectedPool!" :idKey="'delete-pool'" @close="showDeleteConfirm = false"/> -->
 		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="'delete-pool'" @close="showDeleteConfirm = false"/>
 	</div>
 
 	<div v-if="showResilverModal">
-		<!-- <ConfirmResilverModal item="pool" :pool="selectedPool!" :idKey="'resilver-pool'" @close="showResilverModal = false"/> -->
 		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="'resilver-pool'" @close="showResilverModal = false"/>
 	</div>
 
 	<div v-if="showTrimModal">
-		<!-- <ConfirmTrimModal item="pool" :pool="selectedPool!" :idKey="'trim-pool'" @close="showTrimModal = false"/> -->
 		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="'trim-pool'" @close="showTrimModal = false"/>
 	</div>
 
 	<div v-if="showExportModal">
-		<!-- <ConfirmExportModal item="pool" :pool="selectedPool!" :idKey="'export-pool'" @close="showExportModal = false"/> -->
 		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="'export-pool'" @close="showExportModal = false"/>
 	</div>
 </template>
@@ -284,7 +280,7 @@ async function exportThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
 	showExportModal.value = true;
-	watch(confirmExport, async (newVal, oldVal) => {
+	watch(confirmExport, async (newValue, oldValue) => {
 		if (confirmExport.value == true) {
 			exporting.value = true;
 			console.log('now exporting:', selectedPool.value);

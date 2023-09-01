@@ -333,7 +333,6 @@ const poolConfig = ref<PoolData>({
 		forceCreate: props.pool.properties.forceCreate,
 		delegation: props.pool.properties.delegation,
 		displaySnapshots: props.pool.properties.displaySnapshots,
-		multiHost: false,
 		readOnly: props.pool.properties.readOnly,
 	},
 	vdevs: props.pool.vdevs,

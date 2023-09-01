@@ -55,7 +55,6 @@ interface ConfirmTrimModalProps {
     idKey: string;
     item: string;
     name: string;
-    //pool: PoolData;
 }
 
 const props = defineProps<ConfirmTrimModalProps>();

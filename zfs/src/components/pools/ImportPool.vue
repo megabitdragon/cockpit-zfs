@@ -318,10 +318,14 @@ const importedPool = ref<ImportedPool>({
     isDestroyed: false,
 });
 
+function isPoolDestroyed() {
+    return importableDestroyedPools.value.some(pool => pool.guid === importedPool.value.poolGUID);
+}
+
 async function importPoolBtn() {
-    // if (importableDestroyedPools.value.some((pool) => {pool.guid === importedPool.value.poolGUID;})) {
-    //     importedPool.value.isDestroyed = true;
-    // }
+    if (isPoolDestroyed()) {
+        importedPool.value.isDestroyed = true;
+    }
     
     console.log('importing pool:', importedPool.value);
     importing.value = true;

@@ -35,7 +35,6 @@ interface ConfirmResilverModalProps {
     idKey: string;
     item: string;
     name: string;
-    //pool: PoolData;
 }
 
 const props = defineProps<ConfirmResilverModalProps>();

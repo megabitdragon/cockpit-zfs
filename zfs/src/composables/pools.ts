@@ -361,7 +361,7 @@ export async function getImportableDestroyedPools() {
 
 export async function importPool(pool) {
 	try {
-		let cmdString = ['zpool', 'import', '-d'];
+		let cmdString = ['zpool', 'import'];
 		//import specific pool
 		//zpool import [-Dflmt] [-F [-nTX]] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s] pool|id [newpool]
 
@@ -390,6 +390,8 @@ export async function importPool(pool) {
 		if(pool.recoveryMode) {
 			cmdString.push('-F');
 		}
+
+		cmdString.push('-d');
 
 		switch(pool.identifier) {
 			case 'device-alias':

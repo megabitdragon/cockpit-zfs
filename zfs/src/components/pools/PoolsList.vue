@@ -82,22 +82,22 @@
 															<a href="#" @click="showPoolModal(poolData[poolIdx])!" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="clearThisPoolErrors(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+															<a href="#" @click="clearThisPoolErrors(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="resilverThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+															<a href="#" @click="resilverThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="scrubThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+															<a href="#" @click="scrubThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+															<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="exportThisPool(pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+															<a href="#" @click="exportThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="destroyPoolAndUpdate(poolData[poolIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
@@ -453,11 +453,11 @@ async function exportThisPool(pool) {
 			exporting.value = true;
 			console.log('now exporting:', selectedPool.value);
 			if (forceUnmount.value) {
-				await exportPool(pool, forceUnmount.value);
+				exportPool(pool, forceUnmount.value);
 			} else {
-				await exportPool(pool);
+				exportPool(pool);
 			}
-
+			message.value = "Exported " + pool.name + " at " + getTimestampString();
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
 			poolData.value = [];
@@ -468,7 +468,7 @@ async function exportThisPool(pool) {
 			confirmExport.value = false;
 			showExportModal.value = false;
 			exporting.value = false;
-			message.value = "Exported " + pool.name + " at " + getTimestampString();
+			
 		}
 	});
 
