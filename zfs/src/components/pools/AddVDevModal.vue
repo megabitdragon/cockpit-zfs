@@ -69,7 +69,9 @@
         </template>
         <template v-slot:footer>
             <div class="flex flex-row mt-2">
-                
+                <!-- <div class="mt-2 justify-self-start">
+					<button @click="showPoolDetails = false" :id="getIdKey('close-details-btn')" name="close-details-btn" class="mt-1 btn btn-danger">Close</button>
+				</div> -->
                 <div class="justify-self-start mt-2">
                     <p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
                     <p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>

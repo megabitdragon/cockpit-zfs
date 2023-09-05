@@ -82,7 +82,7 @@
                         <select :id="getIdKey('disk-identifier')" v-model="importedPool.identifier" name="" class="mt-1 block w-full input-textlike bg-default">
                             <option value="device-alias">Device Alias</option>
                             <option value="block-device">Block Device</option>
-                            <option value="disk">Disk/WWN</option>
+                            <!-- <option value="disk">Disk/WWN</option> -->
                             <option value="hardware-path">Hardware Path</option>
                         </select>
                     </div>
@@ -289,7 +289,7 @@ function loadImports() {
 
 function loadDestroyedImports() {
     loading.value = true;
-    //importableDestroyedPools.value = [];
+    allImportableDestroyedPools.value = [];
     loadImportableDestroyedPools(allImportableDestroyedPools.value);    
     loading.value = false;
 }

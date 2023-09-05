@@ -406,9 +406,9 @@ export async function importPool(pool) {
 				cmdString.push('/dev');
 				break;
 
-			case 'disk':
-				cmdString.push('/dev/disk/by-id');
-				break;
+			// case 'disk':
+			// 	cmdString.push('/dev/disk/by-id');
+			// 	break;
 			
 			default:
 				break;

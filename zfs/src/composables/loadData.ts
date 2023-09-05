@@ -273,9 +273,14 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	
 	//checks if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
 	if (vDev.children.length < 1) {
+		////////////////////////////////////////////////////////////////////
 		const diskVDev = disks.value.find(disk => disk.name === vDev.name)!;
+		////////////////////////////////////////////////////////////////////
 		const notAChildDisk : DiskData = {
+			////////////////////////////////////////////
+			//ERROR HAPPENING HERE IF NOT DEVICE_ALIAS//
 			name: diskVDev.name,
+			////////////////////////////////////////////
 			path: vDev.path,
 			guid: vDev.guid,
 			type: diskVDev.type,

@@ -16,7 +16,7 @@
 					<label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-default">Type</label>
 					<!-- if first VDev, always either DISK, MIRROR, RAIDZ1-3 -->
 					<!-- if NOT first VDev, always either CACHE, LOG, SPECIAL, SPARE, DEDUP, or TYPE OF FIRST VDEV -->
-					<select id="virtual-device" v-model="poolConfig.vdevs[vDevIdx].type" name="virtual-device" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
+					<select :id="getIdKey('virtual-device')" v-model="poolConfig.vdevs[vDevIdx].type" name="virtual-device" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
 						<option v-if="vDevIdx === 0" value="disk">Disk</option>
 						<option v-if="vDevIdx === 0" value="mirror">Mirror</option>
 						<option v-if="vDevIdx === 0" value="raidz1">RaidZ1</option>
@@ -31,6 +31,17 @@
 					</select>
 				</div>
 
+				  <!-- Disk ID (Select) -->
+				<div>
+					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
+					<select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
+					<option value="sd_path">Block Device</option>
+					<!-- <option value="">Disk</option> -->
+					<option value="phy_path">Hardware Path</option>
+					<option value="vdev_path">Device Alias</option>
+					</select>
+				</div>
+
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
 				<ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 grid-cols-4">
@@ -41,7 +52,7 @@
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
 								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
 								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
-								<p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p>
+								<p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
 							</label>
@@ -303,6 +314,8 @@ const vDevFeedback = inject<Ref<string>>('feedback-vdev')!;
 const diskFeedback = inject<Ref<string>>('feedback-disk')!;
 const diskSizeFeedback = inject<Ref<string>>('feedback-disk-size')!;
 const isProperReplicationFeedback = inject<Ref<string>>('feedback-replication-level')!;
+
+const diskIdentifier = ref('vdev_path');
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection
 //This currently ties in to the disk selection UI elements and shows/hides the disks based on whether they are in use or not

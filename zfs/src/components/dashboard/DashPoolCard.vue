@@ -139,19 +139,19 @@
 	</div>
 
 	<div v-if="showDeleteConfirm">
-		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="'delete-pool'" @close="showDeleteConfirm = false"/>
+		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" @close="showDeleteConfirm = false"/>
 	</div>
 
 	<div v-if="showResilverModal">
-		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="'resilver-pool'" @close="showResilverModal = false"/>
+		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`resilver-pool-${selectedPool?.guid}`)" @close="showResilverModal = false"/>
 	</div>
 
 	<div v-if="showTrimModal">
-		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="'trim-pool'" @close="showTrimModal = false"/>
+		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`trim-pool-${selectedPool?.guid}`)" @close="showTrimModal = false"/>
 	</div>
 
 	<div v-if="showExportModal">
-		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="'export-pool'" @close="showExportModal = false"/>
+		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`export-pool-${selectedPool?.guid}`)" @close="showExportModal = false"/>
 	</div>
 </template>
 
@@ -396,6 +396,8 @@ async function clearAlerts(pool) {
 async function addNewVDev(pool) {
 
 }
+
+const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
 provide('show-pool-deets', showPoolDetails);
 </script>

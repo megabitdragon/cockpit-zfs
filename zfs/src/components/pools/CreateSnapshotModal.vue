@@ -55,6 +55,9 @@
             </div>
         </template>
         <template v-slot:footer>
+            <!-- <div class="mt-2 justify-self-start">
+					<button @click="showPoolDetails = false" :id="getIdKey('close-details-btn')" name="close-details-btn" class="mt-1 btn btn-danger">Close</button>
+            </div> -->
             <div class="mt-2">
                 <button @click="createSnapshotOK" :id="getIdKey('create-snapshot-btn')" name="create-snapshot-btn" class="mt-1 btn btn-primary">OK</button>
             </div>
