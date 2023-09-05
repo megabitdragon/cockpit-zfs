@@ -268,35 +268,54 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		selectedDisks: [],
 		disks: [],
 		poolName: poolName,
+		path: vDev.path,
 		diskType: determineDiskType(vDev, disks),
 	};
 	
 	//checks if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
 	if (vDev.children.length < 1) {
 		////////////////////////////////////////////////////////////////////
-		const diskVDev = disks.value.find(disk => disk.name === vDev.name)!;
+		// ^\/dev\/disk\/by-path\/[0-9a-zA-Z\-]+(?:-part[0-9]+)?$ (phy_path)
+		const phyPathRegex = `^\/dev\/disk\/by-path\/[0-9a-zA-Z\-]+(?:-part[0-9]+)?$`;
+		// ^\/dev\/sd[a-z][0-9]$/ (sd_path)
+		const sdPathRegex = `^\/dev\/sd[a-z][0-9]$/`;
+		// ^\/dev\/disk\/by-vdev\/.*-part\d*$ (vdev_path)
+		const vDevRegex = `^\/dev\/disk\/by-vdev\/.*-part\d*$`
+
+		const diskVDev = ref();
+
+		if (vDevData.path!.match(phyPathRegex)) {
+			 diskVDev.value = disks.value.find(disk => disk.phy_path + '-part1' === vDev.path)!;
+		} else if (vDevData.path!.match(sdPathRegex)) {
+			 diskVDev.value = disks.value.find(disk => disk.sd_path + '1' === vDev.path)!;
+		} else if (vDevData.path!.match(vDevRegex)) {
+			 diskVDev.value = disks.value.find(disk => disk.vdev_path + '-part1' === vDev.path)!;
+		}
+
+		console.log('vDev', vDev);
+		console.log('diskvdev:', diskVDev);
 		////////////////////////////////////////////////////////////////////
 		const notAChildDisk : DiskData = {
 			////////////////////////////////////////////
 			//ERROR HAPPENING HERE IF NOT DEVICE_ALIAS//
-			name: diskVDev.name,
+			name: diskVDev.value!.name,
 			////////////////////////////////////////////
 			path: vDev.path,
 			guid: vDev.guid,
-			type: diskVDev.type,
-			status: diskVDev.health,
+			type: diskVDev.value!.type,
+			status: diskVDev.value!.health,
 			stats: vDev.stats,
-			capacity: diskVDev.capacity,
-			model: diskVDev.model,
-			phy_path: diskVDev.phy_path,
-			sd_path: diskVDev.sd_path,
-			vdev_path: diskVDev.vdev_path,
-			serial: diskVDev.serial,
+			capacity: diskVDev.value!.capacity,
+			model: diskVDev.value!.model,
+			phy_path: diskVDev.value!.phy_path,
+			sd_path: diskVDev.value!.sd_path,
+			vdev_path: diskVDev.value!.vdev_path,
+			serial: diskVDev.value!.serial,
 			usable: false,
-			powerOnHours: diskVDev.powerOnHours,
-			powerOnCount: diskVDev.powerOnCount,
-			temp: diskVDev.temp,
-			rotationRate: diskVDev.rotationRate,
+			powerOnHours: diskVDev.value!.powerOnHours,
+			powerOnCount: diskVDev.value!.powerOnCount,
+			temp: diskVDev.value!.temp,
+			rotationRate: diskVDev.value!.rotationRate,
 			vDevName: vDev.name,
 			poolName: poolName,
 		}

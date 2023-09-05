@@ -51,6 +51,47 @@ interface PoolData {
 		bytes_processed: number;
 		bytes_to_process: number;
 	}
+	diskIdentifier?: DiskIdentifier;
+}
+
+//object for vdev
+interface vDevData {
+	name: string;
+	type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
+	status: string;
+	guid: string;
+	stats: {};
+	disks: DiskData[];
+	selectedDisks: string[];
+	forceAdd?: boolean;
+	poolName?: string;
+	isMirror?: boolean;
+	diskType?: 'SSD' | 'HDD' | 'Hybrid';
+	path?: string;
+}
+
+//object for disk
+interface DiskData {
+	name: string;
+	capacity: string;
+	model: string;
+	guid: string;
+	type: string;
+	status: string;
+	stats: {};
+	path: string;
+	phy_path: string;
+	sd_path: string;
+	vdev_path: string;
+	serial: string;
+	usable: boolean;
+	temp: string;
+	powerOnCount: string;
+	powerOnHours: number;
+	rotationRate: number;
+	vDevName?: string;
+	poolName?: string;
+	identifier?: DiskIdentifier;
 }
 
 //object for importing pools
@@ -59,7 +100,7 @@ interface ImportedPool {
 	altRoot: string;
 	renamePool: boolean;
 	newPoolName?: string;
-	identifier: 'device-alias' | 'hardware-path' | 'disk' | 'block-device';
+	identifier: DiskIdentifier;
 	forceImport: boolean;
 	recoveryMode: boolean;
 	ignoreMissingLog: boolean;
@@ -128,43 +169,7 @@ interface newVDevData {
 	forceAdd?: boolean;
 }
 
-//object for vdev
-interface vDevData {
-	name: string;
-	type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
-	status: string;
-	guid: string;
-	stats: {};
-	disks: DiskData[];
-	selectedDisks: string[];
-	forceAdd?: boolean;
-	poolName?: string;
-	isMirror?: boolean;
-	diskType?: 'SSD' | 'HDD' | 'Hybrid';
-}
-
-//object for disk
-interface DiskData {
-	name: string;
-	capacity: string;
-	model: string;
-	guid: string;
-	type: string;
-	status: string;
-	stats: {};
-	path: string;
-	phy_path: string;
-	sd_path: string;
-	vdev_path: string;
-	serial: string;
-	usable: boolean;
-	temp: string;
-	powerOnCount: string;
-	powerOnHours: number;
-	rotationRate: number;
-	vDevName?: string;
-	poolName?: string;
-}
+type DiskIdentifier = 'device-alias' | 'hardware-path' | 'block-device';
 
 //object for filesystem
 interface FileSystemData {
