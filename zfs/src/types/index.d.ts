@@ -169,7 +169,7 @@ interface newVDevData {
 	forceAdd?: boolean;
 }
 
-type DiskIdentifier = 'device-alias' | 'hardware-path' | 'block-device';
+type DiskIdentifier = 'vdev_path' | 'phy_path' | 'sd_path';
 
 //object for filesystem
 interface FileSystemData {

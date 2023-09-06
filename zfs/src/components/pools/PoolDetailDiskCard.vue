@@ -3,7 +3,7 @@
 		<template v-slot:title>
 			<div class="flex flex-row justify-between gap-1">
 				<div class="pr-2 text-default text-medium">
-					{{ props.disk.name }} ({{ props.disk.sd_path }}) ({{ props.disk.type }})
+					{{ props.disk.name }} ({{ props.disk.type }})
 				</div>
 				<div class="px-1">
 					<img class="w-4 h-4" src="../../../public/icons/success.svg">

@@ -35,25 +35,25 @@
 				<div>
 					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
 					<select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
-					<option value="sd_path">Block Device</option>
-					<!-- <option value="">Disk/WWN</option> -->
-					<option value="phy_path">Hardware Path</option>
-					<option value="vdev_path">Device Alias</option>
+						<option value="sd_path">Block Device</option>
+						<!-- <option value="">Disk/WWN</option> -->
+						<option value="phy_path">Hardware Path</option>
+						<option value="vdev_path">Device Alias</option>
 					</select>
 				</div>
 
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
 				<ul :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
-					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="">
-						<button class="flex min-w-fit w-full h-full border border-default rounded-lg"
+					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="my-2">
+						<button class="flex min-w-fit w-full h-full border border-default rounded-lg p-4"
 						:class="diskCardClass(disk.name, vDevIdx)">
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
-								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
-								<p class="mt-1 truncate text-sm text-default w-min break-all justify-self-center">{{ disk[diskIdentifier] }}</p>
+								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
+								<p class="truncate text-sm font-medium text-default">{{ disk.name }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
+								<p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
 							</label>
 						</button>
@@ -315,7 +315,7 @@ const diskFeedback = inject<Ref<string>>('feedback-disk')!;
 const diskSizeFeedback = inject<Ref<string>>('feedback-disk-size')!;
 const isProperReplicationFeedback = inject<Ref<string>>('feedback-replication-level')!;
 
-const diskIdentifier = ref('vdev_path');
+const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection
 //This currently ties in to the disk selection UI elements and shows/hides the disks based on whether they are in use or not
