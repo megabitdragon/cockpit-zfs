@@ -306,7 +306,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 
 		// console.log('vDev', vDev);
 		// console.log('diskvdev:', diskVDev);
-		
+
 		const notAChildDisk : DiskData = {
 			name: diskVDev.value!.name,
 			path: vDev.path,
@@ -337,32 +337,49 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		vDevs.value.push(vDevData);
 	} else {
 		//if VDev does have child disks, add those disks to the VDev data object + array
-		vDev.children.forEach(disk1 => {
-			const fullDiskData = disks.value.find(disk => disk.name === disk1.name)!;
+		vDev.children.forEach(child => {
+
+			const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
+			const sdPathRegex = `\/dev\/sd[a-z][0-9]+$`;
+			const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9\-]+(?:-part[0-9]+)?$`;
+
+			const fullDiskData = ref();
+
+			if (child.path!.match(phyPathRegex)) {
+				fullDiskData.value = disks.value.find(disk => disk.phy_path + '-part1' === child.path)!;
+				//console.log('phyPath match');
+			} else if (child.path!.match(sdPathRegex)) {
+				fullDiskData.value = disks.value.find(disk => disk.sd_path + '1' === child.path)!;
+				//console.log('sdPath match');
+			} else if (child.path!.match(vDevPathRegex)) {
+				fullDiskData.value = disks.value.find(disk => disk.vdev_path  + '-part1' === child.path)!;
+				//console.log('vDevPath match');
+			}
+
 			const childDisk : DiskData = {
-				name: fullDiskData.name,
-				path: fullDiskData.path,
-				guid: fullDiskData.guid,
-				type: fullDiskData.type,
-				status: fullDiskData.status,
-				stats: fullDiskData.stats,
-				capacity: fullDiskData.capacity,
-				model: fullDiskData.model,
-				phy_path: fullDiskData.phy_path,
-				sd_path: fullDiskData.sd_path,
-				vdev_path: fullDiskData.vdev_path,
-				serial: fullDiskData.serial,
+				name: fullDiskData.value.name,
+				path: fullDiskData.value.path,
+				guid: fullDiskData.value.guid,
+				type: fullDiskData.value.type,
+				status: fullDiskData.value.status,
+				stats: fullDiskData.value.stats,
+				capacity: fullDiskData.value.capacity,
+				model: fullDiskData.value.model,
+				phy_path: fullDiskData.value.phy_path,
+				sd_path: fullDiskData.value.sd_path,
+				vdev_path: fullDiskData.value.vdev_path,
+				serial: fullDiskData.value.serial,
 				usable: false,
-				powerOnHours: fullDiskData.powerOnHours,
-				powerOnCount: fullDiskData.powerOnCount,
-				temp: fullDiskData.temp,
-				rotationRate: fullDiskData.rotationRate,
+				powerOnHours: fullDiskData.value.powerOnHours,
+				powerOnCount: fullDiskData.value.powerOnCount,
+				temp: fullDiskData.value.temp,
+				rotationRate: fullDiskData.value.rotationRate,
 				vDevName: vDev.name,
 				poolName: poolName,
 			}; 
 
-			// console.log("ChildDisk:");
-			// console.log(childDisk);
+			console.log("ChildDisk:");
+			console.log(childDisk);
 			vDevData.disks.push(childDisk);
 
 		});
