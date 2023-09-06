@@ -225,7 +225,7 @@
             <div class="w-full grid grid-rows-2">
                 <div class="w-full row-start-1">
                     <div class="mt-2">
-                        <p class="text-danger" ></p>
+                        <p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
                     </div>
                 </div>
                 <div class="button-group-row w-full row-start-2 justify-between mt-2">
@@ -276,6 +276,8 @@ const importableDestroyedPools = computed<ImportablePoolData[]>(() => {
 const importing = ref(false);
 const loading = ref(true);
 
+const nameFeedback = ref('');
+
 const poolSelectedClass = (poolGUID) => {
    return poolGUID === importedPool.value.poolGUID ? 'bg-green-300 dark:bg-green-700' : '';
 }
@@ -322,22 +324,76 @@ function isPoolDestroyed() {
     return importableDestroyedPools.value.some(pool => pool.guid === importedPool.value.poolGUID);
 }
 
-async function importPoolBtn() {
-    if (isPoolDestroyed()) {
-        importedPool.value.isDestroyed = true;
+//method for validating pool name fits the criteria
+const nameCheck = () => {
+	let result = true;
+	nameFeedback.value = '';
+    console.log('importedPool.newName:', importedPool.value.newPoolName!);
+    if (importedPool.value.renamePool) {
+        if (importedPool.value.newPoolName! == '') {
+		    result = false;
+            nameFeedback.value = 'Name cannot be empty.';
+        } else if (importedPool.value.newPoolName!.match(/^[0-9]/) ) {
+            result = false;
+            nameFeedback.value = 'Name cannot begin with numbers.';
+        } else if (importedPool.value.newPoolName!.match(/^[.]/ )) {
+            result = false;
+            nameFeedback.value = 'Name cannot begin with a period (.).';
+        } else if (importedPool.value.newPoolName!.match(/^[_]/)) {
+            result = false;
+            nameFeedback.value = 'Name cannot begin with an underscore (_).';
+        } else if (importedPool.value.newPoolName!.match(/^[-]/)) {
+            result = false;
+            nameFeedback.value = 'Name cannot begin with a hyphen (-).';
+        } else if (importedPool.value.newPoolName!.match(/^[:]/)) {
+            result = false;
+            nameFeedback.value = 'Name cannot begin with a colon (:).';
+        } else if (importedPool.value.newPoolName!.match(/^[ ]/)) {
+            result = false;
+            nameFeedback.value = 'Name cannot begin with whitespace.';
+        } else if (importedPool.value.newPoolName!.match(/[ ]$/)) {
+            result = false;
+            nameFeedback.value = 'Name cannot end with whitespace.';
+        } else if (importedPool.value.newPoolName!.match(/^c[0-9]|^log|^mirror|^raidz|^raidz1|^raidz2|^raidz3|^spare/)) {
+            result = false;
+            nameFeedback.value = 'Name cannot begin with a reserved name.';
+        } else if (!importedPool.value.newPoolName!.match(/^[a-zA-Z0-9_.:-]*$/)) {
+            result = false;
+            nameFeedback.value = 'Name contains invalid characters.';
+        } else if (importableNameExists()) {
+            result = false;
+            nameFeedback.value = 'A pool with that name already exists.';
+        }
     }
-    
-    console.log('importing pool:', importedPool.value);
-    importing.value = true;
-    await importPool(importedPool.value);
-    disks.value = [];
-    pools.value = [];
-    datasets.value = [];
-    await loadDisksThenPools(disks, pools);
-    await loadDatasets(datasets);
-    importing.value = false;
-    showImportModal.value = false;
+
+    return result;
 }
+
+function importableNameExists() {
+    return importablePools.value.some((pool) => {
+        return importedPool.value.newPoolName! === pool.name;
+    });
+}
+
+async function importPoolBtn() {
+    if (nameCheck()) {
+        if (isPoolDestroyed()) {
+            importedPool.value.isDestroyed = true;
+        }
+        
+        console.log('importing pool:', importedPool.value);
+        importing.value = true;
+        await importPool(importedPool.value);
+        disks.value = [];
+        pools.value = [];
+        datasets.value = [];
+        await loadDisksThenPools(disks, pools);
+        await loadDatasets(datasets);
+        importing.value = false;
+        showImportModal.value = false;
+    }
+}
+
 
 const getIdKey = (name: string) => `${name}`;
 </script>

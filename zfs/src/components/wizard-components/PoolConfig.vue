@@ -36,7 +36,7 @@
 					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
 					<select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
 					<option value="sd_path">Block Device</option>
-					<!-- <option value="">Disk</option> -->
+					<!-- <option value="">Disk/WWN</option> -->
 					<option value="phy_path">Hardware Path</option>
 					<option value="vdev_path">Device Alias</option>
 					</select>

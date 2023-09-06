@@ -435,7 +435,7 @@ async function scrubThisPool(pool) {
 
 	loading.value = false;
 	loadingMessage.value = "";
-	message.value = "Scrub on " + pool.name + " completed at " + getTimestampString();
+	message.value = "Scrub on " + pool.name + " ended at " + getTimestampString();
 }
 
 async function clearThisPoolErrors(pool) {
