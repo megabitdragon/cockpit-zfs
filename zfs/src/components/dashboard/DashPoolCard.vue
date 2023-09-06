@@ -140,8 +140,8 @@
 		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
 	</div>
 
-	<div v-if="showDeleteConfirm">
-		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" @close="showDeleteConfirm = false"/>
+	<div v-if="showDeleteConfirmModal">
+		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" @close="showDeleteConfirmModal = false"/>
 	</div>
 
 	<div v-if="showResilverModal">
@@ -191,17 +191,14 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
 const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
-const showDeleteConfirm = inject<Ref<boolean>>('show-delete-modal')!;
+const showDeleteConfirmModal = ref(false);
 const deleting = inject<Ref<boolean>>('deleting')!;
-
 const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
-const showResilverModal = inject<Ref<boolean>>('show-resilver-modal')!;	
-
-const showTrimModal = inject<Ref<boolean>>('show-trim-modal')!;
+const showResilverModal = ref(false);
+const showTrimModal = ref(false);
 const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
 const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
-
-const showExportModal = inject<Ref<boolean>>('show-export-modal')!;
+const showExportModal = ref(false);
 const confirmExport = inject<Ref<boolean>>('confirm-export')!;
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
 
@@ -238,9 +235,7 @@ const runningOperation = ref(false);
 // }
 
 // watchEffect(() => {
-// 	const interval = setInterval(updateProgress, updateInterval);
-
-// 	return () => {
+// 	const interval = setInterval(updateProgress, updateInterval);selectedPool.value = pool;
 // 		clearInterval(interval);
 // 	};
 // });
@@ -254,7 +249,7 @@ function showDetails(pool) {
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
-	showDeleteConfirm.value = true;
+	showDeleteConfirmModal.value = true;
 	
 	watch(confirmDelete, async (newValue, oldValue) => {
 	
@@ -270,7 +265,7 @@ async function destroyPoolAndUpdate(pool) {
 			disksLoaded.value = true;
 			poolsLoaded.value = true;
 			confirmDelete.value = false;
-			showDeleteConfirm.value = false;
+			showDeleteConfirmModal.value = false;
 			deleting.value = false;
 		}
 	});
@@ -402,4 +397,8 @@ async function addNewVDev(pool) {
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
 provide('show-pool-deets', showPoolDetails);
+provide('show-delete-modal', showDeleteConfirmModal);
+provide("show-resilver-modal", showResilverModal);
+provide("show-trim-modal", showTrimModal);
+provide("show-export-modal", showExportModal);
 </script>

@@ -51,21 +51,17 @@ const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
 
 const confirmDelete = ref(false);
-const showDeleteConfirmModal = ref(false);
 const deleting = ref(false);
 const forceDestroy = ref(false);
 const hasChildren = ref(false);
 
 const confirmResilver = ref(false);
-const showResilverModal = ref(false);
 
 const saving = ref(false);
 
-const showTrimModal = ref(false);
 const confirmTrim = ref(false);
 const secureTRIM = ref(false);
 
-const showExportModal = ref(false);
 const confirmExport = ref(false);
 const forceUnmount = ref(false);
 
@@ -100,21 +96,14 @@ provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
 provide('confirm-delete', confirmDelete);
-provide('show-delete-modal', showDeleteConfirmModal);
 provide('deleting', deleting);
 provide('force-destroy', forceDestroy);
 provide('has-children', hasChildren);
 provide("saving", saving);
-
-provide("show-resilver-modal", showResilverModal);
 provide("confirm-resilver", confirmResilver);
-provide("show-trim-modal", showTrimModal);
 provide("confirm-trim", confirmTrim);
-
 provide("secure-trim", secureTRIM);
-provide("show-export-modal", showExportModal);
 provide("confirm-export", confirmExport);
-
 provide("force-unmount", forceUnmount);
 provide("show-import-modal", showImportModal);
 </script>

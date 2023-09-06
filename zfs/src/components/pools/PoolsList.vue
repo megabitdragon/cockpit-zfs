@@ -293,18 +293,18 @@ const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 
 const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
-const showDeleteConfirm = inject<Ref<boolean>>('show-delete-modal')!;
+const showDeleteConfirm = ref(false);
 const deleting = inject<Ref<boolean>>('deleting')!;
 
 const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
-const showResilverModal = inject<Ref<boolean>>('show-resilver-modal')!;	
+const showResilverModal = ref(false);
 
-const showTrimModal = inject<Ref<boolean>>('show-trim-modal')!;
+const showTrimModal = ref(false);
 const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
 
 const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
 
-const showExportModal = inject<Ref<boolean>>('show-export-modal')!;
+const showExportModal = ref(false);
 const confirmExport = inject<Ref<boolean>>('confirm-export')!;
 
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
@@ -517,4 +517,8 @@ function newPoolWizardBtn() {
 
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
+provide('show-delete-modal', showDeleteConfirm);
+provide("show-resilver-modal", showResilverModal);
+provide("show-trim-modal", showTrimModal);
+provide("show-export-modal", showExportModal);
 </script>

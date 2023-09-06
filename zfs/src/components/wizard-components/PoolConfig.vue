@@ -44,7 +44,7 @@
 
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
-				<ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 grid-cols-4">
+				<ul :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
 					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="">
 						<button class="flex min-w-fit w-full h-full border border-default rounded-lg"
 						:class="diskCardClass(disk.name, vDevIdx)">
@@ -52,7 +52,7 @@
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
 								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
 								<h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
-								<p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
+								<p class="mt-1 truncate text-sm text-default w-min break-all justify-self-center">{{ disk[diskIdentifier] }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
 							</label>
