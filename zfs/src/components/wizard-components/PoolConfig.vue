@@ -574,25 +574,49 @@ function isBoolCompression(bool : boolean) {
 const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
 const newVDevs = ref<newVDevData[]>([]);
 const newVDevDisks = ref<string[]>([]);
-//const newPoolName = inject<Ref<string>>('new-pool-name')!;
+
+const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
+const sdPathRegex = `\/dev\/sd[a-z][0-9]+$`;
+const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9\-]+(?:-part[0-9]+)?$`;
+const phyPathPrefix = '/dev/disk/by-path/';
+const sdPathPrefix = '/dev/';
+const newDisk = ref();
+const diskName = ref('');
+const diskPath = ref('');
 
 function fillNewPoolData() {
-	// console.log("poolConfig");
-	// console.log(poolConfig);
-
 	newPoolData.value.name = poolConfig.value.name;
-	//newPoolName.value = poolConfig.value.name;
-	//console.log("newPoolName sent:", newPoolName);
 	poolConfig.value.vdevs.forEach(vDev => {
 		const newVDev : newVDevData = {
 			type: '',
 			disks: [],
 		}
 		newVDev.type = vDev.type;
-		//newVDev.forceAdd = vDev.forceAdd;
 		newVDev.isMirror = vDev.isMirror;
-		vDev.selectedDisks.forEach(disk => {
-			newVDevDisks.value.push(disk);
+
+		vDev.selectedDisks.forEach(selectedDisk => {
+			switch (diskIdentifier.value) {
+				case 'vdev_path':
+					newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
+					diskPath.value = newDisk.value!.vdev_path;
+					diskName.value = selectedDisk;
+					break;
+				case 'phy_path':
+					newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
+					diskPath.value = newDisk.value!.phy_path;
+					diskName.value = diskPath.value.replace(phyPathPrefix, '');
+					break;
+				case 'sd_path':
+					newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
+					diskPath.value = newDisk.value!.sd_path;
+					diskName.value = diskPath.value.replace(sdPathPrefix, '');
+					break;	
+				default:
+					console.log('error with selectedDisks/diskIdentifier'); 
+					break;
+			}
+			//newVDevDisks.value.push(selectedDisk);
+			newVDevDisks.value.push(diskName.value);
 		});
 		newVDev.disks = newVDevDisks.value;
 		newVDevDisks.value = [];

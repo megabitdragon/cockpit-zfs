@@ -299,15 +299,15 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			diskName.value = diskVDev.value.phy_path.replace(phyPathPrefix, '');
 			console.log(diskName.value);
 		} else if (vDevData.path!.match(sdPathRegex)) {
-			diskPath.value = diskVDev.value.sd_path;
 			diskVDev.value = disks.value.find(disk => disk.sd_path + '1' === vDevData.path)!;
 			//console.log('sdPath match');
+			diskPath.value = diskVDev.value.sd_path;
 			diskName.value = diskVDev.value.sd_path.replace(sdPathPrefix, '');
 			console.log(diskName.value);
 		} else if (vDevData.path!.match(vDevPathRegex)) {
-			diskPath.value = diskVDev.value.vdev_path;
 			diskVDev.value = disks.value.find(disk => disk.vdev_path  + '-part1' === vDevData.path)!;
 			//console.log('vDevPath match');
+			diskPath.value = diskVDev.value.vdev_path;
 			diskName.value = diskVDev.value!.name;
 		}
 
