@@ -1,138 +1,140 @@
 <template>
-	<Card class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
-		<template v-slot:title>
-			<div class="flex flex-row justify-between">
-				<div class="text-default">
-					{{ props.pool.name }}
-				</div>
-				<Menu as="div" class="relative inline-block text-right">
-					<div>
-						<MenuButton class="rounded-full bg-accent text-muted hover:text-gray-600">
-							<span class="sr-only">Open options</span>
-							<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
-						</MenuButton>
+	<button v-on:dblclick="showDetails(props.pool)" class="w-full h-full">
+		<Card class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
+			<template v-slot:title>
+				<div class="flex flex-row justify-between">
+					<div class="text-default">
+						{{ props.pool.name }}
 					</div>
-					<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-						<MenuItems class="absolute right-0 z-10 -mt-1 w-max origin-top-left rounded-md bg-accent shadow-lg">
-							<div class="py-1">
-								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="showDetails(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
-								</MenuItem>
-								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="clearThisPoolErrors(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
-								</MenuItem>
-								<!-- <MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="clearAlerts(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Alerts</a>
-								</MenuItem> -->
-								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
-								</MenuItem>
-								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="scrubThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
-								</MenuItem>
-								<MenuItem as="div" v-slot="{ active }">
-									<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
-								</MenuItem>
-								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
-								</MenuItem>
-								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="exportThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
-								</MenuItem>
-								<MenuItem as="div" v-slot="{ active }">
-									<a href="#" @click="destroyPoolAndUpdate(props.pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
-								</MenuItem>
-							</div>
-						</MenuItems>
-					</transition>
-				</Menu>
-			</div>
-			<div class="flex flex-row w-full h-max border border-default rounded-sm bg-accent justify-center">
-				<div v-if="!cleared && trimming " class="grid grid-cols-4 gap-0.5 justify-items-center">
-					<h3 class="text-muted col-span-4 mt-2">Trimming...</h3>
-					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+					<Menu as="div" class="relative inline-block text-right">
+						<div>
+							<MenuButton class="rounded-full bg-accent text-muted hover:text-gray-600">
+								<span class="sr-only">Open options</span>
+								<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+							</MenuButton>
+						</div>
+						<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+							<MenuItems class="absolute right-0 z-10 -mt-1 w-max origin-top-left rounded-md bg-accent shadow-lg">
+								<div class="py-1">
+									<MenuItem as="div" v-slot="{ active }">
+										<a href="#" @click="showDetails(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+										<a href="#" @click="clearThisPoolErrors(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+									</MenuItem>
+									<!-- <MenuItem as="div" v-slot="{ active }">
+										<a href="#" @click="clearAlerts(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Alerts</a>
+									</MenuItem> -->
+									<MenuItem as="div" v-slot="{ active }">
+										<a href="#" @click="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+										<a href="#" @click="scrubThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+										<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+										<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+										<a href="#" @click="exportThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+										<a href="#" @click="destroyPoolAndUpdate(props.pool)!" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+									</MenuItem>
+								</div>
+							</MenuItems>
+						</transition>
+					</Menu>
 				</div>
-				<div v-else-if="!cleared && scrubbing " class="grid grid-cols-4 gap-0.5 justify-items-center">
-					<h3 class="text-muted col-span-4 mt-2">Scrubbing...</h3>
-					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+				<div class="flex flex-row w-full h-max border border-default rounded-sm bg-accent justify-center">
+					<div v-if="!cleared && trimming " class="grid grid-cols-4 gap-0.5 justify-items-center">
+						<h3 class="text-muted col-span-4 mt-2">Trimming...</h3>
+						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+					</div>
+					<div v-else-if="!cleared && scrubbing " class="grid grid-cols-4 gap-0.5 justify-items-center">
+						<h3 class="text-muted col-span-4 mt-2">Scrubbing...</h3>
+						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+					</div>
+					<div v-else-if="!cleared && resilvering " class="grid grid-cols-4 gap-0.5 justify-items-center">
+						<h3 class="text-muted col-span-4 mt-2">Resilvering...</h3>
+						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+					</div>
+					<div v-else-if="!cleared && trimmed ">
+						<span class="text-success">Trim completed at <br/> {{ messageTimestamp }}.</span>
+					</div>
+					<div v-else-if="!cleared && scrubbed ">
+						<span class="text-success">Scrub completed at <br/> {{ messageTimestamp }}.</span>
+					</div>
+					<div v-else-if="!cleared && resilvered ">
+						<span class="text-success">Resilver completed at <br/> {{ messageTimestamp }}.</span>
+					</div>
+					<div v-else-if="cleared == true || !trimming && !scrubbing && !resilvering && !trimmed && !scrubbed && !resilvered">
+						<span class="text-muted">No Alerts</span>
+					</div>
+
+					<!-- <div v-if="runningOperation" class="grid grid-cols-4 gap-0.5 justify-items-center">
+						<h3 class="text-muted col-span-4 mt-2">{{ props.pool.scan!.function }} in progress...</h3>
+						<h3 class="text-muted col-span-4 mt-2">{{ props.pool.scan!.percentage }}%</h3>
+						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+					</div>
+					<div v-else-if="!runningOperation && completedOperation">
+						<span class="text-success">{{props.pool.scan!.function}} {{props.pool.scan!.state}} at <br/> {{ props.pool.scan!.end_time }}.</span>
+					</div>
+					<div v-else-if="!completedOperation && !runningOperation">
+						<span class="text-muted">No Alerts</span>
+					</div> -->
+
+					<!-- <div v-if="runningOperation" class="grid grid-cols-4 gap-0.5 justify-items-center">
+						<h3 class="text-muted col-span-4 mt-2">Scrubbing...</h3>
+						<h3 class="text-muted col-span-4 mt-2">{{ progressPercentage }}%</h3>
+						<h3 class="text-muted col-span-4 mt-2">{{ timeRemaining }}</h3>
+						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+					</div>
+					<div v-else-if="!runningOperation && completedOperation">
+						<span class="text-success">{{props.pool.scan!.function}} {{props.pool.scan!.state}} at <br/> {{ props.pool.scan!.end_time }}.</span>
+					</div>
+					<div v-else-if="!completedOperation && !runningOperation">
+						<span class="text-muted">No Alerts</span>
+					</div> -->
+
 				</div>
-				<div v-else-if="!cleared && resilvering " class="grid grid-cols-4 gap-0.5 justify-items-center">
-					<h3 class="text-muted col-span-4 mt-2">Resilvering...</h3>
-					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
-				</div>
-				<div v-else-if="!cleared && trimmed ">
-					<span class="text-success">Trim completed at <br/> {{ messageTimestamp }}.</span>
-				</div>
-				<div v-else-if="!cleared && scrubbed ">
-					<span class="text-success">Scrub completed at <br/> {{ messageTimestamp }}.</span>
-				</div>
-				<div v-else-if="!cleared && resilvered ">
-					<span class="text-success">Resilver completed at <br/> {{ messageTimestamp }}.</span>
-				</div>
-				<div v-else-if="cleared == true || !trimming && !scrubbing && !resilvering && !trimmed && !scrubbed && !resilvered">
-					<span class="text-muted">No Alerts</span>
+			</template>
+			<template v-slot:content>
+				<div class="flex flex-row justify-between">
+					<div>
+						<span class="text-success">{{props.pool.status}}</span>
+					</div>
+					<div>
+						<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+					</div>					
 				</div>
 
-				<!-- <div v-if="runningOperation" class="grid grid-cols-4 gap-0.5 justify-items-center">
-					<h3 class="text-muted col-span-4 mt-2">{{ props.pool.scan!.function }} in progress...</h3>
-					<h3 class="text-muted col-span-4 mt-2">{{ props.pool.scan!.percentage }}%</h3>
-					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
+				<div v-if="props.pool.properties.capacity >= 1" class="w-full bg-well rounded-full mt-2 relative flex h-6 min-h-min max-h-max overflow-hidden">
+					<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${props.pool.properties.capacity}%` }">
+						<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+							{{ props.pool.properties.capacity }}%
+						</div>
+					</div>
 				</div>
-				<div v-else-if="!runningOperation && completedOperation">
-					<span class="text-success">{{props.pool.scan!.function}} {{props.pool.scan!.state}} at <br/> {{ props.pool.scan!.end_time }}.</span>
-				</div>
-				<div v-else-if="!completedOperation && !runningOperation">
-					<span class="text-muted">No Alerts</span>
-				</div> -->
 
-				<!-- <div v-if="runningOperation" class="grid grid-cols-4 gap-0.5 justify-items-center">
-					<h3 class="text-muted col-span-4 mt-2">Scrubbing...</h3>
-					<h3 class="text-muted col-span-4 mt-2">{{ progressPercentage }}%</h3>
-					<h3 class="text-muted col-span-4 mt-2">{{ timeRemaining }}</h3>
-					<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
-				</div>
-				<div v-else-if="!runningOperation && completedOperation">
-					<span class="text-success">{{props.pool.scan!.function}} {{props.pool.scan!.state}} at <br/> {{ props.pool.scan!.end_time }}.</span>
-				</div>
-				<div v-else-if="!completedOperation && !runningOperation">
-					<span class="text-muted">No Alerts</span>
-				</div> -->
-
-			</div>
-		</template>
-		<template v-slot:content>
-			<div class="flex flex-row justify-between">
-				<div>
-					<span class="text-success">{{props.pool.status}}</span>
-				</div>
-				<div>
-					<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
-				</div>					
-			</div>
-
-			<div v-if="props.pool.properties.capacity >= 1" class="w-full bg-well rounded-full mt-2 relative flex h-6 min-h-min max-h-max overflow-hidden">
-				<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${props.pool.properties.capacity}%` }">
-					<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+				<div v-if="props.pool.properties.capacity! < 1" class="w-full bg-well rounded-full h-6 text-center mt-2 relative flex">
+					<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
 						{{ props.pool.properties.capacity }}%
 					</div>
 				</div>
-			</div>
-
-			<div v-if="props.pool.properties.capacity! < 1" class="w-full bg-well rounded-full h-6 text-center mt-2 relative flex">
-				<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
-					{{ props.pool.properties.capacity }}%
+				
+			</template>
+			<template v-slot:footer>
+				<div class="grid grid-rows-3">
+					<p class="row-start-1">Used {{ props.pool.properties.allocated }}</p>
+					<p class="row-start-2">Free {{ props.pool.properties.free }}</p>
+					<p class="row-start-3"><b>Total {{ props.pool.properties.size }}</b></p>
 				</div>
-			</div>
-			
-		</template>
-		<template v-slot:footer>
-			<div class="grid grid-rows-3">
-				<p class="row-start-1">Used {{ props.pool.properties.allocated }}</p>
-				<p class="row-start-2">Free {{ props.pool.properties.free }}</p>
-				<p class="row-start-3"><b>Total {{ props.pool.properties.size }}</b></p>
-			</div>
-		</template>
-	</Card>
+			</template>
+		</Card>
+	</button>
 
 	<div v-if="showPoolDetails">
 		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>

@@ -1,70 +1,72 @@
 <template>
-	<Card class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
-		<template v-slot:title>
-			<div class="flex flex-row justify-between">
-				<div class="pr-2 text-default">
-					{{ props.disk.name }}
+	<button v-on:dblclick="showDetails(props.disk)" class="w-full h-full">
+		<Card class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
+			<template v-slot:title>
+				<div class="flex flex-row justify-between">
+					<div class="pr-2 text-default">
+						{{ props.disk.name }}
+					</div>
+					<div>
+						<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+					</div>
+					<Menu as="div" class="relative inline-block text-right">
+						<div>
+							<MenuButton class="rounded-full bg-accent text-muted hover:text-gray-600">
+								<span class="sr-only">Open options</span>
+								<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+							</MenuButton>
+						</div>
+
+						<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+							<MenuItems class="absolute right-0 z-10 -mt-1 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+								<div class="py-1">
+								
+									<MenuItem v-slot="{ active }">
+										<a href="#" @click="clearPartAndRefreshDisks(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">wipefs -a</a>
+									</MenuItem>
+								</div>
+							</MenuItems>
+						</transition>
+					</Menu>
+				</div>
+				<!-- <div>
+					Member of {{ props.disk.vDevName }} in {{ props.disk.poolName }}
+				</div> -->
+				<div>
+					<span class="text-success">{{ props.disk.status }}</span>
 				</div>
 				<div>
-					<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+					<span>{{ props.disk.type }}</span>
 				</div>
-				<Menu as="div" class="relative inline-block text-right">
-					<div>
-						<MenuButton class="rounded-full bg-accent text-muted hover:text-gray-600">
-							<span class="sr-only">Open options</span>
-							<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
-						</MenuButton>
-					</div>
-
-					<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-						<MenuItems class="absolute right-0 z-10 -mt-1 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-							<div class="py-1">
-							
-								<MenuItem v-slot="{ active }">
-									<a href="#" @click="clearPartAndRefreshDisks(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">wipefs -a</a>
-								</MenuItem>
-							</div>
-						</MenuItems>
-					</transition>
-				</Menu>
-			</div>
-			<!-- <div>
-				Member of {{ props.disk.vDevName }} in {{ props.disk.poolName }}
-			</div> -->
-			<div>
-				<span class="text-success">{{ props.disk.status }}</span>
-			</div>
-			<div>
-				<span>{{ props.disk.type }}</span>
-			</div>
+				</template>
+				<template v-slot:content>
+				<div>
+					<span>{{props.disk.temp}}</span>
+				</div>
+				<div>
+					<span class="text-base font-medium text-success">Space&nbsp;&nbsp;&nbsp;</span>
+					<span class="text-sm font-medium text-success">0%</span>
+				</div>
+				<!-- <div class="w-full bg-well rounded-full h-2.5">
+					<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
+				</div> -->
 			</template>
-			<template v-slot:content>
-			<div>
-				<span>{{props.disk.temp}}</span>
-			</div>
-			<div>
-				<span class="text-base font-medium text-success">Space&nbsp;&nbsp;&nbsp;</span>
-				<span class="text-sm font-medium text-success">0%</span>
-			</div>
-			<!-- <div class="w-full bg-well rounded-full h-2.5">
-				<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
-			</div> -->
-		</template>
-		<template v-slot:footer>
-			<div>
-				Used X TB
-			</div>
-			<div>
-				Free Y TB
-			</div>
-			<div>
-				<b>Total: {{ props.disk.capacity }}</b>
-			</div>
-		</template>
-	</Card>
+			<template v-slot:footer>
+				<div>
+					Used X TB
+				</div>
+				<div>
+					Free Y TB
+				</div>
+				<div>
+					<b>Total: {{ props.disk.capacity }}</b>
+				</div>
+			</template>
+		</Card>
+	</button>
 
 	<div v-if="showDiskDetails">
-		<!-- <DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="false"/> -->
+		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="false"/>
 	</div>
 </template>
 
