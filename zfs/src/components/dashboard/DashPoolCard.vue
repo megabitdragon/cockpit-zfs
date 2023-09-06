@@ -35,7 +35,7 @@
 										<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+										<a href="#" @click="showAddVDev(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click="exportThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
@@ -140,6 +140,10 @@
 		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
 	</div>
 
+	<div v-if="showAddVDevModal">
+		<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="selectedPool!"/>
+	</div>
+
 	<div v-if="showDeleteConfirmModal">
 		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" @close="showDeleteConfirmModal = false"/>
 	</div>
@@ -171,6 +175,7 @@ import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vu
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
+import AddVDevModal from "../pools/AddVDevModal.vue";
 import { checkStatus } from '../../composables/pools';
 
 interface DashPoolCardProps {
@@ -201,6 +206,8 @@ const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
 const showExportModal = ref(false);
 const confirmExport = inject<Ref<boolean>>('confirm-export')!;
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
+
+const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
 
 const exporting = ref(false);
 const trimmed = ref(false);
@@ -390,10 +397,11 @@ async function clearAlerts(pool) {
 	cleared.value = true;
 }
 
-async function addNewVDev(pool) {
-
+function showAddVDev(pool) {
+	selectedPool.value = pool;
+	console.log(selectedPool);
+	showAddVDevModal.value = true;
 }
-
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
 provide('show-pool-deets', showPoolDetails);

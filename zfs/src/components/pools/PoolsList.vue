@@ -94,7 +94,7 @@
 															<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+															<a href="#" @click="showAddVDev(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="exportThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
@@ -256,6 +256,10 @@
 	<div v-if="showImportModal">
 		<ImportPool :idKey="'import-pool'"/>
 	</div>
+
+	<div v-if="showAddVDevModal">
+		<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="selectedPool!"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -275,6 +279,7 @@ import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vu
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
 import ImportPool from "./ImportPool.vue";
+import AddVDevModal from "../pools/AddVDevModal.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
@@ -322,6 +327,7 @@ const loadingMessage = ref('');
 const loading = ref(false);
 
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
+const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
@@ -499,6 +505,12 @@ function showPoolModal(pool) {
 	selectedPool.value = pool;
 	console.log(selectedPool);
 	showPoolDetails.value = true;
+}
+
+function showAddVDev(pool) {
+	selectedPool.value = pool;
+	console.log(selectedPool);
+	showAddVDevModal.value = true;
 }
 
 function showDiskModal(disk) {

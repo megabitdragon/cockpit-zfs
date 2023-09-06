@@ -341,7 +341,7 @@ const poolConfig = ref<PoolData>({
 });
 
 const showSnapshotModal = ref(false);
-const showAddVDevModal = ref(false);
+const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
 const snapshots = ref<Snapshot[]>([]);
@@ -515,6 +515,5 @@ const navigation = reactive<NavigationItem[]>([
 const getIdKey = (name: string) => `${name}`;
 
 provide('create-snap-modal', showSnapshotModal);
-provide('add-vdev-modal', showAddVDevModal);
 provide('current-pool-config', poolConfig);
 </script>

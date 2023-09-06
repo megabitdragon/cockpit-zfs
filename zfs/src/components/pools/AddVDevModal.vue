@@ -46,62 +46,74 @@
 					</Switch>
 				</div>
 
+                <!-- Disk ID (Select) -->
+				<div>
+					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
+					<select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
+						<option value="sd_path">Block Device</option>
+						<!-- <option value="">Disk/WWN</option> -->
+						<option value="phy_path">Hardware Path</option>
+						<option value="vdev_path">Device Alias</option>
+					</select>
+				</div>
+
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
-                <ul :id="getIdKey('available-disk-list')" role="list" class="grid gap-4 grid-cols-4">
-                    <li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="">
+                <ul :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
+                    <li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="my-2">
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
                         :class="diskCardClass(disk.name, vDevIdx)">
                             <label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
                                 <h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
-                                <p class="mt-1 truncate text-sm font-base text-default">{{ disk.sd_path }}</p>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
+                                <p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
                         </button>
                     </li>
                 </ul>
 
-
             </div>
         </template>
         <template v-slot:footer>
-            <div class="flex flex-row mt-2">
-                <!-- <div class="mt-2 justify-self-start">
-					<button @click="showPoolDetails = false" :id="getIdKey('close-details-btn')" name="close-details-btn" class="mt-1 btn btn-danger">Close</button>
-				</div> -->
-                <div class="justify-self-start mt-2">
-                    <p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
-                    <p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
-                    <p class="text-danger" v-if="isProperReplicationFeedback">{{ isProperReplicationFeedback }}</p>
-                </div>
-
-                <div class="flex flex-row mr-4">
-                    <label :for="'forcefully-add-vdev'" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully Add</label>
-                    <Switch v-model="newVDev.forceAdd" :class="[newVDev.forceAdd ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-                        <span class="sr-only">Use setting</span>
-                        <span :class="[newVDev.forceAdd ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-                            <span :class="[newVDev.forceAdd ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                                <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-                                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </span>
-                            <span :class="[newVDev.forceAdd ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                                <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-                                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-                                </svg>
-                            </span>
-                        </span>
-                    </Switch>
-                </div>
-    
-                <div class="button-group-row">
-                    <button id="add-vdev-btn" class="btn btn-primary object-right justify-end mr-4 h-fit w-full" @click="addVDevBtn">Add VDev</button>
-                </div>
-
-            </div>
+            <div class="w-full grid grid-rows-2">
+				<div class="w-full row-start-1 justify-center items-center">
+                    <div class="justify-self-start mt-2">
+                        <p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
+                        <p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
+                        <p class="text-danger" v-if="isProperReplicationFeedback">{{ isProperReplicationFeedback }}</p>
+                    </div>
+				</div>
+				
+				<div class="button-group-row w-full justify-between row-start-2">
+					<div class="button-group-row mt-2">
+                        <button @click="showAddVDevModal = false" :id="getIdKey('close-add-vdev-btn')" name="close-add-vdev-btn" class="mt-1 btn btn-danger">Close</button>
+                        <div class="flex flex-row">
+                            <label :for="'forcefully-add-vdev'" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully Add</label>
+                            <Switch v-model="newVDev.forceAdd" :class="[newVDev.forceAdd ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                                <span class="sr-only">Use setting</span>
+                                <span :class="[newVDev.forceAdd ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                    <span :class="[newVDev.forceAdd ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                            <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </span>
+                                    <span :class="[newVDev.forceAdd ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                            <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                        </svg>
+                                    </span>
+                                </span>
+                            </Switch>
+                        </div>
+					</div>
+					<div class="button-group-row mt-2">
+                        <button id="add-vdev-btn" class="btn btn-primary object-right justify-end mr-4 h-fit w-full" @click="addVDevBtn">Add VDev</button>
+					</div>
+				</div>
+			</div>
         </template>
     </Modal>
 </template>
@@ -119,7 +131,7 @@ interface AddVDevModalProps {
 
 const props = defineProps<AddVDevModalProps>();
 
-const showAddVDevModal = inject<Ref<boolean>>('add-vdev-modal')!;
+const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
 
 const newVDev : newVDevData = {
 	type: 'mirror',
@@ -132,6 +144,8 @@ const isProperReplicationFeedback = inject<Ref<string>>('feedback-replication-le
 
 const poolConfig = inject<Ref<PoolData>>('current-pool-config')!;
 const allDisks = inject<Ref<DiskData[]>>('disks')!;
+
+const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 
 const vDevAvailDisks = computed<DiskData[][]>(() => {
 	return poolConfig.value.vdevs.map((vdev, vdevIdx) => {

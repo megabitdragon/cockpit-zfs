@@ -31,7 +31,7 @@
 					</select>
 				</div>
 
-				  <!-- Disk ID (Select) -->
+				<!-- Disk ID (Select) -->
 				<div>
 					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
 					<select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
