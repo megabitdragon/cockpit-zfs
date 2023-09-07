@@ -133,6 +133,9 @@
 																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 																</MenuItem>
 																<MenuItem as="div" v-slot="{ active }">
+																	<a href="#" @click="removeVDev(poolData[poolIdx], poolData[poolIdx].vdevs[vDevIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
+																</MenuItem>
+																<MenuItem as="div" v-slot="{ active }">
 																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
 																</MenuItem>
 															</div>
@@ -144,7 +147,7 @@
 									</template>
 									<template v-slot:content>
 										<table class="table-auto min-w-full divide-y divide-default rounded-md bg-secondary text-default">
-											<tr v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx" class="rounded-md">
+											<tr :key="vDevIdx" class="rounded-md">
 												<td colspan="8" class="ml-7">
 													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-well rounded-md">
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
@@ -157,7 +160,7 @@
 														<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
 															<span class="sr-only"></span>
 														</th>
-														<tr v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="indent-16 bg-default rounded-md">
+														<tr v-for="disk, diskIdx in pool.vdevs[vDevIdx].disks" :key="diskIdx" class="indent-16 bg-default rounded-md">
 															<td>{{ disk.name }}</td>
 															<td>{{ disk.status }}</td>
 															<td>W</td>
@@ -258,7 +261,11 @@
 	</div>
 
 	<div v-if="showAddVDevModal">
-		<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="selectedPool!"/>
+		<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="selectedPool!" :marginTop="'mt-28'"/>
+	</div>
+
+	<div v-if="showRemoveVDevConfirm">
+		<ConfirmRemoveVDev @close="showRemoveVDevConfirm = false" :idKey="'show-remove-modal'" :poolName="selectedPool!.name" :vDevName="selectedVDev!.name"/>
 	</div>
 </template>
 
@@ -269,7 +276,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors, exportPool, importPool } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors, exportPool, importPool, removeVDevFromPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
@@ -280,6 +287,7 @@ import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
 import ImportPool from "./ImportPool.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
+import ConfirmRemoveVDev from "../common/confirmation/ConfirmRemoveVDev.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
@@ -296,6 +304,7 @@ const showDiskDetails = ref(false);
 
 const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
+const selectedVDev = ref<vDevData>();
 
 const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
 const showDeleteConfirm = ref(false);
@@ -327,7 +336,11 @@ const loadingMessage = ref('');
 const loading = ref(false);
 
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
-const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
+const showAddVDevModal = ref(false);
+
+const showRemoveVDevConfirm = ref(false);
+const confirmRemove = ref(false);
+const removing = ref(false);
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
@@ -474,7 +487,6 @@ async function exportThisPool(pool) {
 			confirmExport.value = false;
 			showExportModal.value = false;
 			exporting.value = false;
-			
 		}
 	});
 
@@ -527,10 +539,42 @@ function newPoolWizardBtn() {
 	}
 }
 
+async function removeVDev(pool : PoolData, vDev : vDevData) {
+	selectedPool.value = pool;
+	selectedVDev.value = vDev;
+	showRemoveVDevConfirm.value = true;
+
+	watch(confirmRemove, async (newValue, oldValue) => {
+		if (confirmRemove.value == true) {
+			removing.value = true;
+			console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
+			await removeVDevFromPool(selectedVDev.value, selectedPool.value);
+			disksLoaded.value = false;
+			poolsLoaded.value = false;
+			diskData.value = [];
+			poolData.value = [];
+			await loadDisksThenPools(diskData, poolData);
+			disksLoaded.value = true;
+			poolsLoaded.value = true;
+			confirmRemove.value = false;
+			showRemoveVDevConfirm.value = false;
+			removing.value = false;
+			message.value = "Removed " + vDev.name + " from " + pool.name + " at " + getTimestampString();
+		}
+	});
+
+	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
+
+}
+
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
 provide('show-delete-modal', showDeleteConfirm);
 provide("show-resilver-modal", showResilverModal);
 provide("show-trim-modal", showTrimModal);
 provide("show-export-modal", showExportModal);
+provide("show-vdev-modal", showAddVDevModal);
+provide('show-remove-modal', showRemoveVDevConfirm);
+provide('confirm-remove', confirmRemove);
+provide('removing', removing);
 </script>

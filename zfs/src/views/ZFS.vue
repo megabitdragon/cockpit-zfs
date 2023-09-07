@@ -66,7 +66,6 @@ const confirmExport = ref(false);
 const forceUnmount = ref(false);
 
 const showImportModal = ref(false);
-const showAddVDevModal = ref(false);
 
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
@@ -107,6 +106,6 @@ provide("secure-trim", secureTRIM);
 provide("confirm-export", confirmExport);
 provide("force-unmount", forceUnmount);
 provide("show-import-modal", showImportModal);
-provide('show-vdev-modal', showAddVDevModal);
+
 </script>
 

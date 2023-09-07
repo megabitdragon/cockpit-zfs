@@ -180,7 +180,7 @@ export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
 }
 
 const properties = [
-	"sector",
+	"ashift",
 	"failmode",
 	"comment",
 	"autoexpand",
@@ -430,6 +430,52 @@ export async function importPool(pool) {
 
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function addVDev(pool, vdev) {
+	try {
+		let cmdString = ['zpool', 'add'];
+
+		if (vdev.forceAdd) {
+			cmdString.push('-f');
+		}
+
+		cmdString.push(pool.name);
+		cmdString.push(vdev.type);
+
+		vdev.disks.forEach(disk => {
+			cmdString.push(disk);
+		});
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function removeVDevFromPool(vdev, pool) {
+	try {
+		let cmdString = ['zpool', 'remove'];
+
+		cmdString.push(pool.name);
+		cmdString.push(vdev.name);
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
 		console.log(output)

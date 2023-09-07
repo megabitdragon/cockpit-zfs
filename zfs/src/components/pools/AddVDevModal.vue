@@ -1,10 +1,11 @@
 <template>
-    <Modal @close="showAddVDevModal = false" :isOpen="showAddVDevModal" :marginTop="'mt-48'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal @close="showAddVDevModal = false" :isOpen="showAddVDevModal" :marginTop="props.marginTop" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+        
         <template v-slot:title>
             Add Virtual Device
         </template>
         <template v-slot:content>
-            <div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
+            <div v-for="(vDev, vDevIdx) in props.pool.vdevs" :key="vDevIdx">
                 <!-- Virtual Device (Select) -->
 				<div>
 					<label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-default">Type</label>
@@ -60,11 +61,11 @@
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
                 <ul :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
-                    <li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="my-2">
+                    <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
-                        :class="diskCardClass(disk.name, vDevIdx)">
-                            <label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
-                                <input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
+                        :class="diskCardClass(disk.name)">
+                            <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
+                                <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
                                 <h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
@@ -123,10 +124,13 @@ import { reactive, ref, inject, Ref, computed, provide } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
+import { addVDev } from '../../composables/pools';
+import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
 
 interface AddVDevModalProps {
 	idKey: string;
     pool: PoolData;
+    marginTop: string;
 }
 
 const props = defineProps<AddVDevModalProps>();
@@ -136,14 +140,20 @@ const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
 const newVDev : newVDevData = {
 	type: 'mirror',
 	disks: [],
+    isMirror: false,
+    forceAdd: false,
 }
 
-const diskFeedback = inject<Ref<string>>('feedback-disk')!;
-const diskSizeFeedback = inject<Ref<string>>('feedback-disk-size')!;
-const isProperReplicationFeedback = inject<Ref<string>>('feedback-replication-level')!;
+const selectedDisks = ref<string[]>([])!;
 
+const diskFeedback = ref('')
+const diskSizeFeedback = ref('')
+const isProperReplicationFeedback = ref('')
+
+const pools = inject<Ref<PoolData[]>>('pools')!;
 const poolConfig = inject<Ref<PoolData>>('current-pool-config')!;
 const allDisks = inject<Ref<DiskData[]>>('disks')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 
@@ -156,33 +166,78 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 	});
 });
 
-// const availableDisks = computed<DiskData[]>(() => {
-//     return allDisks.value.filter(disk => disk.usable);
-// });
+const availableDisks = computed<DiskData[]>(() => {
+    // const claimed = newVDev.disks;
+    // return allDisks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
+    return allDisks.value.filter(disk => disk.usable);
+})
 
 //change color of disk when selected
-const diskCardClass = (diskName, vDevIdx) => {
-  const isSelected = poolConfig.value.vdevs[vDevIdx].disks.includes(diskName);
-  return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
+const diskCardClass = (diskName) => {
+    const isSelected = selectedDisks.value.includes(diskName);
+    return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
-function addVDevBtn() {
-    // replicationLevelCheck();
-    // diskSizeMatch();
-    // diskCheck();
+// const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
+// const sdPathRegex = `\/dev\/sd[a-z][0-9]+$`;
+// const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9\-]+(?:-part[0-9]+)?$`;
+const phyPathPrefix = '/dev/disk/by-path/';
+const sdPathPrefix = '/dev/';
+const newDisk = ref();
+const diskName = ref('');
+const diskPath = ref('');
 
-    showAddVDevModal.value = false;
+async function addVDevBtn() {
+    if (replicationLevelCheck()) {
+        if (diskSizeMatch()) {
+            if (diskCheck()) {
+                selectedDisks.value.forEach(selectedDisk => {
+                    newDisk.value = allDisks.value.find(disk => disk.name === selectedDisk);
+                    switch (diskIdentifier.value) {
+                        case 'vdev_path':
+                            diskPath.value = newDisk.value!.vdev_path;
+                            diskName.value = selectedDisk;
+                            break;
+                        case 'phy_path':
+                            diskPath.value = newDisk.value!.phy_path;
+                            diskName.value = diskPath.value.replace(phyPathPrefix, '');
+                            break;
+                        case 'sd_path':
+                            diskPath.value = newDisk.value!.sd_path;
+                            diskName.value = diskPath.value.replace(sdPathPrefix, '');
+                            break;	
+                        default:
+                            console.log('error with selectedDisks/diskIdentifier'); 
+                            break;
+                    }
+                    console.log('disk:', diskName.value);
+                    newVDev.disks.push(diskName.value);
+                    console.log('newVdev.disks:', newVDev.disks);
+                });
+
+                addVDev(props.pool, newVDev);
+
+                showAddVDevModal.value = false;
+                allDisks.value = [];
+                pools.value = [];
+                await loadDisksThenPools(allDisks, pools);
+                datasets.value = [];
+                await loadDatasets(datasets);
+            }
+        }
+    }
+    
+   
 }
 
 const replicationLevelCheck = () => {
 	let result = true;
 	isProperReplicationFeedback.value = '';
-
 	
-    if ((newVDev.type == 'dedup' || newVDev.type == 'special') && !newVDev!.forceAdd && !newVDev.isMirror) {
+    if ((newVDev.type == 'dedup' || newVDev.type == 'special') && !newVDev.forceAdd && !newVDev.isMirror) {
         result = false;
         isProperReplicationFeedback.value = 'Mismatched replication level. Forcefully create to override.';
-    } else if (newVDev.isMirror && (newVDev.type == 'special' || newVDev.type == 'dedup' || newVDev.type == 'log') && newVDev.disks.length < 2) {
+    } else if (newVDev.isMirror && (newVDev.type == 'special' || newVDev.type == 'dedup' || newVDev.type == 'log') && selectedDisks.value.length < 2) {
         result = false;
         isProperReplicationFeedback.value = `Two or more Disks are required for Mirror (${upperCaseWord(newVDev.type)}).`;
     }
@@ -198,22 +253,22 @@ const diskSizeMatch = () => {
 		return true;
 	}
 
-		let previousCapacity = 0;
+    let previousCapacity = 0;
 
-    newVDev.disks.forEach(selDisk => {
+    selectedDisks.value.forEach(selDisk => {
         const disk = allDisks.value.find(fullDisk => fullDisk.name == selDisk);
         
         if (disk) {
             const currentCapacity = convertSizeToBytes(disk.capacity);
 
             if (previousCapacity != 0 && currentCapacity != previousCapacity) {
-                result = false;
                 diskSizeFeedback.value = `Mirror contains devices of different sizes. Forcefully create to override.\n`;
+                result = false;
             }
 
             previousCapacity = currentCapacity;
         }
-                
+
     });
 
 	return result;
@@ -224,36 +279,36 @@ const diskCheck = () => {
 	let result = true;
 	diskFeedback.value = '';
 	
-    if (newVDev.type == 'mirror' && newVDev.disks.length < 2) {
-        result = false;
+    if (newVDev.type == 'mirror' &&  selectedDisks.value.length < 2) {
         diskFeedback.value = 'Two or more Disks are required for Mirror.';
-    } else if (newVDev.type == 'raidz1' && newVDev.disks.length < 2) {
         result = false;
+    } else if (newVDev.type == 'raidz1' &&  selectedDisks.value.length < 2) {
         diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
-    } else if (newVDev.type == 'raidz2' && newVDev.disks.length < 3) {
         result = false;
+    } else if (newVDev.type == 'raidz2' &&  selectedDisks.value.length < 3) {
         diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
-    } else if (newVDev.type == 'raidz3' && newVDev.disks.length < 4) {
         result = false;
+    } else if (newVDev.type == 'raidz3' &&  selectedDisks.value.length < 4) {
         diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
-    } else if (newVDev.type == 'disk' && newVDev.disks.length < 1) {
         result = false;
+    } else if (newVDev.type == 'disk' &&  selectedDisks.value.length < 1) {
         diskFeedback.value = 'At least one Disk is required.';
-    } else if (newVDev.type == 'log' && newVDev.disks.length < 1) {
         result = false;
+    } else if (newVDev.type == 'log' &&  selectedDisks.value.length < 1) {
         diskFeedback.value = 'At least one Disk is required for Log.';
-    } else if (newVDev.type == 'cache' && newVDev.disks.length < 1) {
         result = false;
+    } else if (newVDev.type == 'cache' &&  selectedDisks.value.length < 1) {
         diskFeedback.value = 'At least one Disk is required for Cache.';		
-    } else if (newVDev.type == 'special' && newVDev.disks.length < 1) {
         result = false;
+    } else if (newVDev.type == 'special' &&  selectedDisks.value.length < 1) {
         diskFeedback.value = 'At least one Disk is required for Special.';
-    } else if (newVDev.type == 'spare' && newVDev.disks.length < 1) {
         result = false;
+    } else if (newVDev.type == 'spare' &&  selectedDisks.value.length < 1) {
         diskFeedback.value = 'At least one Disk is required for Spare.';
-    } else if (newVDev.type == 'dedup' && newVDev.disks.length < 1) {
         result = false;
+    } else if (newVDev.type == 'dedup' &&  selectedDisks.value.length < 1) {
         diskFeedback.value = 'At least one Disk is required for Dedup.';
+        result = false;
     } 
 
 	return result;

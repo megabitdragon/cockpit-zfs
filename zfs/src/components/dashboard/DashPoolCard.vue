@@ -141,7 +141,7 @@
 	</div>
 
 	<div v-if="showAddVDevModal">
-		<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="selectedPool!"/>
+		<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="selectedPool!" :marginTop="'mt-28'"/>
 	</div>
 
 	<div v-if="showDeleteConfirmModal">
@@ -207,7 +207,7 @@ const showExportModal = ref(false);
 const confirmExport = inject<Ref<boolean>>('confirm-export')!;
 const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
 
-const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
+const showAddVDevModal = ref(false);
 
 const exporting = ref(false);
 const trimmed = ref(false);
@@ -397,6 +397,35 @@ async function clearAlerts(pool) {
 	cleared.value = true;
 }
 
+const poolConfig = ref<PoolData>({
+	name: props.pool.name,
+	status: props.pool.status,
+	guid: props.pool.guid,
+	properties: {
+		rawsize: props.pool.properties.rawsize,
+		size: props.pool.properties.size,
+		allocated: props.pool.properties.allocated,
+		capacity: props.pool.properties.capacity,
+		free: props.pool.properties.free,
+		sector: props.pool.properties.sector,
+		record: props.pool.properties.record,
+		compression: props.pool.properties.compression,
+		deduplication: props.pool.properties.deduplication,
+		refreservationPercent: props.pool.properties.refreservationPercent,
+		autoExpand: props.pool.properties.autoExpand,
+		autoReplace: props.pool.properties.autoReplace,
+		autoTrim: props.pool.properties.autoTrim,
+		forceCreate: props.pool.properties.forceCreate,
+		delegation: props.pool.properties.delegation,
+		displaySnapshots: props.pool.properties.displaySnapshots,
+		readOnly: props.pool.properties.readOnly,
+	},
+	vdevs: props.pool.vdevs,
+	failMode: props.pool.failMode,
+	comment: props.pool.comment,
+});
+
+
 function showAddVDev(pool) {
 	selectedPool.value = pool;
 	console.log(selectedPool);
@@ -409,4 +438,6 @@ provide('show-delete-modal', showDeleteConfirmModal);
 provide("show-resilver-modal", showResilverModal);
 provide("show-trim-modal", showTrimModal);
 provide("show-export-modal", showExportModal);
+provide('show-vdev-modal', showAddVDevModal);
+provide('current-pool-config', poolConfig);
 </script>

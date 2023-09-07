@@ -288,7 +288,7 @@
 	</Modal>
 
 	<CreateSnapshotModal @close="showSnapshotModal = false"/>
-	<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="props.pool"/>
+	<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
 </template>
 
 <script setup lang="ts">
@@ -341,7 +341,7 @@ const poolConfig = ref<PoolData>({
 });
 
 const showSnapshotModal = ref(false);
-const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
+const showAddVDevModal = ref(false);
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
 const snapshots = ref<Snapshot[]>([]);
@@ -447,10 +447,6 @@ async function checkForChanges(poolDataCheck) {
 	if (poolDataCheck.properties.autoTrim != props.pool.properties.autoTrim) {
 		updatedProperties.autotrim = isBoolOnOff(poolDataCheck.properties.autoTrim);
 	}
-	//multihost
-	// if (poolDataCheck.properties.multiHost != props.pool.properties.multiHost) {
-	// 	updatedProperties.multihost = isBoolOnOff(poolDataCheck.properties.multiHost);
-	// }
 	//delegation
 	if (poolDataCheck.properties.delegation != props.pool.properties.delegation) {
 		updatedProperties.delegation = isBoolOnOff(poolDataCheck.properties.delegation);
@@ -516,4 +512,5 @@ const getIdKey = (name: string) => `${name}`;
 
 provide('create-snap-modal', showSnapshotModal);
 provide('current-pool-config', poolConfig);
+provide('show-vdev-modal', showAddVDevModal);
 </script>

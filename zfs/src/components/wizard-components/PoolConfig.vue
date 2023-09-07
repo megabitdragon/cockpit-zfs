@@ -341,7 +341,6 @@ const createFileSystemCardClass = (createFileSystem : boolean) => {
 	return isCreateFS ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
-
 //method for adding initial vdev with default values 
 function initialVDev() {
 	const vDevConfig: vDevData = {
@@ -595,19 +594,17 @@ function fillNewPoolData() {
 		newVDev.isMirror = vDev.isMirror;
 
 		vDev.selectedDisks.forEach(selectedDisk => {
+			newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
 			switch (diskIdentifier.value) {
 				case 'vdev_path':
-					newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
 					diskPath.value = newDisk.value!.vdev_path;
 					diskName.value = selectedDisk;
 					break;
 				case 'phy_path':
-					newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
 					diskPath.value = newDisk.value!.phy_path;
 					diskName.value = diskPath.value.replace(phyPathPrefix, '');
 					break;
 				case 'sd_path':
-					newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
 					diskPath.value = newDisk.value!.sd_path;
 					diskName.value = diskPath.value.replace(sdPathPrefix, '');
 					break;	
