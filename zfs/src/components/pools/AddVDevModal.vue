@@ -220,8 +220,8 @@ async function addVDevBtn() {
                 showAddVDevModal.value = false;
                 allDisks.value = [];
                 pools.value = [];
-                await loadDisksThenPools(allDisks, pools);
                 datasets.value = [];
+                await loadDisksThenPools(allDisks, pools);
                 await loadDatasets(datasets);
             }
         }

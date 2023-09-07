@@ -110,18 +110,18 @@
 			<div v-if="navTag == 'settings'">
 				<div class="grid grid-cols-4 gap-2">
 					<div class="mt-2 col-span-1 col-start-1 row-start-1">
-						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-default">Pool</p><p>{{ poolConfig.name }}</p>
+						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-default">Pool</p><p class="mt-1 py-1.5">{{ poolConfig.name }}</p>
 					</div>
 					<div class="mt-2 col-span-1 col-start-2 row-start-1">
-						<p :id="getIdKey('settings-pool-readonly')" name="settings-pool-readonly" class="text-base text-default">Read Only</p><p>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.readOnly)) }}</p>
+						<p :id="getIdKey('settings-pool-readonly')" name="settings-pool-readonly" class="text-base text-default">Read Only</p><p class="mt-1 py-1.5">{{ upperCaseWord(isBoolOnOff(poolConfig.properties.readOnly)) }}</p>
 					</div>
-					<div class="mt-2 col-span-2 col-start-3 row-start-1">
-						<p :id="getIdKey('settings-pool-guid')" name="settings-pool-guid" class="text-base text-default">GUID</p><p>{{ poolConfig.guid }}</p>
+					<div class="mt-2 col-span-1 col-start-3 row-start-1">
+						<p :id="getIdKey('settings-pool-guid')" name="settings-pool-guid" class="text-base text-default">GUID</p><p class="mt-1 py-1.5">{{ poolConfig.guid }}</p>
 					</div>
 
-					<div class="mt-2 col-span-2 col-start-1 row-start-2">
+					<div class="mt-2 col-span-1 col-start-4 row-start-1">
 						<label :for="getIdKey('settings-pool-sector-size')" class="bg-default block text-base leading-6 text-default">Sector Size</label>
-						<select :id="getIdKey('settings-pool-sector-size')" v-model="poolConfig.properties.sector" name="pool-sector-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<!-- <select :id="getIdKey('settings-pool-sector-size')" v-model="poolConfig.properties.sector" name="pool-sector-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
 							<option value="auto">Auto Detect</option>
 							<option value="9">512 B</option>
 							<option value="12">4 KiB</option>
@@ -129,23 +129,25 @@
 							<option value="14">16 KiB</option>
 							<option value="15">32 KiB</option>
 							<option value="16">64 KiB</option>
-						</select>
+						</select> -->
+						<p :id="getIdKey('settings-pool-sector-size')" name="settings-pool-sector-size" class="mt-1 py-1.5">{{ calculateSectorSize(Number(poolConfig.properties.sector)) }}</p>
 					</div>
-					<div class="mt-2 col-span-2 col-start-3 row-start-2">
+
+					<div class="mt-2 col-span-1 col-start-1 row-start-2">
 						<label :for="getIdKey('settings-pool-fail-mode')" class="bg-default block text-base leading-6 text-default">Fail Mode</label>
-						<select :id="getIdKey('settings-pool-fail-mode')" v-model="poolConfig.failMode" name="pool-fail-mode" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<select :id="getIdKey('settings-pool-fail-mode')" v-model="poolConfig.failMode" name="pool-fail-mode" class="mt-1 block w-full rounded-md border-0 py-1.5 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
 							<option value="wait">Wait</option>
 							<option value="continue">Continue</option>
 							<option value="panic">Panic</option>
 						</select>
 					</div>
-					<div class="mt-2 col-span-4 col-start-1 row-start-3">
+					<div class="mt-2 col-span-3 col-start-2 row-start-2">
 						<p :for="getIdKey('settings-pool-comment')" class="text-base text-default">Comment</p>
 						<input :id="getIdKey('settings-pool-comment')" v-model="poolConfig.comment" name="setting-pool-comment" placeholder="Enter a comment here" type="text" class="input-textlike mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
 					</div>
 
 					<!-- auto-expand -->
-					<div class="col-span-1 col-start-1 row-start-4">
+					<div class="col-span-1 col-start-1 row-start-3">
 						<label :for="getIdKey('settings-pool-auto-expand')" class="mt-1 block text-sm leading-6 text-default">Auto-Expand Pool</label>
 						<Switch v-model="poolConfig.properties.autoExpand" :id="getIdKey('settings-pool-auto-expand')" :class="[poolConfig.properties.autoExpand ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
@@ -165,7 +167,7 @@
 					</div>
 
 					<!-- auto-replace -->
-					<div class="col-span-1 col-start-2 row-start-4">
+					<div class="col-span-1 col-start-2 row-start-3">
 						<label :for="getIdKey('settings-pool-auto-replace')" class="mt-1 block text-sm leading-6 text-default">Auto-Replace Drives</label>
 						<Switch v-model="poolConfig.properties.autoReplace" :id="getIdKey('settings-pool-auto-replace')" :class="[poolConfig.properties.autoReplace ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
@@ -185,7 +187,7 @@
 					</div>
 
 					<!-- auto-trim -->
-					<div class="col-span-2 col-start-3 row-start-4">
+					<div class="col-span-2 col-start-3 row-start-3">
 						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-default">List Snapshots With File Systems</label>
 						<Switch v-model="poolConfig.properties.displaySnapshots" :id="getIdKey('settings-pool-display-snapshots')" :class="[poolConfig.properties.displaySnapshots ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
@@ -205,7 +207,7 @@
 					</div>
 
 					<!-- delegation (Allow non-priveleged user access based on the dataset permissions)-->
-					<div class="col-span-2 col-start-1 row-start-5">
+					<div class="col-span-2 col-start-1 row-start-4">
 						<label :for="getIdKey('settings-pool-delegation')" class="mt-1 block text-sm leading-6 text-default">Delegation</label>
 						<p class="text-xs">(non-privleged access based on dataset permissions)</p>
 						<Switch v-model="poolConfig.properties.delegation" :id="getIdKey('settings-pool-delegation')" :class="[poolConfig.properties.delegation ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
@@ -226,7 +228,7 @@
 					</div>
 
 					<!-- display snapshots in filesystem list -->
-					<div v-if="props.pool.diskType == 'SSD' || props.pool.diskType == 'Hybrid'" class="col-span-1 col-start-3 row-start-5">						
+					<div v-if="props.pool.diskType == 'SSD' || props.pool.diskType == 'Hybrid'" class="col-span-1 col-start-3 row-start-4">						
 						<label :for="getIdKey('settings-pool-auto-trim')" class="mt-1 block text-sm leading-6 text-default">Auto-TRIM Pool</label>
 						<Switch v-model="poolConfig.properties.autoTrim" :id="getIdKey('settings-pool-auto-trim')" :class="[poolConfig.properties.autoTrim ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
@@ -256,6 +258,7 @@
 				<div class="justofy-self-center">
 					<div class="button-group-row mt-2 justify-self-center">
 						<p class="text-danger" v-if="commentFeedback">{{ commentFeedback }}</p>
+
 					</div>
 				</div>
 				<div class="justify-self-end">
@@ -289,10 +292,11 @@
 
 	<CreateSnapshotModal @close="showSnapshotModal = false"/>
 	<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
+	<!-- <ConfirmSectorSize @close="showConfirmSector = false" :idKey="getIdKey(`show-confirm-sector`)" :sector="calculateSectorSize(Number(props.pool.properties.sector!))"/> -->
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, inject, Ref, computed, provide } from 'vue';
+import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
@@ -305,6 +309,7 @@ import CreateSnapshotModal from './CreateSnapshotModal.vue';
 import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../pools/PoolDetailDiskCard.vue';
 import { loadDisksThenPools } from '../../composables/loadData';
+import ConfirmSectorSize from '../common/confirmation/ConfirmSectorSize.vue';
 
 interface PoolDetailsProps {
 	pool: PoolData;
@@ -357,6 +362,9 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
 const commentFeedback = ref('');
+
+// const confirmChangeSector = ref(false);
+// const showConfirmSector = ref(false);
 
 getSnapshots().then(rawJSON => {
 	const parsedJSON = (JSON.parse(rawJSON));
@@ -422,11 +430,59 @@ const updatedProperties: Partial<PoolEditConfig> = ({
 	readonly: isBoolOnOff(poolConfig.value.properties.readOnly),
 });
 
+// const sectorChanged = ref(false);
+
+function calculateSectorSize(exponent) {
+	// Calculate the sector size in bytes
+	const bytes = Math.pow(2, exponent);
+	const result = ref('');
+
+	if (bytes > 1024) {
+		// Convert bytes to KiB
+		const kiB = bytes / 1024;
+		result.value = `${kiB} KiB`;
+	} else {
+		result.value = `${bytes} B`;
+	}
+	  return result.value;
+}
+
+
+// function checkSectorChange(poolDataCheck) {
+// 	if (poolDataCheck.properties.sector != props.pool.properties.sector) {
+// 		console.log('sector changed');
+// 		return true;
+// 	} else {
+// 		console.log('sector same');
+// 		return false;
+// 	}
+// }
+
+// async function ifSectorChange(boolCheck) {
+// 	if (boolCheck) {
+// 		showConfirmSector.value = true;
+// 		console.log('modal trigger:', showConfirmSector.value);
+// 		watch (confirmChangeSector, async (newVal, oldVal) => {
+// 			if (confirmChangeSector.value == true) {
+// 				sectorChanged.value = true;
+// 				showConfirmSector.value = false;
+// 			}
+// 		});
+// 	}
+// }
+
 async function checkForChanges(poolDataCheck) {
 	//sector
-	if (poolDataCheck.properties.sector != props.pool.properties.sector) {
-		updatedProperties.ashift = poolDataCheck.properties.sector;
-	}
+	// if (poolDataCheck.properties.sector != props.pool.properties.sector) {
+	// 	updatedProperties.ashift = poolDataCheck.properties.sector;
+	// }
+	// await ifSectorChange(checkSectorChange(poolDataCheck));
+
+	// if(sectorChanged.value == true) {
+	// 	updatedProperties.ashift = poolDataCheck.properties.sector;
+	// 	console.log('updatedProps.ashift:', updatedProperties.ashift, 'poolDataCheck.sector:', poolDataCheck.properties.sector)
+	// }
+
 	//failmode
 	if (poolDataCheck.failMode != props.pool.failMode) {
 		updatedProperties.failmode = poolDataCheck.failMode;
@@ -464,9 +520,10 @@ async function checkForChanges(poolDataCheck) {
     newChangesToPool.value = newChanges;
 }
 
-async function poolConfigureBtn() {
+async function poolConfigureBtn() {	
 	if (commentLengthCheck(poolConfig.value)) {
 		console.log('pool:', poolConfig.value);
+
 		await checkForChanges(poolConfig.value);
 		console.log('newChanges:', newChangesToPool.value);
 		saving.value = true;
@@ -513,4 +570,6 @@ const getIdKey = (name: string) => `${name}`;
 provide('create-snap-modal', showSnapshotModal);
 provide('current-pool-config', poolConfig);
 provide('show-vdev-modal', showAddVDevModal);
+// provide('show-confirm-sector', showConfirmSector);
+// provide('confirm-sector', confirmChangeSector);
 </script>
