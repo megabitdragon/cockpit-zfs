@@ -151,24 +151,17 @@ const diskSizeFeedback = ref('')
 const isProperReplicationFeedback = ref('')
 
 const pools = inject<Ref<PoolData[]>>('pools')!;
-const poolConfig = inject<Ref<PoolData>>('current-pool-config')!;
+
 const allDisks = inject<Ref<DiskData[]>>('disks')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 
-const vDevAvailDisks = computed<DiskData[][]>(() => {
-	return poolConfig.value.vdevs.map((vdev, vdevIdx) => {
-		const claimed = poolConfig.value.vdevs
-		.filter((_, idx) => idx !== vdevIdx)
-		.flatMap(vdev => vdev.disks);
-		return allDisks.value.filter(disk => disk.usable && !claimed.includes(disk));
-	});
-});
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const availableDisks = computed<DiskData[]>(() => {
-    // const claimed = newVDev.disks;
-    // return allDisks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
     return allDisks.value.filter(disk => disk.usable);
 })
 
@@ -178,9 +171,6 @@ const diskCardClass = (diskName) => {
     return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
-// const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
-// const sdPathRegex = `\/dev\/sd[a-z][0-9]+$`;
-// const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9\-]+(?:-part[0-9]+)?$`;
 const phyPathPrefix = '/dev/disk/by-path/';
 const sdPathPrefix = '/dev/';
 const newDisk = ref();
@@ -218,11 +208,17 @@ async function addVDevBtn() {
                 addVDev(props.pool, newVDev);
 
                 showAddVDevModal.value = false;
+               disksLoaded.value = false;
+                poolsLoaded.value = false;
+                fileSystemsLoaded.value = false;
                 allDisks.value = [];
                 pools.value = [];
                 datasets.value = [];
                 await loadDisksThenPools(allDisks, pools);
                 await loadDatasets(datasets);
+                disksLoaded.value = true;
+                poolsLoaded.value = true;
+                fileSystemsLoaded.value = true;
             }
         }
     }

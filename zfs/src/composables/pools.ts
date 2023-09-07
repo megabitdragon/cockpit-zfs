@@ -180,7 +180,7 @@ export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
 }
 
 const properties = [
-	"ashift",
+	// "ashift",
 	"failmode",
 	"comment",
 	"autoexpand",
