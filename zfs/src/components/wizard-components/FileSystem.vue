@@ -485,6 +485,7 @@ const poolConfig = inject<PoolData>("pool-config-data")!;
 
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const nameFeedback = ref('');
 const passphrase = ref('');
@@ -493,7 +494,6 @@ const passFeedback = ref('');
 
 const quotaFeedback = ref('');
 
-const parentPool = ref<PoolData>();
 const saving = ref(false);
 
 const newFileSystemConfig = ref<FileSystemData>({
@@ -721,10 +721,12 @@ async function fsCreateBtn(fileSystem) {
 					fillDatasetData();
 					saving.value = true;
 					createDataset(newDataset.value).then(async() => {
+						fileSystemsLoaded.value = false;
 						datasets.value = [];
 						await loadDatasets(datasets);
 						showFSWizard.value = false;
 						saving.value = false;
+						fileSystemsLoaded.value = true;
 					});
 				}
 			}
@@ -734,10 +736,12 @@ async function fsCreateBtn(fileSystem) {
 				fillDatasetData();
 				saving.value = true;
 				createDataset(newDataset.value).then(async() => {
+					fileSystemsLoaded.value = false;
 					datasets.value = [];
 					await loadDatasets(datasets);
 					showFSWizard.value = false;
 					saving.value = false;
+					fileSystemsLoaded.value = true;
 				});
 			}
 		}
