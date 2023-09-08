@@ -2,7 +2,7 @@ import { reactive, ref, Ref, inject, computed, provide } from 'vue';
 import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
-import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString } from "./helpers";
+import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath } from "./helpers";
 
 const vDevs = ref<vDevData[]>([]);
 
@@ -202,6 +202,7 @@ export async function loadDatasets(datasets) {
 					
 				},
 				children: parsedJSON[i].children,
+				parentFS: getParentPath(parsedJSON[i].name),
 			}
 
 			datasets.value.push(dataset);

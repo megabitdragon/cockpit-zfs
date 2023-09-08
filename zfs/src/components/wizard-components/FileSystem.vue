@@ -467,7 +467,7 @@
 <script setup lang="ts">
 import { ref, Ref, inject } from 'vue';
 import { Switch } from '@headlessui/vue';
-import { convertSizeToBytes, convertBytesToSize, isBoolOnOff } from '../../composables/helpers';
+import { convertSizeToBytes, convertBytesToSize, isBoolOnOff, getParentPath } from '../../composables/helpers';
 import { createDataset } from '../../composables/datasets';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
@@ -538,7 +538,7 @@ const newFileSystemConfig = ref<FileSystemData>({
     children: [],
 });
 
-console.log('poolConfig', poolConfig);
+// console.log('poolConfig', poolConfig);
 
 function getInheritedProperties() {
 	if (props.isStandalone) {
@@ -571,8 +571,8 @@ function getInheritedProperties() {
 			newFileSystemConfig.value.properties.extendedAttributes = selectedDataset?.properties.extendedAttributes!;
 		}
 
-		console.log("newFileSystemConfig");
-		console.log(newFileSystemConfig);
+		// console.log("newFileSystemConfig");
+		// console.log(newFileSystemConfig);
 	} else {
 		fileSystemConfig.value.parentFS = poolConfig.name;
 
@@ -598,8 +598,8 @@ function getInheritedProperties() {
 			fileSystemConfig.value.properties.extendedAttributes = 'sa';
 		}
 
-		console.log("fileSystemConfig");
-		console.log(fileSystemConfig);
+		// console.log("fileSystemConfig");
+		// console.log(fileSystemConfig);
 	}
 }
 
@@ -610,35 +610,41 @@ const nameCheck = (fileSystem : FileSystemData) => {
 	if (fileSystem.name == '') {
 		result = false;
 		nameFeedback.value = 'Name cannot be empty.';
-	} else if (fileSystem.name.match(/^[0-9]/) ) {
+	} else if (!fileSystem.name.match(/^[a-zA-Z0-9]/) ) {
 		result = false;
-		nameFeedback.value = 'Name cannot begin with numbers.';
-	} else if (fileSystem.name.match(/^[.]/ )) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with a period (.).';
-	} else if (fileSystem.name.match(/^[_]/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with an underscore (_).';
-	} else if (fileSystem.name.match(/^[-]/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with a hyphen (-).';
-	} else if (fileSystem.name.match(/^[:]/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with a colon (:).';
+		nameFeedback.value = 'Name must begin with alphanumeric characters.';
 	} else if (fileSystem.name.match(/^[ ]/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with whitespace.';
 	} else if (fileSystem.name.match(/[ ]$/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot end with whitespace.';
-	} else if (fileSystem.name.match(/^c[0-9]|^log|^mirror|^raidz|^raidz1|^raidz2|^raidz3|^spare/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with a reserved name.';
 	} else if (!fileSystem.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
 		result = false;
 		nameFeedback.value = 'Name contains invalid characters.';
-	} 
-	return result;
+	} else if (fileSystemNameExists(fileSystem, datasets.value)) {
+		result = false;
+		nameFeedback.value = `Name already exists in this location: ${fileSystem.parentFS}.`;
+	}
+
+    return result;
+}
+
+function fileSystemNameExists(filesystem : FileSystemData, datasets : FileSystemData[]) {
+	const newParentPath = filesystem.parentFS;
+	//console.log('newParentPath:', newParentPath);
+	for (const dataset of datasets) {
+		const existingParentPath = dataset.parentFS;
+		const existingDatasetName = dataset.name.split('/').pop();
+		// console.log('existingParentPath:', existingParentPath, 'datasetName:', existingDatasetName);
+		// console.log('filesystemName:', filesystem.name);
+		if (existingParentPath === newParentPath && existingDatasetName === filesystem.name) {
+			//console.log('returning true');
+			return true;
+		}
+	}
+
+	return false;
 }
 
 const encryptPasswordCheck = (fileSystem : FileSystemData) => {

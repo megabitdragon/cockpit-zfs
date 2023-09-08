@@ -135,3 +135,8 @@ export const getPoolDiskType = (pool) => {
 	}
 };
   
+export function getParentPath(datasetName) {
+	const segments = datasetName.split('/');
+	segments.pop();
+	return segments.join('/');
+}
