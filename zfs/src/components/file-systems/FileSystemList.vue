@@ -212,7 +212,6 @@ function deleteFileSystem(fileSystem) {
 			isDeleting.value = false;
 		}
 	});
-	
 }
 
 provide('show-fs-wizard', showNewFSWizard);

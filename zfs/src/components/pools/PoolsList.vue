@@ -82,7 +82,7 @@
 															<a href="#" @click="showPoolModal(poolData[poolIdx])!" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="clearThisPoolErrors(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+															<a href="#" @click="clearPoolErrors(poolData[poolIdx].name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="resilverThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
@@ -130,7 +130,7 @@
 														<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 															<div class="py-1">												
 																<MenuItem as="div" v-slot="{ active }">
-																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
+																	<a href="#" @click="clearVDevErrors(pool.name, vDev.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 																</MenuItem>
 																<MenuItem v-if="vDevIdx != 0" as="div" v-slot="{ active }">
 																	<a href="#" @click="removeVDev(poolData[poolIdx], poolData[poolIdx].vdevs[vDevIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
@@ -185,7 +185,7 @@
 																						<a href="#" @click="showDiskModal(disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Disk Details</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
+																						<a href="#" @click="clearDiskErrors(pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
@@ -276,7 +276,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors, exportPool, importPool, removeVDevFromPool } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, importPool, removeVDevFromPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
@@ -458,11 +458,24 @@ async function scrubThisPool(pool) {
 	message.value = "Scrub on " + pool.name + " ended at " + getTimestampString();
 }
 
-async function clearThisPoolErrors(pool) {
+async function clearPoolErrors(poolName) {
 	cleared.value = false;
-	await clearPoolErrors(pool);
+	await clearErrors(poolName);
 	cleared.value = true;
 }
+
+async function clearVDevErrors(poolName, vDevName) {
+	cleared.value = false;
+	await clearErrors(poolName, vDevName);
+	cleared.value = true;
+}
+
+async function clearDiskErrors(poolName, diskName) {
+	cleared.value = false;
+	await clearErrors(poolName, diskName);
+	cleared.value = true;
+}
+
 
 async function exportThisPool(pool) {
 	cleared.value = false;

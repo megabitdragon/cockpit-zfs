@@ -234,9 +234,16 @@ function hasChanges(pool) {
 	return false;
 }
 
-export async function clearPoolErrors(pool) {
+export async function clearErrors(poolName, deviceName?) {
 	try {
-		const state = useSpawn(['zpool', 'clear', pool.name]);
+		let cmdString = ['zpool', 'clear'];
+		cmdString.push(poolName);
+
+		if(deviceName) {
+			cmdString.push(deviceName);
+		}
+		
+		const state = useSpawn(cmdString);
 		const output = await state.promise();
 		console.log(output)
 		return output.stdout;

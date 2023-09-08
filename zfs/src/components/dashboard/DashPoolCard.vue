@@ -20,7 +20,7 @@
 										<a href="#" @click="showDetails(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a href="#" @click="clearThisPoolErrors(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+										<a href="#" @click="clearPoolErrors(props.pool.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 									</MenuItem>
 									<!-- <MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click="clearAlerts(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Alerts</a>
@@ -166,7 +166,7 @@ import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors, exportPool } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { getTimestampString } from "../../composables/helpers";
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
@@ -390,9 +390,9 @@ async function scrubThisPool(pool) {
 
 }
 
-async function clearThisPoolErrors(pool) {
+async function clearPoolErrors(poolName) {
 	cleared.value = false;
-	await clearPoolErrors(pool);
+	await clearErrors(poolName);
 	cleared.value = true;
 }
 

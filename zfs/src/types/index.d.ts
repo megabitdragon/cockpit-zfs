@@ -67,6 +67,7 @@ interface vDevData {
 	poolName?: string;
 	isMirror?: boolean;
 	diskType?: 'SSD' | 'HDD' | 'Hybrid';
+	diskIdentifier?: DiskIdentifier;
 	path?: string;
 }
 

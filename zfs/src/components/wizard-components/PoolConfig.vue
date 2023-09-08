@@ -34,7 +34,7 @@
 				<!-- Disk ID (Select) -->
 				<div>
 					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
-					<select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
+					<select :id="getIdKey('disk-identifier')" v-model="poolConfig.vdevs[vDevIdx].diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
 						<option value="sd_path">Block Device</option>
 						<!-- <option value="">Disk/WWN</option> -->
 						<option value="phy_path">Hardware Path</option>
@@ -53,7 +53,7 @@
 								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
 								<p class="truncate text-sm font-medium text-default">{{ disk.name }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
-								<p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
+								<p class="mt-1 truncate text-sm text-default">{{ disk[poolConfig.vdevs[vDevIdx].diskIdentifier!] }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
 							</label>
 						</button>
@@ -351,6 +351,7 @@ function initialVDev() {
 		stats: {},
 		disks: [],
 		selectedDisks: [],
+		diskIdentifier: 'vdev_path',
 	}
 
 	poolConfig.value.vdevs.push(vDevConfig);
@@ -366,6 +367,7 @@ function addVDev() {
 		stats: {},
 		disks: [],
 		selectedDisks: [],
+		diskIdentifier: 'vdev_path',
 	}
 
   	poolConfig.value.vdevs.push(vDevConfig);
@@ -574,9 +576,9 @@ const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
 const newVDevs = ref<newVDevData[]>([]);
 const newVDevDisks = ref<string[]>([]);
 
-const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
-const sdPathRegex = `\/dev\/sd[a-z][0-9]+$`;
-const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9\-]+(?:-part[0-9]+)?$`;
+// const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
+// const sdPathRegex = `\/dev\/sd[a-z][0-9]+$`;
+// const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9\-]+(?:-part[0-9]+)?$`;
 const phyPathPrefix = '/dev/disk/by-path/';
 const sdPathPrefix = '/dev/';
 const newDisk = ref();
@@ -595,7 +597,7 @@ function fillNewPoolData() {
 
 		vDev.selectedDisks.forEach(selectedDisk => {
 			newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
-			switch (diskIdentifier.value) {
+			switch (vDev.diskIdentifier!) {
 				case 'vdev_path':
 					diskPath.value = newDisk.value!.vdev_path;
 					diskName.value = selectedDisk;
