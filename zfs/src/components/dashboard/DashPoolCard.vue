@@ -144,8 +144,8 @@
 		<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="selectedPool!" :marginTop="'mt-28'"/>
 	</div>
 
-	<div v-if="showDeleteConfirmModal">
-		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" @close="showDeleteConfirmModal = false"/>
+	<div v-if="showDeletePoolConfirm">
+		<ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" @close="showDeletePoolConfirm = false"/>
 	</div>
 
 	<div v-if="showResilverModal">
@@ -170,7 +170,7 @@ import { destroyPool, trimPool, scrubPool, resilverPool, clearPoolErrors, export
 import { getTimestampString } from "../../composables/helpers";
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
-import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
+import ConfirmDeletePoolModal from "../common/confirmation/ConfirmDeletePoolModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
@@ -195,8 +195,11 @@ const diskData = inject<Ref<DiskData[]>>("disks")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
-const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
-const showDeleteConfirmModal = ref(false);
+const confirmDelete = inject<Ref<boolean>>('confirm-delete-pool')!;
+	
+const showDeletePoolConfirm = ref(false);
+//const showDeleteConfirm = inject<Ref<boolean>>('show-delete-confirm')!;
+
 const deleting = inject<Ref<boolean>>('deleting')!;
 const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
 const showResilverModal = ref(false);
@@ -256,7 +259,7 @@ function showDetails(pool) {
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
-	showDeleteConfirmModal.value = true;
+	showDeletePoolConfirm.value = true;
 	
 	watch(confirmDelete, async (newValue, oldValue) => {
 	
@@ -272,7 +275,7 @@ async function destroyPoolAndUpdate(pool) {
 			disksLoaded.value = true;
 			poolsLoaded.value = true;
 			confirmDelete.value = false;
-			showDeleteConfirmModal.value = false;
+			showDeletePoolConfirm.value = false;
 			deleting.value = false;
 		}
 	});
@@ -434,7 +437,7 @@ function showAddVDev(pool) {
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
 provide('show-pool-deets', showPoolDetails);
-provide('show-delete-modal', showDeleteConfirmModal);
+provide('show-delete-pool-confirm', showDeletePoolConfirm);
 provide("show-resilver-modal", showResilverModal);
 provide("show-trim-modal", showTrimModal);
 provide("show-export-modal", showExportModal);

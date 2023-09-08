@@ -114,8 +114,8 @@
 		<FSConfigModal ref="fileSystemConfiguration" :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
 	</div>
 
-	<div v-if="showDeleteConfirm">
-		<ConfirmDeleteModal item="filesystem" :name="selectedDataset!.name" :idKey="'delete-filesystem'" @close="showDeleteConfirm = false"/>
+	<div v-if="showDeleteFileSystemConfirm">
+		<ConfirmDeleteFileSystemModal :fileSystemName="selectedDataset!.name" :idKey="'delete-filesystem'" @close="showDeleteFileSystemConfirm = false"/>
 	</div>
 
 </template>
@@ -130,7 +130,7 @@ import { destroyDataset, unmountChildren } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
-import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
+import ConfirmDeleteFileSystemModal from "../common/confirmation/ConfirmDeleteFileSystemModal.vue";
 
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -140,8 +140,9 @@ const fileSystemConfiguration = ref();
 
 const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
-const showDeleteConfirm = inject<Ref<boolean>>('show-delete-modal')!;
-const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
+const showDeleteFileSystemConfirm = ref(false);
+//const showDeleteFileSystemConfirm = inject<Ref<boolean>>('show-delete-confirm')!;
+const confirmDelete = inject<Ref<boolean>>('confirm-delete-filesystem')!;
 
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
@@ -178,7 +179,7 @@ function deleteFileSystem(fileSystem) {
 		hasChildren.value = false;
 	}
 
-	showDeleteConfirm.value = true;
+	showDeleteFileSystemConfirm.value = true;
 	selectedDataset.value = fileSystem;
 	console.log('selected for deletion:', selectedDataset.value);
 
@@ -196,7 +197,8 @@ function deleteFileSystem(fileSystem) {
 		if (confirmDelete.value == true) {
 			// deleting.value = true;
 			await destroyDataset(selectedDataset.value!, forceDestroy.value);
-			showDeleteConfirm.value = false;
+			console.log('deleted:', fileSystem);
+			showDeleteFileSystemConfirm.value = false;
 			confirmDelete.value = false;
 			// deleting.value = false;
 			hasChildren.value = false;
@@ -204,11 +206,10 @@ function deleteFileSystem(fileSystem) {
 			await refreshDatasets();
 		}
 	});
-	console.log('deleted:', fileSystem);
+	
 }
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
-provide('show-delete-confirm', showDeleteConfirm);
-
+provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
 </script>

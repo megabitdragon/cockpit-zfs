@@ -50,7 +50,8 @@ const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
 
-const confirmDelete = ref(false);
+const confirmDeletePool = ref(false);
+const confirmDeleteFileSystem = ref(false);
 const deleting = ref(false);
 const forceDestroy = ref(false);
 const hasChildren = ref(false);
@@ -66,6 +67,8 @@ const confirmExport = ref(false);
 const forceUnmount = ref(false);
 
 const showImportModal = ref(false);
+
+//const showDeleteConfirm = ref(false);
 
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
@@ -95,7 +98,8 @@ provide("disks-in-pools", disksInPools);
 provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
-provide('confirm-delete', confirmDelete);
+provide('confirm-delete-pool', confirmDeletePool);
+provide('confirm-delete-filesystem', confirmDeleteFileSystem);
 provide('deleting', deleting);
 provide('force-destroy', forceDestroy);
 provide('has-children', hasChildren);
@@ -106,6 +110,6 @@ provide("secure-trim", secureTRIM);
 provide("confirm-export", confirmExport);
 provide("force-unmount", forceUnmount);
 provide("show-import-modal", showImportModal);
-
+//provide("show-delete-confirm", showDeleteConfirm);
 </script>
 

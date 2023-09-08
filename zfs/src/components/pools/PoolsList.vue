@@ -240,8 +240,8 @@
 		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
 	</div>
 
-	<div v-if="showDeleteConfirm">
-		<ConfirmDeleteModal item="pool" :name="selectedPool!.name" :idKey="'delete-pool'" @close="showDeleteConfirm = false"/>
+	<div v-if="showDeletePoolConfirm">
+		<ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="'delete-pool'" @close="showDeletePoolConfirm = false"/>
 	</div>
 
 	<div v-if="showResilverModal">
@@ -281,7 +281,7 @@ import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
-import ConfirmDeleteModal from "../common/confirmation/ConfirmDeleteModal.vue";
+import ConfirmDeletePoolModal from "../common/confirmation/ConfirmDeletePoolModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
@@ -306,8 +306,9 @@ const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 const selectedVDev = ref<vDevData>();
 
-const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
-const showDeleteConfirm = ref(false);
+const confirmDelete = inject<Ref<boolean>>('confirm-delete-pool')!;
+const showDeletePoolConfirm = ref(false);
+//const showDeletePoolConfirm = inject<Ref<boolean>>('show-delete-confirm')!;
 const deleting = inject<Ref<boolean>>('deleting')!;
 
 const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
@@ -344,7 +345,7 @@ const removing = ref(false);
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
-	showDeleteConfirm.value = true;
+	showDeletePoolConfirm.value = true;
 	
 	watch(confirmDelete, async (newValue, oldValue) => {
 	
@@ -360,7 +361,7 @@ async function destroyPoolAndUpdate(pool) {
 			disksLoaded.value = true;
 			poolsLoaded.value = true;
 			confirmDelete.value = false;
-			showDeleteConfirm.value = false;
+			showDeletePoolConfirm.value = false;
 			deleting.value = false;
 			message.value = "Destroyed " + pool.name + " at " + getTimestampString();
 		}
@@ -568,7 +569,7 @@ async function removeVDev(pool : PoolData, vDev : vDevData) {
 
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
-provide('show-delete-modal', showDeleteConfirm);
+provide('show-delete-pool-confirm', showDeletePoolConfirm);
 provide("show-resilver-modal", showResilverModal);
 provide("show-trim-modal", showTrimModal);
 provide("show-export-modal", showExportModal);

@@ -1,14 +1,14 @@
 <template>
-	<Modal :isOpen="showDeleteConfirmModal" @close="showDeleteConfirmModal = false" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-96'">
+	<Modal :isOpen="showDeleteFileSystemConfirm" @close="showDeleteFileSystemConfirm = false" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-96'">
         <template v-slot:title>
-            <legend class="flex justify-center">Destroy {{upperCaseWord(props.item)}}</legend>
+            <legend class="flex justify-center">Destroy File System</legend>
         </template>
         <template v-slot:content>
             <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
-                <p class="text-default row-start-1">Are you sure you wish to <span class="text-danger">destroy</span> <b>{{ props.name }}</b>?</p>
+                <p class="text-default row-start-1">Are you sure you wish to <span class="text-danger">destroy</span> <b>{{ props.fileSystemName }}</b>?</p>
                 <div v-if="hasChildren" class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center">
                     <p class="text-danger font-medium row-start-1">WARNING!!!</p>
-                    <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props.name }}</b> has children.</p>
+                    <p class="text-danger row-start-2">File System <b>{{ props.fileSystemName }}</b> has children.</p>
                     <p class="text-default row-start-3">If you wish to destroy, use <span class="text-danger">Force Destroy</span>.</p>
                 </div>
                
@@ -17,12 +17,12 @@
         <template v-slot:footer>
             <div class="w-full grid grid-rows-1">
                 <div class="button-group-row mt-2 justify-between">
-                    <button @click="showDeleteConfirmModal = false" :id="getIdKey('confirm-delete-no')" name="delete-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
+                    <button @click="showDeleteFileSystemConfirm = false" :id="getIdKey('confirm-delete-no')" name="delete-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
                     <!-- <button @click="confirmDelete = true;" :id="getIdKey('confirm-delete-yes')" name="delete-button-yes" class="mt-1 btn btn-danger object-right justify-end h-fit">Destroy</button> -->
                    
                     <div class="flex flex-row">
-                        <label :for="'forcefully-destroy'" class="mt-2 mr-2 block text-sm font-medium text-default">Force Destroy</label>
-                        <Switch v-model="forceDestroy" :class="[forceDestroy ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                        <label :for="getIdKey('forcefully-destroy')" class="mt-2 mr-2 block text-sm font-medium text-default">Force Destroy</label>
+                        <Switch v-model="forceDestroy" :id="getIdKey('forcefully-destroy')" :class="[forceDestroy ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
                             <span :class="[forceDestroy ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
                                 <span :class="[forceDestroy ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
@@ -61,16 +61,15 @@ import { Ref, inject  } from 'vue';
 import { upperCaseWord } from '../../../composables/helpers';
 import Modal from '../../common/Modal.vue';
 
-interface ConfirmDeleteModalProps {
+interface ConfirmDeleteFileSystemModalProps {
     idKey: string;
-    item: string;
-    name: string;
+    fileSystemName: string;
 }
 
-const props = defineProps<ConfirmDeleteModalProps>();
+const props = defineProps<ConfirmDeleteFileSystemModalProps>();
 
-const showDeleteConfirmModal = inject<Ref<boolean>>('show-delete-modal')!;
-const confirmDelete = inject<Ref<boolean>>('confirm-delete')!;
+const showDeleteFileSystemConfirm = inject<Ref<boolean>>('show-delete-filesystem-confirm')!;
+const confirmDelete = inject<Ref<boolean>>('confirm-delete-filesystem')!;
 const deleting = inject<Ref<boolean>>('deleting')!;
 
 const hasChildren = inject<Ref<boolean>>('has-children')!;
