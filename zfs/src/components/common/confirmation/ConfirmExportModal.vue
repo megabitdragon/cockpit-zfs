@@ -5,7 +5,7 @@
         </template>
         <template v-slot:content>
             <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
-                <p class="text-default row-start-1">Are you sure you wish to start export for storage pool {{props.name}}?</p>
+                <p class="text-default row-start-1">Are you sure you wish to start export for storage pool <b>{{props.name}}</b>?</p>
             </div>
         </template>
         <template v-slot:footer>

@@ -311,7 +311,7 @@ const importedPool = ref<ImportedPool>({
 	altRoot: '',
 	renamePool: false,
 	newPoolName: '',
-	identifier: 'device-alias',
+	identifier: 'vdev_path',
 	forceImport: false,
 	recoveryMode: false,
 	ignoreMissingLog: false,

@@ -90,8 +90,8 @@
 														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="scrubThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 														</MenuItem>
-														<MenuItem as="div" v-slot="{ active }">
-															<a v-if="pool.diskType != 'HDD'" href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+														<MenuItem v-if="pool.diskType != 'HDD'" as="div" v-slot="{ active }">
+															<a href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="showAddVDev(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
@@ -132,7 +132,7 @@
 																<MenuItem as="div" v-slot="{ active }">
 																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 																</MenuItem>
-																<MenuItem as="div" v-slot="{ active }">
+																<MenuItem v-if="vDevIdx != 0" as="div" v-slot="{ active }">
 																	<a href="#" @click="removeVDev(poolData[poolIdx], poolData[poolIdx].vdevs[vDevIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
 																</MenuItem>
 																<MenuItem as="div" v-slot="{ active }">
@@ -509,7 +509,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	message.value = 'No Alerts';
+	//message.value = 'No Alerts';
 }
 
 //method to show pool details when button is clicked
@@ -564,7 +564,6 @@ async function removeVDev(pool : PoolData, vDev : vDevData) {
 	});
 
 	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
-
 }
 
 provide('show-wizard', showWizard);

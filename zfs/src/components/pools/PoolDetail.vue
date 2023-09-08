@@ -523,7 +523,6 @@ async function checkForChanges(poolDataCheck) {
 async function poolConfigureBtn() {	
 	if (commentLengthCheck(poolConfig.value)) {
 		console.log('pool:', poolConfig.value);
-
 		await checkForChanges(poolConfig.value);
 		console.log('newChanges:', newChangesToPool.value);
 		saving.value = true;

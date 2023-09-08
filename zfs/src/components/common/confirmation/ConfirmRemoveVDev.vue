@@ -5,7 +5,7 @@
         </template>
         <template v-slot:content>
             <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
-                <p class="text-default row-start-1">Are you sure you wish to remove {{ props.vDevName }} from {{props.poolName}}?</p>
+                <p class="text-default row-start-1">Are you sure you wish to remove <b>{{ props.vDevName }}</b> from <b>{{props.poolName}}</b>?</p>
             </div>
         </template>
         <template v-slot:footer>

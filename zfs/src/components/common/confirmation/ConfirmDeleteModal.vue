@@ -5,10 +5,10 @@
         </template>
         <template v-slot:content>
             <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
-                <p class="text-default row-start-1">Are you sure you wish to <span class="text-danger">destroy</span> {{ props.name }}?</p>
+                <p class="text-default row-start-1">Are you sure you wish to <span class="text-danger">destroy</span> <b>{{ props.name }}</b>?</p>
                 <div v-if="hasChildren" class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center">
                     <p class="text-danger font-medium row-start-1">WARNING!!!</p>
-                    <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} {{ props.name }} has children.</p>
+                    <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props.name }}</b> has children.</p>
                     <p class="text-default row-start-3">If you wish to destroy, use <span class="text-danger">Force Destroy</span>.</p>
                 </div>
                
