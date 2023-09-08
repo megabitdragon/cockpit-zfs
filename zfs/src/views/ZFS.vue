@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="w-full h-full overflow-visible px-8 bg-default text-default">
+		<div class="w-full h-full min-h-max min-w-max overflow-visible px-8 bg-default text-default">
 
 			<div v-if="props.tag === 'dashboard'" class="p-4">
 			   <Dashboard />
@@ -51,7 +51,7 @@ const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
 
 const confirmDeletePool = ref(false);
-const confirmDeleteFileSystem = ref(false);
+// const confirmDeleteFileSystem = ref(false);
 const deleting = ref(false);
 const forceDestroy = ref(false);
 const hasChildren = ref(false);
@@ -99,7 +99,7 @@ provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
 provide('confirm-delete-pool', confirmDeletePool);
-provide('confirm-delete-filesystem', confirmDeleteFileSystem);
+// provide('confirm-delete-filesystem', confirmDeleteFileSystem);
 provide('deleting', deleting);
 provide('force-destroy', forceDestroy);
 provide('has-children', hasChildren);

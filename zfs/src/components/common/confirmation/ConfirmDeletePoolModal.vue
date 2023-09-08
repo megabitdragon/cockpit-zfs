@@ -58,7 +58,6 @@
 <script setup lang="ts">
 import { Switch } from '@headlessui/vue';
 import { Ref, inject  } from 'vue';
-import { upperCaseWord } from '../../../composables/helpers';
 import Modal from '../../common/Modal.vue';
 
 interface ConfirmDeletePoolModalProps {

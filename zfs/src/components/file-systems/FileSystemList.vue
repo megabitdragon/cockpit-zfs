@@ -59,31 +59,31 @@
 											<MenuItems class="absolute right-0 z-10 mt-1 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 												<div class="py-1">
 													<MenuItem as="div" v-slot="{ active }">
-														<a href="#" @click="loadFileSystemConfig(fileSystem)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
+														<a href="#" @click="loadFileSystemConfig(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
 													</MenuItem>
-													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Edit Permissions</a>
 													</MenuItem>
-													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 													</MenuItem>
 													<MenuItem as="div" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 													</MenuItem>
-													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 													</MenuItem>
-													<MenuItem as="div" v-if="fileSystem.encrypted" v-slot="{ active }">
+													<MenuItem as="div" v-if="fileSystems[fsIdx].encrypted" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 													</MenuItem>
 													<MenuItem as="div" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 													</MenuItem>
-													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
 													</MenuItem>
-													<MenuItem as="div" v-if="!findPoolDataset(fileSystem)" v-slot="{ active }">
-														<a href="#" @click="deleteFileSystem(fileSystem)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+													<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
+														<a href="#" @click="deleteFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 													</MenuItem>											
 												</div>
 											</MenuItems>
@@ -142,7 +142,10 @@ const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
 const showDeleteFileSystemConfirm = ref(false);
 //const showDeleteFileSystemConfirm = inject<Ref<boolean>>('show-delete-confirm')!;
-const confirmDelete = inject<Ref<boolean>>('confirm-delete-filesystem')!;
+// const confirmDelete = inject<Ref<boolean>>('confirm-delete-filesystem')!;
+const confirmDelete = ref(false);
+
+const isDeleting = ref(false);
 
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
@@ -167,7 +170,6 @@ function findPoolDataset(fileSystem) {
 	}
 }
 
-// const deleting = inject<Ref<boolean>>('deleting')!;
 const hasChildren = inject<Ref<boolean>>('has-children')!;
 const forceDestroy = inject<Ref<boolean>>('force-destroy')!;
 
@@ -184,6 +186,9 @@ function deleteFileSystem(fileSystem) {
 	console.log('selected for deletion:', selectedDataset.value);
 
 	watch(confirmDelete, async (newValue, oldValue) => {
+		if (isDeleting.value) {
+			return;
+		}
 		if (hasChildren.value) {
 			watch(forceDestroy,  (newValue, oldValue) => {
 					console.log('forceDestroy.value changed:', newValue);
@@ -193,17 +198,18 @@ function deleteFileSystem(fileSystem) {
 			});
 		}
 		console.log('confirmDelete.value changed:', newValue);
+		isDeleting.value = true;
 
 		if (confirmDelete.value == true) {
-			// deleting.value = true;
 			await destroyDataset(selectedDataset.value!, forceDestroy.value);
 			console.log('deleted:', fileSystem);
 			showDeleteFileSystemConfirm.value = false;
+
 			confirmDelete.value = false;
-			// deleting.value = false;
 			hasChildren.value = false;
 			forceDestroy.value = false;
 			await refreshDatasets();
+			isDeleting.value = false;
 		}
 	});
 	
@@ -212,4 +218,5 @@ function deleteFileSystem(fileSystem) {
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
+provide('confirm-delete-filesystem', confirmDelete);
 </script>
