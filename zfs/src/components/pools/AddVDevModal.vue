@@ -192,6 +192,8 @@ async function addVDevBtn() {
             if (diskCheck()) {
                 selectedDisks.value.forEach(selectedDisk => {
                     newDisk.value = allDisks.value.find(disk => disk.name === selectedDisk);
+                    console.log('newDisk.value:', newDisk.value);
+                    console.log('selectedDisks:', selectedDisks.value);
                     switch (diskIdentifier.value) {
                         case 'vdev_path':
                             diskPath.value = newDisk.value!.vdev_path;

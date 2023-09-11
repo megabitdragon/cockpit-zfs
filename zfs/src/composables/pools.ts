@@ -494,3 +494,24 @@ export async function removeVDevFromPool(vdev, pool) {
 		return null;
 	}
 }
+
+export async function attachDisk(diskVDevPoolData) {
+	try {
+		let cmdString = ['zpool', 'attach'];
+
+		cmdString.push(diskVDevPoolData.poolName);
+		//cmdString.push(diskVDevPoolData.vDevName);
+		cmdString.push(diskVDevPoolData.existingDiskName);
+		cmdString.push(diskVDevPoolData.newDiskName);
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}

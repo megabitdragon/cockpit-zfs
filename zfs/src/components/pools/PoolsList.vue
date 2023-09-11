@@ -136,7 +136,7 @@
 																	<a href="#" @click="removeVDev(poolData[poolIdx], poolData[poolIdx].vdevs[vDevIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
 																</MenuItem>
 																<MenuItem as="div" v-slot="{ active }">
-																	<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
+																	<a href="#" @click="showAttachDisk(pool, vDev)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
 																</MenuItem>
 															</div>
 														</MenuItems>
@@ -267,6 +267,10 @@
 	<div v-if="showRemoveVDevConfirm">
 		<ConfirmRemoveVDev @close="showRemoveVDevConfirm = false" :idKey="'show-remove-modal'" :poolName="selectedPool!.name" :vDevName="selectedVDev!.name"/>
 	</div>
+
+	<div v-if="showAttachDiskModal">
+		<AttachDiskModal @close="showAttachDiskModal = false" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -288,6 +292,7 @@ import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
 import ImportPool from "./ImportPool.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
 import ConfirmRemoveVDev from "../common/confirmation/ConfirmRemoveVDev.vue";
+import AttachDiskModal from "./AttachDiskModal.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
@@ -342,6 +347,8 @@ const showAddVDevModal = ref(false);
 const showRemoveVDevConfirm = ref(false);
 const confirmRemove = ref(false);
 const removing = ref(false);
+
+const showAttachDiskModal = ref(false);
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
@@ -539,6 +546,13 @@ function showAddVDev(pool) {
 	showAddVDevModal.value = true;
 }
 
+function showAttachDisk(pool, vdev) {
+	selectedPool.value = pool;
+	selectedVDev.value = vdev;
+	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
+	showAttachDiskModal.value = true;
+}
+
 function showDiskModal(disk) {
 	selectedDisk.value = disk;
 	console.log(selectedDisk);
@@ -580,6 +594,33 @@ async function removeVDev(pool : PoolData, vDev : vDevData) {
 	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
 }
 
+async function detachDisk(pool : PoolData, vDev : vDevData) {
+	selectedPool.value = pool;
+	selectedVDev.value = vDev;
+	showRemoveVDevConfirm.value = true;
+
+	watch(confirmRemove, async (newValue, oldValue) => {
+		if (confirmRemove.value == true) {
+			removing.value = true;
+			console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
+			await removeVDevFromPool(selectedVDev.value, selectedPool.value);
+			disksLoaded.value = false;
+			poolsLoaded.value = false;
+			diskData.value = [];
+			poolData.value = [];
+			await loadDisksThenPools(diskData, poolData);
+			disksLoaded.value = true;
+			poolsLoaded.value = true;
+			confirmRemove.value = false;
+			showRemoveVDevConfirm.value = false;
+			removing.value = false;
+			message.value = "Removed " + vDev.name + " from " + pool.name + " at " + getTimestampString();
+		}
+	});
+
+	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
+}
+
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
 provide('show-delete-pool-confirm', showDeletePoolConfirm);
@@ -590,4 +631,5 @@ provide("show-vdev-modal", showAddVDevModal);
 provide('show-remove-modal', showRemoveVDevConfirm);
 provide('confirm-remove', confirmRemove);
 provide('removing', removing);
+provide('show-attach-modal', showAttachDiskModal);
 </script>
