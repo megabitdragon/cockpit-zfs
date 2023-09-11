@@ -181,9 +181,9 @@
 																		<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 																			<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																				<div class="py-1">
-																					<MenuItem as="div" v-slot="{ active }">
+																					<!-- <MenuItem as="div" v-slot="{ active }">
 																						<a href="#" @click="showDiskModal(disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Disk Details</a>
-																					</MenuItem>
+																					</MenuItem> -->
 																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" @click="clearDiskErrors(pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 																					</MenuItem>
@@ -284,7 +284,8 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, importPool, detachDisk, removeVDevFromPool } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, importPool, removeVDevFromPool } from "../../composables/pools";
+import { labelClear, detachDisk, } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
@@ -356,6 +357,7 @@ const showAttachDiskModal = ref(false);
 const showDetachDiskModal = ref(false);
 const confirmDetach = ref(false);
 const detaching = ref(false);
+const clearLabels = ref(false);
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
@@ -490,7 +492,6 @@ async function clearDiskErrors(poolName, diskName) {
 	cleared.value = true;
 }
 
-
 async function exportThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
@@ -560,11 +561,11 @@ function showAttachDisk(pool, vdev) {
 	showAttachDiskModal.value = true;
 }
 
-function showDiskModal(disk) {
-	selectedDisk.value = disk;
-	console.log(selectedDisk);
-	showDiskDetails.value = true;
-}
+// function showDiskModal(disk) {
+// 	selectedDisk.value = disk;
+// 	console.log(selectedDisk);
+// 	showDiskDetails.value = true;
+// }
 
 function newPoolWizardBtn() {
 	if (!showWizard.value) {
@@ -610,7 +611,13 @@ async function detachThisDisk(pool : PoolData, disk: DiskData) {
 		if (confirmDetach.value == true) {
 			detaching.value = true;
 			console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
-			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
+			if (clearLabels.value == true) {
+				await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
+				await labelClear(selectedDisk.value!.name);
+			} else {
+				await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
+			}
+			
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
 			diskData.value = [];
@@ -628,6 +635,37 @@ async function detachThisDisk(pool : PoolData, disk: DiskData) {
 	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 }
 
+/*async function exportThisPool(pool) {
+	cleared.value = false;
+	selectedPool.value = pool;
+	showExportModal.value = true;
+	watch(confirmExport, async (newVal, oldVal) => {
+		if (confirmExport.value == true) {
+			exporting.value = true;
+			console.log('now exporting:', selectedPool.value);
+			if (forceUnmount.value) {
+				exportPool(pool, forceUnmount.value);
+			} else {
+				exportPool(pool);
+			}
+			message.value = "Exported " + pool.name + " at " + getTimestampString();
+			disksLoaded.value = false;
+			poolsLoaded.value = false;
+			poolData.value = [];
+			diskData.value = [];
+			await loadDisksThenPools(diskData, poolData);
+			disksLoaded.value = true;
+			poolsLoaded.value = true;
+			confirmExport.value = false;
+			showExportModal.value = false;
+			exporting.value = false;
+		}
+	});
+
+	console.log('preparing to export:', selectedPool.value);
+}
+ */
+
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
 provide('show-delete-pool-confirm', showDeletePoolConfirm);
@@ -642,4 +680,5 @@ provide('show-attach-modal', showAttachDiskModal);
 provide('show-detach-modal', showDetachDiskModal);
 provide('confirm-detach', confirmDetach);
 provide('detaching', detaching);
+provide('clear-labels', clearLabels);
 </script>

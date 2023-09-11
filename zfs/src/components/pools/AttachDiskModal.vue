@@ -88,7 +88,7 @@ import { reactive, ref, inject, Ref, computed, provide } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
-import { attachDisk } from '../../composables/pools';
+import { attachDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
 
 interface AttachDiskModalProps {

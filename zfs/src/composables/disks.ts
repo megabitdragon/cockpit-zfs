@@ -27,3 +27,67 @@ export async function clearPartitions(disk) {
       }
 }
 
+
+export async function labelClear(disk) {
+    try {
+
+    } catch (state) {
+
+    }
+}
+
+// export async function clearDiskLabels(pool) {
+// 	try {
+// 		pool.vdevs.forEach(vDev => {
+			
+// 		});
+		
+// 		const state = useSpawn(['zpool', 'labelclear', ]);
+// 		const output = await state.promise();
+// 		console.log(output)
+// 		return output.stdout;
+// 	} catch (state) {
+// 		console.error(errorString(state));
+// 		return null;
+// 	}
+// }
+
+export async function attachDisk(diskVDevPoolData) {
+	try {
+		let cmdString = ['zpool', 'attach'];
+
+		cmdString.push(diskVDevPoolData.poolName);
+		//cmdString.push(diskVDevPoolData.vDevName);
+		cmdString.push(diskVDevPoolData.existingDiskName);
+		cmdString.push(diskVDevPoolData.newDiskName);
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function detachDisk(poolName, diskName) {
+	try {
+		let cmdString = ['zpool', 'detach'];
+
+		cmdString.push(poolName);
+		cmdString.push(diskName);
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
