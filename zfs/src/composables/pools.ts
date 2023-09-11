@@ -515,3 +515,22 @@ export async function attachDisk(diskVDevPoolData) {
 		return null;
 	}
 }
+
+export async function detachDisk(poolName, diskName) {
+	try {
+		let cmdString = ['zpool', 'detach'];
+
+		cmdString.push(poolName);
+		cmdString.push(diskName);
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}

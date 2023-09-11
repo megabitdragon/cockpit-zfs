@@ -212,37 +212,72 @@ async function attachDiskBtn() {
     }
 }
 
+// const diskSizeMatch = () => {
+//     let result = true;
+//     diskSizeFeedback.value = '';
+//     console.log("Checking disk:", selectedDisk.value);
+//     if (selectedDisk.value == '') {
+//             diskSizeFeedback.value = 'At least one disk is required.'
+//             return false;
+//     }
+
+//     const newDiskData = allDisks.value.find(fullDisk => fullDisk.name === selectedDisk.value);
+
+//     if (newDiskData) {
+
+//         const oldDisks = props.vDev.disks;
+//         console.log('setting oldDisks:', oldDisks);
+//         oldDisk.value = oldDisks.pop();
+//         console.log('setting oldDisk.value:', oldDisk.value);
+
+//         const newCapacity = convertSizeToBytes(newDiskData!.capacity);
+//         console.log('newCapacity:', newCapacity);
+//         const currentCapacity = convertSizeToBytes(oldDisk.value.capacity);
+//         console.log('currentCapacity:', currentCapacity);
+
+//         if (newCapacity < currentCapacity) {
+//             diskSizeFeedback.value = "Cannot Attach. Please select a disk that has capacity greater than or equal to current disks."
+//             result = false;
+//         }
+//     }
+
+//     return result;
+// };
+
 const diskSizeMatch = () => {
     let result = true;
     diskSizeFeedback.value = '';
     console.log("Checking disk:", selectedDisk.value);
+    
     if (selectedDisk.value == '') {
-            diskSizeFeedback.value = 'At least one disk is required.'
-            return false;
+        diskSizeFeedback.value = 'At least one disk is required.'
+        return false;
     }
 
     const newDiskData = allDisks.value.find(fullDisk => fullDisk.name === selectedDisk.value);
 
     if (newDiskData) {
-
-        const oldDisks = props.vDev.disks;
-        console.log('setting oldDisks:', oldDisks);
-        oldDisk.value = oldDisks.pop();
-        console.log('setting oldDisk.value:', oldDisk.value);
-
         const newCapacity = convertSizeToBytes(newDiskData!.capacity);
         console.log('newCapacity:', newCapacity);
-        const currentCapacity = convertSizeToBytes(oldDisk.value.capacity);
-        console.log('currentCapacity:', currentCapacity);
 
-        if (newCapacity < currentCapacity) {
-            diskSizeFeedback.value = "Cannot Attach. Please select a disk that has capacity greater than or equal to current disks."
-            result = false;
+        const oldDisks = props.vDev.disks;
+        console.log('oldDisks:', oldDisks);
+
+        for (const oldDisk of oldDisks) {
+            const currentCapacity = convertSizeToBytes(oldDisk.capacity);
+            console.log('currentCapacity:', currentCapacity);
+
+            if (newCapacity < currentCapacity) {
+                diskSizeFeedback.value = "Cannot Attach. Please select a disk that has capacity greater than or equal to current disks."
+                result = false;
+                break;
+            }
         }
     }
 
     return result;
 };
+
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 </script>

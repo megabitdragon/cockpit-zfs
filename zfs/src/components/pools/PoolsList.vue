@@ -188,7 +188,7 @@
 																						<a href="#" @click="clearDiskErrors(pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
+																						<a href="#" @click="detachThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
@@ -271,6 +271,10 @@
 	<div v-if="showAttachDiskModal">
 		<AttachDiskModal @close="showAttachDiskModal = false" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
 	</div>
+
+	<div v-if="showDetachDiskModal">
+		<ConfirmDetachDisk @close="showDetachDiskModal = false" :idKey="'show-detach-disk-modal'" :poolName="selectedPool!.name" :diskName="selectedDisk!.name"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -280,7 +284,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, importPool, removeVDevFromPool } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, importPool, detachDisk, removeVDevFromPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
@@ -293,6 +297,7 @@ import ImportPool from "./ImportPool.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
 import ConfirmRemoveVDev from "../common/confirmation/ConfirmRemoveVDev.vue";
 import AttachDiskModal from "./AttachDiskModal.vue";
+import ConfirmDetachDisk from "../common/confirmation/ConfirmDetachDisk.vue";
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
@@ -313,7 +318,6 @@ const selectedVDev = ref<vDevData>();
 
 const confirmDelete = inject<Ref<boolean>>('confirm-delete-pool')!;
 const showDeletePoolConfirm = ref(false);
-//const showDeletePoolConfirm = inject<Ref<boolean>>('show-delete-confirm')!;
 const deleting = inject<Ref<boolean>>('deleting')!;
 
 const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
@@ -349,6 +353,9 @@ const confirmRemove = ref(false);
 const removing = ref(false);
 
 const showAttachDiskModal = ref(false);
+const showDetachDiskModal = ref(false);
+const confirmDetach = ref(false);
+const detaching = ref(false);
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
@@ -594,16 +601,16 @@ async function removeVDev(pool : PoolData, vDev : vDevData) {
 	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
 }
 
-async function detachDisk(pool : PoolData, vDev : vDevData) {
+async function detachThisDisk(pool : PoolData, disk: DiskData) {
 	selectedPool.value = pool;
-	selectedVDev.value = vDev;
-	showRemoveVDevConfirm.value = true;
+	selectedDisk.value = disk;
+	showDetachDiskModal.value = true;
 
-	watch(confirmRemove, async (newValue, oldValue) => {
-		if (confirmRemove.value == true) {
-			removing.value = true;
-			console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
-			await removeVDevFromPool(selectedVDev.value, selectedPool.value);
+	watch(confirmDetach, async (newValue, oldValue) => {
+		if (confirmDetach.value == true) {
+			detaching.value = true;
+			console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
+			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
 			disksLoaded.value = false;
 			poolsLoaded.value = false;
 			diskData.value = [];
@@ -611,14 +618,14 @@ async function detachDisk(pool : PoolData, vDev : vDevData) {
 			await loadDisksThenPools(diskData, poolData);
 			disksLoaded.value = true;
 			poolsLoaded.value = true;
-			confirmRemove.value = false;
-			showRemoveVDevConfirm.value = false;
-			removing.value = false;
-			message.value = "Removed " + vDev.name + " from " + pool.name + " at " + getTimestampString();
+			confirmDetach.value = false;
+			showDetachDiskModal.value = false;
+			detaching.value = false;
+			message.value = "Detached disk " + selectedDisk.value!.name + " from " + selectedPool.value!.name + " at " + getTimestampString();
 		}
 	});
 
-	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
+	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 }
 
 provide('show-wizard', showWizard);
@@ -632,4 +639,7 @@ provide('show-remove-modal', showRemoveVDevConfirm);
 provide('confirm-remove', confirmRemove);
 provide('removing', removing);
 provide('show-attach-modal', showAttachDiskModal);
+provide('show-detach-modal', showDetachDiskModal);
+provide('confirm-detach', confirmDetach);
+provide('detaching', detaching);
 </script>
