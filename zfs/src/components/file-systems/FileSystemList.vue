@@ -172,6 +172,8 @@ function findPoolDataset(fileSystem) {
 
 const hasChildren = inject<Ref<boolean>>('has-children')!;
 const forceDestroy = inject<Ref<boolean>>('force-destroy')!;
+const destroyChildren = ref(false);
+const destroyAllDependents = ref(false);
 
 function deleteFileSystem(fileSystem) {
 
@@ -189,19 +191,19 @@ function deleteFileSystem(fileSystem) {
 		if (isDeleting.value) {
 			return;
 		}
-		if (hasChildren.value) {
-			watch(forceDestroy,  (newValue, oldValue) => {
-					console.log('forceDestroy.value changed:', newValue);
-					if (forceDestroy.value) {
-						 unmountChildren(fileSystem);
-					}
-			});
-		}
+		// if (hasChildren.value) {
+		// 	watch(forceDestroy,  (newValue, oldValue) => {
+		// 			console.log('forceDestroy.value changed:', newValue);
+		// 			if (forceDestroy.value) {
+		// 				 unmountChildren(fileSystem);
+		// 			}
+		// 	});
+		// }
 		console.log('confirmDelete.value changed:', newValue);
 		isDeleting.value = true;
 
 		if (confirmDelete.value == true) {
-			await destroyDataset(selectedDataset.value!, forceDestroy.value);
+			await destroyDataset(selectedDataset.value!, forceDestroy.value, destroyChildren.value, destroyAllDependents.value);
 			console.log('deleted:', fileSystem);
 			showDeleteFileSystemConfirm.value = false;
 
@@ -218,4 +220,6 @@ provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
 provide('confirm-delete-filesystem', confirmDelete);
+provide('destroy-children', destroyChildren);
+provide('destroy-dependents', destroyAllDependents);
 </script>

@@ -159,11 +159,19 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 	}
 }
 
-export async function destroyDataset(fileSystemData : FileSystemData, forceDestroy? : boolean) {
+export async function destroyDataset(fileSystemData : FileSystemData, forceDestroy? : boolean, destroyChildren?: boolean, destroyDependents?: boolean) {
 	try {
 		let cmdString = ['zfs', 'destroy'];
 
+		if (destroyDependents) {
+			cmdString.push('-R');
+		}
+
 		if (forceDestroy) {
+			cmdString.push('-f');
+		}
+
+		if (destroyChildren) {
 			cmdString.push('-r');
 		}
 

@@ -4,33 +4,66 @@
             <legend class="flex justify-center">Destroy File System</legend>
         </template>
         <template v-slot:content>
-            <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
-                <p class="text-default row-start-1">Are you sure you wish to <span class="text-danger">destroy</span> <b>{{ props.fileSystemName }}</b>?</p>
+            <div class="grid grid-flow-row mt-3 justify-items-center gap-0.5">
+                <p class="text-default row-start-1">Are you sure you wish to <span class="text-danger">destroy</span> file system <b>{{ props.fileSystemName }}</b>?</p>
                 <div v-if="hasChildren" class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center">
                     <p class="text-danger font-medium row-start-1">WARNING!!!</p>
                     <p class="text-danger row-start-2">File System <b>{{ props.fileSystemName }}</b> has children.</p>
-                    <p class="text-default row-start-3">If you wish to destroy, use <span class="text-danger">Force Destroy</span>.</p>
+                    <p class="text-default row-start-3">If you wish to destroy, use <span class="text-danger">Destroy all children/dependents</span>.</p>                 
                 </div>
-               
+                <div v-if="hasChildren">
+                    <label :for="getIdKey('destroy-children')" class="mt-2 mr-2 block text-sm font-medium text-default">Destroy all children</label>
+                    <Switch v-model="destroyChildren" :id="getIdKey('destroy-children')" :class="[destroyChildren ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                        <span class="sr-only">Use setting</span>
+                        <span :class="[destroyChildren ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                            <span :class="[destroyChildren ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                            <span :class="[destroyChildren ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                </svg>
+                            </span>
+                        </span>
+                    </Switch>
+
+                    <label :for="getIdKey('destroy-dependents')" class="mt-2 mr-2 block text-sm font-medium text-default">Destroy all dependents (children + clones)</label>
+                    <Switch v-model="destroyAllDependents" :id="getIdKey('destroy-dependents')" :class="[destroyAllDependents ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                        <span class="sr-only">Use setting</span>
+                        <span :class="[destroyAllDependents ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                            <span :class="[destroyAllDependents ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                            <span :class="[destroyAllDependents ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                </svg>
+                            </span>
+                        </span>
+                    </Switch>
+                </div>
             </div>
         </template>
         <template v-slot:footer>
             <div class="w-full grid grid-rows-1">
                 <div class="button-group-row mt-2 justify-between">
                     <button @click="showDeleteFileSystemConfirm = false" :id="getIdKey('confirm-delete-no')" name="delete-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
-                    <!-- <button @click="confirmDelete = true;" :id="getIdKey('confirm-delete-yes')" name="delete-button-yes" class="mt-1 btn btn-danger object-right justify-end h-fit">Destroy</button> -->
                    
                     <div class="flex flex-row">
-                        <label :for="getIdKey('forcefully-destroy')" class="mt-2 mr-2 block text-sm font-medium text-default">Force Destroy</label>
-                        <Switch v-model="forceDestroy" :id="getIdKey('forcefully-destroy')" :class="[forceDestroy ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                        <label :for="getIdKey('forcefully-destroy')" class="mt-3 mr-2 block text-sm font-medium text-default">Force unmount</label>
+                        <Switch v-model="forceUnmount" :id="getIdKey('forcefully-destroy')" :class="[forceUnmount ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
-                            <span :class="[forceDestroy ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-                                <span :class="[forceDestroy ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                            <span :class="[forceUnmount ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[forceUnmount ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                                     <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
                                         <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                 </span>
-                                <span :class="[forceDestroy ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                <span :class="[forceUnmount ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                                     <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
                                         <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
                                     </svg>
@@ -39,9 +72,9 @@
                         </Switch>
                     </div>
 
-                    <button v-if="!deleting && !hasChildren && !forceDestroy" @click="confirmDelete = true;" :id="getIdKey('confirm-delete-yes-A')" name="delete-button-yes-A" class="mt-1 btn btn-danger object-right justify-end h-fit">Destroy</button>
-                    <button v-if="!deleting && hasChildren && !forceDestroy" disabled @click="confirmDelete = true;" :id="getIdKey('confirm-delete-yes-A')" name="delete-button-yes-A" class="mt-1 btn btn-danger object-right justify-end h-fit">Destroy</button>
-                    <button v-if="!deleting && forceDestroy" @click="confirmDelete = true;" :id="getIdKey('confirm-delete-yes-B')" name="delete-button-yes-B" class="mt-1 btn btn-danger object-right justify-end h-fit">Destroy</button>
+                    <button v-if="!deleting && !hasChildren && !forceUnmount" @click="confirmDelete = true;" :id="getIdKey('confirm-delete-yes-A')" name="delete-button-yes-A" class="mt-1 btn btn-danger object-right justify-end h-fit">Destroy</button>
+                    <button v-if="!deleting && hasChildren && !forceUnmount" disabled @click="confirmDelete = true;" :id="getIdKey('confirm-delete-yes-A')" name="delete-button-yes-A" class="mt-1 btn btn-danger object-right justify-end h-fit">Destroy</button>
+                    <button v-if="!deleting && forceUnmount" @click="confirmDelete = true;" :id="getIdKey('confirm-delete-yes-B')" name="delete-button-yes-B" class="mt-1 btn btn-danger object-right justify-end h-fit">Destroy</button>
                     <button disabled v-if="deleting" :id="getIdKey('confirm-delete-spinner')" type="button" class="btn btn-danger object-right justify-end h-fit">
 							<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -73,7 +106,12 @@ const deleting = inject<Ref<boolean>>('deleting')!;
 
 const hasChildren = inject<Ref<boolean>>('has-children')!;
 
-const forceDestroy = inject<Ref<boolean>>('force-destroy')!;
+const forceUnmount = inject<Ref<boolean>>('force-destroy')!;
+const destroyChildren = inject<Ref<boolean>>('destroy-children')!;
+const destroyAllDependents = inject<Ref<boolean>>('destroy-dependents')!;
+
+//     provide('destroy-children', destroyChildren);
+// provide('destroy-dependents', destroyAllDependents);
 
 const getIdKey = (name: string) => `${name}`;
 
