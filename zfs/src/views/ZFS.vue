@@ -50,23 +50,23 @@ const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
 
-const confirmDeletePool = ref(false);
+// const confirmDeletePool = ref(false);
 // const confirmDeleteFileSystem = ref(false);
-const deleting = ref(false);
-const forceDestroy = ref(false);
-const hasChildren = ref(false);
+// const deleting = ref(false);
+// const forceDestroy = ref(false);
+// const hasChildren = ref(false);
 
-const confirmResilver = ref(false);
+// const confirmResilver = ref(false);
 
-const saving = ref(false);
+// const saving = ref(false);
 
-const confirmTrim = ref(false);
-const secureTRIM = ref(false);
+// const confirmTrim = ref(false);
+// const secureTRIM = ref(false);
 
-const confirmExport = ref(false);
-const forceUnmount = ref(false);
+// const confirmExport = ref(false);
+// const forceUnmount = ref(false);
 
-const showImportModal = ref(false);
+// const showImportModal = ref(false);
 
 //const showDeleteConfirm = ref(false);
 
@@ -95,21 +95,10 @@ provide("importable-destroyed-pools", importableDestroyedPools);
 provide("disks", disks);
 provide("datasets", datasets);
 provide("disks-in-pools", disksInPools);
+
 provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
-provide('confirm-delete-pool', confirmDeletePool);
-// provide('confirm-delete-filesystem', confirmDeleteFileSystem);
-provide('deleting', deleting);
-provide('force-destroy', forceDestroy);
-provide('has-children', hasChildren);
-provide("saving", saving);
-provide("confirm-resilver", confirmResilver);
-provide("confirm-trim", confirmTrim);
-provide("secure-trim", secureTRIM);
-provide("confirm-export", confirmExport);
-provide("force-unmount", forceUnmount);
-provide("show-import-modal", showImportModal);
-//provide("show-delete-confirm", showDeleteConfirm);
+
 </script>
 

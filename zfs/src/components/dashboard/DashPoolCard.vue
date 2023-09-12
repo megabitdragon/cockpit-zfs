@@ -149,7 +149,7 @@
 	</div>
 
 	<div v-if="showResilverModal">
-		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`resilver-pool-${selectedPool?.guid}`)" @close="showResilverModal = false"/>
+		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`resilver-pool-${selectedPool?.guid}`)" :confirmResilver="confirmThisResilver" @close="showResilverModal = false"/>
 	</div>
 
 	<div v-if="showTrimModal">
@@ -176,7 +176,7 @@ import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
-import { checkStatus } from '../../composables/pools';
+// import { checkStatus } from '../../composables/pools';
 
 interface DashPoolCardProps {
 	pool: PoolData;
@@ -195,20 +195,20 @@ const diskData = inject<Ref<DiskData[]>>("disks")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
-const confirmDelete = inject<Ref<boolean>>('confirm-delete-pool')!;
+const confirmDelete = ref(false);
 	
 const showDeletePoolConfirm = ref(false);
 //const showDeleteConfirm = inject<Ref<boolean>>('show-delete-confirm')!;
 
-const deleting = inject<Ref<boolean>>('deleting')!;
-const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
+const deleting = ref(false)
+const confirmResilver = ref(false);
 const showResilverModal = ref(false);
 const showTrimModal = ref(false);
-const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
-const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
+const confirmTrim = ref(false);
+const secureTRIM = ref(false)
 const showExportModal = ref(false);
-const confirmExport = inject<Ref<boolean>>('confirm-export')!;
-const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
+const confirmExport = ref(false);
+const forceUnmount = ref(false)
 
 const showAddVDevModal = ref(false);
 
@@ -312,6 +312,10 @@ async function exportThisPool(pool) {
 	});
 
 	console.log('preparing to export:', selectedPool.value);
+}
+
+const confirmThisResilver : ConfirmationCallback = () => {
+	confirmResilver.value = true;
 }
 
 async function resilverThisPool(pool) {
@@ -443,4 +447,10 @@ provide("show-trim-modal", showTrimModal);
 provide("show-export-modal", showExportModal);
 provide('show-vdev-modal', showAddVDevModal);
 provide('current-pool-config', poolConfig);
+provide('deleting', deleting);
+provide("secure-trim", secureTRIM);
+provide("force-unmount", forceUnmount);
+provide("confirm-resilver", confirmResilver);
+provide("confirm-trim", confirmTrim);
+provide("confirm-export", confirmExport);
 </script>

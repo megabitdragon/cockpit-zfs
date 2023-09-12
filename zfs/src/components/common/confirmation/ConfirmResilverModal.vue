@@ -13,7 +13,7 @@
                 <div class="button-group-row mt-2 justify-between">
                     <button @click="showResilverModal = false" :id="getIdKey('confirm-resilver-no')" name="resilver-button-no" class="mt-1 btn btn-danger object-left justify-start h-fit">Cancel</button>
 
-                    <button v-if="!resilvering" @click="confirmResilver = true;" :id="getIdKey('confirm-resilver-yes-B')" name="resilver-button-yes-B" class="mt-1 btn btn-primary object-right justify-end h-fit">Resilver</button>
+                    <button v-if="!resilvering" @click="props.confirmResilver" :id="getIdKey('confirm-resilver-yes-B')" name="resilver-button-yes-B" class="mt-1 btn btn-primary object-right justify-end h-fit">Resilver</button>
                     <button disabled v-if="resilvering" :id="getIdKey('confirm-resilver-spinner')" type="button" class="btn btn-primary object-right justify-end h-fit">
                         <svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -35,12 +35,13 @@ interface ConfirmResilverModalProps {
     idKey: string;
     item: string;
     name: string;
+    confirmResilver: ConfirmationCallback;
 }
 
 const props = defineProps<ConfirmResilverModalProps>();
 
 const showResilverModal = inject<Ref<boolean>>('show-resilver-modal')!;
-const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
+//const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
 const resilvering = inject<Ref<boolean>>('resilvering')!;
 
 const getIdKey = (name: string) => `${name}`;

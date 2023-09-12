@@ -14,8 +14,16 @@ import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import { pluginVersion } from "./version";
 import { HoustonHeader } from "@45drives/cockpit-vue-components";
+import { FIFO } from '@45drives/cockpit-helpers';
 import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';
+
+interface AppProps {
+	notificationFIFO: FIFO;
+}
+
+const props = defineProps<AppProps>();
+const notifications = ref<any>(null);
 
 const show = ref(true);
 const navTag = ref('dashboard');
@@ -35,6 +43,9 @@ const navigation = reactive<NavigationItem[]>([
 	// { name: 'Stats', tag: 'stats', current: computed(() => navTag.value == 'stats') as unknown as boolean, show: true, },
 	// { name: 'Settings', tag: 'settings', current: computed(() => navTag.value == 'settings') as unknown as boolean, show: true, },
 ].filter(item => item.show));
+
+provide('notifications', notifications);
+provide('notification-fifo', props.notificationFIFO);
 </script>
 
 	

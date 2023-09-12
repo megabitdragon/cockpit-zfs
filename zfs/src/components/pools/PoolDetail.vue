@@ -357,7 +357,7 @@ const disks = inject<Ref<DiskData[]>>('disks')!;
 const show = ref(true);
 const navTag = ref('stats');
 
-const saving = inject<Ref<boolean>>('saving')!;
+const saving = ref(false);
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
@@ -571,4 +571,5 @@ provide('current-pool-config', poolConfig);
 provide('show-vdev-modal', showAddVDevModal);
 // provide('show-confirm-sector', showConfirmSector);
 // provide('confirm-sector', confirmChangeSector);
+provide("saving", saving);
 </script>

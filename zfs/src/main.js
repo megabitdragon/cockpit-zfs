@@ -1,5 +1,11 @@
-import { createApp, VueElement } from 'vue';
+import { createApp, reactive} from 'vue';
 import './assets/zfs.css';
 import App from './App.vue';
+import { FIFO } from '@45drives/cockpit-helpers';
+import '@45drives/cockpit-css/src/index.css';
 
-createApp(App).mount('#app');
+const notificationFIFO = reactive(new FIFO());
+
+const app = createApp(App, { notificationFIFO });
+
+app.mount('#app');

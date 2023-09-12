@@ -181,8 +181,8 @@ function findPoolDataset(fileSystem) {
 	}
 }
 
-const hasChildren = inject<Ref<boolean>>('has-children')!;
-const forceDestroy = inject<Ref<boolean>>('force-destroy')!;
+const hasChildren = ref(false);
+const forceDestroy = ref(false);
 
 const showUnmountFileSystemConfirm = ref(false);
 const destroyChildren = ref(false);
@@ -289,4 +289,7 @@ provide('unmounting', unmounting);
 provide('mounting', mounting);
 provide('force-unmount', forceUnmount);
 provide('force-mount', forceMount);
+provide('force-destroy', forceDestroy);
+provide('has-children', hasChildren);
+provide("force-unmount", forceUnmount);
 </script>

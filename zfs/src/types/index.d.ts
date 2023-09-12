@@ -305,6 +305,8 @@ interface NewSnapshot {
 	}
 }
 
+type ConfirmationCallback = () => void;
+
 //object for navigation (generic)
 interface NavigationItem {
 	name: string;

@@ -245,7 +245,7 @@
 	</div>
 
 	<div v-if="showResilverModal">
-		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="'resilver-pool'" @close="showResilverModal = false"/>
+		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="'resilver-pool'" :confirmResilver="confirmThisResilver" @close="showResilverModal = false"/>
 	</div>
 
 	<div v-if="showTrimModal">
@@ -300,6 +300,8 @@ import ConfirmRemoveVDev from "../common/confirmation/ConfirmRemoveVDev.vue";
 import AttachDiskModal from "./AttachDiskModal.vue";
 import ConfirmDetachDisk from "../common/confirmation/ConfirmDetachDisk.vue";
 
+const notifications = inject<Ref<any>>('notifications')!;
+
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
 const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -317,22 +319,22 @@ const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 const selectedVDev = ref<vDevData>();
 
-const confirmDelete = inject<Ref<boolean>>('confirm-delete-pool')!;
+const confirmDelete = ref(false);
 const showDeletePoolConfirm = ref(false);
-const deleting = inject<Ref<boolean>>('deleting')!;
+const deleting = ref(false);
 
-const confirmResilver = inject<Ref<boolean>>('confirm-resilver')!;
+const confirmResilver = ref(false);
 const showResilverModal = ref(false);
 
 const showTrimModal = ref(false);
-const confirmTrim = inject<Ref<boolean>>('confirm-trim')!;
+const confirmTrim = ref(false);
 
-const secureTRIM = inject<Ref<boolean>>('secure-trim')!;
+const secureTRIM = ref(false);
 
 const showExportModal = ref(false);
-const confirmExport = inject<Ref<boolean>>('confirm-export')!;
+const confirmExport = ref(false);
 
-const forceUnmount = inject<Ref<boolean>>('force-unmount')!;
+const forceUnmount = ref(false);
 
 const exporting = ref(false);
 const trimmed = ref(false);
@@ -346,7 +348,7 @@ const message = ref('No Alerts');
 const loadingMessage = ref('');
 const loading = ref(false);
 
-const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
+const showImportModal = ref(false);
 const showAddVDevModal = ref(false);
 
 const showRemoveVDevConfirm = ref(false);
@@ -387,9 +389,9 @@ async function destroyPoolAndUpdate(pool) {
 }
 
 async function resilverThisPool(pool) {
-	scrubbed.value = false;
-	trimmed.value = false;
-	cleared.value = false;
+	// scrubbed.value = false;
+	// trimmed.value = false;
+	// cleared.value = false;
 	selectedPool.value = pool;
 	showResilverModal.value = true;
 	
@@ -411,11 +413,16 @@ async function resilverThisPool(pool) {
 
 			loading.value = false;
 			loadingMessage.value = "";
-			message.value = "Resilver on " + pool.name + " completed at " + getTimestampString();
+			//message.value = "Resilver on " + pool.name + " completed at " + getTimestampString();
+			notifications.value.constructNotification('Resilver Completed', 'Resilver on ' + pool.name + " completed at " + getTimestampString(), 'success');
 		}
 	});
 
 	console.log('preparing to resilver:', selectedPool.value);
+}
+
+const confirmThisResilver : ConfirmationCallback = () => {
+	confirmResilver.value = true;
 }
 
 async function trimThisPool(pool) {
@@ -635,37 +642,6 @@ async function detachThisDisk(pool : PoolData, disk: DiskData) {
 	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 }
 
-/*async function exportThisPool(pool) {
-	cleared.value = false;
-	selectedPool.value = pool;
-	showExportModal.value = true;
-	watch(confirmExport, async (newVal, oldVal) => {
-		if (confirmExport.value == true) {
-			exporting.value = true;
-			console.log('now exporting:', selectedPool.value);
-			if (forceUnmount.value) {
-				exportPool(pool, forceUnmount.value);
-			} else {
-				exportPool(pool);
-			}
-			message.value = "Exported " + pool.name + " at " + getTimestampString();
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			confirmExport.value = false;
-			showExportModal.value = false;
-			exporting.value = false;
-		}
-	});
-
-	console.log('preparing to export:', selectedPool.value);
-}
- */
-
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
 provide('show-delete-pool-confirm', showDeletePoolConfirm);
@@ -681,4 +657,11 @@ provide('show-detach-modal', showDetachDiskModal);
 provide('confirm-detach', confirmDetach);
 provide('detaching', detaching);
 provide('clear-labels', clearLabels);
+provide('deleting', deleting);
+provide("secure-trim", secureTRIM);
+provide("force-unmount", forceUnmount);
+provide("show-import-modal", showImportModal);
+provide("confirm-resilver", confirmResilver);
+provide("confirm-trim", confirmTrim);
+provide("confirm-export", confirmExport);
 </script>
