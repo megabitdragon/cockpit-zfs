@@ -67,8 +67,11 @@
 													<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
+													<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'yes'" v-slot="{ active }">
+														<a href="#" @click="unmountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
+													</MenuItem>
+													<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no'" v-slot="{ active }">
+														<a href="#" @click="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
 													</MenuItem>
 													<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
@@ -118,6 +121,14 @@
 		<ConfirmDeleteFileSystemModal :fileSystemName="selectedDataset!.name" :idKey="'delete-filesystem'" @close="showDeleteFileSystemConfirm = false"/>
 	</div>
 
+	<div v-if="showUnmountFileSystemConfirm">
+		<ConfirmUnmountFileSystem :fileSystemName="selectedDataset!.name" :idKey="'unmount-filesystem'" @close="showUnmountFileSystemConfirm = false"/>
+	</div>
+
+	<div v-if="showMountFileSystemConfirm">
+		<ConfirmMountFileSystem :fileSystemName="selectedDataset!.name" :idKey="'mount-filesystem'" @close="showMountFileSystemConfirm = false"/>
+	</div>
+
 </template>
 
 <script setup lang="ts">
@@ -126,11 +137,13 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
-import { destroyDataset, unmountChildren } from "../../composables/datasets";
+import { destroyDataset, unmountFileSystem, mountFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
 import ConfirmDeleteFileSystemModal from "../common/confirmation/ConfirmDeleteFileSystemModal.vue";
+import ConfirmUnmountFileSystem from "../common/confirmation/ConfirmUnmountFileSystem.vue";
+import ConfirmMountFileSystem from '../common/confirmation/ConfirmMountFileSystem.vue';
 
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -141,8 +154,6 @@ const fileSystemConfiguration = ref();
 const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
 const showDeleteFileSystemConfirm = ref(false);
-//const showDeleteFileSystemConfirm = inject<Ref<boolean>>('show-delete-confirm')!;
-// const confirmDelete = inject<Ref<boolean>>('confirm-delete-filesystem')!;
 const confirmDelete = ref(false);
 
 const isDeleting = ref(false);
@@ -172,8 +183,18 @@ function findPoolDataset(fileSystem) {
 
 const hasChildren = inject<Ref<boolean>>('has-children')!;
 const forceDestroy = inject<Ref<boolean>>('force-destroy')!;
+
+const showUnmountFileSystemConfirm = ref(false);
 const destroyChildren = ref(false);
 const destroyAllDependents = ref(false);
+const forceUnmount = ref(false);
+const unmounting = ref(false);
+const confirmUnmount = ref(false);
+
+const showMountFileSystemConfirm = ref(false);
+const forceMount = ref(true);
+const mounting = ref(false);
+const confirmMount = ref(false);
 
 function deleteFileSystem(fileSystem) {
 
@@ -191,18 +212,12 @@ function deleteFileSystem(fileSystem) {
 		if (isDeleting.value) {
 			return;
 		}
-		// if (hasChildren.value) {
-		// 	watch(forceDestroy,  (newValue, oldValue) => {
-		// 			console.log('forceDestroy.value changed:', newValue);
-		// 			if (forceDestroy.value) {
-		// 				 unmountChildren(fileSystem);
-		// 			}
-		// 	});
-		// }
-		console.log('confirmDelete.value changed:', newValue);
-		isDeleting.value = true;
 
+		console.log('confirmDelete.value changed:', newValue);
+	
 		if (confirmDelete.value == true) {
+			isDeleting.value = true;
+
 			await destroyDataset(selectedDataset.value!, forceDestroy.value, destroyChildren.value, destroyAllDependents.value);
 			console.log('deleted:', fileSystem);
 			showDeleteFileSystemConfirm.value = false;
@@ -216,10 +231,62 @@ function deleteFileSystem(fileSystem) {
 	});
 }
 
+function unmountThisFileSystem(fileSystem) {
+	showUnmountFileSystemConfirm.value = true;
+	selectedDataset.value = fileSystem;
+	console.log('selected to be unmounted:', selectedDataset.value);
+
+	watch(confirmUnmount, async (newValue, oldValue) => {
+		console.log('confirmUnmount changed:', newValue);
+		
+		if (confirmUnmount.value == true) {
+			unmounting.value = true;
+			await unmountFileSystem(fileSystem, forceUnmount.value);
+			console.log('unmounted:', fileSystem);
+			showUnmountFileSystemConfirm.value = false;
+			
+			confirmUnmount.value = false;
+			forceUnmount.value = false;
+			await refreshDatasets();
+			unmounting.value = false;
+		}
+	});
+}
+
+function mountThisFileSystem(fileSystem) {
+	showMountFileSystemConfirm.value = true;
+	selectedDataset.value = fileSystem;
+	console.log('selected to be mounted:', selectedDataset.value);
+
+	watch(confirmMount, async (newValue, oldValue) => {
+		console.log('confirmMount changed:', newValue);
+		
+		if (confirmMount.value == true) {
+			mounting.value = true;
+			await mountFileSystem(fileSystem, forceMount.value);
+			console.log('mounted:', fileSystem);
+			showMountFileSystemConfirm.value = false;
+			
+			confirmMount.value = false;
+			forceMount.value = false;
+			await refreshDatasets();
+			mounting.value = false;
+		}
+	});
+}
+
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
 provide('confirm-delete-filesystem', confirmDelete);
 provide('destroy-children', destroyChildren);
 provide('destroy-dependents', destroyAllDependents);
+provide('show-mount-filesystem-confirm', showMountFileSystemConfirm);
+provide('show-unmount-filesystem-confirm', showUnmountFileSystemConfirm);
+provide('confirm-unmount-filesystem', confirmUnmount);
+provide('confirm-mount-filesystem', confirmMount);
+provide('unmounting', unmounting);
+provide('mounting', mounting);
+provide('force-unmount', forceUnmount);
+provide('force-mount', forceMount);
 </script>

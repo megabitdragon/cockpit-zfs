@@ -189,26 +189,48 @@ export async function destroyDataset(fileSystemData : FileSystemData, forceDestr
 	}
 }
 
-export async function unmountChildren(fileSystemData: FileSystemData) {
+export async function unmountFileSystem(fileSystemData: FileSystemData, forceUnmount?: boolean) {
 	try {
-		for (const child of fileSystemData.children!) {
-			if (child.children!) {
-				await unmountChildren(child);
-			} else {
-				let cmdString = ['zfs', 'unmount', child.name];
-				console.log("unmount cmdString:", cmdString);
-	
-				const state = useSpawn(cmdString);
-				const output = await state.promise();
-				console.log(output);
-				return output.stdout;
-			}
+		let cmdString = ['zfs', 'unmount'];
+		
+		if (forceUnmount) {
+			cmdString.push('-f');
 		}
+
+		cmdString.push(fileSystemData.name)
+
+		console.log("***\ncmdString:", cmdString, "\n***");
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
 	} catch (state) {
 		console.error(errorString(state));
 		return null;
 	}
 }
+
+export async function mountFileSystem(fileSystemData: FileSystemData, forceMount?: boolean) {
+	try {
+		let cmdString = ['zfs', 'mount'];
+		
+		if (forceMount) {
+			cmdString.push('-f');
+		}
+
+		cmdString.push(fileSystemData.name)
+
+		console.log("***\ncmdString:", cmdString, "\n***");
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
 
 function hasChanges(fileSystemData) {
 	const properties = [

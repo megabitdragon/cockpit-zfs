@@ -110,9 +110,6 @@ const forceUnmount = inject<Ref<boolean>>('force-destroy')!;
 const destroyChildren = inject<Ref<boolean>>('destroy-children')!;
 const destroyAllDependents = inject<Ref<boolean>>('destroy-dependents')!;
 
-//     provide('destroy-children', destroyChildren);
-// provide('destroy-dependents', destroyAllDependents);
-
 const getIdKey = (name: string) => `${name}`;
 
 </script>
