@@ -302,6 +302,33 @@ import ConfirmDetachDisk from "../common/confirmation/ConfirmDetachDisk.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
 
+const selectedPool = ref<PoolData>();
+const selectedDisk = ref<DiskData>();
+const selectedVDev = ref<vDevData>();
+
+const message = ref('No Alerts');
+const loadingMessage = ref('');
+const loading = ref(false);
+
+////////////// Show Pool/Disk Details ////////////////
+/////////////////////////////////////////////////////
+const showPoolDetails = ref(false);
+const showDiskDetails = ref(false);
+
+function showPoolModal(pool) {
+	selectedPool.value = pool;
+	console.log(selectedPool);
+	showPoolDetails.value = true;
+}
+
+// function showDiskModal(disk) {
+// 	selectedDisk.value = disk;
+// 	console.log(selectedDisk);
+// 	showDiskDetails.value = true;
+// }
+
+/////////////// Loading/Refreshing //////////////////
+/////////////////////////////////////////////////////
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
 const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -310,83 +337,56 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
-const showWizard = ref(false);
+async function refreshAllData() {
+	disksLoaded.value = false;
+	poolsLoaded.value = false;
+	fileSystemsLoaded.value = false;
+	diskData.value = [];
+	poolData.value = [];
+	filesystemData.value = [];
+	await loadDisksThenPools(diskData, poolData);
+	await loadDatasets(filesystemData);
+	disksLoaded.value = true;
+	poolsLoaded.value = true;
+	fileSystemsLoaded.value = true;
+	message.value = '';
+	notifications.value.constructNotification('Data Refreshed', "Sucessfully refreshed pool, disk and filesystem data.", 'success');
+}
 
-const showPoolDetails = ref(false);
-const showDiskDetails = ref(false);
-
-const selectedPool = ref<PoolData>();
-const selectedDisk = ref<DiskData>();
-const selectedVDev = ref<vDevData>();
-
+////////////////// Destroy Pool /////////////////////
+/////////////////////////////////////////////////////
 const confirmDelete = ref(false);
 const showDeletePoolConfirm = ref(false);
 const deleting = ref(false);
 
-const confirmResilver = ref(false);
-const showResilverModal = ref(false);
-
-const showTrimModal = ref(false);
-const confirmTrim = ref(false);
-
-const secureTRIM = ref(false);
-
-const showExportModal = ref(false);
-const confirmExport = ref(false);
-
-const forceUnmount = ref(false);
-
-const exporting = ref(false);
-const trimmed = ref(false);
-const trimming = ref(false);
-const resilvered = ref(false);
-const resilvering = ref(false);
-const scrubbed = ref(false);
-const scrubbing = ref(false);
-const cleared = ref(false);
-const message = ref('No Alerts');
-const loadingMessage = ref('');
-const loading = ref(false);
-
-const showImportModal = ref(false);
-const showAddVDevModal = ref(false);
-
-const showRemoveVDevConfirm = ref(false);
-const confirmRemove = ref(false);
-const removing = ref(false);
-
-const showAttachDiskModal = ref(false);
-const showDetachDiskModal = ref(false);
-const confirmDetach = ref(false);
-const detaching = ref(false);
-const clearLabels = ref(false);
-
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
 	showDeletePoolConfirm.value = true;
-	
-	watch(confirmDelete, async (newValue, oldValue) => {
-	
-		if (confirmDelete.value == true) {	
-			deleting.value = true;
-			console.log('now deleting:', selectedPool.value);
-			await destroyPool(selectedPool.value!);
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			confirmDelete.value = false;
-			showDeletePoolConfirm.value = false;
-			deleting.value = false;
-			message.value = "Destroyed " + pool.name + " at " + getTimestampString();
-		}
-	});
 
 	console.log('preparing to delete:', selectedPool.value);
 }
+
+watch(confirmDelete, async (newValue, oldValue) => {
+	
+	if (confirmDelete.value == true) {	
+		deleting.value = true;
+		console.log('now deleting:', selectedPool.value);
+		await destroyPool(selectedPool.value!);
+		refreshAllData();
+		confirmDelete.value = false;
+		showDeletePoolConfirm.value = false;
+		deleting.value = false;
+		message.value = "Destroyed " + selectedPool.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
+	}
+});
+
+////////////////// Resilver Pool /////////////////////
+/////////////////////////////////////////////////////
+const confirmResilver = ref(false);
+const showResilverModal = ref(false);
+const resilvered = ref(false);
+const resilvering = ref(false);
 
 async function resilverThisPool(pool) {
 	// scrubbed.value = false;
@@ -394,29 +394,6 @@ async function resilverThisPool(pool) {
 	// cleared.value = false;
 	selectedPool.value = pool;
 	showResilverModal.value = true;
-	
-	watch(confirmResilver, async (newValue, oldValue) => {
-
-		if (confirmResilver.value == true) {
-			resilvering.value = true;
-			resilvered.value = false;
-			console.log('now resilvering:', selectedPool.value);
-
-			loading.value = true;
-			loadingMessage.value = `Resilvering ${pool.name}...`;
-
-			showResilverModal.value = false;
-		 	await resilverPool(pool);
-			confirmResilver.value = false;
-			resilvered.value = true;
-			resilvering.value = false;
-
-			loading.value = false;
-			loadingMessage.value = "";
-			//message.value = "Resilver on " + pool.name + " completed at " + getTimestampString();
-			notifications.value.constructNotification('Resilver Completed', 'Resilver on ' + pool.name + " completed at " + getTimestampString(), 'success');
-		}
-	});
 
 	console.log('preparing to resilver:', selectedPool.value);
 }
@@ -425,40 +402,77 @@ const confirmThisResilver : ConfirmationCallback = () => {
 	confirmResilver.value = true;
 }
 
+watch(confirmResilver, async (newValue, oldValue) => {
+
+	if (confirmResilver.value == true) {
+		resilvering.value = true;
+		resilvered.value = false;
+		console.log('now resilvering:', selectedPool.value);
+
+		loading.value = true;
+		loadingMessage.value = `Resilvering ${selectedPool.value!.name}...`;
+
+		showResilverModal.value = false;
+		await resilverPool(selectedPool.value);
+		confirmResilver.value = false;
+		resilvered.value = true;
+		resilvering.value = false;
+
+		loading.value = false;
+		loadingMessage.value = "";
+		message.value = "Resilver on " + selectedPool.value!.name + " completed at " + getTimestampString();
+		notifications.value.constructNotification('Resilver Completed', 'Resilver on ' + selectedPool.value!.name + " completed.", 'success');
+	}
+});
+
+//////////////////// TRIM Pool //////////////////////
+/////////////////////////////////////////////////////
+const showTrimModal = ref(false);
+const confirmTrim = ref(false);
+const secureTRIM = ref(false);
+const trimmed = ref(false);
+const trimming = ref(false);
+
 async function trimThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
 	showTrimModal.value = true;
 
-	watch(confirmTrim, async (newValue, oldValue) => {
-		if (confirmTrim.value == true) {
-			trimming.value = true;
-			trimmed.value = false;
-			console.log('now trimming:', selectedPool.value);
-
-			loading.value = true;
-			loadingMessage.value = `Trimming ${pool.name}...`;
-
-			if (secureTRIM.value) {
-				confirmTrim.value = false;	
-				showTrimModal.value = false;
-				await trimPool(pool, secureTRIM.value);
-			} else {
-				confirmTrim.value = false;
-				showTrimModal.value = false;
-				await trimPool(pool);
-			}
-			trimming.value = false;
-			trimmed.value = true;
-
-			loading.value = false;
-			loadingMessage.value = "";
-			message.value = "Trim on " + pool.name + " completed at " + getTimestampString();
-		}
-	});
-
 	console.log("preparing to trim:", selectedPool.value);
 }
+
+watch(confirmTrim, async (newValue, oldValue) => {
+	if (confirmTrim.value == true) {
+		trimming.value = true;
+		trimmed.value = false;
+		console.log('now trimming:', selectedPool.value);
+
+		loading.value = true;
+		loadingMessage.value = `Trimming ${selectedPool.value!.name}...`;
+
+		if (secureTRIM.value) {
+			confirmTrim.value = false;	
+			showTrimModal.value = false;
+			await trimPool(selectedPool.value, secureTRIM.value);
+		} else {
+			confirmTrim.value = false;
+			showTrimModal.value = false;
+			await trimPool(selectedPool.value);
+		}
+		trimming.value = false;
+		trimmed.value = true;
+
+		loading.value = false;
+		loadingMessage.value = "";
+		message.value = "Trim on " + selectedPool.value!.name + " completed at " + getTimestampString();
+		notifications.value.constructNotification('Trim Completed', 'Trim on ' + selectedPool.value!.name + " completed.", 'success');
+	}
+});
+
+/////////////////// Scrub Pool //////////////////////
+/////////////////////////////////////////////////////
+const scrubbed = ref(false);
+const scrubbing = ref(false);
 
 async function scrubThisPool(pool) {
 	cleared.value = false;
@@ -469,7 +483,7 @@ async function scrubThisPool(pool) {
 	console.log('now scrubbing:', selectedPool.value);
 
 	loading.value = true;
-	loadingMessage.value = `Scrubbing ${pool.name}...`;
+	loadingMessage.value = `Scrubbing ${selectedPool.value!.name}...`;
 
 	await scrubPool(pool);
 
@@ -478,8 +492,147 @@ async function scrubThisPool(pool) {
 
 	loading.value = false;
 	loadingMessage.value = "";
-	message.value = "Scrub on " + pool.name + " ended at " + getTimestampString();
+	message.value = "Scrub on " + selectedPool.value!.name + " ended at " + getTimestampString();
+	notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
 }
+
+/////////////////// Export Pool /////////////////////
+/////////////////////////////////////////////////////
+const showExportModal = ref(false);
+const confirmExport = ref(false);
+const forceUnmount = ref(false);
+const exporting = ref(false);
+
+async function exportThisPool(pool) {
+	cleared.value = false;
+	selectedPool.value = pool;
+	showExportModal.value = true;
+
+	console.log('preparing to export:', selectedPool.value);
+}
+
+watch(confirmExport, async (newVal, oldVal) => {
+	if (confirmExport.value == true) {
+		exporting.value = true;
+		console.log('now exporting:', selectedPool.value);
+		if (forceUnmount.value) {
+			exportPool(selectedPool.value!, forceUnmount.value);
+		} else {
+			exportPool(selectedPool.value!);
+		}
+		message.value = "Exported " + selectedPool.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
+		refreshAllData();
+		confirmExport.value = false;
+		showExportModal.value = false;
+		exporting.value = false;
+	}
+});
+
+/////////////// Create/Import Pool //////////////////
+/////////////////////////////////////////////////////
+const showWizard = ref(false);
+const showImportModal = ref(false);
+
+function newPoolWizardBtn() {
+	if (!showWizard.value) {
+		showWizard.value = true;	
+	} else {
+		showWizard.value = false;
+	}
+}
+
+function importNewPoolBtn() {
+	showImportModal.value = true;
+}
+
+///////////////// Add/Remove VDev ///////////////////
+/////////////////////////////////////////////////////
+const showAddVDevModal = ref(false);
+
+const showRemoveVDevConfirm = ref(false);
+const confirmRemove = ref(false);
+const removing = ref(false);
+
+function showAddVDev(pool) {
+	selectedPool.value = pool;
+	console.log(selectedPool);
+	showAddVDevModal.value = true;
+}
+
+async function removeVDev(pool : PoolData, vDev : vDevData) {
+	selectedPool.value = pool;
+	selectedVDev.value = vDev;
+	showRemoveVDevConfirm.value = true;
+
+	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
+}
+
+watch(confirmRemove, async (newValue, oldValue) => {
+	if (confirmRemove.value == true) {
+		removing.value = true;
+		console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
+		await removeVDevFromPool(selectedVDev.value, selectedPool.value);
+		refreshAllData();
+		confirmRemove.value = false;
+		showRemoveVDevConfirm.value = false;
+		removing.value = false;
+		message.value = "Removed " + selectedVDev.value!.name + " from " + selectedVDev.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Remove Completed', 'Removal of VDev '+ selectedVDev.value!.name + " from " + selectedVDev.value!.name + " completed.", 'success');
+	}
+});
+
+
+////////////// Clearing Disk Labels /////////////////
+/////////////////////////////////////////////////////
+const clearLabels = ref(false);
+
+
+
+/////////////// Attach/Detach Disk //////////////////
+/////////////////////////////////////////////////////
+const showAttachDiskModal = ref(false);
+const showDetachDiskModal = ref(false);
+const confirmDetach = ref(false);
+const detaching = ref(false);
+
+function showAttachDisk(pool, vdev) {
+	selectedPool.value = pool;
+	selectedVDev.value = vdev;
+	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
+	showAttachDiskModal.value = true;
+}
+
+async function detachThisDisk(pool : PoolData, disk: DiskData) {
+	selectedPool.value = pool;
+	selectedDisk.value = disk;
+	showDetachDiskModal.value = true;
+
+	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
+}
+
+watch(confirmDetach, async (newValue, oldValue) => {
+	if (confirmDetach.value == true) {
+		detaching.value = true;
+		console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
+		if (clearLabels.value == true) {
+			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
+			await labelClear(selectedDisk.value!.name);
+		} else {
+			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
+		}
+		refreshAllData();
+		confirmDetach.value = false;
+		showDetachDiskModal.value = false;
+		detaching.value = false;
+		message.value = "Detached disk " + selectedDisk.value!.name + " from " + selectedPool.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Detach Completed', selectedDisk.value!.name + " was detached from " + selectedPool.value!.name + ".", 'success');
+	}
+});
+
+/////////////////// Clear Errors ////////////////////
+/////////////////////////////////////////////////////
+const cleared = ref(false);
 
 async function clearPoolErrors(poolName) {
 	cleared.value = false;
@@ -497,149 +650,6 @@ async function clearDiskErrors(poolName, diskName) {
 	cleared.value = false;
 	await clearErrors(poolName, diskName);
 	cleared.value = true;
-}
-
-async function exportThisPool(pool) {
-	cleared.value = false;
-	selectedPool.value = pool;
-	showExportModal.value = true;
-	watch(confirmExport, async (newVal, oldVal) => {
-		if (confirmExport.value == true) {
-			exporting.value = true;
-			console.log('now exporting:', selectedPool.value);
-			if (forceUnmount.value) {
-				exportPool(pool, forceUnmount.value);
-			} else {
-				exportPool(pool);
-			}
-			message.value = "Exported " + pool.name + " at " + getTimestampString();
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			confirmExport.value = false;
-			showExportModal.value = false;
-			exporting.value = false;
-		}
-	});
-
-	console.log('preparing to export:', selectedPool.value);
-}
-
-function importNewPoolBtn() {
-	showImportModal.value = true;
-}
-
-async function refreshAllData() {
-	disksLoaded.value = false;
-	poolsLoaded.value = false;
-	fileSystemsLoaded.value = false;
-	diskData.value = [];
-	poolData.value = [];
-	filesystemData.value = [];
-	await loadDisksThenPools(diskData, poolData);
-	await loadDatasets(filesystemData);
-	disksLoaded.value = true;
-	poolsLoaded.value = true;
-	fileSystemsLoaded.value = true;
-	//message.value = 'No Alerts';
-}
-
-//method to show pool details when button is clicked
-function showPoolModal(pool) {
-	selectedPool.value = pool;
-	console.log(selectedPool);
-	showPoolDetails.value = true;
-}
-
-function showAddVDev(pool) {
-	selectedPool.value = pool;
-	console.log(selectedPool);
-	showAddVDevModal.value = true;
-}
-
-function showAttachDisk(pool, vdev) {
-	selectedPool.value = pool;
-	selectedVDev.value = vdev;
-	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
-	showAttachDiskModal.value = true;
-}
-
-// function showDiskModal(disk) {
-// 	selectedDisk.value = disk;
-// 	console.log(selectedDisk);
-// 	showDiskDetails.value = true;
-// }
-
-function newPoolWizardBtn() {
-	if (!showWizard.value) {
-		showWizard.value = true;	
-	} else {
-		showWizard.value = false;
-	}
-}
-
-async function removeVDev(pool : PoolData, vDev : vDevData) {
-	selectedPool.value = pool;
-	selectedVDev.value = vDev;
-	showRemoveVDevConfirm.value = true;
-
-	watch(confirmRemove, async (newValue, oldValue) => {
-		if (confirmRemove.value == true) {
-			removing.value = true;
-			console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
-			await removeVDevFromPool(selectedVDev.value, selectedPool.value);
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			diskData.value = [];
-			poolData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			confirmRemove.value = false;
-			showRemoveVDevConfirm.value = false;
-			removing.value = false;
-			message.value = "Removed " + vDev.name + " from " + pool.name + " at " + getTimestampString();
-		}
-	});
-
-	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
-}
-
-async function detachThisDisk(pool : PoolData, disk: DiskData) {
-	selectedPool.value = pool;
-	selectedDisk.value = disk;
-	showDetachDiskModal.value = true;
-
-	watch(confirmDetach, async (newValue, oldValue) => {
-		if (confirmDetach.value == true) {
-			detaching.value = true;
-			console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
-			if (clearLabels.value == true) {
-				await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
-				await labelClear(selectedDisk.value!.name);
-			} else {
-				await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
-			}
-			
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			diskData.value = [];
-			poolData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			confirmDetach.value = false;
-			showDetachDiskModal.value = false;
-			detaching.value = false;
-			message.value = "Detached disk " + selectedDisk.value!.name + " from " + selectedPool.value!.name + " at " + getTimestampString();
-		}
-	});
-
-	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 }
 
 provide('show-wizard', showWizard);
