@@ -241,7 +241,7 @@
 	</div>
 
 	<div v-if="showDeletePoolConfirm">
-		<ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="'delete-pool'" @close="showDeletePoolConfirm = false"/>
+		<ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="'delete-pool'" :confirmDestroy="confirmThisDestroy" @close="showDeletePoolConfirm = false"/>
 	</div>
 
 	<div v-if="showResilverModal">
@@ -249,11 +249,11 @@
 	</div>
 
 	<div v-if="showTrimModal">
-		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="'trim-pool'" @close="showTrimModal = false"/>
+		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="'trim-pool'" :confirmTrim="confirmThisTrim" @close="showTrimModal = false"/>
 	</div>
 
 	<div v-if="showExportModal">
-		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="'export-pool'" @close="showExportModal = false"/>
+		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="'export-pool'" :confirmExport="confirmThisExport" @close="showExportModal = false"/>
 	</div>
 
 	<div v-if="showImportModal">
@@ -265,7 +265,7 @@
 	</div>
 
 	<div v-if="showRemoveVDevConfirm">
-		<ConfirmRemoveVDev @close="showRemoveVDevConfirm = false" :idKey="'show-remove-modal'" :poolName="selectedPool!.name" :vDevName="selectedVDev!.name"/>
+		<ConfirmRemoveVDev @close="showRemoveVDevConfirm = false" :idKey="'show-remove-modal'" :confirmRemove="confirmThisRemove" :poolName="selectedPool!.name" :vDevName="selectedVDev!.name"/>
 	</div>
 
 	<div v-if="showAttachDiskModal">
@@ -273,7 +273,7 @@
 	</div>
 
 	<div v-if="showDetachDiskModal">
-		<ConfirmDetachDisk @close="showDetachDiskModal = false" :idKey="'show-detach-disk-modal'" :poolName="selectedPool!.name" :diskName="selectedDisk!.name"/>
+		<ConfirmDetachDisk @close="showDetachDiskModal = false" :idKey="'show-detach-disk-modal'" :confirmDetach="confirmThisDetach" :poolName="selectedPool!.name" :diskName="selectedDisk!.name"/>
 	</div>
 </template>
 
@@ -284,7 +284,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, importPool, removeVDevFromPool } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
@@ -310,7 +310,7 @@ const message = ref('No Alerts');
 const loadingMessage = ref('');
 const loading = ref(false);
 
-////////////// Show Pool/Disk Details ////////////////
+////////////// Show Pool/Disk Details ///////////////
 /////////////////////////////////////////////////////
 const showPoolDetails = ref(false);
 const showDiskDetails = ref(false);
@@ -350,7 +350,7 @@ async function refreshAllData() {
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
 	message.value = '';
-	notifications.value.constructNotification('Data Refreshed', "Sucessfully refreshed pool, disk and filesystem data.", 'success');
+	//notifications.value.constructNotification('Data Refreshed', "Sucessfully refreshed pool, disk and filesystem data.", 'success');
 }
 
 ////////////////// Destroy Pool /////////////////////
@@ -358,12 +358,18 @@ async function refreshAllData() {
 const confirmDelete = ref(false);
 const showDeletePoolConfirm = ref(false);
 const deleting = ref(false);
+const hasChildren = ref(false);
+const forceDestroy = ref(false);
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
 	showDeletePoolConfirm.value = true;
 
 	console.log('preparing to delete:', selectedPool.value);
+}
+
+const confirmThisDestroy : ConfirmationCallback = () => {
+	confirmDelete.value = true;
 }
 
 watch(confirmDelete, async (newValue, oldValue) => {
@@ -381,7 +387,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 	}
 });
 
-////////////////// Resilver Pool /////////////////////
+////////////////// Resilver Pool ////////////////////
 /////////////////////////////////////////////////////
 const confirmResilver = ref(false);
 const showResilverModal = ref(false);
@@ -439,6 +445,10 @@ async function trimThisPool(pool) {
 	showTrimModal.value = true;
 
 	console.log("preparing to trim:", selectedPool.value);
+}
+
+const confirmThisTrim : ConfirmationCallback = () => {
+	confirmTrim.value = true;
 }
 
 watch(confirmTrim, async (newValue, oldValue) => {
@@ -511,6 +521,10 @@ async function exportThisPool(pool) {
 	console.log('preparing to export:', selectedPool.value);
 }
 
+const confirmThisExport : ConfirmationCallback = () => {
+	confirmExport.value = true;
+}
+
 watch(confirmExport, async (newVal, oldVal) => {
 	if (confirmExport.value == true) {
 		exporting.value = true;
@@ -568,6 +582,10 @@ async function removeVDev(pool : PoolData, vDev : vDevData) {
 	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
 }
 
+const confirmThisRemove : ConfirmationCallback = () => {
+	confirmRemove.value = true;
+}
+
 watch(confirmRemove, async (newValue, oldValue) => {
 	if (confirmRemove.value == true) {
 		removing.value = true;
@@ -582,12 +600,9 @@ watch(confirmRemove, async (newValue, oldValue) => {
 	}
 });
 
-
 ////////////// Clearing Disk Labels /////////////////
 /////////////////////////////////////////////////////
 const clearLabels = ref(false);
-
-
 
 /////////////// Attach/Detach Disk //////////////////
 /////////////////////////////////////////////////////
@@ -609,6 +624,10 @@ async function detachThisDisk(pool : PoolData, disk: DiskData) {
 	showDetachDiskModal.value = true;
 
 	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
+}
+
+const confirmThisDetach : ConfirmationCallback = () => {
+	confirmDetach.value = true;
 }
 
 watch(confirmDetach, async (newValue, oldValue) => {
@@ -654,24 +673,37 @@ async function clearDiskErrors(poolName, diskName) {
 
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
+
 provide('show-delete-pool-confirm', showDeletePoolConfirm);
+provide('confirm-delete-pool', confirmDelete);
+provide('deleting', deleting);
+provide('has-children', hasChildren);
+provide('force-destroy', forceDestroy);
+
 provide("show-resilver-modal", showResilverModal);
+provide("confirm-resilver", confirmResilver);
+provide('resilvering', resilvering);
+
 provide("show-trim-modal", showTrimModal);
+provide("secure-trim", secureTRIM);
+provide("confirm-trim", confirmTrim);
+
 provide("show-export-modal", showExportModal);
-provide("show-vdev-modal", showAddVDevModal);
+provide("confirm-export", confirmExport);
+provide("force-unmount", forceUnmount);
+provide('exporting', exporting);
+
 provide('show-remove-modal', showRemoveVDevConfirm);
 provide('confirm-remove', confirmRemove);
 provide('removing', removing);
+
+provide("show-import-modal", showImportModal);
+provide("show-vdev-modal", showAddVDevModal);
 provide('show-attach-modal', showAttachDiskModal);
+
 provide('show-detach-modal', showDetachDiskModal);
 provide('confirm-detach', confirmDetach);
 provide('detaching', detaching);
+
 provide('clear-labels', clearLabels);
-provide('deleting', deleting);
-provide("secure-trim", secureTRIM);
-provide("force-unmount", forceUnmount);
-provide("show-import-modal", showImportModal);
-provide("confirm-resilver", confirmResilver);
-provide("confirm-trim", confirmTrim);
-provide("confirm-export", confirmExport);
 </script>

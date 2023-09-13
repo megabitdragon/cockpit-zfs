@@ -22,9 +22,6 @@
 									<MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click="clearPoolErrors(props.pool.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 									</MenuItem>
-									<!-- <MenuItem as="div" v-slot="{ active }">
-										<a href="#" @click="clearAlerts(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Alerts</a>
-									</MenuItem> -->
 									<MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 									</MenuItem>
@@ -73,32 +70,6 @@
 					<div v-else-if="cleared == true || !trimming && !scrubbing && !resilvering && !trimmed && !scrubbed && !resilvered">
 						<span class="text-muted">No Alerts</span>
 					</div>
-
-					<!-- <div v-if="runningOperation" class="grid grid-cols-4 gap-0.5 justify-items-center">
-						<h3 class="text-muted col-span-4 mt-2">{{ props.pool.scan!.function }} in progress...</h3>
-						<h3 class="text-muted col-span-4 mt-2">{{ props.pool.scan!.percentage }}%</h3>
-						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
-					</div>
-					<div v-else-if="!runningOperation && completedOperation">
-						<span class="text-success">{{props.pool.scan!.function}} {{props.pool.scan!.state}} at <br/> {{ props.pool.scan!.end_time }}.</span>
-					</div>
-					<div v-else-if="!completedOperation && !runningOperation">
-						<span class="text-muted">No Alerts</span>
-					</div> -->
-
-					<!-- <div v-if="runningOperation" class="grid grid-cols-4 gap-0.5 justify-items-center">
-						<h3 class="text-muted col-span-4 mt-2">Scrubbing...</h3>
-						<h3 class="text-muted col-span-4 mt-2">{{ progressPercentage }}%</h3>
-						<h3 class="text-muted col-span-4 mt-2">{{ timeRemaining }}</h3>
-						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
-					</div>
-					<div v-else-if="!runningOperation && completedOperation">
-						<span class="text-success">{{props.pool.scan!.function}} {{props.pool.scan!.state}} at <br/> {{ props.pool.scan!.end_time }}.</span>
-					</div>
-					<div v-else-if="!completedOperation && !runningOperation">
-						<span class="text-muted">No Alerts</span>
-					</div> -->
-
 				</div>
 			</template>
 			<template v-slot:content>
@@ -145,7 +116,7 @@
 	</div>
 
 	<div v-if="showDeletePoolConfirm">
-		<ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" @close="showDeletePoolConfirm = false"/>
+		<ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" :confirmDestroy="confirmThisDestroy" @close="showDeletePoolConfirm = false"/>
 	</div>
 
 	<div v-if="showResilverModal">
@@ -153,11 +124,11 @@
 	</div>
 
 	<div v-if="showTrimModal">
-		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`trim-pool-${selectedPool?.guid}`)" @close="showTrimModal = false"/>
+		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`trim-pool-${selectedPool?.guid}`)" :confirmTrim="confirmThisTrim" @close="showTrimModal = false"/>
 	</div>
 
 	<div v-if="showExportModal">
-		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`export-pool-${selectedPool?.guid}`)" @close="showExportModal = false"/>
+		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`export-pool-${selectedPool?.guid}`)" :confirmExport="confirmThisExport" @close="showExportModal = false"/>
 	</div>
 </template>
 
@@ -176,233 +147,16 @@ import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
-// import { checkStatus } from '../../composables/pools';
 
 interface DashPoolCardProps {
 	pool: PoolData;
 }
 
-const props = defineProps<DashPoolCardProps>();
-
-const showPoolDetails = ref(false);
-
-const selectedPool = ref<PoolData>();
-
-const poolData = inject<Ref<PoolData[]>>("pools")!;
-
-const diskData = inject<Ref<DiskData[]>>("disks")!;
-
-const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
-const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
-
-const confirmDelete = ref(false);
+const notifications = inject<Ref<any>>('notifications')!;
 	
-const showDeletePoolConfirm = ref(false);
-//const showDeleteConfirm = inject<Ref<boolean>>('show-delete-confirm')!;
-
-const deleting = ref(false)
-const confirmResilver = ref(false);
-const showResilverModal = ref(false);
-const showTrimModal = ref(false);
-const confirmTrim = ref(false);
-const secureTRIM = ref(false)
-const showExportModal = ref(false);
-const confirmExport = ref(false);
-const forceUnmount = ref(false)
-
-const showAddVDevModal = ref(false);
-
-const exporting = ref(false);
-const trimmed = ref(false);
-const trimming = ref(false);
-const resilvered = ref(false);
-const resilvering = ref(false);
-const scrubbed = ref(false);
-const scrubbing = ref(false);
-const cleared = ref(false);
 const messageTimestamp = ref('');
-
-const completedOperation = ref(false);
-const runningOperation = ref(false);
-
-// const progressPercentage = ref(null);
-// const timeRemaining = ref(null);
-// const updateInterval = 3000;
-// const stopUpdatingProgress = ref(false);
-
-// const updateProgress = async (poolName) => {
-// 	try {
-// 		const response = await checkStatus(poolName);
-// 		progressPercentage.value = response.percentage_done;
-// 		timeRemaining.value = response.time_remaining
-
-// 		if (scrubbed) {
-// 			stopUpdatingProgress.value = true; // Set the flag to stop updating
-// 		}
-// 	} catch (error) {
-// 		console.error("Error:", error);
-// 	}
-// }
-
-// watchEffect(() => {
-// 	const interval = setInterval(updateProgress, updateInterval);selectedPool.value = pool;
-// 		clearInterval(interval);
-// 	};
-// });
-
-//method to show pool details when button is clicked
-function showDetails(pool) {
-	selectedPool.value = pool;
-	console.log('loading:', selectedPool);
-	showPoolDetails.value = true;
-}
-
-async function destroyPoolAndUpdate(pool) {
-	selectedPool.value = pool;
-	showDeletePoolConfirm.value = true;
-	
-	watch(confirmDelete, async (newValue, oldValue) => {
-	
-		if (confirmDelete.value == true) {	
-			deleting.value = true;
-			console.log('now deleting:', selectedPool.value);
-			await destroyPool(selectedPool.value!);
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			confirmDelete.value = false;
-			showDeletePoolConfirm.value = false;
-			deleting.value = false;
-		}
-	});
-
-	console.log('preparing to delete:', selectedPool.value);
-}
-
-async function exportThisPool(pool) {
-	cleared.value = false;
-	selectedPool.value = pool;
-	showExportModal.value = true;
-	watch(confirmExport, async (newValue, oldValue) => {
-		if (confirmExport.value == true) {
-			exporting.value = true;
-			console.log('now exporting:', selectedPool.value);
-			if (forceUnmount.value) {
-				await exportPool(pool, forceUnmount.value);
-			} else {
-				await exportPool(pool);
-			}
-
-			disksLoaded.value = false;
-			poolsLoaded.value = false;
-			poolData.value = [];
-			diskData.value = [];
-			await loadDisksThenPools(diskData, poolData);
-			disksLoaded.value = true;
-			poolsLoaded.value = true;
-			confirmExport.value = false;
-			showExportModal.value = false;
-			exporting.value = false;
-
-		}
-	});
-
-	console.log('preparing to export:', selectedPool.value);
-}
-
-const confirmThisResilver : ConfirmationCallback = () => {
-	confirmResilver.value = true;
-}
-
-async function resilverThisPool(pool) {
-	scrubbed.value = false;
-	trimmed.value = false;
-	cleared.value = false;
-	selectedPool.value = pool;
-	showResilverModal.value = true;
-	
-	watch(confirmResilver, async (newValue, oldValue) => {
-
-		if (confirmResilver.value == true) {
-			resilvering.value = true;
-			resilvered.value = false;
-			console.log('now resilvering:', selectedPool.value);
-			showResilverModal.value = false;
-		 	await resilverPool(pool);
-			confirmResilver.value = false;
-			resilvered.value = true;
-			resilvering.value = false;
-			messageTimestamp.value = getTimestampString();
-
-		}
-	});
-
-	console.log('preparing to resilver:', selectedPool.value);
-}
-
-async function trimThisPool(pool) {
-	cleared.value = false;
-	selectedPool.value = pool;
-	showTrimModal.value = true;
-
-	watch(confirmTrim, async (newValue, oldValue) => {
-		if (confirmTrim.value == true) {
-			trimming.value = true;
-			trimmed.value = false;
-			console.log('now trimming:', selectedPool.value);
-			if (secureTRIM.value) {
-				confirmTrim.value = false;
-				showTrimModal.value = false;
-				await trimPool(pool, secureTRIM.value);
-			} else {
-				confirmTrim.value = false;
-				showTrimModal.value = false;
-				await trimPool(pool);
-			}
-			
-			trimming.value = false;
-			trimmed.value = true;
-			messageTimestamp.value = getTimestampString();
-		}
-	});
-
-	console.log("preparing to trim:", selectedPool.value);
-}
-
-async function scrubThisPool(pool) {
-	cleared.value = false;
-	selectedPool.value = pool;
-	console.log('preparing to scrub:', selectedPool.value);
-	scrubbed.value = false;
-	scrubbing.value = true;
-	console.log('now scrubbing:', selectedPool.value);
-	await scrubPool(pool);
-	scrubbing.value = false;
-	scrubbed.value = true;
-	messageTimestamp.value = getTimestampString();
-
-	// completedOperation.value = false;
-	// runningOperation.value = true;
-	// console.log('now scrubbing:', selectedPool.value);
-	// await scrubPool(pool);
-	// runningOperation.value = false;
-	// completedOperation.value = true;
-
-}
-
-async function clearPoolErrors(poolName) {
-	cleared.value = false;
-	await clearErrors(poolName);
-	cleared.value = true;
-}
-
-async function clearAlerts(pool) {
-	cleared.value = true;
-}
+const props = defineProps<DashPoolCardProps>();
+const selectedPool = ref<PoolData>();
 
 const poolConfig = ref<PoolData>({
 	name: props.pool.name,
@@ -432,25 +186,241 @@ const poolConfig = ref<PoolData>({
 	comment: props.pool.comment,
 });
 
+////////////// Show Pool/Disk Details ///////////////
+/////////////////////////////////////////////////////
+const showPoolDetails = ref(false);
+
+function showDetails(pool) {
+	selectedPool.value = pool;
+	console.log('loading:', selectedPool);
+	showPoolDetails.value = true;
+}
+
+/////////////// Loading/Refreshing //////////////////
+/////////////////////////////////////////////////////
+const poolData = inject<Ref<PoolData[]>>("pools")!;
+const diskData = inject<Ref<DiskData[]>>("disks")!;
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+
+async function refreshAllData() {
+	disksLoaded.value = false;
+	poolsLoaded.value = false;
+	diskData.value = [];
+	poolData.value = [];
+	await loadDisksThenPools(diskData, poolData);
+	disksLoaded.value = true;
+	poolsLoaded.value = true;
+}
+
+////////////////// Destroy Pool /////////////////////
+/////////////////////////////////////////////////////
+const confirmDelete = ref(false);
+const showDeletePoolConfirm = ref(false);
+const deleting = ref(false);
+
+async function destroyPoolAndUpdate(pool) {
+	selectedPool.value = pool;
+	showDeletePoolConfirm.value = true;
+
+	console.log('preparing to delete:', selectedPool.value);
+}
+
+const confirmThisDestroy : ConfirmationCallback = () => {
+	confirmDelete.value = true;
+}
+
+watch(confirmDelete, async (newValue, oldValue) => {
+	
+	if (confirmDelete.value == true) {	
+		deleting.value = true;
+		console.log('now deleting:', selectedPool.value);
+		await destroyPool(selectedPool.value!);
+		refreshAllData();
+		confirmDelete.value = false;
+		showDeletePoolConfirm.value = false;
+		deleting.value = false;
+		notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
+	}
+});
+
+////////////////// Resilver Pool ////////////////////
+/////////////////////////////////////////////////////
+const confirmResilver = ref(false);
+const showResilverModal = ref(false);
+const resilvered = ref(false);
+const resilvering = ref(false);
+
+async function resilverThisPool(pool) {
+	scrubbed.value = false;
+	trimmed.value = false;
+	cleared.value = false;
+	selectedPool.value = pool;
+	showResilverModal.value = true;
+	
+	console.log('preparing to resilver:', selectedPool.value);
+}
+
+const confirmThisResilver : ConfirmationCallback = () => {
+	confirmResilver.value = true;
+}
+
+watch(confirmResilver, async (newValue, oldValue) => {
+
+	if (confirmResilver.value == true) {
+		resilvering.value = true;
+		resilvered.value = false;
+		console.log('now resilvering:', selectedPool.value);
+		showResilverModal.value = false;
+		await resilverPool(selectedPool.value!);
+		confirmResilver.value = false;
+		resilvered.value = true;
+		resilvering.value = false;
+		messageTimestamp.value = getTimestampString();
+		notifications.value.constructNotification('Resilver Completed', 'Resilver on ' + selectedPool.value!.name + " completed.", 'success');
+	}
+});
+
+//////////////////// TRIM Pool //////////////////////
+/////////////////////////////////////////////////////
+const showTrimModal = ref(false);
+const confirmTrim = ref(false);
+const secureTRIM = ref(false);
+const trimmed = ref(false);
+const trimming = ref(false);
+
+async function trimThisPool(pool) {
+	cleared.value = false;
+	selectedPool.value = pool;
+	showTrimModal.value = true;
+
+	console.log("preparing to trim:", selectedPool.value);
+}
+
+const confirmThisTrim : ConfirmationCallback = () => {
+	confirmTrim.value = true;
+}
+
+watch(confirmTrim, async (newValue, oldValue) => {
+	if (confirmTrim.value == true) {
+		trimming.value = true;
+		trimmed.value = false;
+		console.log('now trimming:', selectedPool.value);
+		if (secureTRIM.value) {
+			confirmTrim.value = false;
+			showTrimModal.value = false;
+			await trimPool(selectedPool.value!, secureTRIM.value);
+		} else {
+			confirmTrim.value = false;
+			showTrimModal.value = false;
+			await trimPool(selectedPool.value!);
+		}
+		
+		trimming.value = false;
+		trimmed.value = true;
+		messageTimestamp.value = getTimestampString();
+		notifications.value.constructNotification('Trim Completed', 'Trim on ' + selectedPool.value!.name + " completed.", 'success');
+	}
+});
+
+/////////////////// Scrub Pool //////////////////////
+/////////////////////////////////////////////////////
+const scrubbed = ref(false);
+const scrubbing = ref(false);
+
+async function scrubThisPool(pool) {
+	cleared.value = false;
+	selectedPool.value = pool;
+	console.log('preparing to scrub:', selectedPool.value);
+	scrubbed.value = false;
+	scrubbing.value = true;
+	console.log('now scrubbing:', selectedPool.value);
+	await scrubPool(pool);
+	scrubbing.value = false;
+	scrubbed.value = true;
+	messageTimestamp.value = getTimestampString();
+	notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
+}
+
+/////////////////// Export Pool /////////////////////
+/////////////////////////////////////////////////////
+const showExportModal = ref(false);
+const confirmExport = ref(false);
+const forceUnmount = ref(false);
+const exporting = ref(false);
+
+async function exportThisPool(pool) {
+	cleared.value = false;
+	selectedPool.value = pool;
+	showExportModal.value = true;
+
+	console.log('preparing to export:', selectedPool.value);
+}
+
+const confirmThisExport : ConfirmationCallback = () => {
+	confirmExport.value = true;
+}
+
+watch(confirmExport, async (newValue, oldValue) => {
+	if (confirmExport.value == true) {
+		exporting.value = true;
+		console.log('now exporting:', selectedPool.value);
+		if (forceUnmount.value) {
+			await exportPool(selectedPool.value!, forceUnmount.value);
+		} else {
+			await exportPool(selectedPool.value!);
+		}
+		notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
+		refreshAllData();
+		confirmExport.value = false;
+		showExportModal.value = false;
+		exporting.value = false;
+	}
+});
+
+/////////////////// Clear Errors ////////////////////
+/////////////////////////////////////////////////////
+const cleared = ref(false);
+
+async function clearPoolErrors(poolName) {
+	cleared.value = false;
+	await clearErrors(poolName);
+	cleared.value = true;
+}
+
+///////////////////// Add VDev //////////////////////
+/////////////////////////////////////////////////////
+const showAddVDevModal = ref(false);
 
 function showAddVDev(pool) {
 	selectedPool.value = pool;
 	console.log(selectedPool);
 	showAddVDevModal.value = true;
 }
+
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
 provide('show-pool-deets', showPoolDetails);
-provide('show-delete-pool-confirm', showDeletePoolConfirm);
-provide("show-resilver-modal", showResilverModal);
-provide("show-trim-modal", showTrimModal);
-provide("show-export-modal", showExportModal);
-provide('show-vdev-modal', showAddVDevModal);
 provide('current-pool-config', poolConfig);
+provide("show-vdev-modal", showAddVDevModal);
+
+provide('show-delete-pool-confirm', showDeletePoolConfirm);
+provide('confirm-delete-pool', confirmDelete);
 provide('deleting', deleting);
-provide("secure-trim", secureTRIM);
-provide("force-unmount", forceUnmount);
+
+provide("show-resilver-modal", showResilverModal);
 provide("confirm-resilver", confirmResilver);
+provide('resilvering', resilvering);
+
+provide("show-trim-modal", showTrimModal);
+provide("secure-trim", secureTRIM);
 provide("confirm-trim", confirmTrim);
+
+provide("show-export-modal", showExportModal);
+provide("force-unmount", forceUnmount);
 provide("confirm-export", confirmExport);
+provide('exporting', exporting);
+
+provide('show-vdev-modal', showAddVDevModal);
+provide('show-pool-deets', showPoolDetails);
 </script>
