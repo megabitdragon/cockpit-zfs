@@ -309,7 +309,7 @@ import CreateSnapshotModal from './CreateSnapshotModal.vue';
 import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../pools/PoolDetailDiskCard.vue';
 import { loadDisksThenPools } from '../../composables/loadData';
-import ConfirmSectorSize from '../common/confirmation/ConfirmSectorSize.vue';
+//import ConfirmSectorSize from '../common/confirmation/ConfirmSectorSize.vue';
 
 interface PoolDetailsProps {
 	pool: PoolData;

@@ -80,10 +80,10 @@
                     <div class="mt-2 col-span-2">
                         <label :for="getIdKey('disk-identifier')" class="mt-1 bg-default block text-sm leading-6 text-default">Disk Identifier</label>
                         <select :id="getIdKey('disk-identifier')" v-model="importedPool.identifier" name="" class="mt-1 block w-full input-textlike bg-default">
-                            <option value="device-alias">Device Alias</option>
-                            <option value="block-device">Block Device</option>
+                            <option value="vdev_path">Device Alias</option>
+                            <option value="sd_path">Block Device</option>
                             <!-- <option value="disk">Disk/WWN</option> -->
-                            <option value="hardware-path">Hardware Path</option>
+                            <option value="phy_path">Hardware Path</option>
                         </select>
                     </div>
 

@@ -306,7 +306,7 @@ const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 const selectedVDev = ref<vDevData>();
 
-const message = ref('No Alerts');
+const message = ref('');
 const loadingMessage = ref('');
 const loading = ref(false);
 
