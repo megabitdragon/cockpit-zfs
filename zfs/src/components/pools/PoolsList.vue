@@ -188,7 +188,7 @@
 																						<a href="#" @click="clearDiskErrors(pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" @click="detachThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
+																						<a v-if="diskIdx != 0" href="#" @click="detachThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
@@ -310,6 +310,8 @@ const message = ref('');
 const loadingMessage = ref('');
 const loading = ref(false);
 
+const clearLabels = inject<Ref<boolean>>('clear-labels')!;
+
 ////////////// Show Pool/Disk Details ///////////////
 /////////////////////////////////////////////////////
 const showPoolDetails = ref(false);
@@ -363,6 +365,7 @@ const forceDestroy = ref(false);
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
+	clearLabels.value = false;
 	showDeletePoolConfirm.value = true;
 
 	console.log('preparing to delete:', selectedPool.value);
@@ -373,11 +376,22 @@ const confirmThisDestroy : ConfirmationCallback = () => {
 }
 
 watch(confirmDelete, async (newValue, oldValue) => {
-	
 	if (confirmDelete.value == true) {	
 		deleting.value = true;
 		console.log('now deleting:', selectedPool.value);
-		await destroyPool(selectedPool.value!);
+
+		if (clearLabels.value == true) {
+			await destroyPool(selectedPool.value!);
+			selectedPool.value!.vdevs.forEach(vDev => {
+				vDev.disks.forEach(async disk => {
+					selectedDisk.value = disk;
+					await labelClear(selectedDisk.value!);
+				});
+			});
+		} else {
+			await destroyPool(selectedPool.value!);
+		}
+
 		refreshAllData();
 		confirmDelete.value = false;
 		showDeletePoolConfirm.value = false;
@@ -600,10 +614,6 @@ watch(confirmRemove, async (newValue, oldValue) => {
 	}
 });
 
-////////////// Clearing Disk Labels /////////////////
-/////////////////////////////////////////////////////
-const clearLabels = ref(false);
-
 /////////////// Attach/Detach Disk //////////////////
 /////////////////////////////////////////////////////
 const showAttachDiskModal = ref(false);
@@ -621,6 +631,7 @@ function showAttachDisk(pool, vdev) {
 async function detachThisDisk(pool : PoolData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
+	clearLabels.value = false;
 	showDetachDiskModal.value = true;
 
 	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
@@ -634,9 +645,10 @@ watch(confirmDetach, async (newValue, oldValue) => {
 	if (confirmDetach.value == true) {
 		detaching.value = true;
 		console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
+
 		if (clearLabels.value == true) {
 			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
-			await labelClear(selectedDisk.value!.name);
+			await labelClear(selectedDisk.value!);
 		} else {
 			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
 		}
@@ -705,5 +717,5 @@ provide('show-detach-modal', showDetachDiskModal);
 provide('confirm-detach', confirmDetach);
 provide('detaching', detaching);
 
-provide('clear-labels', clearLabels);
+// provide('clear-labels', clearLabels);
 </script>

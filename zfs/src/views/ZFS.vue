@@ -50,6 +50,8 @@ const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
 
+const clearLabels = ref(false);
+
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
@@ -78,5 +80,6 @@ provide("disks-in-pools", disksInPools);
 provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
+provide('clear-labels', clearLabels);
 </script>
 

@@ -61,7 +61,6 @@ interface ConfirmDetachDiskProps {
 const props = defineProps<ConfirmDetachDiskProps>();
 
 const showDetachDiskModal = inject<Ref<boolean>>('show-detach-modal')!;
-//const confirmDetach = inject<Ref<boolean>>('confirm-detach')!;
 const detaching = inject<Ref<boolean>>('detaching')!;
 const clearLabels = inject<Ref<boolean>>('clear-labels')!;
 

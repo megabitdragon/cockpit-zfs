@@ -138,6 +138,7 @@ import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
+import { labelClear } from "../../composables/disks";
 import { getTimestampString } from "../../composables/helpers";
 import Card from '../common/Card.vue';
 import PoolDetail from "../pools/PoolDetail.vue";
@@ -218,9 +219,12 @@ async function refreshAllData() {
 const confirmDelete = ref(false);
 const showDeletePoolConfirm = ref(false);
 const deleting = ref(false);
+const clearLabels = inject<Ref<boolean>>('clear-labels')!;
+const selectedDisk = ref<DiskData>();
 
 async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
+	clearLabels.value = false;
 	showDeletePoolConfirm.value = true;
 
 	console.log('preparing to delete:', selectedPool.value);
@@ -235,7 +239,19 @@ watch(confirmDelete, async (newValue, oldValue) => {
 	if (confirmDelete.value == true) {	
 		deleting.value = true;
 		console.log('now deleting:', selectedPool.value);
-		await destroyPool(selectedPool.value!);
+
+		if (clearLabels.value == true) {
+			await destroyPool(selectedPool.value!);
+			selectedPool.value!.vdevs.forEach(vDev => {
+				vDev.disks.forEach(async disk => {
+					selectedDisk.value = disk;
+					await labelClear(selectedDisk.value!);
+				});
+			});
+		} else {
+			await destroyPool(selectedPool.value!);
+		}
+
 		refreshAllData();
 		confirmDelete.value = false;
 		showDeletePoolConfirm.value = false;

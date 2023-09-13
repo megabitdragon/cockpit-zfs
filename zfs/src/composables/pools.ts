@@ -385,15 +385,15 @@ export async function importPool(pool) {
 		cmdString.push('-d');
 
 		switch(pool.identifier) {
-			case 'device-alias':
+			case 'vdev_path':
 				cmdString.push('/dev/disk/by-vdev');
 				break;
 
-			case 'hardware-path':
+			case 'phy_path':
 				cmdString.push('/dev/disk/by-path');
 				break;
 
-			case 'block-device':
+			case 'sd_path':
 				cmdString.push('/dev');
 				break;
 

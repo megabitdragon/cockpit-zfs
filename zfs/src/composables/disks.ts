@@ -30,27 +30,21 @@ export async function clearPartitions(disk) {
 
 export async function labelClear(disk) {
     try {
+		const cmdString = ['zpool', 'labelclear'];
+		cmdString.push(disk.name);
 
-    } catch (state) {
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
-    }
+		const state = useSpawn(cmdString);
+        const output = await state.promise();
+        console.log(output)
+        return output.stdout;
+      } catch (state) {
+        console.error(errorString(state));
+        return null;
+      }
 }
 
-// export async function clearDiskLabels(pool) {
-// 	try {
-// 		pool.vdevs.forEach(vDev => {
-			
-// 		});
-		
-// 		const state = useSpawn(['zpool', 'labelclear', ]);
-// 		const output = await state.promise();
-// 		console.log(output)
-// 		return output.stdout;
-// 	} catch (state) {
-// 		console.error(errorString(state));
-// 		return null;
-// 	}
-// }
 
 export async function attachDisk(diskVDevPoolData) {
 	try {
