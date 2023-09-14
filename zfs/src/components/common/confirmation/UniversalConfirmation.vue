@@ -58,6 +58,8 @@
                         </Switch>
                     </div>
                 </div>
+
+                
             </div>
         </template>
         <template v-slot:footer>
@@ -65,7 +67,7 @@
                 <div class="button-group-row mt-2 justify-between">
                     <button @click="showModalFlag = false" :id="getIdKey('confirm-delete-no')" name="delete-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
                    
-                    <div class="flex flex-row">
+                    <div v-if="props.firstOption" class="flex flex-row">
                         <label :for="getIdKey('forcefully-destroy')" class="mt-3 mr-2 block text-sm font-medium text-default">{{upperCaseWord(option1)}}</label>
                         <Switch v-model="option1Toggle" :id="getIdKey('forcefully-destroy')" :class="[option1Toggle ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>
@@ -84,7 +86,7 @@
                         </Switch>
                     </div>
 
-                    <div class="flex flex-row">
+                    <div v-if="props.secondOption" class="flex flex-row">
                         <label :for="getIdKey('clear-disk-labels')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">{{upperCaseWord(option2)}}</label>
                         <Switch v-model="option2Toggle" :id="getIdKey('clear-disk-labels')" :class="[option2Toggle! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                             <span class="sr-only">Use setting</span>

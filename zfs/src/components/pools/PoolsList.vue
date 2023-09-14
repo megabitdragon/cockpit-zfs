@@ -292,7 +292,7 @@ import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 import UniversalConfirmation from "../common/confirmation/UniversalConfirmation.vue";
-import ConfirmDeletePoolModal from "../common/confirmation/ConfirmDeletePoolModal.vue";
+// import ConfirmDeletePoolModal from "../common/confirmation/ConfirmDeletePoolModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
@@ -317,7 +317,6 @@ const clearLabels = inject<Ref<boolean>>('clear-labels')!;
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
 const showModalFlag = ref(false);
-const operationConfirm = ref(false);
 const operationRunning = ref(false);
 const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
@@ -376,6 +375,7 @@ const hasChildren = ref(false);
 const forceDestroy = ref(false);
 
 async function destroyPoolAndUpdate(pool) {
+	operationRunning.value = false;
 	selectedPool.value = pool;
 	clearLabels.value = false;
 	showDeletePoolConfirm.value = true;
@@ -694,14 +694,6 @@ async function showOfflineDisk(pool: PoolData, disk: DiskData) {
 	showOfflineDiskModal.value = true;
 	showModalFlag.value = showOfflineDiskModal.value;
 }
-
-// const confirmCallback : ConfirmationCallback = () => {
-// 	confirmOperation.value = confirmOffline.value;
-// }
-
-watch(operationConfirm, async (newValue, oldValue) => {
-
-});
 
 
 /////////////////// Clear Errors ////////////////////

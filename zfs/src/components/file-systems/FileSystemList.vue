@@ -118,7 +118,8 @@
 	</div>
 
 	<div v-if="showDeleteFileSystemConfirm">
-		<ConfirmDeleteFileSystemModal :fileSystemName="selectedDataset!.name" :idKey="'delete-filesystem'" @close="showDeleteFileSystemConfirm = false"/>
+		<!-- <ConfirmDeleteFileSystemModal :fileSystemName="selectedDataset!.name" :idKey="'delete-filesystem'" @close="showDeleteFileSystemConfirm = false"/> -->
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showUnmountFileSystemConfirm">
@@ -141,22 +142,32 @@ import { destroyDataset, unmountFileSystem, mountFileSystem } from "../../compos
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
-import ConfirmDeleteFileSystemModal from "../common/confirmation/ConfirmDeleteFileSystemModal.vue";
+// import ConfirmDeleteFileSystemModal from "../common/confirmation/ConfirmDeleteFileSystemModal.vue";
+import UniversalConfirmation from "../common/confirmation/UniversalConfirmation.vue";
 import ConfirmUnmountFileSystem from "../common/confirmation/ConfirmUnmountFileSystem.vue";
 import ConfirmMountFileSystem from '../common/confirmation/ConfirmMountFileSystem.vue';
 
+const notifications = inject<Ref<any>>('notifications')!;
+
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
+const selectedDataset = ref<FileSystemData>();
+
+///////// Values for Confirmation Modals ////////////
+/////////////////////////////////////////////////////
+const showModalFlag = ref(false);
+const operationRunning = ref(false);
+const firstOptionToggle = ref(false);
+const secondOptionToggle = ref(false);
+const thirdOptionToggle = ref(false);
+const fourthOptionToggle = ref(false);
+
+/////////////// Loading/Refreshing //////////////////
+/////////////////////////////////////////////////////
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
-
 const fileSystemConfiguration = ref();
-
 const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
-const showDeleteFileSystemConfirm = ref(false);
-const confirmDelete = ref(false);
-
-const isDeleting = ref(false);
 
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
@@ -164,8 +175,6 @@ async function refreshDatasets() {
 	await loadDatasets(fileSystems);
 	fileSystemsLoaded.value = true;
 }
-
-const selectedDataset = ref<FileSystemData>();
 
 function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
@@ -181,12 +190,58 @@ function findPoolDataset(fileSystem) {
 	}
 }
 
+////////////// Destroy File System //////////////////
+/////////////////////////////////////////////////////
 const hasChildren = ref(false);
 const forceDestroy = ref(false);
-
-const showUnmountFileSystemConfirm = ref(false);
 const destroyChildren = ref(false);
 const destroyAllDependents = ref(false);
+const showDeleteFileSystemConfirm = ref(false);
+const confirmDelete = ref(false);
+const isDeleting = ref(false);
+
+async function deleteFileSystem(fileSystem) {
+	operationRunning.value = false;
+	selectedDataset.value = fileSystem;
+	if (!findPoolDataset(selectedDataset.value) && selectedDataset.value!.children!.length > 0) {
+		hasChildren.value = true;
+	} else { 
+		hasChildren.value = false;
+	}
+
+	showDeleteFileSystemConfirm.value = true;
+	showModalFlag.value = showDeleteFileSystemConfirm.value;
+	console.log('selected for deletion:', selectedDataset.value);
+}
+
+const confirmThisDestroy : ConfirmationCallback = () => {
+	confirmDelete.value = true;
+}
+
+watch(confirmDelete, async (newValue, oldValue) => {
+	if (confirmDelete.value == true) {
+		//isDeleting.value = true;
+		
+		console.log('now deleting:', newValue);
+		operationRunning.value = true;
+		await destroyDataset(selectedDataset.value!, firstOptionToggle.value, thirdOptionToggle.value, fourthOptionToggle.value);
+		operationRunning.value = false;
+		refreshDatasets();
+		showDeleteFileSystemConfirm.value = false;
+		showModalFlag.value = showDeleteFileSystemConfirm.value;
+
+		confirmDelete.value = false;
+		hasChildren.value = false;
+		forceDestroy.value = false;
+		console.log('deleted:', selectedDataset.value!);
+		//isDeleting.value = false;
+		notifications.value.constructNotification('File System Destroyed', selectedDataset.value!.name + " destroyed.", 'success');
+	}
+});
+
+//////////// Unmount/Mount File System //////////////
+/////////////////////////////////////////////////////
+const showUnmountFileSystemConfirm = ref(false);
 const forceUnmount = ref(false);
 const unmounting = ref(false);
 const confirmUnmount = ref(false);
@@ -195,41 +250,6 @@ const showMountFileSystemConfirm = ref(false);
 const forceMount = ref(true);
 const mounting = ref(false);
 const confirmMount = ref(false);
-
-function deleteFileSystem(fileSystem) {
-
-	if (!findPoolDataset(fileSystem) && fileSystem.children.length > 0) {
-		hasChildren.value = true;
-	} else { 
-		hasChildren.value = false;
-	}
-
-	showDeleteFileSystemConfirm.value = true;
-	selectedDataset.value = fileSystem;
-	console.log('selected for deletion:', selectedDataset.value);
-
-	watch(confirmDelete, async (newValue, oldValue) => {
-		if (isDeleting.value) {
-			return;
-		}
-
-		console.log('confirmDelete.value changed:', newValue);
-	
-		if (confirmDelete.value == true) {
-			isDeleting.value = true;
-
-			await destroyDataset(selectedDataset.value!, forceDestroy.value, destroyChildren.value, destroyAllDependents.value);
-			console.log('deleted:', fileSystem);
-			showDeleteFileSystemConfirm.value = false;
-
-			confirmDelete.value = false;
-			hasChildren.value = false;
-			forceDestroy.value = false;
-			await refreshDatasets();
-			isDeleting.value = false;
-		}
-	});
-}
 
 function unmountThisFileSystem(fileSystem) {
 	showUnmountFileSystemConfirm.value = true;
@@ -277,19 +297,28 @@ function mountThisFileSystem(fileSystem) {
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
+
 provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
 provide('confirm-delete-filesystem', confirmDelete);
 provide('destroy-children', destroyChildren);
 provide('destroy-dependents', destroyAllDependents);
-provide('show-mount-filesystem-confirm', showMountFileSystemConfirm);
-provide('show-unmount-filesystem-confirm', showUnmountFileSystemConfirm);
-provide('confirm-unmount-filesystem', confirmUnmount);
-provide('confirm-mount-filesystem', confirmMount);
-provide('unmounting', unmounting);
-provide('mounting', mounting);
-provide('force-unmount', forceUnmount);
-provide('force-mount', forceMount);
 provide('force-destroy', forceDestroy);
 provide('has-children', hasChildren);
-provide("force-unmount", forceUnmount);
+
+provide('show-mount-filesystem-confirm', showMountFileSystemConfirm);
+provide('confirm-mount-filesystem', confirmMount);
+provide('mounting', mounting);
+provide('force-mount', forceMount);
+
+provide('show-unmount-filesystem-confirm', showUnmountFileSystemConfirm);
+provide('confirm-unmount-filesystem', confirmUnmount);
+provide('unmounting', unmounting);
+provide('force-unmount', forceUnmount);
+
+provide('modal-confirm-show', showModalFlag);
+provide('modal-confirm-running', operationRunning);
+provide('modal-option-one-toggle', firstOptionToggle);
+provide('modal-option-two-toggle', secondOptionToggle);
+provide('modal-option-three-toggle', thirdOptionToggle);
+provide('modal-option-four-toggle', fourthOptionToggle);
 </script>
