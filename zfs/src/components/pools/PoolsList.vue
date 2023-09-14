@@ -241,7 +241,8 @@
 	</div>
 
 	<div v-if="showDeletePoolConfirm">
-		<ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="'delete-pool'" :confirmDestroy="confirmThisDestroy" @close="showDeletePoolConfirm = false"/>
+		<!-- <ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="'delete-pool'" :confirmDestroy="confirmThisDestroy" @close="showDeletePoolConfirm = false"/> -->
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showResilverModal">
@@ -290,6 +291,7 @@ import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
+import UniversalConfirmation from "../common/confirmation/UniversalConfirmation.vue";
 import ConfirmDeletePoolModal from "../common/confirmation/ConfirmDeletePoolModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
@@ -311,6 +313,16 @@ const loadingMessage = ref('');
 const loading = ref(false);
 
 const clearLabels = inject<Ref<boolean>>('clear-labels')!;
+
+///////// Values for Confirmation Modals ////////////
+/////////////////////////////////////////////////////
+const showModalFlag = ref(false);
+const operationConfirm = ref(false);
+const operationRunning = ref(false);
+const firstOptionToggle = ref(false);
+const secondOptionToggle = ref(false);
+const thirdOptionToggle = ref(false);
+const fourthOptionToggle = ref(false);
 
 ////////////// Show Pool/Disk Details ///////////////
 /////////////////////////////////////////////////////
@@ -367,7 +379,8 @@ async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
 	clearLabels.value = false;
 	showDeletePoolConfirm.value = true;
-
+	showModalFlag.value = showDeletePoolConfirm.value;
+	
 	console.log('preparing to delete:', selectedPool.value);
 }
 
@@ -377,11 +390,12 @@ const confirmThisDestroy : ConfirmationCallback = () => {
 
 watch(confirmDelete, async (newValue, oldValue) => {
 	if (confirmDelete.value == true) {	
-		deleting.value = true;
+		// deleting.value = true;
+		operationRunning.value = true;
 		console.log('now deleting:', selectedPool.value);
 
-		if (clearLabels.value == true) {
-			await destroyPool(selectedPool.value!);
+		if (secondOptionToggle.value == true) {
+			await destroyPool(selectedPool.value!, firstOptionToggle.value);
 			selectedPool.value!.vdevs.forEach(vDev => {
 				vDev.disks.forEach(async disk => {
 					selectedDisk.value = disk;
@@ -395,7 +409,9 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		refreshAllData();
 		confirmDelete.value = false;
 		showDeletePoolConfirm.value = false;
-		deleting.value = false;
+		showModalFlag.value = showDeletePoolConfirm.value;
+		operationRunning.value = false;
+		// deleting.value = false;
 		message.value = "Destroyed " + selectedPool.value!.name + " at " + getTimestampString();
 		notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
 	}
@@ -621,7 +637,7 @@ const showDetachDiskModal = ref(false);
 const confirmDetach = ref(false);
 const detaching = ref(false);
 
-function showAttachDisk(pool, vdev) {
+function showAttachDisk(pool: PoolData, vdev: vDevData) {
 	selectedPool.value = pool;
 	selectedVDev.value = vdev;
 	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
@@ -660,6 +676,33 @@ watch(confirmDetach, async (newValue, oldValue) => {
 		notifications.value.constructNotification('Detach Completed', selectedDisk.value!.name + " was detached from " + selectedPool.value!.name + ".", 'success');
 	}
 });
+
+/////////////// Online/Offline Disk /////////////////
+/////////////////////////////////////////////////////
+
+const showOfflineDiskModal = ref(false);
+const confirmOffline = ref(false);
+const offlining = ref(false);
+const showOnlineDiskModal = ref(false);
+const confirmOnline = ref(false);
+const onlining = ref(false);
+
+async function showOfflineDisk(pool: PoolData, disk: DiskData) {
+	selectedPool.value = pool;
+	selectedDisk.value = disk;
+	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	showOfflineDiskModal.value = true;
+	showModalFlag.value = showOfflineDiskModal.value;
+}
+
+// const confirmCallback : ConfirmationCallback = () => {
+// 	confirmOperation.value = confirmOffline.value;
+// }
+
+watch(operationConfirm, async (newValue, oldValue) => {
+
+});
+
 
 /////////////////// Clear Errors ////////////////////
 /////////////////////////////////////////////////////
@@ -717,5 +760,10 @@ provide('show-detach-modal', showDetachDiskModal);
 provide('confirm-detach', confirmDetach);
 provide('detaching', detaching);
 
-// provide('clear-labels', clearLabels);
+provide('modal-confirm-show', showModalFlag);
+provide('modal-confirm-running', operationRunning);
+provide('modal-option-one-toggle', firstOptionToggle);
+provide('modal-option-two-toggle', secondOptionToggle);
+provide('modal-option-three-toggle', thirdOptionToggle);
+provide('modal-option-four-toggle', fourthOptionToggle);
 </script>

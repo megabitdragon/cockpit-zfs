@@ -25,9 +25,9 @@ import json
 #         print(f"Error running 'zpool status': {e}")
 #     return associations
 
-def get_disk_info():
+# def get_disk_info():
     # label,model,mountpoint,name,partuuid,phy-sec,rota,serial,size,type,uuid,vendor,wwn
-    result = subprocess.run(['lsblk', ''])
+    # result = subprocess.run(['lsblk', '-o'])
 
 def main():
     result = subprocess.run(['lsdev', '-jdHmtTsfcp'], stdout=subprocess.PIPE)

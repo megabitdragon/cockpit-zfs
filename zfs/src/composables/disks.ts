@@ -85,3 +85,72 @@ export async function detachDisk(poolName, diskName) {
 		return null;
 	}
 }
+
+export async function offlineDisk(poolName, diskName, forceFault, temporary) {
+	try {
+		let cmdString = ['zpool', 'offline'];
+		//force fault, instead of offlining disk it is placed into faulted state (-f)
+		//temporary, upon reboot the device returns to prev state (-t)
+
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function onlineDisk(poolName, diskName, expand, doScrub) {
+	try {
+		let cmdString = ['zpool', 'online'];
+		//expand the device to use all available space (-e)
+		//scrub the pool after bringing disk online
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function replaceDisk(poolName, diskName) {
+	try {
+		let cmdString = ['zpool', 'replace'];
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function trimDisk(poolName, diskName) {
+	try {
+		let cmdString = ['zpool', 'trim'];
+
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}

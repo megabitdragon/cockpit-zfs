@@ -169,7 +169,14 @@ export async function setRefreservation(pool: PoolData, refreservationPercent: n
 
 export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
 	try {
-		const state = useSpawn(['zpool', 'destroy', pool.name]);
+		const cmdString = ['zpool', 'destroy'];
+
+		if(forceDestroy) {
+			cmdString.push('-f');
+		}
+		cmdString.push(pool.name);
+		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		const state = useSpawn(cmdString);
 		const output = await state.promise();
 		console.log(output)
 		return output.stdout;
