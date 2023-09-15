@@ -91,7 +91,16 @@ export async function offlineDisk(poolName, diskName, forceFault, temporary) {
 		let cmdString = ['zpool', 'offline'];
 		//force fault, instead of offlining disk it is placed into faulted state (-f)
 		//temporary, upon reboot the device returns to prev state (-t)
+		if (forceFault) {
+			cmdString.push('-f');
+		}
 
+		if (temporary) {
+			cmdString.push('-t');
+		}
+
+		cmdString.push(poolName);
+		cmdString.push(diskName);
 
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
@@ -109,7 +118,13 @@ export async function onlineDisk(poolName, diskName, expand, doScrub) {
 	try {
 		let cmdString = ['zpool', 'online'];
 		//expand the device to use all available space (-e)
-		//scrub the pool after bringing disk online
+	
+		if (expand) {
+			cmdString.push('-e');
+		}
+
+		cmdString.push(poolName);
+		cmdString.push(diskName);
 
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 

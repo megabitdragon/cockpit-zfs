@@ -123,10 +123,12 @@
 
 	<div v-if="showUnmountFileSystemConfirm">
 		<ConfirmUnmountFileSystem :fileSystemName="selectedDataset!.name" :idKey="'unmount-filesystem'" @close="showUnmountFileSystemConfirm = false"/>
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showMountFileSystemConfirm">
 		<ConfirmMountFileSystem :fileSystemName="selectedDataset!.name" :idKey="'mount-filesystem'" @close="showMountFileSystemConfirm = false"/>
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
 	</div>
 
 </template>

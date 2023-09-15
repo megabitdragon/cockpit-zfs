@@ -305,7 +305,7 @@ import AttachDiskModal from "./AttachDiskModal.vue";
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
-import { labelClear, detachDisk, offlineDisk, } from "../../composables/disks";
+import { labelClear, detachDisk, offlineDisk, onlineDisk, replaceDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
@@ -757,7 +757,11 @@ watch(confirmOnline, async (newVal, oldVal) => {
 		onlining.value = true;
 		operationRunning.value = true;
 		console.log('now onlining:', selectedDisk.value);
-		//await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
+
+		// if option2, scrub the pool after bringing disk online
+
+
+		await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
 		message.value = "Offlined " + selectedDisk.value!.name + " at " + getTimestampString();
 		notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
 		refreshAllData();
