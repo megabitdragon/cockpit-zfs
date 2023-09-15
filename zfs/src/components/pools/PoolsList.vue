@@ -181,9 +181,6 @@
 																		<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 																			<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																				<div class="py-1">
-																					<!-- <MenuItem as="div" v-slot="{ active }">
-																						<a href="#" @click="showDiskModal(disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Disk Details</a>
-																					</MenuItem> -->
 																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" @click="clearDiskErrors(pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 																					</MenuItem>
@@ -191,13 +188,16 @@
 																						<a v-if="pool.vdevs[vDevIdx].disks.length > 1" href="#" @click="detachThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
+																						<a href="#" @click="offlineThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
+																						<a href="#" @click="onlineThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Online Disk</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
+																						<a href="#" @click="replaceThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
+																					</MenuItem>
+																					<MenuItem as="div" v-slot="{ active }">
+																						<a href="#" @click="trimThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
 																					</MenuItem>
 																				</div>
 																			</MenuItems>
@@ -230,10 +230,6 @@
 
 	<div v-if="showWizard">
 		<CreatePool @close="showWizard = false"/>
-	</div>
-
-	<div v-if="showDiskDetails">
-		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="false"/>
 	</div>
 
 	<div v-if="showPoolDetails">
@@ -279,6 +275,22 @@
 	<div v-if="showDetachDiskModal">
 		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-detach-disk'" :item="'disk'" :operation="'detach'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDetach" :secondOption="'clear disk labels'" :hasChildren="false"/>
 	</div>
+
+	<div v-if="showOfflineDiskModal">
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-offline-disk'" :item="'disk'" :operation="'offline'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisOffline" :firstOption="'forcefully offline'" :secondOption="'temporarily offline until next reboot'" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showOnlineDiskModal">
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-online-disk'" :item="'disk'" :operation="'online'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisOnline" :firstOption="'expand devices to use whole disk'" :secondOption="'scrub pool after coming online'" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showTrimDiskModal">
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-trim-disk'" :item="'disk'" :operation="'trim'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDiskTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showReplaceDiskModal">
+	
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -287,14 +299,13 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolDetail from "./PoolDetail.vue";
-import DiskDetail from "./DiskDetail.vue";
 import ImportPool from "./ImportPool.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
 import AttachDiskModal from "./AttachDiskModal.vue";
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
-import { labelClear, detachDisk, } from "../../composables/disks";
+import { labelClear, detachDisk, offlineDisk, } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
@@ -330,12 +341,6 @@ function showPoolModal(pool) {
 	console.log(selectedPool);
 	showPoolDetails.value = true;
 }
-
-// function showDiskModal(disk) {
-// 	selectedDisk.value = disk;
-// 	console.log(selectedDisk);
-// 	showDiskDetails.value = true;
-// }
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
@@ -693,17 +698,14 @@ watch(confirmDetach, async (newValue, oldValue) => {
 	}
 });
 
-/////////////// Online/Offline Disk /////////////////
+////////////////// Offline Disk /////////////////////
 /////////////////////////////////////////////////////
-
 const showOfflineDiskModal = ref(false);
 const confirmOffline = ref(false);
 const offlining = ref(false);
-const showOnlineDiskModal = ref(false);
-const confirmOnline = ref(false);
-const onlining = ref(false);
 
-async function showOfflineDisk(pool: PoolData, disk: DiskData) {
+
+async function offlineThisDisk(pool: PoolData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
@@ -711,6 +713,132 @@ async function showOfflineDisk(pool: PoolData, disk: DiskData) {
 	showModalFlag.value = showOfflineDiskModal.value;
 }
 
+const confirmThisOffline : ConfirmationCallback = () => {
+	confirmOffline.value = true;
+}
+
+watch(confirmOffline, async (newVal, oldVal) => {
+	if (confirmOffline.value == true) {
+		offlining.value = true;
+		operationRunning.value = true;
+		console.log('now offlining:', selectedDisk.value);
+		await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
+		message.value = "Offlined " + selectedDisk.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Offline Completed', 'Offlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
+		refreshAllData();
+		confirmOffline.value = false;
+		showOfflineDiskModal.value = false;
+		showModalFlag.value = showOfflineDiskModal.value;
+		offlining.value = false;
+		operationRunning.value = false;
+	}
+});
+
+/////////////////// Online Disk /////////////////////
+/////////////////////////////////////////////////////
+const showOnlineDiskModal = ref(false);
+const confirmOnline = ref(false);
+const onlining = ref(false);
+
+async function onlineThisDisk(pool: PoolData, disk: DiskData) {
+	selectedPool.value = pool;
+	selectedDisk.value = disk;
+	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	showOnlineDiskModal.value = true;
+	showModalFlag.value = showOnlineDiskModal.value;
+}
+
+const confirmThisOnline : ConfirmationCallback = () => {
+	confirmOnline.value = true;
+}
+
+watch(confirmOnline, async (newVal, oldVal) => {
+	if (confirmOnline.value == true) {
+		onlining.value = true;
+		operationRunning.value = true;
+		console.log('now onlining:', selectedDisk.value);
+		//await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
+		message.value = "Offlined " + selectedDisk.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
+		refreshAllData();
+		confirmOnline.value = false;
+		showOnlineDiskModal.value = false;
+		showModalFlag.value = showOnlineDiskModal.value;
+		onlining.value = false;
+		operationRunning.value = false;
+	}
+});
+
+
+///////////////////// TRIM Disk /////////////////////
+/////////////////////////////////////////////////////
+const showTrimDiskModal = ref(false);
+const confirmTrimDisk = ref(false);
+const trimmingDisk = ref(false);
+
+async function trimThisDisk(pool: PoolData, disk: DiskData) {
+	selectedPool.value = pool;
+	selectedDisk.value = disk;
+	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	showTrimDiskModal.value = true;
+	showModalFlag.value = showTrimDiskModal.value;
+}
+
+const confirmThisDiskTrim : ConfirmationCallback = () => {
+	confirmTrimDisk.value = true;
+}
+
+watch(confirmTrimDisk, async (newVal, oldVal) => {
+	if (confirmTrimDisk.value == true) {
+		trimmingDisk.value = true;
+		operationRunning.value = true;
+		console.log('now Trimming:', selectedDisk.value);
+		//await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+		message.value = "Trimmed " + selectedDisk.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Online Completed', 'Trimming of disk ' + selectedDisk.value!.name + " completed.", 'success');
+		refreshAllData();
+		confirmTrimDisk.value = false;
+		showTrimDiskModal.value = false;
+		showModalFlag.value = showTrimDiskModal.value;
+		trimmingDisk.value = false;
+		operationRunning.value = false;
+	}
+});
+
+/////////////////// Replace Disk ////////////////////
+/////////////////////////////////////////////////////
+const showReplaceDiskModal = ref(false);
+const confirmReplace = ref(false);
+const replacing = ref(false);
+
+async function replaceThisDisk(pool: PoolData, disk: DiskData) {
+	selectedPool.value = pool;
+	selectedDisk.value = disk;
+	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	showReplaceDiskModal.value = true;
+	showModalFlag.value = showReplaceDiskModal.value;
+}
+
+const confirmThisReplace : ConfirmationCallback = () => {
+	confirmReplace.value = true;
+}
+
+watch(confirmReplace, async (newVal, oldVal) => {
+	if (confirmReplace.value == true) {
+		replacing.value = true;
+		operationRunning.value = true;
+		console.log('now replacing:', selectedDisk.value);
+		//await replaceDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
+		message.value = "Replaced " + selectedDisk.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Online Completed', 'Replacing of disk ' + selectedDisk.value!.name + " completed.", 'success');
+		refreshAllData();
+		confirmReplace.value = false;
+		showReplaceDiskModal.value = false;
+		showModalFlag.value = showReplaceDiskModal.value;
+		replacing.value = false;
+		operationRunning.value = false;
+	}
+});
 
 /////////////////// Clear Errors ////////////////////
 /////////////////////////////////////////////////////

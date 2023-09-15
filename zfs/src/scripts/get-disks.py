@@ -1,17 +1,10 @@
 import subprocess
 import json
 
-# def check_zfs_labels(device_path):
-#     try:
-#         subprocess.check_output(['sudo', 'zdb', '-l', device_path])
-#         return True
-#     except subprocess.CalledProcessError:
-#         return False
-
 # def get_disk_pool_associations():
 #     associations= {}
 #     try:
-#         result = subprocess.run(['zpool', 'status'], stdout=subprocess.PIPE)
+#         result = subprocess.run(['zpool', 'status'], stdout=subprocess.PIPE, universal_newlines=True, check=True)
 #         current_pool = None
 
 #         for line in result.stdout.splitlines():
@@ -23,11 +16,8 @@ import json
 #                     associations[disk] = [current_pool]
 #     except subprocess.CalledProcessError as e:
 #         print(f"Error running 'zpool status': {e}")
+    
 #     return associations
-
-# def get_disk_info():
-    # label,model,mountpoint,name,partuuid,phy-sec,rota,serial,size,type,uuid,vendor,wwn
-    # result = subprocess.run(['lsblk', '-o'])
 
 def main():
     result = subprocess.run(['lsdev', '-jdHmtTsfcp'], stdout=subprocess.PIPE)
@@ -47,7 +37,7 @@ def main():
 
             device_path = disk['dev']
 
-            # pools_for_disk = disk_to_pool.get(device_path, [])
+            # pools_for_disk = disk_to_pool.get(device_path, '')
 
             disks.append({
                 'vdev_path': f'/dev/disk/by-vdev/{disk["bay-id"]}',
@@ -65,8 +55,7 @@ def main():
                 'rotation_rate': disk['rotation-rate'],
                 'power_on_count': disk['power-cycle-count'],
                 'power_on_time': disk['power-on-time'],
-                # 'has_zfs_labels': check_zfs_labels(device_path),
-                # 'member of': pools_for_disk,
+                # 'member_of': pools_for_disk,
             })
 
     print(json.dumps(disks, indent=4))
