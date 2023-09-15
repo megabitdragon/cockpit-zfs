@@ -118,7 +118,6 @@
 	</div>
 
 	<div v-if="showDeleteFileSystemConfirm">
-		<!-- <ConfirmDeleteFileSystemModal :fileSystemName="selectedDataset!.name" :idKey="'delete-filesystem'" @close="showDeleteFileSystemConfirm = false"/> -->
 		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
 	</div>
 
@@ -142,8 +141,7 @@ import { destroyDataset, unmountFileSystem, mountFileSystem } from "../../compos
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
-// import ConfirmDeleteFileSystemModal from "../common/confirmation/ConfirmDeleteFileSystemModal.vue";
-import UniversalConfirmation from "../common/confirmation/UniversalConfirmation.vue";
+import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import ConfirmUnmountFileSystem from "../common/confirmation/ConfirmUnmountFileSystem.vue";
 import ConfirmMountFileSystem from '../common/confirmation/ConfirmMountFileSystem.vue';
 

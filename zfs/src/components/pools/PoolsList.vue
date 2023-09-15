@@ -188,7 +188,7 @@
 																						<a href="#" @click="clearDiskErrors(pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
-																						<a v-if="diskIdx != 0" href="#" @click="detachThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
+																						<a v-if="pool.vdevs[vDevIdx].disks.length > 1" href="#" @click="detachThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
@@ -245,15 +245,19 @@
 	</div>
 
 	<div v-if="showResilverModal">
-		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="'resilver-pool'" :confirmResilver="confirmThisResilver" @close="showResilverModal = false"/>
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-resilver-pool'" :item="'pool'" :operation="'resilver'" :pool="selectedPool!" :confirmOperation="confirmThisResilver" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showTrimModal">
-		<ConfirmTrimModal item="pool" :name="selectedPool!.name" :idKey="'trim-pool'" :confirmTrim="confirmThisTrim" @close="showTrimModal = false"/>
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-trim-pool'" :item="'pool'" :operation="'trim'" :pool="selectedPool!" :confirmOperation="confirmThisTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showScrubModal">
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-scrub-pool'" :item="'pool'" :operation="'scrub'" :pool="selectedPool!" :confirmOperation="confirmThisScrub" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showExportModal">
-		<ConfirmExportModal item="pool" :name="selectedPool!.name" :idKey="'export-pool'" :confirmExport="confirmThisExport" @close="showExportModal = false"/>
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-export-pool'" :item="'pool'" :operation="'export'" :pool="selectedPool!" :confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showImportModal">
@@ -265,7 +269,7 @@
 	</div>
 
 	<div v-if="showRemoveVDevConfirm">
-		<ConfirmRemoveVDev @close="showRemoveVDevConfirm = false" :idKey="'show-remove-modal'" :confirmRemove="confirmThisRemove" :poolName="selectedPool!.name" :vDevName="selectedVDev!.name"/>
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-remove-vdev'" :item="'vdev'" :operation="'remove'" :pool="selectedPool!" :vdev="selectedVDev!" :confirmOperation="confirmThisRemove" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showAttachDiskModal">
@@ -273,7 +277,7 @@
 	</div>
 
 	<div v-if="showDetachDiskModal">
-		<ConfirmDetachDisk @close="showDetachDiskModal = false" :idKey="'show-detach-disk-modal'" :confirmDetach="confirmThisDetach" :poolName="selectedPool!.name" :diskName="selectedDisk!.name"/>
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-detach-disk'" :item="'disk'" :operation="'detach'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDetach" :secondOption="'clear disk labels'" :hasChildren="false"/>
 	</div>
 </template>
 
@@ -282,23 +286,18 @@ import { ref, inject, Ref, provide, watch } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import CreatePool from '../wizard-components/CreatePool.vue';
+import PoolDetail from "./PoolDetail.vue";
+import DiskDetail from "./DiskDetail.vue";
+import ImportPool from "./ImportPool.vue";
+import AddVDevModal from "../pools/AddVDevModal.vue";
+import AttachDiskModal from "./AttachDiskModal.vue";
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
-import PoolDetail from "./PoolDetail.vue";
-import DiskDetail from "./DiskDetail.vue";
-import UniversalConfirmation from "../common/confirmation/UniversalConfirmation.vue";
-import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
-import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
-import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
-import ImportPool from "./ImportPool.vue";
-import AddVDevModal from "../pools/AddVDevModal.vue";
-import ConfirmRemoveVDev from "../common/confirmation/ConfirmRemoveVDev.vue";
-import AttachDiskModal from "./AttachDiskModal.vue";
-import ConfirmDetachDisk from "../common/confirmation/ConfirmDetachDisk.vue";
+import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -367,7 +366,6 @@ async function refreshAllData() {
 /////////////////////////////////////////////////////
 const confirmDelete = ref(false);
 const showDeletePoolConfirm = ref(false);
-const deleting = ref(false);
 const hasChildren = ref(false);
 const forceDestroy = ref(false);
 
@@ -387,7 +385,6 @@ const confirmThisDestroy : ConfirmationCallback = () => {
 
 watch(confirmDelete, async (newValue, oldValue) => {
 	if (confirmDelete.value == true) {	
-		// deleting.value = true;
 		operationRunning.value = true;
 		console.log('now deleting:', selectedPool.value);
 
@@ -408,7 +405,6 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		showDeletePoolConfirm.value = false;
 		showModalFlag.value = showDeletePoolConfirm.value;
 		operationRunning.value = false;
-		// deleting.value = false;
 		message.value = "Destroyed " + selectedPool.value!.name + " at " + getTimestampString();
 		notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
 	}
@@ -419,14 +415,11 @@ watch(confirmDelete, async (newValue, oldValue) => {
 const confirmResilver = ref(false);
 const showResilverModal = ref(false);
 const resilvered = ref(false);
-const resilvering = ref(false);
 
 async function resilverThisPool(pool) {
-	// scrubbed.value = false;
-	// trimmed.value = false;
-	// cleared.value = false;
 	selectedPool.value = pool;
 	showResilverModal.value = true;
+	showModalFlag.value = showResilverModal.value;
 
 	console.log('preparing to resilver:', selectedPool.value);
 }
@@ -436,21 +429,20 @@ const confirmThisResilver : ConfirmationCallback = () => {
 }
 
 watch(confirmResilver, async (newValue, oldValue) => {
-
 	if (confirmResilver.value == true) {
-		resilvering.value = true;
+		operationRunning.value = true;
 		resilvered.value = false;
 		console.log('now resilvering:', selectedPool.value);
 
 		loading.value = true;
 		loadingMessage.value = `Resilvering ${selectedPool.value!.name}...`;
-
 		showResilverModal.value = false;
+		showModalFlag.value = showResilverModal.value;
 		await resilverPool(selectedPool.value);
+
 		confirmResilver.value = false;
 		resilvered.value = true;
-		resilvering.value = false;
-
+		operationRunning.value = false;
 		loading.value = false;
 		loadingMessage.value = "";
 		message.value = "Resilver on " + selectedPool.value!.name + " completed at " + getTimestampString();
@@ -464,12 +456,12 @@ const showTrimModal = ref(false);
 const confirmTrim = ref(false);
 const secureTRIM = ref(false);
 const trimmed = ref(false);
-const trimming = ref(false);
 
 async function trimThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
 	showTrimModal.value = true;
+	showModalFlag.value = showTrimModal.value;
 
 	console.log("preparing to trim:", selectedPool.value);
 }
@@ -480,23 +472,25 @@ const confirmThisTrim : ConfirmationCallback = () => {
 
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
-		trimming.value = true;
+		operationRunning.value = true;
 		trimmed.value = false;
 		console.log('now trimming:', selectedPool.value);
 
 		loading.value = true;
 		loadingMessage.value = `Trimming ${selectedPool.value!.name}...`;
 
-		if (secureTRIM.value) {
+		if (firstOptionToggle.value) {
 			confirmTrim.value = false;	
 			showTrimModal.value = false;
-			await trimPool(selectedPool.value, secureTRIM.value);
+			showModalFlag.value = showTrimModal.value;
+			await trimPool(selectedPool.value, firstOptionToggle.value);
 		} else {
 			confirmTrim.value = false;
 			showTrimModal.value = false;
+			showModalFlag.value = showTrimModal.value;
 			await trimPool(selectedPool.value);
 		}
-		trimming.value = false;
+		operationRunning.value = false;
 		trimmed.value = true;
 
 		loading.value = false;
@@ -508,30 +502,44 @@ watch(confirmTrim, async (newValue, oldValue) => {
 
 /////////////////// Scrub Pool //////////////////////
 /////////////////////////////////////////////////////
+const showScrubModal = ref(false);
+const confirmScrub = ref(false);
 const scrubbed = ref(false);
-const scrubbing = ref(false);
 
 async function scrubThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
+	showScrubModal.value = true;
+	showModalFlag.value = showScrubModal.value;
+
 	console.log('preparing to scrub:', selectedPool.value);
-	scrubbed.value = false;
-	scrubbing.value = true;
-	console.log('now scrubbing:', selectedPool.value);
-
-	loading.value = true;
-	loadingMessage.value = `Scrubbing ${selectedPool.value!.name}...`;
-
-	await scrubPool(pool);
-
-	scrubbing.value = false;
-	scrubbed.value = true;
-
-	loading.value = false;
-	loadingMessage.value = "";
-	message.value = "Scrub on " + selectedPool.value!.name + " ended at " + getTimestampString();
-	notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
 }
+
+const confirmThisScrub : ConfirmationCallback = () => {
+	confirmScrub.value = true;
+}
+
+watch(confirmScrub, async (newVal, oldVal) => {
+	if (confirmScrub.value == true) {
+		scrubbed.value = false;
+		operationRunning.value = true;
+		console.log('now scrubbing:', selectedPool.value);
+
+		loading.value = true;
+		loadingMessage.value = `Scrubbing ${selectedPool.value!.name}...`;
+
+		await scrubPool(selectedPool.value!);
+
+		operationRunning.value = false;
+		scrubbed.value = true;
+		showScrubModal.value = false;
+		showModalFlag.value = showScrubModal.value;
+		loading.value = false;
+		loadingMessage.value = "";
+		message.value = "Scrub on " + selectedPool.value!.name + " ended at " + getTimestampString();
+		notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
+	}
+});
 
 /////////////////// Export Pool /////////////////////
 /////////////////////////////////////////////////////
@@ -544,6 +552,7 @@ async function exportThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
 	showExportModal.value = true;
+	showModalFlag.value = showExportModal.value;
 
 	console.log('preparing to export:', selectedPool.value);
 }
@@ -555,9 +564,10 @@ const confirmThisExport : ConfirmationCallback = () => {
 watch(confirmExport, async (newVal, oldVal) => {
 	if (confirmExport.value == true) {
 		exporting.value = true;
+		operationRunning.value = true;
 		console.log('now exporting:', selectedPool.value);
-		if (forceUnmount.value) {
-			exportPool(selectedPool.value!, forceUnmount.value);
+		if (firstOptionToggle.value) {
+			exportPool(selectedPool.value!, firstOptionToggle.value);
 		} else {
 			exportPool(selectedPool.value!);
 		}
@@ -566,7 +576,9 @@ watch(confirmExport, async (newVal, oldVal) => {
 		refreshAllData();
 		confirmExport.value = false;
 		showExportModal.value = false;
+		showModalFlag.value = showExportModal.value;
 		exporting.value = false;
+		operationRunning.value = false;
 	}
 });
 
@@ -605,6 +617,7 @@ async function removeVDev(pool : PoolData, vDev : vDevData) {
 	selectedPool.value = pool;
 	selectedVDev.value = vDev;
 	showRemoveVDevConfirm.value = true;
+	showModalFlag.value = showRemoveVDevConfirm.value;
 
 	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
 }
@@ -615,13 +628,16 @@ const confirmThisRemove : ConfirmationCallback = () => {
 
 watch(confirmRemove, async (newValue, oldValue) => {
 	if (confirmRemove.value == true) {
-		removing.value = true;
+		operationRunning.value = true;
 		console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
+
 		await removeVDevFromPool(selectedVDev.value, selectedPool.value);
+
 		refreshAllData();
 		confirmRemove.value = false;
 		showRemoveVDevConfirm.value = false;
-		removing.value = false;
+		showModalFlag.value = showRemoveVDevConfirm.value;
+		operationRunning.value = false;
 		message.value = "Removed " + selectedVDev.value!.name + " from " + selectedVDev.value!.name + " at " + getTimestampString();
 		notifications.value.constructNotification('Remove Completed', 'Removal of VDev '+ selectedVDev.value!.name + " from " + selectedVDev.value!.name + " completed.", 'success');
 	}
@@ -644,8 +660,8 @@ function showAttachDisk(pool: PoolData, vdev: vDevData) {
 async function detachThisDisk(pool : PoolData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
-	clearLabels.value = false;
 	showDetachDiskModal.value = true;
+	showModalFlag.value = showDetachDiskModal.value;
 
 	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 }
@@ -657,9 +673,10 @@ const confirmThisDetach : ConfirmationCallback = () => {
 watch(confirmDetach, async (newValue, oldValue) => {
 	if (confirmDetach.value == true) {
 		detaching.value = true;
+		operationRunning.value = true;
 		console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 
-		if (clearLabels.value == true) {
+		if (secondOptionToggle.value == true) {
 			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
 			await labelClear(selectedDisk.value!);
 		} else {
@@ -668,7 +685,9 @@ watch(confirmDetach, async (newValue, oldValue) => {
 		refreshAllData();
 		confirmDetach.value = false;
 		showDetachDiskModal.value = false;
+		showModalFlag.value = showDetachDiskModal.value;
 		detaching.value = false;
+		operationRunning.value = false;
 		message.value = "Detached disk " + selectedDisk.value!.name + " from " + selectedPool.value!.name + " at " + getTimestampString();
 		notifications.value.constructNotification('Detach Completed', selectedDisk.value!.name + " was detached from " + selectedPool.value!.name + ".", 'success');
 	}
@@ -720,13 +739,11 @@ provide('show-pool-deets', showPoolDetails);
 
 provide('show-delete-pool-confirm', showDeletePoolConfirm);
 provide('confirm-delete-pool', confirmDelete);
-provide('deleting', deleting);
 provide('has-children', hasChildren);
 provide('force-destroy', forceDestroy);
 
 provide("show-resilver-modal", showResilverModal);
 provide("confirm-resilver", confirmResilver);
-provide('resilvering', resilvering);
 
 provide("show-trim-modal", showTrimModal);
 provide("secure-trim", secureTRIM);
@@ -735,11 +752,9 @@ provide("confirm-trim", confirmTrim);
 provide("show-export-modal", showExportModal);
 provide("confirm-export", confirmExport);
 provide("force-unmount", forceUnmount);
-provide('exporting', exporting);
 
 provide('show-remove-modal', showRemoveVDevConfirm);
 provide('confirm-remove', confirmRemove);
-provide('removing', removing);
 
 provide("show-import-modal", showImportModal);
 provide("show-vdev-modal", showAddVDevModal);
@@ -747,7 +762,6 @@ provide('show-attach-modal', showAttachDiskModal);
 
 provide('show-detach-modal', showDetachDiskModal);
 provide('confirm-detach', confirmDetach);
-provide('detaching', detaching);
 
 provide('modal-confirm-show', showModalFlag);
 provide('modal-confirm-running', operationRunning);
