@@ -118,6 +118,9 @@
 	<div v-if="showDeletePoolConfirm">
 		<ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="getIdKey(`delete-pool-${selectedPool?.guid}`)" :confirmDestroy="confirmThisDestroy" @close="showDeletePoolConfirm = false"/>
 	</div>
+	<div v-if="showDeletePoolConfirm">
+		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/>
+	</div>
 
 	<div v-if="showResilverModal">
 		<ConfirmResilverModal item="pool" :name="selectedPool!.name" :idKey="getIdKey(`resilver-pool-${selectedPool?.guid}`)" :confirmResilver="confirmThisResilver" @close="showResilverModal = false"/>
@@ -141,6 +144,7 @@ import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool
 import { labelClear } from "../../composables/disks";
 import { getTimestampString } from "../../composables/helpers";
 import Card from '../common/Card.vue';
+import UniversalConfirmation from "../common/confirmation/UniversalConfirmation.vue";
 import PoolDetail from "../pools/PoolDetail.vue";
 import ConfirmDeletePoolModal from "../common/confirmation/ConfirmDeletePoolModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
@@ -187,6 +191,15 @@ const poolConfig = ref<PoolData>({
 	comment: props.pool.comment,
 });
 
+///////// Values for Confirmation Modals ////////////
+/////////////////////////////////////////////////////
+const showModalFlag = ref(false);
+const operationRunning = ref(false);
+const firstOptionToggle = ref(false);
+const secondOptionToggle = ref(false);
+const thirdOptionToggle = ref(false);
+const fourthOptionToggle = ref(false);
+
 ////////////// Show Pool/Disk Details ///////////////
 /////////////////////////////////////////////////////
 const showPoolDetails = ref(false);
@@ -223,9 +236,11 @@ const clearLabels = inject<Ref<boolean>>('clear-labels')!;
 const selectedDisk = ref<DiskData>();
 
 async function destroyPoolAndUpdate(pool) {
+	operationRunning.value = false;
 	selectedPool.value = pool;
 	clearLabels.value = false;
 	showDeletePoolConfirm.value = true;
+	showModalFlag.value = showDeletePoolConfirm.value;
 
 	console.log('preparing to delete:', selectedPool.value);
 }
@@ -237,11 +252,12 @@ const confirmThisDestroy : ConfirmationCallback = () => {
 watch(confirmDelete, async (newValue, oldValue) => {
 	
 	if (confirmDelete.value == true) {	
-		deleting.value = true;
+		//deleting.value = true;
+		operationRunning.value = true;
 		console.log('now deleting:', selectedPool.value);
 
-		if (clearLabels.value == true) {
-			await destroyPool(selectedPool.value!);
+		if (secondOptionToggle.value == true) {
+			await destroyPool(selectedPool.value!, firstOptionToggle.value);
 			selectedPool.value!.vdevs.forEach(vDev => {
 				vDev.disks.forEach(async disk => {
 					selectedDisk.value = disk;
@@ -255,7 +271,9 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		refreshAllData();
 		confirmDelete.value = false;
 		showDeletePoolConfirm.value = false;
-		deleting.value = false;
+		showModalFlag.value = showDeletePoolConfirm.value;
+		operationRunning.value = false;
+		//deleting.value = false;
 		notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
 	}
 });
@@ -439,4 +457,11 @@ provide('exporting', exporting);
 
 provide('show-vdev-modal', showAddVDevModal);
 provide('show-pool-deets', showPoolDetails);
+
+provide('modal-confirm-show', showModalFlag);
+provide('modal-confirm-running', operationRunning);
+provide('modal-option-one-toggle', firstOptionToggle);
+provide('modal-option-two-toggle', secondOptionToggle);
+provide('modal-option-three-toggle', thirdOptionToggle);
+provide('modal-option-four-toggle', fourthOptionToggle);
 </script>

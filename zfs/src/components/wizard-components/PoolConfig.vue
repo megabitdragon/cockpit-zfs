@@ -46,7 +46,7 @@
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
 				<ul :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
 					<li v-for="(disk, diskIdx) in vDevAvailDisks[vDevIdx]" :key="diskIdx" class="my-2">
-						<button class="flex min-w-fit w-full h-full border border-default rounded-lg p-4"
+						<button class="flex min-w-fit w-full h-full border border-default rounded-lg"
 						:class="diskCardClass(disk.name, vDevIdx)">
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"

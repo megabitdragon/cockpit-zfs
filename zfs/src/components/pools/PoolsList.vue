@@ -241,7 +241,6 @@
 	</div>
 
 	<div v-if="showDeletePoolConfirm">
-		<!-- <ConfirmDeletePoolModal :poolName="selectedPool!.name" :idKey="'delete-pool'" :confirmDestroy="confirmThisDestroy" @close="showDeletePoolConfirm = false"/> -->
 		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/>
 	</div>
 
@@ -292,7 +291,6 @@ import { getTimestampString } from "../../composables/helpers";
 import PoolDetail from "./PoolDetail.vue";
 import DiskDetail from "./DiskDetail.vue";
 import UniversalConfirmation from "../common/confirmation/UniversalConfirmation.vue";
-// import ConfirmDeletePoolModal from "../common/confirmation/ConfirmDeletePoolModal.vue";
 import ConfirmResilverModal from "../common/confirmation/ConfirmResilverModal.vue";
 import ConfirmTrimModal from "../common/confirmation/ConfirmTrimModal.vue";
 import ConfirmExportModal from "../common/confirmation/ConfirmExportModal.vue";
@@ -345,7 +343,6 @@ function showPoolModal(pool) {
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
 const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
-
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
