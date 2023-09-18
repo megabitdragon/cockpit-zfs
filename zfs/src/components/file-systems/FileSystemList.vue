@@ -118,17 +118,15 @@
 	</div>
 
 	<div v-if="showDeleteFileSystemConfirm">
-		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation  :showFlag="showDeleteFileSystemConfirm" @close="updateShowDestroyFileSystem" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showUnmountFileSystemConfirm">
-		<ConfirmUnmountFileSystem :fileSystemName="selectedDataset!.name" :idKey="'unmount-filesystem'" @close="showUnmountFileSystemConfirm = false"/>
-		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation  :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showMountFileSystemConfirm">
-		<ConfirmMountFileSystem :fileSystemName="selectedDataset!.name" :idKey="'mount-filesystem'" @close="showMountFileSystemConfirm = false"/>
-		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation  :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
 	</div>
 
 </template>
@@ -144,8 +142,6 @@ import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FSConfigModal from "./FSConfigModal.vue";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
-import ConfirmUnmountFileSystem from "../common/confirmation/ConfirmUnmountFileSystem.vue";
-import ConfirmMountFileSystem from '../common/confirmation/ConfirmMountFileSystem.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -155,7 +151,7 @@ const selectedDataset = ref<FileSystemData>();
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
-const showModalFlag = ref(false);
+//const showModalFlag = ref(false);
 const operationRunning = ref(false);
 const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
@@ -210,12 +206,15 @@ async function deleteFileSystem(fileSystem) {
 	}
 
 	showDeleteFileSystemConfirm.value = true;
-	showModalFlag.value = showDeleteFileSystemConfirm.value;
 	console.log('selected for deletion:', selectedDataset.value);
 }
 
 const confirmThisDestroy : ConfirmationCallback = () => {
 	confirmDelete.value = true;
+}
+
+const updateShowDestroyFileSystem = (newVal) => {
+	showDeleteFileSystemConfirm.value = newVal;
 }
 
 watch(confirmDelete, async (newValue, oldValue) => {
@@ -228,7 +227,6 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		operationRunning.value = false;
 		refreshDatasets();
 		showDeleteFileSystemConfirm.value = false;
-		showModalFlag.value = showDeleteFileSystemConfirm.value;
 
 		confirmDelete.value = false;
 		hasChildren.value = false;
@@ -239,61 +237,83 @@ watch(confirmDelete, async (newValue, oldValue) => {
 	}
 });
 
-//////////// Unmount/Mount File System //////////////
+/////////////// Unmount File System /////////////////
 /////////////////////////////////////////////////////
 const showUnmountFileSystemConfirm = ref(false);
 const forceUnmount = ref(false);
 const unmounting = ref(false);
 const confirmUnmount = ref(false);
 
+function unmountThisFileSystem(fileSystem) {
+	showUnmountFileSystemConfirm.value = true;
+	selectedDataset.value = fileSystem;
+	console.log('selected to be unmounted:', selectedDataset.value);
+}
+
+const confirmThisUnmount : ConfirmationCallback = () => {
+	confirmUnmount.value = true;
+}
+
+const updateShowUnmountFileSystem = (newVal) => {
+	showUnmountFileSystemConfirm.value = newVal;
+}
+
+watch(confirmUnmount, async (newValue, oldValue) => {
+	console.log('confirmUnmount changed:', newValue);
+	
+	if (confirmUnmount.value == true) {
+		unmounting.value = true;
+		operationRunning.value = true;
+		await unmountFileSystem(selectedDataset.value!, forceUnmount.value);
+		console.log('unmounted:', selectedDataset.value!);
+		showUnmountFileSystemConfirm.value = false;
+		
+		confirmUnmount.value = false;
+		forceUnmount.value = false;
+		await refreshDatasets();
+		unmounting.value = false;
+		operationRunning.value = false;
+	}
+});
+
+/////////////// Unmount File System /////////////////
+/////////////////////////////////////////////////////
 const showMountFileSystemConfirm = ref(false);
 const forceMount = ref(true);
 const mounting = ref(false);
 const confirmMount = ref(false);
 
-function unmountThisFileSystem(fileSystem) {
-	showUnmountFileSystemConfirm.value = true;
-	selectedDataset.value = fileSystem;
-	console.log('selected to be unmounted:', selectedDataset.value);
-
-	watch(confirmUnmount, async (newValue, oldValue) => {
-		console.log('confirmUnmount changed:', newValue);
-		
-		if (confirmUnmount.value == true) {
-			unmounting.value = true;
-			await unmountFileSystem(fileSystem, forceUnmount.value);
-			console.log('unmounted:', fileSystem);
-			showUnmountFileSystemConfirm.value = false;
-			
-			confirmUnmount.value = false;
-			forceUnmount.value = false;
-			await refreshDatasets();
-			unmounting.value = false;
-		}
-	});
-}
-
 function mountThisFileSystem(fileSystem) {
 	showMountFileSystemConfirm.value = true;
 	selectedDataset.value = fileSystem;
 	console.log('selected to be mounted:', selectedDataset.value);
-
-	watch(confirmMount, async (newValue, oldValue) => {
-		console.log('confirmMount changed:', newValue);
-		
-		if (confirmMount.value == true) {
-			mounting.value = true;
-			await mountFileSystem(fileSystem, forceMount.value);
-			console.log('mounted:', fileSystem);
-			showMountFileSystemConfirm.value = false;
-			
-			confirmMount.value = false;
-			forceMount.value = false;
-			await refreshDatasets();
-			mounting.value = false;
-		}
-	});
 }
+
+const confirmThisMount : ConfirmationCallback = () => {
+	confirmMount.value = true;
+}
+
+const updateShowMountFileSystem = (newVal) => {
+	showMountFileSystemConfirm.value = newVal;
+}
+
+watch(confirmMount, async (newValue, oldValue) => {
+	console.log('confirmMount changed:', newValue);
+	
+	if (confirmMount.value == true) {
+		mounting.value = true;
+		operationRunning.value = true;
+		await mountFileSystem(selectedDataset.value!, forceMount.value);
+		console.log('mounted:', selectedDataset.value!);
+		showMountFileSystemConfirm.value = false;
+		
+		confirmMount.value = false;
+		forceMount.value = false;
+		await refreshDatasets();
+		mounting.value = false;
+		operationRunning.value = false;
+	}
+});
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
@@ -315,7 +335,6 @@ provide('confirm-unmount-filesystem', confirmUnmount);
 provide('unmounting', unmounting);
 provide('force-unmount', forceUnmount);
 
-provide('modal-confirm-show', showModalFlag);
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);

@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showModalFlag" @close="showModalFlag = false" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'">
+    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'">
         <template v-slot:title>
             <legend class="flex justify-center">{{ upperCaseWord(props.operation) }} {{ upperCaseWord(props.item) }}</legend>
         </template>
@@ -65,7 +65,7 @@
         <template v-slot:footer>
             <div class="w-full grid grid-rows-1">
                 <div class="button-group-row mt-2 justify-between">
-                    <button @click="showModalFlag = false" :id="getIdKey('confirm-delete-no')" name="delete-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
+                    <button @click="closeModal" :id="getIdKey('confirm-delete-no')" name="delete-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
                    
                     <div v-if="props.firstOption" class="flex flex-row">
                         <label :for="getIdKey('forcefully-destroy')" class="mt-3 mr-2 block text-sm font-medium text-default">{{upperCaseWord(option1)}}</label>
@@ -123,7 +123,7 @@
 </template>
 <script setup lang="ts">
 import { Switch } from '@headlessui/vue';
-import { Ref, inject, watch, ref } from 'vue';
+import { Ref, inject, watch, ref} from 'vue';
 import { upperCaseWord } from '../../composables/helpers';
 import Modal from './Modal.vue';
 
@@ -132,24 +132,34 @@ interface UniversalConfirmationProps {
     item: string;
     operation: string;
     confirmOperation: ConfirmationCallback;
-
     pool?: PoolData;
     vDev?: vDevData;
     disk?: DiskData;
     filesystem?: FileSystemData;
     firstOption?: string;
     secondOption?: string;
-    thirdOption?: string;
-    fourthOption?: string;
-
+    // thirdOption?: string;
+    // fourthOption?: string;
     hasChildren: boolean;
+
+    showFlag: boolean;
 }
 
 const props = defineProps<UniversalConfirmationProps>();
+const emit = defineEmits(['close']);
 
 const operationRunning = inject<Ref<boolean>>('modal-confirm-running')!;
-const showModalFlag = inject<Ref<boolean>>('modal-confirm-show')!;
-const confirmBool = ref(false);
+const showFlag = ref(props.showFlag);
+
+const updateShowFlag = () => {
+    if (props.showFlag !== showFlag.value) {
+        showFlag.value = props.showFlag;
+    } 
+}
+
+const closeModal = () => {
+    emit('close');
+}
 
 //options: force (mount, unmount, destroy, replace, offline), secureTRIM, expand device
 const option1 = props.firstOption;
@@ -160,11 +170,11 @@ const option2 = props.secondOption;
 const option2Toggle = inject<Ref<boolean>>('modal-option-two-toggle')!;
 
 //option: destroy children
-const option3 = props.thirdOption;
+// const option3 = props.thirdOption;
 const option3Toggle = inject<Ref<boolean>>('modal-option-three-toggle')!;
 
 //option: destroy children + dependents
-const option4 = props.fourthOption;
+// const option4 = props.fourthOption;
 const option4Toggle = inject<Ref<boolean>>('modal-option-four-toggle')!;
 
 const operating = ref('');
@@ -195,37 +205,6 @@ switch (props.operation) {
         operating.value = 'Exporting...';
         break;
 }
-
-/*
-///////// Values for Confirmation Modals ////////////
-/////////////////////////////////////////////////////
-const item = ref('');
-const showModalFlag = ref(false);
-const operation = ref('');
-const operationConfirm = ref(false);
-const operationRunning = ref(false);
-
-const confirmOperation : ConfirmationCallback = () => {
-	operationConfirm.value = !operationConfirm.value;
-}
-
-const hasExtraOptions = ref(false);
-const firstOption = ref('');
-const secondOption = ref('');
-const thirdOption = ref('');
-const fourthOption = ref('');
-const poolHasChildren = ref(false);
-
-provide('modal-confirm-show', showModalFlag);
-provide('modal-confirm-running', operationRunning);
-provide('modal-option-one-toggle', firstOptionToggle);
-provide('modal-option-two-toggle', secondOptionToggle);
-provide('modal-option-three-toggle', thirdOptionToggle);
-provide('modal-option-four-toggle', fourthOptionToggle);
-*/
-
-
-
 
 const getIdKey = (name: string) => `${name}`;
 </script>

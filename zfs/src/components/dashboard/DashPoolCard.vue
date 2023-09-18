@@ -116,23 +116,23 @@
 	</div>
 
 	<div v-if="showDeletePoolConfirm">
-		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/>
+		<UniversalConfirmation :showFlag="showDeletePoolConfirm" @close="updateShowDestroyPool" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showResilverModal">
-		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-resilver-pool'" :item="'pool'" :operation="'resilver'" :pool="selectedPool!" :confirmOperation="confirmThisResilver" :hasChildren="false"/>
+		<UniversalConfirmation :showFlag="showResilverModal" @close="updateShowResilverPool" :idKey="'confirm-resilver-pool'" :item="'pool'" :operation="'resilver'" :pool="selectedPool!" :confirmOperation="confirmThisResilver" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showTrimModal">
-		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-trim-pool'" :item="'pool'" :operation="'trim'" :pool="selectedPool!" :confirmOperation="confirmThisTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
+		<UniversalConfirmation :showFlag="showTrimModal" @close="updateShowTrimPool" :idKey="'confirm-trim-pool'" :item="'pool'" :operation="'trim'" :pool="selectedPool!" :confirmOperation="confirmThisTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showScrubModal">
-		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-scrub-pool'" :item="'pool'" :operation="'scrub'" :pool="selectedPool!" :confirmOperation="confirmThisScrub" :hasChildren="false"/>
+		<UniversalConfirmation :showFlag="showScrubModal" @close="updateShowScrubPool" :idKey="'confirm-scrub-pool'" :item="'pool'" :operation="'scrub'" :pool="selectedPool!" :confirmOperation="confirmThisScrub" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showExportModal">
-		<UniversalConfirmation @close="showModalFlag = false" :idKey="'confirm-export-pool'" :item="'pool'" :operation="'export'" :pool="selectedPool!" :confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false"/>
+		<UniversalConfirmation :showFlag="showExportModal" @close="updateShowExportPool" :idKey="'confirm-export-pool'" :item="'pool'" :operation="'export'" :pool="selectedPool!" :confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false"/>
 	</div>
 </template>
 
@@ -190,7 +190,6 @@ const poolConfig = ref<PoolData>({
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
-const showModalFlag = ref(false);
 const operationRunning = ref(false);
 const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
@@ -237,13 +236,16 @@ async function destroyPoolAndUpdate(pool) {
 	selectedPool.value = pool;
 	clearLabels.value = false;
 	showDeletePoolConfirm.value = true;
-	showModalFlag.value = showDeletePoolConfirm.value;
 
 	console.log('preparing to delete:', selectedPool.value);
 }
 
 const confirmThisDestroy : ConfirmationCallback = () => {
 	confirmDelete.value = true;
+}
+
+const updateShowDestroyPool = (newVal) => {
+	showDeletePoolConfirm.value = newVal;
 }
 
 watch(confirmDelete, async (newValue, oldValue) => {
@@ -267,7 +269,6 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		refreshAllData();
 		confirmDelete.value = false;
 		showDeletePoolConfirm.value = false;
-		showModalFlag.value = showDeletePoolConfirm.value;
 		operationRunning.value = false;
 		notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
 	}
@@ -283,13 +284,16 @@ const resilvering = ref(false);
 async function resilverThisPool(pool) {
 	selectedPool.value = pool;
 	showResilverModal.value = true;
-	showModalFlag.value = showResilverModal.value;
 
 	console.log('preparing to resilver:', selectedPool.value);
 }
 
 const confirmThisResilver : ConfirmationCallback = () => {
 	confirmResilver.value = true;
+}
+
+const updateShowResilverPool = (newVal) => {
+	showResilverModal.value = newVal;
 }
 
 watch(confirmResilver, async (newValue, oldValue) => {
@@ -300,7 +304,6 @@ watch(confirmResilver, async (newValue, oldValue) => {
 		console.log('now resilvering:', selectedPool.value);
 
 		showResilverModal.value = false;
-		showModalFlag.value = showResilverModal.value;
 		await resilverPool(selectedPool.value);
 
 		confirmResilver.value = false;
@@ -324,13 +327,16 @@ async function trimThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
 	showTrimModal.value = true;
-	showModalFlag.value = showTrimModal.value;
 
 	console.log("preparing to trim:", selectedPool.value);
 }
 
 const confirmThisTrim : ConfirmationCallback = () => {
 	confirmTrim.value = true;
+}
+
+const updateShowTrimPool = (newVal) => {
+	showTrimModal.value = newVal;
 }
 
 watch(confirmTrim, async (newValue, oldValue) => {
@@ -343,12 +349,10 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		if (firstOptionToggle.value) {
 			confirmTrim.value = false;	
 			showTrimModal.value = false;
-			showModalFlag.value = showTrimModal.value;
 			await trimPool(selectedPool.value, firstOptionToggle.value);
 		} else {
 			confirmTrim.value = false;
 			showTrimModal.value = false;
-			showModalFlag.value = showTrimModal.value;
 			await trimPool(selectedPool.value);
 		}
 		trimming.value = false;
@@ -370,13 +374,16 @@ async function scrubThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
 	showScrubModal.value = true;
-	showModalFlag.value = showScrubModal.value;
 
 	console.log('preparing to scrub:', selectedPool.value);
 }
 
 const confirmThisScrub : ConfirmationCallback = () => {
 	confirmScrub.value = true;
+}
+
+const updateShowScrubPool = (newVal) => {
+	showScrubModal.value = newVal;
 }
 
 watch(confirmScrub, async (newVal, oldVal) => {
@@ -392,7 +399,6 @@ watch(confirmScrub, async (newVal, oldVal) => {
 		operationRunning.value = scrubbing.value;
 		scrubbed.value = true;
 		showScrubModal.value = false;
-		showModalFlag.value = showScrubModal.value;
 		messageTimestamp.value = getTimestampString();
 		notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
 	}
@@ -409,13 +415,16 @@ async function exportThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
 	showExportModal.value = true;
-	showModalFlag.value = showExportModal.value;
 
 	console.log('preparing to export:', selectedPool.value);
 }
 
 const confirmThisExport : ConfirmationCallback = () => {
 	confirmExport.value = true;
+}
+
+const updateShowExportPool = (newVal) => {
+	showExportModal.value = newVal;
 }
 
 watch(confirmExport, async (newVal, oldVal) => {
@@ -432,7 +441,6 @@ watch(confirmExport, async (newVal, oldVal) => {
 		refreshAllData();
 		confirmExport.value = false;
 		showExportModal.value = false;
-		showModalFlag.value = showExportModal.value;
 		exporting.value = false;
 		operationRunning.value = false;
 	}
@@ -482,7 +490,6 @@ provide("confirm-export", confirmExport);
 provide('show-vdev-modal', showAddVDevModal);
 provide('show-pool-deets', showPoolDetails);
 
-provide('modal-confirm-show', showModalFlag);
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);
