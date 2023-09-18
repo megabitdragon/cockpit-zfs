@@ -1,0 +1,249 @@
+<template>
+    <Modal @close="showReplaceDiskModal = false" :isOpen="showReplaceDiskModal" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+        <template v-slot:title>
+            Replace Disk
+        </template>
+        <template v-slot:content>
+            <div v-for="(vDev, vDevIdx) in props.pool.vdevs" :key="vDevIdx">
+                <!-- Disk ID (Select) -->
+				<div>
+					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
+					<select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
+						<option value="sd_path">Block Device</option>
+						<option value="phy_path">Hardware Path</option>
+						<option value="vdev_path">Device Alias</option>
+					</select>
+				</div>
+
+				<!-- Disk selection, shows disks that are not in use -->
+				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
+                <ul :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
+                    <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
+                        <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
+                        :class="diskCardClass(disk.name)">
+                            <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
+                                <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisk" type="radio" :value="`${disk.name}`" :name="`disk-${disk.name}`"
+                                class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
+                                <h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
+                                <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
+                                <p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
+                                <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
+                            </label>
+                        </button>
+                    </li>
+                </ul>
+
+            </div>
+        </template>
+        <template v-slot:footer>
+            <div class="w-full grid grid-rows-2">
+                <div class="w-full row-start-1 justify-center items-center">
+                    <div class="justify-self-start mt-2">
+                        <p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
+                    </div>
+				</div> 
+				
+				<div class="button-group-row w-full justify-between row-start-2">
+					<div class="button-group-row mt-2">
+                        <button @click="showReplaceDiskModal = false" :id="getIdKey('close-replace-disk-btn')" name="close-replace-disk-btn" class="btn btn-danger">Close</button>
+
+                        <div class="flex flex-row">
+                            <label :for="getIdKey('force-add-vdev')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully Replace Disk</label>
+                            <Switch v-model="diskVDevPoolData.forceReplace" :id="getIdKey('force-add-vdev')" :class="[diskVDevPoolData.forceReplace! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                                <span class="sr-only">Use setting</span>
+                                <span :class="[diskVDevPoolData.forceReplace! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                    <span :class="[diskVDevPoolData.forceReplace! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                            <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </span>
+                                    <span :class="[diskVDevPoolData.forceReplace! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                            <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                        </svg>
+                                    </span>
+                                </span>
+                            </Switch>
+                        </div>
+					</div>
+					<div class="button-group-row mt-2">
+                        <button v-if="!adding" id="replace-disk-btn" class="btn btn-primary object-right justify-end mr-4 h-fit w-full" @click="replaceDiskBtn">Replace Disk</button>
+                        <button disabled v-if="adding" id="finish" type="button" class="btn btn-primary object-right justify-end">
+                            <svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="text-success"/>
+                            </svg>
+                            Replacing...
+                        </button>
+					</div>
+				</div>
+			</div>
+        </template>
+    </Modal>
+</template>
+<script setup lang="ts">
+import { reactive, ref, inject, Ref, computed, provide } from 'vue';
+import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
+import Modal from '../common/Modal.vue';
+import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
+import { replaceDisk } from '../../composables/disks';
+import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
+
+interface ReplaceDiskModalProps {
+    idKey: string;
+    pool: PoolData;
+    vDev: vDevData;
+    disk: DiskData;
+}
+
+const props = defineProps<ReplaceDiskModalProps>();
+
+const showReplaceDiskModal = inject<Ref<boolean>>('show-replace-modal')!;
+const selectedDisk = ref('');
+
+const pools = inject<Ref<PoolData[]>>('pools')!;
+const allDisks = inject<Ref<DiskData[]>>('disks')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+
+const diskIdentifier = ref<DiskIdentifier>('vdev_path');
+const diskSizeFeedback = ref('')
+
+const phyPathPrefix = '/dev/disk/by-path/';
+const sdPathPrefix = '/dev/';
+const newDisk = ref();
+const oldDisk = ref();
+const diskNewName = ref('');
+const diskNewPath = ref('');
+const diskExistPath = ref('');
+const diskExistName = ref('');
+const adding = ref(false);
+
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+
+const diskVDevPoolData = ref({
+    existingDiskName: '',
+    newDiskName: '',
+    vDevName: props.vDev.name,
+    poolName: props.pool.name,
+    forceReplace: false,
+});
+
+const availableDisks = computed<DiskData[]>(() => {
+    return allDisks.value.filter(disk => disk.usable);
+})
+
+//change color of disk when selected
+const diskCardClass = (diskName) => {
+    const isSelected = selectedDisk.value === diskName;
+    console.log('DISK SELECTED:', selectedDisk.value);
+    return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
+};
+
+function setDiskNamePath() {
+    // const oldDisks = props.vDev.disks;
+    // console.log('setting oldDisks:', oldDisks);
+    // oldDisk.value = oldDisks.pop();
+    oldDisk.value = props.disk;
+    console.log('setting oldDisk.value:', oldDisk.value);
+    console.log('getting selectedDisk.value:', selectedDisk.value);
+    newDisk.value = allDisks.value.find(disk => disk.name === selectedDisk.value);
+    console.log('setting newDisk.value:', newDisk.value);
+    switch (diskIdentifier.value) {
+        case 'vdev_path':
+            diskNewPath.value = newDisk.value!.vdev_path;
+            diskNewName.value = selectedDisk.value;
+            diskExistPath.value = oldDisk.value!.path;
+            diskExistName.value = oldDisk.value!.name;
+            console.log('diskNewPath:', diskNewPath.value, 'diskNewName:', diskNewName.value);
+            console.log('diskExistPath:', diskExistPath.value, 'diskExistName:', diskExistName.value);
+            break;
+        case 'phy_path':
+            diskNewPath.value = newDisk.value!.phy_path;
+            //diskNewName.value = diskNewPath.value;
+             diskNewName.value = diskNewPath.value.replace(phyPathPrefix, '');
+            diskExistPath.value = oldDisk.value!.path;
+            //diskExistName.value = diskExistPath.value;
+             diskExistName.value = diskExistPath.value.replace(phyPathPrefix, '');
+            console.log('diskNewPath:', diskNewPath.value, 'diskNewName:', diskNewName.value);
+            console.log('diskExistPath:', diskExistPath.value, 'diskExistName:', diskExistName.value);
+            break;
+        case 'sd_path':
+            diskNewPath.value = newDisk.value!.sd_path;
+            //diskNewName.value = diskNewPath.value;
+             diskNewName.value = diskNewPath.value.replace(sdPathPrefix, '');
+            diskExistPath.value = oldDisk.value!.path;
+            //diskExistName.value = diskExistPath.value;
+             diskExistName.value = diskExistPath.value.replace(sdPathPrefix, '');
+            console.log('diskNewPath:', diskNewPath.value, 'diskNewName:', diskNewName.value);
+            console.log('diskExistPath:', diskExistPath.value, 'diskExistName:', diskExistName.value);
+            break;
+        default:
+            console.log('error with set diskName/paths');
+            break;
+    }
+}
+
+async function replaceDiskBtn() {
+    
+    if (diskSizeMatch()) {
+        setDiskNamePath();
+        diskVDevPoolData.value.newDiskName = diskNewName.value;
+        diskVDevPoolData.value.existingDiskName = diskExistName.value;
+        console.log('all data of disk being replaceed:', diskVDevPoolData.value);
+            
+        adding.value = true;
+        await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
+        showReplaceDiskModal.value = false;
+        adding.value = false;
+        disksLoaded.value = false;
+        poolsLoaded.value = false;
+        fileSystemsLoaded.value = false;
+        allDisks.value = [];
+        pools.value = [];
+        datasets.value = [];
+        await loadDisksThenPools(allDisks, pools);
+        await loadDatasets(datasets);
+        disksLoaded.value = true;
+        poolsLoaded.value = true;
+        fileSystemsLoaded.value = true;
+    }
+}
+
+const diskSizeMatch = () => {
+    let result = true;
+    diskSizeFeedback.value = '';
+    console.log("Checking disk:", selectedDisk.value);
+    
+    if (selectedDisk.value == '') {
+        diskSizeFeedback.value = 'At least one disk is required.'
+        return false;
+    }
+
+    const newDiskData = allDisks.value.find(fullDisk => fullDisk.name === selectedDisk.value);
+
+    if (newDiskData) {
+        const newCapacity = convertSizeToBytes(newDiskData!.capacity);
+        console.log('newCapacity:', newCapacity);
+
+        const oldDisks = props.vDev.disks;
+        console.log('oldDisks:', oldDisks);
+
+        for (const oldDisk of oldDisks) {
+            const currentCapacity = convertSizeToBytes(oldDisk.capacity);
+            console.log('currentCapacity:', currentCapacity);
+
+            if (newCapacity < currentCapacity) {
+                diskSizeFeedback.value = "Cannot replace. Please select a disk that has capacity greater than or equal to current disks."
+                result = false;
+                break;
+            }
+        }
+    }
+
+    return result;
+};
+
+const getIdKey = (name: string) => `${props.idKey}-${name}`;
+</script>

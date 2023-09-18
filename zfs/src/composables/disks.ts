@@ -138,9 +138,19 @@ export async function onlineDisk(poolName, diskName, expand) {
 	}
 }
 
-export async function replaceDisk(poolName, diskName) {
+export async function replaceDisk(poolName, diskName, newDiskName, forceReplace?) {
 	try {
 		let cmdString = ['zpool', 'replace'];
+
+		if (forceReplace) {
+			cmdString.push('-f');
+		}
+
+		cmdString.push('-w');
+		
+		cmdString.push(poolName);
+		cmdString.push(diskName);
+		cmdString.push(newDiskName);
 
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 

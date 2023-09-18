@@ -194,7 +194,7 @@
 																						<a href="#" @click="onlineThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Online Disk</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" @click="replaceThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
+																						<a href="#" @click="replaceThisDisk(pool, vDev, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
 																					</MenuItem>
 																					<MenuItem as="div" v-slot="{ active }">
 																						<a href="#" @click="trimThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
@@ -289,7 +289,7 @@
 	</div>
 
 	<div v-if="showReplaceDiskModal">
-		
+		<ReplaceDiskModal @close="showReplaceDiskModal = false" :idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!"/>
 	</div>
 </template>
 
@@ -297,6 +297,10 @@
 import { ref, inject, Ref, provide, watch } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
+import { labelClear, detachDisk, offlineDisk, onlineDisk, replaceDisk, trimDisk } from "../../composables/disks";
+import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
+import { getTimestampString } from "../../composables/helpers";
 import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolDetail from "./PoolDetail.vue";
 import ImportPool from "./ImportPool.vue";
@@ -304,11 +308,10 @@ import AddVDevModal from "../pools/AddVDevModal.vue";
 import AttachDiskModal from "../disks/AttachDiskModal.vue";
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
-import { labelClear, detachDisk, offlineDisk, onlineDisk, replaceDisk, trimDisk } from "../../composables/disks";
-import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
-import { getTimestampString } from "../../composables/helpers";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
+import ReplaceDiskModal from "../disks/ReplaceDiskModal.vue";
+
+
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -868,34 +871,14 @@ const showReplaceDiskModal = ref(false);
 const confirmReplace = ref(false);
 const replacing = ref(false);
 
-async function replaceThisDisk(pool: PoolData, disk: DiskData) {
+function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
-	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	selectedVDev.value = vdev;
+	console.log('selected pool:', selectedPool.value, 'selectedVDev:', selectedVDev, 'selected disk:', selectedDisk.value);
+	showReplaceDiskModal.value = true;
 }
 
-const confirmThisReplace : ConfirmationCallback = () => {
-	confirmReplace.value = true;
-}
-
-const updateShowReplaceDisk = (newVal) => {
-	showReplaceDiskModal.value = newVal;
-}
-
-watch(confirmReplace, async (newVal, oldVal) => {
-	if (confirmReplace.value == true) {
-		replacing.value = true;
-		operationRunning.value = true;
-		console.log('now replacing:', selectedDisk.value);
-		//await replaceDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
-		message.value = "Replaced " + selectedDisk.value!.name + " at " + getTimestampString();
-		notifications.value.constructNotification('Online Completed', 'Replacing of disk ' + selectedDisk.value!.name + " completed.", 'success');
-		refreshAllData();
-		confirmReplace.value = false;
-		replacing.value = false;
-		operationRunning.value = false;
-	}
-});
 
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
@@ -922,11 +905,9 @@ provide('confirm-remove', confirmRemove);
 provide("show-import-modal", showImportModal);
 provide("show-vdev-modal", showAddVDevModal);
 provide('show-attach-modal', showAttachDiskModal);
-
 provide('show-detach-modal', showDetachDiskModal);
 provide('confirm-detach', confirmDetach);
-
-// provide('modal-confirm-show', showModalFlag);
+provide('show-replace-modal', showReplaceDiskModal);
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);
