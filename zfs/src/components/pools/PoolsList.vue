@@ -797,19 +797,23 @@ watch(confirmOnline, async (newVal, oldVal) => {
 		operationRunning.value = true;
 		console.log('now onlining:', selectedDisk.value);
 
-		// if option2, scrub the pool after bringing disk online
-
-		await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
-		message.value = "Offlined " + selectedDisk.value!.name + " at " + getTimestampString();
-		notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
+		if (secondOptionToggle.value == true) {
+			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+			await scrubPool(selectedPool.value);
+			notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
+		} else {
+			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+		}
 		refreshAllData();
+
 		confirmOnline.value = false;
 		showOnlineDiskModal.value = false;
 		onlining.value = false;
 		operationRunning.value = false;
+		message.value = "Offlined " + selectedDisk.value!.name + " at " + getTimestampString();
+		notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
 	}
 });
-
 
 ///////////////////// TRIM Disk /////////////////////
 /////////////////////////////////////////////////////
@@ -837,7 +841,17 @@ watch(confirmTrimDisk, async (newVal, oldVal) => {
 		trimmingDisk.value = true;
 		operationRunning.value = true;
 		console.log('now Trimming:', selectedDisk.value);
-		//await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+
+		if (firstOptionToggle.value) {
+			confirmTrimDisk.value = false;	
+			showTrimDiskModal.value = false;
+			await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+		} else {
+			confirmTrimDisk.value = false;
+			showTrimDiskModal.value = false;
+			await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
+		}
+		
 		message.value = "Trimmed " + selectedDisk.value!.name + " at " + getTimestampString();
 		notifications.value.constructNotification('Online Completed', 'Trimming of disk ' + selectedDisk.value!.name + " completed.", 'success');
 		refreshAllData();

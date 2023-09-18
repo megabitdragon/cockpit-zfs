@@ -114,7 +114,7 @@ export async function offlineDisk(poolName, diskName, forceFault, temporary) {
 	}
 }
 
-export async function onlineDisk(poolName, diskName, expand, doScrub) {
+export async function onlineDisk(poolName, diskName, expand) {
 	try {
 		let cmdString = ['zpool', 'online'];
 		//expand the device to use all available space (-e)
@@ -154,9 +154,18 @@ export async function replaceDisk(poolName, diskName) {
 	}
 }
 
-export async function trimDisk(poolName, diskName) {
+export async function trimDisk(poolName, diskName, isSecure?) {
 	try {
 		let cmdString = ['zpool', 'trim'];
+
+		if (isSecure) {
+			cmdString.push('-d');
+		}
+		//wait to finish before returning (remove?)
+		cmdString.push('-w');
+
+		cmdString.push(poolName);
+		cmdString.push(diskName);
 
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
