@@ -879,7 +879,6 @@ function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 	showReplaceDiskModal.value = true;
 }
 
-
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
 

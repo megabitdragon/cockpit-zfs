@@ -114,7 +114,7 @@
 	</div>
 
 	<div v-if="showFSConfig">
-		<FSConfigModal ref="fileSystemConfiguration" :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
+		<FileSystemConfigModal ref="fileSystemConfiguration" :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
 	</div>
 
 	<div v-if="showDeleteFileSystemConfirm">
@@ -140,7 +140,7 @@ import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composable
 import { destroyDataset, unmountFileSystem, mountFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
-import FSConfigModal from "./FSConfigModal.vue";
+import FileSystemConfigModal from "./FileSystemConfigModal.vue";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
@@ -151,7 +151,6 @@ const selectedDataset = ref<FileSystemData>();
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
-//const showModalFlag = ref(false);
 const operationRunning = ref(false);
 const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
@@ -219,7 +218,6 @@ const updateShowDestroyFileSystem = (newVal) => {
 
 watch(confirmDelete, async (newValue, oldValue) => {
 	if (confirmDelete.value == true) {
-		//isDeleting.value = true;
 		
 		console.log('now deleting:', newValue);
 		operationRunning.value = true;
@@ -232,7 +230,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		hasChildren.value = false;
 		forceDestroy.value = false;
 		console.log('deleted:', selectedDataset.value!);
-		//isDeleting.value = false;
+		
 		notifications.value.constructNotification('File System Destroyed', selectedDataset.value!.name + " destroyed.", 'success');
 	}
 });

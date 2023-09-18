@@ -442,6 +442,7 @@
 				<div class="w-full grid grid-rows-2">
 					<div class="w-full row-start-1">
 						<div class="button-group-row mt-2 justify-self-center">
+							<p class="text-danger" v-if="parentFeedback">{{ parentFeedback }}</p>
 							<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
 							<p class="text-danger" v-if="passFeedback">{{ passFeedback }}</p>
 							<p class="text-danger" v-if="quotaFeedback">{{ quotaFeedback }}</p>
@@ -487,6 +488,7 @@ const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
+const parentFeedback = ref('');
 const nameFeedback = ref('');
 const passphrase = ref('');
 const passphraseConfirm = ref('');
@@ -630,6 +632,18 @@ const nameCheck = (fileSystem : FileSystemData) => {
     return result;
 }
 
+const parentCheck = (fileSystem : FileSystemData) => {
+	let result = true;
+	parentFeedback.value = '';
+
+	if (fileSystem.parentFS == '') {
+		result = false;
+		parentFeedback.value = 'Please select a Parent File System.';
+	}
+
+	return false;
+}
+
 function fileSystemNameExists(filesystem : FileSystemData, datasets : FileSystemData[]) {
 	const newParentPath = filesystem.parentFS;
 	//console.log('newParentPath:', newParentPath);
@@ -713,9 +727,25 @@ function fillDatasetData() {
 }
 
 async function fsCreateBtn(fileSystem) {
-	if (nameCheck(fileSystem)) {
-		if (fileSystem.encrypted) {
-			if (encryptPasswordCheck(fileSystem)) {
+	if (parentCheck(fileSystem)) {
+		if (nameCheck(fileSystem)) {
+			if (fileSystem.encrypted) {
+				if (encryptPasswordCheck(fileSystem)) {
+					if (checkQuota(fileSystem)) {
+						getInheritedProperties();
+						fillDatasetData();
+						saving.value = true;
+						createDataset(newDataset.value).then(async() => {
+							fileSystemsLoaded.value = false;
+							datasets.value = [];
+							await loadDatasets(datasets);
+							showFSWizard.value = false;
+							saving.value = false;
+							fileSystemsLoaded.value = true;
+						});
+					}
+				}
+			} else {
 				if (checkQuota(fileSystem)) {
 					getInheritedProperties();
 					fillDatasetData();
@@ -730,22 +760,9 @@ async function fsCreateBtn(fileSystem) {
 					});
 				}
 			}
-		} else {
-			if (checkQuota(fileSystem)) {
-				getInheritedProperties();
-				fillDatasetData();
-				saving.value = true;
-				createDataset(newDataset.value).then(async() => {
-					fileSystemsLoaded.value = false;
-					datasets.value = [];
-					await loadDatasets(datasets);
-					showFSWizard.value = false;
-					saving.value = false;
-					fileSystemsLoaded.value = true;
-				});
-			}
 		}
 	}
+
 }
 
 function isBoolCompression(bool : boolean) {

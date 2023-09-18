@@ -235,12 +235,12 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
 
-interface FSConfigModalProps {
+interface FileSystemConfigModalProps {
     idKey: string;
     filesystem: FileSystemData;
 }
 
-const props = defineProps<FSConfigModalProps>();
+const props = defineProps<FileSystemConfigModalProps>();
 
 const showFSConfig = inject<Ref<boolean>>('show-fs-config')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;

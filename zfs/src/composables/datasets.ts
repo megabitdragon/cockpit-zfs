@@ -231,6 +231,31 @@ export async function mountFileSystem(fileSystemData: FileSystemData, forceMount
 	}
 }
 
+export async function renameFileSystem(oldPath, newPath, forceUnmount?, createParent?) {
+	try {
+		let cmdString = ['zfs', 'rename'];
+
+		if (createParent) {
+			cmdString.push('-p');
+		}
+
+		if (forceUnmount) {
+			cmdString.push('-f');
+		}
+
+		cmdString.push(oldPath);
+		cmdString.push(newPath);
+
+		console.log("***\ncmdString:", cmdString, "\n***");
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
 
 function hasChanges(fileSystemData) {
 	const properties = [
