@@ -307,7 +307,7 @@ import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composable
 import Navigation from '../common/Navigation.vue';
 import CreateSnapshotModal from './CreateSnapshotModal.vue';
 import AddVDevModal from './AddVDevModal.vue';
-import PoolDetailDiskCard from '../pools/PoolDetailDiskCard.vue';
+import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import { loadDisksThenPools } from '../../composables/loadData';
 //import ConfirmSectorSize from '../common/confirmation/ConfirmSectorSize.vue';
 

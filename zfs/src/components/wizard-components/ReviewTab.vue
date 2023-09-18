@@ -18,7 +18,7 @@
 						</template>
 						<template v-slot:content>
 							<p class="ml-10 text-default">Deduplication: {{isBoolOnOff(poolConfig.properties.deduplication)}}</p>
-							<p class="ml-10 text-default">Refreservation Amount: {{(poolConfig.properties.refreservation)}}%</p>
+							<!-- <p class="ml-10 text-default">Refreservation Amount: {{(poolConfig.properties.refreservation)}}%</p> -->
 							<p class="ml-10 text-default">Auto-Expand Pool: {{isBoolOnOff(poolConfig.properties.autoExpand)}}</p>
 							<p class="ml-10 text-default">Auto-Replace Devices: {{isBoolOnOff(poolConfig.properties.autoReplace)}}</p>
 							<p class="ml-10 text-default">Automatic TRIM: {{isBoolOnOff(poolConfig.properties.autoTrim)}}</p>

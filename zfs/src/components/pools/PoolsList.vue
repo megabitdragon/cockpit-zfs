@@ -301,7 +301,7 @@ import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolDetail from "./PoolDetail.vue";
 import ImportPool from "./ImportPool.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
-import AttachDiskModal from "./AttachDiskModal.vue";
+import AttachDiskModal from "../disks/AttachDiskModal.vue";
 import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";

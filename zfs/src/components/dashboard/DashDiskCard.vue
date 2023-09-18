@@ -76,7 +76,7 @@ import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDisks, loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import { clearPartitions } from "../../composables/disks";
-import DiskDetail from '../pools/DiskDetail.vue';
+import DiskDetail from '../disks/DiskDetail.vue';
 import Card from '../common/Card.vue';
 
 interface DashDiskCardProps {
