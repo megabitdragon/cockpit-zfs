@@ -33,7 +33,7 @@
 					Member of {{ props.disk.vDevName }} in {{ props.disk.poolName }}
 				</div> -->
 				<div>
-					<span class="text-success">{{ props.disk.status }}</span>
+					<span class="text-success">{{ props.disk.health }}</span>
 				</div>
 				<div>
 					<span>{{ props.disk.type }}</span>

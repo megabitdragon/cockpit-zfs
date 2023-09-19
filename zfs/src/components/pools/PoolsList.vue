@@ -162,7 +162,7 @@
 														</th>
 														<tr v-for="disk, diskIdx in pool.vdevs[vDevIdx].disks" :key="diskIdx" class="indent-16 bg-default rounded-md">
 															<td>{{ disk.name }}</td>
-															<td>{{ disk.status }}</td>
+															<td>{{ disk.health }}</td>
 															<td>W</td>
 															<td>X</td>
 															<td>Y</td>

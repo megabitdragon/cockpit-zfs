@@ -49,7 +49,7 @@
 					<!-- alias, name, model/serial, temp, status -->	
 		<template v-slot:content>
 		<div>
-			<span class="text-success">{{ props.disk.status }}</span>
+			<span class="text-success">{{ props.disk.health }}</span>
 		</div>
 		<div>
 			<span class="text-default">{{ props.disk.temp }}&nbsp;</span>
