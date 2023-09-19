@@ -65,7 +65,7 @@
 														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Edit Permissions</a>
 													</MenuItem>
 													<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
-														<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
+														<a href="#" @click="renameThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 													</MenuItem>
 													<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'yes'" v-slot="{ active }">
 														<a href="#" @click="unmountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
@@ -129,6 +129,10 @@
 		<UniversalConfirmation  :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
 	</div>
 
+	<div v-if="showRenameModal">
+		<RenameFileSystem :idKey="'show-rename-modal'" :filesystem="selectedDataset!" @close="showRenameModal = false" />
+	</div>
+
 </template>
 
 <script setup lang="ts">
@@ -141,6 +145,7 @@ import { destroyDataset, unmountFileSystem, mountFileSystem } from "../../compos
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FileSystemConfigModal from "./FileSystemConfigModal.vue";
+import RenameFileSystem from "./RenameFileSystem.vue";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
@@ -274,7 +279,7 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 	}
 });
 
-/////////////// Unmount File System /////////////////
+//////////////// Mount File System //////////////////
 /////////////////////////////////////////////////////
 const showMountFileSystemConfirm = ref(false);
 const forceMount = ref(true);
@@ -313,6 +318,18 @@ watch(confirmMount, async (newValue, oldValue) => {
 	}
 });
 
+//////////////// Rename File System /////////////////
+/////////////////////////////////////////////////////
+const showRenameModal = ref(false);
+const renaming = ref(false);
+const confirmRename = ref(false);
+
+function renameThisDataset(fileSystem) {
+	showRenameModal.value = true;
+	selectedDataset.value = fileSystem;
+	console.log('selected to be renamed:', selectedDataset.value);
+}
+
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 
@@ -332,6 +349,10 @@ provide('show-unmount-filesystem-confirm', showUnmountFileSystemConfirm);
 provide('confirm-unmount-filesystem', confirmUnmount);
 provide('unmounting', unmounting);
 provide('force-unmount', forceUnmount);
+
+provide('show-rename-modal', showRenameModal);
+provide('renaming', renaming);
+provide('confirm-rename', confirmRename);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);

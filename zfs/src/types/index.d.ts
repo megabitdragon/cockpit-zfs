@@ -78,7 +78,7 @@ interface DiskData {
 	model: string;
 	guid: string;
 	type: string;
-	status: string;
+	health: string;
 	stats: {};
 	path: string;
 	phy_path: string;
