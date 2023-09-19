@@ -641,7 +641,7 @@ const parentCheck = (fileSystem : FileSystemData) => {
 		parentFeedback.value = 'Please select a Parent File System.';
 	}
 
-	return false;
+	return result;
 }
 
 function fileSystemNameExists(filesystem : FileSystemData, datasets : FileSystemData[]) {
