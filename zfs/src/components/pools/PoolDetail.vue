@@ -44,7 +44,7 @@
 				</div>
 				<div v-else class="inline-block min-w-full min-h-full align-middle rounded-md border border-default overflow-y-visible">
 					<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-						<table class="table-auto min-w-full min-h-full divide-y divide-default bg-well">
+						<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-well">
 							<thead>
 								<tr class="rounded-md">
 									<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
@@ -189,15 +189,15 @@
 					<!-- auto-trim -->
 					<div class="col-span-2 col-start-3 row-start-3">
 						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-default">List Snapshots With File Systems</label>
-						<Switch v-model="poolConfig.properties.displaySnapshots" :id="getIdKey('settings-pool-display-snapshots')" :class="[poolConfig.properties.displaySnapshots ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+						<Switch v-model="poolConfig.properties.listSnapshots" :id="getIdKey('settings-pool-display-snapshots')" :class="[poolConfig.properties.listSnapshots ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
-							<span :class="[poolConfig.properties.displaySnapshots ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-								<span :class="[poolConfig.properties.displaySnapshots ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+							<span :class="[poolConfig.properties.listSnapshots ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+								<span :class="[poolConfig.properties.listSnapshots ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
 									<svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
 										<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 									</svg>
 								</span>
-								<span :class="[poolConfig.properties.displaySnapshots ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+								<span :class="[poolConfig.properties.listSnapshots ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
 									<svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
 										<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 									</svg>
@@ -305,10 +305,10 @@ import { getSnapshots } from '../../composables/snapshots';
 import { configurePool } from '../../composables/pools';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
 import Navigation from '../common/Navigation.vue';
-import CreateSnapshotModal from './CreateSnapshotModal.vue';
+import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
-import { loadDisksThenPools } from '../../composables/loadData';
+import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool } from '../../composables/loadData';
 //import ConfirmSectorSize from '../common/confirmation/ConfirmSectorSize.vue';
 
 interface PoolDetailsProps {
@@ -337,7 +337,7 @@ const poolConfig = ref<PoolData>({
 		autoTrim: props.pool.properties.autoTrim,
 		forceCreate: props.pool.properties.forceCreate,
 		delegation: props.pool.properties.delegation,
-		displaySnapshots: props.pool.properties.displaySnapshots,
+		listSnapshots: props.pool.properties.listSnapshots,
 		readOnly: props.pool.properties.readOnly,
 	},
 	vdevs: props.pool.vdevs,
@@ -357,6 +357,8 @@ const disks = inject<Ref<DiskData[]>>('disks')!;
 const show = ref(true);
 const navTag = ref('stats');
 
+const creating = ref(false);
+
 const saving = ref(false);
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
@@ -366,45 +368,7 @@ const commentFeedback = ref('');
 // const confirmChangeSector = ref(false);
 // const showConfirmSector = ref(false);
 
-getSnapshots().then(rawJSON => {
-	const parsedJSON = (JSON.parse(rawJSON));
-	console.log('Snapshots JSON:');
-	console.log(parsedJSON);
-
-	parsedJSON[props.pool.name].forEach(snapshot => {
-		const snap : Snapshot = {
-			name: snapshot.name,
-			id: snapshot.id,
-			snapName: snapshot.snapshot_name,
-			dataset: snapshot.dataset,
-			pool: snapshot.pool,
-			mountpoint: snapshot.mountpoint,
-			type: snapshot.type,
-			properties: {
-				clones: snapshot.properties.clones.parsed,
-				creation: {
-					rawTimestamp: snapshot.properties.creation.rawvalue,
-					parsed: snapshot.properties.creation.parsed,
-					value: snapshot.properties.creation.value,
-				},
-				referenced: {
-					value: snapshot.properties.referenced.value,
-					rawNum: snapshot.properties.referenced.parsed,
-				},
-				used: {
-					value: snapshot.properties.used.value,
-					rawNum: snapshot.properties.used.parsed,
-				},
-			},
-  			holds: snapshot.holds
-		}
-
-		//const snap : Snapshot = snapshot;
-		
-		//console.log(snap);
-		snapshots.value.push(snap);
-	})
-});
+loadSnapshotsInPool(snapshots, props.pool.name);
 
 const getNumDevices = props.pool.vdevs.length;
 
@@ -508,8 +472,8 @@ async function checkForChanges(poolDataCheck) {
 		updatedProperties.delegation = isBoolOnOff(poolDataCheck.properties.delegation);
 	}
 	//listsnapshots
-	if (poolDataCheck.properties.displaySnapshots != props.pool.properties.displaySnapshots) {
-		updatedProperties.listsnapshots = isBoolOnOff(poolDataCheck.properties.displaySnapshots);
+	if (poolDataCheck.properties.listSnapshots != props.pool.properties.listSnapshots) {
+		updatedProperties.listsnapshots = isBoolOnOff(poolDataCheck.properties.listSnapshots);
 	}
 
 	const newChanges = {
@@ -572,4 +536,5 @@ provide('show-vdev-modal', showAddVDevModal);
 // provide('show-confirm-sector', showConfirmSector);
 // provide('confirm-sector', confirmChangeSector);
 provide("saving", saving);
+provide('creating', creating);
 </script>

@@ -14,3 +14,24 @@ export async function getSnapshots() {
         return null;
     }
 }
+
+export async function createSnapshot(newSnap : NewSnapshot) {
+    try {
+        let cmdString = ['zfs', 'snapshot'];
+
+        if (newSnap.snapChildren) {
+            cmdString.push('-r');
+        }
+
+        cmdString.push(newSnap.filesystem + '@' + newSnap.name);
+
+        console.log("****create cmdString: *****\n" , cmdString);
+			
+        const state = useSpawn(cmdString);
+        const output = await state.promise();
+        console.log(output)
+        return output.stdout;
+    } catch (state) {
+        console.error(errorString(state));
+    }
+}

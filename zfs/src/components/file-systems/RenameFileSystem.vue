@@ -142,8 +142,6 @@ const datasetsInSamePool = computed<FileSystemData[]>(() => {
    });
 });
 
-
-
 async function renameBtn() {
     if (parentCheck(parentFS.value)) {
         if (nameCheck(newName.value, parentFS.value)) {

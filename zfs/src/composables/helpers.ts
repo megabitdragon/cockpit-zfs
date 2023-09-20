@@ -96,17 +96,32 @@ export const getQuotaRefreservUnit = (bytes) => {
 export function getTimestampString() {
 	const currentDateTime = new Date();
 	const timestampString = currentDateTime.toLocaleString('en-US', {
-	  hour: 'numeric',
-	  minute: 'numeric',
-	  second: 'numeric',
-	  day: '2-digit',
-	  month: '2-digit',
-	  year: 'numeric'
+		hour: 'numeric',
+		minute: 'numeric',
+		second: 'numeric',
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric'
 	});
 
 	//console.log("timestampString:", timestampString);
 	
 	return timestampString;
+}
+
+export function getTimestamp() {
+	const currentDateTime = new Date();
+  
+	const year = currentDateTime.getFullYear();
+	const month = String(currentDateTime.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-based
+	const day = String(currentDateTime.getDate()).padStart(2, '0');
+	const hour = String(currentDateTime.getHours()).padStart(2, '0');
+	const minute = String(currentDateTime.getMinutes()).padStart(2, '0');
+	const second = String(currentDateTime.getSeconds()).padStart(2, '0');
+  
+	const timestamp = `${year}.${month}.${day}-${hour}.${minute}.${second}`;
+  
+	return timestamp;
   }
 
 export const getPoolDiskType = (pool) => {

@@ -2,7 +2,7 @@
 	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<div class="button-group-row">
 			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showNewFSWizard = true">Create File System</button>
-			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="refreshDatasets" ><ArrowPathIcon class="w-5 h-5"/></button>
+			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="refreshDatasets"><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
 		<div class="mt-8 overflow-visible">
@@ -139,7 +139,7 @@
 import { ref, inject, Ref, provide, watch, computed } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadDatasets } from "../../composables/loadData";
+import { loadDatasets, loadSnapshots } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
@@ -153,6 +153,25 @@ const notifications = inject<Ref<any>>('notifications')!;
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const selectedDataset = ref<FileSystemData>();
+const snapshots = ref<Snapshot[]>([]);
+const fileSystemsAndSnaps = ref<SnapDatasets[]>([]);
+
+function checkForSnapshotsInList() {
+	fileSystems.value.forEach(dataset => {
+		fileSystemsAndSnaps.value.push(dataset);
+	});
+	pools.value.forEach(pool => {
+		if (pool.properties.listSnapshots) {
+			snapshots.value.forEach(snap => {
+				if (snap.pool == pool.name) {
+					fileSystemsAndSnaps.value.push(snap);
+				}
+			});
+		}
+	});
+}
+
+checkForSnapshotsInList();
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
@@ -173,6 +192,7 @@ async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
 	fileSystems.value = [];
 	await loadDatasets(fileSystems);
+	await loadSnapshots(snapshots);
 	fileSystemsLoaded.value = true;
 }
 
@@ -329,6 +349,7 @@ function renameThisDataset(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log('selected to be renamed:', selectedDataset.value);
 }
+
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);

@@ -180,7 +180,7 @@ const poolConfig = ref<PoolData>({
 		autoTrim: props.pool.properties.autoTrim,
 		forceCreate: props.pool.properties.forceCreate,
 		delegation: props.pool.properties.delegation,
-		displaySnapshots: props.pool.properties.displaySnapshots,
+		listSnapshots: props.pool.properties.listSnapshots,
 		readOnly: props.pool.properties.readOnly,
 	},
 	vdevs: props.pool.vdevs,

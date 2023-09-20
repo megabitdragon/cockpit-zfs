@@ -28,7 +28,7 @@ interface PoolData {
 		autoTrim: boolean;
 		forceCreate?: boolean;
 		delegation?: boolean;
-		displaySnapshots?: boolean;
+		listSnapshots?: boolean;
 		multiHost?: boolean;
 	}
 	vdevs: vDevData[];
@@ -296,13 +296,69 @@ interface Snapshot {
 	holds: {}
 }
 
+interface SnapDatasets {
+	name: string;
+	id: string;
+	snapName?: string;
+	dataset?: string;
+	mountpoint?: string;
+	type: string;
+	properties: {
+		clones?: string;
+		// creation?: {
+		// 	rawTimestamp: string;
+		// 	parsed: string;
+		// 	value: string;
+		// }
+		// referenced?: {
+		// 	value: string;
+		// 	rawNum: number;
+		// }
+		// used?: {
+		// 	value: string;
+		// 	rawNum: number;
+		// }
+		// creation?: string;
+		// referenced?: string;
+		// used?: string;
+		guid?: string;
+		encryption?: string;
+		accessTime?: string;
+		caseSensitivity?: string;
+		compression?: string;
+		deduplication?: string;
+		dNodeSize?: string;
+		extendedAttributes?: string;
+		recordSize?: string;
+		quota?: {
+			raw: number;
+			value: string;
+			unit: 'kib' | 'mib' | 'gib' | 'tib';
+		}
+		isReadOnly?: boolean;
+		readOnly?: string;
+		snapshotCount?: string;
+		mounted?: string;
+		usedbyRefreservation?: string;
+		usedByDataset?: string;
+		canMount?: string;
+		aclInheritance?: string;
+		aclType?: string;
+		checksum?: string;
+		refreservation?: {
+			raw: number;
+			value: string;
+			unit: 'kib' | 'mib' | 'gib' | 'tib';
+		}
+	}
+	holds?: {}
+}
+
 interface NewSnapshot {
 	filesystem: string;
 	isCustomName: boolean;
 	name: string;
-	options: {
-		snapFileSystems: boolean;
-	}
+	snapChildren: boolean;
 }
 
 type ConfirmationCallback = () => void;

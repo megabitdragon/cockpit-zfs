@@ -31,7 +31,7 @@ import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
-import { loadDisksThenPools, loadDatasets } from '../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadSnapshots } from '../composables/loadData';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
 
 interface ZFSProps {
@@ -45,6 +45,7 @@ const disks = ref<DiskData[]>([]);
 const datasets = ref<FileSystemData[]>([]);
 const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
+// const snapshots = ref<Snapshot[]>([]);
 
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
@@ -53,11 +54,13 @@ const fileSystemsLoaded = ref(false);
 const clearLabels = ref(false);
 
 async function initialLoad(disks, pools, datasets) {
+	//console.log('disks:', disks, 'pools:', pools, 'datasets:', datasets, 'snapshots:', snapshots);
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
+	// await loadSnapshots(snapshots);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
@@ -81,5 +84,6 @@ provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
 provide('clear-labels', clearLabels);
+// provide("snapshots", snapshots);
 </script>
 
