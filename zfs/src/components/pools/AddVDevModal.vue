@@ -233,9 +233,10 @@ async function addVDevBtn() {
             }
         }
     }
-    
-   
 }
+
+/////////////////// Validation //////////////////////
+/////////////////////////////////////////////////////
 
 const replicationLevelCheck = () => {
 	let result = true;

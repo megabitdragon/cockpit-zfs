@@ -264,12 +264,12 @@
 				<div class="justify-self-end">
 					<div v-if="navTag == 'topology'" >
 						<div class="mt-2">
-							<button @click="showAddVDevModal = true" :id="getIdKey('add-vdev-btn')" name="add-vdev-btn" class="mt-1 btn btn-primary">Add Virtual Device</button>
+							<button @click="addVDevButton()" :id="getIdKey('add-vdev-btn')" name="add-vdev-btn" class="mt-1 btn btn-primary">Add Virtual Device</button>
 						</div>
 					</div>
 					<div v-if="navTag == 'snapshots'" >
 						<div class="mt-2">
-							<button @click="showSnapshotModal = true" :id="getIdKey('create-snap-wizard-btn')" name="create-snap-wizard-btn" class="mt-1 btn btn-primary">Create Snapshot</button>
+							<button @click="createSnapshotBtn()" :id="getIdKey('create-snap-wizard-btn')" name="create-snap-wizard-btn" class="mt-1 btn btn-primary">Create Snapshot</button>
 						</div>
 					</div>
 					<div v-if="navTag == 'settings'" >
@@ -290,9 +290,8 @@
 		</template>
 	</Modal>
 
-	<CreateSnapshotModal @close="showSnapshotModal = false"/>
+	<CreateSnapshotModal @close="showSnapshotModal = false" />
 	<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
-	<!-- <ConfirmSectorSize @close="showConfirmSector = false" :idKey="getIdKey(`show-confirm-sector`)" :sector="calculateSectorSize(Number(props.pool.properties.sector!))"/> -->
 </template>
 
 <script setup lang="ts">
@@ -301,7 +300,6 @@ import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
-import { getSnapshots } from '../../composables/snapshots';
 import { configurePool } from '../../composables/pools';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
 import Navigation from '../common/Navigation.vue';
@@ -309,7 +307,6 @@ import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool } from '../../composables/loadData';
-//import ConfirmSectorSize from '../common/confirmation/ConfirmSectorSize.vue';
 
 interface PoolDetailsProps {
 	pool: PoolData;
@@ -345,30 +342,16 @@ const poolConfig = ref<PoolData>({
 	comment: props.pool.comment,
 });
 
-const showSnapshotModal = ref(false);
-const showAddVDevModal = ref(false);
-const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
-
-const snapshots = ref<Snapshot[]>([]);
-
+////////////////// Loading Data /////////////////////
+/////////////////////////////////////////////////////
 const pools = inject<Ref<PoolData[]>>('pools')!;
-const disks = inject<Ref<DiskData[]>>('disks')!;
-
-const show = ref(true);
-const navTag = ref('stats');
-
-const creating = ref(false);
-
-const saving = ref(false);
-const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+const disks = inject<Ref<DiskData[]>>('disks')!;
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const snapshots = ref<Snapshot[]>([]);
+const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 
-const commentFeedback = ref('');
-
-// const confirmChangeSector = ref(false);
-// const showConfirmSector = ref(false);
-
-loadSnapshotsInPool(snapshots, props.pool.name);
+const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
 const getNumDevices = props.pool.vdevs.length;
 
@@ -382,6 +365,46 @@ const getNumDisks = computed(() =>  {
 	return disks;
 });
 
+//displaying sector size in bytes/kb
+function calculateSectorSize(exponent) {
+	const bytes = Math.pow(2, exponent);
+	const result = ref('');
+
+	if (bytes > 1024) {
+		const kiB = bytes / 1024;
+		result.value = `${kiB} KiB`;
+	} else {
+		result.value = `${bytes} B`;
+	}
+	  return result.value;
+}
+
+loadSnapshotsInPool(snapshots, props.pool.name);
+
+///////////////////// Topology //////////////////////
+/////////////////////////////////////////////////////
+const showAddVDevModal = ref(false);
+
+function addVDevButton() {
+	showAddVDevModal.value = true;
+	console.log('add vdev modal triggred');
+}
+
+//////////////////// Snapshots //////////////////////
+/////////////////////////////////////////////////////
+const showSnapshotModal = ref(false);
+const creating = ref(false);
+
+function createSnapshotBtn() {
+	showSnapshotModal.value = true;
+	console.log('create snapshot modal triggered');
+}
+
+/////////////////// Pool Changes ////////////////////
+/////////////////////////////////////////////////////
+const saving = ref(false);
+const commentFeedback = ref('');
+
 const newChangesToPool = ref<PoolEditConfig>({
 	name: poolConfig.value.name,
 	guid: poolConfig.value.guid,
@@ -394,59 +417,7 @@ const updatedProperties: Partial<PoolEditConfig> = ({
 	readonly: isBoolOnOff(poolConfig.value.properties.readOnly),
 });
 
-// const sectorChanged = ref(false);
-
-function calculateSectorSize(exponent) {
-	// Calculate the sector size in bytes
-	const bytes = Math.pow(2, exponent);
-	const result = ref('');
-
-	if (bytes > 1024) {
-		// Convert bytes to KiB
-		const kiB = bytes / 1024;
-		result.value = `${kiB} KiB`;
-	} else {
-		result.value = `${bytes} B`;
-	}
-	  return result.value;
-}
-
-
-// function checkSectorChange(poolDataCheck) {
-// 	if (poolDataCheck.properties.sector != props.pool.properties.sector) {
-// 		console.log('sector changed');
-// 		return true;
-// 	} else {
-// 		console.log('sector same');
-// 		return false;
-// 	}
-// }
-
-// async function ifSectorChange(boolCheck) {
-// 	if (boolCheck) {
-// 		showConfirmSector.value = true;
-// 		console.log('modal trigger:', showConfirmSector.value);
-// 		watch (confirmChangeSector, async (newVal, oldVal) => {
-// 			if (confirmChangeSector.value == true) {
-// 				sectorChanged.value = true;
-// 				showConfirmSector.value = false;
-// 			}
-// 		});
-// 	}
-// }
-
 async function checkForChanges(poolDataCheck) {
-	//sector
-	// if (poolDataCheck.properties.sector != props.pool.properties.sector) {
-	// 	updatedProperties.ashift = poolDataCheck.properties.sector;
-	// }
-	// await ifSectorChange(checkSectorChange(poolDataCheck));
-
-	// if(sectorChanged.value == true) {
-	// 	updatedProperties.ashift = poolDataCheck.properties.sector;
-	// 	console.log('updatedProps.ashift:', updatedProperties.ashift, 'poolDataCheck.sector:', poolDataCheck.properties.sector)
-	// }
-
 	//failmode
 	if (poolDataCheck.failMode != props.pool.failMode) {
 		updatedProperties.failmode = poolDataCheck.failMode;
@@ -484,6 +455,18 @@ async function checkForChanges(poolDataCheck) {
     newChangesToPool.value = newChanges;
 }
 
+const commentLengthCheck = (poolData) => {
+	let result = true;
+	commentFeedback.value = '';	
+
+	if (poolData.comment.length > 32) {
+		result = false;
+		commentFeedback.value = 'Comment cannot exceed 32 characters.';
+	}
+
+	return result;
+}
+
 async function poolConfigureBtn() {	
 	if (commentLengthCheck(poolConfig.value)) {
 		console.log('pool:', poolConfig.value);
@@ -503,17 +486,10 @@ async function poolConfigureBtn() {
 	}
 }
 
-const commentLengthCheck = (poolData) => {
-	let result = true;
-	commentFeedback.value = '';	
-
-	if (poolData.comment.length > 32) {
-		result = false;
-		commentFeedback.value = 'Comment cannot exceed 32 characters.';
-	}
-
-	return result;
-}
+/////////////////// Navigation //////////////////////
+/////////////////////////////////////////////////////
+const navTag = ref('stats');
+const show = ref(true);
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
@@ -533,8 +509,6 @@ const getIdKey = (name: string) => `${name}`;
 provide('create-snap-modal', showSnapshotModal);
 provide('current-pool-config', poolConfig);
 provide('show-vdev-modal', showAddVDevModal);
-// provide('show-confirm-sector', showConfirmSector);
-// provide('confirm-sector', confirmChangeSector);
 provide("saving", saving);
 provide('creating', creating);
 </script>

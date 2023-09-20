@@ -205,9 +205,10 @@ async function createSnapButton(newSnapshot) {
             await createSnapshot(newSnapshot);
 
             showSnapshotModal.value = false;
-            
-            snapshots.value = [];
+
+            //snapshots.value = [];
             await loadSnapshots(snapshots);
+            creating.value = false;
     //     }
     // }   
 }
