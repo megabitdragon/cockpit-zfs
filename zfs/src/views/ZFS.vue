@@ -14,8 +14,8 @@
 			  	<FileSystemList/>
 			</div>
 
-			<!-- <div v-if="props.tag === 'stats'" class="p-4">
-			
+			<!-- <div v-if="props.tag === 'snapshots'" class="p-4">
+				<SnapshotsTab/>
 			</div>
 
 			<div v-if="props.tag === 'settings'" class="p-4">
@@ -29,10 +29,11 @@
 import { reactive, ref, Ref, inject, computed, provide, watch } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
+import { loadDisksThenPools, loadDatasets, loadSnapshots } from '../composables/loadData';
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
-import { loadDisksThenPools, loadDatasets, loadSnapshots } from '../composables/loadData';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
+import SnapshotsTab from '../components/snapshots/SnapshotsTab.vue';
 
 interface ZFSProps {
   	tag: string;
@@ -50,28 +51,30 @@ const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
+// const snapshotsLoaded = ref(false);
 
 const clearLabels = ref(false);
 
 async function initialLoad(disks, pools, datasets) {
-	//console.log('disks:', disks, 'pools:', pools, 'datasets:', datasets, 'snapshots:', snapshots);
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
 	fileSystemsLoaded.value = false;
+	// snapshotsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
 	// await loadSnapshots(snapshots);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
+	// snapshotsLoaded.value = true;
 }
 
 initialLoad(disks, pools, datasets);
 
 //get all disks in use by pools
-const disksInPools = computed<DiskData[]>(() => {
-	return disks.value.filter(disk => disk.usable === false);
-});
+// const disksInPools = computed<DiskData[]>(() => {
+// 	return disks.value.filter(disk => disk.usable === false);
+// });
 
 //provide data for other components to inject
 provide("pools", pools);
@@ -79,10 +82,11 @@ provide("importable-pools", importablePools);
 provide("importable-destroyed-pools", importableDestroyedPools);
 provide("disks", disks);
 provide("datasets", datasets);
-provide("disks-in-pools", disksInPools);
+// provide("disks-in-pools", disksInPools);
 provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
+// provide('snapshots-loaded', snapshotsLoaded);
 provide('clear-labels', clearLabels);
 // provide("snapshots", snapshots);
 </script>

@@ -39,7 +39,7 @@
 			</div>
 			
 			<div v-if="navTag == 'snapshots'" class="overflow-y-visible">
-				<div v-if="snapshots.length < 1" class="flex items-center justify-center">
+				<div v-if="snapshotsInPool.length < 1" class="flex items-center justify-center">
 					<p class="text-default">No snapshots found.</p>
 				</div>
 				<div v-else class="inline-block min-w-full min-h-full align-middle rounded-md border border-default overflow-y-visible">
@@ -58,7 +58,10 @@
 								
 							</thead>
 							<tbody class="divide-y divide-x divide-default bg-default">
-								<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4">
+								<tr v-if="!snapshotsLoaded" class="bg-well justify-center">
+									<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500"/>
+								</tr>
+								<tr v-if="snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshotsInPool" :key="snapshotIdx" class="text-default ml-4">
 									<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
 										{{ snapshot.name }}
 									</td>
@@ -290,7 +293,7 @@
 		</template>
 	</Modal>
 
-	<CreateSnapshotModal @close="showSnapshotModal = false" />
+	<CreateSnapshotModal @close="showSnapshotModal = false" :poolName="props.pool.name"/>
 	<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
 </template>
 
@@ -306,6 +309,7 @@ import Navigation from '../common/Navigation.vue';
 import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
+import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool } from '../../composables/loadData';
 
 interface PoolDetailsProps {
@@ -348,8 +352,15 @@ const pools = inject<Ref<PoolData[]>>('pools')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
-const snapshots = ref<Snapshot[]>([]);
-const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+// const snapshots = ref<Snapshot[]>([]);
+const snapshotsLoaded = ref(true);
+// const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+// const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+const snapshotsInPool = ref<Snapshot[]>([]);
+
+// loadSnapshots(snapshots);
+loadSnapshotsInPool(snapshotsInPool, props.pool.name);
 
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
@@ -378,8 +389,6 @@ function calculateSectorSize(exponent) {
 	}
 	  return result.value;
 }
-
-loadSnapshotsInPool(snapshots, props.pool.name);
 
 ///////////////////// Topology //////////////////////
 /////////////////////////////////////////////////////
@@ -510,5 +519,9 @@ provide('create-snap-modal', showSnapshotModal);
 provide('current-pool-config', poolConfig);
 provide('show-vdev-modal', showAddVDevModal);
 provide("saving", saving);
+provide('create-snap-modal', showSnapshotModal);
+provide('snapshots-loaded', snapshotsLoaded)!;
+// provide("snapshots", snapshots);
+provide("snapshots-in-pool", snapshotsInPool);
 provide('creating', creating);
 </script>

@@ -8,7 +8,7 @@
                 <div>
 					<label :for="getIdKey('file-system')" class="block text-sm font-medium leading-6 text-default">File System</label>
 					<select id="file-system" v-model="newSnapshot.filesystem" name="file-system" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option v-for="dataset in datasets" :value="dataset.name">{{ dataset.name }}</option>
+						<option v-for="dataset in datasetsInSamePool" :value="dataset.name">{{ dataset.name }}</option>
 					</select>
 				</div>
                 <div>
@@ -82,50 +82,36 @@
 import { reactive, ref, inject, Ref, computed, provide } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-// import { loadSnapshots, loadDatasets } from '../../composables/loadData';
 import { getTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
-import { loadSnapshots } from '../../composables/loadData';
+import { loadSnapshotsInPool } from '../../composables/loadData';
+
+interface CreateSnapshotModalProps {
+    poolName: string;
+}
+
+const props = defineProps<CreateSnapshotModalProps>();
 
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
-const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+const datasetsInSamePool = computed<FileSystemData[]>(() => {
+    return datasets.value.filter(dataset => dataset.pool === props.poolName);
+});
+
+const defaultFileSystem = ref(datasetsInSamePool.value[0]);
+// const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+const snapshotsInPool = inject<Ref<Snapshot[]>>('snapshots-in-pool')!;
 
 const showSnapshotModal = inject<Ref<boolean>>('create-snap-modal')!;
 const creating = inject<Ref<boolean>>('creating')!;
+const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 
 const newSnapshot = ref<NewSnapshot>({
     name: '',
-    filesystem: '',
+    filesystem: defaultFileSystem.value.name,
     isCustomName: false,
     snapChildren: false,
 }); 
 
-
-// function getChildDatasetIds(pool, allDatasets): string[] {
-//     let childIds: string[] = [];
-
-//     const children = allDatasets.filter(child => child.pool === pool.id);
-
-//     for (const child of children) {
-//         childIds.push(child.id);
-//         childIds = childIds.concat(getChildDatasetIds(child, allDatasets));
-//     }
-
-//     return childIds;
-// }
-
-// const datasetsInSamePool = computed<FileSystemData[]>(() => {
-//    // return datasets.value.filter(dataset => dataset.pool === props.filesystem.pool && dataset.id !== props.filesystem.id);
-//     const currentDataset = props.filesystem;
-
-//     const childDatasetIds = getChildDatasetIds(currentDataset, datasets.value);
-
-//     return datasets.value.filter(dataset => {
-//         return (
-//             dataset.pool === currentDataset.pool && dataset.id !== currentDataset.id && !childDatasetIds.includes(dataset.id)
-//         );
-//    });
-// });
 
 
 const nameFeedback = ref('');
@@ -146,41 +132,28 @@ const filesystemCheck = (newSnapshot : NewSnapshot) => {
 const nameCheck = (newSnapshot : NewSnapshot) => {
 	let result = true;
 	nameFeedback.value = '';
+	
 	if (newSnapshot.name == '') {
 		result = false;
 		nameFeedback.value = 'Name cannot be empty.';
-	} else if (newSnapshot.name.match(/^[0-9]/) ) {
+	} else if (!newSnapshot.name.match(/^[a-zA-Z0-9]/) ) {
 		result = false;
-		nameFeedback.value = 'Name cannot begin with numbers.';
-	} else if (newSnapshot.name.match(/^[.]/ )) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with a period (.).';
-	} else if (newSnapshot.name.match(/^[_]/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with an underscore (_).';
-	} else if (newSnapshot.name.match(/^[-]/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with a hyphen (-).';
-	} else if (newSnapshot.name.match(/^[:]/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with a colon (:).';
+		nameFeedback.value = 'Name must begin with alphanumeric characters.';
 	} else if (newSnapshot.name.match(/^[ ]/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot begin with whitespace.';
 	} else if (newSnapshot.name.match(/[ ]$/)) {
 		result = false;
 		nameFeedback.value = 'Name cannot end with whitespace.';
-	} else if (newSnapshot.name.match(/^c[0-9]|^log|^mirror|^raidz|^raidz1|^raidz2|^raidz3|^spare/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with a reserved name.';
 	} else if (!newSnapshot.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
 		result = false;
 		nameFeedback.value = 'Name contains invalid characters.';
-	} else if (nameExists(newSnapshot, snapshots.value)) {
+	} else if (nameExists(newSnapshot, snapshotsInPool.value)) {
 		result = false;
 		nameFeedback.value = 'A snapshot with that name already exists.';
 	}
-	return result;
+
+    return result;
 }
 
 function nameExists(newSnapshot : NewSnapshot, snapshots : Snapshot[]) {
@@ -195,22 +168,30 @@ function nameExists(newSnapshot : NewSnapshot, snapshots : Snapshot[]) {
     return false;
 }
 
-async function createSnapButton(newSnapshot) {
-    // if (filesystemCheck(newSnapshot)) {
-    //     if (nameCheck(newSnapshot)) {
-        if (!newSnapshot.isCustomName) {
-            newSnapshot.name = getTimestamp();
+function createSnapButton(newSnapshot) {
+    if (newSnapshot.isCustomName) {
+        if (nameCheck(newSnapshot)) {
+            if (filesystemCheck(newSnapshot)) {
+                create(newSnapshot);
+            }
         }
-            creating.value = true;
-            await createSnapshot(newSnapshot);
+    } else if (!newSnapshot.isCustomName) {
+        newSnapshot.name = getTimestamp();
+        if (filesystemCheck(newSnapshot)) {
+            create(newSnapshot);
+        }
+    }
+}
 
-            showSnapshotModal.value = false;
-
-            //snapshots.value = [];
-            await loadSnapshots(snapshots);
-            creating.value = false;
-    //     }
-    // }   
+async function create(newSnapshot) {
+    creating.value = true;
+    await createSnapshot(newSnapshot);
+    snapshotsLoaded.value = false;
+    snapshotsInPool.value = [];
+    await loadSnapshotsInPool(snapshotsInPool, props.poolName);
+    snapshotsLoaded.value = true;
+    creating.value = false;
+    showSnapshotModal.value = false;
 }
 
 
