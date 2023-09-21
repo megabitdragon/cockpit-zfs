@@ -21,20 +21,20 @@
 		<div class="mt-8 overflow-visible rounded-md">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
 
-				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
+				<div class="overflow-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
-							<tr class="bg-well rounded-t-md">
-								<th class="relative px-3 py-3.5">
+							<tr class="bg-well rounded-t-md grid grid-cols-8">
+								<th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="px-3 py-3.5 font-semibold text-default">Name</th>
-								<th class="px-3 py-3.5 font-semibold text-default">Status</th>
-								<th class="px-3 py-3.5 font-semibold text-default">Used (%)</th>
-								<th class="px-3 py-3.5 font-semibold text-default">Used</th>
-								<th class="px-3 py-3.5 font-semibold text-default">Free</th>
-								<th class="px-3 py-3.5 font-semibold text-default">Total</th>
-								<th class="relative px-3 py-3.5 sm:pr-6 lg:pr-8">
+								<th class="py-3.5 font-semibold text-default col-span-1">Name</th>
+								<th class="py-3.5 font-semibold text-default col-span-1">Status</th>
+								<th class="py-3.5 font-semibold text-default col-span-1">Used (%)</th>
+								<th class="py-3.5 font-semibold text-default col-span-1">Used</th>
+								<th class="py-3.5 font-semibold text-default col-span-1">Free</th>
+								<th class="py-3.5 font-semibold text-default col-span-1">Total</th>
+								<th class="relative py-3.5 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
 							</tr>
@@ -42,36 +42,39 @@
 					</table>
 					
 					<div v-if="poolData.length > 0 && poolsLoaded == true">
-						<Accordion :isOpen="false" class="divide-y divide-default bg-default rounded-b-md border border-solid border-spacing-1 border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
+						<Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
 							<template v-slot:title>
-								<div class="grid grid-cols-7 grid-flow-cols w-full rounded-md ml-5">
-									<div class="px-3 py-4">{{ poolData[poolIdx].name }}</div>
-									<div class="px-3 py-4">{{ poolData[poolIdx].status }}</div>
-									<div class="px-3 py-4">
-										<div class="w-full bg-well rounded-full text-center">
-											<div v-if="poolData[poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
-												<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
-													{{ poolData[poolIdx].properties.capacity }}%
-												</div>
-											</div>
-											<div v-if="poolData[poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-6 mt-0.5 min-h-min max-h-max overflow-hidden">
-												<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${poolData[poolIdx].properties.capacity}%` }">
-													<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								<!-- <button v-on:dblclick="showPoolModal(poolData[poolIdx])!" class="grid grid-cols-7 grid-flow-cols w-full justify-center text-center pt-1"> -->
+								<div class="grid grid-cols-7 grid-flow-cols w-full justify-center text-center">
+									<button @click="showPoolModal(poolData[poolIdx])!" class="grid grid-cols-6 col-span-6 hover:bg-accent pt-1 rounded-r-md">
+										<div class="py-4">{{ poolData[poolIdx].name }}</div>
+										<div class="py-4">{{ poolData[poolIdx].status }}</div>
+										<div class="py-4">
+											<div class="w-full bg-well rounded-full text-center">
+												<div v-if="poolData[poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
+													<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
 														{{ poolData[poolIdx].properties.capacity }}%
+													</div>
+												</div>
+												<div v-if="poolData[poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-6 mt-0.5 min-h-min max-h-max overflow-hidden">
+													<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${poolData[poolIdx].properties.capacity}%` }">
+														<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+															{{ poolData[poolIdx].properties.capacity }}%
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-									<div class="px-3 py-4">{{ poolData[poolIdx].properties.allocated }}</div>
-									<div class="px-3 py-4">{{ poolData[poolIdx].properties.free }}</div>
-									<div class="px-3 py-4">{{ poolData[poolIdx].properties.size }}</div>
+										<div class="py-4">{{ poolData[poolIdx].properties.allocated }}</div>
+										<div class="py-4">{{ poolData[poolIdx].properties.free }}</div>
+										<div class="py-4">{{ poolData[poolIdx].properties.size }}</div>
+									</button>
 									<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
-										<Menu as="div" class="relative inline-block text-right">
+										<Menu as="div" class="relative inline-block text-right -mt-1">
 											<div>
-												<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+												<MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 													<span class="sr-only">Open options</span>
-													<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+													<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 												</MenuButton>
 											</div>
 
@@ -111,18 +114,18 @@
 								
 							</template>
 							<template v-slot:content>
-								<Accordion :isOpen="false" class="btn-secondary rounded-md border border-solid border-default p-2" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+								<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
 									<template v-slot:title>
-										<div class="grid grid-cols-3 grid-flow-cols btn-secondary w-full rounded-md">
-											<div class="col-start-2 text-center -mx-4 py-4">
+										<div class="grid grid-cols-7 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
+											<div class="col-span-6 text-center py-4 mt-1">
 												{{ vDev.name }} ({{ vDev.type }})
 											</div>
 											<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 												<Menu as="div" class="relative inline-block text-right">
 													<div>
-														<MenuButton class="flex items-center rounded-full btn-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+														<MenuButton class="flex items-center rounded-full btn-primary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 															<span class="sr-only">Open options</span>
-															<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+															<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 														</MenuButton>
 													</div>
 
@@ -172,9 +175,9 @@
 																<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 																	<Menu as="div" class="relative inline-block text-right">
 																		<div>
-																			<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+																			<MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 																				<span class="sr-only">Open options</span>
-																				<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+																				<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 																			</MenuButton>
 																		</div>
 
