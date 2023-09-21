@@ -156,22 +156,22 @@ const selectedDataset = ref<FileSystemData>();
 const snapshots = ref<Snapshot[]>([]);
 const fileSystemsAndSnaps = ref<SnapDatasets[]>([]);
 
-function checkForSnapshotsInList() {
-	fileSystems.value.forEach(dataset => {
-		fileSystemsAndSnaps.value.push(dataset);
-	});
-	pools.value.forEach(pool => {
-		if (pool.properties.listSnapshots) {
-			snapshots.value.forEach(snap => {
-				if (snap.pool == pool.name) {
-					fileSystemsAndSnaps.value.push(snap);
-				}
-			});
-		}
-	});
-}
+// function checkForSnapshotsInList() {
+// 	fileSystems.value.forEach(dataset => {
+// 		fileSystemsAndSnaps.value.push(dataset);
+// 	});
+// 	pools.value.forEach(pool => {
+// 		if (pool.properties.listSnapshots) {
+// 			snapshots.value.forEach(snap => {
+// 				if (snap.pool == pool.name) {
+// 					fileSystemsAndSnaps.value.push(snap);
+// 				}
+// 			});
+// 		}
+// 	});
+// }
 
-checkForSnapshotsInList();
+// checkForSnapshotsInList();
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
@@ -191,10 +191,13 @@ const showFSConfig = ref(false);
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
 	fileSystems.value = [];
+	snapshots.value = [];
 	await loadDatasets(fileSystems);
 	await loadSnapshots(snapshots);
 	fileSystemsLoaded.value = true;
 }
+
+refreshDatasets();
 
 function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
@@ -207,6 +210,14 @@ function findPoolDataset(fileSystem) {
 		return pools.value.find(pool => pool.name == fileSystem.name);
 	} catch {
 		console.log('error finding pool');
+	}
+}
+
+function findSnapDataset(fileSystem) {
+	try {
+		return snapshots.value.find(snapshot => snapshot.dataset == fileSystem.name);
+	} catch {
+		console.log('error finding snapshot');
 	}
 }
 
@@ -223,7 +234,7 @@ const isDeleting = ref(false);
 async function deleteFileSystem(fileSystem) {
 	operationRunning.value = false;
 	selectedDataset.value = fileSystem;
-	if (!findPoolDataset(selectedDataset.value) && selectedDataset.value!.children!.length > 0) {
+	if (!findPoolDataset(selectedDataset.value) && selectedDataset.value!.children!.length > 0 || findSnapDataset(selectedDataset.value)) {
 		hasChildren.value = true;
 	} else { 
 		hasChildren.value = false;
@@ -255,7 +266,9 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		hasChildren.value = false;
 		forceDestroy.value = false;
 		console.log('deleted:', selectedDataset.value!);
-		
+		firstOptionToggle.value = false;
+		thirdOptionToggle.value = false;
+		fourthOptionToggle.value = false;
 		notifications.value.constructNotification('File System Destroyed', selectedDataset.value!.name + " destroyed.", 'success');
 	}
 });

@@ -14,11 +14,7 @@
 			  	<FileSystemList/>
 			</div>
 
-			<!-- <div v-if="props.tag === 'snapshots'" class="p-4">
-				<SnapshotsTab/>
-			</div>
-
-			<div v-if="props.tag === 'settings'" class="p-4">
+			<!-- <div v-if="props.tag === 'settings'" class="p-4">
 			
 			</div> -->
 		</div>
@@ -33,7 +29,6 @@ import { loadDisksThenPools, loadDatasets, loadSnapshots } from '../composables/
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
-import SnapshotsTab from '../components/snapshots/SnapshotsTab.vue';
 
 interface ZFSProps {
   	tag: string;

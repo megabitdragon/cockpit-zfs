@@ -407,7 +407,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 
 export async function loadSnapshots(snapshots) {
 	try {
-		const rawJSON = await getSnapshots();
+	/*	const rawJSON = await getSnapshots();
 		const parsedJSON = (JSON.parse(rawJSON));
 		console.log('Snapshots JSON:');
 		console.log(parsedJSON);
@@ -440,7 +440,46 @@ export async function loadSnapshots(snapshots) {
 				  holds: parsedJSON[i].holds
 			}
 			snapshots.push(snap);
-		}
+		}   */
+
+		getSnapshots().then(rawJSON => {
+			const parsedJSON = (JSON.parse(rawJSON));
+			console.log('Snapshots JSON:');
+			console.log(parsedJSON);
+			for (const dataset in parsedJSON) {
+				parsedJSON[dataset].forEach(snapshot => {
+					const snap = {
+						name: snapshot.name,
+						id: snapshot.id,
+						snapName: snapshot.snapshot_name,
+						dataset: snapshot.dataset,
+						pool: snapshot.pool,
+						mountpoint: snapshot.mountpoint,
+						type: snapshot.type,
+						properties: {
+							clones: snapshot.properties.clones.parsed,
+							creation: {
+								rawTimestamp: snapshot.properties.creation.rawvalue,
+								parsed: snapshot.properties.creation.parsed,
+								value: snapshot.properties.creation.value,
+							},
+							referenced: {
+								value: snapshot.properties.referenced.value,
+								rawNum: snapshot.properties.referenced.parsed,
+							},
+							used: {
+								value: snapshot.properties.used.value,
+								rawNum: snapshot.properties.used.parsed,
+							},
+						},
+						holds: snapshot.holds
+					}
+	
+					snapshots.value.push(snap);
+				});
+			}
+			
+		});
 
 		console.log('snapshots:', snapshots);
 	} catch(error) {
