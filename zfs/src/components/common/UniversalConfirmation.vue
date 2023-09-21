@@ -136,6 +136,7 @@ interface UniversalConfirmationProps {
     vDev?: vDevData;
     disk?: DiskData;
     filesystem?: FileSystemData;
+    snapshot?: Snapshot;
     firstOption?: string;
     secondOption?: string;
     // thirdOption?: string;

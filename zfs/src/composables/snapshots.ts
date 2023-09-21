@@ -35,3 +35,20 @@ export async function createSnapshot(newSnap : NewSnapshot) {
         console.error(errorString(state));
     }
 }
+
+export async function destroySnapshot(snapshot) {
+    try {
+        let cmdString = ['zfs', 'destroy'];
+
+
+
+        console.log("****create cmdString: *****\n" , cmdString);
+			
+        const state = useSpawn(cmdString);
+        const output = await state.promise();
+        console.log(output)
+        return output.stdout;
+    } catch (state) {
+        console.error(errorString(state));
+    }
+}

@@ -38,12 +38,12 @@
 				</div>
 			</div>
 			
-			<div v-if="navTag == 'snapshots'" class="overflow-y-visible">
+			<div v-if="navTag == 'snapshots'" class="">
 				<div v-if="snapshotsInPool.length < 1" class="flex items-center justify-center">
 					<p class="text-default">No snapshots found.</p>
 				</div>
-				<div v-else class="inline-block min-w-full min-h-full align-middle rounded-md border border-default overflow-y-visible">
-					<div class="overflow-y-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+				<div v-else class="inline-block min-w-full max-h-max align-middle rounded-md border border-default ">
+					<div class="ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 						<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-well">
 							<thead>
 								<tr class="rounded-md">
@@ -55,7 +55,6 @@
 										<span class="sr-only"></span>
 									</th>
 								</tr>
-								
 							</thead>
 							<tbody class="divide-y divide-x divide-default bg-default">
 								<tr v-if="!snapshotsLoaded" class="bg-well justify-center">
@@ -87,16 +86,16 @@
 												<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 													<div class="py-1">
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+															<a href="#" @click="cloneSnapshotBtn()" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+															<a href="#" @click="renameSnapshotBtn()" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+															<a href="#" @click="rollbackSnapshotBtn()" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+															<a href="#" @click="destroySnapshotBtn()" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
 														</MenuItem>
 													</div>
 												</MenuItems>
@@ -295,22 +294,25 @@
 
 	<CreateSnapshotModal @close="showSnapshotModal = false" :poolName="props.pool.name"/>
 	<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
+	<UniversalConfirmation  :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy snapshots of child filesystems with this name'" :secondOption="'Destroy all child: snapshots, clones and file systems'" :hasChildren="hasChildren"/>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
-import Modal from '../common/Modal.vue';
-import CircleProgress from '../common/CircleProgress.vue';
 import { configurePool } from '../../composables/pools';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
+import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool } from '../../composables/loadData';
+import { destroySnapshot } from '../../composables/snapshots';
+import Modal from '../common/Modal.vue';
+import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';
 import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool } from '../../composables/loadData';
+import UniversalConfirmation from '../common/UniversalConfirmation.vue';
 
 interface PoolDetailsProps {
 	pool: PoolData;
@@ -352,12 +354,15 @@ const pools = inject<Ref<PoolData[]>>('pools')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+
 // const snapshots = ref<Snapshot[]>([]);
 const snapshotsLoaded = ref(true);
 // const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 // const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 const snapshotsInPool = ref<Snapshot[]>([]);
+const selectedSnapshot = ref<Snapshot>();
 
 // loadSnapshots(snapshots);
 loadSnapshotsInPool(snapshotsInPool, props.pool.name);
@@ -390,7 +395,29 @@ function calculateSectorSize(exponent) {
 	  return result.value;
 }
 
-///////////////////// Topology //////////////////////
+async function refreshData() {
+		// disksLoaded.value = false;
+		// poolsLoaded.value = false;
+		snapshotsLoaded.value = false;
+		// pools.value = [];
+		// disks.value = [];
+		snapshotsInPool.value = [];
+		// await loadDisksThenPools(disks, pools);
+		await loadSnapshotsInPool(snapshotsInPool, props.pool.name);
+		// disksLoaded.value = true;
+		// poolsLoaded.value = true;
+		snapshotsLoaded.value = true;
+}
+
+///////// Values for Confirmation Modals ////////////
+/////////////////////////////////////////////////////
+const operationRunning = ref(false);
+const firstOptionToggle = ref(false);
+const secondOptionToggle = ref(false);
+const thirdOptionToggle = ref(false);
+const fourthOptionToggle = ref(false);
+
+///////////////////// Add VDev //////////////////////
 /////////////////////////////////////////////////////
 const showAddVDevModal = ref(false);
 
@@ -399,7 +426,7 @@ function addVDevButton() {
 	console.log('add vdev modal triggred');
 }
 
-//////////////////// Snapshots //////////////////////
+///////////////// Create Snapshots //////////////////
 /////////////////////////////////////////////////////
 const showSnapshotModal = ref(false);
 const creating = ref(false);
@@ -408,6 +435,68 @@ function createSnapshotBtn() {
 	showSnapshotModal.value = true;
 	console.log('create snapshot modal triggered');
 }
+
+///////////////// Destroy Snapshot //////////////////
+/////////////////////////////////////////////////////
+const showDestroySnapshotModal = ref(false);
+const destroying = ref(false);
+const destroyChildren = ref(false);
+const destroyAllDependents = ref(false);
+const hasChildren = ref(false);
+const forceDestroy = ref(false);
+const confirmDestroy = ref(false);
+
+function destroySnapshotBtn() {
+
+}
+
+async function destroyThisSnapshot(snapshot) {
+	operationRunning.value = false;
+	selectedSnapshot.value = snapshot;
+	//check if has children then set hasChildren
+
+	showDestroySnapshotModal.value = true;
+	console.log('selected for destroy:', selectedSnapshot.value);
+}
+
+const confirmThisDestroy : ConfirmationCallback = () => {
+	confirmDestroy.value = true;
+}
+
+const updateShowDestroySnapshot = (newVal) => {
+	showDestroySnapshotModal.value = newVal;
+}
+
+watch (confirmDestroy, async (newVal, oldVal) => {
+	if (confirmDestroy.value == true) {
+		console.log('now destroying:', newVal);
+		operationRunning.value = true;
+		await destroySnapshot(selectedSnapshot.value);
+		operationRunning.value = false;
+		refreshData();
+		showDestroySnapshotModal.value = false;
+		confirmDestroy.value = false;
+	}
+});
+
+////////////////// Clone Snapshot ///////////////////
+/////////////////////////////////////////////////////
+function cloneSnapshotBtn() {
+
+}
+
+/////////////// Rollback Snapshot ///////////////////
+/////////////////////////////////////////////////////
+function rollbackSnapshotBtn() {
+	
+}
+
+///////////////// Rename Snapshot ///////////////////
+/////////////////////////////////////////////////////
+function renameSnapshotBtn() {
+	
+}
+
 
 /////////////////// Pool Changes ////////////////////
 /////////////////////////////////////////////////////
@@ -483,8 +572,6 @@ async function poolConfigureBtn() {
 		console.log('newChanges:', newChangesToPool.value);
 		saving.value = true;
 		await configurePool(newChangesToPool.value);
-		disksLoaded.value = false;
-		poolsLoaded.value = false;
 		pools.value = [];
 		disks.value = [];
 		await loadDisksThenPools(disks, pools);
