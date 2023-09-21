@@ -112,8 +112,6 @@ const newSnapshot = ref<NewSnapshot>({
     snapChildren: false,
 }); 
 
-
-
 const nameFeedback = ref('');
 const filesystemFeedback = ref('');
 
@@ -191,6 +189,8 @@ async function create(newSnapshot) {
     await loadSnapshotsInPool(snapshotsInPool, props.poolName);
     snapshotsLoaded.value = true;
     creating.value = false;
+    newSnapshot.isCustomName = false;
+    newSnapshot.snapChildren = false;
     showSnapshotModal.value = false;
 }
 
