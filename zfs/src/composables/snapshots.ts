@@ -112,19 +112,16 @@ export async function renameSnapshot(snapshot, ) {
 }
 
 
-export async function cloneSnapshot(snapshot, ) {
+export async function cloneSnapshot(name, newParentFS, cloneName, createParent?) {
     try {
         let cmdString = ['zfs', 'clone'];
 
-        // if (destroyChildrenSameName) {
-        //     cmdString.push('-r');
-        // }
+        if (createParent) {
+            cmdString.push('-p');
+        }
 
-        // if (destroyAllChildren) {
-        //     cmdString.push('-R');
-        // }
-
-        cmdString.push(snapshot.name)
+        cmdString.push(`${name}`);
+        cmdString.push(`${newParentFS}/${cloneName}`);
 
         console.log("****create cmdString: *****\n" , cmdString);
 			

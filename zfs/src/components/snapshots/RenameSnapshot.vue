@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showRenameModal" @close="showRenameModal = false" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal :isOpen="showRenameModal" @close="showRenameModal = false" :marginTop="'mt-60'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
         <template v-slot:title>
             <legend class="flex justify-center">Rename {{props.filesystem.name}}</legend>
         </template>
@@ -72,7 +72,7 @@
                     <p class="text-danger" v-if="parentFeedback">{{ parentFeedback }}</p>
                 </div>
                 <div class="button-group-row mt-2 justify-between">
-                    <button @click="showRenameModal = false" :id="getIdKey('confirm-rename-no')" name="rename-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
+                    <button @click="showRenameModal = false" :id="getIdKey('confirm-delete-no')" name="delete-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
                 
                     <div class="button-group-row">
                         <button v-if="!renaming" id="rename-filesystem-btn" class="btn btn-primary object-right justify-end mr-4 h-fit w-full" @click="renameBtn()">Rename</button>

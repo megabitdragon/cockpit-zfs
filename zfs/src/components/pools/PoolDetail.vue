@@ -297,7 +297,7 @@
 	</div>
 
 	<div v-if="showCloneSnapshotModal">
-
+		<CloneSnapshot @close="showCloneSnapshotModal = false" :idKey="'clone-snapshot-modal'" :snapshot="selectedSnapshot!"/>
 	</div>
 
 	<div v-if="showRenameSnapshotModal">
@@ -325,6 +325,7 @@ import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';
 import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
+import CloneSnapshot from '../snapshots/CloneSnapshot.vue';
 import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
@@ -499,16 +500,13 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 ////////////////// Clone Snapshot ///////////////////
 /////////////////////////////////////////////////////
 const showCloneSnapshotModal = ref(false);
+const cloning = ref(false);
 const confirmClone = ref(false);
-//readonly Snap Name
-//select Parent FS
-//input Clone Name
-//toggle Create Non-Existent Parent FS
-
-//zfs clone (-p) oldParentFS/snap@timestamp newParentFS/cloneName 
 
 function cloneThisSnapshot(snapshot) {
-
+	showCloneSnapshotModal.value = true;
+	selectedSnapshot.value = snapshot;
+	console.log('clone snapshot modal triggered');
 }
 
 
@@ -680,7 +678,9 @@ provide('snapshots-loaded', snapshotsLoaded)!;
 // provide("snapshots", snapshots);
 provide("snapshots-in-pool", snapshotsInPool);
 provide('creating', creating);
-
+provide('cloning', cloning);
+provide('confirm-clone', confirmClone);
+provide('show-clone-modal', showCloneSnapshotModal);
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);

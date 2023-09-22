@@ -106,8 +106,6 @@
             <div class="w-full grid grid-rows-1">
                 <div class="button-group-row mt-2 justify-between">
                     <button @click="closeModal" :id="getIdKey('confirm-no')" name="button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
-                   
-                   
 
                     <!-- fix this to account for option 3 and 4 if filesystem destroy -->
                     <button v-if="!operationRunning && !hasChildren && !option1" @click="confirmOperation" :id="getIdKey('confirm-yes-A')" name="button-yes-A" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
@@ -127,7 +125,7 @@
 </template>
 <script setup lang="ts">
 import { Switch } from '@headlessui/vue';
-import { Ref, inject, watch, ref} from 'vue';
+import { Ref, inject, watch, ref, computed} from 'vue';
 import { upperCaseWord } from '../../composables/helpers';
 import Modal from './Modal.vue';
 
@@ -210,6 +208,53 @@ switch (props.operation) {
         operating.value = 'Exporting...';
         break;
 }
+
+const syncSwitchesOneTwo = computed(() => {
+    if (option1Toggle.value) {
+        option2Toggle.value = false;
+    } else if (option2Toggle.value) {
+        option1Toggle.value = false;
+    }
+});
+
+const syncSwitchesThreeFour = computed(() => {
+    if (option3Toggle.value) {
+        option4Toggle.value = false;
+    } else if (option4Toggle.value) {
+        option3Toggle.value = false;
+    }
+});
+
+// const syncSwitchesOneTwo = () => {
+//     if (option1Toggle.value) {
+//         option2Toggle.value = false;
+//     } else if (option2Toggle.value) {
+//         option1Toggle.value = false;
+//     }
+// }
+
+// const syncSwitchesThreeFour = () => {
+//     if (option3Toggle.value) {
+//         option4Toggle.value = false;
+//     } else if (option4Toggle.value) {
+//         option3Toggle.value = false;
+//     }
+// }
+
+if (props.item == 'snapshot' && props.operation == 'destroy' || props.operation == 'rollback') {
+    // syncSwitchesOneTwo;
+}
+
+
+if (props.item == 'filesystem' && props.operation == 'destroy' && props.hasChildren) {
+    // syncSwitchesThreeFour;
+}
+
+// watch(syncSwitchesOneTwo, async (newValue, oldValue) => {
+	
+// });
+
+
 
 const getIdKey = (name: string) => `${name}`;
 </script>
