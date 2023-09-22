@@ -32,7 +32,7 @@
                 <div>
 					<label :for="getIdKey('snapshot-name')" class="block text-sm font-medium leading-6 text-default">Snapshot Name</label>
                     <input v-if="!newSnapshot.isCustomName" type="text" v-model="newSnapshot.name" name="snapshot-name" :id="getIdKey('snapshot-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="YYYY.MM.DD-HH.MM.SS" disabled/>
-                    <input v-if="newSnapshot.isCustomName" type="text" v-model="newSnapshot.name" name="snapshot-name" :id="getIdKey('snapshot-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="Enter Name Here" />
+                    <input v-if="newSnapshot.isCustomName" @keydown.enter="createSnapButton(newSnapshot)" type="text" v-model="newSnapshot.name" name="snapshot-name" :id="getIdKey('snapshot-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="Enter Name Here" />
                 </div>
                 <div>
                     <label :for="getIdKey('snap-children')" class="mt-1 block text-sm font-medium leading-6 text-default">Create snapshots of child file systems</label>

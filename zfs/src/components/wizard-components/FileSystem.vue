@@ -237,7 +237,7 @@
 				<!-- Name of File System (Text) -->
 				<div>
 					<label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium text-default">Name</label>
-					<input :id="getIdKey('filesystem-name')" type="name" name="pool-name" v-model="newFileSystemConfig.name" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="File System Name" />
+					<input :id="getIdKey('filesystem-name')" @keydown.enter="fsCreateBtn(newFileSystemConfig)" type="name" name="pool-name" v-model="newFileSystemConfig.name" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="File System Name" />
 				</div>
 
 				<!-- Encryption (Toggle) -> Reveals extra fields-->

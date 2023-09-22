@@ -6,7 +6,7 @@
 		</template>
 		<template v-slot:content>
 			<!-- actual content for create pool wizard -->
-			<PoolConfig ref="poolConfiguration" :tag="navTag" idKey="pool-config" class="mx-4"/>
+			<PoolConfig ref="poolConfiguration" :navCallback="next" :tag="navTag" idKey="pool-config" class="mx-4"/>
 		</template>
 		<template v-slot:footer>
 			<!-- buttons for next, back & also finish (if at last tab) -->

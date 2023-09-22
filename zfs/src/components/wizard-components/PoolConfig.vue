@@ -2,7 +2,7 @@
 	<!-- first tab: name entry -->
 	<div v-if="props.tag ==='name-entry'">
 		<legend class="mb-1 text-base font-semibold leading-6 text-default">Name this Pool</legend>
-		<input type="text" v-model="poolConfig.name" name="pool-name" :id="getIdKey('pool-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="Pool Name" />
+		<input type="text" @keydown.enter="props.navCallback" v-model="poolConfig.name" name="pool-name" :id="getIdKey('pool-name')" class="mt-1 block w-full input-textlike bg-default" placeholder="Pool Name" />
 	</div>
 
   	<!-- second tab: vDev + disk selection -->
@@ -300,6 +300,7 @@ import ReviewTab from './ReviewTab.vue';
 interface PoolConfigProps {
 	tag: string;
 	idKey: string;
+	navCallback: NavigationCallback;
 }
 
 const props = defineProps<PoolConfigProps>();
