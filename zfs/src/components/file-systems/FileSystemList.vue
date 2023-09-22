@@ -224,7 +224,7 @@ function findSnapDataset(fileSystem) {
 ////////////// Destroy File System //////////////////
 /////////////////////////////////////////////////////
 const hasChildren = ref(false);
-const forceDestroy = ref(false);
+// const forceDestroy = ref(false);
 const destroyChildren = ref(false);
 const destroyAllDependents = ref(false);
 const showDeleteFileSystemConfirm = ref(false);
@@ -264,7 +264,6 @@ watch(confirmDelete, async (newValue, oldValue) => {
 
 		confirmDelete.value = false;
 		hasChildren.value = false;
-		forceDestroy.value = false;
 		console.log('deleted:', selectedDataset.value!);
 		firstOptionToggle.value = false;
 		thirdOptionToggle.value = false;
@@ -371,7 +370,7 @@ provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
 provide('confirm-delete-filesystem', confirmDelete);
 provide('destroy-children', destroyChildren);
 provide('destroy-dependents', destroyAllDependents);
-provide('force-destroy', forceDestroy);
+// provide('force-destroy', forceDestroy);
 provide('has-children', hasChildren);
 
 provide('show-mount-filesystem-confirm', showMountFileSystemConfirm);

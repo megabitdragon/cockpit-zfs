@@ -86,16 +86,16 @@
 												<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 													<div class="py-1">
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="cloneSnapshotBtn()" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+															<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="renameSnapshotBtn()" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+															<a href="#" @click="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="rollbackSnapshotBtn()" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+															<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="destroySnapshotBtn()" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+															<a href="#" @click="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
 														</MenuItem>
 													</div>
 												</MenuItems>
@@ -292,9 +292,25 @@
 		</template>
 	</Modal>
 
+	<div v-if="showDestroySnapshotModal">
+		<UniversalConfirmation  :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy child snapshots with same name'" :secondOption="'Destroy ALL child snapshots, clones and file systems'" :hasChildren="hasChildren"/>
+	</div>
+
+	<div v-if="showCloneSnapshotModal">
+
+	</div>
+
+	<div v-if="showRenameSnapshotModal">
+		
+	</div>
+
+	<div v-if="showRollbackSnapshotModal">
+		<UniversalConfirmation :showFlag="showRollbackSnapshotModal" @close="updateShowRollbackSnapshot" :idKey="'confirm-rollback-snapshot'" :item="'snapshot'" :operation="'rollback'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisRollback" :firstOption="'Destroy all newer snapshots of file system'" :secondOption="'Destroy all newer: snapshots, cloned file systems and file systems'" :hasChildren="hasChildren"/>
+	</div>
+
 	<CreateSnapshotModal @close="showSnapshotModal = false" :poolName="props.pool.name"/>
 	<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
-	<UniversalConfirmation  :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy snapshots of child filesystems with this name'" :secondOption="'Destroy all child: snapshots, clones and file systems'" :hasChildren="hasChildren"/>
+	
 </template>
 
 <script setup lang="ts">
@@ -304,7 +320,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { configurePool } from '../../composables/pools';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
 import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool } from '../../composables/loadData';
-import { destroySnapshot } from '../../composables/snapshots';
+import { destroySnapshot, rollbackSnapshot, cloneSnapshot, renameSnapshot } from '../../composables/snapshots';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';
@@ -313,6 +329,8 @@ import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import UniversalConfirmation from '../common/UniversalConfirmation.vue';
+
+const notifications = inject<Ref<any>>('notifications')!;
 
 interface PoolDetailsProps {
 	pool: PoolData;
@@ -395,7 +413,7 @@ function calculateSectorSize(exponent) {
 	  return result.value;
 }
 
-async function refreshData() {
+async function refreshSnaps() {
 		// disksLoaded.value = false;
 		// poolsLoaded.value = false;
 		snapshotsLoaded.value = false;
@@ -439,18 +457,10 @@ function createSnapshotBtn() {
 ///////////////// Destroy Snapshot //////////////////
 /////////////////////////////////////////////////////
 const showDestroySnapshotModal = ref(false);
-const destroying = ref(false);
-const destroyChildren = ref(false);
-const destroyAllDependents = ref(false);
 const hasChildren = ref(false);
-const forceDestroy = ref(false);
 const confirmDestroy = ref(false);
 
-function destroySnapshotBtn() {
-
-}
-
-async function destroyThisSnapshot(snapshot) {
+function destroyThisSnapshot(snapshot) {
 	operationRunning.value = false;
 	selectedSnapshot.value = snapshot;
 	//check if has children then set hasChildren
@@ -469,31 +479,90 @@ const updateShowDestroySnapshot = (newVal) => {
 
 watch (confirmDestroy, async (newVal, oldVal) => {
 	if (confirmDestroy.value == true) {
+
 		console.log('now destroying:', newVal);
 		operationRunning.value = true;
-		await destroySnapshot(selectedSnapshot.value);
+		await destroySnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
 		operationRunning.value = false;
-		refreshData();
+		refreshSnaps();
 		showDestroySnapshotModal.value = false;
+		
 		confirmDestroy.value = false;
+		hasChildren.value = false;
+		console.log('destroyed:', selectedSnapshot.value);
+		firstOptionToggle.value = false;
+		secondOptionToggle.value = false;
+		notifications.value.constructNotification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success');
 	}
 });
 
 ////////////////// Clone Snapshot ///////////////////
 /////////////////////////////////////////////////////
-function cloneSnapshotBtn() {
+const showCloneSnapshotModal = ref(false);
+const confirmClone = ref(false);
+//readonly Snap Name
+//select Parent FS
+//input Clone Name
+//toggle Create Non-Existent Parent FS
+
+//zfs clone (-p) oldParentFS/snap@timestamp newParentFS/cloneName 
+
+function cloneThisSnapshot(snapshot) {
 
 }
+
 
 /////////////// Rollback Snapshot ///////////////////
 /////////////////////////////////////////////////////
-function rollbackSnapshotBtn() {
-	
+const showRollbackSnapshotModal = ref(false);
+const confirmRollback = ref(false);
+
+//WARNING about data discarding 
+//toggle destroy all newer snapshots of file system (-r)
+//toggle destroy all newer snapshots, clones and file systems (-R)
+
+//zfs rollback (-r)(-R) snapshotName
+
+function rollbackThisSnapshot(snapshot) {
+	showRollbackSnapshotModal.value = true;
+	selectedSnapshot.value = snapshot;
+	console.log('selected to be rolled back:', selectedSnapshot.value);
 }
+
+const confirmThisRollback : ConfirmationCallback = () => {
+	confirmRollback.value = true;
+}
+
+const updateShowRollbackSnapshot = (newVal) => {
+	showRollbackSnapshotModal.value = newVal;
+}
+
+watch(confirmRollback, async (newVal, oldVal) => {
+	if (confirmRollback.value == true) {
+		operationRunning.value = true;
+		await rollbackSnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
+		console.log('rolled back:', selectedSnapshot.value);
+		showRollbackSnapshotModal.value = false;
+
+		confirmRollback.value = false;
+		await refreshSnaps();
+		operationRunning.value = false;
+		notifications.value.constructNotification('Snapshot Rolled Back', `Rolled back to snapshot ${selectedSnapshot.value!.name} .`, 'success');
+	}
+});
 
 ///////////////// Rename Snapshot ///////////////////
 /////////////////////////////////////////////////////
-function renameSnapshotBtn() {
+const showRenameSnapshotModal = ref(false);
+
+//readonly File System
+//toggle creation date
+//input name (show current name, if creation date toggled then switch to creation timestamp)
+//toggle rename snaps of children with this new name
+
+//zfs rename (-r) oldSnamName newSnapName
+
+function renameThisSnapshot(snapshot) {
 	
 }
 
@@ -611,4 +680,10 @@ provide('snapshots-loaded', snapshotsLoaded)!;
 // provide("snapshots", snapshots);
 provide("snapshots-in-pool", snapshotsInPool);
 provide('creating', creating);
+
+provide('modal-confirm-running', operationRunning);
+provide('modal-option-one-toggle', firstOptionToggle);
+provide('modal-option-two-toggle', secondOptionToggle);
+provide('modal-option-three-toggle', thirdOptionToggle);
+provide('modal-option-four-toggle', fourthOptionToggle);
 </script>

@@ -36,11 +36,19 @@ export async function createSnapshot(newSnap : NewSnapshot) {
     }
 }
 
-export async function destroySnapshot(snapshot) {
+export async function destroySnapshot(snapshot, destroyChildrenSameName, destroyAllChildren) {
     try {
         let cmdString = ['zfs', 'destroy'];
 
+        if (destroyChildrenSameName) {
+            cmdString.push('-r');
+        }
 
+        if (destroyAllChildren) {
+            cmdString.push('-R');
+        }
+
+        cmdString.push(snapshot.name)
 
         console.log("****create cmdString: *****\n" , cmdString);
 			
@@ -52,3 +60,81 @@ export async function destroySnapshot(snapshot) {
         console.error(errorString(state));
     }
 }
+
+export async function rollbackSnapshot(snapshot, destroyNewerSnaps, destroyAllNewer) {
+    try {
+        let cmdString = ['zfs', 'rollback'];
+
+        if (destroyNewerSnaps) {
+            cmdString.push('-r');
+        }
+
+        if (destroyAllNewer) {
+            cmdString.push('-R');
+        }
+
+        cmdString.push(snapshot.name)
+
+        console.log("****create cmdString: *****\n" , cmdString);
+			
+        const state = useSpawn(cmdString);
+        const output = await state.promise();
+        console.log(output)
+        return output.stdout;
+    } catch (state) {
+        console.error(errorString(state));
+    }
+}
+
+export async function renameSnapshot(snapshot, ) {
+    try {
+        let cmdString = ['zfs', 'rename'];
+
+        // if (destroyChildrenSameName) {
+        //     cmdString.push('-r');
+        // }
+
+        // if (destroyAllChildren) {
+        //     cmdString.push('-R');
+        // }
+
+        cmdString.push(snapshot.name)
+
+        console.log("****create cmdString: *****\n" , cmdString);
+			
+        const state = useSpawn(cmdString);
+        const output = await state.promise();
+        console.log(output)
+        return output.stdout;
+    } catch (state) {
+        console.error(errorString(state));
+    }
+}
+
+
+export async function cloneSnapshot(snapshot, ) {
+    try {
+        let cmdString = ['zfs', 'clone'];
+
+        // if (destroyChildrenSameName) {
+        //     cmdString.push('-r');
+        // }
+
+        // if (destroyAllChildren) {
+        //     cmdString.push('-R');
+        // }
+
+        cmdString.push(snapshot.name)
+
+        console.log("****create cmdString: *****\n" , cmdString);
+			
+        const state = useSpawn(cmdString);
+        const output = await state.promise();
+        console.log(output)
+        return output.stdout;
+    } catch (state) {
+        console.error(errorString(state));
+    }
+}
+
+
