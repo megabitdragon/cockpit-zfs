@@ -1,5 +1,5 @@
 <template>
-	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-fit'" :minWidth="'min-w-8/12'">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
@@ -301,7 +301,7 @@
 	</div>
 
 	<div v-if="showRenameSnapshotModal">
-		
+		<RenameSnapshot @close="showRenameSnapshotModal = false" :idKey="'rename-snapshot-modal'" :snapshot="selectedSnapshot!"/>
 	</div>
 
 	<div v-if="showRollbackSnapshotModal">
@@ -326,6 +326,7 @@ import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';
 import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import CloneSnapshot from '../snapshots/CloneSnapshot.vue';
+import RenameSnapshot from '../snapshots/RenameSnapshot.vue';
 import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
@@ -449,11 +450,23 @@ function addVDevButton() {
 /////////////////////////////////////////////////////
 const showSnapshotModal = ref(false);
 const creating = ref(false);
+const confirmCreate = ref(false);
 
 function createSnapshotBtn() {
 	showSnapshotModal.value = true;
 	console.log('create snapshot modal triggered');
 }
+
+watch(confirmCreate, async (newVal, oldVal) => {
+	if (confirmCreate.value == true) {
+		operationRunning.value = true;
+		await refreshSnaps();
+		confirmCreate.value = false;
+		operationRunning.value = false;
+		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+	}
+});
+
 
 ///////////////// Destroy Snapshot //////////////////
 /////////////////////////////////////////////////////
@@ -515,12 +528,6 @@ function cloneThisSnapshot(snapshot) {
 const showRollbackSnapshotModal = ref(false);
 const confirmRollback = ref(false);
 
-//WARNING about data discarding 
-//toggle destroy all newer snapshots of file system (-r)
-//toggle destroy all newer snapshots, clones and file systems (-R)
-
-//zfs rollback (-r)(-R) snapshotName
-
 function rollbackThisSnapshot(snapshot) {
 	showRollbackSnapshotModal.value = true;
 	selectedSnapshot.value = snapshot;
@@ -552,18 +559,24 @@ watch(confirmRollback, async (newVal, oldVal) => {
 ///////////////// Rename Snapshot ///////////////////
 /////////////////////////////////////////////////////
 const showRenameSnapshotModal = ref(false);
-
-//readonly File System
-//toggle creation date
-//input name (show current name, if creation date toggled then switch to creation timestamp)
-//toggle rename snaps of children with this new name
-
-//zfs rename (-r) oldSnamName newSnapName
+const renaming = ref(false);
+const confirmRename = ref(false);
 
 function renameThisSnapshot(snapshot) {
-	
+	showRenameSnapshotModal.value = true;
+	selectedSnapshot.value = snapshot;
+	console.log('rename snapshot modal triggered');
 }
 
+watch(confirmRename, async (newVal, oldVal) => {
+	if (confirmRename.value == true) {
+		operationRunning.value = true;
+		await refreshSnaps();
+		confirmRename.value = false;
+		operationRunning.value = false;
+		notifications.value.constructNotification('Snapshot Renamed', `Renamed snapshot ${selectedSnapshot.value!.name} .`, 'success');
+	}
+});
 
 /////////////////// Pool Changes ////////////////////
 /////////////////////////////////////////////////////
@@ -677,10 +690,14 @@ provide('create-snap-modal', showSnapshotModal);
 provide('snapshots-loaded', snapshotsLoaded)!;
 // provide("snapshots", snapshots);
 provide("snapshots-in-pool", snapshotsInPool);
+provide('confirm-create', confirmCreate);
 provide('creating', creating);
 provide('cloning', cloning);
 provide('confirm-clone', confirmClone);
 provide('show-clone-modal', showCloneSnapshotModal);
+provide('renaming', renaming);
+provide('confirm-rename', confirmRename);
+provide('show-rename-modal', showRenameSnapshotModal);
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);

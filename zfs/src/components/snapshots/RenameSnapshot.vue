@@ -1,7 +1,7 @@
 <template>
-    <Modal :isOpen="showRenameModal" @close="showRenameModal = false" :marginTop="'mt-60'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal :isOpen="showRenameSnapModal" @close="showRenameSnapModal = false" :marginTop="'mt-52'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
         <template v-slot:title>
-            <legend class="flex justify-center">Rename {{props.filesystem.name}}</legend>
+            <legend class="flex justify-center">rename Snapshot</legend>
         </template>
         <template v-slot:content>
             <div>
@@ -9,51 +9,52 @@
                     <!-- Parent File System -->
                     <div class="mt-2">
                         <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-                        <select v-model="parentFS" :id="getIdKey('parent-filesystem')" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
-                            <option v-for="dataset, datasetIdx in datasetsInSamePool" :key="datasetIdx">{{ dataset.name }}</option>
-                        </select>
+                        <p>{{ props.snapshot.dataset }}</p>
                     </div>
+
+                     <!-- Set name as creation date -->
+                     <div class="mt-2">
+                        <div class="flex flex-row">
+                            <label :for="getIdKey('set-name-creation-date')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Creation date</label>
+                            <Switch v-model="creationDate" :id="getIdKey('set-name-creation-date')" :class="[creationDate! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                                <span class="sr-only">Use setting</span>
+                                <span :class="[creationDate! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                    <span :class="[creationDate! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                            <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </span>
+                                    <span :class="[creationDate! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                            <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                        </svg>
+                                    </span>
+                                </span>
+                            </Switch>
+                        </div>
+                    </div>
+
 
                     <!-- New Name -->
                     <div class="mt-2">
                         <label :for="getIdKey('new-name')" class="mt-1 block text-sm font-medium leading-6 text-default">New Name</label>
-                        <input :id="getIdKey('new-name')" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="`${ props.filesystem.name}`" />
+                        <input v-if="creationDate" disabled :id="getIdKey('new-name')" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="`${convertRawTimestampToString(props.snapshot.properties.creation.rawTimestamp)}`" />
+                        <input v-else :id="getIdKey('new-name')" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="`${props.snapshot.name}`" />
                     </div>
-                  
-                     <!-- Force Unmount -->
-                     <div class="mt-2">
-                        <div class="flex flex-row">
-                            <label :for="getIdKey('force-unmount-filesystem')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully Unmount File System</label>
-                            <Switch v-model="forceUnmount" :id="getIdKey('force-unmount-filesystem')" :class="[forceUnmount! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-                                <span class="sr-only">Use setting</span>
-                                <span :class="[forceUnmount! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-                                    <span :class="[forceUnmount! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                                        <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-                                            <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </span>
-                                    <span :class="[forceUnmount! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                                        <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-                                            <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-                                        </svg>
-                                    </span>
-                                </span>
-                            </Switch>
-                        </div>
-                    </div>
-                    <!-- Create non-existent parent file systems -->
+                
+                    <!-- Rename child snapshots with same name -->
                     <div class="mt-2">
                         <div class="flex flex-row">
-                            <label :for="getIdKey('create-parent-filesystems')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Create Non-Existent Parent File Systems</label>
-                            <Switch v-model="createNonExistParent" :id="getIdKey('create-parent-filesystems')" :class="[createNonExistParent! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <label :for="getIdKey('rename-children')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Rename child snapshots with same name</label>
+                            <Switch v-model="renameChildSnaps" :id="getIdKey('rename-children')" :class="[renameChildSnaps! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                 <span class="sr-only">Use setting</span>
-                                <span :class="[createNonExistParent! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-                                    <span :class="[createNonExistParent! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                <span :class="[renameChildSnaps! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                    <span :class="[renameChildSnaps! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                                         <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
                                             <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
                                     </span>
-                                    <span :class="[createNonExistParent! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <span :class="[renameChildSnaps! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                                         <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
                                             <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
                                         </svg>
@@ -62,6 +63,7 @@
                             </Switch>
                         </div>
                     </div>
+
                 </div>
             </div>
         </template>
@@ -69,13 +71,12 @@
             <div class="w-full grid grid-rows-2">
                 <div class="w-full row-start-1">
                     <p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
-                    <p class="text-danger" v-if="parentFeedback">{{ parentFeedback }}</p>
                 </div>
                 <div class="button-group-row mt-2 justify-between">
-                    <button @click="showRenameModal = false" :id="getIdKey('confirm-delete-no')" name="delete-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
+                    <button @click="showRenameSnapModal = false" :id="getIdKey('confirm-rename-no')" name="rename-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
                 
                     <div class="button-group-row">
-                        <button v-if="!renaming" id="rename-filesystem-btn" class="btn btn-primary object-right justify-end mr-4 h-fit w-full" @click="renameBtn()">Rename</button>
+                        <button v-if="!renaming" id="rename-snapshot-btn" class="btn btn-primary object-right justify-end mr-4 h-fit w-full" @click="renameBtn()">Rename</button>
                         <button disabled v-if="renaming" id="finish" type="button" class="btn btn-primary object-right justify-end">
                             <svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -91,106 +92,83 @@
 </template>
 <script setup lang="ts">
 import { ref, Ref, inject, watch, computed } from 'vue';
-// import { onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from '../../composables/helpers';
-import { renameFileSystem } from '../../composables/datasets';
+import { convertRawTimestampToString, onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from '../../composables/helpers';
+import { renameSnapshot } from '../../composables/snapshots';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { loadDatasets } from '../../composables/loadData';
 
-interface RenameFileSystemProps {
+interface RenameSnapshotProps {
     idKey: string;
-    filesystem: FileSystemData;
+    snapshot: Snapshot;
 }
 
-const props = defineProps<RenameFileSystemProps>();
-const showRenameModal = inject<Ref<boolean>>('show-rename-modal')!;
+const props = defineProps<RenameSnapshotProps>();
+const showRenameSnapModal = inject<Ref<boolean>>('show-rename-modal')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
-const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const renaming = inject<Ref<boolean>>('renaming')!;
 const confirmRename = inject<Ref<boolean>>('confirm-rename')!;
 const nameFeedback = ref('');
-const parentFeedback = ref('');
-const parentFS = ref(props.filesystem.parentFS!);
+
+const parentFS = ref(props.snapshot.dataset!);
 const newName = ref('');
-const forceUnmount = ref(false);
-const createNonExistParent = ref(false);
-
-function getChildDatasetIds(dataset, allDatasets): string[] {
-    let childIds: string[] = [];
-
-    const children = allDatasets.filter(child => child.parentFS === dataset.id);
-
-    for (const child of children) {
-        childIds.push(child.id);
-        childIds = childIds.concat(getChildDatasetIds(child, allDatasets));
-    }
-
-    return childIds;
-}
-
-const datasetsInSamePool = computed<FileSystemData[]>(() => {
-   // return datasets.value.filter(dataset => dataset.pool === props.filesystem.pool && dataset.id !== props.filesystem.id);
-    const currentDataset = props.filesystem;
-
-    const childDatasetIds = getChildDatasetIds(currentDataset, datasets.value);
-
-    return datasets.value.filter(dataset => {
-        return (
-            dataset.pool === currentDataset.pool && dataset.id !== currentDataset.id && !childDatasetIds.includes(dataset.id)
-        );
-   });
-});
+const creationDate = ref(false);
+const renameChildSnaps = ref(false);
 
 async function renameBtn() {
-    if (nameCheck(newName.value, parentFS.value)) {
-        renaming.value = true;
-        confirmRename.value = true;
-        await renameFileSystem(props.filesystem.name, (parentFS.value + '/' + newName.value), forceUnmount.value, createNonExistParent.value);
-        fileSystemsLoaded.value = false;
-        datasets.value = [];
-        await loadDatasets(datasets);
-        showRenameModal.value = false;
-        renaming.value = false;
-        fileSystemsLoaded.value = true;
+    if (creationDate.value == true) {
+        newName.value = convertRawTimestampToString(props.snapshot.properties.creation.rawTimestamp);
     }
 
+    if (nameCheck(newName.value, parentFS.value)) {   
+        renaming.value = true;
+        confirmRename.value = true;
+        await renameSnapshot(props.snapshot.name, newName.value);
+        showRenameSnapModal.value = false;
+        renaming.value = false;
+    }
 }
 
-const nameCheck = (fileSystemName, fileSystemParent) => {
+const nameCheck = (snapshotName, fileSystemParent) => {
     let result = true;
     nameFeedback.value = '';
-    	
-	if (fileSystemName == '') {
-		result = false;
-		nameFeedback.value = 'Name cannot be empty.';
-	} else if (!fileSystemName.match(/^[a-zA-Z0-9]/) ) {
-		result = false;
-		nameFeedback.value = 'Name must begin with alphanumeric characters.';
-	} else if (fileSystemName.match(/^[ ]/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot begin with whitespace.';
-	} else if (fileSystemName.match(/[ ]$/)) {
-		result = false;
-		nameFeedback.value = 'Name cannot end with whitespace.';
-	} else if (!fileSystemName.match(/^[a-zA-Z0-9_.:-]*$/)) {
-		result = false;
-		nameFeedback.value = 'Name contains invalid characters.';
-	} else if (fileSystemNameExists(fileSystemName, fileSystemParent, datasets.value)) {
-		result = false;
-		nameFeedback.value = `Name already exists in this location: ${fileSystemParent}.`;
-	}
-
+    if (!creationDate) {
+        if (snapshotName == '') {
+            result = false;
+            nameFeedback.value = 'Name cannot be empty.';
+        } else if (!snapshotName.match(/^[a-zA-Z0-9]/) ) {
+            result = false;
+            nameFeedback.value = 'Name must begin with alphanumeric characters.';
+        } else if (snapshotName.match(/^[ ]/)) {
+            result = false;
+            nameFeedback.value = 'Name cannot begin with whitespace.';
+        } else if (snapshotName.match(/[ ]$/)) {
+            result = false;
+            nameFeedback.value = 'Name cannot end with whitespace.';
+        } else if (!snapshotName.match(/^[a-zA-Z0-9_.:-]*$/)) {
+            result = false;
+            nameFeedback.value = 'Name contains invalid characters.';
+        } else if (snapshotNameExists(snapshotName, fileSystemParent, datasets.value)) {
+            result = false;
+            nameFeedback.value = `Name already exists in this location: ${fileSystemParent}.`;
+        }
+    } else {
+        if (snapshotNameExists(snapshotName, fileSystemParent, datasets.value)) {
+            result = false;
+            nameFeedback.value = `Name already exists in this location: ${fileSystemParent}.`;
+        }
+    }
+	
     return result;
 }
 
-function fileSystemNameExists(filesystemName, fileSystemParent, datasets : FileSystemData[]) {
+function snapshotNameExists(snapshotName, fileSystemParent, datasets : FileSystemData[]) {
 	const newParentPath = fileSystemParent;
 	for (const dataset of datasets) {
 		const existingParentPath = dataset.parentFS;
 		const existingDatasetName = dataset.name.split('/').pop();
 	
-		if (existingParentPath === newParentPath && existingDatasetName === filesystemName) {
+		if (existingParentPath === newParentPath && existingDatasetName === snapshotName) {
 			return true;
 		}
 	}

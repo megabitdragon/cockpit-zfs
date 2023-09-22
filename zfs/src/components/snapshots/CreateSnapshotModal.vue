@@ -114,6 +114,7 @@ const newSnapshot = ref<NewSnapshot>({
 
 const nameFeedback = ref('');
 const filesystemFeedback = ref('');
+const confirmCreate = inject<Ref<boolean>>('confirm-create')!;
 
 const filesystemCheck = (newSnapshot : NewSnapshot) => {
 	let result = true;
@@ -183,6 +184,7 @@ function createSnapButton(newSnapshot) {
 
 async function create(newSnapshot) {
     creating.value = true;
+    confirmCreate.value = true;
     await createSnapshot(newSnapshot);
     snapshotsLoaded.value = false;
     snapshotsInPool.value = [];

@@ -100,15 +100,6 @@ const parentFS = ref(props.snapshot.dataset!);
 const newName = ref('');
 const createNonExistParent = ref(false);
 
-// const newCloneData = ref({
-//     parentFS: props.snapshot.dataset,
-//     name: props.snapshot.name,
-//     newParentFS: parentFS.value,
-//     cloneName: newName.value,
-//     createParent: createNonExistParent.value,
-// });
-
-
 function getChildDatasetIds(dataset, allDatasets): string[] {
     let childIds: string[] = [];
 
@@ -123,7 +114,6 @@ function getChildDatasetIds(dataset, allDatasets): string[] {
 }
 
 const datasetsInSamePool = computed<FileSystemData[]>(() => {
-   // return datasets.value.filter(dataset => dataset.pool === props.filesystem.pool && dataset.id !== props.filesystem.id);
     const currentDataset = props.snapshot.dataset!;
 
     const childDatasetIds = getChildDatasetIds(currentDataset, datasets.value);
@@ -147,7 +137,6 @@ async function cloneBtn() {
         cloning.value = false;
         fileSystemsLoaded.value = true;
     }
-//clone Test-Pool-9001/test/testtoo@2023.09.22-14.26.55 Test-Pool-9001/test-snap-002/tester
 
 }
 

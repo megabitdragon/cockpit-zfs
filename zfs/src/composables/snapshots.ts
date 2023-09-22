@@ -86,19 +86,16 @@ export async function rollbackSnapshot(snapshot, destroyNewerSnaps, destroyAllNe
     }
 }
 
-export async function renameSnapshot(snapshot, ) {
+export async function renameSnapshot(snapshotName, newName, renameChildren?) {
     try {
         let cmdString = ['zfs', 'rename'];
 
-        // if (destroyChildrenSameName) {
-        //     cmdString.push('-r');
-        // }
+        if (renameChildren) {
+            cmdString.push('-r');
+        }
 
-        // if (destroyAllChildren) {
-        //     cmdString.push('-R');
-        // }
-
-        cmdString.push(snapshot.name)
+        cmdString.push(snapshotName);
+        cmdString.push(newName);
 
         console.log("****create cmdString: *****\n" , cmdString);
 			
@@ -112,7 +109,7 @@ export async function renameSnapshot(snapshot, ) {
 }
 
 
-export async function cloneSnapshot(name, newParentFS, cloneName, createParent?) {
+export async function cloneSnapshot(snapName, newParentFS, cloneName, createParent?) {
     try {
         let cmdString = ['zfs', 'clone'];
 
@@ -120,7 +117,7 @@ export async function cloneSnapshot(name, newParentFS, cloneName, createParent?)
             cmdString.push('-p');
         }
 
-        cmdString.push(`${name}`);
+        cmdString.push(`${snapName}`);
         cmdString.push(`${newParentFS}/${cloneName}`);
 
         console.log("****create cmdString: *****\n" , cmdString);
