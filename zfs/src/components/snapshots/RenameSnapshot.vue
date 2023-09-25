@@ -1,7 +1,7 @@
 <template>
-    <Modal :isOpen="showRenameSnapModal" @close="showRenameSnapModal = false" :marginTop="'mt-52'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal :isOpen="showRenameSnapModal" @close="showRenameSnapModal = false" :marginTop="'mt-52'" :width="'w-fit'" :minWidth="'min-w-8/12'">
         <template v-slot:title>
-            <legend class="flex justify-center">rename Snapshot</legend>
+            <legend class="flex justify-center">Rename Snapshot</legend>
         </template>
         <template v-slot:content>
             <div>
@@ -15,7 +15,7 @@
                      <!-- Set name as creation date -->
                      <div class="mt-2">
                         <div class="flex flex-row">
-                            <label :for="getIdKey('set-name-creation-date')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Creation date</label>
+                            <label :for="getIdKey('set-name-creation-date')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Creation Date</label>
                             <Switch v-model="creationDate" :id="getIdKey('set-name-creation-date')" :class="[creationDate! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                 <span class="sr-only">Use setting</span>
                                 <span :class="[creationDate! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
