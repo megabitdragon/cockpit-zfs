@@ -293,7 +293,7 @@
 	</Modal>
 
 	<div v-if="showDestroySnapshotModal">
-		<UniversalConfirmation  :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy child snapshots with same name'" :secondOption="'Destroy ALL child snapshots, clones and file systems'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation  :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy child snapshots with same name'" :secondOption="'Force Destroy ALL child datasets'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showCloneSnapshotModal">
@@ -305,7 +305,7 @@
 	</div>
 
 	<div v-if="showRollbackSnapshotModal">
-		<UniversalConfirmation :showFlag="showRollbackSnapshotModal" @close="updateShowRollbackSnapshot" :idKey="'confirm-rollback-snapshot'" :item="'snapshot'" :operation="'rollback'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisRollback" :firstOption="'Destroy all newer snapshots of file system'" :secondOption="'Destroy all newer: snapshots, cloned file systems and file systems'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation :showFlag="showRollbackSnapshotModal" @close="updateShowRollbackSnapshot" :idKey="'confirm-rollback-snapshot'" :item="'snapshot'" :operation="'rollback'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisRollback" :firstOption="'Destroy all newer snapshots of file system'" :secondOption="'Force Destroy ALL newer datasets'" :hasChildren="hasChildren"/>
 	</div>
 
 	<CreateSnapshotModal @close="showSnapshotModal = false" :poolName="props.pool.name"/>
@@ -467,7 +467,6 @@ watch(confirmCreate, async (newVal, oldVal) => {
 	}
 });
 
-
 ///////////////// Destroy Snapshot //////////////////
 /////////////////////////////////////////////////////
 const showDestroySnapshotModal = ref(false);
@@ -477,7 +476,10 @@ const confirmDestroy = ref(false);
 function destroyThisSnapshot(snapshot) {
 	operationRunning.value = false;
 	selectedSnapshot.value = snapshot;
-	//check if has children then set hasChildren
+	
+	if (selectedSnapshot.value!.properties.clones.length > 0) {
+		hasChildren.value = true;
+	}
 
 	showDestroySnapshotModal.value = true;
 	console.log('selected for destroy:', selectedSnapshot.value);

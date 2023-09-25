@@ -9,16 +9,16 @@
 
                 <div v-if="props.operation == 'destroy' && props.hasChildren!" >
                     <div v-if="props.item == 'pool'">
-                        <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center">
-                            <p class="text-danger font-medium row-start-1">WARNING!!!</p>
+                        <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center gap-0.5">
+                            <p class="text-danger font-medium row-start-1 mt-3">WARNING!!!</p>
                             <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> has children.</p>
                             <p class="text-default row-start-3">If you wish to {{ props.operation }}, use <span class="text-danger">{{upperCaseWord(option1)}}</span>.</p>
                         </div>
                     </div>
 
                     <div v-if="props.item == 'filesystem'">
-                        <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center">
-                            <p class="text-danger font-medium row-start-1">WARNING!!!</p>
+                        <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center gap-0.5">
+                            <p class="text-danger font-medium row-start-1 mt-3">WARNING!!!</p>
                             <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> has children.</p>
                             <p class="text-default row-start-3">If you wish to destroy, use <span class="text-danger">Destroy all children/dependents</span>.</p>            
                         </div>
@@ -57,6 +57,15 @@
                             </span>
                         </Switch>
                     </div>
+
+                    <div v-if="props.item == 'snapshot'">
+                        <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center gap-0.5">
+                            <p class="text-danger font-medium row-start-1 mt-3">WARNING!!!</p>
+                            <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> has dependent clones.</p>
+                            <p class="text-default row-start-3">If you wish to {{ props.operation }}, use <span class="text-danger">{{upperCaseWord(option2)}}</span>.</p>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div v-if="props.operation == 'rollback' && props.item == 'snapshot'">
@@ -108,9 +117,14 @@
                     <button @click="closeModal" :id="getIdKey('confirm-no')" name="button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
 
                     <!-- fix this to account for option 3 and 4 if filesystem destroy -->
-                    <button v-if="!operationRunning && !hasChildren && !option1" @click="confirmOperation" :id="getIdKey('confirm-yes-A')" name="button-yes-A" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
-                    <button v-if="!operationRunning && hasChildren && !option1" disabled @click="confirmOperation" :id="getIdKey('confirm-yes-C')" name="button-yes-C" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
-                    <button v-if="!operationRunning && option1" @click="confirmOperation" :id="getIdKey('confirm-yes-B')" name="button-yes-B" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
+                    <button v-if="props.item != 'snapshot' && !operationRunning && !hasChildren && !option1" @click="confirmOperation" :id="getIdKey('confirm-yes-A')" name="button-yes-A" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
+                    <button v-if="props.item != 'snapshot' && !operationRunning && hasChildren && !option1" disabled @click="confirmOperation" :id="getIdKey('confirm-yes-C')" name="button-yes-C" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
+                    <button v-if="props.item != 'snapshot' && !operationRunning && option1" @click="confirmOperation" :id="getIdKey('confirm-yes-B')" name="button-yes-B" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
+                    
+                    <button v-if="props.item == 'snapshot' && !operationRunning && hasChildren && !option2Toggle" disabled @click="confirmOperation" :id="getIdKey('confirm-yes-C')" name="button-yes-C" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
+                    <button v-if="props.item == 'snapshot' && !operationRunning && hasChildren && option2Toggle" @click="confirmOperation" :id="getIdKey('confirm-yes-B')" name="button-yes-B" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
+                    <button v-if="props.item == 'snapshot' && !operationRunning && !hasChildren" @click="confirmOperation" :id="getIdKey('confirm-yes-B')" name="button-yes-B" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
+
                     <button disabled v-if="operationRunning" :id="getIdKey('confirm-spinner')" type="button" class="btn btn-danger object-right justify-end h-fit">
 							<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>

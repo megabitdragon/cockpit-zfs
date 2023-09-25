@@ -75,7 +75,7 @@
                 <div class="button-group-row mt-2 justify-between">
                     <button @click="showRenameSnapModal = false" :id="getIdKey('confirm-rename-no')" name="rename-button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
                 
-                    <div class="button-group-row">
+                    <div class="button-group-row mt-2">
                         <button v-if="!renaming" id="rename-snapshot-btn" class="btn btn-primary object-right justify-end mr-4 h-fit w-full" @click="renameBtn()">Rename</button>
                         <button disabled v-if="renaming" id="finish" type="button" class="btn btn-primary object-right justify-end">
                             <svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
