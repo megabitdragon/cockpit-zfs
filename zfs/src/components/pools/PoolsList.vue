@@ -19,10 +19,13 @@
 
 		<div class="mt-8 overflow-visible rounded-md">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
+
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
 							<tr class="bg-well rounded-t-md grid grid-cols-8">
+
 								<th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -35,6 +38,7 @@
 								<th class="relative py-3.5 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
+								
 							</tr>
 						</thead>
 					</table>
@@ -112,7 +116,7 @@
 								
 							</template>
 							<template v-slot:content>
-								<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+								<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-2'" :titleColSpan="'col-span-6'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
 									<template v-slot:title>
 										<div class="grid grid-cols-7 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
 											<div class="col-span-6 text-center py-4 mt-1">
@@ -311,8 +315,6 @@ import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import ReplaceDiskModal from "../disks/ReplaceDiskModal.vue";
-
-
 
 const notifications = inject<Ref<any>>('notifications')!;
 

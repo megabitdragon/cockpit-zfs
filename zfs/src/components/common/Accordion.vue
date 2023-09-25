@@ -9,7 +9,6 @@
 			<slot name="title" />
 		</div>
 		
-
 		<div v-show="isOpen" :id="`collapse${uid}`" :class="[props.contentColSpan]">
 			<slot name="content" />
 		</div>

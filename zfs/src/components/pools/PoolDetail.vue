@@ -39,7 +39,7 @@
 			</div>
 			
 			<div v-if="navTag == 'snapshots'" class="">
-				<SnapshotsList :pool="props.pool" :snapshots="snapshotsInPool"/>
+				<SnapshotsList :pool="props.pool" :snapshots="snapshotsInPool" :item="'pool'"/>
 			</div>
 
 			<div v-if="navTag == 'settings'">
@@ -244,7 +244,6 @@ import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import SnapshotsList from '../snapshots/SnapshotsList.vue';
 
-
 const notifications = inject<Ref<any>>('notifications')!;
 
 interface PoolDetailsProps {
@@ -288,16 +287,12 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
-
-const snapshots = ref<Snapshot[]>([]);
-const snapshotsLoaded = ref(true);
-// const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-// const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+// const snapshots = ref<Snapshot[]>([]);
+// const snapshotsLoaded = ref(true);
+const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+const snapshotsLoaded = inject<Ref<Snapshot[]>>('snapshots-loaded')!;
 const snapshotsInPool = ref<Snapshot[]>([]);
-const selectedSnapshot = ref<Snapshot>();
 
-// loadSnapshots(snapshots);
 loadSnapshotsInPool(snapshotsInPool, props.pool.name);
 
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
@@ -327,7 +322,6 @@ function calculateSectorSize(exponent) {
 	}
 	  return result.value;
 }
-
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////

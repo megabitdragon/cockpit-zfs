@@ -407,41 +407,6 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 
 export async function loadSnapshots(snapshots) {
 	try {
-	/*	const rawJSON = await getSnapshots();
-		const parsedJSON = (JSON.parse(rawJSON));
-		console.log('Snapshots JSON:');
-		console.log(parsedJSON);
-
-		for (let i = 0; i < parsedJSON.length; i++) {
-			const snap = {
-				name: parsedJSON[i].name,
-				id: parsedJSON[i].id,
-				snapName: parsedJSON[i].snapshot_name,
-				dataset: parsedJSON[i].dataset,
-				pool: parsedJSON[i].pool,
-				mountpoint: parsedJSON[i].mountpoint,
-				type: parsedJSON[i].type,
-				properties: {
-					clones: parsedJSON[i].properties.clones.parsed,
-					creation: {
-						rawTimestamp: parsedJSON[i].properties.creation.rawvalue,
-						parsed: parsedJSON[i].properties.creation.parsed,
-						value: parsedJSON[i].properties.creation.value,
-					},
-					referenced: {
-						value: parsedJSON[i].properties.referenced.value,
-						rawNum: parsedJSON[i].properties.referenced.parsed,
-					},
-					used: {
-						value: parsedJSON[i].properties.used.value,
-						rawNum: parsedJSON[i].properties.used.parsed,
-					},
-				},
-				  holds: parsedJSON[i].holds
-			}
-			snapshots.push(snap);
-		}   */
-
 		getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
 			console.log('Snapshots JSON:');
@@ -536,6 +501,57 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 		console.error("An error occurred getting snapshots:", error);
 	}
 }
+
+export async function loadSnapshotsInDataset(snapshots, datasetName) {
+	try {
+			getSnapshots().then(rawJSON => {
+			const parsedJSON = (JSON.parse(rawJSON));
+			console.log('Snapshots JSON:');
+			console.log(parsedJSON);
+			for (const dataset in parsedJSON) {
+				parsedJSON[dataset].forEach(snapshot => {
+					if (dataset == datasetName) {
+						const snap = {
+							name: snapshot.name,
+							id: snapshot.id,
+							snapName: snapshot.snapshot_name,
+							dataset: snapshot.dataset,
+							pool: snapshot.pool,
+							mountpoint: snapshot.mountpoint,
+							type: snapshot.type,
+							properties: {
+								clones: snapshot.properties.clones.parsed,
+								creation: {
+									rawTimestamp: snapshot.properties.creation.rawvalue,
+									parsed: snapshot.properties.creation.parsed,
+									value: snapshot.properties.creation.value,
+								},
+								referenced: {
+									value: snapshot.properties.referenced.value,
+									rawNum: snapshot.properties.referenced.parsed,
+								},
+								used: {
+									value: snapshot.properties.used.value,
+									rawNum: snapshot.properties.used.parsed,
+								},
+							},
+							holds: snapshot.holds
+						}
+		
+						snapshots.value.push(snap);
+					}
+					
+				});
+			}
+			
+		});
+
+		console.log('snapshots in:', datasetName, '\n', snapshots);
+	} catch(error) {
+		console.error("An error occurred getting snapshots:", error);
+	}
+}
+
 
 function determineDiskType(vDev, disks) {
     const childDisks = vDev.children.map(child => child.name);

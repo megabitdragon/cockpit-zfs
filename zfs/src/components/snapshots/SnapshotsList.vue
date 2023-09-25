@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div v-if="snapshotsInPool.length < 1" class="flex items-center justify-center">
+		<div v-if="snapshots.length < 1" class="flex items-center justify-center">
 			<p class="text-default">No snapshots found.</p>
 		</div>
 		<div v-else class="inline-block min-w-full max-h-max align-middle rounded-md border border-default ">
@@ -21,7 +21,7 @@
 						<tr v-if="!snapshotsLoaded" class="bg-well justify-center">
 							<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500"/>
 						</tr>
-						<tr v-if="snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshotsInPool" :key="snapshotIdx" class="text-default ml-4">
+						<tr v-if="snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4">
 							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
 								{{ snapshot.name }}
 							</td>
@@ -86,7 +86,6 @@
 			<UniversalConfirmation :showFlag="showRollbackSnapshotModal" @close="updateShowRollbackSnapshot" :idKey="'confirm-rollback-snapshot'" :item="'snapshot'" :operation="'rollback'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisRollback" :firstOption="'Destroy all newer snapshots of file system'" :secondOption="'Force Destroy ALL newer datasets'" :hasChildren="hasChildren"/>
 		</div>
 
-		<CreateSnapshotModal @close="showSnapshotModal = false" :poolName="props.pool!.name"/>
 	</div>
 
 </template>
@@ -95,7 +94,7 @@ import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
-import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool } from '../../composables/loadData';
+import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset } from '../../composables/loadData';
 import { destroySnapshot, rollbackSnapshot, cloneSnapshot, renameSnapshot } from '../../composables/snapshots';
 import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import CloneSnapshot from '../snapshots/CloneSnapshot.vue';
@@ -108,6 +107,7 @@ const notifications = inject<Ref<any>>('notifications')!;
 interface SnapshotsListProps {
 	pool?: PoolData;
 	filesystem?: FileSystemData;
+	item: 'pool' | 'filesystem';
 	snapshots: Snapshot[];
 }
 
@@ -115,22 +115,29 @@ const props = defineProps<SnapshotsListProps>();
 
 ////////////////// Loading Data /////////////////////
 /////////////////////////////////////////////////////
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
-const disks = inject<Ref<DiskData[]>>('disks')!;
-const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+// const pools = inject<Ref<PoolData[]>>('pools')!;
+// const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+// const disks = inject<Ref<DiskData[]>>('disks')!;
+// const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+// const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+// const datasetsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
 // const snapshots = ref<Snapshot[]>([]);
 const snapshotsLoaded = ref(true);
 // const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 // const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
-const snapshotsInPool = ref<Snapshot[]>([]);
+	
+const snapshots = ref<Snapshot[]>([]);
 const selectedSnapshot = ref<Snapshot>();
 
 // loadSnapshots(snapshots);
-loadSnapshotsInPool(snapshotsInPool, props.pool!.name);
+
+if (props.item == 'pool') {
+	loadSnapshotsInPool(snapshots, props.pool!.name);
+} else if (props.item == 'filesystem') {
+	loadSnapshotsInDataset(snapshots, props.filesystem!.name);
+}
 
 async function refreshSnaps() {
 	// disksLoaded.value = false;
@@ -138,9 +145,9 @@ async function refreshSnaps() {
 	snapshotsLoaded.value = false;
 	// pools.value = [];
 	// disks.value = [];
-	snapshotsInPool.value = [];
+	snapshots.value = [];
 	// await loadDisksThenPools(disks, pools);
-	await loadSnapshotsInPool(snapshotsInPool, props.pool!.name);
+	await loadSnapshotsInPool(snapshots, props.pool!.name);
 	// disksLoaded.value = true;
 	// poolsLoaded.value = true;
 	snapshotsLoaded.value = true;
@@ -157,24 +164,24 @@ const fourthOptionToggle = ref(false);
 
 ///////////////// Create Snapshots //////////////////
 /////////////////////////////////////////////////////
-const showSnapshotModal = ref(false);
-const creating = ref(false);
-const confirmCreate = ref(false);
+// const showSnapshotModal = ref(false);
+// const creating = ref(false);
+// const confirmCreate = ref(false);
 
-function createSnapshotBtn() {
-	showSnapshotModal.value = true;
-	console.log('create snapshot modal triggered');
-}
+// function createSnapshotBtn() {
+// 	showSnapshotModal.value = true;
+// 	console.log('create snapshot modal triggered');
+// }
 
-watch(confirmCreate, async (newVal, oldVal) => {
-	if (confirmCreate.value == true) {
-		operationRunning.value = true;
-		await refreshSnaps();
-		confirmCreate.value = false;
-		operationRunning.value = false;
-		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
-	}
-});
+// watch(confirmCreate, async (newVal, oldVal) => {
+// 	if (confirmCreate.value == true) {
+// 		operationRunning.value = true;
+// 		await refreshSnaps();
+// 		confirmCreate.value = false;
+// 		operationRunning.value = false;
+// 		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+// 	}
+// });
 
 ///////////////// Destroy Snapshot //////////////////
 /////////////////////////////////////////////////////
@@ -291,12 +298,7 @@ watch(confirmRename, async (newVal, oldVal) => {
 
 const getIdKey = (name: string) => `${name}`;
 
-provide('create-snap-modal', showSnapshotModal);
-provide('create-snap-modal', showSnapshotModal);
 provide('snapshots-loaded', snapshotsLoaded)!;
-provide("snapshots-in-pool", snapshotsInPool);
-provide('confirm-create', confirmCreate);
-provide('creating', creating);
 provide('cloning', cloning);
 provide('confirm-clone', confirmClone);
 provide('show-clone-modal', showCloneSnapshotModal);
