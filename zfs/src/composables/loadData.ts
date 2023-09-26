@@ -409,7 +409,7 @@ export async function loadSnapshots(snapshots) {
 	try {
 		getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON:');
+			console.log('Snapshots JSON (all):');
 			console.log(parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
@@ -456,7 +456,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 	try {
 			getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON:');
+			console.log('Snapshots JSON (loadByPool):');
 			console.log(parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
@@ -506,7 +506,7 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 	try {
 			getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON:');
+			console.log('Snapshots JSON (loadByDataset):');
 			console.log(parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {

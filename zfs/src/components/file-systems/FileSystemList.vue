@@ -184,12 +184,12 @@ const selectedDataset = ref<FileSystemData>();
 // const snapshots = ref<Snapshot[]>([]);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 // const fileSystemsAndSnaps = ref<SnapDatasets[]>([]);
-const snapshotsInFilesystem = ref<Snapshot[]>([]);
+// const snapshotsInFilesystem = ref<Snapshot[]>([]);
 
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
 	fileSystems.value = [];
-	snapshotsInFilesystem.value = [];
+	// snapshotsInFilesystem.value = [];
 	await loadDatasets(fileSystems);
 	//await loadSnapshotsInDataset(snapshotsInFilesystem);
 	fileSystemsLoaded.value = true;
@@ -416,7 +416,7 @@ provide('create-snap-modal', showSnapshotModal);
 provide('creating', creating);
 provide('confirm-create', confirmCreate);
 
-provide('snapshots-in-filesystem', snapshotsInFilesystem);
+// provide('snapshots-in-filesystem', snapshotsInFilesystem);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);

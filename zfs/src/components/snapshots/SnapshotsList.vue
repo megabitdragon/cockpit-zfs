@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<div v-if="snapshots.length < 1 && snapshotsLoaded" class="flex items-center justify-center">
-			<p class="text-default">No snapshots found.</p>
-		</div>
-		<div v-if="snapshots.length > 0" class="inline-block min-w-full max-h-max align-middle rounded-md border border-default ">
+		<div class="inline-block min-w-full max-h-max align-middle rounded-md border border-default ">
 			<div class="ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 				<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-well">
 					<thead>
-						<tr class="rounded-md">
+						<tr v-if="props.item == 'pool' && snapshots.length < 1 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
+							<p class="text-default w-full justify-self-center">No snapshots found.</p>
+						</tr>
+						<tr v-if="props.item == 'pool' && snapshots.length > 0 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md">
 							<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
 							<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Created</th>
 							<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used</th>
@@ -16,12 +16,12 @@
 								<span class="sr-only"></span>
 							</th>
 						</tr>
-					</thead>
-					<tbody class="divide-y divide-x divide-default bg-default">
-						<tr v-if="!snapshotsLoaded" class="flex bg-well justify-self-center">
+						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
 							<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500"/>
 						</tr>
-						<tr v-if="snapshotsLoaded && props.item == 'pool'" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4">
+					</thead>
+					<tbody v-if="snapshotsLoaded && props.item == 'pool'" class="divide-y divide-x divide-default bg-default">
+						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4">
 							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
 								{{ snapshot.name }}
 							</td>
@@ -64,7 +64,9 @@
 								</Menu>
 							</td>
 						</tr>
-						<tr v-if="snapshotsLoaded && props.item == 'filesystem'" v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default ml-4">
+					</tbody>
+					<tbody v-if="snapshotsLoaded && props.item == 'filesystem'" class="divide-y divide-x divide-default bg-default">
+						<tr v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default ml-4">
 							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
 								{{ snapshot.name }}
 							</td>
@@ -112,7 +114,6 @@
 			</div>
 		</div>
 	
-
 		<div v-if="showDestroySnapshotModal">
 			<UniversalConfirmation  :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy child snapshots with same name'" :secondOption="'Force Destroy ALL child datasets'" :hasChildren="hasChildren"/>
 		</div>
@@ -166,8 +167,9 @@ const props = defineProps<SnapshotsListProps>();
 const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 // const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
-const snapshotsInFilesystem = inject<Ref<Snapshot[]>>('snapshots-in-filesystem')!;
+// const snapshotsInFilesystem = inject<Ref<Snapshot[]>>('snapshots-in-filesystem')!;
 // const snapshots = ref<Snapshot[]>([]);
+const snapshotsInFilesystem = ref<Snapshot[]>([]);
 const selectedSnapshot = ref<Snapshot>();
 
 // loadTheseSnapshots();
@@ -179,19 +181,24 @@ refreshSnaps();
 // }
 
 // loadSnapshots(snapshots);
-async function loadTheseSnapshots() {
+function loadTheseSnapshots() {
 	if (props.item == 'pool') {
-		await loadSnapshotsInPool(snapshots, props.pool!.name);
+		loadSnapshotsInPool(snapshots, props.pool!.name);
 	} else if (props.item == 'filesystem') {
-		await loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name);
+		loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name);
 	}
 }
 
-async function refreshSnaps() {
+function refreshSnaps() {
 	snapshotsLoaded.value = false;
-	snapshots.value = [];
-	snapshotsInFilesystem.value = [];
-	await loadTheseSnapshots();
+
+	if (props.item == 'pool') {
+		snapshots.value = [];
+	} else if (props.item == 'filesystem') {
+		snapshotsInFilesystem.value = [];
+	}
+	
+	loadTheseSnapshots();
 	snapshotsLoaded.value = true;
 }
 
@@ -202,7 +209,6 @@ const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
 const thirdOptionToggle = ref(false);
 const fourthOptionToggle = ref(false);
-
 
 ///////////////// Destroy Snapshot //////////////////
 /////////////////////////////////////////////////////
