@@ -7,8 +7,11 @@
             <div>
                 <div>
 					<label :for="getIdKey('file-system')" class="block text-sm font-medium leading-6 text-default">File System</label>
-					<select id="file-system" v-model="newSnapshot.filesystem" name="file-system" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+					<select v-if="props.item == 'pool'" id="file-system" v-model="newSnapshot.filesystem" name="file-system" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
 						<option v-for="dataset in datasetsInSamePool" :value="dataset.name">{{ dataset.name }}</option>
+					</select>
+                    <select v-if="props.item == 'filesystem'" id="file-system" v-model="newSnapshot.filesystem" name="file-system" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<option v-for="dataset in datasets" :value="dataset.name">{{ dataset.name }}</option>
 					</select>
 				</div>
                 <div>
@@ -87,7 +90,8 @@ import { createSnapshot } from '../../composables/snapshots';
 import { loadSnapshotsInPool } from '../../composables/loadData';
 
 interface CreateSnapshotModalProps {
-    poolName: string;
+    item: 'pool' | 'filesystem';
+    poolName?: string;
 }
 
 const props = defineProps<CreateSnapshotModalProps>();
@@ -97,13 +101,19 @@ const datasetsInSamePool = computed<FileSystemData[]>(() => {
     return datasets.value.filter(dataset => dataset.pool === props.poolName);
 });
 
-const defaultFileSystem = ref(datasetsInSamePool.value[0]);
+const defaultFileSystem = ref();
 // const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const snapshotsInPool = inject<Ref<Snapshot[]>>('snapshots-in-pool')!;
 
 const showSnapshotModal = inject<Ref<boolean>>('create-snap-modal')!;
 const creating = inject<Ref<boolean>>('creating')!;
 const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+
+if (props.item == 'pool') {
+    defaultFileSystem.value = datasetsInSamePool.value[0];
+} else {
+    defaultFileSystem.value = datasets.value[0];
+}
 
 const newSnapshot = ref<NewSnapshot>({
     name: '',
@@ -187,8 +197,8 @@ async function create(newSnapshot) {
     confirmCreate.value = true;
     await createSnapshot(newSnapshot);
     snapshotsLoaded.value = false;
-    snapshotsInPool.value = [];
-    await loadSnapshotsInPool(snapshotsInPool, props.poolName);
+    // snapshotsInPool.value = [];
+    // await loadSnapshotsInPool(snapshotsInPool, props.poolName);
     snapshotsLoaded.value = true;
     creating.value = false;
     newSnapshot.isCustomName = false;

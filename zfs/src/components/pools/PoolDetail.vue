@@ -225,7 +225,7 @@
 		</template>
 	</Modal>
 
-	<CreateSnapshotModal @close="showSnapshotModal = false" :poolName="props.pool.name"/>
+	<CreateSnapshotModal @close="showSnapshotModal = false" :poolName="props.pool.name" :item="'pool'"/>
 	<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
 	
 </template>

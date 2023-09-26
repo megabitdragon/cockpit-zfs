@@ -5,10 +5,10 @@
 			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="refreshDatasets"><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
-		<div class="mt-8 overflow-visible rounded-md">
-			<div class="inline-block min-w-full min-h-full align-middle rounded-md border border-default">
+		<div class="mt-8 overflow-visible rounded-md max-w-7xl">
+			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
 
-				<div class="overflow-visible ring-1 ring-black ring-opacity-5 shadow rounded-md sm:rounded-lg">
+				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
@@ -81,7 +81,7 @@
 															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
+															<a href="#" @click="createSnapshotBtn()" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 														</MenuItem>
 														<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
@@ -103,13 +103,13 @@
 							</template>
 						</Accordion>
 					</div>
-				</div>
 
-				<div v-if="fileSystemsLoaded == false" class="p-2 flex justify-center bg-default">
-					<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
-				</div>
-				<div v-if="fileSystems.length < 1 && fileSystemsLoaded == true" class="p-2 flex bg-default justify-center">
-					<span class="font-semibold text-lg my-2">No File Systems Found</span>
+					<div v-if="fileSystemsLoaded == false" class="p-2 flex justify-center bg-default">
+						<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
+					</div>
+					<div v-if="fileSystems.length < 1 && fileSystemsLoaded == true" class="p-2 flex bg-default justify-center">
+						<span class="font-semibold text-lg my-2">No File Systems Found</span>
+					</div>
 				</div>
 
 			</div>
@@ -140,6 +140,9 @@
 		<RenameFileSystem :idKey="'show-rename-modal'" :filesystem="selectedDataset!" @close="showRenameModal = false" />
 	</div>
 
+	<div v-if="showSnapshotModal">
+		<CreateSnapshotModal :idKey="'show-create-snap-modal'" @close="showSnapshotModal = false" :item="'filesystem'" />
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -153,6 +156,7 @@ import LoadingSpinner from "../common/LoadingSpinner.vue";
 import Accordion from "../common/Accordion.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FileSystemConfigModal from "./FileSystemConfigModal.vue";
+import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import RenameFileSystem from "./RenameFileSystem.vue";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
@@ -179,7 +183,7 @@ const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const selectedDataset = ref<FileSystemData>();
 // const snapshots = ref<Snapshot[]>([]);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-const fileSystemsAndSnaps = ref<SnapDatasets[]>([]);
+// const fileSystemsAndSnaps = ref<SnapDatasets[]>([]);
 
 const snapshotsInFilesystem = ref<Snapshot[]>([]);
 
@@ -188,7 +192,7 @@ async function refreshDatasets() {
 	fileSystems.value = [];
 	snapshotsInFilesystem.value = [];
 	await loadDatasets(fileSystems);
-	// await loadSnapshotsInDataset(snapshotsInFilesystem);
+	//await loadSnapshotsInDataset(snapshotsInFilesystem);
 	fileSystemsLoaded.value = true;
 }
 
@@ -217,8 +221,29 @@ function findSnapDataset(fileSystem) {
 }
 
 function showFSDetails(filesystem) {
-
+	
 }
+
+///////////////// Create Snapshots //////////////////
+/////////////////////////////////////////////////////
+const showSnapshotModal = ref(false);
+const creating = ref(false);
+const confirmCreate = ref(false);
+
+function createSnapshotBtn() {
+	showSnapshotModal.value = true;
+	console.log('create snapshot modal triggered');
+}
+
+watch(confirmCreate, async (newVal, oldVal) => {
+	if (confirmCreate.value == true) {
+		operationRunning.value = true;
+		await refreshDatasets();
+		confirmCreate.value = false;
+		operationRunning.value = false;
+		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+	}
+});
 
 ////////////// Destroy File System //////////////////
 /////////////////////////////////////////////////////
@@ -369,7 +394,7 @@ provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
 provide('confirm-delete-filesystem', confirmDelete);
 provide('destroy-children', destroyChildren);
 provide('destroy-dependents', destroyAllDependents);
-// provide('force-destroy', forceDestroy);
+
 provide('has-children', hasChildren);
 
 provide('show-mount-filesystem-confirm', showMountFileSystemConfirm);
@@ -385,6 +410,10 @@ provide('force-unmount', forceUnmount);
 provide('show-rename-modal', showRenameModal);
 provide('renaming', renaming);
 provide('confirm-rename', confirmRename);
+
+provide('create-snap-modal', showSnapshotModal);
+provide('creating', creating);
+provide('confirm-create', confirmCreate);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
