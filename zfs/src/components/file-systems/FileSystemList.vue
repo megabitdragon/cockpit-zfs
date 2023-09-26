@@ -35,10 +35,10 @@
 					</table>
 
 					<div v-if="fileSystems.length > 0 && fileSystemsLoaded == true">
-						<Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-11'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-10'" :contentColSpan="'col-span-11'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
+						<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-11'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-10'" :contentColSpan="'col-span-11'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="fileSystem, fsIdx in fileSystems" :key="fsIdx">
 							<template v-slot:title>
 								<div class="grid grid-cols-10 grid-flow-cols w-full justify-center text-center">
-									<button @click="showFSDetails(fileSystems[fsIdx])" class="grid grid-cols-9 col-span-6 hover:bg-accent pt-1 rounded-r-md">
+									<!-- <button @click="showFSDetails(fileSystems[fsIdx])" class="grid grid-cols-9 col-span-6 hover:bg-accent pt-1 rounded-r-md"> -->
 										<div class="py-4 pl-4 pr-3 text-sm font-medium text-default"> {{ fileSystem.name }}</div>
 										<div class="px-3 py-4 text-sm text-muted">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
 										<div class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedByDataset }}</div>
@@ -49,7 +49,7 @@
 										<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
 										<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.snapshotCount) }}</div>
 										<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
-									</button>
+									<!-- </button> -->
 									<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 										<Menu as="div" class="relative inline-block text-left">
 											<div>
@@ -81,7 +81,7 @@
 															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="createSnapshotBtn()" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
+															<a href="#" @click="createSnapshotBtn(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 														</MenuItem>
 														<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 															<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
@@ -98,7 +98,7 @@
 							</template>
 							<template v-slot:content>
 								<div>
-									<SnapshotsList :filesystem="fileSystems[fsIdx]" :snapshots="snapshotsInFilesystem" :item="'filesystem'"/>
+									<SnapshotsList :filesystem="fileSystems[fsIdx]" :item="'filesystem'"/>
 								</div>
 							</template>
 						</Accordion>
@@ -184,7 +184,6 @@ const selectedDataset = ref<FileSystemData>();
 // const snapshots = ref<Snapshot[]>([]);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 // const fileSystemsAndSnaps = ref<SnapDatasets[]>([]);
-
 const snapshotsInFilesystem = ref<Snapshot[]>([]);
 
 async function refreshDatasets() {
@@ -230,7 +229,8 @@ const showSnapshotModal = ref(false);
 const creating = ref(false);
 const confirmCreate = ref(false);
 
-function createSnapshotBtn() {
+function createSnapshotBtn(filesystem) {
+	selectedDataset.value = filesystem;
 	showSnapshotModal.value = true;
 	console.log('create snapshot modal triggered');
 }
@@ -396,6 +396,7 @@ provide('destroy-children', destroyChildren);
 provide('destroy-dependents', destroyAllDependents);
 
 provide('has-children', hasChildren);
+provide('selected-dataset', selectedDataset);
 
 provide('show-mount-filesystem-confirm', showMountFileSystemConfirm);
 provide('confirm-mount-filesystem', confirmMount);
@@ -414,6 +415,8 @@ provide('confirm-rename', confirmRename);
 provide('create-snap-modal', showSnapshotModal);
 provide('creating', creating);
 provide('confirm-create', confirmCreate);
+
+provide('snapshots-in-filesystem', snapshotsInFilesystem);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);

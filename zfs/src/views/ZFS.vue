@@ -46,7 +46,7 @@ const snapshots = ref<Snapshot[]>([]);
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
-const snapshotsLoaded = ref(false);
+const snapshotsLoaded = ref(true);
 
 const clearLabels = ref(false);
 
@@ -54,14 +54,14 @@ async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
 	fileSystemsLoaded.value = false;
-	snapshotsLoaded.value = false;
+	//snapshotsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
-	await loadSnapshots(snapshots);
+	//await loadSnapshots(snapshots);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	snapshotsLoaded.value = true;
+	//snapshotsLoaded.value = true;
 }
 
 initialLoad(disks, pools, datasets);

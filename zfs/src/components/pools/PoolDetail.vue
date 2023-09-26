@@ -39,7 +39,7 @@
 			</div>
 			
 			<div v-if="navTag == 'snapshots'" class="">
-				<SnapshotsList :pool="props.pool" :snapshots="snapshotsInPool" :item="'pool'"/>
+				<SnapshotsList :pool="props.pool" :item="'pool'"/>
 			</div>
 
 			<div v-if="navTag == 'settings'">
@@ -287,13 +287,12 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 
-// const snapshots = ref<Snapshot[]>([]);
 // const snapshotsLoaded = ref(true);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-const snapshotsLoaded = inject<Ref<Snapshot[]>>('snapshots-loaded')!;
-const snapshotsInPool = ref<Snapshot[]>([]);
+// const snapshotsLoaded = inject<Ref<Snapshot[]>>('snapshots-loaded')!;
+// const snapshotsInPool = ref<Snapshot[]>([]);
 
-loadSnapshotsInPool(snapshotsInPool, props.pool.name);
+// loadSnapshotsInPool(snapshots, props.pool.name);
 
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
@@ -354,9 +353,11 @@ function createSnapshotBtn() {
 watch(confirmCreate, async (newVal, oldVal) => {
 	if (confirmCreate.value == true) {
 		operationRunning.value = true;
+		creating.value = operationRunning.value;
 		// await refreshSnaps();
 		confirmCreate.value = false;
 		operationRunning.value = false;
+		creating.value = operationRunning.value;
 		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
 	}
 });
@@ -470,9 +471,9 @@ provide('current-pool-config', poolConfig);
 provide('show-vdev-modal', showAddVDevModal);
 provide("saving", saving);
 provide('create-snap-modal', showSnapshotModal);
-provide('snapshots-loaded', snapshotsLoaded)!;
+// provide('snapshots-loaded', snapshotsLoaded);
 provide("snapshots", snapshots);
-provide("snapshots-in-pool", snapshotsInPool);
+// provide("snapshots-in-pool", snapshotsInPool);
 provide('confirm-create', confirmCreate);
 provide('creating', creating);
 provide('modal-confirm-running', operationRunning);

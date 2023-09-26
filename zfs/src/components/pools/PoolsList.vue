@@ -7,14 +7,14 @@
 				<button id="importPool" class="btn btn-secondary" @click="importNewPoolBtn">Import Storage Pool</button>
 				<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData"><ArrowPathIcon class="w-5 h-5"/></button>
 			</div>
-			<div class="ml-6">
+			<!-- <div class="ml-6">
 				<div v-if="loading" class="text-muted mt-2 animate-pulse flex flex-row w-full h-max bg-accent justify-center">
 					{{ loadingMessage }}
 				</div>
 				<div v-else class="text-success mt-2 flex flex-row w-full h-max bg-accent justify-center">
 					{{ message }}
 				</div>
-			</div>
+			</div> -->
 		</div>
 
 		<div class="mt-8 overflow-visible rounded-md">
@@ -44,7 +44,7 @@
 					</table>
 					
 					<div v-if="poolData.length > 0 && poolsLoaded == true">
-						<Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
+						<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
 							<template v-slot:title>
 								<!-- <button v-on:dblclick="showPoolModal(poolData[poolIdx])!" class="grid grid-cols-7 grid-flow-cols w-full justify-center text-center pt-1"> -->
 								<div class="grid grid-cols-7 grid-flow-cols w-full justify-center text-center">
@@ -116,7 +116,7 @@
 								
 							</template>
 							<template v-slot:content>
-								<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-2'" :titleColSpan="'col-span-6'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+								<Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
 									<template v-slot:title>
 										<div class="grid grid-cols-7 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
 											<div class="col-span-6 text-center py-4 mt-1">

@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<div v-if="snapshots.length < 1" class="flex items-center justify-center">
+		<div v-if="snapshots.length < 1 && snapshotsLoaded" class="flex items-center justify-center">
 			<p class="text-default">No snapshots found.</p>
 		</div>
-		<div v-else class="inline-block min-w-full max-h-max align-middle rounded-md border border-default ">
+		<div v-if="snapshots.length > 0" class="inline-block min-w-full max-h-max align-middle rounded-md border border-default ">
 			<div class="ring-1 ring-black ring-opacity-5 sm:rounded-lg">
 				<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-well">
 					<thead>
@@ -18,10 +18,53 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-x divide-default bg-default">
-						<tr v-if="!snapshotsLoaded" class="bg-well justify-center">
+						<tr v-if="!snapshotsLoaded" class="flex bg-well justify-self-center">
 							<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500"/>
 						</tr>
-						<tr v-if="snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4">
+						<tr v-if="snapshotsLoaded && props.item == 'pool'" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4">
+							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
+								{{ snapshot.name }}
+							</td>
+							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+								{{ snapshot.properties.creation.parsed }}
+							</td>
+							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+								{{ snapshot.properties.used.value }}
+							</td>
+							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+								{{ snapshot.properties.referenced.value }}
+							</td>
+							<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+								<Menu as="div" class="relative inline-block text-right">
+									<div>
+										<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+											<span class="sr-only">Open options</span>
+											<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+										</MenuButton>
+									</div>
+
+									<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+										<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+											<div class="py-1">
+												<MenuItem as="div" v-slot="{ active }">
+													<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+												</MenuItem>
+												<MenuItem as="div" v-slot="{ active }">
+													<a href="#" @click="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+												</MenuItem>
+												<MenuItem as="div" v-slot="{ active }">
+													<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+												</MenuItem>
+												<MenuItem as="div" v-slot="{ active }">
+													<a href="#" @click="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+												</MenuItem>
+											</div>
+										</MenuItems>
+									</transition>
+								</Menu>
+							</td>
+						</tr>
+						<tr v-if="snapshotsLoaded && props.item == 'filesystem'" v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default ml-4">
 							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
 								{{ snapshot.name }}
 							</td>
@@ -96,7 +139,6 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
 import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset } from '../../composables/loadData';
 import { destroySnapshot, rollbackSnapshot, cloneSnapshot, renameSnapshot } from '../../composables/snapshots';
-import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import CloneSnapshot from '../snapshots/CloneSnapshot.vue';
 import RenameSnapshot from '../snapshots/RenameSnapshot.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
@@ -108,7 +150,6 @@ interface SnapshotsListProps {
 	pool?: PoolData;
 	filesystem?: FileSystemData;
 	item: 'pool' | 'filesystem';
-	snapshots: Snapshot[];
 }
 
 const props = defineProps<SnapshotsListProps>();
@@ -122,38 +163,35 @@ const props = defineProps<SnapshotsListProps>();
 // const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 // const datasetsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
-
-// const snapshots = ref<Snapshot[]>([]);
-const snapshotsLoaded = ref(true);
-// const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 // const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
-	
-const snapshots = ref<Snapshot[]>([]);
+const snapshotsInFilesystem = inject<Ref<Snapshot[]>>('snapshots-in-filesystem')!;
+// const snapshots = ref<Snapshot[]>([]);
 const selectedSnapshot = ref<Snapshot>();
 
-// loadSnapshots(snapshots);
+// loadTheseSnapshots();
+refreshSnaps();
+// if (props.item == 'pool') {
+// 	refreshSnaps();
+// } else if (props.item == 'filesystem') {
+// 	loadTheseSnapshots();
+// }
 
-if (props.item == 'pool') {
-	loadSnapshotsInPool(snapshots, props.pool!.name);
-} else if (props.item == 'filesystem') {
-	loadSnapshotsInDataset(snapshots, props.filesystem!.name);
+// loadSnapshots(snapshots);
+async function loadTheseSnapshots() {
+	if (props.item == 'pool') {
+		await loadSnapshotsInPool(snapshots, props.pool!.name);
+	} else if (props.item == 'filesystem') {
+		await loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name);
+	}
 }
 
 async function refreshSnaps() {
-	// disksLoaded.value = false;
-	// poolsLoaded.value = false;
 	snapshotsLoaded.value = false;
-	// pools.value = [];
-	// disks.value = [];
 	snapshots.value = [];
-	// await loadDisksThenPools(disks, pools);
-	if (props.item == 'pool') {
-		loadSnapshotsInPool(snapshots, props.pool!.name);
-	} else if (props.item == 'filesystem') {
-		loadSnapshotsInDataset(snapshots, props.filesystem!.name);
-	}
-	// disksLoaded.value = true;
-	// poolsLoaded.value = true;
+	snapshotsInFilesystem.value = [];
+	await loadTheseSnapshots();
 	snapshotsLoaded.value = true;
 }
 
@@ -165,27 +203,6 @@ const secondOptionToggle = ref(false);
 const thirdOptionToggle = ref(false);
 const fourthOptionToggle = ref(false);
 
-
-///////////////// Create Snapshots //////////////////
-/////////////////////////////////////////////////////
-// const showSnapshotModal = ref(false);
-// const creating = ref(false);
-// const confirmCreate = ref(false);
-
-// function createSnapshotBtn() {
-// 	showSnapshotModal.value = true;
-// 	console.log('create snapshot modal triggered');
-// }
-
-// watch(confirmCreate, async (newVal, oldVal) => {
-// 	if (confirmCreate.value == true) {
-// 		operationRunning.value = true;
-// 		await refreshSnaps();
-// 		confirmCreate.value = false;
-// 		operationRunning.value = false;
-// 		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
-// 	}
-// });
 
 ///////////////// Destroy Snapshot //////////////////
 /////////////////////////////////////////////////////
@@ -302,7 +319,7 @@ watch(confirmRename, async (newVal, oldVal) => {
 
 const getIdKey = (name: string) => `${name}`;
 
-provide('snapshots-loaded', snapshotsLoaded)!;
+// provide('snapshots-loaded', snapshotsLoaded)!;
 provide('cloning', cloning);
 provide('confirm-clone', confirmClone);
 provide('show-clone-modal', showCloneSnapshotModal);

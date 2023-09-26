@@ -87,7 +87,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { getTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
-import { loadSnapshotsInPool } from '../../composables/loadData';
+import { loadSnapshots, loadSnapshotsInDataset, loadSnapshotsInPool } from '../../composables/loadData';
 
 interface CreateSnapshotModalProps {
     item: 'pool' | 'filesystem';
@@ -102,17 +102,42 @@ const datasetsInSamePool = computed<FileSystemData[]>(() => {
 });
 
 const defaultFileSystem = ref();
-// const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-const snapshotsInPool = inject<Ref<Snapshot[]>>('snapshots-in-pool')!;
+const selectedDataset= inject<Ref<FileSystemData>>('selected-dataset')!;
+const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+// const snapshotsInPool = inject<Ref<Snapshot[]>>('snapshots-in-pool')!;
+// const snapshotsInDataset = ref<Snapshot[]>([]);
+// const snapshots = ref<Snapshot[]>([]);
 
 const showSnapshotModal = inject<Ref<boolean>>('create-snap-modal')!;
 const creating = inject<Ref<boolean>>('creating')!;
 const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 
-if (props.item == 'pool') {
-    defaultFileSystem.value = datasetsInSamePool.value[0];
-} else {
-    defaultFileSystem.value = datasets.value[0];
+initialize();
+
+function refreshSnapshots() {
+    clearSnapshots();
+    loadTheseSnapshots();
+}
+
+function clearSnapshots() {
+    snapshots.value = [];
+}
+
+function loadTheseSnapshots() {
+    if (props.item == 'pool') {
+        loadSnapshotsInPool(snapshots, props.poolName);
+    } else if (props.item == 'filesystem') {
+        loadSnapshotsInDataset(snapshots, selectedDataset.value.name);
+    }
+}
+
+function initialize() {
+    loadTheseSnapshots();
+    if (props.item == 'pool') {
+        defaultFileSystem.value = datasetsInSamePool.value[0];
+    } else if (props.item == 'filesystem') {
+        defaultFileSystem.value = selectedDataset.value;
+    }
 }
 
 const newSnapshot = ref<NewSnapshot>({
@@ -141,7 +166,7 @@ const filesystemCheck = (newSnapshot : NewSnapshot) => {
 const nameCheck = (newSnapshot : NewSnapshot) => {
 	let result = true;
 	nameFeedback.value = '';
-	
+
 	if (newSnapshot.name == '') {
 		result = false;
 		nameFeedback.value = 'Name cannot be empty.';
@@ -157,10 +182,10 @@ const nameCheck = (newSnapshot : NewSnapshot) => {
 	} else if (!newSnapshot.name.match(/^[a-zA-Z0-9_.:-]*$/)) {
 		result = false;
 		nameFeedback.value = 'Name contains invalid characters.';
-	} else if (nameExists(newSnapshot, snapshotsInPool.value)) {
-		result = false;
-		nameFeedback.value = 'A snapshot with that name already exists.';
-	}
+	} else if (nameExists(newSnapshot, snapshots.value)) {
+        result = false;
+        nameFeedback.value = 'A snapshot with that name already exists.';
+    } 
 
     return result;
 }
@@ -197,8 +222,7 @@ async function create(newSnapshot) {
     confirmCreate.value = true;
     await createSnapshot(newSnapshot);
     snapshotsLoaded.value = false;
-    // snapshotsInPool.value = [];
-    // await loadSnapshotsInPool(snapshotsInPool, props.poolName);
+    refreshSnapshots();
     snapshotsLoaded.value = true;
     creating.value = false;
     newSnapshot.isCustomName = false;
