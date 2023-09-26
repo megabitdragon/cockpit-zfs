@@ -147,7 +147,11 @@ async function refreshSnaps() {
 	// disks.value = [];
 	snapshots.value = [];
 	// await loadDisksThenPools(disks, pools);
-	await loadSnapshotsInPool(snapshots, props.pool!.name);
+	if (props.item == 'pool') {
+		loadSnapshotsInPool(snapshots, props.pool!.name);
+	} else if (props.item == 'filesystem') {
+		loadSnapshotsInDataset(snapshots, props.filesystem!.name);
+	}
 	// disksLoaded.value = true;
 	// poolsLoaded.value = true;
 	snapshotsLoaded.value = true;
