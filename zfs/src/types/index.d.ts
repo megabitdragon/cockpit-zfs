@@ -1,10 +1,3 @@
-//object for create-pools.py
-interface newVDev {
-	root: string;
-	type: string;
-	devices: string[];
-}
-
 //object for pool
 interface PoolData {
 	name: string;
@@ -39,18 +32,7 @@ interface PoolData {
 	comment?: string;
 	failMode?: 'wait' | 'continue' | 'panic';
 	diskType?: 'SSD' | 'HDD' | 'Hybrid';
-	scan?: {
-		function: string;
-		start_time: string;
-		end_time: string;
-		state: string;
-		errors: number;
-		percentage: number;
-		total_secs_left: number;
-		bytes_issued: number;
-		bytes_processed: number;
-		bytes_to_process: number;
-	}
+	scan?: PoolScanObject;
 	diskIdentifier?: DiskIdentifier;
 }
 
@@ -163,6 +145,13 @@ interface newPoolData {
 	refreservationPercent: number;
 }
 
+//object for create-pools.py
+// interface newVDev {
+// 	root: string;
+// 	type: string;
+// 	devices: string[];
+// }
+
 interface newVDevData {
 	type: string;
 	disks: string[];
@@ -239,16 +228,6 @@ interface FileSystemEditConfig {
 	xattr?: string;
 	quota?: number;
 	refreservation?: number;
-	// quota?:{
-	// 	raw: number;
-	// 	value: string;
-	// 	unit: 'kib' | 'mib' | 'gib' | 'tib';
-	// }
-	// refreservation?: {
-	// 	raw: number;
-	// 	value: string;
-	// 	unit: 'kib' | 'mib' | 'gib' | 'tib';
-	// }
 }
 
 //dataset command data object
@@ -296,69 +275,26 @@ interface Snapshot {
 	holds: {}
 }
 
-interface SnapDatasets {
-	name: string;
-	id: string;
-	snapName?: string;
-	dataset?: string;
-	mountpoint?: string;
-	type: string;
-	properties: {
-		clones?: string;
-		// creation?: {
-		// 	rawTimestamp: string;
-		// 	parsed: string;
-		// 	value: string;
-		// }
-		// referenced?: {
-		// 	value: string;
-		// 	rawNum: number;
-		// }
-		// used?: {
-		// 	value: string;
-		// 	rawNum: number;
-		// }
-		// creation?: string;
-		// referenced?: string;
-		// used?: string;
-		guid?: string;
-		encryption?: string;
-		accessTime?: string;
-		caseSensitivity?: string;
-		compression?: string;
-		deduplication?: string;
-		dNodeSize?: string;
-		extendedAttributes?: string;
-		recordSize?: string;
-		quota?: {
-			raw: number;
-			value: string;
-			unit: 'kib' | 'mib' | 'gib' | 'tib';
-		}
-		isReadOnly?: boolean;
-		readOnly?: string;
-		snapshotCount?: string;
-		mounted?: string;
-		usedbyRefreservation?: string;
-		usedByDataset?: string;
-		canMount?: string;
-		aclInheritance?: string;
-		aclType?: string;
-		checksum?: string;
-		refreservation?: {
-			raw: number;
-			value: string;
-			unit: 'kib' | 'mib' | 'gib' | 'tib';
-		}
-	}
-	holds?: {}
-}
-
 interface NewSnapshot {
 	filesystem: string;
 	isCustomName: boolean;
 	name: string;
 	snapChildren: boolean;
+}
+
+interface PoolScanObject {
+	name?: string;
+	function: string;
+	start_time: string;
+	end_time: string;
+	state: string;
+	errors: number;
+	percentage: number;
+	pause: string;
+	total_secs_left: number;
+	bytes_issued: number;
+	bytes_processed: number;
+	bytes_to_process: number;
 }
 
 type ConfirmationCallback = () => void;

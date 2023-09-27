@@ -8,11 +8,56 @@ import { getScan } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
 
-export async function loadScanObjects() {
+export async function loadScanObject(scanObject : PoolScanObject, poolName?) {
 	try {
-		const rawJSON = await getScan();
-		const parsedJSON = JSON.parse(rawJSON);
-		console.log("Scan JSON:", parsedJSON);
+		// if (poolName) {
+			const rawJSON = await getScan(poolName);
+			const parsedJSON = JSON.parse(rawJSON);
+			//console.log(`Scan JSON for ${poolName}:`, parsedJSON);
+
+			scanObject = {
+				name: parsedJSON.name,
+				function: parsedJSON.function,
+				start_time: parsedJSON.start_time,
+				end_time: parsedJSON.end_time,
+				pause: parsedJSON.pause,
+				state: parsedJSON.state,
+				errors: parsedJSON.errors,
+				percentage: parsedJSON.percentage,
+				total_secs_left: parsedJSON.total_secs_left,
+				bytes_issued: parsedJSON.bytes_issued,
+				bytes_processed: parsedJSON.bytes_processed,
+				bytes_to_process: parsedJSON.bytes_to_process,
+			}
+
+			console.log("Scan Object:", scanObject);
+		// } else {
+		// 	const rawJSON = await getScan();
+		// 	const parsedJSON = JSON.parse(rawJSON);
+		// 	console.log(`Scan JSON:`, parsedJSON);
+
+		// 	for (let i = 0; i < parsedJSON.length; i++) {
+
+		// 		const scan : PoolScanObject = {
+		// 			name: parsedJSON[i].name,
+		// 			function: parsedJSON[i].function,
+		// 			start_time: parsedJSON[i].start_time,
+		// 			end_time: parsedJSON[i].end_time,
+		// 			pause: parsedJSON[i].pause,
+		// 			state: parsedJSON[i].state,
+		// 			errors: parsedJSON[i].errors,
+		// 			percentage: parsedJSON[i].percentage,
+		// 			total_secs_left: parsedJSON[i].total_secs_left,
+		// 			bytes_issued: parsedJSON[i].bytes_issued,
+		// 			bytes_processed: parsedJSON[i].bytes_processed,
+		// 			bytes_to_process: parsedJSON[i].bytes_to_process,
+		// 		}
+		// 		if (!scanObject.value.includes(scan)) 
+		// 		scanObject.value.push(scan);
+		// 	}
+		// 	console.log("Scan Object:", scanObject);
+		// }
+
 	} catch (error) {
 		console.error("An error occurred getting scan objects:", error);
 	}
@@ -95,9 +140,11 @@ export async function loadDisksThenPools(disks, pools) {
 					failMode: parsedJSON[i].properties.failmode.parsed,
 					comment: parsedJSON[i].properties.comment.value,
 					scan: {
+						name: parsedJSON[i].scan.name,
 						function: parsedJSON[i].scan.function,
 						start_time: parsedJSON[i].scan.start_time,
 						end_time: parsedJSON[i].scan.end_time,
+						pause: parsedJSON[i].scan.pause,
 						state: parsedJSON[i].scan.state,
 						errors: parsedJSON[i].scan.errors,
 						percentage: parsedJSON[i].scan.percentage,
@@ -548,7 +595,6 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 		console.error("An error occurred getting snapshots:", error);
 	}
 }
-
 
 function determineDiskType(vDev, disks) {
     const childDisks = vDev.children.map(child => child.name);

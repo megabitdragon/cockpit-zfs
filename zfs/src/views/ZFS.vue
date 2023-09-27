@@ -25,7 +25,7 @@
 import { reactive, ref, Ref, inject, computed, provide, watch } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import { loadDisksThenPools, loadDatasets, loadSnapshots, loadScanObjects } from '../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadSnapshots, loadScanObject } from '../composables/loadData';
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
@@ -42,6 +42,20 @@ const datasets = ref<FileSystemData[]>([]);
 const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const snapshots = ref<Snapshot[]>([]);
+const scanObject = ref<PoolScanObject>({
+	name: '',
+	function: '',
+	start_time: '',
+	end_time: '',
+	state: '',
+	errors: 0,
+	percentage: 0,
+	pause: '',
+	total_secs_left: 0,
+	bytes_issued: 0,
+	bytes_processed: 0,
+	bytes_to_process: 0,
+});
 
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
@@ -54,18 +68,20 @@ async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
 	fileSystemsLoaded.value = false;
-	//snapshotsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
-	//await loadSnapshots(snapshots);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	//snapshotsLoaded.value = true;
 }
 
+setInterval(() => {
+    pools.value.forEach(pool => {
+		loadScanObject(scanObject.value, pool.name);
+	});
+}, 5000);
+
 initialLoad(disks, pools, datasets);
-loadScanObjects();
 
 //get all disks in use by pools
 // const disksInPools = computed<DiskData[]>(() => {
