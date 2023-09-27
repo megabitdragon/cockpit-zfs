@@ -4,16 +4,26 @@ import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath } from "./helpers";
 import { getSnapshots } from './snapshots';
+import { getScan } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
+
+export async function loadScanObjects(poolName) {
+	try {
+		const rawJSON = await getScan();
+		const parsedJSON = JSON.parse(rawJSON);
+		console.log("Scan JSON:", parsedJSON);
+	} catch (error) {
+		console.error("An error occurred getting scan objects:", error);
+	}
+}
 
 export async function loadDisksThenPools(disks, pools) {
 	//executes a python script to retrieve all disk data and outputs a JSON
 	try {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Disks JSON:');
-		console.log(parsedJSON);
+		console.log('Disks JSON:', parsedJSON);
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -40,15 +50,13 @@ export async function loadDisksThenPools(disks, pools) {
 		// console.log("Disk:");
 		// console.log(disk);
 		}
-		console.log("Disks:");
-		console.log(disks);
+		console.log("Disks:", disks);
 
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
 			const rawJSON = await getPools();
 			const parsedJSON = JSON.parse(rawJSON);
-			console.log('Pools JSON:');
-			console.log(parsedJSON);
+			console.log('Pools JSON:', parsedJSON);
 
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
@@ -136,8 +144,7 @@ export async function loadDisksThenPools(disks, pools) {
 			});
 			  
 
-			console.log("Pools:");
-			console.log(pools);
+			console.log("Pools:", pools);
 		} catch (error) {
 			// Handle any errors that may occur during the asynchronous operation
 			console.error("An error occurred getting pools:", error);
@@ -153,8 +160,7 @@ export async function loadDatasets(datasets) {
 	try {
 		const rawJSON = await getDatasets();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Datasets JSON:');
-		console.log(parsedJSON);
+		console.log('Datasets JSON:', parsedJSON);
 
 		//loops through JSON data and adds data to a Dataset object
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -209,8 +215,7 @@ export async function loadDatasets(datasets) {
 			datasets.value.push(dataset);
 		}
 
-		console.log("Datasets");
-		console.log(datasets);
+		console.log("Datasets:", datasets);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
@@ -222,8 +227,7 @@ export async function loadDisks(disks) {
 	try {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Disks JSON:');
-		console.log(parsedJSON);
+		console.log('Disks JSON:', parsedJSON);
 		
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -337,10 +341,8 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		}
 		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
-		console.log("Not A ChildDisk:");
-		console.log(notAChildDisk);
-		console.log("vDevData (disk device):");
-		console.log(vDevData);
+		console.log("Not A ChildDisk:", notAChildDisk);
+		console.log("vDevData (disk device):", vDevData);
 		
 		vDevs.value.push(vDevData);
 	} else {
@@ -393,14 +395,12 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 				poolName: poolName,
 			}; 
 
-			console.log("ChildDisk:");
-			console.log(childDisk);
+			console.log("ChildDisk:", childDisk);
 			vDevData.disks.push(childDisk);
 
 		});
 	
-		console.log("vDevData:");
-		console.log(vDevData);
+		console.log("vDevData:", vDevData);
 		vDevs.value.push(vDevData);
 	}
 }
@@ -409,8 +409,7 @@ export async function loadSnapshots(snapshots) {
 	try {
 		getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON (all):');
-			console.log(parsedJSON);
+			console.log('Snapshots JSON (all):', parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
 					const snap = {
@@ -456,8 +455,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 	try {
 			getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON (loadByPool):');
-			console.log(parsedJSON);
+			console.log('Snapshots JSON (loadByPool):', parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
 					if (snapshot.pool == poolName) {
@@ -506,8 +504,7 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 	try {
 			getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON (loadByDataset):');
-			console.log(parsedJSON);
+			console.log('Snapshots JSON (loadByDataset):', parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
 					if (dataset == datasetName) {

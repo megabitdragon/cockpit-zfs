@@ -51,7 +51,7 @@
 
 
 		<!-- DISKS SECTION (FOR DEVELOPMENT ONLY) -->
-		<!-- <div name="disks" class="">
+		<div name="disks" class="">
 			<div v-if="disks.length > 0 && disksLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-start mt-0.5">
 					<span class="font-semibold text-lg mt-1 justify-self-start">Disks</span>
@@ -99,7 +99,7 @@
 			<div v-if="disks.length < 1 && disksLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
 				<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 			</div>
-		</div> -->
+		</div>
 
 	</div>
 
