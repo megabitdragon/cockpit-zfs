@@ -15,22 +15,20 @@ export async function loadScanObject(scanObject : PoolScanObject, poolName?) {
 			const parsedJSON = JSON.parse(rawJSON);
 			//console.log(`Scan JSON for ${poolName}:`, parsedJSON);
 
-			scanObject = {
-				name: parsedJSON.name,
-				function: parsedJSON.function,
-				start_time: parsedJSON.start_time,
-				end_time: parsedJSON.end_time,
-				pause: parsedJSON.pause,
-				state: parsedJSON.state,
-				errors: parsedJSON.errors,
-				percentage: parsedJSON.percentage,
-				total_secs_left: parsedJSON.total_secs_left,
-				bytes_issued: parsedJSON.bytes_issued,
-				bytes_processed: parsedJSON.bytes_processed,
-				bytes_to_process: parsedJSON.bytes_to_process,
-			}
+			scanObject.name = parsedJSON.name;
+			scanObject.function = parsedJSON.function;
+			scanObject.start_time = parsedJSON.start_time;
+			scanObject.end_time = parsedJSON.end_time;
+			scanObject.pause = parsedJSON.pause;
+			scanObject.state = parsedJSON.state;
+			scanObject.errors = parsedJSON.errors;
+			scanObject.percentage = parsedJSON.percentage;
+			scanObject.total_secs_left = parsedJSON.total_secs_left;
+			scanObject.bytes_issued = parsedJSON.bytes_issued;
+			scanObject.bytes_processed = parsedJSON.bytes_processed;
+			scanObject.bytes_to_process = parsedJSON.bytes_to_process;
 
-			console.log("Scan Object:", scanObject);
+			//console.log("Scan Object:", scanObject);
 		// } else {
 		// 	const rawJSON = await getScan();
 		// 	const parsedJSON = JSON.parse(rawJSON);

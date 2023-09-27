@@ -57,6 +57,12 @@ const scanObject = ref<PoolScanObject>({
 	bytes_to_process: 0,
 });
 
+// setInterval(() => {
+//     pools.value.forEach(pool => {
+// 		loadScanObject(scanObject.value, pool.name);
+// 	});
+// }, 5000);
+
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
@@ -74,12 +80,6 @@ async function initialLoad(disks, pools, datasets) {
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
 }
-
-setInterval(() => {
-    pools.value.forEach(pool => {
-		loadScanObject(scanObject.value, pool.name);
-	});
-}, 5000);
 
 initialLoad(disks, pools, datasets);
 
@@ -101,5 +101,6 @@ provide('pools-loaded', poolsLoaded);
 provide('snapshots-loaded', snapshotsLoaded);
 provide('clear-labels', clearLabels);
 provide("snapshots", snapshots);
+provide('scan-object', scanObject);
 </script>
 

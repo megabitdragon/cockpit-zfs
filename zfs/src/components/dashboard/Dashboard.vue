@@ -121,9 +121,6 @@ const disks = inject<Ref<DiskData[]>>("disks")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
-//get all disks in use by pools
-const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
-
 async function refreshAllData() {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
@@ -132,13 +129,6 @@ async function refreshAllData() {
 	await loadDisksThenPools(disks, pools);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
-}
-
-async function refreshDiskData() {
-	disksLoaded.value = false;
-	disks.value = [];
-	await loadDisks(disks);
-	disksLoaded.value = true;
 }
 
 //determine total effective space of pools
@@ -150,6 +140,18 @@ const totalEffectivePoolSpace = computed(() => {
 
 	return(convertBytesToSize(totalCapacity));
 });
+
+////////////////// Disk Methods /////////////////////
+/////////////////////////////////////////////////////
+//get all disks in use by pools
+// const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
+
+async function refreshDiskData() {
+	disksLoaded.value = false;
+	disks.value = [];
+	await loadDisks(disks);
+	disksLoaded.value = true;
+}
 
 //find highest disk temperature
 const maxTemp = computed(() => {

@@ -70,6 +70,9 @@
 					<div v-else-if="cleared == true || !trimming && !scrubbing && !resilvering && !trimmed && !scrubbed && !resilvered">
 						<span class="text-muted">No Alerts</span>
 					</div>
+
+					<Status :idKey="'status-box'" :poolName="props.pool.name"/>
+
 				</div>
 			</template>
 			<template v-slot:content>
@@ -148,6 +151,7 @@ import Card from '../common/Card.vue';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import PoolDetail from "../pools/PoolDetail.vue";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
+import Status from '../common/Status.vue';
 import AddVDevModal from "../pools/AddVDevModal.vue";
 
 interface DashPoolCardProps {
@@ -191,6 +195,7 @@ const poolConfig = ref<PoolData>({
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
 const operationRunning = ref(false);
+const operationCompleted = ref(false);
 const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
 const thirdOptionToggle = ref(false);
