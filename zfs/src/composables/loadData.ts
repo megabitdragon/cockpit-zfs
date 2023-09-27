@@ -8,7 +8,7 @@ import { getScan } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
 
-export async function loadScanObjects(poolName) {
+export async function loadScanObjects() {
 	try {
 		const rawJSON = await getScan();
 		const parsedJSON = JSON.parse(rawJSON);
