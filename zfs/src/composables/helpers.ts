@@ -169,3 +169,20 @@ export function getParentPath(datasetName) {
 	segments.pop();
 	return segments.join('/');
 }
+
+export function convertSecondsToString(seconds) {
+    let result = '';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    
+    if (hours > 0) {
+        result += `${hours} hour${hours > 1 ? 's' : ''} `;
+    }
+    
+    if (minutes > 0) {
+        result += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+    }
+    
+    return result.trim();
+}

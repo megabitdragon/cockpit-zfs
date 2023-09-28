@@ -6,7 +6,9 @@
 		<template v-slot:content>
 			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
 				<div class="col-span-2">
-					<CircleProgress :justCircle="false" :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" :name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" :radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :strokeDashArr="314"/>
+					<CircleProgress :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
+					:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
+					:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'"/>
 				</div>
 				
 				<div class="mt-2 col-span-2 col-start-3 row-start-1">

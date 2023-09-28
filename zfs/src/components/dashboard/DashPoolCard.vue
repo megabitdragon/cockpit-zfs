@@ -45,37 +45,6 @@
 						</transition>
 					</Menu>
 				</div>
-				<div class="flex flex-row w-full h-max border border-default rounded-sm bg-accent justify-center">
-					<div v-if="!cleared && trimming " class="grid grid-cols-4 gap-0.5 justify-items-center">
-						<h3 class="text-muted col-span-4 mt-2">Trimming...</h3>
-						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
-					</div>
-					<div v-else-if="!cleared && scrubbing " class="grid grid-cols-4 gap-0.5 justify-items-center">
-						<h3 class="text-muted col-span-4 mt-2">Scrubbing...</h3>
-						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
-					</div>
-					<div v-else-if="!cleared && resilvering " class="grid grid-cols-4 gap-0.5 justify-items-center">
-						<h3 class="text-muted col-span-4 mt-2">Resilvering...</h3>
-						<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500" class="col-span-4 my-2"/>
-					</div>
-					<div v-else-if="!cleared && trimmed ">
-						<span class="text-success">Trim completed at <br/> {{ messageTimestamp }}.</span>
-					</div>
-					<div v-else-if="!cleared && scrubbed ">
-						<span class="text-success">Scrub completed at <br/> {{ messageTimestamp }}.</span>
-					</div>
-					<div v-else-if="!cleared && resilvered ">
-						<span class="text-success">Resilver completed at <br/> {{ messageTimestamp }}.</span>
-					</div>
-					<div v-else-if="cleared == true || !trimming && !scrubbing && !resilvering && !trimmed && !scrubbed && !resilvered">
-						<span class="text-muted">No Alerts</span>
-					</div>
-
-					<Status :idKey="'status-box'" :poolName="props.pool.name"/>
-
-				</div>
-			</template>
-			<template v-slot:content>
 				<div class="flex flex-row justify-between">
 					<div>
 						<span class="text-success">{{props.pool.status}}</span>
@@ -88,17 +57,22 @@
 				<div v-if="props.pool.properties.capacity >= 1" class="w-full bg-well rounded-full mt-2 relative flex h-6 min-h-min max-h-max overflow-hidden">
 					<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${props.pool.properties.capacity}%` }">
 						<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-							{{ props.pool.properties.capacity }}%
+							{{ props.pool.properties.capacity }}% Full
 						</div>
 					</div>
 				</div>
 
 				<div v-if="props.pool.properties.capacity! < 1" class="w-full bg-well rounded-full h-6 text-center mt-2 relative flex">
 					<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
-						{{ props.pool.properties.capacity }}%
+						{{ props.pool.properties.capacity }}% Full
 					</div>
 				</div>
 				
+			</template>
+			<template v-slot:content>
+				<div class="flex flex-row w-full h-max rounded-sm justify-center">
+					<Status :idKey="'status-box'" :poolName="props.pool.name"/>
+				</div>
 			</template>
 			<template v-slot:footer>
 				<div class="grid grid-rows-3">
@@ -397,13 +371,13 @@ watch(confirmScrub, async (newVal, oldVal) => {
 		scrubbing.value = true;
 		operationRunning.value = scrubbing.value;
 		console.log('now scrubbing:', selectedPool.value);
-
+		showScrubModal.value = false;
 		await scrubPool(selectedPool.value!);
 
 		scrubbing.value = false;
 		operationRunning.value = scrubbing.value;
 		scrubbed.value = true;
-		showScrubModal.value = false;
+		
 		messageTimestamp.value = getTimestampString();
 		notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
 	}

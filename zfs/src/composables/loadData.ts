@@ -8,25 +8,25 @@ import { getScan } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
 
-export async function loadScanObject(scanObject : PoolScanObject, poolName?) {
+export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName? : string) {
 	try {
 		// if (poolName) {
 			const rawJSON = await getScan(poolName);
 			const parsedJSON = JSON.parse(rawJSON);
 			//console.log(`Scan JSON for ${poolName}:`, parsedJSON);
 
-			scanObject.name = parsedJSON.name;
-			scanObject.function = parsedJSON.function;
-			scanObject.start_time = parsedJSON.start_time;
-			scanObject.end_time = parsedJSON.end_time;
-			scanObject.pause = parsedJSON.pause;
-			scanObject.state = parsedJSON.state;
-			scanObject.errors = parsedJSON.errors;
-			scanObject.percentage = parsedJSON.percentage;
-			scanObject.total_secs_left = parsedJSON.total_secs_left;
-			scanObject.bytes_issued = parsedJSON.bytes_issued;
-			scanObject.bytes_processed = parsedJSON.bytes_processed;
-			scanObject.bytes_to_process = parsedJSON.bytes_to_process;
+			scanObject.value.name = parsedJSON.name;
+			scanObject.value.function = parsedJSON.function;
+			scanObject.value.start_time = parsedJSON.start_time;
+			scanObject.value.end_time = parsedJSON.end_time;
+			scanObject.value.pause = parsedJSON.pause;
+			scanObject.value.state = parsedJSON.state;
+			scanObject.value.errors = parsedJSON.errors;
+			scanObject.value.percentage = parsedJSON.percentage;
+			scanObject.value.total_secs_left = parsedJSON.total_secs_left;
+			scanObject.value.bytes_issued = parsedJSON.bytes_issued;
+			scanObject.value.bytes_processed = parsedJSON.bytes_processed;
+			scanObject.value.bytes_to_process = parsedJSON.bytes_to_process;
 
 			//console.log("Scan Object:", scanObject);
 		// } else {
