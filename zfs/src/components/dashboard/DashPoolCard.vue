@@ -398,18 +398,18 @@ watch(confirmScrub, async (newVal, oldVal) => {
 	}
 });
 
-function pauseScrub(pool) {
-	scrubPool(pool, 'pause');
+async function pauseScrub(pool) {
+	await scrubPool(pool, 'pause');
 	scanNow();
 }
 
-function resumeScrub(pool) {
-	scrubPool(pool);
+async function resumeScrub(pool) {
+	await scrubPool(pool);
 	scanNow();
 }
 
-function stopScrub(pool) {
-	scrubPool(pool, 'stop');
+async function stopScrub(pool) {
+	await scrubPool(pool, 'stop');
 	scanNow();
 }
 
@@ -509,7 +509,7 @@ const isPaused = computed(() => {
 
 //method to repeatedly check scan object
 async function continuousScanCheck() {
-    if (!isFinished.value || !isCanceled.value) {
+    if (!isFinished || !isCanceled) {
         setInterval(async () => {
             await loadScanObject(scanObject, props.pool.name);
             console.log('continuous scan object:', scanObject.value);
@@ -521,7 +521,7 @@ async function continuousScanCheck() {
 async function scanNow() {
     await loadScanObject(scanObject, props.pool.name);
     console.log('scan object:', scanObject.value);
-    if (isScanning.value) {
+    if (isScanning) {
         continuousScanCheck();
     } 
 }
