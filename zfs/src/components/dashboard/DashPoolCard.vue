@@ -57,24 +57,24 @@
 				<div v-if="props.pool.properties.capacity >= 1" class="w-full bg-well rounded-full mt-2 relative flex h-6 min-h-min max-h-max overflow-hidden">
 					<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${props.pool.properties.capacity}%` }">
 						<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-							{{ props.pool.properties.capacity }}% Full
+							{{ props.pool.properties.capacity }}% Capacity
 						</div>
 					</div>
 				</div>
 
 				<div v-if="props.pool.properties.capacity! < 1" class="w-full bg-well rounded-full h-6 text-center mt-2 relative flex">
 					<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
-						{{ props.pool.properties.capacity }}% Full
+						Empty
 					</div>
 				</div>
 				
 			</template>
 			<template v-slot:content>
-				<div class="grid grid-cols-4 gap-0.5 w-full h-max rounded-sm justify-center">
-					<Status :isPoolList="false" class="col-span-4" :idKey="'status-box'" @scan_continuous="continuousScanCheck()" @scan_now="scanNow()"/>
-					<div v-if="scanObject.function === 'SCRUB' && isScanning" class="btn-group-row w-full col-span-4">
-						<button class="btn btn-primary" v-if="!isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
-						<button class="btn btn-secondary" v-if="isPaused" @click="resumeScrub(props.pool)">Resume Scrub</button>
+				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
+					<Status :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_continuous="continuousScanCheck()" @scan_now="scanNow()"/>
+					<div v-if="scanObject.function === 'SCRUB' && isScanning" class="button-group-row justify-self-center col-span-4">
+						<button class="btn btn-secondary" v-if="!isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
+						<button class="btn btn-primary" v-if="isPaused" @click="resumeScrub(props.pool)">Resume Scrub</button>
 						<button class="btn btn-danger" @click="stopScrub(props.pool)">Cancel Scrub</button>
 					</div>
 				</div>

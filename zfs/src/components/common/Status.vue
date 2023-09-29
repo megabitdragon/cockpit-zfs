@@ -2,7 +2,6 @@
     <div>
         <div v-if="!isPoolList">
             <div class="grid grid-cols-4 gap-1 justify-items-center">
-
                 <span class="col-span-4" :class="stateMessageClass()">
                     {{ stateMessage }}
                 </span>
@@ -20,22 +19,27 @@
                 </span>
 
                 <span v-if="isScanning && !isPaused" class="col-span-4">
-                    Completes in {{ timeRemaining }}.
+                    Completes in {{ timeRemaining }}.                    
                 </span>
-
+                <span v-if="isScanning && isPaused" class="col-span-4">
+                    Resume to continue or cancel to stop.                    
+                </span>
             </div>
         </div>
 
         <div v-if="isPoolList">
-            <div class="grid-grid-cols-2 gap-0.5 justify items-center">
+            <div class="grid-grid-cols-2 gap-1 justify items-center">
                 <span class="col-span-2" :class="stateMessageClass()">
-                    {{ scanObject.function }} {{ scanObject.state }}
+                    {{ miniStateMsg }}
                 </span>
-                <span>
-                    <span v-if="isScanning && !isPaused" class="col-span-2">
-                        Completes in {{ timeRemaining }}.
-                    </span>
-                </span>
+          
+                <div v-if="isScanning" class="col-span-2 min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
+                    <div :class="progressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                        <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
+                            {{ amountProcessed }}/{{ amountTotal }} 
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -47,6 +51,7 @@ import { convertBytesToSize, convertSecondsToString } from "../../composables/he
 
 interface StatusProps {
     isPoolList: boolean;
+    isPoolDetail: boolean;
 }
 
 const props = defineProps<StatusProps>();
@@ -70,7 +75,6 @@ const scanNow = () => {
 
 scanNow();
 
-//scan function : NONE | SCRUB | RESILVER
 const scanFunction = computed(() => {
     switch (scanObject.value.function) {
         case 'RESILVER':
@@ -78,26 +82,45 @@ const scanFunction = computed(() => {
         case 'SCRUB':
             return 'Scrubbing';
         case 'NONE':
-            return 'Nothing';
+            return 'N/A';
         default:
             return;
     }
 });
 
-//scan state: NONE | SCANNING | FINISHED | CANCELED
 const stateMessage = computed(() => {
     if (scanObject.value.pause !== 'None') {
-       return `${scanObject.value.function} paused at ${scanObject.value.pause}`;
+       return `${scanFunction.value} paused @ ${scanObject.value.pause}`;
     } else {
         switch (scanObject.value.state) {
             case 'SCANNING':
-                return `${scanObject.value.function} started at ${scanObject.value.start_time}`;
+                return `${scanFunction.value} started @${scanObject.value.start_time}`;
             case 'FINISHED':
-                return `${scanObject.value.function} finished at ${scanObject.value.end_time}`;
+                return `${scanFunction.value} finished @${scanObject.value.end_time}`;
             case 'CANCELED':
-                return `${scanObject.value.function} canceled at ${scanObject.value.end_time}`;
+                return `${scanFunction.value} canceled @${scanObject.value.end_time}`;
             case 'NONE':
-                return 'None';
+                return 'N/A';
+            default:
+                return '';
+        }
+    }
+});
+
+const miniStateMsg = computed(() => {
+    // scanFunction.value }} {{ scanObject.state }} ({{ parseFloat(scanPercentage.toFixed(2)) }}%)
+    if (scanObject.value.pause !== 'None') {
+       return `${scanFunction.value} Paused (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
+    } else {
+        switch (scanObject.value.state) {
+            case 'SCANNING':
+                return `${scanFunction.value}... (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
+            case 'FINISHED':
+                return `${scanFunction.value} Complete`;
+            case 'CANCELED':
+                return `${scanFunction.value} Canceled (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
+            case 'NONE':
+                return 'N/A';
             default:
                 return '';
         }
@@ -143,7 +166,7 @@ function progressBarClass() {
     if (scanObject.value.pause === 'None') {
         switch (scanObject.value.state) {
             case 'SCANNING':
-                return 'bg-green-600';
+                return 'bg-blue-600';
             case 'FINISHED':
                 return 'bg-green-600'; 
             case 'CANCELED':
@@ -163,13 +186,32 @@ watch(scanObject, (newVal, oldVal) => {
     if (scanObject.value.state === 'SCANNING') {
         scanContinuous();
     }
-
+    
     //notifications : 'info' | 'warning' | 'error' | 'success' | 'denied';
     if (scanObject.value.state === 'FINISHED') {
         notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'success');
     } else if (scanObject.value.state === 'CANCELED') {
         notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'denied');
     }
+   
 });
+
+// watch(isScanning, (newVal, oldVal) => {
+//     if (isScanning) {
+//         scanContinuous();
+//     }
+// });
+
+// watch(isFinished, (newVal, oldVal) => {
+//     if (isFinished) {
+//         notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'success');
+//     } 
+// });
+
+// watch(isCanceled, (newVal, oldVal) => {
+//     if (isCanceled) {
+//         notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'denied');
+//     }
+// });
 
 </script>

@@ -7,7 +7,7 @@
 						{{ props.disk.name }}
 					</div>
 					<div>
-						<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+						<span>{{ props.disk.type }}</span>
 					</div>
 					<Menu as="div" class="relative inline-block text-right">
 						<div>
@@ -32,35 +32,37 @@
 				<!-- <div>
 					Member of {{ props.disk.vDevName }} in {{ props.disk.poolName }}
 				</div> -->
-				<div>
+				<!-- <div>
 					<span class="text-success">{{ props.disk.health }}</span>
-				</div>
-				<div>
-					<span>{{ props.disk.type }}</span>
-				</div>
+				</div> -->
+				
 				</template>
 				<template v-slot:content>
 				<div>
 					<span>{{props.disk.temp}}</span>
 				</div>
-				<div>
+				<!-- <div>
 					<span class="text-base font-medium text-success">Space&nbsp;&nbsp;&nbsp;</span>
 					<span class="text-sm font-medium text-success">0%</span>
-				</div>
+				</div> -->
 				<!-- <div class="w-full bg-well rounded-full h-2.5">
 					<div v-if="capacity <= 85" class="bg-green-600 h-2.5 rounded-full" :style="{width: `${props.capacity}%`}"></div>
 				</div> -->
 			</template>
 			<template v-slot:footer>
-				<div>
+				<!-- <div>
 					Used X TB
 				</div>
 				<div>
 					Free Y TB
-				</div>
+				</div> -->
 				<div>
 					<b>Total: {{ props.disk.capacity }}</b>
 				</div>
+				<!-- <div>
+					<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+				</div> -->
+				
 			</template>
 		</Card>
 	</button>

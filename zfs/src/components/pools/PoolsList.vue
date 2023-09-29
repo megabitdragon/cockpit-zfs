@@ -24,7 +24,8 @@
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
-							<tr class="bg-well rounded-t-md grid grid-cols-8">
+							<tr class="bg-well rounded-t-md grid grid-cols-10">
+								<!-- <tr class="bg-well rounded-t-md grid grid-cols-8"> -->
 
 								<th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
@@ -35,6 +36,7 @@
 								<th class="py-3.5 font-semibold text-default col-span-1">Used</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Free</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Total</th>
+								<th class="py-3.5 font-semibold text-default col-span-2">Message</th>
 								<th class="relative py-3.5 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -44,14 +46,15 @@
 					</table>
 					
 					<div v-if="poolData.length > 0 && poolsLoaded == true">
-						<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
+						<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-10'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-9'" :contentColSpan="'col-span-10'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
+							<!-- <Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="pool, poolIdx in poolData" :key="poolIdx"> -->
 							<template v-slot:title>
-								<!-- <button v-on:dblclick="showPoolModal(poolData[poolIdx])!" class="grid grid-cols-7 grid-flow-cols w-full justify-center text-center pt-1"> -->
-								<div class="grid grid-cols-7 grid-flow-cols w-full justify-center text-center">
-									<button @click="showPoolModal(poolData[poolIdx])!" class="grid grid-cols-6 col-span-6 hover:bg-accent pt-1 rounded-r-md">
-										<div class="py-4">{{ poolData[poolIdx].name }}</div>
-										<div class="py-4">{{ poolData[poolIdx].status }}</div>
-										<div class="py-4">
+								<div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center">
+									<!-- <div class="grid grid-cols-7 grid-flow-cols w-full justify-center text-center"> -->
+									<button @click="showPoolModal(poolData[poolIdx])!" class="grid grid-cols-8 col-span-8 hover:bg-accent pt-1 rounded-r-md">
+										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].name }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].status }}</div>
+										<div class="py-6 mt-1 col-span-1">
 											<div class="w-full bg-well rounded-full text-center">
 												<div v-if="poolData[poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
 													<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
@@ -67,11 +70,14 @@
 												</div>
 											</div>
 										</div>
-										<div class="py-4">{{ poolData[poolIdx].properties.allocated }}</div>
-										<div class="py-4">{{ poolData[poolIdx].properties.free }}</div>
-										<div class="py-4">{{ poolData[poolIdx].properties.size }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.allocated }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.free }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.size }}</div>
+										<div class="py-6 col-span-2">
+											<Status :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_continuous="continuousScanCheck(poolData[poolIdx].name)" @scan_now="scanNow(poolData[poolIdx].name)"/>
+										</div>
 									</button>
-									<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+									<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 										<Menu as="div" class="relative inline-block text-right -mt-1">
 											<div>
 												<MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -116,10 +122,11 @@
 								
 							</template>
 							<template v-slot:content>
-								<Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+								<Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-10'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-9'" :contentColSpan="'col-span-10'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
+									<!-- <Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx"> -->
 									<template v-slot:title>
-										<div class="grid grid-cols-7 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
-											<div class="col-span-6 text-center py-4 mt-1">
+										<div class="grid grid-cols-8 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
+											<div class="col-span-8 text-center py-4 mt-1">
 												{{ vDev.name }} ({{ vDev.type }})
 											</div>
 											<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
@@ -299,12 +306,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch } from "vue";
+import { ref, inject, Ref, provide, watch, computed } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, replaceDisk, trimDisk } from "../../composables/disks";
-import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools, loadScanObject } from '../../composables/loadData';
 import { getTimestampString } from "../../composables/helpers";
 import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolDetail from "./PoolDetail.vue";
@@ -315,6 +322,7 @@ import Accordion from '../common/Accordion.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import ReplaceDiskModal from "../disks/ReplaceDiskModal.vue";
+import Status from "../common/Status.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -882,6 +890,58 @@ function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 	showReplaceDiskModal.value = true;
 }
 
+///////////////////// Scanning //////////////////////
+/////////////////////////////////////////////////////
+const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
+
+const isScanning = computed(() => {
+    if (scanObject.value.state === 'SCANNING') {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+const isFinished = computed(() => {
+    if (scanObject.value.state === 'FINISHED') {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+const isCanceled = computed(() => {
+    if (scanObject.value.state === 'CANCELED') {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+const isPaused = computed(() => {
+    return scanObject.value.pause !== 'None';
+});
+
+//method to repeatedly check scan object
+async function continuousScanCheck(poolName) {
+    if (!isFinished.value || !isCanceled.value) {
+        setInterval(async () => {
+            await loadScanObject(scanObject, poolName);
+            console.log('continuous scan object:', scanObject.value);
+        }, 5000);
+    }
+}
+
+//method to check scan object on first load, and if scanning, then repeatedly check
+async function scanNow(poolName) {
+    await loadScanObject(scanObject, poolName);
+    console.log('scan object:', scanObject.value);
+    if (isScanning.value) {
+        continuousScanCheck(poolName);
+    } 
+}
+
+
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
 
@@ -910,9 +970,15 @@ provide('show-attach-modal', showAttachDiskModal);
 provide('show-detach-modal', showDetachDiskModal);
 provide('confirm-detach', confirmDetach);
 provide('show-replace-modal', showReplaceDiskModal);
+
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);
 provide('modal-option-three-toggle', thirdOptionToggle);
 provide('modal-option-four-toggle', fourthOptionToggle);
+
+provide('is-scanning', isScanning);
+provide('is-finished', isFinished);
+provide('is-canceled', isCanceled);
+provide('is-paused', isPaused);
 </script>
