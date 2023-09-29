@@ -5,40 +5,49 @@
                 <span class="col-span-4" :class="stateMessageClass()">
                     {{ stateMessage }}
                 </span>
-        
-                <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
-                    <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-                            {{ parseFloat(scanPercentage.toFixed(2)) }}%
+
+                <div v-if="scanObject.state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
+                    <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                        <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                            <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+                                {{ parseFloat(scanPercentage.toFixed(2)) }}%
+                            </div>
                         </div>
                     </div>
+
+                    <span class="text-muted col-span-4">
+                        {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
+                    </span>
+
+                    <span v-if="isScanning && !isPaused" class="col-span-4">
+                        Completes in {{ timeRemaining }}.                    
+                    </span>
+                    <span v-if="isScanning && isPaused" class="col-span-4">
+                        Resume to continue or cancel to stop.                    
+                    </span>
                 </div>
 
-                <span class="text-muted col-span-4">
-                    {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
-                </span>
-
-                <span v-if="isScanning && !isPaused" class="col-span-4">
-                    Completes in {{ timeRemaining }}.                    
-                </span>
-                <span v-if="isScanning && isPaused" class="col-span-4">
-                    Resume to continue or cancel to stop.                    
-                </span>
             </div>
         </div>
 
         <div v-if="isPoolList">
             <div class="grid-grid-cols-2 gap-1 justify items-center">
-                <span class="col-span-2" :class="stateMessageClass()">
-                    {{ miniStateMsg }}
-                </span>
-          
-                <div v-if="isScanning" class="col-span-2 min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
-                    <div :class="progressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                        <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
-                            {{ amountProcessed }}/{{ amountTotal }} 
+                <div v-if="scanObject.state !== null" class="col-span-2">
+                    <span :class="stateMessageClass()">
+                        {{ miniStateMsg }}
+                    </span>
+                    <div class="min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
+                        <div :class="progressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                            <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
+                                {{ amountProcessed }}/{{ amountTotal }} 
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div v-if="scanObject.state === null" class="col-span-2">
+                    <span class="mt-2" :class="stateMessageClass()">
+                        {{ miniStateMsg }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -89,42 +98,51 @@ const scanFunction = computed(() => {
 });
 
 const stateMessage = computed(() => {
-    if (scanObject.value.pause !== 'None') {
-       return `${scanFunction.value} paused @ ${scanObject.value.pause}`;
+    if (scanObject.value.state === null) {
+        return `No scan data found.`;
     } else {
-        switch (scanObject.value.state) {
-            case 'SCANNING':
-                return `${scanFunction.value} started @${scanObject.value.start_time}`;
-            case 'FINISHED':
-                return `${scanFunction.value} finished @${scanObject.value.end_time}`;
-            case 'CANCELED':
-                return `${scanFunction.value} canceled @${scanObject.value.end_time}`;
-            case 'NONE':
-                return 'N/A';
-            default:
-                return '';
+        if (scanObject.value.pause !== 'None') {
+           return `${scanFunction.value} paused @ ${scanObject.value.pause}`;
+        } else {
+            switch (scanObject.value.state) {
+                case 'SCANNING':
+                    return `${scanFunction.value} started @${scanObject.value.start_time}`;
+                case 'FINISHED':
+                    return `${scanFunction.value} finished @${scanObject.value.end_time}`;
+                case 'CANCELED':
+                    return `${scanFunction.value} canceled @${scanObject.value.end_time}`;
+                case 'NONE':
+                    return 'N/A';
+                default:
+                    return '';
+            }
         }
     }
+    
 });
 
 const miniStateMsg = computed(() => {
-    // scanFunction.value }} {{ scanObject.state }} ({{ parseFloat(scanPercentage.toFixed(2)) }}%)
-    if (scanObject.value.pause !== 'None') {
-       return `${scanFunction.value} Paused (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
+    if (scanObject.value.state === null) {
+        return `No scan data found.`;
     } else {
-        switch (scanObject.value.state) {
-            case 'SCANNING':
-                return `${scanFunction.value}... (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
-            case 'FINISHED':
-                return `${scanFunction.value} Complete`;
-            case 'CANCELED':
-                return `${scanFunction.value} Canceled (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
-            case 'NONE':
-                return 'N/A';
-            default:
-                return '';
+        if (scanObject.value.pause !== 'None') {
+            return `${scanFunction.value} Paused (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
+        } else {
+            switch (scanObject.value.state) {
+                case 'SCANNING':
+                    return `${scanFunction.value}... (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
+                case 'FINISHED':
+                    return `${scanFunction.value} Complete`;
+                case 'CANCELED':
+                    return `${scanFunction.value} Canceled (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
+                case 'NONE':
+                    return 'N/A';
+                default:
+                    return '';
+            }
         }
     }
+   
 });
 
 const scanPercentage = computed(() => {

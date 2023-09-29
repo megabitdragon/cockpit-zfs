@@ -6,15 +6,7 @@
 				<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
 				<button id="importPool" class="btn btn-secondary" @click="importNewPoolBtn">Import Storage Pool</button>
 				<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData"><ArrowPathIcon class="w-5 h-5"/></button>
-			</div>
-			<!-- <div class="ml-6">
-				<div v-if="loading" class="text-muted mt-2 animate-pulse flex flex-row w-full h-max bg-accent justify-center">
-					{{ loadingMessage }}
-				</div>
-				<div v-else class="text-success mt-2 flex flex-row w-full h-max bg-accent justify-center">
-					{{ message }}
-				</div>
-			</div> -->
+			</div>			
 		</div>
 
 		<div class="mt-8 overflow-visible rounded-md">
@@ -25,8 +17,6 @@
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
 							<tr class="bg-well rounded-t-md grid grid-cols-10">
-								<!-- <tr class="bg-well rounded-t-md grid grid-cols-8"> -->
-
 								<th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -40,17 +30,14 @@
 								<th class="relative py-3.5 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								
 							</tr>
 						</thead>
 					</table>
 					
 					<div v-if="poolData.length > 0 && poolsLoaded == true">
 						<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-10'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-9'" :contentColSpan="'col-span-10'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="pool, poolIdx in poolData" :key="poolIdx">
-							<!-- <Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" v-for="pool, poolIdx in poolData" :key="poolIdx"> -->
 							<template v-slot:title>
 								<div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center">
-									<!-- <div class="grid grid-cols-7 grid-flow-cols w-full justify-center text-center"> -->
 									<button @click="showPoolModal(poolData[poolIdx])!" class="grid grid-cols-8 col-span-8 hover:bg-accent pt-1 rounded-r-md">
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].name }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].status }}</div>
@@ -73,7 +60,7 @@
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.allocated }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.free }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.size }}</div>
-										<div class="py-6 col-span-2">
+										<div class="py-6 -mt-2 col-span-2">
 											<Status :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_continuous="continuousScanCheck(poolData[poolIdx].name)" @scan_now="scanNow(poolData[poolIdx].name)"/>
 										</div>
 									</button>
@@ -126,7 +113,7 @@
 									<!-- <Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx"> -->
 									<template v-slot:title>
 										<div class="grid grid-cols-8 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
-											<div class="col-span-8 text-center py-4 mt-1">
+											<div class="col-span-7 text-center py-4 mt-1">
 												{{ vDev.name }} ({{ vDev.type }})
 											</div>
 											<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
@@ -330,10 +317,6 @@ const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 const selectedVDev = ref<vDevData>();
 
-const message = ref('');
-const loadingMessage = ref('');
-const loading = ref(false);
-
 const clearLabels = inject<Ref<boolean>>('clear-labels')!;
 
 ///////// Values for Confirmation Modals ////////////
@@ -376,8 +359,6 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	message.value = '';
-	//notifications.value.constructNotification('Data Refreshed', "Sucessfully refreshed pool, disk and filesystem data.", 'success');
 }
 
 ////////////////// Destroy Pool /////////////////////
@@ -425,7 +406,6 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		confirmDelete.value = false;
 		showDeletePoolConfirm.value = false;
 		operationRunning.value = false;
-		message.value = "Destroyed " + selectedPool.value!.name + " at " + getTimestampString();
 		notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
 	}
 });
@@ -451,27 +431,85 @@ const updateShowResilverPool = (newVal) => {
 	showResilverModal.value = newVal;
 }
 
+async function resilverAndScan() {
+	await resilverPool(selectedPool.value!);
+	scanNow(selectedPool.value!.name);
+}
+
 watch(confirmResilver, async (newValue, oldValue) => {
 	if (confirmResilver.value == true) {
 		operationRunning.value = true;
 		resilvered.value = false;
 		console.log('now resilvering:', selectedPool.value);
 
-		loading.value = true;
-		loadingMessage.value = `Resilvering ${selectedPool.value!.name}...`;
-
 		showResilverModal.value = false;
-		await resilverPool(selectedPool.value);
+		await resilverAndScan();
 
 		confirmResilver.value = false;
 		resilvered.value = true;
 		operationRunning.value = false;
-		loading.value = false;
-		loadingMessage.value = "";
-		message.value = "Resilver on " + selectedPool.value!.name + " completed at " + getTimestampString();
+
 		notifications.value.constructNotification('Resilver Completed', 'Resilver on ' + selectedPool.value!.name + " completed.", 'success');
 	}
 });
+
+/////////////////// Scrub Pool //////////////////////
+/////////////////////////////////////////////////////
+const showScrubModal = ref(false);
+const confirmScrub = ref(false);
+const scrubbed = ref(false);
+
+async function scrubThisPool(pool) {
+	cleared.value = false;
+	selectedPool.value = pool;
+	showScrubModal.value = true;
+
+	console.log('preparing to scrub:', selectedPool.value);
+}
+
+const confirmThisScrub : ConfirmationCallback = () => {
+	confirmScrub.value = true;
+}
+
+const updateShowScrubPool = (newVal) => {
+	showScrubModal.value = newVal;
+}
+
+async function scrubAndScan() {
+	await scrubPool(selectedPool.value!);
+	scanNow(selectedPool.value!.name);
+}
+
+watch(confirmScrub, async (newVal, oldVal) => {
+	if (confirmScrub.value == true) {
+		scrubbed.value = false;
+		operationRunning.value = true;
+		console.log('now scrubbing:', selectedPool.value);
+
+		await scrubAndScan();
+
+		operationRunning.value = false;
+		scrubbed.value = true;
+		showScrubModal.value = false;
+		
+		notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
+	}
+});
+
+async function pauseScrub(pool) {
+	await scrubPool(pool, 'pause');
+	scanNow(pool.name);
+}
+
+async function resumeScrub(pool) {
+	await scrubPool(pool);
+	scanNow(pool.name);
+}
+
+async function stopScrub(pool) {
+	await scrubPool(pool, 'stop');
+	scanNow(pool.name);
+}
 
 //////////////////// TRIM Pool //////////////////////
 /////////////////////////////////////////////////////
@@ -502,9 +540,6 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		trimmed.value = false;
 		console.log('now trimming:', selectedPool.value);
 
-		loading.value = true;
-		loadingMessage.value = `Trimming ${selectedPool.value!.name}...`;
-
 		if (firstOptionToggle.value) {
 			confirmTrim.value = false;	
 			showTrimModal.value = false;
@@ -517,53 +552,7 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		operationRunning.value = false;
 		trimmed.value = true;
 
-		loading.value = false;
-		loadingMessage.value = "";
-		message.value = "Trim on " + selectedPool.value!.name + " completed at " + getTimestampString();
 		notifications.value.constructNotification('Trim Completed', 'Trim on ' + selectedPool.value!.name + " completed.", 'success');
-	}
-});
-
-/////////////////// Scrub Pool //////////////////////
-/////////////////////////////////////////////////////
-const showScrubModal = ref(false);
-const confirmScrub = ref(false);
-const scrubbed = ref(false);
-
-async function scrubThisPool(pool) {
-	cleared.value = false;
-	selectedPool.value = pool;
-	showScrubModal.value = true;
-
-	console.log('preparing to scrub:', selectedPool.value);
-}
-
-const confirmThisScrub : ConfirmationCallback = () => {
-	confirmScrub.value = true;
-}
-
-const updateShowScrubPool = (newVal) => {
-	showScrubModal.value = newVal;
-}
-
-watch(confirmScrub, async (newVal, oldVal) => {
-	if (confirmScrub.value == true) {
-		scrubbed.value = false;
-		operationRunning.value = true;
-		console.log('now scrubbing:', selectedPool.value);
-
-		loading.value = true;
-		loadingMessage.value = `Scrubbing ${selectedPool.value!.name}...`;
-
-		await scrubPool(selectedPool.value!);
-
-		operationRunning.value = false;
-		scrubbed.value = true;
-		showScrubModal.value = false;
-		loading.value = false;
-		loadingMessage.value = "";
-		message.value = "Scrub on " + selectedPool.value!.name + " ended at " + getTimestampString();
-		notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
 	}
 });
 
@@ -600,7 +589,7 @@ watch(confirmExport, async (newVal, oldVal) => {
 		} else {
 			exportPool(selectedPool.value!);
 		}
-		message.value = "Exported " + selectedPool.value!.name + " at " + getTimestampString();
+
 		notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
 		refreshAllData();
 		confirmExport.value = false;
@@ -655,7 +644,6 @@ const showAddVDevModal = ref(false);
 
 const showRemoveVDevConfirm = ref(false);
 const confirmRemove = ref(false);
-const removing = ref(false);
 
 function showAddVDev(pool) {
 	selectedPool.value = pool;
@@ -690,7 +678,7 @@ watch(confirmRemove, async (newValue, oldValue) => {
 		confirmRemove.value = false;
 		showRemoveVDevConfirm.value = false;
 		operationRunning.value = false;
-		message.value = "Removed " + selectedVDev.value!.name + " from " + selectedVDev.value!.name + " at " + getTimestampString();
+
 		notifications.value.constructNotification('Remove Completed', 'Removal of VDev '+ selectedVDev.value!.name + " from " + selectedVDev.value!.name + " completed.", 'success');
 	}
 });
@@ -742,7 +730,7 @@ watch(confirmDetach, async (newValue, oldValue) => {
 		showDetachDiskModal.value = false;
 		detaching.value = false;
 		operationRunning.value = false;
-		message.value = "Detached disk " + selectedDisk.value!.name + " from " + selectedPool.value!.name + " at " + getTimestampString();
+
 		notifications.value.constructNotification('Detach Completed', selectedDisk.value!.name + " was detached from " + selectedPool.value!.name + ".", 'success');
 	}
 });
@@ -774,7 +762,7 @@ watch(confirmOffline, async (newVal, oldVal) => {
 		operationRunning.value = true;
 		console.log('now offlining:', selectedDisk.value);
 		await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
-		message.value = "Offlined " + selectedDisk.value!.name + " at " + getTimestampString();
+
 		notifications.value.constructNotification('Offline Completed', 'Offlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
 		refreshAllData();
 		confirmOffline.value = false;
@@ -824,7 +812,7 @@ watch(confirmOnline, async (newVal, oldVal) => {
 		showOnlineDiskModal.value = false;
 		onlining.value = false;
 		operationRunning.value = false;
-		message.value = "Offlined " + selectedDisk.value!.name + " at " + getTimestampString();
+
 		notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
 	}
 });
@@ -866,7 +854,7 @@ watch(confirmTrimDisk, async (newVal, oldVal) => {
 			await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
 		}
 		
-		message.value = "Trimmed " + selectedDisk.value!.name + " at " + getTimestampString();
+
 		notifications.value.constructNotification('Online Completed', 'Trimming of disk ' + selectedDisk.value!.name + " completed.", 'success');
 		refreshAllData();
 		confirmTrimDisk.value = false;
@@ -941,6 +929,7 @@ async function scanNow(poolName) {
     } 
 }
 
+const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);

@@ -253,7 +253,7 @@ export async function trimPool(pool, isSecure?) {
 		if(isSecure) {
 			cmdString.push('-d');
 		}
-		cmdString.push('-w');
+		// cmdString.push('-w');
 		cmdString.push(pool.name);
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
