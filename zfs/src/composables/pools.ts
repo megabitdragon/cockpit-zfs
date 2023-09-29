@@ -267,14 +267,19 @@ export async function trimPool(pool, isSecure?) {
 	}
 }
 
-export async function scrubPool(pool) {
+export async function scrubPool(pool, action?) {
 	try {
 		let cmdString = ['zpool', 'scrub'];
 
-		// if(isSecure) {
-		// 	cmdString.push('-d');
-		// }
-		cmdString.push('-w');
+		if(action === 'pause') {
+			cmdString.push('-p');
+		}
+
+		if(action === 'stop') {
+			cmdString.push('-s');
+		}
+		
+		// cmdString.push('-w');
 		cmdString.push(pool.name);
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
@@ -287,6 +292,8 @@ export async function scrubPool(pool) {
 		return null;
 	}
 }
+
+
 
 export async function resilverPool(pool) {
 	try {

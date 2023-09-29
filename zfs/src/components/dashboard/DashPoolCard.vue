@@ -70,8 +70,13 @@
 				
 			</template>
 			<template v-slot:content>
-				<div class="flex flex-row w-full h-max rounded-sm justify-center">
-					<Status :idKey="'status-box'" :poolName="props.pool.name"/>
+				<div class="grid grid-cols-4 gap-0.5 w-full h-max rounded-sm justify-center">
+					<Status :isPoolList="false" class="col-span-4" :idKey="'status-box'" @scan_continuous="continuousScanCheck()" @scan_now="scanNow()"/>
+					<div v-if="scanObject.function === 'SCRUB' && isScanning" class="btn-group-row w-full col-span-4">
+						<button class="btn btn-primary" v-if="!isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
+						<button class="btn btn-secondary" v-if="isPaused" @click="resumeScrub(props.pool)">Resume Scrub</button>
+						<button class="btn btn-danger" @click="stopScrub(props.pool)">Cancel Scrub</button>
+					</div>
 				</div>
 			</template>
 			<template v-slot:footer>
@@ -117,16 +122,16 @@
 import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools, loadScanObject } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
 import { getTimestampString } from "../../composables/helpers";
 import Card from '../common/Card.vue';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import PoolDetail from "../pools/PoolDetail.vue";
-import LoadingSpinner from "../common/LoadingSpinner.vue";
 import Status from '../common/Status.vue';
 import AddVDevModal from "../pools/AddVDevModal.vue";
+
 
 interface DashPoolCardProps {
 	pool: PoolData;
@@ -134,7 +139,7 @@ interface DashPoolCardProps {
 
 const notifications = inject<Ref<any>>('notifications')!;
 	
-const messageTimestamp = ref('');
+// const messageTimestamp = ref('');
 const props = defineProps<DashPoolCardProps>();
 const selectedPool = ref<PoolData>();
 
@@ -275,21 +280,26 @@ const updateShowResilverPool = (newVal) => {
 	showResilverModal.value = newVal;
 }
 
+async function resilverAndScan() {
+	resilverPool(selectedPool.value!);
+	scanNow();
+}
+
 watch(confirmResilver, async (newValue, oldValue) => {
 	if (confirmResilver.value == true) {
-		resilvering.value = true;
-		operationRunning.value = true;
 		resilvered.value = false;
+		resilvering.value = true;
+		operationRunning.value = resilvering.value;
+		
 		console.log('now resilvering:', selectedPool.value);
-
 		showResilverModal.value = false;
-		await resilverPool(selectedPool.value);
+		await resilverAndScan();
 
 		confirmResilver.value = false;
 		resilvered.value = true;
 		resilvering.value = false;
 		operationRunning.value = false;
-		messageTimestamp.value = getTimestampString();
+		// messageTimestamp.value = getTimestampString();
 		notifications.value.constructNotification('Resilver Completed', 'Resilver on ' + selectedPool.value!.name + " completed.", 'success');
 	}
 });
@@ -337,7 +347,7 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		trimming.value = false;
 		operationRunning.value = false;
 		trimmed.value = true;
-		messageTimestamp.value = getTimestampString();
+		// messageTimestamp.value = getTimestampString();
 		notifications.value.constructNotification('Trim Completed', 'Trim on ' + selectedPool.value!.name + " completed.", 'success');
 	}
 });
@@ -349,7 +359,7 @@ const confirmScrub = ref(false);
 const scrubbed = ref(false);
 const scrubbing = ref(false);
 
-async function scrubThisPool(pool) {
+function scrubThisPool(pool) {
 	cleared.value = false;
 	selectedPool.value = pool;
 	showScrubModal.value = true;
@@ -365,23 +375,43 @@ const updateShowScrubPool = (newVal) => {
 	showScrubModal.value = newVal;
 }
 
+async function scrubAndScan() {
+	scrubPool(selectedPool.value!);
+	scanNow();
+}
+
 watch(confirmScrub, async (newVal, oldVal) => {
 	if (confirmScrub.value == true) {
 		scrubbed.value = false;
 		scrubbing.value = true;
 		operationRunning.value = scrubbing.value;
+
 		console.log('now scrubbing:', selectedPool.value);
 		showScrubModal.value = false;
-		await scrubPool(selectedPool.value!);
-
+		await scrubAndScan();
+		
 		scrubbing.value = false;
 		operationRunning.value = scrubbing.value;
 		scrubbed.value = true;
-		
-		messageTimestamp.value = getTimestampString();
+
 		notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
 	}
 });
+
+function pauseScrub(pool) {
+	scrubPool(pool, 'pause');
+	scanNow();
+}
+
+function resumeScrub(pool) {
+	scrubPool(pool);
+	scanNow();
+}
+
+function stopScrub(pool) {
+	scrubPool(pool, 'stop');
+	scanNow();
+}
 
 /////////////////// Export Pool /////////////////////
 /////////////////////////////////////////////////////
@@ -425,7 +455,6 @@ watch(confirmExport, async (newVal, oldVal) => {
 	}
 });
 
-
 /////////////////// Clear Errors ////////////////////
 /////////////////////////////////////////////////////
 const cleared = ref(false);
@@ -444,6 +473,57 @@ function showAddVDev(pool) {
 	selectedPool.value = pool;
 	console.log(selectedPool);
 	showAddVDevModal.value = true;
+}
+
+///////////////////// Scanning //////////////////////
+/////////////////////////////////////////////////////
+const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
+
+const isScanning = computed(() => {
+    if (scanObject.value.state === 'SCANNING') {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+const isFinished = computed(() => {
+    if (scanObject.value.state === 'FINISHED') {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+const isCanceled = computed(() => {
+    if (scanObject.value.state === 'CANCELED') {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+const isPaused = computed(() => {
+    return scanObject.value.pause !== 'None';
+});
+
+//method to repeatedly check scan object
+async function continuousScanCheck() {
+    if (!isFinished.value || !isCanceled.value) {
+        setInterval(async () => {
+            await loadScanObject(scanObject, props.pool.name);
+            console.log('continuous scan object:', scanObject.value);
+        }, 5000);
+    }
+}
+
+//method to check scan object on first load, and if scanning, then repeatedly check
+async function scanNow() {
+    await loadScanObject(scanObject, props.pool.name);
+    console.log('scan object:', scanObject.value);
+    if (isScanning.value) {
+        continuousScanCheck();
+    } 
 }
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
@@ -474,4 +554,9 @@ provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);
 provide('modal-option-three-toggle', thirdOptionToggle);
 provide('modal-option-four-toggle', fourthOptionToggle);
+
+provide('is-scanning', isScanning);
+provide('is-finished', isFinished);
+provide('is-canceled', isCanceled);
+provide('is-paused', isPaused);
 </script>

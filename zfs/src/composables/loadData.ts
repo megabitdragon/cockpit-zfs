@@ -10,7 +10,6 @@ const vDevs = ref<vDevData[]>([]);
 
 export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName? : string) {
 	try {
-		// if (poolName) {
 			const rawJSON = await getScan(poolName);
 			const parsedJSON = JSON.parse(rawJSON);
 			//console.log(`Scan JSON for ${poolName}:`, parsedJSON);
@@ -27,34 +26,6 @@ export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName?
 			scanObject.value.bytes_issued = parsedJSON.bytes_issued;
 			scanObject.value.bytes_processed = parsedJSON.bytes_processed;
 			scanObject.value.bytes_to_process = parsedJSON.bytes_to_process;
-
-			//console.log("Scan Object:", scanObject);
-		// } else {
-		// 	const rawJSON = await getScan();
-		// 	const parsedJSON = JSON.parse(rawJSON);
-		// 	console.log(`Scan JSON:`, parsedJSON);
-
-		// 	for (let i = 0; i < parsedJSON.length; i++) {
-
-		// 		const scan : PoolScanObject = {
-		// 			name: parsedJSON[i].name,
-		// 			function: parsedJSON[i].function,
-		// 			start_time: parsedJSON[i].start_time,
-		// 			end_time: parsedJSON[i].end_time,
-		// 			pause: parsedJSON[i].pause,
-		// 			state: parsedJSON[i].state,
-		// 			errors: parsedJSON[i].errors,
-		// 			percentage: parsedJSON[i].percentage,
-		// 			total_secs_left: parsedJSON[i].total_secs_left,
-		// 			bytes_issued: parsedJSON[i].bytes_issued,
-		// 			bytes_processed: parsedJSON[i].bytes_processed,
-		// 			bytes_to_process: parsedJSON[i].bytes_to_process,
-		// 		}
-		// 		if (!scanObject.value.includes(scan)) 
-		// 		scanObject.value.push(scan);
-		// 	}
-		// 	console.log("Scan Object:", scanObject);
-		// }
 
 	} catch (error) {
 		console.error("An error occurred getting scan objects:", error);

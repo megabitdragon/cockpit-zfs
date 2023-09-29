@@ -50,18 +50,12 @@ const scanObject = ref<PoolScanObject>({
 	state: '',
 	errors: 0,
 	percentage: 0,
-	pause: '',
+	pause: 'None',
 	total_secs_left: 0,
 	bytes_issued: 0,
 	bytes_processed: 0,
 	bytes_to_process: 0,
 });
-
-// setInterval(() => {
-//     pools.value.forEach(pool => {
-// 		loadScanObject(scanObject.value, pool.name);
-// 	});
-// }, 5000);
 
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);

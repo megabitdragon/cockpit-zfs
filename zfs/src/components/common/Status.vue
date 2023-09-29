@@ -1,102 +1,74 @@
 <template>
     <div>
-        <div class="grid grid-cols-4 gap-1 justify-items-center">
+        <div v-if="!isPoolList">
+            <div class="grid grid-cols-4 gap-1 justify-items-center">
 
-            <span class="col-span-4" :class="stateMessageClass()">
-                {{ stateMessage }}
-            </span>
-
-            <span v-if="isScanning && !isPaused" class="col-span-4">
-                Completes in {{ timeRemaining }}.
-            </span>
-       
-            <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
-                <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                    <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-                        {{ parseFloat(scanPercentage.toFixed(2)) }}%
+                <span class="col-span-4" :class="stateMessageClass()">
+                    {{ stateMessage }}
+                </span>
+        
+                <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                    <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+                            {{ parseFloat(scanPercentage.toFixed(2)) }}%
+                        </div>
                     </div>
                 </div>
+
+                <span class="text-muted col-span-4">
+                    {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
+                </span>
+
+                <span v-if="isScanning && !isPaused" class="col-span-4">
+                    Completes in {{ timeRemaining }}.
+                </span>
+
             </div>
-
-            <span class="text-muted col-span-4">
-                {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
-            </span>
-
         </div>
+
+        <div v-if="isPoolList">
+            <div class="grid-grid-cols-2 gap-0.5 justify items-center">
+                <span class="col-span-2" :class="stateMessageClass()">
+                    {{ scanObject.function }} {{ scanObject.state }}
+                </span>
+                <span>
+                    <span v-if="isScanning && !isPaused" class="col-span-2">
+                        Completes in {{ timeRemaining }}.
+                    </span>
+                </span>
+            </div>
+        </div>
+        
     </div>
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
 import { convertBytesToSize, convertSecondsToString } from "../../composables/helpers";
-import { loadScanObject } from '../../composables/loadData';
 
 interface StatusProps {
-    poolName: string;
+    isPoolList: boolean;
 }
 
 const props = defineProps<StatusProps>();
-const paused = ref(false);
+const notifications = inject<Ref<any>>('notifications')!;
+
 const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
+const isScanning = inject<Ref<boolean>>('is-scanning')!;
+const isFinished = inject<Ref<boolean>>('is-finished')!;
+const isCanceled = inject<Ref<boolean>>('is-canceled')!;
+const isPaused = inject<Ref<boolean>>('is-paused')!;
 
-//method to repeatedly check scan object
-async function continuousScanCheck() {
-    if (!isFinished) {
-        setInterval(async () => {
-            await loadScanObject(scanObject, props.poolName);
-            console.log('continuous scan object:', scanObject.value);
-        }, 5000);
-    }
+const emit = defineEmits(['scan_now', 'scan_continuous']);
+
+const scanContinuous = () => {
+    emit('scan_continuous');
 }
 
-//method to check scan object on first load, and if scanning, then repeatedly check
-async function scanOnLoad() {
-    await loadScanObject(scanObject, props.poolName);
-    console.log('scan@load object:', scanObject.value);
-    if (isScanning.value) {
-        continuousScanCheck();
-    } 
+const scanNow = () => {
+    emit('scan_now');
 }
 
-//method to check scan when user input is given (click on resilver, scrub, or refresh)
-async function scanOnInput() {
-    await loadScanObject(scanObject, props.poolName);
-    console.log('scan@input object:', scanObject.value);
-    if (isScanning.value) {
-        continuousScanCheck();
-    }
- }
-
-scanOnLoad();
-
-const isScanning = computed(() => {
-    if (scanObject.value.state === 'SCANNING') {
-        return true;
-    } else {
-        return false;
-    }
-});
-
-
-const isFinished = computed(() => {
-    if (scanObject.value.state === 'FINISHED') {
-        return true;
-    } else {
-        return false;
-    }
-});
-
-
-const isCanceled = computed(() => {
-    if (scanObject.value.state === 'CANCELED') {
-        return true;
-    } else {
-        return false;
-    }
-});
-
-const isPaused = computed(() => {
-    return scanObject.value.pause !== 'None';
-});
+scanNow();
 
 //scan function : NONE | SCRUB | RESILVER
 const scanFunction = computed(() => {
@@ -187,14 +159,17 @@ function progressBarClass() {
    
 }
 
-
-
-
 watch(scanObject, (newVal, oldVal) => {
-    // operationRunning.value = isScanning.value;
-    // operationCompleted.value = newVal.state === 'FINISHED' || newVal.state === 'CANCELED';
-    // paused.value = isPaused.value;
+    if (scanObject.value.state === 'SCANNING') {
+        scanContinuous();
+    }
 
+    //notifications : 'info' | 'warning' | 'error' | 'success' | 'denied';
+    if (scanObject.value.state === 'FINISHED') {
+        notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'success');
+    } else if (scanObject.value.state === 'CANCELED') {
+        notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'denied');
+    }
 });
 
 </script>
