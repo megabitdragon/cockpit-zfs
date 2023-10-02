@@ -75,6 +75,17 @@ interface DiskData {
 	vDevName?: string;
 	poolName?: string;
 	identifier?: DiskIdentifier;
+	children?: ChildDiskData[];
+}
+
+interface ChildDiskData {
+	name: string;
+	guid: string;
+	path: string;
+	stats: {};
+	status: string;
+	type: string;
+	children?:[];
 }
 
 //object for importing pools

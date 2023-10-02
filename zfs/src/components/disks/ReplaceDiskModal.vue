@@ -197,17 +197,17 @@ async function replaceDiskBtn() {
         await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
         showReplaceDiskModal.value = false;
         adding.value = false;
-        disksLoaded.value = false;
-        poolsLoaded.value = false;
-        fileSystemsLoaded.value = false;
-        allDisks.value = [];
-        pools.value = [];
-        datasets.value = [];
-        await loadDisksThenPools(allDisks, pools);
-        await loadDatasets(datasets);
-        disksLoaded.value = true;
-        poolsLoaded.value = true;
-        fileSystemsLoaded.value = true;
+        // disksLoaded.value = false;
+        // poolsLoaded.value = false;
+        // fileSystemsLoaded.value = false;
+        // allDisks.value = [];
+        // pools.value = [];
+        // datasets.value = [];
+        // await loadDisksThenPools(allDisks, pools);
+        // await loadDatasets(datasets);
+        // disksLoaded.value = true;
+        // poolsLoaded.value = true;
+        // fileSystemsLoaded.value = true;
     }
 }
 

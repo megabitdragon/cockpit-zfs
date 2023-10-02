@@ -146,7 +146,7 @@ export async function replaceDisk(poolName, diskName, newDiskName, forceReplace?
 			cmdString.push('-f');
 		}
 
-		cmdString.push('-w');
+		// cmdString.push('-w');
 		
 		cmdString.push(poolName);
 		cmdString.push(diskName);
@@ -172,7 +172,7 @@ export async function trimDisk(poolName, diskName, isSecure?) {
 			cmdString.push('-d');
 		}
 		//wait to finish before returning (remove?)
-		cmdString.push('-w');
+		// cmdString.push('-w');
 
 		cmdString.push(poolName);
 		cmdString.push(diskName);
