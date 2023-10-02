@@ -71,7 +71,7 @@
 			</template>
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_continuous="continuousScanCheck()" @scan_now="scanNow()"/>
+					<Status :scanObjectGroup="scanObjectGroup" :scanObject="scanObject" :poolName="props.pool.name" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_continuous="continuousScanCheck()" @scan_now="scanNow()"/>
 					<div v-if="scanObject.function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
@@ -100,13 +100,6 @@
 							Stopping...
 						</button>
 
-					<!-- 	<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-primary">
-								<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-									<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="text-success"/>
-								</svg>
-								Pausing...
-							</button> -->
 					</div>
 				</div>
 			</template>
@@ -153,7 +146,7 @@
 import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadDatasets, loadDisksThenPools, loadScanObject } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools, loadScanObject, loadScanObjectGroup } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
 import { getTimestampString } from "../../composables/helpers";
@@ -518,9 +511,15 @@ function showAddVDev(pool) {
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 
 const isScanning = computed(() => {
-    if (scanObject.value.state === 'SCANNING') {
+    // if (scanObject.value.state === 'SCANNING') {
+    //     return true;
+    // } else {
+    //     return false;
+    // }
+	if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
         return true;
     } else {
         return false;
@@ -528,7 +527,12 @@ const isScanning = computed(() => {
 });
 
 const isFinished = computed(() => {
-    if (scanObject.value.state === 'FINISHED') {
+    // if (scanObject.value.state === 'FINISHED') {
+    //     return true;
+    // } else {
+    //     return false;
+    // }
+	if (scanObjectGroup.value[props.pool.name].state === 'FINISHED') {
         return true;
     } else {
         return false;
@@ -536,7 +540,12 @@ const isFinished = computed(() => {
 });
 
 const isCanceled = computed(() => {
-    if (scanObject.value.state === 'CANCELED') {
+    // if (scanObject.value.state === 'CANCELED') {
+    //     return true;
+    // } else {
+    //     return false;
+    // }
+	if (scanObjectGroup.value[props.pool.name].state === 'CANCELED') {
         return true;
     } else {
         return false;
@@ -544,27 +553,35 @@ const isCanceled = computed(() => {
 });
 
 const isPaused = computed(() => {
-    return scanObject.value.pause !== 'None';
+    // return scanObject.value.pause !== 'None';
+	return scanObjectGroup.value[props.pool.name].pause !== 'None';
 });
 
 //method to repeatedly check scan object
 async function continuousScanCheck() {
     if (!isFinished || !isCanceled) {
         setInterval(async () => {
-            await loadScanObject(scanObject, props.pool.name);
-            console.log('continuous scan object:', scanObject.value);
+            // await loadScanObject(scanObject, props.pool.name);
+            // console.log('continuous scan object:', scanObject.value);
+			await loadScanObjectGroup(scanObjectGroup);
+            console.log('scan object continue:', scanObjectGroup.value);
         }, 5000);
     }
 }
 
 //method to check scan object on first load, and if scanning, then repeatedly check
 async function scanNow() {
-    await loadScanObject(scanObject, props.pool.name);
-    console.log('scan object:', scanObject.value);
+    // await loadScanObject(scanObject, props.pool.name);
+    // console.log(`scan object for ${props.pool.name}:`, scanObject.value);
+	await loadScanObjectGroup(scanObjectGroup);
+            console.log('scan object now:', scanObjectGroup.value);
     if (isScanning) {
         continuousScanCheck();
     } 
 }
+
+scanNow();
+
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 

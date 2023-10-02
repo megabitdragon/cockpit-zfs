@@ -61,7 +61,7 @@
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.free }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.size }}</div>
 										<div class="py-6 -mt-2 col-span-2">
-											<Status :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_continuous="continuousScanCheck(poolData[poolIdx].name)" @scan_now="scanNow(poolData[poolIdx].name)"/>
+											<Status :scanObjectGroup="scanObjectGroup" :scanObject="scanObject" :poolName="poolData[poolIdx].name" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_continuous="continuousScanCheck(poolData[poolIdx].name)" @scan_now="scanNow(poolData[poolIdx].name)"/>
 										</div>
 									</button>
 									<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
@@ -800,7 +800,7 @@ watch(confirmOnline, async (newVal, oldVal) => {
 
 		if (secondOptionToggle.value == true) {
 			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
-			await scrubPool(selectedPool.value);
+			await scrubAndScan();
 			notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
 		} else {
 			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
@@ -880,6 +880,7 @@ function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
+	const scanObjectGroup = inject<Ref>('scan-object-group')!;
 
 const isScanning = computed(() => {
     if (scanObject.value.state === 'SCANNING') {

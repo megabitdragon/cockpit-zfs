@@ -4,7 +4,7 @@ import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath } from "./helpers";
 import { getSnapshots } from './snapshots';
-import { getScan } from './scan';
+import { getScan, getScanGroup } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
 
@@ -12,7 +12,7 @@ export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName?
 	try {
 			const rawJSON = await getScan(poolName);
 			const parsedJSON = JSON.parse(rawJSON);
-			//console.log(`Scan JSON for ${poolName}:`, parsedJSON);
+			console.log(`Scan JSON for ${poolName}:`, parsedJSON);
 
 			scanObject.value.name = parsedJSON.name;
 			scanObject.value.function = parsedJSON.function;
@@ -26,6 +26,19 @@ export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName?
 			scanObject.value.bytes_issued = parsedJSON.bytes_issued;
 			scanObject.value.bytes_processed = parsedJSON.bytes_processed;
 			scanObject.value.bytes_to_process = parsedJSON.bytes_to_process;
+
+	} catch (error) {
+		console.error("An error occurred getting scan objects:", error);
+	}
+}
+
+export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) {
+	try {
+			const rawJSON = await getScanGroup();
+			const parsedJSON = JSON.parse(rawJSON);
+			console.log(`Scan Group JSON:`, parsedJSON);
+
+			scanObject.value = parsedJSON;
 
 	} catch (error) {
 		console.error("An error occurred getting scan objects:", error);

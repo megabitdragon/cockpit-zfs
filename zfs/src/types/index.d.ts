@@ -308,6 +308,10 @@ interface PoolScanObject {
 	bytes_to_process: number;
 }
 
+interface PoolScanObjectGroup {
+	[poolName: string]: PoolScanObject;
+}
+
 type ConfirmationCallback = () => void;
 
 //object for navigation (generic)

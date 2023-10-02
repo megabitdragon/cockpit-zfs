@@ -6,7 +6,7 @@
                     {{ stateMessage }}
                 </span>
 
-                <div v-if="scanObject.state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
+                <div v-if="scanObjectGroup[props.poolName].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
                     <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
                         <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
                             <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
@@ -32,7 +32,7 @@
 
         <div v-if="isPoolList">
             <div class="grid-grid-cols-2 gap-1 justify items-center">
-                <div v-if="scanObject.state !== null" class="col-span-2">
+                <div v-if="scanObjectGroup[props.poolName].state !== null" class="col-span-2">
                     <span :class="stateMessageClass()">
                         {{ miniStateMsg }}
                     </span>
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="scanObject.state === null" class="col-span-2">
+                <div v-if="scanObjectGroup[props.poolName].state === null" class="col-span-2">
                     <span class="mt-2" :class="stateMessageClass()">
                         {{ miniStateMsg }}
                     </span>
@@ -59,6 +59,9 @@ import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
 import { convertBytesToSize, convertSecondsToString } from "../../composables/helpers";
 
 interface StatusProps {
+    poolName: string;
+    //scanObject: PoolScanObject;
+    scanObjectGroup: PoolScanObjectGroup;
     isPoolList: boolean;
     isPoolDetail: boolean;
 }
@@ -66,7 +69,10 @@ interface StatusProps {
 const props = defineProps<StatusProps>();
 const notifications = inject<Ref<any>>('notifications')!;
 
-const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
+// const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
+// const scanObject = ref(props.scanObject);
+const scanObjectGroup = ref(props.scanObjectGroup);
+    
 const isScanning = inject<Ref<boolean>>('is-scanning')!;
 const isFinished = inject<Ref<boolean>>('is-finished')!;
 const isCanceled = inject<Ref<boolean>>('is-canceled')!;
@@ -85,7 +91,7 @@ const scanNow = () => {
 scanNow();
 
 const scanFunction = computed(() => {
-    switch (scanObject.value.function) {
+    switch (scanObjectGroup.value[props.poolName].function) {
         case 'RESILVER':
             return 'Resilvering';
         case 'SCRUB':
@@ -98,19 +104,19 @@ const scanFunction = computed(() => {
 });
 
 const stateMessage = computed(() => {
-    if (scanObject.value.state === null) {
+    if (scanObjectGroup.value[props.poolName].state === null) {
         return `No scan data found.`;
     } else {
-        if (scanObject.value.pause !== 'None') {
-           return `${scanFunction.value} paused @ ${scanObject.value.pause}`;
+        if (scanObjectGroup.value[props.poolName].pause !== 'None') {
+           return `${scanFunction.value} paused at  ${scanObjectGroup.value[props.poolName].pause}`;
         } else {
-            switch (scanObject.value.state) {
+            switch (scanObjectGroup.value[props.poolName].state) {
                 case 'SCANNING':
-                    return `${scanFunction.value} started @${scanObject.value.start_time}`;
+                    return `${scanFunction.value} started at ${scanObjectGroup.value[props.poolName].start_time}`;
                 case 'FINISHED':
-                    return `${scanFunction.value} finished @${scanObject.value.end_time}`;
+                    return `${scanFunction.value} finished at ${scanObjectGroup.value[props.poolName].end_time}`;
                 case 'CANCELED':
-                    return `${scanFunction.value} canceled @${scanObject.value.end_time}`;
+                    return `${scanFunction.value} canceled at ${scanObjectGroup.value[props.poolName].end_time}`;
                 case 'NONE':
                     return 'N/A';
                 default:
@@ -122,13 +128,13 @@ const stateMessage = computed(() => {
 });
 
 const miniStateMsg = computed(() => {
-    if (scanObject.value.state === null) {
+    if (scanObjectGroup.value[props.poolName].state === null) {
         return `No scan data found.`;
     } else {
-        if (scanObject.value.pause !== 'None') {
+        if (scanObjectGroup.value[props.poolName].pause !== 'None') {
             return `${scanFunction.value} Paused (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
         } else {
-            switch (scanObject.value.state) {
+            switch (scanObjectGroup.value[props.poolName].state) {
                 case 'SCANNING':
                     return `${scanFunction.value}... (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
                 case 'FINISHED':
@@ -146,24 +152,24 @@ const miniStateMsg = computed(() => {
 });
 
 const scanPercentage = computed(() => {
-    return scanObject.value.percentage;
+    return scanObjectGroup.value[props.poolName].percentage;
 });
 
 const amountProcessed = computed(() => {
-    return convertBytesToSize(scanObject.value.bytes_issued);
+    return convertBytesToSize(scanObjectGroup.value[props.poolName].bytes_issued);
 });
 
 const amountTotal = computed(() => {
-    return convertBytesToSize(scanObject.value.bytes_processed);
+    return convertBytesToSize(scanObjectGroup.value[props.poolName].bytes_processed);
 });
 
 const timeRemaining = computed(() => {
-    return convertSecondsToString(scanObject.value.total_secs_left);
+    return convertSecondsToString(scanObjectGroup.value[props.poolName].total_secs_left);
 });
 
 function stateMessageClass() {
-    if (scanObject.value.pause === 'None') {
-        switch (scanObject.value.state) {
+    if (scanObjectGroup.value[props.poolName].pause === 'None') {
+        switch (scanObjectGroup.value[props.poolName].state) {
             case 'SCANNING':
                 return 'text-default';
             case 'FINISHED':
@@ -181,8 +187,8 @@ function stateMessageClass() {
 }
 
 function progressBarClass() {
-    if (scanObject.value.pause === 'None') {
-        switch (scanObject.value.state) {
+    if (scanObjectGroup.value[props.poolName].pause === 'None') {
+        switch (scanObjectGroup.value[props.poolName].state) {
             case 'SCANNING':
                 return 'bg-blue-600';
             case 'FINISHED':
@@ -200,15 +206,15 @@ function progressBarClass() {
    
 }
 
-watch(scanObject, (newVal, oldVal) => {
-    if (scanObject.value.state === 'SCANNING') {
+watch(scanObjectGroup, (newVal, oldVal) => {
+    if (scanObjectGroup.value[props.poolName].state === 'SCANNING') {
         scanContinuous();
     }
     
     //notifications : 'info' | 'warning' | 'error' | 'success' | 'denied';
-    if (scanObject.value.state === 'FINISHED') {
+    if (scanObjectGroup.value[props.poolName].state === 'FINISHED') {
         notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'success');
-    } else if (scanObject.value.state === 'CANCELED') {
+    } else if (scanObjectGroup.value[props.poolName].state === 'CANCELED') {
         notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'denied');
     }
    

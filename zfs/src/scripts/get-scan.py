@@ -11,7 +11,6 @@ def main():
 
     with libzfs.ZFS() as zfs:
         z_pools = {}
-		# z_pools = []
 
         for p in zfs.pools:
             if p.name == poolName:
@@ -22,9 +21,7 @@ def main():
                 pool['scan']['name'] = pool['name']
 
                 z_pools = pool['scan']
-                # z_pools.append(pool['scan'])
                 
-
     print(json.dumps(z_pools, indent=4))
     
 if __name__ == '__main__':
