@@ -181,7 +181,11 @@ export function convertSecondsToString(seconds) {
     }
     
     if (minutes > 0) {
-        result += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        result += `${minutes} minute${minutes > 1 ? 's' : ''} `;
+    }
+
+    if (hours === 0 && minutes === 0) {
+        result += `${seconds} second${seconds > 1 ? 's' : ''} `;
     }
     
     return result.trim();
