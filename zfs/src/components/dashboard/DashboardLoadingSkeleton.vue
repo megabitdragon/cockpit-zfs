@@ -1,9 +1,9 @@
 <template>
-    <div role="status" class="max-w-full min-w-full animate-pulse grid grid-cols-4 auto-rows-max gap-2">
+    <div role="status" class="max-w-full min-w-full animate-pulse grid grid-cols-3 auto-rows-max gap-1">
         <Card :class="['mt-2', 'mb-4', 'min-w-fit', 'rounded-md', 'border', 'border-default', props.color]"/>
         <Card :class="['mt-2', 'mb-4', 'min-w-fit', 'rounded-md', 'border', 'border-default', props.color]"/>
         <Card :class="['mt-2', 'mb-4', 'min-w-fit', 'rounded-md', 'border', 'border-default', props.color]"/>
-        <Card :class="['mt-2', 'mb-4', 'min-w-fit', 'rounded-md', 'border', 'border-default', props.color]"/>
+        <!-- <Card :class="['mt-2', 'mb-4', 'min-w-fit', 'rounded-md', 'border', 'border-default', props.color]"/> -->
         <span class="sr-only">Loading...</span>
     </div>
 

@@ -37,7 +37,7 @@
 			</div>
 
 			<!-- pools card layout -->
-			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-cols-4 auto-rows-max gap-2">
+			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-cols-3 auto-rows-max gap-1">
 				<div v-for="(pool, index) in pools" :key="index">
 					<DashPoolCard :pool="pools[index]!"/>
 				</div>

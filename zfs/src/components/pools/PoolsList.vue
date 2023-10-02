@@ -299,7 +299,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, replaceDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObject } from '../../composables/loadData';
-import { getTimestampString } from "../../composables/helpers";
 import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolDetail from "./PoolDetail.vue";
 import ImportPool from "./ImportPool.vue";
