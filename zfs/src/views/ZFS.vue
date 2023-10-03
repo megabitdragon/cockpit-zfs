@@ -79,12 +79,34 @@ async function initialLoad(disks, pools, datasets) {
 
 initialLoad(disks, pools, datasets);
 
-async function scanGroup() {
-	console.log('initial scan:');
-	loadScanObjectGroup(scanObjectGroup);
+scanNow();
+
+const intervalID = ref();
+const scanning = ref(true);
+
+async function scanNow() {
+	await loadScanObjectGroup(scanObjectGroup);
 }
 
-scanGroup();
+function startInterval() {
+	if (!intervalID.value) {
+		intervalID.value = setInterval(scanNow, 5000);
+	}
+}
+
+function stopInterval() {
+	if (intervalID.value) {
+		clearInterval(intervalID.value);
+		intervalID.value = null;
+	}
+}
+
+if (scanning.value) {
+	startInterval();
+} else {
+	stopInterval();
+}
+
 
 //provide data for other components to inject
 provide("pools", pools);
@@ -100,5 +122,8 @@ provide('clear-labels', clearLabels);
 provide("snapshots", snapshots);
 provide('scan-object', scanObject);
 provide('scan-object-group', scanObjectGroup);
+
+provide('interval', intervalID);
+provide('scanning', scanning);
 </script>
 

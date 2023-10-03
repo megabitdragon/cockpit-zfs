@@ -71,7 +71,7 @@
 			</template>
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :scanObjectGroup="scanObjectGroup" :scanObject="scanObject" :poolName="props.pool.name" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_continuous="continuousScanCheck()" @scan_now="scanNow()"/>
+					<Status :scanObjectGroup="scanObjectGroup" :scanObject="scanObject" :poolName="props.pool.name" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()"/>
 					<div v-if="scanObjectGroup[props.pool.name].function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
@@ -369,32 +369,36 @@ watch(confirmScrub, async (newVal, oldVal) => {
 		showScrubModal.value = false;
 		await scrubAndScan();
 		
+		confirmScrub.value = false;
 		scrubbing.value = false;
 		operationRunning.value = scrubbing.value;
 		scrubbed.value = true;
-
+		
 		notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
 	}
 });
 
 async function pauseScrub(pool) {
 	pausing.value = true;
+	scanning.value = false;
 	await scrubPool(pool, 'pause');
-	scanNow();
+	// scanNow();
 	pausing.value = false;
 }
 
 async function resumeScrub(pool) {
 	resuming.value = true;
+	scanning.value = true;
 	await scrubPool(pool);
-	scanNow();
+	// scanNow();
 	resuming.value = false
 }
 
 async function stopScrub(pool) {
 	stopping.value = true;
+	scanning.value = false;
 	await scrubPool(pool, 'stop');
-	scanNow();
+	// scanNow();
 	stopping.value = false;
 }
 
@@ -557,29 +561,55 @@ const isPaused = computed(() => {
 	return scanObjectGroup.value[props.pool.name].pause !== 'None';
 });
 
-//method to repeatedly check scan object
-async function continuousScanCheck() {
-    if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
-        setInterval(async () => {
-            // await loadScanObject(scanObject, props.pool.name);
-            // console.log('continuous scan object:', scanObject.value);
-			await loadScanObjectGroup(scanObjectGroup);
-            console.log('scan object continue:', scanObjectGroup.value);
-        }, 5000);
-    }
+const intervalID = inject<Ref>('interval')!;
+const scanning = inject<Ref>('scanning')!;
+
+async function scanNow() {
+	await loadScanObjectGroup(scanObjectGroup);
 }
 
-//method to check scan object on first load, and if scanning, then repeatedly check
-async function scanNow() {
-    // await loadScanObject(scanObject, props.pool.name);
-    // console.log(`scan object for ${props.pool.name}:`, scanObject.value);
-	await loadScanObjectGroup(scanObjectGroup);
-	console.log('scan object now:', scanObjectGroup.value);
-    
-	if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
-        continuousScanCheck();
-    } 
+function startInterval() {
+	if (!intervalID.value) {
+		intervalID.value = setInterval(scanNow, 5000);
+	}
 }
+
+function stopInterval() {
+	if (intervalID.value) {
+		clearInterval(intervalID.value);
+		intervalID.value = null;
+	}
+}
+
+if (scanning.value) {
+	startInterval();
+} else {
+	stopInterval();
+}
+
+// //method to repeatedly check scan object
+// async function continuousScanCheck() {
+//     if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
+//         setInterval(async () => {
+//             // await loadScanObject(scanObject, props.pool.name);
+//             // console.log('continuous scan object:', scanObject.value);
+// 			await loadScanObjectGroup(scanObjectGroup);
+//             console.log('scan object continue:', scanObjectGroup.value);
+//         }, 5000);
+//     }
+// }
+
+// //method to check scan object on first load, and if scanning, then repeatedly check
+// async function scanNow() {
+//     // await loadScanObject(scanObject, props.pool.name);
+//     // console.log(`scan object for ${props.pool.name}:`, scanObject.value);
+// 	await loadScanObjectGroup(scanObjectGroup);
+// 	console.log('scan object now:', scanObjectGroup.value);
+    
+// 	if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
+//         await continuousScanCheck();
+//     } 
+// }
 
 // scanNow();
 

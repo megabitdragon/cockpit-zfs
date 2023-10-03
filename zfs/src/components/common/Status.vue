@@ -78,11 +78,11 @@ const isFinished = inject<Ref<boolean>>('is-finished')!;
 const isCanceled = inject<Ref<boolean>>('is-canceled')!;
 const isPaused = inject<Ref<boolean>>('is-paused')!;
 
-const emit = defineEmits(['scan_now', 'scan_continuous']);
-
-const scanContinuous = () => {
-    emit('scan_continuous');
-}
+// const emit = defineEmits(['scan_now', 'scan_continuous']);
+const emit = defineEmits(['scan_now']);
+// const scanContinuous = () => {
+//     emit('scan_continuous');
+// }
 
 const scanNow = () => {
     emit('scan_now');
@@ -207,9 +207,9 @@ function progressBarClass() {
 }
 
 watch(scanObjectGroup.value[props.poolName], (newVal, oldVal) => {
-    if (scanObjectGroup.value[props.poolName].state === 'SCANNING') {
-        scanContinuous();
-    }
+    // if (scanObjectGroup.value[props.poolName].state === 'SCANNING') {
+    //     scanContinuous();
+    // }
     
     //notifications : 'info' | 'warning' | 'error' | 'success' | 'denied';
     // if (scanObjectGroup.value[props.poolName].state === 'FINISHED') {
