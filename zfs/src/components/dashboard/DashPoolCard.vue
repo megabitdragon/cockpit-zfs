@@ -72,7 +72,7 @@
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
 					<Status :scanObjectGroup="scanObjectGroup" :scanObject="scanObject" :poolName="props.pool.name" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_continuous="continuousScanCheck()" @scan_now="scanNow()"/>
-					<div v-if="scanObject.function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
+					<div v-if="scanObjectGroup[props.pool.name].function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
 							<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -324,7 +324,7 @@ watch(confirmResilver, async (newValue, oldValue) => {
 		resilvering.value = false;
 		operationRunning.value = false;
 
-		// notifications.value.constructNotification('Resilver Completed', 'Resilver on ' + selectedPool.value!.name + " completed.", 'success');
+		notifications.value.constructNotification('Resilver Started', 'Resilver on ' + selectedPool.value!.name + " started.", 'success');
 	}
 });
 
@@ -373,7 +373,7 @@ watch(confirmScrub, async (newVal, oldVal) => {
 		operationRunning.value = scrubbing.value;
 		scrubbed.value = true;
 
-		notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
+		notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
 	}
 });
 
@@ -559,7 +559,7 @@ const isPaused = computed(() => {
 
 //method to repeatedly check scan object
 async function continuousScanCheck() {
-    if (!isFinished || !isCanceled) {
+    if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
         setInterval(async () => {
             // await loadScanObject(scanObject, props.pool.name);
             // console.log('continuous scan object:', scanObject.value);
@@ -574,13 +574,14 @@ async function scanNow() {
     // await loadScanObject(scanObject, props.pool.name);
     // console.log(`scan object for ${props.pool.name}:`, scanObject.value);
 	await loadScanObjectGroup(scanObjectGroup);
-            console.log('scan object now:', scanObjectGroup.value);
-    if (isScanning) {
+	console.log('scan object now:', scanObjectGroup.value);
+    
+	if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
         continuousScanCheck();
     } 
 }
 
-scanNow();
+// scanNow();
 
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;

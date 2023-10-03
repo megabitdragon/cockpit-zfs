@@ -61,7 +61,7 @@
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.free }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.size }}</div>
 										<div class="py-6 -mt-2 col-span-2">
-											<Status :scanObjectGroup="scanObjectGroup" :scanObject="scanObject" :poolName="poolData[poolIdx].name" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_continuous="continuousScanCheck(poolData[poolIdx].name)" @scan_now="scanNow(poolData[poolIdx].name)"/>
+											<Status :scanObjectGroup="scanObjectGroup" :scanObject="scanObject" :poolName="poolData[poolIdx].name" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_continuous="continuousScanCheck()" @scan_now="scanNow()"/>
 										</div>
 									</button>
 									<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
@@ -432,7 +432,7 @@ const updateShowResilverPool = (newVal) => {
 
 async function resilverAndScan() {
 	await resilverPool(selectedPool.value!);
-	scanNow(selectedPool.value!.name);
+	scanNow();
 }
 
 watch(confirmResilver, async (newValue, oldValue) => {
@@ -476,7 +476,7 @@ const updateShowScrubPool = (newVal) => {
 
 async function scrubAndScan() {
 	await scrubPool(selectedPool.value!);
-	scanNow(selectedPool.value!.name);
+	scanNow();
 }
 
 watch(confirmScrub, async (newVal, oldVal) => {
@@ -497,17 +497,17 @@ watch(confirmScrub, async (newVal, oldVal) => {
 
 async function pauseScrub(pool) {
 	await scrubPool(pool, 'pause');
-	scanNow(pool.name);
+	scanNow();
 }
 
 async function resumeScrub(pool) {
 	await scrubPool(pool);
-	scanNow(pool.name);
+	scanNow();
 }
 
 async function stopScrub(pool) {
 	await scrubPool(pool, 'stop');
-	scanNow(pool.name);
+	scanNow();
 }
 
 //////////////////// TRIM Pool //////////////////////
@@ -880,7 +880,7 @@ function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
-	const scanObjectGroup = inject<Ref>('scan-object-group')!;
+const scanObjectGroup = inject<Ref>('scan-object-group')!;
 
 const isScanning = computed(() => {
     if (scanObject.value.state === 'SCANNING') {
@@ -911,22 +911,22 @@ const isPaused = computed(() => {
 });
 
 //method to repeatedly check scan object
-async function continuousScanCheck(poolName) {
-    if (!isFinished.value || !isCanceled.value) {
-        setInterval(async () => {
-            await loadScanObject(scanObject, poolName);
-            console.log('continuous scan object:', scanObject.value);
-        }, 5000);
-    }
+async function continuousScanCheck() {
+//     if (scanObject.value.state === 'SCANNING') {
+//         setInterval(async () => {
+//             await loadScanObject(scanObject, props.pool.name);
+//             console.log('continuous scan object:', scanObject.value);
+//         }, 5000);
+//     }
 }
 
 //method to check scan object on first load, and if scanning, then repeatedly check
-async function scanNow(poolName) {
-    await loadScanObject(scanObject, poolName);
-    console.log('scan object:', scanObject.value);
-    if (isScanning.value) {
-        continuousScanCheck(poolName);
-    } 
+async function scanNow() {
+    // await loadScanObject(scanObject, props.pool.name);
+    // console.log('scan object:', scanObject.value);
+    // if (scanObject.value.state === 'SCANNING') {
+    //     continuousScanCheck(props.pool.name);
+    // } 
 }
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;

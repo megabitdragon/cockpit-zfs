@@ -80,6 +80,7 @@ async function initialLoad(disks, pools, datasets) {
 initialLoad(disks, pools, datasets);
 
 async function scanGroup() {
+	console.log('initial scan:');
 	loadScanObjectGroup(scanObjectGroup);
 }
 

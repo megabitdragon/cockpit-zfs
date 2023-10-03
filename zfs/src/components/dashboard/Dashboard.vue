@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
-import { loadDisks, loadDisksThenPools } from '../../composables/loadData';
+import { loadDisks, loadDisksThenPools, loadScanObjectGroup } from '../../composables/loadData';
 import { convertBytesToSize, convertSizeToBytes, convertSizeToBytesDecimal, convertBytesToSizeDecimal } from '../../composables/helpers';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
@@ -186,4 +186,13 @@ const disksHDD = computed(() => {
 	return disks.value.filter(disk => disk.type == 'HDD');
 });
 
+// const scanObjectGroup = ref<PoolScanObjectGroup>({});
+
+// async function scanGroup() {
+// 	loadScanObjectGroup(scanObjectGroup);
+// }
+
+// scanGroup();
+
+// provide('scan-object-group', scanObjectGroup);
 </script>

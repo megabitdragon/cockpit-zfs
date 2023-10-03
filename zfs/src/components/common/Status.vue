@@ -71,7 +71,7 @@ const notifications = inject<Ref<any>>('notifications')!;
 
 // const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
 // const scanObject = ref(props.scanObject);
-const scanObjectGroup = ref(props.scanObjectGroup);
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
     
 const isScanning = inject<Ref<boolean>>('is-scanning')!;
 const isFinished = inject<Ref<boolean>>('is-finished')!;
@@ -206,17 +206,17 @@ function progressBarClass() {
    
 }
 
-watch(scanObjectGroup, (newVal, oldVal) => {
+watch(scanObjectGroup.value[props.poolName], (newVal, oldVal) => {
     if (scanObjectGroup.value[props.poolName].state === 'SCANNING') {
         scanContinuous();
     }
     
     //notifications : 'info' | 'warning' | 'error' | 'success' | 'denied';
-    if (scanObjectGroup.value[props.poolName].state === 'FINISHED') {
-        notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'success');
-    } else if (scanObjectGroup.value[props.poolName].state === 'CANCELED') {
-        notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'denied');
-    }
+    // if (scanObjectGroup.value[props.poolName].state === 'FINISHED') {
+    //     notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'success');
+    // } else if (scanObjectGroup.value[props.poolName].state === 'CANCELED') {
+    //     notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'denied');
+    // }
    
 });
 

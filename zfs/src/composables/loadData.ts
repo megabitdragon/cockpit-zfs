@@ -10,38 +10,45 @@ const vDevs = ref<vDevData[]>([]);
 
 export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName? : string) {
 	try {
-			const rawJSON = await getScan(poolName);
-			const parsedJSON = JSON.parse(rawJSON);
-			console.log(`Scan JSON for ${poolName}:`, parsedJSON);
+		
+		const rawJSON = await getScan(poolName);
+		const parsedJSON = JSON.parse(rawJSON);
+		console.log(`Scan JSON for ${poolName}:`, parsedJSON);
 
-			scanObject.value.name = parsedJSON.name;
-			scanObject.value.function = parsedJSON.function;
-			scanObject.value.start_time = parsedJSON.start_time;
-			scanObject.value.end_time = parsedJSON.end_time;
-			scanObject.value.pause = parsedJSON.pause;
-			scanObject.value.state = parsedJSON.state;
-			scanObject.value.errors = parsedJSON.errors;
-			scanObject.value.percentage = parsedJSON.percentage;
-			scanObject.value.total_secs_left = parsedJSON.total_secs_left;
-			scanObject.value.bytes_issued = parsedJSON.bytes_issued;
-			scanObject.value.bytes_processed = parsedJSON.bytes_processed;
-			scanObject.value.bytes_to_process = parsedJSON.bytes_to_process;
+		scanObject.value.name = parsedJSON.name;
+		scanObject.value.function = parsedJSON.function;
+		scanObject.value.start_time = parsedJSON.start_time;
+		scanObject.value.end_time = parsedJSON.end_time;
+		scanObject.value.pause = parsedJSON.pause;
+		scanObject.value.state = parsedJSON.state;
+		scanObject.value.errors = parsedJSON.errors;
+		scanObject.value.percentage = parsedJSON.percentage;
+		scanObject.value.total_secs_left = parsedJSON.total_secs_left;
+		scanObject.value.bytes_issued = parsedJSON.bytes_issued;
+		scanObject.value.bytes_processed = parsedJSON.bytes_processed;
+		scanObject.value.bytes_to_process = parsedJSON.bytes_to_process;
 
 	} catch (error) {
 		console.error("An error occurred getting scan objects:", error);
 	}
 }
 
-export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) {
+export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>, poolName? : string) {
 	try {
-			const rawJSON = await getScanGroup();
-			const parsedJSON = JSON.parse(rawJSON);
-			console.log(`Scan Group JSON:`, parsedJSON);
 
-			scanObject.value = parsedJSON;
+		const rawJSON = await getScanGroup();
+		const parsedJSON = JSON.parse(rawJSON);
+		// console.log(`Scan Group JSON:`, parsedJSON);
+
+		// for (const item in parsedJSON) {
+		// 	scanObject.value[poolName!] = parsedJSON[item!];
+		// }
+
+		scanObject.value = parsedJSON;
+		
 
 	} catch (error) {
-		console.error("An error occurred getting scan objects:", error);
+		console.error("An error occurred getting scan object group:", error);
 	}
 }
 
