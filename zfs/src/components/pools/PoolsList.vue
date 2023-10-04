@@ -905,7 +905,7 @@ function startInterval() {
 	if (!intervalID.value) {
 		intervalID.value = setInterval(scanNow, 5000);
 	}
-	console.log('interval set (pool tab)', intervalID);
+	console.log('interval set (pool tab)', intervalID.value);
 }
 
 function stopInterval() {
@@ -914,7 +914,7 @@ function stopInterval() {
 		clearInterval(intervalID.value);
 		intervalID.value = null;
 	}
-	console.log('interval cleared (pool tab)');
+	console.log('interval cleared (pool tab)', intervalID.value);
 }
 
 if (scanning.value) {
