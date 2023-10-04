@@ -162,6 +162,7 @@ export async function loadDisksThenPools(disks, pools) {
 					const diskTypes = vDev.disks.map(disk => disk.type);
 					
 					// Check if all disk types within this VDev are the same
+					// does not currently account for 'replacing' type
 					const allSameDiskType = diskTypes.every(type => type === diskTypes[0]);
 				
 					// Return the disk type for this VDev

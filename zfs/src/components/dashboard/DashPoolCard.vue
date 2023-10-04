@@ -443,7 +443,7 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		operationRunning.value = false;
 		trimmed.value = true;
 
-		notifications.value.constructNotification('Trim Completed', 'Trim on ' + selectedPool.value!.name + " completed.", 'success');
+		notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
 	}
 });
 
