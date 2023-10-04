@@ -60,7 +60,6 @@ import { convertBytesToSize, convertSecondsToString } from "../../composables/he
 
 interface StatusProps {
     poolName: string;
-    //scanObject: PoolScanObject;
     scanObjectGroup: PoolScanObjectGroup;
     isPoolList: boolean;
     isPoolDetail: boolean;
@@ -69,8 +68,6 @@ interface StatusProps {
 const props = defineProps<StatusProps>();
 const notifications = inject<Ref<any>>('notifications')!;
 
-// const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
-// const scanObject = ref(props.scanObject);
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
     
 const isScanning = inject<Ref<boolean>>('is-scanning')!;
@@ -78,12 +75,7 @@ const isFinished = inject<Ref<boolean>>('is-finished')!;
 const isCanceled = inject<Ref<boolean>>('is-canceled')!;
 const isPaused = inject<Ref<boolean>>('is-paused')!;
 
-// const emit = defineEmits(['scan_now', 'scan_continuous']);
 const emit = defineEmits(['scan_now']);
-// const scanContinuous = () => {
-//     emit('scan_continuous');
-// }
-
 const scanNow = () => {
     emit('scan_now');
 }
@@ -205,37 +197,5 @@ function progressBarClass() {
     }
    
 }
-
-watch(scanObjectGroup.value[props.poolName], (newVal, oldVal) => {
-    // if (scanObjectGroup.value[props.poolName].state === 'SCANNING') {
-    //     scanContinuous();
-    // }
-    
-    //notifications : 'info' | 'warning' | 'error' | 'success' | 'denied';
-    // if (scanObjectGroup.value[props.poolName].state === 'FINISHED') {
-    //     notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'success');
-    // } else if (scanObjectGroup.value[props.poolName].state === 'CANCELED') {
-    //     notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'denied');
-    // }
-   
-});
-
-// watch(isScanning, (newVal, oldVal) => {
-//     if (isScanning) {
-//         scanContinuous();
-//     }
-// });
-
-// watch(isFinished, (newVal, oldVal) => {
-//     if (isFinished) {
-//         notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'success');
-//     } 
-// });
-
-// watch(isCanceled, (newVal, oldVal) => {
-//     if (isCanceled) {
-//         notifications.value.constructNotification('Scrub Completed', stateMessage.value, 'denied');
-//     }
-// });
 
 </script>

@@ -42,20 +42,6 @@ const datasets = ref<FileSystemData[]>([]);
 const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const snapshots = ref<Snapshot[]>([]);
-const scanObject = ref<PoolScanObject>({
-	name: '',
-	function: '',
-	start_time: '',
-	end_time: '',
-	state: '',
-	errors: 0,
-	percentage: 0,
-	pause: 'None',
-	total_secs_left: 0,
-	bytes_issued: 0,
-	bytes_processed: 0,
-	bytes_to_process: 0,
-});
 
 const scanObjectGroup = ref<PoolScanObjectGroup>({});
 
@@ -120,7 +106,6 @@ provide('pools-loaded', poolsLoaded);
 provide('snapshots-loaded', snapshotsLoaded);
 provide('clear-labels', clearLabels);
 provide("snapshots", snapshots);
-provide('scan-object', scanObject);
 provide('scan-object-group', scanObjectGroup);
 
 provide('interval', intervalID);

@@ -71,7 +71,7 @@
 			</template>
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :scanObjectGroup="scanObjectGroup" :scanObject="scanObject" :poolName="props.pool.name" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()"/>
+					<Status :scanObjectGroup="scanObjectGroup" :poolName="props.pool.name" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()"/>
 					<div v-if="scanObjectGroup[props.pool.name].function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
@@ -149,7 +149,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObject, loadScanObjectGroup } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
-import { getTimestampString } from "../../composables/helpers";
 import Card from '../common/Card.vue';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import PoolDetail from "../pools/PoolDetail.vue";
@@ -198,7 +197,6 @@ const poolConfig = ref<PoolData>({
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
 const operationRunning = ref(false);
-const operationCompleted = ref(false);
 const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
 const thirdOptionToggle = ref(false);
@@ -235,7 +233,6 @@ async function refreshAllData() {
 /////////////////////////////////////////////////////
 const confirmDelete = ref(false);
 const showDeletePoolConfirm = ref(false);
-const deleting = ref(false);
 const clearLabels = inject<Ref<boolean>>('clear-labels')!;
 const selectedDisk = ref<DiskData>();
 
@@ -382,7 +379,7 @@ async function pauseScrub(pool) {
 	pausing.value = true;
 	scanning.value = false;
 	await scrubPool(pool, 'pause');
-	// scanNow();
+	scanNow();
 	pausing.value = false;
 }
 
@@ -390,7 +387,7 @@ async function resumeScrub(pool) {
 	resuming.value = true;
 	scanning.value = true;
 	await scrubPool(pool);
-	// scanNow();
+	scanNow();
 	resuming.value = false
 }
 
@@ -398,7 +395,7 @@ async function stopScrub(pool) {
 	stopping.value = true;
 	scanning.value = false;
 	await scrubPool(pool, 'stop');
-	// scanNow();
+	scanNow();
 	stopping.value = false;
 }
 
@@ -514,15 +511,9 @@ function showAddVDev(pool) {
 
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
-const scanObject = inject<Ref<PoolScanObject>>('scan-object')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 
 const isScanning = computed(() => {
-    // if (scanObject.value.state === 'SCANNING') {
-    //     return true;
-    // } else {
-    //     return false;
-    // }
 	if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
         return true;
     } else {
@@ -531,11 +522,6 @@ const isScanning = computed(() => {
 });
 
 const isFinished = computed(() => {
-    // if (scanObject.value.state === 'FINISHED') {
-    //     return true;
-    // } else {
-    //     return false;
-    // }
 	if (scanObjectGroup.value[props.pool.name].state === 'FINISHED') {
         return true;
     } else {
@@ -544,11 +530,6 @@ const isFinished = computed(() => {
 });
 
 const isCanceled = computed(() => {
-    // if (scanObject.value.state === 'CANCELED') {
-    //     return true;
-    // } else {
-    //     return false;
-    // }
 	if (scanObjectGroup.value[props.pool.name].state === 'CANCELED') {
         return true;
     } else {
@@ -557,7 +538,6 @@ const isCanceled = computed(() => {
 });
 
 const isPaused = computed(() => {
-    // return scanObject.value.pause !== 'None';
 	return scanObjectGroup.value[props.pool.name].pause !== 'None';
 });
 
@@ -569,16 +549,20 @@ async function scanNow() {
 }
 
 function startInterval() {
+	console.log('setting interval (dashboard)');
 	if (!intervalID.value) {
 		intervalID.value = setInterval(scanNow, 5000);
 	}
+	console.log('interval set (dashboard)', intervalID.value);
 }
 
 function stopInterval() {
+	console.log('clearing interval (dashboard)');
 	if (intervalID.value) {
 		clearInterval(intervalID.value);
 		intervalID.value = null;
 	}
+	console.log('interval cleared (dashboard)', intervalID.value);
 }
 
 if (scanning.value) {
@@ -586,33 +570,6 @@ if (scanning.value) {
 } else {
 	stopInterval();
 }
-
-// //method to repeatedly check scan object
-// async function continuousScanCheck() {
-//     if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
-//         setInterval(async () => {
-//             // await loadScanObject(scanObject, props.pool.name);
-//             // console.log('continuous scan object:', scanObject.value);
-// 			await loadScanObjectGroup(scanObjectGroup);
-//             console.log('scan object continue:', scanObjectGroup.value);
-//         }, 5000);
-//     }
-// }
-
-// //method to check scan object on first load, and if scanning, then repeatedly check
-// async function scanNow() {
-//     // await loadScanObject(scanObject, props.pool.name);
-//     // console.log(`scan object for ${props.pool.name}:`, scanObject.value);
-// 	await loadScanObjectGroup(scanObjectGroup);
-// 	console.log('scan object now:', scanObjectGroup.value);
-    
-// 	if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
-//         await continuousScanCheck();
-//     } 
-// }
-
-// scanNow();
-
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
