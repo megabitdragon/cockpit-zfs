@@ -4,13 +4,25 @@ import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath } from "./helpers";
 import { getSnapshots } from './snapshots';
-import { getScan, getScanGroup } from './scan';
+import { getAllTRIMDetails, getScan, getScanGroup } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
 
+// export async function loadTRIMObjectGroup(trimObject : Ref<TrimStatusObjectGroup>, pools : PoolData[]) {
+// 	try {
+// 		const poolsJSONString = JSON.stringify(pools);
+// 		const rawJSON = await getAllTRIMDetails(poolsJSONString);
+// 		const parsedJSON = JSON.parse(rawJSON);
+// 		console.log(`TRIM JSON:`, parsedJSON);
+		
+// 		trimObject.value = parsedJSON;
+// 	} catch (error) {
+// 		console.error("An error occurred getting trim objects:", error);
+// 	}
+// }
+
 export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName? : string) {
 	try {
-		
 		const rawJSON = await getScan(poolName);
 		const parsedJSON = JSON.parse(rawJSON);
 		console.log(`Scan JSON for ${poolName}:`, parsedJSON);
@@ -35,18 +47,10 @@ export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName?
 
 export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>, poolName? : string) {
 	try {
-
 		const rawJSON = await getScanGroup();
 		const parsedJSON = JSON.parse(rawJSON);
-		// console.log(`Scan Group JSON:`, parsedJSON);
-
-		// for (const item in parsedJSON) {
-		// 	scanObject.value[poolName!] = parsedJSON[item!];
-		// }
-
-		scanObject.value = parsedJSON;
 		
-
+		scanObject.value = parsedJSON;
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}
@@ -361,7 +365,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			guid: vDev.guid,
 			type: diskVDev.value!.type,
 			health: diskVDev.value!.status,
-			stats: vDev.stats,
+			stats: diskVDev.value!.stats,
 			capacity: diskVDev.value!.capacity,
 			model: diskVDev.value!.model,
 			phy_path: diskVDev.value!.phy_path,
@@ -417,7 +421,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 					guid: fullDiskData.value.guid,
 					type: fullDiskData.value.type,
 					health: fullDiskData.value.status,
-					stats: fullDiskData.value.stats,
+					stats: child.stats,
 					capacity: fullDiskData.value.capacity,
 					model: fullDiskData.value.model,
 					phy_path: fullDiskData.value.phy_path,

@@ -61,7 +61,7 @@
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.free }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.size }}</div>
 										<div class="py-6 -mt-2 col-span-2">
-											<Status :scanObjectGroup="scanObjectGroup" :poolName="poolData[poolIdx].name" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()"/>
+											<Status :isScanning="scanning" :scanObjectGroup="scanObjectGroup" :pool="poolData[poolIdx]" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()"/>
 										</div>
 									</button>
 									<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
@@ -519,6 +519,16 @@ const updateShowTrimPool = (newVal) => {
 	showTrimModal.value = newVal;
 }
 
+// async function trimAndScan() {
+// 	if (firstOptionToggle.value) {
+// 		await trimPool(selectedPool.value, firstOptionToggle.value);
+// 		trimScanNow();
+// 	} else {
+// 		await trimPool(selectedPool.value);
+// 		trimScanNow();
+// 	}
+// }
+
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
 		operationRunning.value = true;
@@ -528,10 +538,12 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		if (firstOptionToggle.value) {
 			confirmTrim.value = false;	
 			showTrimModal.value = false;
+			// await trimAndScan();
 			await trimPool(selectedPool.value, firstOptionToggle.value);
 		} else {
 			confirmTrim.value = false;
 			showTrimModal.value = false;
+			// await trimAndScan();
 			await trimPool(selectedPool.value);
 		}
 		operationRunning.value = false;
@@ -922,6 +934,33 @@ if (scanning.value) {
 } else {
 	stopInterval();
 }
+
+// const trimObjectGroup = inject<Ref<TrimStatusObjectGroup>>('trim-object-group')!;
+// const trimIntervalID = inject<Ref>('trim-interval')!;
+// const trimScanning = inject<Ref>('trim-scanning')!;
+
+// async function trimScanNow() {
+// 	await loadTRIMObjectGroup(trimObjectGroup, poolData.value);
+// }
+
+// function trimStartInterval() {
+// 	if (!trimIntervalID.value) {
+// 		trimIntervalID.value = setInterval(scanNow, 5000);
+// 	}
+// }
+
+// function trimStopInterval() {
+// 	if (trimIntervalID.value) {
+// 		clearInterval(trimIntervalID.value);
+// 		trimIntervalID.value = null;
+// 	}
+// }
+
+// if (trimScanning.value) {
+// 	trimStartInterval();
+// } else {
+// 	trimStopInterval();
+// }
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 

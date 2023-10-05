@@ -71,7 +71,7 @@
 			</template>
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :scanObjectGroup="scanObjectGroup" :poolName="props.pool.name" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()"/>
+					<Status :isScanning="scanning" :scanObjectGroup="scanObjectGroup" :pool="props.pool" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()"/>
 					<div v-if="scanObjectGroup[props.pool.name].function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
@@ -423,6 +423,16 @@ const updateShowTrimPool = (newVal) => {
 	showTrimModal.value = newVal;
 }
 
+// async function trimAndScan() {
+// 	if (firstOptionToggle.value) {
+// 		await trimPool(selectedPool.value, firstOptionToggle.value);
+// 		trimScanNow();
+// 	} else {
+// 		await trimPool(selectedPool.value);
+// 		trimScanNow();
+// 	}
+// }
+
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
 		trimming.value = true;
@@ -433,10 +443,12 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		if (firstOptionToggle.value) {
 			confirmTrim.value = false;	
 			showTrimModal.value = false;
+			// await trimAndScan();
 			await trimPool(selectedPool.value, firstOptionToggle.value);
 		} else {
 			confirmTrim.value = false;
 			showTrimModal.value = false;
+			// await trimAndScan();
 			await trimPool(selectedPool.value);
 		}
 		trimming.value = false;
@@ -571,6 +583,37 @@ if (scanning.value) {
 	stopInterval();
 }
 
+// const trimObjectGroup = inject<Ref<TrimStatusObjectGroup>>('trim-object-group')!;
+// const trimIntervalID = inject<Ref>('trim-interval')!;
+// const trimScanning = inject<Ref>('trim-scanning')!;
+
+// const trimPaused = computed(() => {
+// 	return trimObjectGroup.value[props.pool.name].state === 'suspended';
+// });
+
+// async function trimScanNow() {
+// 	await loadTRIMObjectGroup(trimObjectGroup, poolData.value);
+// }
+
+// function trimStartInterval() {
+// 	if (!trimIntervalID.value) {
+// 		trimIntervalID.value = setInterval(scanNow, 5000);
+// 	}
+// }
+
+// function trimStopInterval() {
+// 	if (trimIntervalID.value) {
+// 		clearInterval(trimIntervalID.value);
+// 		trimIntervalID.value = null;
+// 	}
+// }
+
+// if (trimScanning.value) {
+// 	trimStartInterval();
+// } else {
+// 	trimStopInterval();
+// }
+
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
 provide('show-pool-deets', showPoolDetails);
@@ -604,4 +647,6 @@ provide('is-scanning', isScanning);
 provide('is-finished', isFinished);
 provide('is-canceled', isCanceled);
 provide('is-paused', isPaused);
+
+// provide('trim-paused', trimPaused);
 </script>

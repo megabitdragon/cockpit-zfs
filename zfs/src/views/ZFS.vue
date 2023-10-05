@@ -25,7 +25,7 @@
 import { reactive, ref, Ref, inject, computed, provide, watch } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import { loadDisksThenPools, loadDatasets, loadSnapshots, loadScanObject, loadScanObjectGroup } from '../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup } from '../composables/loadData';
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
@@ -44,6 +44,7 @@ const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const snapshots = ref<Snapshot[]>([]);
 
 const scanObjectGroup = ref<PoolScanObjectGroup>({});
+const trimObjectGroup = ref<TrimStatusObjectGroup>({});
 
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
@@ -58,14 +59,15 @@ async function initialLoad(disks, pools, datasets) {
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
+	// trimScanNow(pools);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
 }
 
 initialLoad(disks, pools, datasets);
-
 scanNow();
+///////////////////////////////////////////////////
 
 const intervalID = ref();
 const scanning = ref(true);
@@ -93,6 +95,33 @@ if (scanning.value) {
 	stopInterval();
 }
 
+// const trimIntervalID = ref();
+// const trimScanning = ref(true);
+
+// async function trimScanNow(pools) {
+// 	await loadTRIMObjectGroup(trimObjectGroup, pools.value);
+// 	//console.log('trim object:', trimObjectGroup);
+// }
+
+// function trimStartInterval() {
+// 	if (!trimIntervalID.value) {
+// 		trimIntervalID.value = setInterval(scanNow, 5000);
+// 	}
+// }
+
+// function trimStopInterval() {
+// 	if (trimIntervalID.value) {
+// 		clearInterval(trimIntervalID.value);
+// 		trimIntervalID.value = null;
+// 	}
+// }
+
+// if (trimScanning.value) {
+// 	trimStartInterval();
+// } else {
+// 	trimStopInterval();
+// }
+
 
 //provide data for other components to inject
 provide("pools", pools);
@@ -107,8 +136,10 @@ provide('snapshots-loaded', snapshotsLoaded);
 provide('clear-labels', clearLabels);
 provide("snapshots", snapshots);
 provide('scan-object-group', scanObjectGroup);
-
 provide('interval', intervalID);
 provide('scanning', scanning);
+provide('trim-object-group', trimObjectGroup);
+// provide('trim-interval', trimIntervalID);
+// provide('trim-scanning', trimScanning);
 </script>
 

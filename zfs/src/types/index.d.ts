@@ -312,6 +312,17 @@ interface PoolScanObjectGroup {
 	[poolName: string]: PoolScanObject;
 }
 
+interface TrimStatusObject {
+	poolName: string;
+	state: string;
+	percent: number;
+	stateTimestamp: string;
+}
+
+interface TrimStatusObjectGroup {
+	[poolName: string]: TrimStatusObject;
+}
+
 type ConfirmationCallback = () => void;
 
 //object for navigation (generic)
