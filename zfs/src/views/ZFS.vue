@@ -42,7 +42,7 @@ const datasets = ref<FileSystemData[]>([]);
 const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const snapshots = ref<Snapshot[]>([]);
-
+const poolDiskStats = ref<PoolDiskStats>({});
 const scanObjectGroup = ref<PoolScanObjectGroup>({});
 
 const disksLoaded = ref(false);
@@ -58,7 +58,6 @@ async function initialLoad(disks, pools, datasets) {
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
-	// trimScanNow(pools);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
@@ -66,62 +65,64 @@ async function initialLoad(disks, pools, datasets) {
 
 initialLoad(disks, pools, datasets);
 scanNow();
-loadDiskStats();
-///////////////////////////////////////////////////
+checkDiskStats();
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
-const intervalID = ref();
+const scanIntervalID = ref();
 const scanning = ref(true);
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
-function startInterval() {
-	if (!intervalID.value) {
-		intervalID.value = setInterval(scanNow, 5000);
+function startScanInterval() {
+	if (!scanIntervalID.value) {
+		scanIntervalID.value = setInterval(scanNow, 5000);
 	}
 }
 
-function stopInterval() {
-	if (intervalID.value) {
-		clearInterval(intervalID.value);
-		intervalID.value = null;
+function stopScanInterval() {
+	if (scanIntervalID.value) {
+		clearInterval(scanIntervalID.value);
+		scanIntervalID.value = null;
 	}
 }
 
 if (scanning.value) {
-	startInterval();
+	startScanInterval();
 } else {
-	stopInterval();
+	stopScanInterval();
 }
 
-// const trimIntervalID = ref();
-// const trimScanning = ref(true);
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
-// async function trimScanNow(pools) {
-// 	await loadTRIMObjectGroup(trimObjectGroup, pools.value);
-// 	//console.log('trim object:', trimObjectGroup);
-// }
+const diskStatsIntervalID = ref();
+const checkingDiskStats = ref(true);
 
-// function trimStartInterval() {
-// 	if (!trimIntervalID.value) {
-// 		trimIntervalID.value = setInterval(scanNow, 5000);
-// 	}
-// }
+async function checkDiskStats() {
+	await loadDiskStats(poolDiskStats);
+}
 
-// function trimStopInterval() {
-// 	if (trimIntervalID.value) {
-// 		clearInterval(trimIntervalID.value);
-// 		trimIntervalID.value = null;
-// 	}
-// }
+function startDiskStatsInterval() {
+	if (!diskStatsIntervalID.value) {
+		diskStatsIntervalID.value = setInterval(checkDiskStats, 5000);
+	}
+}
 
-// if (trimScanning.value) {
-// 	trimStartInterval();
-// } else {
-// 	trimStopInterval();
-// }
+function stopDiskStatsInterval() {
+	if (diskStatsIntervalID.value) {
+		clearInterval(diskStatsIntervalID.value);
+		diskStatsIntervalID.value = null;
+	}
+}
 
+if (checkingDiskStats.value) {
+	startDiskStatsInterval();
+} else {
+	stopDiskStatsInterval();
+}
 
 //provide data for other components to inject
 provide("pools", pools);
@@ -136,9 +137,10 @@ provide('snapshots-loaded', snapshotsLoaded);
 provide('clear-labels', clearLabels);
 provide("snapshots", snapshots);
 provide('scan-object-group', scanObjectGroup);
-provide('interval', intervalID);
+provide('pool-disk-stats', poolDiskStats);
+provide('scan-interval', scanIntervalID);
 provide('scanning', scanning);
-// provide('trim-interval', trimIntervalID);
-// provide('trim-scanning', trimScanning);
+provide('disk-stats-interval', diskStatsIntervalID);
+provide('checking-disk-stats', checkingDiskStats)
 </script>
 

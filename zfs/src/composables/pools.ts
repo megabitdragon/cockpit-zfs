@@ -246,13 +246,22 @@ export async function clearErrors(poolName, deviceName?) {
 	}
 }
 
-export async function trimPool(pool, isSecure?) {
+export async function trimPool(pool : PoolData, isSecure? : boolean, action? : string) {
 	try {
 		let cmdString = ['zpool', 'trim'];
 
 		if(isSecure) {
 			cmdString.push('-d');
 		}
+
+		if(action === 'pause') {
+			cmdString.push('-s');
+		}
+
+		if(action === 'stop') {
+			cmdString.push('-c');
+		}
+
 		// cmdString.push('-w');
 		cmdString.push(pool.name);
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");

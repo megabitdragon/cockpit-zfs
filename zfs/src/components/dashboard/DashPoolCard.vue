@@ -71,7 +71,7 @@
 			</template>
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :isScanning="scanning" :scanObjectGroup="scanObjectGroup" :pool="props.pool" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()"/>
+					<Status :scanObjectGroup="scanObjectGroup" :pool="props.pool" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()"/>
 					<div v-if="scanObjectGroup[props.pool.name].function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
@@ -99,7 +99,35 @@
 							</svg>
 							Stopping...
 						</button>
+					</div>
 
+					<div v-if="isTrimActive" type="button" class="button-group-row justify-self-center col-span-4">
+						<button v-if="!pausingTrim && !isTrimSuspended" id="pause-trim" class="btn btn-secondary" @click="pauseTrim(props.pool)">Pause Trim</button>
+						<button disabled v-if="pausingTrim && !isTrimSuspended" id="pausing-trim" type="button" class="btn btn-secondary">
+							<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+								<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="text-success"/>
+							</svg>
+							Pausing...
+						</button> 
+
+						<button class="btn btn-primary" v-if="!resumingTrim && isTrimSuspended" id="resume-trim" type="button" @click="resumeTrim(props.pool)">Resume Trim</button>
+						<button disabled v-if="resumingTrim && isTrimSuspended" id="resuming-trim" type="button" class="btn btn-primary">
+							<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+								<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="text-success"/>
+							</svg>
+							Resuming...
+						</button>
+
+						<button class="btn btn-danger" v-if="!stoppingTrim" id="stop-trim" type="button" @click="stopTrim(props.pool)">Stop Trim</button>
+						<button disabled v-if="stoppingTrim" id="stopping-trim" type="button" class="btn btn-danger">
+							<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+								<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="text-success"/>
+							</svg>
+							Stopping...
+						</button>
 					</div>
 				</div>
 			</template>
@@ -146,7 +174,7 @@
 import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadDatasets, loadDisksThenPools, loadScanObject, loadScanObjectGroup } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
 import Card from '../common/Card.vue';
@@ -155,14 +183,12 @@ import PoolDetail from "../pools/PoolDetail.vue";
 import Status from '../common/Status.vue';
 import AddVDevModal from "../pools/AddVDevModal.vue";
 
-
 interface DashPoolCardProps {
 	pool: PoolData;
 }
 
 const notifications = inject<Ref<any>>('notifications')!;
 	
-// const messageTimestamp = ref('');
 const props = defineProps<DashPoolCardProps>();
 const selectedPool = ref<PoolData>();
 
@@ -406,6 +432,9 @@ const confirmTrim = ref(false);
 const secureTRIM = ref(false);
 const trimmed = ref(false);
 const trimming = ref(false);
+const pausingTrim = ref(false);
+const stoppingTrim = ref(false);
+const resumingTrim = ref(false);
 
 async function trimThisPool(pool) {
 	cleared.value = false;
@@ -423,15 +452,15 @@ const updateShowTrimPool = (newVal) => {
 	showTrimModal.value = newVal;
 }
 
-// async function trimAndScan() {
-// 	if (firstOptionToggle.value) {
-// 		await trimPool(selectedPool.value, firstOptionToggle.value);
-// 		trimScanNow();
-// 	} else {
-// 		await trimPool(selectedPool.value);
-// 		trimScanNow();
-// 	}
-// }
+async function trimAndScan() {
+	if (firstOptionToggle.value) {
+		await trimPool(selectedPool.value!, firstOptionToggle.value);
+		checkDiskStats();
+	} else {
+		await trimPool(selectedPool.value!);
+		checkDiskStats();
+	}
+}
 
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
@@ -443,13 +472,11 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		if (firstOptionToggle.value) {
 			confirmTrim.value = false;	
 			showTrimModal.value = false;
-			// await trimAndScan();
-			await trimPool(selectedPool.value, firstOptionToggle.value);
+			await trimAndScan();
 		} else {
 			confirmTrim.value = false;
 			showTrimModal.value = false;
-			// await trimAndScan();
-			await trimPool(selectedPool.value);
+			await trimAndScan();
 		}
 		trimming.value = false;
 		operationRunning.value = false;
@@ -458,6 +485,30 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
 	}
 });
+
+async function pauseTrim(pool) {
+	pausingTrim.value = true;
+	checkingDiskStats.value = false;
+	await trimPool(pool, false, 'pause');
+	checkDiskStats();
+	pausingTrim.value = false;
+}
+
+async function resumeTrim(pool) {
+	resumingTrim.value = true;
+	checkingDiskStats.value = true;
+	await trimPool(pool);
+	checkDiskStats();
+	resumingTrim.value = false
+}
+
+async function stopTrim(pool) {
+	stoppingTrim.value = true;
+	checkingDiskStats.value = false;
+	await trimPool(pool, false, 'stop');
+	checkDiskStats();
+	stoppingTrim.value = false;
+}
 
 /////////////////// Export Pool /////////////////////
 /////////////////////////////////////////////////////
@@ -553,66 +604,78 @@ const isPaused = computed(() => {
 	return scanObjectGroup.value[props.pool.name].pause !== 'None';
 });
 
-const intervalID = inject<Ref>('interval')!;
-const scanning = inject<Ref>('scanning')!;
+const scanIntervalID = inject<Ref<any>>('scan-interval')!;
+const scanning = inject<Ref<boolean>>('scanning')!;
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
-function startInterval() {
-	console.log('setting interval (dashboard)');
-	if (!intervalID.value) {
-		intervalID.value = setInterval(scanNow, 5000);
+function startScanInterval() {
+	if (!scanIntervalID.value) {
+		scanIntervalID.value = setInterval(scanNow, 5000);
 	}
-	console.log('interval set (dashboard)', intervalID.value);
 }
 
-function stopInterval() {
-	console.log('clearing interval (dashboard)');
-	if (intervalID.value) {
-		clearInterval(intervalID.value);
-		intervalID.value = null;
+function stopScanInterval() {
+	if (scanIntervalID.value) {
+		clearInterval(scanIntervalID.value);
+		scanIntervalID.value = null;
 	}
-	console.log('interval cleared (dashboard)', intervalID.value);
 }
 
 if (scanning.value) {
-	startInterval();
+	startScanInterval();
 } else {
-	stopInterval();
+	stopScanInterval();
 }
 
-// const trimObjectGroup = inject<Ref<TrimStatusObjectGroup>>('trim-object-group')!;
-// const trimIntervalID = inject<Ref>('trim-interval')!;
-// const trimScanning = inject<Ref>('trim-scanning')!;
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
-// const trimPaused = computed(() => {
-// 	return trimObjectGroup.value[props.pool.name].state === 'suspended';
-// });
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
-// async function trimScanNow() {
-// 	await loadTRIMObjectGroup(trimObjectGroup, poolData.value);
-// }
+const isTrimActive = computed(() => {
+	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1);
+});
 
-// function trimStartInterval() {
-// 	if (!trimIntervalID.value) {
-// 		trimIntervalID.value = setInterval(scanNow, 5000);
-// 	}
-// }
+const isTrimCanceled = computed(() => {
+	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 2);
+});
 
-// function trimStopInterval() {
-// 	if (trimIntervalID.value) {
-// 		clearInterval(trimIntervalID.value);
-// 		trimIntervalID.value = null;
-// 	}
-// }
+const isTrimSuspended = computed(() => {
+	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 3);
+});
 
-// if (trimScanning.value) {
-// 	trimStartInterval();
-// } else {
-// 	trimStopInterval();
-// }
+const isTrimFinished = computed(() => {
+    return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4);
+});
+
+const diskStatsIntervalID = inject<Ref<any>>('disk-stats-interval')!;
+const checkingDiskStats = inject<Ref<boolean>>('checking-disk-stats')!;
+
+async function checkDiskStats() {
+	await loadDiskStats(poolDiskStats);
+}
+
+function startDiskStatsInterval() {
+	if (!diskStatsIntervalID.value) {
+		diskStatsIntervalID.value = setInterval(checkDiskStats, 5000);
+	}
+}
+
+function stopDiskStatsInterval() {
+	if (diskStatsIntervalID.value) {
+		clearInterval(diskStatsIntervalID.value);
+		diskStatsIntervalID.value = null;
+	}
+}
+
+if (checkingDiskStats.value) {
+	startDiskStatsInterval();
+} else {
+	stopDiskStatsInterval();
+}
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
@@ -648,5 +711,8 @@ provide('is-finished', isFinished);
 provide('is-canceled', isCanceled);
 provide('is-paused', isPaused);
 
-// provide('trim-paused', trimPaused);
+provide('is-trim-finished', isTrimFinished);
+provide('is-trim-canceled', isTrimCanceled);
+provide('is-trim-suspended', isTrimSuspended);
+provide('is-trim-active', isTrimActive);
 </script>

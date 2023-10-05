@@ -18,17 +18,18 @@ def get_disks(group):
 
 def main():
     with libzfs.ZFS() as zfs:
-        z_pools = []
+        z_pools = {}
 
         for p in zfs.pools:
             pool = p.asdict()
             disks = []
             for group in pool['groups']:
                 disks = disks + get_disks(pool['groups'][group])
-            z_pools.append({
-                'name': pool['name'],
-                'disks': disks,
-            })
+            z_pools[pool['name']] = disks
+            # ({
+            #     'name': pool['name'],
+            #     'disks': disks,
+            # })
 
     print(json.dumps(z_pools, indent=4))
 if __name__ == '__main__':

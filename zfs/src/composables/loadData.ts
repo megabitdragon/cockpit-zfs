@@ -4,47 +4,24 @@ import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath } from "./helpers";
 import { getSnapshots } from './snapshots';
-import { getDiskStats, getScan, getScanGroup } from './scan';
+import { getDiskStats, getScanGroup } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
 
-export async function loadDiskStats() {
+export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 	try {
 		const rawJSON = await getDiskStats();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('TRIM JSON Output:', parsedJSON);
+		console.log('Disk Stats Output:', parsedJSON);
 
-		
+		poolDiskStats.value = parsedJSON;
+		console.log("PoolDiskStats:", poolDiskStats.value);
 	} catch (error) {
-		console.error("An error occurred getting trim objects:", error);
+		console.error("An error occurred getting disk stats:", error);
 	}
 }
 
-export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName? : string) {
-	try {
-		const rawJSON = await getScan(poolName);
-		const parsedJSON = JSON.parse(rawJSON);
-		console.log(`Scan JSON for ${poolName}:`, parsedJSON);
-
-		scanObject.value.name = parsedJSON.name;
-		scanObject.value.function = parsedJSON.function;
-		scanObject.value.start_time = parsedJSON.start_time;
-		scanObject.value.end_time = parsedJSON.end_time;
-		scanObject.value.pause = parsedJSON.pause;
-		scanObject.value.state = parsedJSON.state;
-		scanObject.value.errors = parsedJSON.errors;
-		scanObject.value.percentage = parsedJSON.percentage;
-		scanObject.value.total_secs_left = parsedJSON.total_secs_left;
-		scanObject.value.bytes_issued = parsedJSON.bytes_issued;
-		scanObject.value.bytes_processed = parsedJSON.bytes_processed;
-		scanObject.value.bytes_to_process = parsedJSON.bytes_to_process;
-
-	} catch (error) {
-		console.error("An error occurred getting scan objects:", error);
-	}
-}
-
-export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>, poolName? : string) {
+export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) {
 	try {
 		const rawJSON = await getScanGroup();
 		const parsedJSON = JSON.parse(rawJSON);

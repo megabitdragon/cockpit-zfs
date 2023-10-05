@@ -333,14 +333,25 @@ interface DiskStats {
 		trim_errors: number;
 		trim_notsup: number;
 		trim_state: number;
+		// trim: TrimStats;
 		write_errors: number;
 	}
 }
 
 interface PoolDiskStats {
-	name: string;
-	disks: DiskStats[];
+	// name: string;
+	// disks: DiskStats[];
+	[poolName: string]: DiskStats[];
 }
+
+// interface TrimStats {
+// 	trim_timestamp: number;
+// 	trim_bytes_done: number;
+// 	trim_bytes_total: number;
+// 	trim_state: 'None' | 'Active' | 'Canceled' | 'Suspended' | 'Complete';
+// 	trim_supported: boolean;
+// 	trim_errors: number;
+// }
 
 type ConfirmationCallback = () => void;
 

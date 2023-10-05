@@ -1,104 +1,82 @@
 <template>
     <div>
-        <div v-if="ongoingScan">
-            <div v-if="!isPoolList">
-                <div class="grid grid-cols-4 gap-1 justify-items-center">
-                    <span class="col-span-4" :class="stateMessageClass()">
-                        {{ stateMessage }}
-                    </span>
+        <div v-if="!isPoolList">
+            <div class="grid grid-cols-4 gap-1 justify-items-center">
+                <span class="col-span-4" :class="stateMessageClass()">
+                    {{ stateMessage }}
+                </span>
 
-                    <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
-                        <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
-                            <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                                <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-                                    {{ parseFloat(scanPercentage.toFixed(2)) }}%
-                                </div>
-                            </div>
-                        </div>
-
-                        <span class="text-muted col-span-4">
-                            {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
-                        </span>
-
-                        <span v-if="isScanning && !isPaused" class="col-span-4">
-                            Completes in {{ timeRemaining }}.                    
-                        </span>
-                        <span v-if="isScanning && isPaused" class="col-span-4">
-                            Resume to continue or cancel to stop.                    
-                        </span>
-                    </div>
-
-                </div>
-            </div>
-
-            <div v-if="isPoolList">
-                <div class="grid-grid-cols-2 gap-1 justify items-center">
-                    <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-2">
-                        <span :class="stateMessageClass()">
-                            {{ miniStateMsg }}
-                        </span>
-                        <div class="min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
-                            <div :class="progressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                                <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
-                                    {{ amountProcessed }}/{{ amountTotal }} 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2">
-                        <span class="mt-2" :class="stateMessageClass()">
-                            {{ miniStateMsg }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- <div v-if="ongoingTrim && trimObjectGroup[props.pool.name].state !== null ">
-            <div v-if="!isPoolList">
-                <div class="grid grid-cols-4 gap-1 justify-items-center">
-                    <span class="col-span-4" :class="stateMessageClass()">
-                        Trim {{ trimObjectGroup[props.pool.name].state }} at {{ trimObjectGroup[props.pool.name].stateTimestamp }}
-                    </span>
-
-                    <div class="col-span-4 grid grid-cols-4 justify-items-center">
-                        <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
-                            <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${trimObjectGroup[props.pool.name].percent}%` }">
-                                <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-                                    {{ trimObjectGroup[props.pool.name].percent }}%
-                                </div>
-                            </div>
-                        </div>
-
-                        <span v-if="ongoingTrim && trimPaused" class="col-span-4">
-                            Resume to continue or cancel to stop.                    
-                        </span>
-                    </div>
-
-                </div>
-            </div>
-
-            <div v-if="isPoolList">
-                <div class="grid-grid-cols-2 gap-1 justify items-center">
-                    <div v-if="trimObjectGroup[props.pool.name].state !== null" class="col-span-2">
-                        <span :class="stateMessageClass()">
-                            Trim {{ trimObjectGroup[props.pool.name].state }} ({{ trimObjectGroup[props.pool.name].percent }}%)
-                        </span>
-                        <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${trimObjectGroup[props.pool.name].percent}%` }">
+                <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
+                    <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                        <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
                             <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-                                {{ trimObjectGroup[props.pool.name].percent }}%
+                                {{ parseFloat(scanPercentage.toFixed(2)) }}%
                             </div>
                         </div>
                     </div>
-                    <div v-if="trimObjectGroup[props.pool.name].state === null" class="col-span-2">
-                        <span class="mt-2" :class="stateMessageClass()">
-                            Trim not supported.
-                        </span>
-                    </div>
+
+                    <span class="text-muted col-span-4">
+                        {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
+                    </span>
+
+                    <span v-if="isScanning && !isPaused" class="col-span-4">
+                        Completes in {{ timeRemaining }}.                    
+                    </span>
+                    <span v-if="isScanning && isPaused" class="col-span-4">
+                        Resume to continue or cancel to stop.                    
+                    </span>
                 </div>
             </div>
-        </div> -->
-        
-        
+            <div class="grid grid-cols-4 gap-1 justify-items-center">
+                <div v-if="isTrimActive" class="col-span-4">
+                    <span class="col-span-4" :class="trimMessageClass()">
+                        {{ trimMessage }}
+                    </span>
+                    <div class="col-span-4 grid grid-cols-4 justify-items-center">
+                        
+                        <div v-for="disk, idx in poolDiskStats[props.pool.name]" class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
+                            <div :class="trimProgressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(getTrimPercentage(disk).toFixed(2))}%` }">
+                                <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+                                    {{ parseFloat(getTrimPercentage(disk).toFixed(2)) }}%
+                                </div>
+                            </div>
+                            <span class="text-muted col-span-4">
+                                (Disk {{ (poolDiskStats[props.pool.name][idx].name) }})  {{ getTrimmedAmount(disk) }} of {{ getTrimmedTotal(disk) }} processed. <br/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="isTrimSuspended" class="col-span-4">
+                    Resume to continue or cancel to stop.     
+                </div>
+            </div>
+
+        </div>
+
+        <div v-if="isPoolList">
+            <div class="grid-grid-cols-2 gap-1 justify items-center">
+                <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-2">
+                    <span :class="stateMessageClass()">
+                        {{ miniStateMsg }}
+                    </span>
+                    <div class="min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
+                        <div :class="progressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                            <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
+                                {{ amountProcessed }}/{{ amountTotal }} 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2">
+                    <span class="mt-2" :class="stateMessageClass()">
+                        {{ miniStateMsg }}
+                    </span>
+                </div>
+            </div>
+
+
+        </div>
+
     </div>
 </template>
 <script setup lang="ts">
@@ -108,40 +86,38 @@ import { convertBytesToSize, convertSecondsToString } from "../../composables/he
 interface StatusProps {
     pool: PoolData;
     scanObjectGroup: PoolScanObjectGroup;
-    // trimObjectGroup: TrimStatusObjectGroup;
     isPoolList: boolean;
     isPoolDetail: boolean;
-    isScanning: boolean;
-    // isTrimming: boolean;
+
 }
 
 const props = defineProps<StatusProps>();
 const notifications = inject<Ref<any>>('notifications')!;
 
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
-// const trimObjectGroup = inject<Ref<TrimStatusObjectGroup>>('trim-object-group')!;
-    
+
 const isScanning = inject<Ref<boolean>>('is-scanning')!;
 const isFinished = inject<Ref<boolean>>('is-finished')!;
 const isCanceled = inject<Ref<boolean>>('is-canceled')!;
 const isPaused = inject<Ref<boolean>>('is-paused')!;
 
-// const trimPaused = inject<Ref<boolean>>('trim-paused')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
-// const ongoingTrim = ref(props.isTrimming);
-const ongoingScan = ref(props.isScanning);
+const isTrimActive = inject<Ref<boolean>>('is-trim-active')!;
+const isTrimSuspended = inject<Ref<boolean>>('is-trim-suspended')!;
+const isTrimCanceled = inject<Ref<boolean>>('is-trim-canceled')!;
+const isTrimFinished = inject<Ref<boolean>>('is-trim-finished')!;
+
 
 const emit = defineEmits(['scan_now']);
-// const emit = defineEmits(['scan_now', 'scan_trim_now']);
+
 const scanNow = () => {
     emit('scan_now');
 }
-// const trimScanNow = () => {
-//     emit('scan_trim_now');
-// }
+
 
 scanNow();
-// trimScanNow();
+
 
 const scanFunction = computed(() => {
     switch (scanObjectGroup.value[props.pool.name].function) {
@@ -221,7 +197,6 @@ const timeRemaining = computed(() => {
 });
 
 function stateMessageClass() {
-    if (ongoingScan.value) {
         if (scanObjectGroup.value[props.pool.name].pause === 'None') {
             switch (scanObjectGroup.value[props.pool.name].state) {
                 case 'SCANNING':
@@ -238,23 +213,11 @@ function stateMessageClass() {
         } else {
             return 'text-orange-600'
         }
-    } 
-    // else if (ongoingTrim.value) {
-    //     switch (trimObjectGroup.value[props.pool.name].state) {
-    //         case 'started':
-    //             return 'text-default';
-    //         case 'completed':
-    //             return 'text-success';
-    //         case 'suspended':
-    //             return 'text-orange-600';
-    //         default:
-    //             return 'text-default';
-    //     }
-    // }
+  
 }
 
 function progressBarClass() {
-    if (ongoingScan.value) {
+
         if (scanObjectGroup.value[props.pool.name].pause === 'None') {
             switch (scanObjectGroup.value[props.pool.name].state) {
                 case 'SCANNING':
@@ -271,19 +234,95 @@ function progressBarClass() {
         } else {
             return 'bg-orange-600';
         }
-    } 
-    // else if (ongoingTrim.value) {
-    //     switch (trimObjectGroup.value[props.pool.name].state) {
-    //         case 'started':
-    //             return 'bg-blue-600';
-    //         case 'completed':
-    //             return 'bg-green-600';
-    //         case 'suspended':
-    //             return 'bg-orange-600';
-    //         default:
-    //             return 'text-default';
-    //     }
-    // }
+  
 }
+
+//////////////////////////////////////////////////////////////////
+
+const trimMessage = computed(() => {
+    if (isTrimActive.value) {
+        return 'Trim is '
+    } else if (isTrimCanceled.value) {
+
+    } else if (isTrimSuspended.value) {
+
+    } else if (isTrimFinished.value) {
+
+    }
+    
+});
+
+function getTrimMessage(disk) {
+    
+}
+
+// const trimPercentage = computed((disk) => {
+//     return (disk.stats.trim_bytes_done / disk.stats.trim_bytes_est) * 100;
+// });
+
+// const amountTrimmedSoFar = computed((disk) => {
+//     return convertBytesToSize(disk.stats.trim_bytes_done);
+// });
+
+// const amountTotalToTrim = computed((disk) => {
+//     return convertBytesToSize(disk.stats.trim_bytes_est);
+// });
+
+function getTrimPercentage(disk) {
+    return (disk.stats.trim_bytes_done / disk.stats.trim_bytes_est) * 100;
+}
+
+function getTrimmedAmount(disk) {
+    return convertBytesToSize(disk.stats.trim_bytes_done);
+}
+
+function getTrimmedTotal(disk) {
+    return convertBytesToSize(disk.stats.trim_bytes_est);
+}
+
+
+function trimMessageClass() {
+    if (isTrimActive.value) {
+
+    } else if (isTrimCanceled.value) {
+
+    } else if (isTrimSuspended.value) {
+
+    } else if (isTrimFinished.value) {
+
+    }
+
+}
+
+function trimProgressBarClass() {
+    if (isTrimActive.value) {
+
+    } else if (isTrimCanceled.value) {
+
+    } else if (isTrimSuspended.value) {
+
+    } else if (isTrimFinished.value) {
+
+    }
+
+    // if (scanObjectGroup.value[props.pool.name].pause === 'None') {
+    //     switch (scanObjectGroup.value[props.pool.name].state) {
+    //         case 'SCANNING':
+    //             return 'bg-blue-600';
+    //         case 'FINISHED':
+    //             return 'bg-green-600'; 
+    //         case 'CANCELED':
+    //             return 'bg-danger'; 
+    //         case 'NONE':
+    //             return 'text-muted';
+    //         default:
+    //             return 'text-default'; 
+    //     }
+    // } else {
+    //     return 'bg-orange-600';
+    // }
+  
+}
+
 
 </script>
