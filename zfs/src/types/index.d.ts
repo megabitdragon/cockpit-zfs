@@ -312,15 +312,34 @@ interface PoolScanObjectGroup {
 	[poolName: string]: PoolScanObject;
 }
 
-interface TrimStatusObject {
-	poolName: string;
-	state: string;
-	percent: number;
-	stateTimestamp: string;
+interface DiskStats {
+	name: string;
+	stats: {
+		allocated: number;
+		bytes: number[];
+		checksum_errors: number;
+		configured_ashift: number;
+		fragmentation: number;
+		logical_ashift: number;
+		ops: number[];
+		physical_ashift: number;
+		read_errors: number;
+		self_healed: number;
+		size: number;
+		timestamp: number;
+		trim_action_time: number;
+		trim_bytes_done: number;
+		trim_bytes_est: number;
+		trim_errors: number;
+		trim_notsup: number;
+		trim_state: number;
+		write_errors: number;
+	}
 }
 
-interface TrimStatusObjectGroup {
-	[poolName: string]: TrimStatusObject;
+interface PoolDiskStats {
+	name: string;
+	disks: DiskStats[];
 }
 
 type ConfirmationCallback = () => void;

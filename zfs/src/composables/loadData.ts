@@ -4,22 +4,21 @@ import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath } from "./helpers";
 import { getSnapshots } from './snapshots';
-import { getAllTRIMDetails, getScan, getScanGroup } from './scan';
+import { getDiskStats, getScan, getScanGroup } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
 
-// export async function loadTRIMObjectGroup(trimObject : Ref<TrimStatusObjectGroup>, pools : PoolData[]) {
-// 	try {
-// 		const poolsJSONString = JSON.stringify(pools);
-// 		const rawJSON = await getAllTRIMDetails(poolsJSONString);
-// 		const parsedJSON = JSON.parse(rawJSON);
-// 		console.log(`TRIM JSON:`, parsedJSON);
+export async function loadDiskStats() {
+	try {
+		const rawJSON = await getDiskStats();
+		const parsedJSON = JSON.parse(rawJSON);
+		console.log('TRIM JSON Output:', parsedJSON);
+
 		
-// 		trimObject.value = parsedJSON;
-// 	} catch (error) {
-// 		console.error("An error occurred getting trim objects:", error);
-// 	}
-// }
+	} catch (error) {
+		console.error("An error occurred getting trim objects:", error);
+	}
+}
 
 export async function loadScanObject(scanObject : Ref<PoolScanObject>, poolName? : string) {
 	try {
@@ -133,7 +132,7 @@ export async function loadDisksThenPools(disks, pools) {
 					failMode: parsedJSON[i].properties.failmode.parsed,
 					comment: parsedJSON[i].properties.comment.value,
 					scan: {
-						name: parsedJSON[i].scan.name,
+						name: parsedJSON[i].name,
 						function: parsedJSON[i].scan.function,
 						start_time: parsedJSON[i].scan.start_time,
 						end_time: parsedJSON[i].scan.end_time,

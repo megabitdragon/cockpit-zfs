@@ -25,7 +25,7 @@
 import { reactive, ref, Ref, inject, computed, provide, watch } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import { loadDisksThenPools, loadDatasets, loadScanObjectGroup } from '../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../composables/loadData';
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
@@ -44,7 +44,6 @@ const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const snapshots = ref<Snapshot[]>([]);
 
 const scanObjectGroup = ref<PoolScanObjectGroup>({});
-const trimObjectGroup = ref<TrimStatusObjectGroup>({});
 
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
@@ -67,6 +66,7 @@ async function initialLoad(disks, pools, datasets) {
 
 initialLoad(disks, pools, datasets);
 scanNow();
+loadDiskStats();
 ///////////////////////////////////////////////////
 
 const intervalID = ref();
@@ -138,7 +138,6 @@ provide("snapshots", snapshots);
 provide('scan-object-group', scanObjectGroup);
 provide('interval', intervalID);
 provide('scanning', scanning);
-provide('trim-object-group', trimObjectGroup);
 // provide('trim-interval', trimIntervalID);
 // provide('trim-scanning', trimScanning);
 </script>
