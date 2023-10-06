@@ -61,7 +61,7 @@
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.free }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.size }}</div>
 										<div class="py-6 -mt-2 col-span-2">
-											<Status :pool="poolData[poolIdx]" :isDisk="false" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
+											<Status :pool="poolData[poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
 										</div>
 									</button>
 									<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
@@ -146,67 +146,67 @@
 									<template v-slot:content>
 										<table class="table-auto min-w-full divide-y divide-default rounded-md bg-secondary text-default">
 											<tr :key="vDevIdx" class="rounded-md">
-												<td colspan="9" class="ml-7">
-													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-well rounded-md">
-														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
-														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">State</th>
-														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Reads</th>
-														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Writes</th>
-														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Checksum</th>
-														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Capacity</th>
-														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default col-span-2">Message</th>
-														<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
-															<span class="sr-only"></span>
-														</th>
-														<tr v-for="disk, diskIdx in pool.vdevs[vDevIdx].disks" :key="diskIdx" class="indent-16 bg-default rounded-md">
-															<td>{{ disk.name }}</td>
-															<td>{{ disk.health }}</td>
-															<td>W</td>
-															<td>X</td>
-															<td>Y</td>
-															<td>{{ disk.capacity }}</td>
-															<td class="col-span-2">
-																<Status class="-mt-3" :disk="disk" :pool="poolData[poolIdx]" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
-															</td>
-															
-															<td>
-																<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
-																	<Menu as="div" class="relative inline-block text-right">
-																		<div>
-																			<MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-																				<span class="sr-only">Open options</span>
-																				<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
-																			</MenuButton>
-																		</div>
+												<td colspan="9" class="">
+													<table class="min-w-full divide-y divide-default ">
+															<th class="py-3.5 font-semibold text-default col-span-1">Name</th>
+															<th class="py-3.5 font-semibold text-default col-span-1">State</th>
+															<th class="py-3.5 font-semibold text-default col-span-1">Reads</th>
+															<th class="py-3.5 font-semibold text-default col-span-1">Writes</th>
+															<th class="py-3.5 font-semibold text-default col-span-1">Checksum</th>
+															<th class="py-3.5 font-semibold text-default col-span-1">Capacity</th>
+															<th class="py-3.5 font-semibold text-default col-span-2">Message</th>
+															<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+																<span class="sr-only"></span>
+															</th>
+															<tr v-for="disk, diskIdx in pool.vdevs[vDevIdx].disks" :key="diskIdx" class="bg-default rounded-md">
+																<td class="p-4 mt-1 col-span-1">{{ disk.name }}</td>
+																<td class="p-4 mt-1 col-span-1">{{ disk.health }}</td>
+																<td class="p-4 mt-1 col-span-1">W</td>
+																<td class="p-4 mt-1 col-span-1">X</td>
+																<td class="p-4 mt-1 col-span-1">Y</td>
+																<td class="p-4 mt-1 col-span-1">{{ disk.capacity }}</td>
+																<td class="p-4 mt-1 col-span-2">
+																	<Status class="-mt-3" :isTrim="false" :disk="disk" :pool="poolData[poolIdx]" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
+																</td>
+																
+																<td class="p-4 mt-1 col-span-1">
+																	<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+																		<Menu as="div" class="relative inline-block text-right">
+																			<div>
+																				<MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+																					<span class="sr-only">Open options</span>
+																					<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+																				</MenuButton>
+																			</div>
 
-																		<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-																			<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-																				<div class="py-1">
-																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" @click="clearDiskErrors(pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
-																					</MenuItem>
-																					<MenuItem as="div" v-slot="{ active }">
-																						<a v-if="pool.vdevs[vDevIdx].disks.length > 1" href="#" @click="detachThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
-																					</MenuItem>
-																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" @click="offlineThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
-																					</MenuItem>
-																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" @click="onlineThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Online Disk</a>
-																					</MenuItem>
-																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" @click="replaceThisDisk(pool, vDev, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
-																					</MenuItem>
-																					<MenuItem as="div" v-slot="{ active }">
-																						<a href="#" @click="trimThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
-																					</MenuItem>
-																				</div>
-																			</MenuItems>
-																		</transition>
-																	</Menu>
-																</div>
-															</td>
-														</tr>
+																			<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+																				<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+																					<div class="py-1">
+																						<MenuItem as="div" v-slot="{ active }">
+																							<a href="#" @click="clearDiskErrors(pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
+																						</MenuItem>
+																						<MenuItem as="div" v-slot="{ active }">
+																							<a v-if="pool.vdevs[vDevIdx].disks.length > 1" href="#" @click="detachThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
+																						</MenuItem>
+																						<MenuItem as="div" v-slot="{ active }">
+																							<a href="#" @click="offlineThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
+																						</MenuItem>
+																						<MenuItem as="div" v-slot="{ active }">
+																							<a href="#" @click="onlineThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Online Disk</a>
+																						</MenuItem>
+																						<MenuItem as="div" v-slot="{ active }">
+																							<a href="#" @click="replaceThisDisk(pool, vDev, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
+																						</MenuItem>
+																						<MenuItem as="div" v-slot="{ active }">
+																							<a href="#" @click="trimThisDisk(pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
+																						</MenuItem>
+																					</div>
+																				</MenuItems>
+																			</transition>
+																		</Menu>
+																	</div>
+																</td>
+															</tr>
 													</table>
 												</td>
 											</tr>

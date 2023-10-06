@@ -71,7 +71,7 @@
 			</template>
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :pool="props.pool" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
+					<Status :pool="props.pool" :isTrim="false" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
 					<div v-if="scanObjectGroup[props.pool.name].function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
@@ -100,7 +100,7 @@
 							Stopping...
 						</button>
 					</div>
-
+					<Status :pool="props.pool" :isTrim="true" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
 					<div v-if="isTrimActive || isTrimSuspended" type="button" class="button-group-row justify-self-center col-span-4">
 						<button v-if="!pausingTrim && !isTrimSuspended" id="pause-trim" class="btn btn-secondary" @click="pauseTrim(props.pool)">Pause Trim</button>
 						<button disabled v-if="pausingTrim && !isTrimSuspended" id="pausing-trim" type="button" class="btn btn-secondary">
