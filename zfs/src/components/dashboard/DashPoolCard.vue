@@ -71,7 +71,7 @@
 			</template>
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :scanObjectGroup="scanObjectGroup" :pool="props.pool" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()"/>
+					<Status :pool="props.pool" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
 					<div v-if="scanObjectGroup[props.pool.name].function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
@@ -101,7 +101,7 @@
 						</button>
 					</div>
 
-					<div v-if="isTrimActive" type="button" class="button-group-row justify-self-center col-span-4">
+					<div v-if="isTrimActive || isTrimSuspended" type="button" class="button-group-row justify-self-center col-span-4">
 						<button v-if="!pausingTrim && !isTrimSuspended" id="pause-trim" class="btn btn-secondary" @click="pauseTrim(props.pool)">Pause Trim</button>
 						<button disabled v-if="pausingTrim && !isTrimSuspended" id="pausing-trim" type="button" class="btn btn-secondary">
 							<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -692,6 +692,7 @@ provide("confirm-resilver", confirmResilver);
 provide("show-trim-modal", showTrimModal);
 provide("secure-trim", secureTRIM);
 provide("confirm-trim", confirmTrim);
+provide("trimming", trimming);
 
 provide("show-export-modal", showExportModal);
 provide("force-unmount", forceUnmount);

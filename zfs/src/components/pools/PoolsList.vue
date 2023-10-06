@@ -61,7 +61,7 @@
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.free }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.size }}</div>
 										<div class="py-6 -mt-2 col-span-2">
-											<Status :isScanning="scanning" :scanObjectGroup="scanObjectGroup" :pool="poolData[poolIdx]" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()"/>
+											<Status :pool="poolData[poolIdx]" :isDisk="false" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
 										</div>
 									</button>
 									<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
@@ -110,7 +110,6 @@
 							</template>
 							<template v-slot:content>
 								<Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-10'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-9'" :contentColSpan="'col-span-10'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx">
-									<!-- <Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default" v-for="vDev, vDevIdx in pool.vdevs" :key="vDevIdx"> -->
 									<template v-slot:title>
 										<div class="grid grid-cols-8 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
 											<div class="col-span-7 text-center py-4 mt-1">
@@ -147,15 +146,15 @@
 									<template v-slot:content>
 										<table class="table-auto min-w-full divide-y divide-default rounded-md bg-secondary text-default">
 											<tr :key="vDevIdx" class="rounded-md">
-												<td colspan="8" class="ml-7">
+												<td colspan="9" class="ml-7">
 													<table class="table-auto min-w-full divide-y divide-default ring-1 ring-black ring-opacity-5 indent-12 bg-well rounded-md">
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">State</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Reads</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Writes</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Checksum</th>
-														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Message</th>
 														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Capacity</th>
+														<th class="px-3 py-3.5 text-left text-sm font-semibold text-default col-span-2">Message</th>
 														<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
 															<span class="sr-only"></span>
 														</th>
@@ -165,8 +164,11 @@
 															<td>W</td>
 															<td>X</td>
 															<td>Y</td>
-															<td>Z</td>
 															<td>{{ disk.capacity }}</td>
+															<td class="col-span-2">
+																<Status class="-mt-3" :disk="disk" :pool="poolData[poolIdx]" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
+															</td>
+															
 															<td>
 																<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 																	<Menu as="div" class="relative inline-block text-right">
@@ -297,8 +299,8 @@ import { ref, inject, Ref, provide, watch, computed } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
-import { labelClear, detachDisk, offlineDisk, onlineDisk, replaceDisk, trimDisk } from "../../composables/disks";
-import { loadDatasets, loadDisksThenPools, loadScanObjectGroup } from '../../composables/loadData';
+import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
+import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolDetail from "./PoolDetail.vue";
 import ImportPool from "./ImportPool.vue";
@@ -502,6 +504,7 @@ const showTrimModal = ref(false);
 const confirmTrim = ref(false);
 const secureTRIM = ref(false);
 const trimmed = ref(false);
+const trimming = ref(false);
 
 async function trimThisPool(pool) {
 	cleared.value = false;
@@ -519,18 +522,19 @@ const updateShowTrimPool = (newVal) => {
 	showTrimModal.value = newVal;
 }
 
-// async function trimAndScan() {
-// 	if (firstOptionToggle.value) {
-// 		await trimPool(selectedPool.value, firstOptionToggle.value);
-// 		trimScanNow();
-// 	} else {
-// 		await trimPool(selectedPool.value);
-// 		trimScanNow();
-// 	}
-// }
+async function trimAndScan() {
+	if (firstOptionToggle.value) {
+		await trimPool(selectedPool.value!, firstOptionToggle.value);
+		checkDiskStats();
+	} else {
+		await trimPool(selectedPool.value!);
+		checkDiskStats();
+	}
+}
 
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
+		trimming.value = true;
 		operationRunning.value = true;
 		trimmed.value = false;
 		console.log('now trimming:', selectedPool.value);
@@ -538,14 +542,13 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		if (firstOptionToggle.value) {
 			confirmTrim.value = false;	
 			showTrimModal.value = false;
-			// await trimAndScan();
-			await trimPool(selectedPool.value, firstOptionToggle.value);
+			await trimAndScan();
 		} else {
 			confirmTrim.value = false;
 			showTrimModal.value = false;
-			// await trimAndScan();
-			await trimPool(selectedPool.value);
+			await trimAndScan();
 		}
+		trimming.value = false;
 		operationRunning.value = false;
 		trimmed.value = true;
 
@@ -905,62 +908,125 @@ const isPaused = computed(() => {
 	return scanObjectGroup.value[selectedPool.value!.name].pause !== 'None';
 });
 
-const intervalID = inject<Ref>('interval')!;
-const scanning = inject<Ref>('scanning')!;
+const scanIntervalID = inject<Ref<any>>('scan-interval')!;
+const scanning = inject<Ref<boolean>>('scanning')!;
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
-function startInterval() {
-	console.log('setting interval (pool tab)');
-	if (!intervalID.value) {
-		intervalID.value = setInterval(scanNow, 5000);
+function startScanInterval() {
+	if (!scanIntervalID.value) {
+		scanIntervalID.value = setInterval(scanNow, 5000);
 	}
-	console.log('interval set (pool tab)', intervalID.value);
 }
 
-function stopInterval() {
-	console.log('clearing interval (pool tab)');
-	if (intervalID.value) {
-		clearInterval(intervalID.value);
-		intervalID.value = null;
+function stopScanInterval() {
+	if (scanIntervalID.value) {
+		clearInterval(scanIntervalID.value);
+		scanIntervalID.value = null;
 	}
-	console.log('interval cleared (pool tab)', intervalID.value);
 }
 
 if (scanning.value) {
-	startInterval();
+	startScanInterval();
 } else {
-	stopInterval();
+	stopScanInterval();
 }
 
-// const trimObjectGroup = inject<Ref<TrimStatusObjectGroup>>('trim-object-group')!;
-// const trimIntervalID = inject<Ref>('trim-interval')!;
-// const trimScanning = inject<Ref>('trim-scanning')!;
+//////////// Checking Disk Stats (Trim) /////////////
+/////////////////////////////////////////////////////
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
-// async function trimScanNow() {
-// 	await loadTRIMObjectGroup(trimObjectGroup, poolData.value);
-// }
+// const isTrimActive = computed(() => {
+// 	if (poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1)) {
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// });
 
-// function trimStartInterval() {
-// 	if (!trimIntervalID.value) {
-// 		trimIntervalID.value = setInterval(scanNow, 5000);
+// function getTrimActive(disk) {
+// 	if (disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1) {
+// 		return true;
+// 	} else {
+// 		return false;
 // 	}
 // }
 
-// function trimStopInterval() {
-// 	if (trimIntervalID.value) {
-// 		clearInterval(trimIntervalID.value);
-// 		trimIntervalID.value = null;
+// const isTrimCanceled = computed(() => {
+// 	if (poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 2)) {
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// });
+
+// function getTrimCanceled(disk) {
+// 	if (disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 2) {
+// 		return true;
+// 	} else {
+// 		return false;
 // 	}
 // }
 
-// if (trimScanning.value) {
-// 	trimStartInterval();
-// } else {
-// 	trimStopInterval();
+// const isTrimSuspended = computed(() => {
+// 	if (poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 3)) {
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// });
+
+// function getTrimSuspended(disk) {
+// 	if (disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 3) {
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
 // }
+
+// const isTrimFinished = computed(() => {
+//     if (poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4)) {
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// });
+
+// function getTrimFinished(disk) {
+// 	if (disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4) {
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// }
+
+const diskStatsIntervalID = inject<Ref<any>>('disk-stats-interval')!;
+const checkingDiskStats = inject<Ref<boolean>>('checking-disk-stats')!;
+
+async function checkDiskStats() {
+	await loadDiskStats(poolDiskStats);
+}
+
+function startDiskStatsInterval() {
+	if (!diskStatsIntervalID.value) {
+		diskStatsIntervalID.value = setInterval(checkDiskStats, 5000);
+	}
+}
+
+function stopDiskStatsInterval() {
+	if (diskStatsIntervalID.value) {
+		clearInterval(diskStatsIntervalID.value);
+		diskStatsIntervalID.value = null;
+	}
+}
+
+if (checkingDiskStats.value) {
+	startDiskStatsInterval();
+} else {
+	stopDiskStatsInterval();
+}
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
@@ -978,6 +1044,7 @@ provide("confirm-resilver", confirmResilver);
 provide("show-trim-modal", showTrimModal);
 provide("secure-trim", secureTRIM);
 provide("confirm-trim", confirmTrim);
+provide("trimming", trimming);
 
 provide("show-export-modal", showExportModal);
 provide("confirm-export", confirmExport);
@@ -1003,4 +1070,9 @@ provide('is-scanning', isScanning);
 provide('is-finished', isFinished);
 provide('is-canceled', isCanceled);
 provide('is-paused', isPaused);
+
+// provide('is-trim-finished', isTrimFinished);
+// provide('is-trim-canceled', isTrimCanceled);
+// provide('is-trim-suspended', isTrimSuspended);
+// provide('is-trim-active', isTrimActive);
 </script>
