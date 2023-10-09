@@ -71,7 +71,7 @@
 			</template>
 			<template v-slot:content>
 				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :pool="props.pool" :isTrim="false" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
+					<Status :pool="props.pool" :isTrim="false" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'"/>
 					<div v-if="scanObjectGroup[props.pool.name].function === 'SCRUB' && isScanning" id="pause" type="button" class="button-group-row justify-self-center col-span-4">
 						<button class="btn btn-secondary" v-if="!pausing && !isPaused" @click="pauseScrub(props.pool)">Pause Scrub</button>
 						<button disabled v-if="pausing && !isPaused" id="pausing" type="button" class="btn btn-secondary">
@@ -100,7 +100,7 @@
 							Stopping...
 						</button>
 					</div>
-					<Status :pool="props.pool" :isTrim="true" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'" @scan_now="scanNow()" @pool_disk_scan="checkDiskStats()"/>
+					<Status :pool="props.pool" :isTrim="true" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'status-box'"/>
 					<div v-if="isTrimActive || isTrimSuspended" type="button" class="button-group-row justify-self-center col-span-4">
 						<button v-if="!pausingTrim && !isTrimSuspended" id="pause-trim" class="btn btn-secondary" @click="pauseTrim(props.pool)">Pause Trim</button>
 						<button disabled v-if="pausingTrim && !isTrimSuspended" id="pausing-trim" type="button" class="btn btn-secondary">
@@ -355,14 +355,12 @@ watch(confirmResilver, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showScrubModal = ref(false);
 const confirmScrub = ref(false);
-const scrubbed = ref(false);
-const scrubbing = ref(false);
 const pausing = ref(false);
 const stopping = ref(false);
 const resuming = ref(false);
 
 function scrubThisPool(pool) {
-	cleared.value = false;
+	// cleared.value = false;
 	selectedPool.value = pool;
 	showScrubModal.value = true;
 
@@ -379,23 +377,21 @@ const updateShowScrubPool = (newVal) => {
 
 async function scrubAndScan() {
 	await scrubPool(selectedPool.value!);
-	scanNow();
+	scanning.value = true;
+	// scanNow();
 }
 
 watch(confirmScrub, async (newVal, oldVal) => {
 	if (confirmScrub.value == true) {
-		scrubbed.value = false;
-		scrubbing.value = true;
-		operationRunning.value = scrubbing.value;
+		operationRunning.value = true;
 
 		console.log('now scrubbing:', selectedPool.value);
 		showScrubModal.value = false;
 		await scrubAndScan();
-		
+		// scanning.value = true;
 		confirmScrub.value = false;
-		scrubbing.value = false;
-		operationRunning.value = scrubbing.value;
-		scrubbed.value = true;
+		operationRunning.value = false;
+
 		
 		notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
 	}
@@ -430,14 +426,12 @@ async function stopScrub(pool) {
 const showTrimModal = ref(false);
 const confirmTrim = ref(false);
 const secureTRIM = ref(false);
-const trimmed = ref(false);
-const trimming = ref(false);
 const pausingTrim = ref(false);
 const stoppingTrim = ref(false);
 const resumingTrim = ref(false);
 
 async function trimThisPool(pool) {
-	cleared.value = false;
+	// cleared.value = false;
 	selectedPool.value = pool;
 	showTrimModal.value = true;
 
@@ -453,6 +447,7 @@ const updateShowTrimPool = (newVal) => {
 }
 
 async function trimAndScan() {
+	checkingDiskStats.value = true;
 	if (firstOptionToggle.value) {
 		await trimPool(selectedPool.value!, firstOptionToggle.value);
 		checkDiskStats();
@@ -464,9 +459,7 @@ async function trimAndScan() {
 
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
-		trimming.value = true;
 		operationRunning.value = true;
-		trimmed.value = false;
 		console.log('now trimming:', selectedPool.value);
 
 		if (firstOptionToggle.value) {
@@ -478,9 +471,7 @@ watch(confirmTrim, async (newValue, oldValue) => {
 			showTrimModal.value = false;
 			await trimAndScan();
 		}
-		trimming.value = false;
 		operationRunning.value = false;
-		trimmed.value = true;
 
 		notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
 	}
@@ -518,7 +509,7 @@ const forceUnmount = ref(false);
 const exporting = ref(false);
 
 async function exportThisPool(pool) {
-	cleared.value = false;
+	// cleared.value = false;
 	selectedPool.value = pool;
 	showExportModal.value = true;
 
@@ -554,12 +545,12 @@ watch(confirmExport, async (newVal, oldVal) => {
 
 /////////////////// Clear Errors ////////////////////
 /////////////////////////////////////////////////////
-const cleared = ref(false);
+// const cleared = ref(false);
 
 async function clearPoolErrors(poolName) {
-	cleared.value = false;
+	// cleared.value = false;
 	await clearErrors(poolName);
-	cleared.value = true;
+	// cleared.value = true;
 }
 
 ///////////////////// Add VDev //////////////////////
@@ -576,33 +567,22 @@ function showAddVDev(pool) {
 /////////////////////////////////////////////////////
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 
-const isScanning = computed(() => {
-	if (scanObjectGroup.value[props.pool.name].state === 'SCANNING') {
-        return true;
-    } else {
-        return false;
-    }
-});
+function getScanStateBool(state) {
+	return computed(() => {
+		return scanObjectGroup.value[props.pool.name].state === state;
+	});
+}
 
-const isFinished = computed(() => {
-	if (scanObjectGroup.value[props.pool.name].state === 'FINISHED') {
-        return true;
-    } else {
-        return false;
-    }
-});
+function getScanPauseBool(pause) {
+	return computed(() => {
+		return scanObjectGroup.value[props.pool.name].pause !== pause;
+	});
+}
 
-const isCanceled = computed(() => {
-	if (scanObjectGroup.value[props.pool.name].state === 'CANCELED') {
-        return true;
-    } else {
-        return false;
-    }
-});
-
-const isPaused = computed(() => {
-	return scanObjectGroup.value[props.pool.name].pause !== 'None';
-});
+const isScanning = getScanStateBool('SCANNING');
+const isFinished =  getScanStateBool('FINISHED');
+const isCanceled =  getScanStateBool('CANCELED');
+const isPaused = getScanPauseBool('None');
 
 const scanIntervalID = inject<Ref<any>>('scan-interval')!;
 const scanning = inject<Ref<boolean>>('scanning')!;
@@ -613,7 +593,7 @@ async function scanNow() {
 
 function startScanInterval() {
 	if (!scanIntervalID.value) {
-		scanIntervalID.value = setInterval(scanNow, 5000);
+		scanIntervalID.value = setInterval(scanNow, 3000);
 	}
 }
 
@@ -624,32 +604,57 @@ function stopScanInterval() {
 	}
 }
 
-if (scanning.value) {
-	startScanInterval();
-} else {
-	stopScanInterval();
+// watch(isScanning, (newVal, oldVal) => {
+// 	if (isScanning) {
+// 		scanning.value = true;
+// 	} else {
+// 		scanning.value = false;
+// 	}
+// });
+
+watch(scanning, (newVal, oldVal) => {
+	console.log('scanning changed:', scanning.value);
+	if (scanning.value) {
+		startScanInterval();
+	} else if (!scanning.value) {
+		stopScanInterval();
+	}
+});
+
+
+if (isScanning) {
+	scanning.value = true;
+	if (scanning.value) {
+		startScanInterval();
+	} else {
+		stopScanInterval();
+	}
+} else if (!isScanning) {
+	scanning.value = false;
 }
+
+
+console.log('SCAN:', props.pool.name, 'isScanning:', isScanning.value);
+console.log('SCAN:', props.pool.name, 'scanning:', scanning.value);
+console.log('SCAN:', props.pool.name, 'isFinished:', isFinished.value);
+console.log('SCAN:', props.pool.name, 'isCanceled:', isCanceled.value);
+console.log('SCAN:', props.pool.name, 'isPaused:', isPaused.value);
 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
-const isTrimActive = computed(() => {
-	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1);
-});
+function getTrimState(state) {
+	return computed(() => {
+		return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
+	});
+}
 
-const isTrimCanceled = computed(() => {
-	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 2);
-});
-
-const isTrimSuspended = computed(() => {
-	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 3);
-});
-
-const isTrimFinished = computed(() => {
-    return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4);
-});
+const isTrimActive = getTrimState(1);
+const isTrimCanceled = getTrimState(2);
+const isTrimSuspended = getTrimState(3);
+const isTrimFinished = getTrimState(4);
 
 const diskStatsIntervalID = inject<Ref<any>>('disk-stats-interval')!;
 const checkingDiskStats = inject<Ref<boolean>>('checking-disk-stats')!;
@@ -660,7 +665,7 @@ async function checkDiskStats() {
 
 function startDiskStatsInterval() {
 	if (!diskStatsIntervalID.value) {
-		diskStatsIntervalID.value = setInterval(checkDiskStats, 5000);
+		diskStatsIntervalID.value = setInterval(checkDiskStats, 3000);
 	}
 }
 
@@ -671,11 +676,49 @@ function stopDiskStatsInterval() {
 	}
 }
 
-if (checkingDiskStats.value) {
-	startDiskStatsInterval();
-} else {
-	stopDiskStatsInterval();
+// watch(isTrimActive, (newVal, oldVal) => {
+// 	if (isTrimActive) {
+// 		checkingDiskStats.value = true;
+// 	} else {
+// 		checkingDiskStats.value = false;
+// 	}
+// });
+
+// watch(isTrimSuspended, (newVal, oldVal) => {
+// 	if (isTrimSuspended) {
+// 		checkingDiskStats.value = true;
+// 	} else {
+// 		checkingDiskStats.value = false;
+// 	}
+// });
+
+watch(checkingDiskStats, (newVal, oldVal) => {
+	console.log('checkingDiskStats changed:', checkingDiskStats.value);
+	if (checkingDiskStats.value) {
+		startDiskStatsInterval();
+	} else if (!checkingDiskStats.value) {
+		stopDiskStatsInterval();
+	}
+});
+
+if (isTrimActive) {
+	checkingDiskStats.value = true;
+	if (checkingDiskStats.value) {
+		startDiskStatsInterval();
+	} else {
+		stopDiskStatsInterval();
+	}
+
+} else if (!isTrimActive || !isTrimSuspended) {
+	checkingDiskStats.value = false;
 }
+
+
+console.log('TRIM:', props.pool.name, 'isTrimActive:', isTrimActive.value);
+console.log('TRIM:', props.pool.name, 'checkingDiskStats:', checkingDiskStats.value);
+console.log('TRIM:', props.pool.name, 'isTrimSuspended:', isTrimSuspended.value);
+console.log('TRIM:', props.pool.name, 'isTrimCanceled:', isTrimCanceled.value);
+console.log('TRIM:', props.pool.name, 'isTrimFinished:', isTrimFinished.value);
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
@@ -692,7 +735,6 @@ provide("confirm-resilver", confirmResilver);
 provide("show-trim-modal", showTrimModal);
 provide("secure-trim", secureTRIM);
 provide("confirm-trim", confirmTrim);
-provide("trimming", trimming);
 
 provide("show-export-modal", showExportModal);
 provide("force-unmount", forceUnmount);

@@ -132,40 +132,34 @@ const selectedDisk = computed(() => {
     return poolDiskStats.value[props.pool.name].find(disk => disk.name == props.disk!.name);
 });
 
-// const isTrimActive = inject<Ref<boolean>>('is-trim-active')!;
-// const isTrimSuspended = inject<Ref<boolean>>('is-trim-suspended')!;
-// const isTrimCanceled = inject<Ref<boolean>>('is-trim-canceled')!;
-// const isTrimFinished = inject<Ref<boolean>>('is-trim-finished')!;
+const isTrimActive = inject<Ref<boolean>>('is-trim-active')!;
+const isTrimSuspended = inject<Ref<boolean>>('is-trim-suspended')!;
+const isTrimCanceled = inject<Ref<boolean>>('is-trim-canceled')!;
+const isTrimFinished = inject<Ref<boolean>>('is-trim-finished')!;
 
-const isTrimActive = computed(() => {
-	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1);
-});
+// function getTrimStateValue(state) {
+// 	return computed(() => {
+// 		return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
+// 	});
+// }
 
-const isTrimCanceled = computed(() => {
-	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 2);
-});
+// const isTrimActive = getTrimStateValue(1);
+// const isTrimCanceled = getTrimStateValue(2);
+// const isTrimSuspended = getTrimStateValue(3);
+// const isTrimFinished = getTrimStateValue(4);
 
-const isTrimSuspended = computed(() => {
-	return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 3);
-});
+// const emit = defineEmits(['scan_now', 'pool_disk_scan']);
 
-const isTrimFinished = computed(() => {
-    return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4);
-});
+// const scanNow = () => {
+//     emit('scan_now');
+// }
 
+// const poolDiskScan = () => {
+//     emit('pool_disk_scan');
+// }
 
-const emit = defineEmits(['scan_now', 'pool_disk_scan']);
-
-const scanNow = () => {
-    emit('scan_now');
-}
-
-const poolDiskScan = () => {
-    emit('pool_disk_scan');
-}
-
-scanNow();
-poolDiskScan();
+// scanNow();
+// poolDiskScan();
 
 const scanFunction = computed(() => {
     switch (scanObjectGroup.value[props.pool.name].function) {
@@ -245,41 +239,41 @@ const timeRemaining = computed(() => {
 });
 
 function stateMessageClass() {
-        if (scanObjectGroup.value[props.pool.name].pause === 'None') {
-            switch (scanObjectGroup.value[props.pool.name].state) {
-                case 'SCANNING':
-                    return 'text-default';
-                case 'FINISHED':
-                    return 'text-success'; 
-                case 'CANCELED':
-                    return 'text-danger'; 
-                case 'NONE':
-                    return 'text-muted';
-                default:
-                    return 'text-default'; 
-            } 
-        } else {
-            return 'text-orange-600'
-        }
+    if (scanObjectGroup.value[props.pool.name].pause === 'None') {
+        switch (scanObjectGroup.value[props.pool.name].state) {
+            case 'SCANNING':
+                return 'text-default';
+            case 'FINISHED':
+                return 'text-success'; 
+            case 'CANCELED':
+                return 'text-danger'; 
+            case 'NONE':
+                return 'text-muted';
+            default:
+                return 'text-default'; 
+        } 
+    } else {
+        return 'text-orange-600'
+    }
 }
 
 function progressBarClass() {
-        if (scanObjectGroup.value[props.pool.name].pause === 'None') {
-            switch (scanObjectGroup.value[props.pool.name].state) {
-                case 'SCANNING':
-                    return 'bg-blue-600';
-                case 'FINISHED':
-                    return 'bg-green-600'; 
-                case 'CANCELED':
-                    return 'bg-danger'; 
-                case 'NONE':
-                    return 'text-muted';
-                default:
-                    return 'text-default'; 
-            }
-        } else {
-            return 'bg-orange-600';
+    if (scanObjectGroup.value[props.pool.name].pause === 'None') {
+        switch (scanObjectGroup.value[props.pool.name].state) {
+            case 'SCANNING':
+                return 'bg-blue-600';
+            case 'FINISHED':
+                return 'bg-green-600'; 
+            case 'CANCELED':
+                return 'bg-danger'; 
+            case 'NONE':
+                return 'text-muted';
+            default:
+                return 'text-default'; 
         }
+    } else {
+        return 'bg-orange-600';
+    }
 }
 
 //////////////////////////////////////////////////////////////////
@@ -360,8 +354,6 @@ function trimProgressBarClass() {
     } else if (isTrimFinished.value) {
         return 'bg-green-600';
     }
-  
 }
-
 
 </script>

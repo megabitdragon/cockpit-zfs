@@ -12,10 +12,10 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 	try {
 		const rawJSON = await getDiskStats();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Disk Stats JSON:', parsedJSON);
+		console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
-		console.log("PoolDiskStats:", poolDiskStats.value);
+		// console.log("***PoolDiskStatsObject:", poolDiskStats.value);
 	} catch (error) {
 		console.error("An error occurred getting disk stats:", error);
 	}
@@ -25,10 +25,10 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 	try {
 		const rawJSON = await getScanGroup();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Scan Object JSON:', parsedJSON);
+		console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
-		console.log('ScanObject:', scanObject.value);
+		// console.log('---ScanObject:', scanObject.value);
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}

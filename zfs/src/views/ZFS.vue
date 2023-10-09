@@ -42,6 +42,7 @@ const datasets = ref<FileSystemData[]>([]);
 const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const snapshots = ref<Snapshot[]>([]);
+
 const poolDiskStats = ref<PoolDiskStats>({});
 const scanObjectGroup = ref<PoolScanObjectGroup>({});
 
@@ -58,71 +59,79 @@ async function initialLoad(disks, pools, datasets) {
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
+	// await scanNow();
+	// await checkDiskStats();
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
 }
 
 initialLoad(disks, pools, datasets);
+
+//need to be ran here to populate objects
 scanNow();
 checkDiskStats();
+
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
 const scanIntervalID = ref();
-const scanning = ref(true);
+const scanning = ref(false);
+// const scanning = ref(true);
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
-function startScanInterval() {
-	if (!scanIntervalID.value) {
-		scanIntervalID.value = setInterval(scanNow, 5000);
-	}
-}
+// function startScanInterval() {
+// 	if (!scanIntervalID.value) {
+// 		scanIntervalID.value = setInterval(scanNow, 3000);
+// 	}
+// }
 
-function stopScanInterval() {
-	if (scanIntervalID.value) {
-		clearInterval(scanIntervalID.value);
-		scanIntervalID.value = null;
-	}
-}
+// function stopScanInterval() {
+// 	if (scanIntervalID.value) {
+// 		clearInterval(scanIntervalID.value);
+// 		scanIntervalID.value = null;
+// 	}
+// }
 
-if (scanning.value) {
-	startScanInterval();
-} else {
-	stopScanInterval();
-}
+// if (scanning.value) {
+// 	startScanInterval();
+// } else {
+// 	stopScanInterval();
+// }
+
 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
 const diskStatsIntervalID = ref();
-const checkingDiskStats = ref(true);
+const checkingDiskStats = ref(false);
+// const checkingDiskStats = ref(true);
 
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
 }
 
-function startDiskStatsInterval() {
-	if (!diskStatsIntervalID.value) {
-		diskStatsIntervalID.value = setInterval(checkDiskStats, 5000);
-	}
-}
+// function startDiskStatsInterval() {
+// 	if (!diskStatsIntervalID.value) {
+// 		diskStatsIntervalID.value = setInterval(checkDiskStats, 3000);
+// 	}
+// }
 
-function stopDiskStatsInterval() {
-	if (diskStatsIntervalID.value) {
-		clearInterval(diskStatsIntervalID.value);
-		diskStatsIntervalID.value = null;
-	}
-}
+// function stopDiskStatsInterval() {
+// 	if (diskStatsIntervalID.value) {
+// 		clearInterval(diskStatsIntervalID.value);
+// 		diskStatsIntervalID.value = null;
+// 	}
+// }
 
-if (checkingDiskStats.value) {
-	startDiskStatsInterval();
-} else {
-	stopDiskStatsInterval();
-}
+// if (checkingDiskStats.value) {
+// 	startDiskStatsInterval();
+// } else {
+// 	stopDiskStatsInterval();
+// }
 
 //provide data for other components to inject
 provide("pools", pools);

@@ -880,34 +880,22 @@ function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 /////////////////////////////////////////////////////
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 
-const isScanning = computed(() => {
-	if (scanObjectGroup.value[selectedPool.value!.name].state === 'SCANNING') {
-        return true;
-    } else {
-        return false;
-    }
-});
+function getScanStateBool(state) {
+	return computed(() => {
+		return scanObjectGroup.value[selectedPool.value!.name].state === state;
+	});
+}
 
-const isFinished = computed(() => {
-	if (scanObjectGroup.value[selectedPool.value!.name].state === 'FINISHED') {
-        return true;
-    } else {
-        return false;
-    }
-});
+function getScanPauseBool(pause) {
+	return computed(() => {
+		return scanObjectGroup.value[selectedPool.value!.name].pause !== pause;
+	});
+}
 
-const isCanceled = computed(() => {
-	if (scanObjectGroup.value[selectedPool.value!.name].state === 'CANCELED') {
-        return true;
-    } else {
-        return false;
-    }
-});
-
-const isPaused = computed(() => {
-	return scanObjectGroup.value[selectedPool.value!.name].pause !== 'None';
-});
-
+const isScanning = getScanStateBool('SCANNING');
+const isFinished =  getScanStateBool('FINISHED');
+const isCanceled =  getScanStateBool('CANCELED');
+const isPaused = getScanPauseBool('None');
 const scanIntervalID = inject<Ref<any>>('scan-interval')!;
 const scanning = inject<Ref<boolean>>('scanning')!;
 
@@ -917,7 +905,7 @@ async function scanNow() {
 
 function startScanInterval() {
 	if (!scanIntervalID.value) {
-		scanIntervalID.value = setInterval(scanNow, 5000);
+		scanIntervalID.value = setInterval(scanNow, 3000);
 	}
 }
 
@@ -938,69 +926,16 @@ if (scanning.value) {
 /////////////////////////////////////////////////////
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
-// const isTrimActive = computed(() => {
-// 	if (poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1)) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// });
+function getTrimState(state) {
+	return computed(() => {
+		return poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
+	});
+}
 
-// function getTrimActive(disk) {
-// 	if (disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// }
-
-// const isTrimCanceled = computed(() => {
-// 	if (poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 2)) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// });
-
-// function getTrimCanceled(disk) {
-// 	if (disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 2) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// }
-
-// const isTrimSuspended = computed(() => {
-// 	if (poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 3)) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// });
-
-// function getTrimSuspended(disk) {
-// 	if (disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 3) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// }
-
-// const isTrimFinished = computed(() => {
-//     if (poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4)) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// });
-
-// function getTrimFinished(disk) {
-// 	if (disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// }
+const isTrimActive = getTrimState(1);
+const isTrimCanceled = getTrimState(2);
+const isTrimSuspended = getTrimState(3);
+const isTrimFinished = getTrimState(4);
 
 const diskStatsIntervalID = inject<Ref<any>>('disk-stats-interval')!;
 const checkingDiskStats = inject<Ref<boolean>>('checking-disk-stats')!;
@@ -1011,7 +946,7 @@ async function checkDiskStats() {
 
 function startDiskStatsInterval() {
 	if (!diskStatsIntervalID.value) {
-		diskStatsIntervalID.value = setInterval(checkDiskStats, 5000);
+		diskStatsIntervalID.value = setInterval(checkDiskStats, 3000);
 	}
 }
 
@@ -1071,8 +1006,8 @@ provide('is-finished', isFinished);
 provide('is-canceled', isCanceled);
 provide('is-paused', isPaused);
 
-// provide('is-trim-finished', isTrimFinished);
-// provide('is-trim-canceled', isTrimCanceled);
-// provide('is-trim-suspended', isTrimSuspended);
-// provide('is-trim-active', isTrimActive);
+provide('is-trim-finished', isTrimFinished);
+provide('is-trim-canceled', isTrimCanceled);
+provide('is-trim-suspended', isTrimSuspended);
+provide('is-trim-active', isTrimActive);
 </script>
