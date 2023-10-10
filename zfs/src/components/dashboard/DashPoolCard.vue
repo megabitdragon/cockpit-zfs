@@ -392,7 +392,6 @@ watch(confirmScrub, async (newVal, oldVal) => {
 		confirmScrub.value = false;
 		operationRunning.value = false;
 
-		
 		notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
 	}
 });
@@ -604,14 +603,6 @@ function stopScanInterval() {
 	}
 }
 
-// watch(isScanning, (newVal, oldVal) => {
-// 	if (isScanning) {
-// 		scanning.value = true;
-// 	} else {
-// 		scanning.value = false;
-// 	}
-// });
-
 watch(scanning, (newVal, oldVal) => {
 	console.log('scanning changed:', scanning.value);
 	if (scanning.value) {
@@ -619,26 +610,24 @@ watch(scanning, (newVal, oldVal) => {
 	} else if (!scanning.value) {
 		stopScanInterval();
 	}
+	console.log('SCAN:', props.pool.name, 'isScanning:', isScanning.value);
+	console.log('SCAN:', props.pool.name, 'scanning:', scanning.value);
+	console.log('SCAN:', props.pool.name, 'isFinished:', isFinished.value);
+	console.log('SCAN:', props.pool.name, 'isCanceled:', isCanceled.value);
+	console.log('SCAN:', props.pool.name, 'isPaused:', isPaused.value);
 });
 
 
-if (isScanning) {
+if (isScanning.value) {
 	scanning.value = true;
 	if (scanning.value) {
 		startScanInterval();
 	} else {
 		stopScanInterval();
 	}
-} else if (!isScanning) {
+} else if (!isScanning.value) {
 	scanning.value = false;
 }
-
-
-console.log('SCAN:', props.pool.name, 'isScanning:', isScanning.value);
-console.log('SCAN:', props.pool.name, 'scanning:', scanning.value);
-console.log('SCAN:', props.pool.name, 'isFinished:', isFinished.value);
-console.log('SCAN:', props.pool.name, 'isCanceled:', isCanceled.value);
-console.log('SCAN:', props.pool.name, 'isPaused:', isPaused.value);
 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
@@ -676,22 +665,6 @@ function stopDiskStatsInterval() {
 	}
 }
 
-// watch(isTrimActive, (newVal, oldVal) => {
-// 	if (isTrimActive) {
-// 		checkingDiskStats.value = true;
-// 	} else {
-// 		checkingDiskStats.value = false;
-// 	}
-// });
-
-// watch(isTrimSuspended, (newVal, oldVal) => {
-// 	if (isTrimSuspended) {
-// 		checkingDiskStats.value = true;
-// 	} else {
-// 		checkingDiskStats.value = false;
-// 	}
-// });
-
 watch(checkingDiskStats, (newVal, oldVal) => {
 	console.log('checkingDiskStats changed:', checkingDiskStats.value);
 	if (checkingDiskStats.value) {
@@ -699,9 +672,14 @@ watch(checkingDiskStats, (newVal, oldVal) => {
 	} else if (!checkingDiskStats.value) {
 		stopDiskStatsInterval();
 	}
+	console.log('TRIM:', props.pool.name, 'isTrimActive:', isTrimActive.value);
+	console.log('TRIM:', props.pool.name, 'checkingDiskStats:', checkingDiskStats.value);
+	console.log('TRIM:', props.pool.name, 'isTrimSuspended:', isTrimSuspended.value);
+	console.log('TRIM:', props.pool.name, 'isTrimCanceled:', isTrimCanceled.value);
+	console.log('TRIM:', props.pool.name, 'isTrimFinished:', isTrimFinished.value);
 });
 
-if (isTrimActive) {
+if (isTrimActive.value) {
 	checkingDiskStats.value = true;
 	if (checkingDiskStats.value) {
 		startDiskStatsInterval();
@@ -709,16 +687,9 @@ if (isTrimActive) {
 		stopDiskStatsInterval();
 	}
 
-} else if (!isTrimActive || !isTrimSuspended) {
+} else if (!isTrimActive.value || !isTrimSuspended.value) {
 	checkingDiskStats.value = false;
 }
-
-
-console.log('TRIM:', props.pool.name, 'isTrimActive:', isTrimActive.value);
-console.log('TRIM:', props.pool.name, 'checkingDiskStats:', checkingDiskStats.value);
-console.log('TRIM:', props.pool.name, 'isTrimSuspended:', isTrimSuspended.value);
-console.log('TRIM:', props.pool.name, 'isTrimCanceled:', isTrimCanceled.value);
-console.log('TRIM:', props.pool.name, 'isTrimFinished:', isTrimFinished.value);
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 

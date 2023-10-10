@@ -83,26 +83,6 @@ async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
-// function startScanInterval() {
-// 	if (!scanIntervalID.value) {
-// 		scanIntervalID.value = setInterval(scanNow, 3000);
-// 	}
-// }
-
-// function stopScanInterval() {
-// 	if (scanIntervalID.value) {
-// 		clearInterval(scanIntervalID.value);
-// 		scanIntervalID.value = null;
-// 	}
-// }
-
-// if (scanning.value) {
-// 	startScanInterval();
-// } else {
-// 	stopScanInterval();
-// }
-
-
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
@@ -113,25 +93,6 @@ const checkingDiskStats = ref(false);
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
 }
-
-// function startDiskStatsInterval() {
-// 	if (!diskStatsIntervalID.value) {
-// 		diskStatsIntervalID.value = setInterval(checkDiskStats, 3000);
-// 	}
-// }
-
-// function stopDiskStatsInterval() {
-// 	if (diskStatsIntervalID.value) {
-// 		clearInterval(diskStatsIntervalID.value);
-// 		diskStatsIntervalID.value = null;
-// 	}
-// }
-
-// if (checkingDiskStats.value) {
-// 	startDiskStatsInterval();
-// } else {
-// 	stopDiskStatsInterval();
-// }
 
 //provide data for other components to inject
 provide("pools", pools);
