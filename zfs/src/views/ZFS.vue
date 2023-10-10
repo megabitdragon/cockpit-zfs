@@ -68,7 +68,6 @@ async function initialLoad(disks, pools, datasets) {
 
 initialLoad(disks, pools, datasets);
 
-//need to be ran here to populate objects
 scanNow();
 checkDiskStats();
 
@@ -76,7 +75,7 @@ checkDiskStats();
 /////////////////////////////////////////////////////
 
 const scanIntervalID = ref();
-const scanning = ref(false);
+// const scanning = ref(false);
 // const scanning = ref(true);
 
 async function scanNow() {
@@ -87,7 +86,7 @@ async function scanNow() {
 /////////////////////////////////////////////////////
 
 const diskStatsIntervalID = ref();
-const checkingDiskStats = ref(false);
+// const checkingDiskStats = ref(false);
 // const checkingDiskStats = ref(true);
 
 async function checkDiskStats() {
@@ -109,8 +108,8 @@ provide("snapshots", snapshots);
 provide('scan-object-group', scanObjectGroup);
 provide('pool-disk-stats', poolDiskStats);
 provide('scan-interval', scanIntervalID);
-provide('scanning', scanning);
+// provide('scanning', scanning);
 provide('disk-stats-interval', diskStatsIntervalID);
-provide('checking-disk-stats', checkingDiskStats)
+// provide('checking-disk-stats', checkingDiskStats);
 </script>
 

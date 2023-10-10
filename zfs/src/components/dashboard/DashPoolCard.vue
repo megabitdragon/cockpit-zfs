@@ -171,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
+import { ref, inject, Ref, computed, provide, watch, watchEffect, ComputedRef } from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
@@ -566,25 +566,26 @@ function showAddVDev(pool) {
 /////////////////////////////////////////////////////
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 
-function getScanStateBool(state) {
+function getScanStateBool(state) : ComputedRef<boolean> {
 	return computed(() => {
 		return scanObjectGroup.value[props.pool.name].state === state;
 	});
 }
 
-function getScanPauseBool(pause) {
+function getScanPauseBool(pause) : ComputedRef<boolean> {
 	return computed(() => {
 		return scanObjectGroup.value[props.pool.name].pause !== pause;
 	});
 }
 
 const isScanning = getScanStateBool('SCANNING');
-const isFinished =  getScanStateBool('FINISHED');
-const isCanceled =  getScanStateBool('CANCELED');
+const isFinished = getScanStateBool('FINISHED');
+const isCanceled = getScanStateBool('CANCELED');
 const isPaused = getScanPauseBool('None');
 
 const scanIntervalID = inject<Ref<any>>('scan-interval')!;
-const scanning = inject<Ref<boolean>>('scanning')!;
+// const scanning = inject<Ref<boolean>>('scanning')!;
+const scanning = ref(false);
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
@@ -604,37 +605,37 @@ function stopScanInterval() {
 }
 
 watch(scanning, (newVal, oldVal) => {
-	console.log('scanning changed:', scanning.value);
+	pollScanStatus();
+	// displayScanBools();
 	if (scanning.value) {
 		startScanInterval();
 	} else if (!scanning.value) {
 		stopScanInterval();
 	}
+}, {immediate: true});
+
+function displayScanBools() {
 	console.log('SCAN:', props.pool.name, 'isScanning:', isScanning.value);
 	console.log('SCAN:', props.pool.name, 'scanning:', scanning.value);
-	console.log('SCAN:', props.pool.name, 'isFinished:', isFinished.value);
-	console.log('SCAN:', props.pool.name, 'isCanceled:', isCanceled.value);
 	console.log('SCAN:', props.pool.name, 'isPaused:', isPaused.value);
-});
+	console.log('SCAN:', props.pool.name, 'isCanceled:', isCanceled.value);
+	console.log('SCAN:', props.pool.name, 'isFinished:', isFinished.value);
+	console.log('-------------------------');
+}
 
-
-if (isScanning.value) {
-	scanning.value = true;
-	if (scanning.value) {
-		startScanInterval();
-	} else {
-		stopScanInterval();
+function pollScanStatus() {
+	if (isScanning.value && !isPaused.value) {
+		scanning.value = true;
+	} else if (!isScanning.value || isScanning.value && isPaused.value) {
+		scanning.value = false;
 	}
-} else if (!isScanning.value) {
-	scanning.value = false;
 }
 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
-
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
-function getTrimState(state) {
+function getTrimState(state) : ComputedRef<boolean> {
 	return computed(() => {
 		return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
 	});
@@ -646,7 +647,8 @@ const isTrimSuspended = getTrimState(3);
 const isTrimFinished = getTrimState(4);
 
 const diskStatsIntervalID = inject<Ref<any>>('disk-stats-interval')!;
-const checkingDiskStats = inject<Ref<boolean>>('checking-disk-stats')!;
+// const checkingDiskStats = inject<Ref<boolean>>('checking-disk-stats')!;
+const checkingDiskStats = ref(false);
 
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
@@ -666,29 +668,30 @@ function stopDiskStatsInterval() {
 }
 
 watch(checkingDiskStats, (newVal, oldVal) => {
-	console.log('checkingDiskStats changed:', checkingDiskStats.value);
+	pollTrimStatus();
+	// displayTrimBools();
 	if (checkingDiskStats.value) {
 		startDiskStatsInterval();
 	} else if (!checkingDiskStats.value) {
 		stopDiskStatsInterval();
 	}
+}, {immediate: true});
+
+function displayTrimBools() {
 	console.log('TRIM:', props.pool.name, 'isTrimActive:', isTrimActive.value);
 	console.log('TRIM:', props.pool.name, 'checkingDiskStats:', checkingDiskStats.value);
 	console.log('TRIM:', props.pool.name, 'isTrimSuspended:', isTrimSuspended.value);
 	console.log('TRIM:', props.pool.name, 'isTrimCanceled:', isTrimCanceled.value);
 	console.log('TRIM:', props.pool.name, 'isTrimFinished:', isTrimFinished.value);
-});
+	console.log('-------------------------');
+}
 
-if (isTrimActive.value) {
-	checkingDiskStats.value = true;
-	if (checkingDiskStats.value) {
-		startDiskStatsInterval();
-	} else {
-		stopDiskStatsInterval();
+function pollTrimStatus() {
+	if (isTrimActive.value) {
+		checkingDiskStats.value = true;
+	} else if (!isTrimActive.value) {
+		checkingDiskStats.value = false;
 	}
-
-} else if (!isTrimActive.value || !isTrimSuspended.value) {
-	checkingDiskStats.value = false;
 }
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
