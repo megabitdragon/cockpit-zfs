@@ -261,11 +261,15 @@ function getTrimPercentage(disk) {
     return (disk.stats.trim_bytes_done / disk.stats.trim_bytes_est) * 100;
 }
 
-function handleTrimPercentage(percentage) {
-    if (percentage >= 99.95) {
+function handleTrimPercentage(percentage : number) {
+    if (percentage <= 0) {
+        return 0;
+    } else if (percentage >= 99.95) {
         return 100;
-    } else {
+    } else if (percentage > 0 && percentage < 99.5){
         return percentage;
+    } else {
+        return 0;
     }
 }
 
