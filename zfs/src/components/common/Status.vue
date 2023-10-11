@@ -39,7 +39,7 @@
                             <div class="col-span-4 grid grid-cols-4 justify-items-center">
                                 
                                 <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
-                                    <div :class="trimProgressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(getTrimPercentage(disk).toFixed(2))}%` }">
+                                    <div :class="trimProgressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))}%` }">
                                         <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
                                             {{ handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2))) }}%
                                         </div>
@@ -83,15 +83,16 @@
             <div class="grid grid-cols-2">
                 <div v-if="selectedDisk!.stats.trim_notsup === 0" class="col-span-2 flex flex-col items-center justify-center">
                     <span :class="trimMessageClass()">
-                        Disk {{selectedDisk!.name}} Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }}:  {{ handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2))) }}%
+                        Disk {{selectedDisk!.name}} Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }}:  {{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%
                     </span>
                     <div class="min-w-fit w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
-                        <div :class="trimProgressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))}%` }">
-                            <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+                        <div :class="trimProgressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
+                            <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                 {{ getTrimmedAmount(selectedDisk!) }}/{{ getTrimmedTotal(selectedDisk!) }}
                             </div>
                         </div>
                     </div>
+                 
                 </div>
                 <div v-if="selectedDisk!.stats.trim_notsup === 1" class="col-span-2 flex items-center justify-center">
                     <span class="mt-2 text-muted">
@@ -104,7 +105,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, computed, provide, watch, watchEffect } from "vue";
+import { ref, inject, Ref, computed } from "vue";
 import { convertBytesToSize, convertSecondsToString, convertRawTimestampToString, upperCaseWord } from "../../composables/helpers";
 
 interface StatusProps {
@@ -252,7 +253,6 @@ function progressBarClass() {
 
 //////////////////////////////////////////////////////////////////
 
-
 function getTrimTimestamp(disk) {
     return (convertRawTimestampToString(disk.stats.trim_action_time));
 }
@@ -277,6 +277,18 @@ function getTrimmedTotal(disk) {
     return convertBytesToSize(disk.stats.trim_bytes_est);
 }
 
+function trimMessage(disk) {
+    if (isTrimActive.value) {
+        return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)}, started at ${getTrimTimestamp(disk)}.`; 
+    } else if (isTrimCanceled.value) {
+        return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)}.`;
+    } else if (isTrimSuspended.value) {
+        return `${disk.name} Trim is ${getTrimState(disk.stats.trim_state)}.`;
+    } else if (isTrimFinished.value) {
+        return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)} at ${getTrimTimestamp(disk)}.`;
+    }
+}
+
 function getTrimState(state_num) {
     switch (state_num) {
         case 0:
@@ -291,18 +303,6 @@ function getTrimState(state_num) {
             return 'finished';
         default:
             break;
-    }
-}
-
-function trimMessage(disk) {
-    if (isTrimActive.value) {
-        return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)}, started at ${getTrimTimestamp(disk)}.`; 
-    } else if (isTrimCanceled.value) {
-        return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)}.`;
-    } else if (isTrimSuspended.value) {
-        return `${disk.name} Trim is ${getTrimState(disk.stats.trim_state)}.`;
-    } else if (isTrimFinished.value) {
-        return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)} at ${getTrimTimestamp(disk)}.`;
     }
 }
 

@@ -86,11 +86,18 @@
 															<a href="#" @click="resilverThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a href="#" @click="scrubThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+															<a v-if="!isScanning" href="#" @click="scrubThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+															<a v-if="isScanning && isPaused" href="#" @click="resumeScrub(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume Scrub</a>
+															<a v-if="isScanning && !isPaused" href="#" @click="pauseScrub(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause Scrub</a>
 														</MenuItem>
-														<MenuItem v-if="pool.diskType != 'HDD'" as="div" v-slot="{ active }">
-															<a href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+														<MenuItem as="div" v-slot="{ active }">
+															<a v-if="isScanning" href="#" @click="stopScrub(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
 														</MenuItem>
+														<MenuItem as="div" v-slot="{ active }">
+															<a v-if="!isTrimActive && !isTrimSuspended && pool.diskType != 'HDD'" href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+															<a v-if="isTrimSuspended && pool.diskType != 'HDD'" href="#" @click="resumeTrim(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM</a>
+															<a v-if="isTrimActive && pool.diskType != 'HDD'" href="#" @click="pauseTrim(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM</a>
+														</MenuItem>		
 														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="showAddVDev(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 														</MenuItem>
@@ -295,7 +302,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, computed, ComputedRef } from "vue";
+import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
@@ -458,6 +465,7 @@ watch(confirmResilver, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showScrubModal = ref(false);
 const confirmScrub = ref(false);
+const starting = ref(false);
 const pausing = ref(false);
 const stopping = ref(false);
 const resuming = ref(false);
@@ -479,9 +487,10 @@ const updateShowScrubPool = (newVal) => {
 }
 
 async function scrubAndScan() {
+	starting.value = true;
 	await scrubPool(selectedPool.value!);
-	scanning.value = true;
-	// scanNow();
+	pollScanStatus();
+	starting.value = false;
 }
 
 watch(confirmScrub, async (newVal, oldVal) => {
@@ -502,25 +511,22 @@ watch(confirmScrub, async (newVal, oldVal) => {
 
 async function pauseScrub(pool) {
 	pausing.value = true;
-	scanning.value = false;
 	await scrubPool(pool, 'pause');
-	scanNow();
+	pollScanStatus();
 	pausing.value = false;
 }
 
 async function resumeScrub(pool) {
 	resuming.value = true;
-	scanning.value = true;
 	await scrubPool(pool);
-	scanNow();
+	pollScanStatus();
 	resuming.value = false
 }
 
 async function stopScrub(pool) {
 	stopping.value = true;
-	scanning.value = false;
 	await scrubPool(pool, 'stop');
-	scanNow();
+	pollScanStatus();
 	stopping.value = false;
 }
 
@@ -529,6 +535,7 @@ async function stopScrub(pool) {
 const showTrimModal = ref(false);
 const confirmTrim = ref(false);
 const secureTRIM = ref(false);
+const startingTrim = ref(false);
 const pausingTrim = ref(false);
 const stoppingTrim = ref(false);
 const resumingTrim = ref(false);
@@ -550,14 +557,19 @@ const updateShowTrimPool = (newVal) => {
 }
 
 async function trimAndScan() {
+	startingTrim.value = true;
 	if (firstOptionToggle.value) {
 		await trimPool(selectedPool.value!, firstOptionToggle.value);
+		pollTrimStatus();
 		checkingDiskStats.value = true;
 	} else {
 		await trimPool(selectedPool.value!);
+		pollTrimStatus();
 		checkingDiskStats.value = true;
 	}
+	startingTrim.value = false;
 }
+
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
 		operationRunning.value = true;
@@ -582,7 +594,7 @@ async function pauseTrim(pool) {
 	pausingTrim.value = true;
 	checkingDiskStats.value = false;
 	await trimPool(pool, false, 'pause');
-	checkDiskStats();
+	pollTrimStatus();
 	pausingTrim.value = false;
 }
 
@@ -590,7 +602,7 @@ async function resumeTrim(pool) {
 	resumingTrim.value = true;
 	checkingDiskStats.value = true;
 	await trimPool(pool);
-	checkDiskStats();
+	pollTrimStatus();
 	resumingTrim.value = false
 }
 
@@ -598,7 +610,7 @@ async function stopTrim(pool) {
 	stoppingTrim.value = true;
 	checkingDiskStats.value = false;
 	await trimPool(pool, false, 'stop');
-	checkDiskStats();
+	pollTrimStatus();
 	stoppingTrim.value = false;
 }
 
@@ -937,10 +949,17 @@ function getScanPauseBool(pause) : ComputedRef<boolean> {
 	});
 }
 
-const isScanning = getScanStateBool('SCANNING');
-const isFinished =  getScanStateBool('FINISHED');
-const isCanceled =  getScanStateBool('CANCELED');
-const isPaused = getScanPauseBool('None');
+const isScanning = ref(false);
+const isFinished = ref(false);
+const isCanceled = ref(false);
+const isPaused = ref(false);
+
+async function getScanComputedProps() {
+	isScanning.value = getScanStateBool('SCANNING').value;
+	isFinished.value = getScanStateBool('FINISHED').value;
+	isCanceled.value = getScanStateBool('CANCELED').value;
+	isPaused.value = getScanPauseBool('None').value;
+}
 
 const scanIntervalID = inject<Ref<any>>('scan-interval')!;
 const scanning = ref(false);
@@ -963,8 +982,6 @@ function stopScanInterval() {
 }
 
 watch(scanning, (newVal, oldVal) => {
-	pollScanStatus();
-	displayScanBools();
 	if (scanning.value) {
 		startScanInterval();
 	} else if (!scanning.value) {
@@ -973,20 +990,38 @@ watch(scanning, (newVal, oldVal) => {
 }, {immediate: true});
 
 function displayScanBools() {
+	console.log('--------scan-values-------');
 	console.log('SCAN:', selectedPool.value!.name, 'isScanning:', isScanning.value);
 	console.log('SCAN:', selectedPool.value!.name, 'scanning:', scanning.value);
 	console.log('SCAN:', selectedPool.value!.name, 'isPaused:', isPaused.value);
 	console.log('SCAN:', selectedPool.value!.name, 'isCanceled:', isCanceled.value);
 	console.log('SCAN:', selectedPool.value!.name, 'isFinished:', isFinished.value);
-	console.log('-------------------------');
+	console.log('--------------------------');
 }
 
-function pollScanStatus() {
-	if (isScanning.value && !isPaused.value) {
-		scanning.value = true;
-	} else if (!isScanning.value || isScanning.value && isPaused.value) {
+async function pollScanStatus() {
+	console.log('pollScanStatus fired');
+	await scanNow();
+	await getScanComputedProps();
+	console.log('computed updated');
+	if (isScanning.value) {
+		if (!isPaused.value) {
+			console.log('scan active');
+			scanning.value = true;
+		} else if (isPaused.value) {
+			console.log('scan paused');
+			scanning.value = false;
+		}
+	} else if (isCanceled.value) {
+		console.log('scan canceled');
+		scanning.value = false;
+	} else if (isFinished.value) {
+		console.log('scan finished');
 		scanning.value = false;
 	}
+
+	console.log('scan set:', scanning.value);
+	displayScanBools();
 }
 
 //////////// Checking Disk Stats (Trim) /////////////
@@ -999,10 +1034,17 @@ function getTrimState(state) : ComputedRef<boolean> {
 	});
 }
 
-const isTrimActive = getTrimState(1);
-const isTrimCanceled = getTrimState(2);
-const isTrimSuspended = getTrimState(3);
-const isTrimFinished = getTrimState(4);
+const isTrimActive = ref(false);
+const isTrimCanceled = ref(false);
+const isTrimSuspended = ref(false);
+const isTrimFinished = ref(false);
+
+async function getTrimComputedProps() {
+	isTrimActive.value = getTrimState(1).value;
+	isTrimCanceled.value = getTrimState(2).value;
+	isTrimSuspended.value = getTrimState(3).value;
+	isTrimFinished.value = getTrimState(4).value;
+}
 
 const diskStatsIntervalID = inject<Ref<any>>('disk-stats-interval')!;
 const checkingDiskStats = ref(false);
@@ -1025,8 +1067,6 @@ function stopDiskStatsInterval() {
 }
 
 watch(checkingDiskStats, (newVal, oldVal) => {
-	pollTrimStatus();
-	displayTrimBools();
 	if (checkingDiskStats.value) {
 		startDiskStatsInterval();
 	} else if (!checkingDiskStats.value) {
@@ -1035,23 +1075,46 @@ watch(checkingDiskStats, (newVal, oldVal) => {
 }, {immediate: true});
 
 function displayTrimBools() {
+	console.log('********trim*values*******');
 	console.log('TRIM:', selectedPool.value!.name, 'isTrimActive:', isTrimActive.value);
 	console.log('TRIM:', selectedPool.value!.name, 'checkingDiskStats:', checkingDiskStats.value);
 	console.log('TRIM:', selectedPool.value!.name, 'isTrimSuspended:', isTrimSuspended.value);
 	console.log('TRIM:', selectedPool.value!.name, 'isTrimCanceled:', isTrimCanceled.value);
 	console.log('TRIM:', selectedPool.value!.name, 'isTrimFinished:', isTrimFinished.value);
-	console.log('-------------------------');
+	console.log('**************************');
 }
 
-function pollTrimStatus() {
+async function pollTrimStatus() {
+	console.log('pollTrimStatus fired');
+	await checkDiskStats();
+	await getTrimComputedProps();
+	console.log('computed updated');
 	if (isTrimActive.value) {
+		console.log('trim active');
 		checkingDiskStats.value = true;
-	} else if (!isTrimActive.value) {
+	} else if (isTrimCanceled.value) {
+		console.log('trim canceled');
+		checkingDiskStats.value = false;
+	} else if (isTrimFinished.value) {
+		console.log('trim finished');
+		checkingDiskStats.value = false;
+	} else if (isTrimSuspended.value) {
+		console.log('trim paused');
 		checkingDiskStats.value = false;
 	}
+
+	console.log('checkingDiskStats set:', checkingDiskStats.value);
+	displayTrimBools();
 }
 
-const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
+/////////////////////////////////////////////////////
+
+onMounted(() => {
+	pollScanStatus();
+	pollTrimStatus();
+});
+
+/////////////////////////////////////////////////////
 
 provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
