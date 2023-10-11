@@ -105,8 +105,9 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, computed } from "vue";
+import { ref, inject, Ref, computed, ComputedRef, onMounted, watch } from "vue";
 import { convertBytesToSize, convertSecondsToString, convertRawTimestampToString, upperCaseWord } from "../../composables/helpers";
+import { loadScanObjectGroup, loadDiskStats } from "../../composables/loadData";
 
 interface StatusProps {
     pool: PoolData;
@@ -115,10 +116,25 @@ interface StatusProps {
     isPoolDetail: boolean;
     isDisk: boolean;
     isTrim: boolean;
+    pollScan?: boolean;
+    pollTrim?: boolean;
 }
 
 const props = defineProps<StatusProps>();
 const notifications = inject<Ref<any>>('notifications')!;
+
+
+/////////////////////////////////////////////////////
+
+const emit = defineEmits(['scanDone', 'trimDone']);
+
+// onMounted(() => {
+//     doPollScan();
+//     doTrimScan();
+// });
+
+///////////////////// Scanning //////////////////////
+/////////////////////////////////////////////////////
 
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 
@@ -127,16 +143,110 @@ const isFinished = inject<Ref<boolean>>('is-finished')!;
 const isCanceled = inject<Ref<boolean>>('is-canceled')!;
 const isPaused = inject<Ref<boolean>>('is-paused')!;
 
-const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+const pollScan = inject<Ref<boolean>>('poll-scan-now')!;
+const scanActivity = inject<Ref<Activity>>('scan-activity')!;
 
-const selectedDisk = computed(() => {
-    return poolDiskStats.value[props.pool.name].find(disk => disk.name == props.disk!.name);
-});
+const doPollScan = () => {
+    watch(pollScan, (newVal, oldVal) => {
+        if (pollScan.value) {
+            pollScanStatus();
+            scanActivity.value.isActive = isScanning.value;
+            scanActivity.value.isPaused = isPaused.value;
+            emit('scanDone', scanActivity.value);
+        }
+    });
+}
 
-const isTrimActive = inject<Ref<boolean>>('is-trim-active')!;
-const isTrimSuspended = inject<Ref<boolean>>('is-trim-suspended')!;
-const isTrimCanceled = inject<Ref<boolean>>('is-trim-canceled')!;
-const isTrimFinished = inject<Ref<boolean>>('is-trim-finished')!;
+function getScanStateBool(state) : ComputedRef<boolean> {
+	return computed(() => {
+		return scanObjectGroup.value[props.pool.name].state === state;
+	});
+}
+
+function getScanPauseBool(pause) : ComputedRef<boolean> {
+	return computed(() => {
+		return scanObjectGroup.value[props.pool.name].pause !== pause;
+	});
+}
+
+// const isScanning = ref(false);
+// const isFinished = ref(false);
+// const isCanceled = ref(false);
+// const isPaused = ref(false);
+
+async function getScanComputedProps() {
+	isScanning.value = getScanStateBool('SCANNING').value;
+	isFinished.value = getScanStateBool('FINISHED').value;
+	isCanceled.value = getScanStateBool('CANCELED').value;
+	isPaused.value = getScanPauseBool('None').value;
+}
+
+const scanIntervalID = inject<Ref<any>>('scan-interval')!;
+const scanning = ref(false);
+
+async function scanNow() {
+	await loadScanObjectGroup(scanObjectGroup);
+}
+
+function startScanInterval() {
+	if (!scanIntervalID.value) {
+        console.log('scan interval set', scanIntervalID.value);
+		scanIntervalID.value = setInterval(scanNow, 3000);
+	}
+}
+
+function stopScanInterval() {
+	if (scanIntervalID.value) {
+        console.log('scan interval cleared', scanIntervalID.value);
+		clearInterval(scanIntervalID.value);
+		scanIntervalID.value = null;
+	}
+}
+
+watch(scanning, (newVal, oldVal) => {
+	if (scanning.value) {
+		startScanInterval();
+	} else if (!scanning.value) {
+		stopScanInterval();
+	}
+}, {immediate: true});
+
+function displayScanBools() {
+	console.log('--------scan-values-------');
+	console.log('SCAN:', props.pool.name, 'isScanning:', isScanning.value);
+	console.log('SCAN:', props.pool.name, 'scanning:', scanning.value);
+	console.log('SCAN:', props.pool.name, 'isPaused:', isPaused.value);
+	console.log('SCAN:', props.pool.name, 'isCanceled:', isCanceled.value);
+	console.log('SCAN:', props.pool.name, 'isFinished:', isFinished.value);
+	console.log('--------------------------');
+}
+
+async function pollScanStatus() {
+	console.log('pollScanStatus fired');
+	await scanNow();
+	await getScanComputedProps();
+	console.log('computed updated');
+	if (isScanning.value) {
+		if (!isPaused.value) {
+			console.log('scan active');
+			scanning.value = true;
+		} else if (isPaused.value) {
+			console.log('scan paused');
+			scanning.value = false;
+		}
+	} else if (isCanceled.value) {
+		console.log('scan canceled');
+		scanning.value = false;
+	} else if (isFinished.value) {
+		console.log('scan finished');
+		scanning.value = false;
+	}
+
+	console.log('scan set:', scanning.value);
+	// displayScanBools();
+}
+
+//////////////////////////////////////////////////////////////////
 
 const scanFunction = computed(() => {
     switch (scanObjectGroup.value[props.pool.name].function) {
@@ -249,6 +359,115 @@ function progressBarClass() {
     } else {
         return 'bg-orange-600';
     }
+}
+
+//////////// Checking Disk Stats (Trim) /////////////
+/////////////////////////////////////////////////////
+
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
+const selectedDisk = computed(() => {
+    return poolDiskStats.value[props.pool.name].find(disk => disk.name == props.disk!.name);
+});
+
+const isTrimActive = inject<Ref<boolean>>('is-trim-active')!;
+const isTrimSuspended = inject<Ref<boolean>>('is-trim-suspended')!;
+const isTrimCanceled = inject<Ref<boolean>>('is-trim-canceled')!;
+const isTrimFinished = inject<Ref<boolean>>('is-trim-finished')!;
+
+const pollTrim = inject<Ref<boolean>>('poll-trim-now')!;
+const trimActivity = inject<Ref<Activity>>('trim-activity')!;
+
+const doTrimScan = () => {
+    watch(pollTrim, (newVal, oldVal) => {
+        if (pollTrim.value) {
+            pollTrimStatus();
+            trimActivity.value.isActive = isTrimActive.value;
+            trimActivity.value.isPaused = isTrimSuspended.value;
+            emit('trimDone', trimActivity.value);
+        }
+    });
+}
+
+function getTrimStateRef(state) : ComputedRef<boolean> {
+	return computed(() => {
+		return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
+	});
+}
+
+// const isTrimActive = ref(false);
+// const isTrimCanceled = ref(false);
+// const isTrimSuspended = ref(false);
+// const isTrimFinished = ref(false);
+
+async function getTrimComputedProps() {
+	isTrimActive.value = getTrimStateRef(1).value;
+	isTrimCanceled.value = getTrimStateRef(2).value;
+	isTrimSuspended.value = getTrimStateRef(3).value;
+	isTrimFinished.value = getTrimStateRef(4).value;
+}
+
+const diskStatsIntervalID = inject<Ref<any>>('disk-stats-interval')!;
+const checkingDiskStats = ref(false);
+
+async function checkDiskStats() {
+	await loadDiskStats(poolDiskStats);
+}
+
+function startDiskStatsInterval() {
+	if (!diskStatsIntervalID.value) {
+        console.log('trim interval set', diskStatsIntervalID.value);
+		diskStatsIntervalID.value = setInterval(checkDiskStats, 3000);
+	}
+}
+
+function stopDiskStatsInterval() {
+	if (diskStatsIntervalID.value) {
+        console.log('trim interval cleared', diskStatsIntervalID.value);
+		clearInterval(diskStatsIntervalID.value);
+		diskStatsIntervalID.value = null;
+	}
+}
+
+watch(checkingDiskStats, (newVal, oldVal) => {
+	if (checkingDiskStats.value) {
+		startDiskStatsInterval();
+	} else if (!checkingDiskStats.value) {
+		stopDiskStatsInterval();
+	}
+}, {immediate: true});
+
+function displayTrimBools() {
+	console.log('********trim*values*******');
+	console.log('TRIM:', props.pool.name, 'isTrimActive:', isTrimActive.value);
+	console.log('TRIM:', props.pool.name, 'checkingDiskStats:', checkingDiskStats.value);
+	console.log('TRIM:', props.pool.name, 'isTrimSuspended:', isTrimSuspended.value);
+	console.log('TRIM:', props.pool.name, 'isTrimCanceled:', isTrimCanceled.value);
+	console.log('TRIM:', props.pool.name, 'isTrimFinished:', isTrimFinished.value);
+	console.log('**************************');
+}
+
+async function pollTrimStatus() {
+	console.log('pollTrimStatus fired');
+	await checkDiskStats();
+	await getTrimComputedProps();
+	console.log('computed updated');
+	if (isTrimActive.value) {
+		console.log('trim active');
+		checkingDiskStats.value = true;
+	} else if (isTrimCanceled.value) {
+		console.log('trim canceled');
+		checkingDiskStats.value = false;
+	} else if (isTrimFinished.value) {
+		console.log('trim finished');
+		checkingDiskStats.value = false;
+	} else if (isTrimSuspended.value) {
+		console.log('trim paused');
+		checkingDiskStats.value = false;
+	}
+
+	console.log('checkingDiskStats set:', checkingDiskStats.value);
+	// displayTrimBools();
 }
 
 //////////////////////////////////////////////////////////////////
