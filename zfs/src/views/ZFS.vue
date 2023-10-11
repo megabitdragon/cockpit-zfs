@@ -67,27 +67,18 @@ async function initialLoad(disks, pools, datasets) {
 }
 
 initialLoad(disks, pools, datasets);
-
 scanNow();
 checkDiskStats();
 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
-
-const scanIntervalID = ref();
-// const scanning = ref(false);
-// const scanning = ref(true);
+// const scanIntervalID = ref();
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
-/////////////////////////////////////////////////////
-/////////////////////////////////////////////////////
-
-const diskStatsIntervalID = ref();
-// const checkingDiskStats = ref(false);
-// const checkingDiskStats = ref(true);
+// const diskStatsIntervalID = ref();
 
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
@@ -107,9 +98,7 @@ provide('clear-labels', clearLabels);
 provide("snapshots", snapshots);
 provide('scan-object-group', scanObjectGroup);
 provide('pool-disk-stats', poolDiskStats);
-provide('scan-interval', scanIntervalID);
-// provide('scanning', scanning);
-provide('disk-stats-interval', diskStatsIntervalID);
-// provide('checking-disk-stats', checkingDiskStats);
+// provide('scan-interval', scanIntervalID);
+// provide('disk-stats-interval', diskStatsIntervalID);
 </script>
 

@@ -137,30 +137,6 @@ const isTrimSuspended = inject<Ref<boolean>>('is-trim-suspended')!;
 const isTrimCanceled = inject<Ref<boolean>>('is-trim-canceled')!;
 const isTrimFinished = inject<Ref<boolean>>('is-trim-finished')!;
 
-// function getTrimStateValue(state) {
-// 	return computed(() => {
-// 		return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
-// 	});
-// }
-
-// const isTrimActive = getTrimStateValue(1);
-// const isTrimCanceled = getTrimStateValue(2);
-// const isTrimSuspended = getTrimStateValue(3);
-// const isTrimFinished = getTrimStateValue(4);
-
-// const emit = defineEmits(['scan_now', 'pool_disk_scan']);
-
-// const scanNow = () => {
-//     emit('scan_now');
-// }
-
-// const poolDiskScan = () => {
-//     emit('pool_disk_scan');
-// }
-
-// scanNow();
-// poolDiskScan();
-
 const scanFunction = computed(() => {
     switch (scanObjectGroup.value[props.pool.name].function) {
         case 'RESILVER':
@@ -195,7 +171,6 @@ const stateMessage = computed(() => {
             }
         }
     }
-    
 });
 
 const miniStateMsg = computed(() => {
@@ -219,7 +194,6 @@ const miniStateMsg = computed(() => {
             }
         }
     }
-   
 });
 
 const scanPercentage = computed(() => {

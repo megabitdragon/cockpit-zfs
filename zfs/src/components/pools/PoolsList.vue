@@ -295,7 +295,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, computed } from "vue";
+import { ref, inject, Ref, provide, watch, computed, ComputedRef } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
@@ -458,10 +458,12 @@ watch(confirmResilver, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showScrubModal = ref(false);
 const confirmScrub = ref(false);
-const scrubbed = ref(false);
+const pausing = ref(false);
+const stopping = ref(false);
+const resuming = ref(false);
 
 async function scrubThisPool(pool) {
-	cleared.value = false;
+	// cleared.value = false;
 	selectedPool.value = pool;
 	showScrubModal.value = true;
 
@@ -478,36 +480,61 @@ const updateShowScrubPool = (newVal) => {
 
 async function scrubAndScan() {
 	await scrubPool(selectedPool.value!);
-	scanNow();
+	scanning.value = true;
+	// scanNow();
 }
 
 watch(confirmScrub, async (newVal, oldVal) => {
 	if (confirmScrub.value == true) {
-		scrubbed.value = false;
 		operationRunning.value = true;
+
 		console.log('now scrubbing:', selectedPool.value);
+		showScrubModal.value = false;
 
 		await scrubAndScan();
 
+		confirmScrub.value = false;
 		operationRunning.value = false;
-		scrubbed.value = true;
-		showScrubModal.value = false;
 		
 		notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
 	}
 });
 
+async function pauseScrub(pool) {
+	pausing.value = true;
+	scanning.value = false;
+	await scrubPool(pool, 'pause');
+	scanNow();
+	pausing.value = false;
+}
+
+async function resumeScrub(pool) {
+	resuming.value = true;
+	scanning.value = true;
+	await scrubPool(pool);
+	scanNow();
+	resuming.value = false
+}
+
+async function stopScrub(pool) {
+	stopping.value = true;
+	scanning.value = false;
+	await scrubPool(pool, 'stop');
+	scanNow();
+	stopping.value = false;
+}
 
 //////////////////// TRIM Pool //////////////////////
 /////////////////////////////////////////////////////
 const showTrimModal = ref(false);
 const confirmTrim = ref(false);
 const secureTRIM = ref(false);
-const trimmed = ref(false);
-const trimming = ref(false);
+const pausingTrim = ref(false);
+const stoppingTrim = ref(false);
+const resumingTrim = ref(false);
 
 async function trimThisPool(pool) {
-	cleared.value = false;
+	// cleared.value = false;
 	selectedPool.value = pool;
 	showTrimModal.value = true;
 
@@ -525,18 +552,15 @@ const updateShowTrimPool = (newVal) => {
 async function trimAndScan() {
 	if (firstOptionToggle.value) {
 		await trimPool(selectedPool.value!, firstOptionToggle.value);
-		checkDiskStats();
+		checkingDiskStats.value = true;
 	} else {
 		await trimPool(selectedPool.value!);
-		checkDiskStats();
+		checkingDiskStats.value = true;
 	}
 }
-
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
-		trimming.value = true;
 		operationRunning.value = true;
-		trimmed.value = false;
 		console.log('now trimming:', selectedPool.value);
 
 		if (firstOptionToggle.value) {
@@ -548,13 +572,35 @@ watch(confirmTrim, async (newValue, oldValue) => {
 			showTrimModal.value = false;
 			await trimAndScan();
 		}
-		trimming.value = false;
 		operationRunning.value = false;
-		trimmed.value = true;
 
 		notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
 	}
 });
+
+async function pauseTrim(pool) {
+	pausingTrim.value = true;
+	checkingDiskStats.value = false;
+	await trimPool(pool, false, 'pause');
+	checkDiskStats();
+	pausingTrim.value = false;
+}
+
+async function resumeTrim(pool) {
+	resumingTrim.value = true;
+	checkingDiskStats.value = true;
+	await trimPool(pool);
+	checkDiskStats();
+	resumingTrim.value = false
+}
+
+async function stopTrim(pool) {
+	stoppingTrim.value = true;
+	checkingDiskStats.value = false;
+	await trimPool(pool, false, 'stop');
+	checkDiskStats();
+	stoppingTrim.value = false;
+}
 
 /////////////////// Export Pool /////////////////////
 /////////////////////////////////////////////////////
@@ -564,7 +610,7 @@ const forceUnmount = ref(false);
 const exporting = ref(false);
 
 async function exportThisPool(pool) {
-	cleared.value = false;
+	// cleared.value = false;
 	selectedPool.value = pool;
 	showExportModal.value = true;
 
@@ -601,24 +647,24 @@ watch(confirmExport, async (newVal, oldVal) => {
 
 /////////////////// Clear Errors ////////////////////
 /////////////////////////////////////////////////////
-const cleared = ref(false);
+// const cleared = ref(false);
 
 async function clearPoolErrors(poolName) {
-	cleared.value = false;
+	// cleared.value = false;
 	await clearErrors(poolName);
-	cleared.value = true;
+	// cleared.value = true;
 }
 
 async function clearVDevErrors(poolName, vDevName) {
-	cleared.value = false;
+	// cleared.value = false;
 	await clearErrors(poolName, vDevName);
-	cleared.value = true;
+	// cleared.value = true;
 }
 
 async function clearDiskErrors(poolName, diskName) {
-	cleared.value = false;
+	// cleared.value = false;
 	await clearErrors(poolName, diskName);
-	cleared.value = true;
+	// cleared.value = true;
 }
 
 /////////////// Create/Import Pool //////////////////
@@ -853,7 +899,6 @@ watch(confirmTrimDisk, async (newVal, oldVal) => {
 			showTrimDiskModal.value = false;
 			await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
 		}
-		
 
 		notifications.value.constructNotification('Trim Started', 'Trimming of disk ' + selectedDisk.value!.name + " started.", 'success');
 		refreshAllData();
@@ -880,13 +925,13 @@ function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 /////////////////////////////////////////////////////
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 
-function getScanStateBool(state) {
+function getScanStateBool(state) : ComputedRef<boolean> {
 	return computed(() => {
 		return scanObjectGroup.value[selectedPool.value!.name].state === state;
 	});
 }
 
-function getScanPauseBool(pause) {
+function getScanPauseBool(pause) : ComputedRef<boolean> {
 	return computed(() => {
 		return scanObjectGroup.value[selectedPool.value!.name].pause !== pause;
 	});
@@ -896,8 +941,9 @@ const isScanning = getScanStateBool('SCANNING');
 const isFinished =  getScanStateBool('FINISHED');
 const isCanceled =  getScanStateBool('CANCELED');
 const isPaused = getScanPauseBool('None');
+
 const scanIntervalID = inject<Ref<any>>('scan-interval')!;
-const scanning = inject<Ref<boolean>>('scanning')!;
+const scanning = ref(false);
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
@@ -916,17 +962,38 @@ function stopScanInterval() {
 	}
 }
 
-if (scanning.value) {
-	startScanInterval();
-} else {
-	stopScanInterval();
+watch(scanning, (newVal, oldVal) => {
+	pollScanStatus();
+	displayScanBools();
+	if (scanning.value) {
+		startScanInterval();
+	} else if (!scanning.value) {
+		stopScanInterval();
+	}
+}, {immediate: true});
+
+function displayScanBools() {
+	console.log('SCAN:', selectedPool.value!.name, 'isScanning:', isScanning.value);
+	console.log('SCAN:', selectedPool.value!.name, 'scanning:', scanning.value);
+	console.log('SCAN:', selectedPool.value!.name, 'isPaused:', isPaused.value);
+	console.log('SCAN:', selectedPool.value!.name, 'isCanceled:', isCanceled.value);
+	console.log('SCAN:', selectedPool.value!.name, 'isFinished:', isFinished.value);
+	console.log('-------------------------');
+}
+
+function pollScanStatus() {
+	if (isScanning.value && !isPaused.value) {
+		scanning.value = true;
+	} else if (!isScanning.value || isScanning.value && isPaused.value) {
+		scanning.value = false;
+	}
 }
 
 //////////// Checking Disk Stats (Trim) /////////////
 /////////////////////////////////////////////////////
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
-function getTrimState(state) {
+function getTrimState(state) : ComputedRef<boolean> {
 	return computed(() => {
 		return poolDiskStats.value[selectedPool.value!.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
 	});
@@ -938,7 +1005,7 @@ const isTrimSuspended = getTrimState(3);
 const isTrimFinished = getTrimState(4);
 
 const diskStatsIntervalID = inject<Ref<any>>('disk-stats-interval')!;
-const checkingDiskStats = inject<Ref<boolean>>('checking-disk-stats')!;
+const checkingDiskStats = ref(false);
 
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
@@ -957,10 +1024,31 @@ function stopDiskStatsInterval() {
 	}
 }
 
-if (checkingDiskStats.value) {
-	startDiskStatsInterval();
-} else {
-	stopDiskStatsInterval();
+watch(checkingDiskStats, (newVal, oldVal) => {
+	pollTrimStatus();
+	displayTrimBools();
+	if (checkingDiskStats.value) {
+		startDiskStatsInterval();
+	} else if (!checkingDiskStats.value) {
+		stopDiskStatsInterval();
+	}
+}, {immediate: true});
+
+function displayTrimBools() {
+	console.log('TRIM:', selectedPool.value!.name, 'isTrimActive:', isTrimActive.value);
+	console.log('TRIM:', selectedPool.value!.name, 'checkingDiskStats:', checkingDiskStats.value);
+	console.log('TRIM:', selectedPool.value!.name, 'isTrimSuspended:', isTrimSuspended.value);
+	console.log('TRIM:', selectedPool.value!.name, 'isTrimCanceled:', isTrimCanceled.value);
+	console.log('TRIM:', selectedPool.value!.name, 'isTrimFinished:', isTrimFinished.value);
+	console.log('-------------------------');
+}
+
+function pollTrimStatus() {
+	if (isTrimActive.value) {
+		checkingDiskStats.value = true;
+	} else if (!isTrimActive.value) {
+		checkingDiskStats.value = false;
+	}
 }
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
@@ -979,7 +1067,6 @@ provide("confirm-resilver", confirmResilver);
 provide("show-trim-modal", showTrimModal);
 provide("secure-trim", secureTRIM);
 provide("confirm-trim", confirmTrim);
-provide("trimming", trimming);
 
 provide("show-export-modal", showExportModal);
 provide("confirm-export", confirmExport);
