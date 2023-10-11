@@ -344,14 +344,10 @@ interface PoolDiskStats {
 	[poolName: string]: DiskStats[];
 }
 
-// interface TrimStats {
-// 	trim_timestamp: number;
-// 	trim_bytes_done: number;
-// 	trim_bytes_total: number;
-// 	trim_state: 'None' | 'Active' | 'Canceled' | 'Suspended' | 'Complete';
-// 	trim_supported: boolean;
-// 	trim_errors: number;
-// }
+interface Activity {
+	isActive: boolean;
+	isPaused: boolean;
+}
 
 type ConfirmationCallback = () => void;
 
