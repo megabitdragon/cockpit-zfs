@@ -97,7 +97,10 @@
 															<a v-if="!isTrimActive && !isTrimSuspended && pool.diskType != 'HDD'" href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 															<a v-if="isTrimSuspended && pool.diskType != 'HDD'" href="#" @click="resumeTrim(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM</a>
 															<a v-if="isTrimActive && pool.diskType != 'HDD'" href="#" @click="pauseTrim(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM</a>
-														</MenuItem>		
+														</MenuItem>
+														<MenuItem as="div" v-slot="{ active }">
+															<a v-if="isTrimActive || isTrimSuspended && pool.diskType != 'HDD'" href="#" @click="stopTrim(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM</a>
+														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
 															<a href="#" @click="showAddVDev(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 														</MenuItem>
