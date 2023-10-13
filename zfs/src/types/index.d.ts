@@ -347,6 +347,8 @@ interface PoolDiskStats {
 interface Activity {
 	isActive: boolean;
 	isPaused: boolean;
+	isCanceled: boolean;
+	isFinished: boolean;
 }
 
 type ConfirmationCallback = () => void;
