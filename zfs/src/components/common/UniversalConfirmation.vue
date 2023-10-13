@@ -5,8 +5,8 @@
         </template>
         <template v-slot:content>
             <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
-                <p class="text-default row-start-1">Are you sure you wish to {{props.operation}} <b>{{ props[props.item].name }}</b>?</p>
-
+                <p v-if="!operation2" class="text-default row-start-1">Are you sure you wish to {{props.operation}} <b>{{ props[props.item].name }}</b>?</p>
+                <p v-if="operation2" class="text-default row-start-1">Are you sure you wish to {{props.operation}} {{props.operation2!}} on <b>{{ props[props.item].name }}</b>?</p>
                 <div v-if="props.operation == 'destroy' && props.hasChildren!" >
                     <div v-if="props.item == 'pool'">
                         <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center gap-0.5">
@@ -147,6 +147,7 @@ interface UniversalConfirmationProps {
     idKey: string;
     item: string;
     operation: string;
+    operation2?: string;
     confirmOperation: ConfirmationCallback;
     pool?: PoolData;
     vDev?: vDevData;
@@ -220,6 +221,14 @@ switch (props.operation) {
         break;
     case 'export':
         operating.value = 'Exporting...';
+        break;
+    case 'pause':
+        operating.value = 'Pausing...';
+        break;
+    case 'stop':
+        operating.value = 'Stopping...';
+        break;
+    default:
         break;
 }
 

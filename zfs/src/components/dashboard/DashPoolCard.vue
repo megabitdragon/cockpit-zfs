@@ -142,6 +142,14 @@
 	<div v-if="showExportModal">
 		<UniversalConfirmation :showFlag="showExportModal" @close="updateShowExportPool" :idKey="'confirm-export-pool'" :item="'pool'" :operation="'export'" :pool="selectedPool!" :confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false"/>
 	</div>
+
+	<div v-if="showPauseScrubConfirm">
+		<UniversalConfirmation :showFlag="showPauseScrubConfirm" @close="updateShowPauseScrub" :idKey="'confirm-pause-scrub'" :item="'pool'" :operation="'pause'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmPauseThisScrub" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showStopScrubConfirm">
+		<UniversalConfirmation :showFlag="showStopScrubConfirm" @close="updateShowStopScrub" :idKey="'confirm-stop-scrub'" :item="'pool'" :operation="'stop'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmStopThisScrub" :hasChildren="false"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -339,7 +347,6 @@ function scrubThisPool(pool) {
 	// cleared.value = false;
 	selectedPool.value = pool;
 	showScrubModal.value = true;
-
 	console.log('preparing to scrub:', selectedPool.value);
 }
 
@@ -374,13 +381,31 @@ watch(confirmScrub, async (newVal, oldVal) => {
 	}
 });
 
-async function pauseScrub(pool) {
+function pauseScrub(pool) {
+	selectedPool.value = pool;
+	showPauseScrubConfirm.value = true;
+	console.log('scrub to pause:', selectedPool.value);
+}
+
+async function pauseScrubAndScan() {
 	pausing.value = true;
-	await scrubPool(pool, 'pause');
+	await scrubPool(selectedPool.value, 'pause');
 	pollScanStatus();
-	// pollScan();
 	pausing.value = false;
 }
+
+// function resumeScrub(pool) {
+// 	selectedPool.value = pool;
+// 	showResumeScrubConfirm.value = true;
+// 	console.log('scrub to resume:', selectedPool.value);
+// }
+
+// async function resumeScrubAndScan() {
+// 	resuming.value = true;
+// 	await scrubPool(selectedPool.value);
+// 	pollScanStatus();
+// 	resuming.value = false;
+// }
 
 async function resumeScrub(pool) {
 	resuming.value = true;
@@ -390,11 +415,16 @@ async function resumeScrub(pool) {
 	resuming.value = false
 }
 
-async function stopScrub(pool) {
+function stopScrub(pool) {
+	selectedPool.value = pool;
+	showStopScrubConfirm.value = true;
+	console.log('scrub to pause:', selectedPool.value);
+}
+
+async function stopScrubAndScan() {
 	stopping.value = true;
-	await scrubPool(pool, 'stop');
+	await scrubPool(selectedPool.value, 'stop');
 	pollScanStatus();
-	// pollScan();
 	stopping.value = false;
 }
 
@@ -639,6 +669,48 @@ async function pollScanStatus() {
 	console.log('scan set:', scanning.value);
 	displayScanBools();
 }
+
+const showPauseScrubConfirm = ref(false);
+const confirmPauseScrub = ref(false);
+
+const confirmPauseThisScrub : ConfirmationCallback = () => {
+	confirmPauseScrub.value = true;
+}
+
+const updateShowPauseScrub = (newVal) => {
+	showPauseScrubConfirm.value = newVal;
+}
+
+watch(confirmPauseScrub, async (newVal, oldVal) => {
+	if (confirmPauseScrub.value == true) {
+		console.log('now pausing scrub:', selectedPool.value);
+		showPauseScrubConfirm.value = false;
+		await pauseScrubAndScan();
+		confirmPauseScrub.value = false;
+		notifications.value.constructNotification('Scrub Paused', 'Scrub on ' + selectedPool.value!.name + " paused.", 'success');
+	}
+});
+
+const showStopScrubConfirm = ref(false);
+const confirmStopScrub = ref(false);
+
+const confirmStopThisScrub : ConfirmationCallback = () => {
+	confirmStopScrub.value = true;
+}
+
+const updateShowStopScrub = (newVal) => {
+	showStopScrubConfirm.value = newVal;
+}
+
+watch(confirmStopScrub, async (newVal, oldVal) => {
+	if (confirmStopScrub.value == true) {
+		console.log('now stopping scrub:', selectedPool.value);
+		showStopScrubConfirm.value = false;
+		await stopScrubAndScan();
+		confirmStopScrub.value = false;
+		notifications.value.constructNotification('Scrub Stopped', 'Scrub on ' + selectedPool.value!.name + " stopped.", 'success');
+	}
+});
 
 /////////////////////////////////////////////////////
 //New Scanning Stuff (for Status refactor)
