@@ -150,6 +150,14 @@
 	<div v-if="showStopScrubConfirm">
 		<UniversalConfirmation :showFlag="showStopScrubConfirm" @close="updateShowStopScrub" :idKey="'confirm-stop-scrub'" :item="'pool'" :operation="'stop'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmStopThisScrub" :hasChildren="false"/>
 	</div>
+
+	<div v-if="showPauseTrimConfirm">
+		<UniversalConfirmation :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showStopTrimConfirm">
+		<UniversalConfirmation :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -394,19 +402,6 @@ async function pauseScrubAndScan() {
 	pausing.value = false;
 }
 
-// function resumeScrub(pool) {
-// 	selectedPool.value = pool;
-// 	showResumeScrubConfirm.value = true;
-// 	console.log('scrub to resume:', selectedPool.value);
-// }
-
-// async function resumeScrubAndScan() {
-// 	resuming.value = true;
-// 	await scrubPool(selectedPool.value);
-// 	pollScanStatus();
-// 	resuming.value = false;
-// }
-
 async function resumeScrub(pool) {
 	resuming.value = true;
 	await scrubPool(pool);
@@ -490,30 +485,38 @@ watch(confirmTrim, async (newValue, oldValue) => {
 	}
 });
 
-async function pauseTrim(pool) {
+function pauseTrim(pool) {
+	selectedPool.value = pool;
+	showPauseTrimConfirm.value = true;
+	console.log('trim to pause:', selectedPool.value);
+}
+
+async function pauseTrimAndScan() {
 	pausingTrim.value = true;
-	checkingDiskStats.value = false;
-	await trimPool(pool, false, 'pause');
+	await trimPool(selectedPool.value!, false, 'pause');
 	pollTrimStatus();
-	// pollTrim();
 	pausingTrim.value = false;
 }
 
 async function resumeTrim(pool) {
 	resumingTrim.value = true;
-	checkingDiskStats.value = true;
+	// checkingDiskStats.value = true;
 	await trimPool(pool);
 	pollTrimStatus();
 	// pollTrim();
 	resumingTrim.value = false
 }
 
-async function stopTrim(pool) {
+function stopTrim(pool) {
+	selectedPool.value = pool;
+	showStopTrimConfirm.value = true;
+	console.log('trim to pause:', selectedPool.value);
+}
+
+async function stopTrimAndScan() {
 	stoppingTrim.value = true;
-	checkingDiskStats.value = false;
-	await trimPool(pool, false, 'stop');
+	await trimPool(selectedPool.value!, false, 'stop');
 	pollTrimStatus();
-	// pollTrim();
 	stoppingTrim.value = false;
 }
 
@@ -827,6 +830,49 @@ async function pollTrimStatus() {
 	console.log('checkingDiskStats set:', checkingDiskStats.value);
 	displayTrimBools();
 }
+
+const showPauseTrimConfirm = ref(false);
+const confirmPauseTrim = ref(false);
+
+const confirmPauseThisTrim : ConfirmationCallback = () => {
+	confirmPauseTrim.value = true;
+}
+
+const updateShowPauseTrim = (newVal) => {
+	showPauseTrimConfirm.value = newVal;
+}
+
+watch(confirmPauseTrim, async (newVal, oldVal) => {
+	if (confirmPauseTrim.value == true) {
+		console.log('now pausing trim:', selectedPool.value);
+		showPauseTrimConfirm.value = false;
+		await pauseTrimAndScan();
+		confirmPauseTrim.value = false;
+		notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
+	}
+});
+
+const showStopTrimConfirm = ref(false);
+const confirmStopTrim = ref(false);
+
+const confirmStopThisTrim : ConfirmationCallback = () => {
+	confirmStopTrim.value = true;
+}
+
+const updateShowStopTrim = (newVal) => {
+	showStopTrimConfirm.value = newVal;
+}
+
+watch(confirmStopTrim, async (newVal, oldVal) => {
+	if (confirmStopTrim.value == true) {
+		console.log('now stopping trim:', selectedPool.value);
+		showStopTrimConfirm.value = false;
+		await stopTrimAndScan();
+		confirmStopTrim.value = false;
+		notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success');
+	}
+});
+
 
 /////////////////////////////////////////////////////
 //New Trimming Stuff (for Status refactor)
