@@ -61,7 +61,7 @@
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.free }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ poolData[poolIdx].properties.size }}</div>
 										<div class="py-6 -mt-2 col-span-2">
-											<Status :pool="poolData[poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" ref="scanStatus"/>
+											<Status :pool="poolData[poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
 										</div>
 									</button>
 									<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
@@ -176,7 +176,7 @@
 																<td class="p-4 mt-1 col-span-1">Y</td>
 																<td class="p-4 mt-1 col-span-1">{{ disk.capacity }}</td>
 																<td class="p-4 mt-1 col-span-2">
-																	<Status class="-mt-3" :isTrim="false" :disk="disk" :pool="poolData[poolIdx]" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'status-box'" ref="trimStatus"/>
+																	<Status class="-mt-3" :isTrim="false" :disk="disk" :pool="poolData[poolIdx]" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"/>
 																</td>
 																
 																<td class="p-4 mt-1 col-span-1">
@@ -321,7 +321,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted } from "vue";
+import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted, nextTick } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
@@ -1062,38 +1062,42 @@ function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 // const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
-const scanStatus = ref();
+const scanStatusBox = ref();
 const scanActivity = inject<Ref<Activity>>('scan-activity')!;
 
-function getScanStatus() {
-	scanStatus.value.pollScanStatus();
-}
-
-async function scanActivitySet(scanActivity) {
-	await scanStatus.value.setScanActivity(scanActivity);
+async function getScanStatus() {
+	// await nextTick();
+	await scanStatusBox.value.pollScanStatus();
+	// console.log(`PoolList scan values for ${props.pool.name}: \n 
+    //     isActive:${scanActivity.value.isActive}\n
+    //     isPaused:${scanActivity.value.isPaused}\n
+    //     isFinished:${scanActivity.value.isFinished}\n
+    //     isCanceled:${scanActivity.value.isCanceled}\n
+    //     ------`);
 }
 
 //////////// Checking Disk Stats (Trim) /////////////
 /////////////////////////////////////////////////////
 // const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
-const trimStatus = ref();
+const trimStatusBox = ref();
 const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 
-function getTrimStatus() {
-	trimStatus.value.pollTrimStatus();
-}
-
-async function trimActivitySet(trimActivity) {
-	await trimStatus.value.setTrimActivity(trimActivity);
+async function getTrimStatus() {
+	// await nextTick();
+	await trimStatusBox.value.pollTrimStatus();
+	// console.log(`PoolList trim values for ${props.pool.name}: \n 
+    //     isActive:${trimActivity.value.isActive}\n
+    //     isPaused:${trimActivity.value.isPaused}\n
+    //     isFinished:${trimActivity.value.isFinished}\n
+    //     isCanceled:${trimActivity.value.isCanceled}\n
+    //     ******`);
 }
 
 /////////////////////////////////////////////////////
 
-onMounted(async () => {
-	await scanActivitySet(scanActivity);
-	getScanStatus();
-	await trimActivitySet(trimActivity);
-	getTrimStatus();
+onMounted(() => {
+	// getScanStatus();
+	// getTrimStatus();
 });
 
 /////////////////////////////////////////////////////

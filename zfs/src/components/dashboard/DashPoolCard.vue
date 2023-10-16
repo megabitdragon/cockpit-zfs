@@ -675,8 +675,8 @@ async function getTrimStatus() {
 /////////////////////////////////////////////////////
 
 onMounted(() => {
-	getScanStatus();
-	getTrimStatus();
+	// getScanStatus();
+	// getTrimStatus();
 });
 
 /////////////////////////////////////////////////////

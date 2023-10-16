@@ -83,10 +83,10 @@
             <div class="grid grid-cols-2">
                 <div v-if="selectedDisk!.stats.trim_notsup === 0" class="col-span-2 flex flex-col items-center justify-center">
                     <span :class="trimMessageClass(selectedDisk!)">
-                        Disk {{selectedDisk!.name}} Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }}:  {{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%
+                        Disk {{selectedDisk!.name}} Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
                     </span>
                     <div class="min-w-fit w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
-                        <div :class="trimProgressBarClass(disk)" class="h-4 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
+                        <div :class="trimProgressBarClass(selectedDisk!)" class="h-4 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
                             <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                 {{ getTrimmedAmount(selectedDisk!) }}/{{ getTrimmedTotal(selectedDisk!) }}
                             </div>
@@ -116,8 +116,6 @@ interface StatusProps {
     isPoolDetail: boolean;
     isDisk: boolean;
     isTrim: boolean;
-    pollScan?: boolean;
-    pollTrim?: boolean;
 }
 
 const props = defineProps<StatusProps>();
@@ -187,43 +185,44 @@ function displayScanBools() {
 }
 
 async function pollScanStatus() {
-	console.log('pollScanStatus fired');
+	// console.log('pollScanStatus fired');
 	await scanNow();
 	await setScanActivity(scanActivity.value);
     // console.log(`scanActivity for ${props.pool.name} set`);
 
     if (scanActivity.value.isActive) {
 		if (!scanActivity.value.isPaused) {
-			console.log('scan active');
+			// console.log('scan active');
 			scanning.value = true;
 		} else if (scanActivity.value.isPaused) {
-			console.log('scan paused');
+			// console.log('scan paused');
 			scanning.value = false;
 		}
 	} else if (scanActivity.value.isCanceled) {
-		console.log('scan canceled');
+		// console.log('scan canceled');
 		scanning.value = false;
 	} else if (scanActivity.value.isFinished) {
-		console.log('scan finished');
+		// console.log('scan finished');
 		scanning.value = false;
 	}
 
 	// console.log('scan set:', scanning.value);
     // console.log(`scan for ${props.pool.name} set: ${scanning.value}`)
 	// displayScanBools();
+    console.log('polling scanStats...', scanning.value);
 }
 
 function startScanInterval() {
 	if (!scanIntervalID.value) {
-        console.log('----scan interval set----');
 		scanIntervalID.value = setInterval(pollScanStatus, 3000);
+        console.log('----scan interval set----', scanIntervalID.value);
 	}
 }
 
 function stopScanInterval() {
 	if (scanIntervalID.value) {
-        console.log('----scan interval cleared----');
 		clearInterval(scanIntervalID.value);
+        console.log('----scan interval cleared----', scanIntervalID.value);
 		scanIntervalID.value = null;
 	}
 }
@@ -414,26 +413,26 @@ function displayTrimBools() {
 }
 
 async function pollTrimStatus() {
-	console.log('pollTrimStatus fired');
+	// console.log('pollTrimStatus fired');
 	await checkDiskStats();
 	await setTrimActivity(trimActivity.value);
     // console.log(`trimActivity for ${props.pool.name} set`);
 
     switch(checkActivityState(trimActivity.value)) {
         case 'active':
-            console.log('trim active');
+            // console.log('trim active');
 		    checkingDiskStats.value = true;
             break;
         case 'paused':
-            console.log('trim paused');
+            // console.log('trim paused');
 		    checkingDiskStats.value = false;
             break;
         case 'canceled':
-            console.log('trim canceled');
+            // console.log('trim canceled');
 		    checkingDiskStats.value = false;
             break;
         case 'finished':
-            console.log('trim finished');
+            // console.log('trim finished');
 		    checkingDiskStats.value = false;
             break;
         default:
@@ -443,6 +442,7 @@ async function pollTrimStatus() {
 	// console.log('checkingDiskStats set:', checkingDiskStats.value);
     // console.log(`checkDiskStats for ${props.pool.name} set: ${checkingDiskStats.value}`)
     // displayTrimBools();
+    console.log('polling diskStats...', checkingDiskStats.value);
 }
 
 function checkActivityState(activity : Activity) {
@@ -459,16 +459,16 @@ function checkActivityState(activity : Activity) {
 
 function startDiskStatsInterval() {
 	if (!diskStatsIntervalID.value) {
-        console.log('****trim interval set****');
 		diskStatsIntervalID.value = setInterval(pollTrimStatus, 3000);
+        console.log('****trim interval set****', diskStatsIntervalID.value);
 	}
 }
 
 function stopDiskStatsInterval() {
 	if (diskStatsIntervalID.value) {
-        console.log('****trim interval cleared****');
 		clearInterval(diskStatsIntervalID.value);
-		// diskStatsIntervalID.value = null;
+        console.log('****trim interval cleared****', diskStatsIntervalID.value);
+		diskStatsIntervalID.value = null;
 	}
 }
 
@@ -578,12 +578,10 @@ function trimProgressBarClass(disk) {
     }
 }
 
-// onUpdated( () => {
-//    	// setScanActivity(scanActivity.value);
-//     // setTrimActivity(trimActivity.value);
-//     // pollScanStatus();
-//     // pollTrimStatus();
-// });
+onMounted(() => {
+	pollScanStatus();
+	pollTrimStatus();
+});
 
 defineExpose({
     scanNow,
