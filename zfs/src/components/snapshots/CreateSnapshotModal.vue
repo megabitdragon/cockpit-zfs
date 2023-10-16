@@ -85,7 +85,7 @@
 import { reactive, ref, inject, Ref, computed, provide } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { getTimestamp } from '../../composables/helpers';
+import { getSnapshotTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
 import { loadSnapshots, loadSnapshotsInDataset, loadSnapshotsInPool } from '../../composables/loadData';
 
@@ -210,7 +210,7 @@ function createSnapButton(newSnapshot) {
             }
         }
     } else if (!newSnapshot.isCustomName) {
-        newSnapshot.name = getTimestamp();
+        newSnapshot.name = getSnapshotTimestamp();
         if (filesystemCheck(newSnapshot)) {
             create(newSnapshot);
         }

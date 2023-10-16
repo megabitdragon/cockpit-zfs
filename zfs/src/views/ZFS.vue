@@ -43,9 +43,6 @@ const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const snapshots = ref<Snapshot[]>([]);
 
-const poolDiskStats = ref<PoolDiskStats>({});
-const scanObjectGroup = ref<PoolScanObjectGroup>({});
-
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
@@ -59,26 +56,40 @@ async function initialLoad(disks, pools, datasets) {
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
-	// await scanNow();
-	// await checkDiskStats();
+	await scanNow();
+	await checkDiskStats();
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
 }
 
 initialLoad(disks, pools, datasets);
-scanNow();
-checkDiskStats();
+// scanNow();
+// checkDiskStats();
 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
+const scanObjectGroup = ref<PoolScanObjectGroup>({});
 const scanIntervalID = ref();
+const scanActivity = ref<Activity>({
+	isActive: false,
+	isPaused: false,
+	isCanceled: false,
+	isFinished: false,
+});
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
+const poolDiskStats = ref<PoolDiskStats>({});
 const diskStatsIntervalID = ref();
+const trimActivity = ref<Activity>({
+	isActive: false,
+	isPaused: false,
+	isCanceled: false,
+	isFinished: false,
+});
 
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
@@ -100,5 +111,7 @@ provide('scan-object-group', scanObjectGroup);
 provide('pool-disk-stats', poolDiskStats);
 provide('scan-interval', scanIntervalID);
 provide('disk-stats-interval', diskStatsIntervalID);
+provide('scan-activity', scanActivity);
+provide('trim-activity', trimActivity);
 </script>
 

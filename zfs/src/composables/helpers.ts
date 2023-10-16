@@ -109,7 +109,7 @@ export function getTimestampString() {
 	return timestampString;
 }
 
-export function getTimestamp() {
+export function getSnapshotTimestamp() {
 	const currentDateTime = new Date();
   
 	const year = currentDateTime.getFullYear();
@@ -122,6 +122,11 @@ export function getTimestamp() {
 	const timestamp = `${year}.${month}.${day}-${hour}.${minute}.${second}`;
   
 	return timestamp;
+}
+
+export function getRawTimestampFromString(timestampString) {
+	const rawTimestamp = new Date(timestampString).getTime() / 1000;
+	return rawTimestamp;
 }
 
 export function convertRawTimestampToString(rawTimestamp) {
