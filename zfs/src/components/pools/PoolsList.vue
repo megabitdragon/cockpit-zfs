@@ -94,7 +94,7 @@
 															<a v-if="scanActivity.isActive" href="#" @click="stopScrub(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
 														</MenuItem>
 														<MenuItem as="div" v-slot="{ active }">
-															<a v-if="!trimActivity.isActive && pool.diskType != 'HDD'" href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+															<a v-if="!trimActivity.isActive && !trimActivity.isPaused && pool.diskType != 'HDD'" href="#" @click="trimThisPool(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 															<a v-if="trimActivity.isPaused && pool.diskType != 'HDD'" href="#" @click="resumeTrim(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM</a>
 															<a v-if="trimActivity.isActive && pool.diskType != 'HDD'" href="#" @click="pauseTrim(poolData[poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM</a>
 														</MenuItem>									
@@ -1066,8 +1066,10 @@ const scanStatusBox = ref();
 const scanActivity = inject<Ref<Activity>>('scan-activity')!;
 
 async function getScanStatus() {
-	// await nextTick();
-	await scanStatusBox.value.pollScanStatus();
+	console.log('scanStatusBox', scanStatusBox.value);
+	// Needed to specify index to work properly (treating as an array due to multiple pools error)
+	await scanStatusBox.value[0].pollScanStatus();
+
 	// console.log(`PoolList scan values for ${props.pool.name}: \n 
     //     isActive:${scanActivity.value.isActive}\n
     //     isPaused:${scanActivity.value.isPaused}\n
@@ -1083,8 +1085,10 @@ const trimStatusBox = ref();
 const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 
 async function getTrimStatus() {
-	// await nextTick();
-	await trimStatusBox.value.pollTrimStatus();
+	console.log('trimStatusBox', trimStatusBox.value);
+	// Needed to specify index to work properly (treating as an array due to multiple pools error)
+	await trimStatusBox.value[0].pollTrimStatus();
+
 	// console.log(`PoolList trim values for ${props.pool.name}: \n 
     //     isActive:${trimActivity.value.isActive}\n
     //     isPaused:${trimActivity.value.isPaused}\n
@@ -1095,10 +1099,10 @@ async function getTrimStatus() {
 
 /////////////////////////////////////////////////////
 
-onMounted(() => {
+// onMounted(() => {
 	// getScanStatus();
 	// getTrimStatus();
-});
+// });
 
 /////////////////////////////////////////////////////
 

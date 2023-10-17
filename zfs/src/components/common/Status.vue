@@ -105,7 +105,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, computed, ComputedRef, onMounted, watch, onUpdated } from "vue";
+import { ref, inject, Ref, computed, ComputedRef, onMounted, watch, onUpdated, defineExpose } from "vue";
 import { convertBytesToSize, convertSecondsToString, convertRawTimestampToString, upperCaseWord, getRawTimestampFromString } from "../../composables/helpers";
 import { loadScanObjectGroup, loadDiskStats } from "../../composables/loadData";
 
@@ -515,13 +515,13 @@ function trimMessage(disk) {
         case 'none':
             return `Trim Information N/A`; 
         case 'active':
-            return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)}, started at ${getTrimTimestamp(disk)}.`; 
+            return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)}, started at ${getTrimTimestamp(disk)}`; 
         case 'canceled':
-            return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)}.`;
+            return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)}`;
         case 'suspended':
-            return `${disk.name} Trim is ${getTrimState(disk.stats.trim_state)}.`;
+            return `${disk.name} Trim is ${getTrimState(disk.stats.trim_state)}`;
         case 'finished':
-            return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)} at ${getTrimTimestamp(disk)}.`;
+            return `${disk.name} Trim ${getTrimState(disk.stats.trim_state)} at ${getTrimTimestamp(disk)}`;
         default:
             break;
     }
@@ -584,17 +584,7 @@ onMounted(() => {
 });
 
 defineExpose({
-    scanNow,
-    displayScanBools,
-    setScanActivity,
     pollScanStatus,
-    startScanInterval,
-    stopScanInterval,
-    checkDiskStats,
-    displayTrimBools,
-    setTrimActivity,
     pollTrimStatus,
-    startDiskStatsInterval,
-    stopDiskStatsInterval,
-})
+});
 </script>
