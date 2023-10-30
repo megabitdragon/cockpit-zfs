@@ -26,6 +26,7 @@ import { reactive, ref, Ref, inject, computed, provide, watch } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../composables/loadData';
+import { addActivity, removeActivity } from '../composables/helpers';
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
@@ -50,6 +51,9 @@ const snapshotsLoaded = ref(true);
 
 const clearLabels = ref(false);
 
+const scanActivities = ref<Map<string, Ref<Activity>>>(new Map());
+const trimActivities = ref<Map<string, Ref<Activity>>>(new Map());
+
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
@@ -57,10 +61,14 @@ async function initialLoad(disks, pools, datasets) {
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
 	await scanNow();
+	await loadScanActivities(pools, scanActivities);
 	await checkDiskStats();
+	await loadTrimActivities(pools, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
+	console.log(scanActivities.value);
+	console.log(trimActivities.value);
 }
 
 initialLoad(disks, pools, datasets);
@@ -69,12 +77,17 @@ initialLoad(disks, pools, datasets);
 /////////////////////////////////////////////////////
 const scanObjectGroup = ref<PoolScanObjectGroup>({});
 const scanIntervalID = ref();
-const scanActivity = ref<Activity>({
-	isActive: false,
-	isPaused: false,
-	isCanceled: false,
-	isFinished: false,
-});
+// const scanActivity = ref<Activity>({
+// 	isActive: false,
+// 	isPaused: false,
+// 	isCanceled: false,
+// 	isFinished: false,
+// });
+async function loadScanActivities(pools, scanActivities) {
+	pools.value.forEach(pool => {
+		addActivity(pool.name, scanActivities);
+	});
+}
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
@@ -82,12 +95,18 @@ async function scanNow() {
 
 const poolDiskStats = ref<PoolDiskStats>({});
 const diskStatsIntervalID = ref();
-const trimActivity = ref<Activity>({
-	isActive: false,
-	isPaused: false,
-	isCanceled: false,
-	isFinished: false,
-});
+// const trimActivity = ref<Activity>({
+// 	isActive: false,
+// 	isPaused: false,
+// 	isCanceled: false,
+// 	isFinished: false,
+// });
+
+async function loadTrimActivities(pools, trimActivities) {
+	pools.value.forEach(pool => {
+		addActivity(pool.name, trimActivities);
+	});
+}
 
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
@@ -109,6 +128,8 @@ provide('scan-object-group', scanObjectGroup);
 provide('pool-disk-stats', poolDiskStats);
 provide('scan-interval', scanIntervalID);
 provide('disk-stats-interval', diskStatsIntervalID);
-provide('scan-activity', scanActivity);
-provide('trim-activity', trimActivity);
+// provide('scan-activity', scanActivity);
+// provide('trim-activity', trimActivity);
+provide('scan-activities', scanActivities);
+provide('trim-activities', trimActivities);
 </script>

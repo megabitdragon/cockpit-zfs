@@ -1,80 +1,54 @@
 <template>
     <div>
-        <table class="table-auto min-w-full divide-y divide-default rounded-md bg-secondary text-default">
-            <tr :key="props.vDevIdx" class="rounded-md">
-                <td colspan="11" class="">
-                    <table class="min-w-full divide-y divide-default ">
-							<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-2">
-                                <span class="sr-only"></span>
-                            </th>
-                            <th class="py-3.5 font-semibold text-default col-span-1">Name</th>
-                            <th class="py-3.5 font-semibold text-default col-span-1">State</th>
-                            <th class="py-3.5 font-semibold text-default col-span-1">Reads</th>
-                            <th class="py-3.5 font-semibold text-default col-span-1">Writes</th>
-                            <th class="py-3.5 font-semibold text-default col-span-1">Checksum</th>
-                            <th class="py-3.5 font-semibold text-default col-span-1">Capacity</th>
-                            <th class="py-3.5 font-semibold text-default col-span-2">Message</th>
-                            <th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
-                                <span class="sr-only"></span>
-                            </th>
-                            <tr v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx" class="bg-default rounded-md">
-								<td class="p-4 mt-1 col-span-2">
-									<span class="sr-only"></span>
-								</td>
-                                <td class="p-4 mt-1 col-span-1">{{ disk.name }}</td>
-                                <td class="p-4 mt-1 col-span-1">{{ disk.health }}</td>
-                                <td class="p-4 mt-1 col-span-1">W</td>
-                                <td class="p-4 mt-1 col-span-1">X</td>
-                                <td class="p-4 mt-1 col-span-1">Y</td>
-                                <td class="p-4 mt-1 col-span-1">{{ disk.capacity }}</td>
-                                <td class="p-4 mt-1 col-span-2">
-                                    <Status class="-mt-3" :isTrim="false" :disk="disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"/>
-                                </td>
-                                
-                                <td class="p-4 mt-1 col-span-1">
-                                    <div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
-                                        <Menu as="div" class="relative inline-block text-right">
-                                            <div>
-                                                <MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-                                                    <span class="sr-only">Open options</span>
-                                                    <EllipsisVerticalIcon class="w-5" aria-hidden="true" />
-                                                </MenuButton>
-                                            </div>
+        <div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center bg-default">
+            <div class="py-4 mt-1 col-span-1">{{ props.disk.name }}</div>
+            <div class="py-4 mt-1 col-span-1">{{ props.disk.health }}</div>
+            <div class="py-4 mt-1 col-span-1">X</div>
+            <div class="py-4 mt-1 col-span-1">Y Writes</div>
+            <div class="py-4 mt-1 col-span-1">Z Checksum</div>
+            <div class="py-4 mt-1 col-span-1">{{ props.disk.capacity }}</div>
+            <div class="py-4 mt-1 col-span-2">
+                <Status class="-mt-1" :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"/>
+            </div>
+            <div class="col-span-1">
+                <div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+                    <Menu as="div" class="relative inline-block text-right">
+                        <div>
+                            <MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+                                <span class="sr-only">Open options</span>
+                                <EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+                            </MenuButton>
+                        </div>
 
-                                            <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                                                <MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                                    <div class="py-1">
-                                                        <MenuItem as="div" v-slot="{ active }">
-                                                            <a href="#" @click="clearDiskErrors(props.pool.name, disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
-                                                        </MenuItem>
-                                                        <MenuItem as="div" v-slot="{ active }">
-                                                            <a v-if="props.vDev.disks.length > 1" href="#" @click="detachThisDisk(props.pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
-                                                        </MenuItem>
-                                                        <MenuItem as="div" v-slot="{ active }">
-                                                            <a href="#" @click="offlineThisDisk(props.pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
-                                                        </MenuItem>
-                                                        <MenuItem as="div" v-slot="{ active }">
-                                                            <a href="#" @click="onlineThisDisk(props.pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Online Disk</a>
-                                                        </MenuItem>
-                                                        <MenuItem as="div" v-slot="{ active }">
-                                                            <a href="#" @click="replaceThisDisk(props.pool, vDev, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
-                                                        </MenuItem>
-                                                        <MenuItem as="div" v-slot="{ active }">
-                                                            <a href="#" @click="trimThisDisk(props.pool, disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
-                                                        </MenuItem>
-                                                    </div>
-                                                </MenuItems>
-                                            </transition>
-                                        </Menu>
-                                    </div>
-                                </td>
-                            </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+                        <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                            <MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <div class="py-1">
+                                    <MenuItem as="div" v-slot="{ active }">
+                                        <a href="#" @click="clearDiskErrors(props.pool.name, props.disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
+                                    </MenuItem>
+                                    <MenuItem as="div" v-slot="{ active }">
+                                        <a v-if="props.vDev.disks.length > 1" href="#" @click="detachThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
+                                    </MenuItem>
+                                    <MenuItem as="div" v-slot="{ active }">
+                                        <a href="#" @click="offlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
+                                    </MenuItem>
+                                    <MenuItem as="div" v-slot="{ active }">
+                                        <a href="#" @click="onlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Online Disk</a>
+                                    </MenuItem>
+                                    <MenuItem as="div" v-slot="{ active }">
+                                        <a href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
+                                    </MenuItem>
+                                    <MenuItem as="div" v-slot="{ active }">
+                                        <a href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
+                                    </MenuItem>
+                                </div>
+                            </MenuItems>
+                        </transition>
+                    </Menu>
+                </div>
+            </div>
+        </div>
     </div>
-
 
 	<div v-if="showDetachDiskModal">
 		<UniversalConfirmation :showFlag="showDetachDiskModal" @close="updateShowDetachDisk" :idKey="'confirm-detach-disk'" :item="'disk'" :operation="'detach'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDetach" :secondOption="'clear disk labels'" :hasChildren="false"/>
@@ -95,6 +69,7 @@
 	<div v-if="showReplaceDiskModal">
 		<ReplaceDiskModal @close="showReplaceDiskModal = false" :idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!"/>
 	</div>
+	
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted, nextTick } from "vue";
@@ -112,8 +87,8 @@ interface DiskListElementProps {
 	poolIdx: number;
 	vDev: vDevData;
 	vDevIdx: number;
-	// disk: DiskData;
-    // diskIdx: number;
+	disk: DiskData;
+    diskIdx: number;
 }
 
 const props = defineProps<DiskListElementProps>();
@@ -365,5 +340,28 @@ async function clearDiskErrors(poolName, diskName) {
 	// cleared.value = true;
 }
 
+//////////// Checking Disk Stats (Trim) /////////////
+/////////////////////////////////////////////////////
+const trimStatusBox = ref();
+
+async function getDiskTrimStatus() {
+	console.log('trimStatusBox', trimStatusBox.value);
+
+	// Needed to specify index to work properly (treating as an array due to multiple pools error)
+	await trimStatusBox.value.pollTrimStatus();
+}
+
+/////////////////////////////////////////////////////
+// const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+
+// const poolID = ref(props.pool.name);
+// const trimActivity = computed(() => {
+// 	return trimActivities.value.get(poolID.value);
+// });
+
+
+defineExpose({
+    getDiskTrimStatus,
+});
 
 </script>

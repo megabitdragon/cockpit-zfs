@@ -87,7 +87,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
 import { replaceDisk } from '../../composables/disks';
-import { loadDisksThenPools, loadDatasets, loadScanObject } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
 
 interface ReplaceDiskModalProps {
     idKey: string;
@@ -150,6 +150,7 @@ function setDiskNamePath() {
     console.log('getting selectedDisk.value:', selectedDisk.value);
     newDisk.value = allDisks.value.find(disk => disk.name === selectedDisk.value);
     console.log('setting newDisk.value:', newDisk.value);
+    
     switch (diskIdentifier.value) {
         case 'vdev_path':
             diskNewPath.value = newDisk.value!.vdev_path;

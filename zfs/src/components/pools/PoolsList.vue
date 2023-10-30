@@ -36,7 +36,7 @@
 					
 					<div v-if="poolData.length > 0 && poolsLoaded == true">
 						<div v-for="pool, poolIdx in poolData" :key="poolIdx" >
-							<PoolListElement :poolIdx="poolIdx"/>
+							<PoolListElement :poolIdx="poolIdx" :pool="pool"/>
 						</div>
 					</div>
 					
@@ -62,11 +62,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch } from "vue";
+import { ref, inject, Ref, provide } from "vue";
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
-import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
-import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolListElement from './PoolListElement.vue';
 import ImportPool from "./ImportPool.vue";
@@ -123,40 +121,40 @@ function importNewPoolBtn() {
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 // const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
-const scanStatusBox = ref();
-const scanActivity = inject<Ref<Activity>>('scan-activity')!;
+// const scanStatusBox = ref();
+// const scanActivity = inject<Ref<Activity>>('scan-activity')!;
 
-async function getScanStatus() {
-	console.log('scanStatusBox', scanStatusBox.value);
-	// Needed to specify index to work properly (treating as an array due to multiple pools error)
-	await scanStatusBox.value[0].pollScanStatus();
+// async function getScanStatus() {
+// 	console.log('scanStatusBox', scanStatusBox.value);
+// 	// Needed to specify index to work properly (treating as an array due to multiple pools error)
+// 	await scanStatusBox.value[0].pollScanStatus();
 
-	// console.log(`PoolList scan values for ${props.pool.name}: \n 
-    //     isActive:${scanActivity.value.isActive}\n
-    //     isPaused:${scanActivity.value.isPaused}\n
-    //     isFinished:${scanActivity.value.isFinished}\n
-    //     isCanceled:${scanActivity.value.isCanceled}\n
-    //     ------`);
-}
+// 	// console.log(`PoolList scan values for ${props.pool.name}: \n 
+//     //     isActive:${scanActivity.value.isActive}\n
+//     //     isPaused:${scanActivity.value.isPaused}\n
+//     //     isFinished:${scanActivity.value.isFinished}\n
+//     //     isCanceled:${scanActivity.value.isCanceled}\n
+//     //     ------`);
+// }
 
 //////////// Checking Disk Stats (Trim) /////////////
 /////////////////////////////////////////////////////
 // const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
-const trimStatusBox = ref();
-const trimActivity = inject<Ref<Activity>>('trim-activity')!;
+// const trimStatusBox = ref();
+// const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 
-async function getTrimStatus() {
-	console.log('trimStatusBox', trimStatusBox.value);
-	// Needed to specify index to work properly (treating as an array due to multiple pools error)
-	await trimStatusBox.value[0].pollTrimStatus();
+// async function getTrimStatus() {
+// 	console.log('trimStatusBox', trimStatusBox.value);
+// 	// Needed to specify index to work properly (treating as an array due to multiple pools error)
+// 	await trimStatusBox.value[0].pollTrimStatus();
 
-	// console.log(`PoolList trim values for ${props.pool.name}: \n 
-    //     isActive:${trimActivity.value.isActive}\n
-    //     isPaused:${trimActivity.value.isPaused}\n
-    //     isFinished:${trimActivity.value.isFinished}\n
-    //     isCanceled:${trimActivity.value.isCanceled}\n
-    //     ******`);
-}
+// 	// console.log(`PoolList trim values for ${props.pool.name}: \n 
+//     //     isActive:${trimActivity.value.isActive}\n
+//     //     isPaused:${trimActivity.value.isPaused}\n
+//     //     isFinished:${trimActivity.value.isFinished}\n
+//     //     isCanceled:${trimActivity.value.isCanceled}\n
+//     //     ******`);
+// }
 
 /////////////////////////////////////////////////////
 

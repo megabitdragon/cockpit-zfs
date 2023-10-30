@@ -26,20 +26,20 @@
 										<a href="#" @click="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="!scanActivity.isActive" href="#" @click="scrubThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
-										<a v-if="scanActivity.isActive && scanActivity.isPaused" href="#" @click="resumeScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume Scrub</a>
-										<a v-if="scanActivity.isActive && !scanActivity.isPaused" href="#" @click="pauseScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause Scrub</a>
+										<a v-if="!scanActivity!.isActive" href="#" @click="scrubThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+										<a v-if="scanActivity!.isActive && scanActivity!.isPaused" href="#" @click="resumeScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume Scrub</a>
+										<a v-if="scanActivity!.isActive && !scanActivity!.isPaused" href="#" @click="pauseScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause Scrub</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="scanActivity.isActive" href="#" @click="stopScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
+										<a v-if="scanActivity!.isActive" href="#" @click="stopScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="!trimActivity.isActive && !trimActivity.isPaused && pool.diskType != 'HDD'" href="#" @click="trimThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
-										<a v-if="trimActivity.isPaused && pool.diskType != 'HDD'" href="#" @click="resumeTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM</a>
-										<a v-if="trimActivity.isActive && pool.diskType != 'HDD'" href="#" @click="pauseTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM</a>
+										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && pool.diskType != 'HDD'" href="#" @click="trimThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+										<a v-if="trimActivity!.isPaused && pool.diskType != 'HDD'" href="#" @click="resumeTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM</a>
+										<a v-if="trimActivity!.isActive && pool.diskType != 'HDD'" href="#" @click="pauseTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM</a>
 									</MenuItem>									
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity.isActive || trimActivity.isPaused && pool.diskType != 'HDD'" href="#" @click="stopTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM</a>
+										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && pool.diskType != 'HDD'" href="#" @click="stopTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click="showAddVDev(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, provide, watch, watchEffect, ComputedRef, onMounted } from "vue";
+import { ref, inject, Ref, computed, provide, watch, watchEffect, ComputedRef, onMounted} from "vue";
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
@@ -644,7 +644,7 @@ function showAddVDev(pool) {
 /////////////////////////////////////////////////////
 // const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const scanStatus = ref();
-const scanActivity = inject<Ref<Activity>>('scan-activity')!;
+// const scanActivity = inject<Ref<Activity>>('scan-activity')!;
 
 async function getScanStatus() {
 	await scanStatus.value.pollScanStatus();
@@ -660,7 +660,7 @@ async function getScanStatus() {
 /////////////////////////////////////////////////////
 // const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const trimStatus = ref();
-const trimActivity = inject<Ref<Activity>>('trim-activity')!;
+// const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 
 async function getTrimStatus() {
 	await trimStatus.value.pollTrimStatus();
@@ -671,6 +671,20 @@ async function getTrimStatus() {
     //     isCanceled:${trimActivity.value.isCanceled}\n
     //     ******`);
 }
+
+/////////////////////////////////////////////////////
+// const scanActivities = ref<Map<string, Activity>>(new Map());
+// const trimActivities = ref<Map<string, Activity>>(new Map());
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+
+const poolID = ref(props.pool.name);
+const scanActivity = computed(() => {
+	return scanActivities.value.get(poolID.value);
+});
+const trimActivity = computed(() => {
+	return trimActivities.value.get(poolID.value);
+});
 
 /////////////////////////////////////////////////////
 

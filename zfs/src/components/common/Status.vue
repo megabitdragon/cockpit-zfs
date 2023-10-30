@@ -80,7 +80,7 @@
             </div>
         </div>
         <div v-if="isDisk">
-            <div class="grid grid-cols-2">
+            <div v-if="selectedDisk!" class="grid grid-cols-2">
                 <div v-if="selectedDisk!.stats.trim_notsup === 0" class="col-span-2 flex flex-col items-center justify-center">
                     <span :class="trimMessageClass(selectedDisk!)">
                         Disk {{selectedDisk!.name}} Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
@@ -100,7 +100,11 @@
                     </span>
                 </div>    
             </div>
-            
+            <div v-if="!selectedDisk">
+                <span class="mt-2 text-muted">
+                    Disk replacing in progress...
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -119,12 +123,11 @@ interface StatusProps {
 }
 
 const props = defineProps<StatusProps>();
-const notifications = inject<Ref<any>>('notifications')!;
 
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
-const scanActivity = inject<Ref<Activity>>('scan-activity')!;
+// const scanActivity = inject<Ref<Activity>>('scan-activity')!;
 
 function getScanStateBool(state) : ComputedRef<boolean> {
 	return computed(() => {
@@ -175,33 +178,44 @@ async function scanNow() {
     // console.log(`polling scanObject...`);
 }
 
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+
+const poolID = ref(props.pool.name);
+const scanActivity = computed(() => {
+	return scanActivities.value.get(poolID.value);
+});
+const trimActivity = computed(() => {
+	return trimActivities.value.get(poolID.value);
+});
+
 function displayScanBools() {
     console.log(`Status scan values for ${props.pool.name}: \n 
-        isActive:${scanActivity.value.isActive}\n
-        isPaused:${scanActivity.value.isPaused}\n
-        isFinished:${scanActivity.value.isFinished}\n
-        isCanceled:${scanActivity.value.isCanceled}\n
+        isActive:${scanActivity!.value!.isActive}\n
+        isPaused:${scanActivity!.value!.isPaused}\n
+        isFinished:${scanActivity!.value!.isFinished}\n
+        isCanceled:${scanActivity!.value!.isCanceled}\n
         ------`);
 }
 
 async function pollScanStatus() {
 	// console.log('pollScanStatus fired');
 	await scanNow();
-	await setScanActivity(scanActivity.value);
+	await setScanActivity(scanActivity!.value!);
     // console.log(`scanActivity for ${props.pool.name} set`);
 
-    if (scanActivity.value.isActive) {
-		if (!scanActivity.value.isPaused) {
+    if (scanActivity!.value!.isActive) {
+		if (!scanActivity!.value!.isPaused) {
 			// console.log('scan active');
 			scanning.value = true;
-		} else if (scanActivity.value.isPaused) {
+		} else if (scanActivity!.value!.isPaused) {
 			// console.log('scan paused');
 			scanning.value = false;
 		}
-	} else if (scanActivity.value.isCanceled) {
+	} else if (scanActivity!.value!.isCanceled) {
 		// console.log('scan canceled');
 		scanning.value = false;
-	} else if (scanActivity.value.isFinished) {
+	} else if (scanActivity!.value!.isFinished) {
 		// console.log('scan finished');
 		scanning.value = false;
 	}
@@ -354,7 +368,7 @@ function progressBarClass() {
 //////////// Checking Disk Stats (Trim) /////////////
 /////////////////////////////////////////////////////
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
-const trimActivity = inject<Ref<Activity>>('trim-activity')!;
+// const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 
 const selectedDisk = computed(() => {
     return poolDiskStats.value[props.pool.name].find(disk => disk.name == props.disk!.name);
@@ -405,20 +419,20 @@ async function checkDiskStats() {
 
 function displayTrimBools() {
     console.log(`Status trim values for ${props.pool.name}: \n 
-        isActive:${trimActivity.value.isActive}\n
-        isPaused:${trimActivity.value.isPaused}\n
-        isFinished:${trimActivity.value.isFinished}\n
-        isCanceled:${trimActivity.value.isCanceled}\n
+        isActive:${trimActivity!.value!.isActive}\n
+        isPaused:${trimActivity!.value!.isPaused}\n
+        isFinished:${trimActivity!.value!.isFinished}\n
+        isCanceled:${trimActivity!.value!.isCanceled}\n
         ******`);
 }
 
 async function pollTrimStatus() {
 	// console.log('pollTrimStatus fired');
 	await checkDiskStats();
-	await setTrimActivity(trimActivity.value);
+	await setTrimActivity(trimActivity!.value!);
     // console.log(`trimActivity for ${props.pool.name} set`);
 
-    switch(checkActivityState(trimActivity.value)) {
+    switch(checkActivityState(trimActivity!.value!)) {
         case 'active':
             // console.log('trim active');
 		    checkingDiskStats.value = true;

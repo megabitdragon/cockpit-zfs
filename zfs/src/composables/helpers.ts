@@ -195,3 +195,17 @@ export function convertSecondsToString(seconds) {
     
     return result.trim();
 }
+
+export function addActivity(poolId: string, activities: Ref<Map<string, Ref<Activity>>>) {
+	const activity = ref<Activity>({
+		isActive: false,
+		isPaused: false,
+		isCanceled: false,
+		isFinished: false,
+	});
+	activities.value.set(poolId, activity);
+}
+
+export function removeActivity(poolId: string, activities: Ref<Map<string, Ref<Activity>>>) {
+	activities.value.delete(poolId);
+}
