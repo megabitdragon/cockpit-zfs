@@ -1,76 +1,206 @@
 <template>
-	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
-		<!-- buttons for creating/importing pools and refreshing list -->
-		<div class="flex">
-			<div class="button-group-row">
-				<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
-				<button id="importPool" class="btn btn-secondary" @click="importNewPoolBtn">Import Storage Pool</button>
-				<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData"><ArrowPathIcon class="w-5 h-5"/></button>
-			</div>			
-		</div>
-
-		<div class="mt-8 overflow-visible rounded-md">
-			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
-
-				<div class="overflow-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-
-					<table class="min-w-full divide-y divide-default rounded-md">
-						<thead class="rounded-md">
-							<tr class="bg-well rounded-t-md grid grid-cols-10">
-								<th class="relative py-3.5 rounded-tl-md col-span-1">
-									<span class="sr-only"></span>
-								</th>
-								<th class="py-3.5 font-semibold text-default col-span-1">Name</th>
-								<th class="py-3.5 font-semibold text-default col-span-1">Status</th>
-								<th class="py-3.5 font-semibold text-default col-span-1">Used (%)</th>
-								<th class="py-3.5 font-semibold text-default col-span-1">Used</th>
-								<th class="py-3.5 font-semibold text-default col-span-1">Free</th>
-								<th class="py-3.5 font-semibold text-default col-span-1">Total</th>
-								<th class="py-3.5 font-semibold text-default col-span-2">Message</th>
-								<th class="relative py-3.5 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
-									<span class="sr-only"></span>
-								</th>
-							</tr>
-						</thead>
-					</table>
-					
-					<div v-if="poolData.length > 0 && poolsLoaded == true">
-						<div v-for="pool, poolIdx in poolData" :key="poolIdx" >
-							<PoolListElement :poolIdx="poolIdx"/>
+	<div>
+		<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-10'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-9'" :contentColSpan="'col-span-10'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default">
+			<template v-slot:title>
+				<div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center">
+					<button @click="showPoolModal(poolData[props.poolIdx])!" class="grid grid-cols-8 col-span-8 hover:bg-accent pt-1 rounded-r-md">
+						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].name }}</div>
+						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].status }}</div>
+						<div class="py-6 mt-1 col-span-1">
+							<div class="w-full bg-well rounded-full text-center">
+								<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
+									<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
+										{{ poolData[props.poolIdx].properties.capacity }}%
+									</div>
+								</div>
+								<div v-if="poolData[props.poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-6 mt-0.5 min-h-min max-h-max overflow-hidden">
+									<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
+										<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+											{{ poolData[props.poolIdx].properties.capacity }}%
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
+						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.allocated }}</div>
+						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.free }}</div>
+						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.size }}</div>
+						<div class="py-6 -mt-2 col-span-2">
+							<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
+						</div>
+					</button>
+					<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
+						<Menu as="div" class="relative inline-block text-right -mt-1">
+							<div>
+								<MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+									<span class="sr-only">Open options</span>
+									<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+								</MenuButton>
+							</div>
+
+							<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+								<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+									<div class="py-1">
+										<MenuItem as="div" v-slot="{ active }">
+											<a href="#" @click="showPoolModal(poolData[props.poolIdx])!" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a href="#" @click="clearPoolErrors(poolData[props.poolIdx].name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a href="#" @click="resilverThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a v-if="!scanActivity.isActive" href="#" @click="scrubThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+											<a v-if="scanActivity.isActive && scanActivity.isPaused" href="#" @click="resumeScrub(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume Scrub</a>
+											<a v-if="scanActivity.isActive && !scanActivity.isPaused" href="#" @click="pauseScrub(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause Scrub</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a v-if="scanActivity.isActive" href="#" @click="stopScrub(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a v-if="!trimActivity.isActive && !trimActivity.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="trimThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+											<a v-if="trimActivity.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="resumeTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM</a>
+											<a v-if="trimActivity.isActive && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="pauseTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM</a>
+										</MenuItem>									
+										<MenuItem as="div" v-slot="{ active }">
+											<a v-if="trimActivity.isActive || trimActivity.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="stopTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a href="#" @click="showAddVDev(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a href="#" @click="exportThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a href="#" @click="destroyPoolAndUpdate(poolData[props.poolIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+										</MenuItem>
+									</div>
+								</MenuItems>
+							</transition>
+						</Menu>
 					</div>
-					
-					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default rounded-md">
-						<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
-					</div>
-					<div v-if="poolData.length < 1 && poolsLoaded == true" class="p-2 flex bg-default justify-center rounded-md">
-						<span class="font-semibold text-lg my-2">No Pools Found</span>
-					</div>
-	
 				</div>
-			</div>
-		</div>
+				
+			</template>
+			<template v-slot:content>
+				<Accordion v-for="vDev, vDevIdx in poolData[props.poolIdx].vdevs" :key="vDevIdx" :btnColor="'btn-secondary'" :gridSize="'grid-cols-10'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-9'" :contentColSpan="'col-span-10'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default">
+					<template v-slot:title>
+						<div class="grid grid-cols-8 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
+							<div class="col-span-7 text-center py-4 mt-1">
+								{{ vDev.name }} ({{ vDev.type }})
+							</div>
+							<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+								<Menu as="div" class="relative inline-block text-right">
+									<div>
+										<MenuButton class="flex items-center rounded-full btn-primary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+											<span class="sr-only">Open options</span>
+											<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+										</MenuButton>
+									</div>
+
+									<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+										<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+											<div class="py-1">												
+												<MenuItem as="div" v-slot="{ active }">
+													<a href="#" @click="clearVDevErrors(poolData[props.poolIdx].name, vDev.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
+												</MenuItem>
+												<MenuItem v-if="vDevIdx != 0" as="div" v-slot="{ active }">
+													<a href="#" @click="removeVDev(poolData[props.poolIdx], poolData[props.poolIdx].vdevs[vDevIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
+												</MenuItem>
+												<MenuItem as="div" v-slot="{ active }">
+													<a href="#" @click="showAttachDisk(poolData[props.poolIdx], vDev)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
+												</MenuItem>
+											</div>
+										</MenuItems>
+									</transition>
+								</Menu>
+							</div>
+						</div>
+					</template>
+					<template v-slot:content>
+						<!-- <div v-for="disk, diskIdx in poolData[props.poolIdx].vdevs[vDevIdx].disks"> -->
+							<DiskElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="vDev" :vDevIdx="vDevIdx" />
+						<!-- </div> -->
+					</template>
+				</Accordion>
+			</template>
+		</Accordion>
 	</div>
 
-	<div v-if="showWizard">
-		<CreatePool @close="showWizard = false"/>
+	<div v-if="showPoolDetails">
+		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
 	</div>
 
-	<div v-if="showImportModal">
-		<ImportPool :idKey="'import-pool'"/>
+	<div v-if="showDeletePoolConfirm">
+		<UniversalConfirmation :showFlag="showDeletePoolConfirm" @close="updateShowDestroyPool" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showResilverModal">
+		<UniversalConfirmation :showFlag="showResilverModal" @close="updateShowResilverPool" :idKey="'confirm-resilver-pool'" :item="'pool'" :operation="'resilver'" :pool="selectedPool!" :confirmOperation="confirmThisResilver" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showTrimModal">
+		<UniversalConfirmation :showFlag="showTrimModal" @close="updateShowTrimPool" :idKey="'confirm-trim-pool'" :item="'pool'" :operation="'trim'" :pool="selectedPool!" :confirmOperation="confirmThisTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showScrubModal">
+		<UniversalConfirmation :showFlag="showScrubModal" @close="updateShowScrubPool" :idKey="'confirm-scrub-pool'" :item="'pool'" :operation="'scrub'" :pool="selectedPool!" :confirmOperation="confirmThisScrub" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showExportModal">
+		<UniversalConfirmation :showFlag="showExportModal" @close="updateShowExportPool" :idKey="'confirm-export-pool'" :item="'pool'" :operation="'export'" :pool="selectedPool!" :confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showAddVDevModal">
+		<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="selectedPool!" :marginTop="'mt-28'"/>
+	</div>
+
+	<div v-if="showRemoveVDevConfirm">
+		<UniversalConfirmation :showFlag="showRemoveVDevConfirm" @close="updateShowRemoveVDev" :idKey="'confirm-remove-vdev'" :item="'vdev'" :operation="'remove'" :pool="selectedPool!" :vdev="selectedVDev!" :confirmOperation="confirmThisRemove" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showAttachDiskModal">
+		<AttachDiskModal @close="showAttachDiskModal = false" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
+	</div>
+
+
+	<div v-if="showPauseScrubConfirm">
+		<UniversalConfirmation :showFlag="showPauseScrubConfirm" @close="updateShowPauseScrub" :idKey="'confirm-pause-scrub'" :item="'pool'" :operation="'pause'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmPauseThisScrub" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showStopScrubConfirm">
+		<UniversalConfirmation :showFlag="showStopScrubConfirm" @close="updateShowStopScrub" :idKey="'confirm-stop-scrub'" :item="'pool'" :operation="'stop'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmStopThisScrub" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showPauseTrimConfirm">
+		<UniversalConfirmation :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showStopTrimConfirm">
+		<UniversalConfirmation :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/>
 	</div>
 </template>
-
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch } from "vue";
-import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted, nextTick } from "vue";
+import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import CreatePool from '../wizard-components/CreatePool.vue';
-import PoolListElement from './PoolListElement.vue';
-import ImportPool from "./ImportPool.vue";
-import LoadingSpinner from '../common/LoadingSpinner.vue';
+import DiskElement from "./DiskElement.vue";
+import PoolDetail from "./PoolDetail.vue";
+import AddVDevModal from "../pools/AddVDevModal.vue";
+import AttachDiskModal from "../disks/AttachDiskModal.vue";
+import Accordion from '../common/Accordion.vue';
+import UniversalConfirmation from "../common/UniversalConfirmation.vue";
+import Status from "../common/Status.vue";
+
+interface PoolListElementProps {
+    poolIdx: number;
+}
+
+const props = defineProps<PoolListElementProps>();
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -531,28 +661,22 @@ async function clearVDevErrors(poolName, vDevName) {
 	// cleared.value = true;
 }
 
-async function clearDiskErrors(poolName, diskName) {
-	// cleared.value = false;
-	await clearErrors(poolName, diskName);
-	// cleared.value = true;
-}
+// /////////////// Create/Import Pool //////////////////
+// /////////////////////////////////////////////////////
+// const showWizard = ref(false);
+// const showImportModal = ref(false);
 
-/////////////// Create/Import Pool //////////////////
-/////////////////////////////////////////////////////
-const showWizard = ref(false);
-const showImportModal = ref(false);
+// function newPoolWizardBtn() {
+// 	if (!showWizard.value) {
+// 		showWizard.value = true;	
+// 	} else {
+// 		showWizard.value = false;
+// 	}
+// }
 
-function newPoolWizardBtn() {
-	if (!showWizard.value) {
-		showWizard.value = true;	
-	} else {
-		showWizard.value = false;
-	}
-}
-
-function importNewPoolBtn() {
-	showImportModal.value = true;
-}
+// function importNewPoolBtn() {
+// 	showImportModal.value = true;
+// }
 
 ///////////////// Add/Remove VDev ///////////////////
 /////////////////////////////////////////////////////
@@ -601,196 +725,16 @@ watch(confirmRemove, async (newValue, oldValue) => {
 	}
 });
 
-/////////////// Attach/Detach Disk //////////////////
+/////////////////// Attach Disk /////////////////////
 /////////////////////////////////////////////////////
 const showAttachDiskModal = ref(false);
-const showDetachDiskModal = ref(false);
-const confirmDetach = ref(false);
-const detaching = ref(false);
+
 
 function showAttachDisk(pool: PoolData, vdev: vDevData) {
 	selectedPool.value = pool;
 	selectedVDev.value = vdev;
 	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
 	showAttachDiskModal.value = true;
-}
-
-async function detachThisDisk(pool : PoolData, disk: DiskData) {
-	selectedPool.value = pool;
-	selectedDisk.value = disk;
-	showDetachDiskModal.value = true;
-	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
-}
-
-const confirmThisDetach : ConfirmationCallback = () => {
-	confirmDetach.value = true;
-}
-
-const updateShowDetachDisk = (newVal) => {
-	showDetachDiskModal.value = newVal;
-}
-
-watch(confirmDetach, async (newValue, oldValue) => {
-	if (confirmDetach.value == true) {
-		detaching.value = true;
-		operationRunning.value = true;
-		console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
-
-		if (secondOptionToggle.value == true) {
-			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
-			await labelClear(selectedDisk.value!);
-		} else {
-			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
-		}
-		refreshAllData();
-		
-		confirmDetach.value = false;
-		showDetachDiskModal.value = false;
-		detaching.value = false;
-		operationRunning.value = false;
-
-		notifications.value.constructNotification('Detach Completed', selectedDisk.value!.name + " was detached from " + selectedPool.value!.name + ".", 'success');
-	}
-});
-
-////////////////// Offline Disk /////////////////////
-/////////////////////////////////////////////////////
-const showOfflineDiskModal = ref(false);
-const confirmOffline = ref(false);
-const offlining = ref(false);
-
-async function offlineThisDisk(pool: PoolData, disk: DiskData) {
-	selectedPool.value = pool;
-	selectedDisk.value = disk;
-	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
-	showOfflineDiskModal.value = true;
-}
-
-const confirmThisOffline : ConfirmationCallback = () => {
-	confirmOffline.value = true;
-}
-
-const updateShowOfflineDisk = (newVal) => {
-	showOfflineDiskModal.value = newVal;
-}
-
-watch(confirmOffline, async (newVal, oldVal) => {
-	if (confirmOffline.value == true) {
-		offlining.value = true;
-		operationRunning.value = true;
-		console.log('now offlining:', selectedDisk.value);
-		await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
-
-		notifications.value.constructNotification('Offline Completed', 'Offlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
-		refreshAllData();
-		confirmOffline.value = false;
-		showOfflineDiskModal.value = false;
-		offlining.value = false;
-		operationRunning.value = false;
-	}
-});
-
-/////////////////// Online Disk /////////////////////
-/////////////////////////////////////////////////////
-const showOnlineDiskModal = ref(false);
-const confirmOnline = ref(false);
-const onlining = ref(false);
-
-async function onlineThisDisk(pool: PoolData, disk: DiskData) {
-	selectedPool.value = pool;
-	selectedDisk.value = disk;
-	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
-	showOnlineDiskModal.value = true;
-}
-
-const confirmThisOnline : ConfirmationCallback = () => {
-	confirmOnline.value = true;
-}
-
-const updateShowOnlineDisk = (newVal) => {
-	showOnlineDiskModal.value = newVal;
-}
-
-watch(confirmOnline, async (newVal, oldVal) => {
-	if (confirmOnline.value == true) {
-		onlining.value = true;
-		operationRunning.value = true;
-		console.log('now onlining:', selectedDisk.value);
-
-		if (secondOptionToggle.value == true) {
-			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
-			await scrubAndScan();
-			notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
-		} else {
-			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
-		}
-		refreshAllData();
-
-		confirmOnline.value = false;
-		showOnlineDiskModal.value = false;
-		onlining.value = false;
-		operationRunning.value = false;
-
-		notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
-	}
-});
-
-///////////////////// TRIM Disk /////////////////////
-/////////////////////////////////////////////////////
-const showTrimDiskModal = ref(false);
-const confirmTrimDisk = ref(false);
-const trimmingDisk = ref(false);
-
-async function trimThisDisk(pool: PoolData, disk: DiskData) {
-	selectedPool.value = pool;
-	selectedDisk.value = disk;
-	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
-	showTrimDiskModal.value = true;
-}
-
-const confirmThisDiskTrim : ConfirmationCallback = () => {
-	confirmTrimDisk.value = true;
-}
-
-const updateShowTrimDisk = (newVal) => {
-	showTrimDiskModal.value = newVal;
-}
-
-watch(confirmTrimDisk, async (newVal, oldVal) => {
-	if (confirmTrimDisk.value == true) {
-		trimmingDisk.value = true;
-		operationRunning.value = true;
-		console.log('now Trimming:', selectedDisk.value);
-
-		if (firstOptionToggle.value) {
-			confirmTrimDisk.value = false;	
-			showTrimDiskModal.value = false;
-			await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
-		} else {
-			confirmTrimDisk.value = false;
-			showTrimDiskModal.value = false;
-			await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
-		}
-
-		notifications.value.constructNotification('Trim Started', 'Trimming of disk ' + selectedDisk.value!.name + " started.", 'success');
-		refreshAllData();
-		confirmTrimDisk.value = false;
-		showTrimDiskModal.value = false;
-		trimmingDisk.value = false;
-		operationRunning.value = false;
-	}
-});
-
-/////////////////// Replace Disk ////////////////////
-/////////////////////////////////////////////////////
-const showReplaceDiskModal = ref(false);
-
-function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
-	selectedPool.value = pool;
-	selectedDisk.value = disk;
-	selectedVDev.value = vdev;
-	console.log('selected pool:', selectedPool.value, 'selectedVDev:', selectedVDev, 'selected disk:', selectedDisk.value);
-	showReplaceDiskModal.value = true;
 }
 
 ///////////////////// Scanning //////////////////////
@@ -801,15 +745,9 @@ const scanActivity = inject<Ref<Activity>>('scan-activity')!;
 
 async function getScanStatus() {
 	console.log('scanStatusBox', scanStatusBox.value);
-	// Needed to specify index to work properly (treating as an array due to multiple pools error)
-	await scanStatusBox.value[0].pollScanStatus();
 
-	// console.log(`PoolList scan values for ${props.pool.name}: \n 
-    //     isActive:${scanActivity.value.isActive}\n
-    //     isPaused:${scanActivity.value.isPaused}\n
-    //     isFinished:${scanActivity.value.isFinished}\n
-    //     isCanceled:${scanActivity.value.isCanceled}\n
-    //     ------`);
+	// Needed to specify index to work properly (treating as an array due to multiple pools error)
+	await scanStatusBox.value.pollScanStatus();
 }
 
 //////////// Checking Disk Stats (Trim) /////////////
@@ -820,27 +758,12 @@ const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 
 async function getTrimStatus() {
 	console.log('trimStatusBox', trimStatusBox.value);
-	// Needed to specify index to work properly (treating as an array due to multiple pools error)
-	await trimStatusBox.value[0].pollTrimStatus();
 
-	// console.log(`PoolList trim values for ${props.pool.name}: \n 
-    //     isActive:${trimActivity.value.isActive}\n
-    //     isPaused:${trimActivity.value.isPaused}\n
-    //     isFinished:${trimActivity.value.isFinished}\n
-    //     isCanceled:${trimActivity.value.isCanceled}\n
-    //     ******`);
+	// Needed to specify index to work properly (treating as an array due to multiple pools error)
+	await trimStatusBox.value.pollTrimStatus();
 }
 
-/////////////////////////////////////////////////////
-
-// onMounted(() => {
-	// getScanStatus();
-	// getTrimStatus();
-// });
-
-/////////////////////////////////////////////////////
-
-provide('show-wizard', showWizard);
+// provide('show-wizard', showWizard);
 provide('show-pool-deets', showPoolDetails);
 
 provide('show-delete-pool-confirm', showDeletePoolConfirm);
@@ -862,16 +785,17 @@ provide("force-unmount", forceUnmount);
 provide('show-remove-modal', showRemoveVDevConfirm);
 provide('confirm-remove', confirmRemove);
 
-provide("show-import-modal", showImportModal);
+// provide("show-import-modal", showImportModal);
 provide("show-vdev-modal", showAddVDevModal);
 provide('show-attach-modal', showAttachDiskModal);
-provide('show-detach-modal', showDetachDiskModal);
-provide('confirm-detach', confirmDetach);
-provide('show-replace-modal', showReplaceDiskModal);
+// provide('show-detach-modal', showDetachDiskModal);
+// provide('confirm-detach', confirmDetach);
+// provide('show-replace-modal', showReplaceDiskModal);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);
 provide('modal-option-three-toggle', thirdOptionToggle);
 provide('modal-option-four-toggle', fourthOptionToggle);
+
 </script>

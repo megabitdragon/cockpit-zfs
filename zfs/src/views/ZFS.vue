@@ -112,4 +112,3 @@ provide('disk-stats-interval', diskStatsIntervalID);
 provide('scan-activity', scanActivity);
 provide('trim-activity', trimActivity);
 </script>
-
