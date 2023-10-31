@@ -150,7 +150,7 @@ interface UniversalConfirmationProps {
     operation2?: string;
     confirmOperation: ConfirmationCallback;
     pool?: PoolData;
-    vDev?: vDevData;
+    vdev?: vDevData;
     disk?: DiskData;
     filesystem?: FileSystemData;
     snapshot?: Snapshot;

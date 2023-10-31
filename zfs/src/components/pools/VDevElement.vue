@@ -19,13 +19,13 @@
 								<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">												
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="clearVDevErrors(poolData[props.poolIdx].name, props.vDev.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
+											<a href="#" @click="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 										</MenuItem>
 										<MenuItem v-if="vDevIdx != 0" as="div" v-slot="{ active }">
-											<a href="#" @click="removeVDev(poolData[props.poolIdx], poolData[props.poolIdx].vdevs[vDevIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
+											<a href="#" @click="removeVDev(props.pool, props.pool.vdevs[vDevIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="showAttachDisk(poolData[props.poolIdx], props.vDev)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
+											<a href="#" @click="showAttachDisk(props.pool, props.vDev)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
 										</MenuItem>
 									</div>
 								</MenuItems>
@@ -63,6 +63,11 @@
 	<div v-if="showAttachDiskModal">
 		<AttachDiskModal @close="showAttachDiskModal = false" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
 	</div>
+
+	<div v-if="showRemoveVDevConfirm">
+		<UniversalConfirmation :showFlag="showRemoveVDevConfirm" @close="updateShowRemoveVDev" :idKey="'confirm-remove-vdev'" :item="'vdev'" :operation="'remove'" :pool="selectedPool!" :vdev="selectedVDev!" :confirmOperation="confirmThisRemove" :hasChildren="false"/>
+	</div>
+
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted, nextTick } from "vue";
@@ -174,7 +179,7 @@ async function removeVDev(pool : PoolData, vDev : vDevData) {
 	selectedVDev.value = vDev;
 	showRemoveVDevConfirm.value = true;
 
-	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
+	console.log('preparing to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
 }
 
 const confirmThisRemove : ConfirmationCallback = () => {
@@ -204,7 +209,6 @@ watch(confirmRemove, async (newValue, oldValue) => {
 /////////////////// Attach Disk /////////////////////
 /////////////////////////////////////////////////////
 const showAttachDiskModal = ref(false);
-
 
 function showAttachDisk(pool: PoolData, vdev: vDevData) {
 	selectedPool.value = pool;
