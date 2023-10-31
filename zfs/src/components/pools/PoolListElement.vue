@@ -123,10 +123,6 @@
 		<UniversalConfirmation :showFlag="showRemoveVDevConfirm" @close="updateShowRemoveVDev" :idKey="'confirm-remove-vdev'" :item="'vdev'" :operation="'remove'" :pool="selectedPool!" :vdev="selectedVDev!" :confirmOperation="confirmThisRemove" :hasChildren="false"/>
 	</div>
 
-	<div v-if="showAttachDiskModal">
-		<AttachDiskModal @close="showAttachDiskModal = false" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
-	</div>
-
 	<div v-if="showPauseScrubConfirm">
 		<UniversalConfirmation :showFlag="showPauseScrubConfirm" @close="updateShowPauseScrub" :idKey="'confirm-pause-scrub'" :item="'pool'" :operation="'pause'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmPauseThisScrub" :hasChildren="false"/>
 	</div>
@@ -153,7 +149,6 @@ import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } 
 import VDevElement from "./VDevElement.vue";
 import PoolDetail from "./PoolDetail.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
-import AttachDiskModal from "../disks/AttachDiskModal.vue";
 import Accordion from '../common/Accordion.vue';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import Status from "../common/Status.vue";
@@ -618,29 +613,6 @@ async function clearPoolErrors(poolName) {
 	// cleared.value = true;
 }
 
-async function clearVDevErrors(poolName, vDevName) {
-	// cleared.value = false;
-	await clearErrors(poolName, vDevName);
-	// cleared.value = true;
-}
-
-// /////////////// Create/Import Pool //////////////////
-// /////////////////////////////////////////////////////
-// const showWizard = ref(false);
-// const showImportModal = ref(false);
-
-// function newPoolWizardBtn() {
-// 	if (!showWizard.value) {
-// 		showWizard.value = true;	
-// 	} else {
-// 		showWizard.value = false;
-// 	}
-// }
-
-// function importNewPoolBtn() {
-// 	showImportModal.value = true;
-// }
-
 ///////////////// Add/Remove VDev ///////////////////
 /////////////////////////////////////////////////////
 const showAddVDevModal = ref(false);
@@ -688,18 +660,6 @@ watch(confirmRemove, async (newValue, oldValue) => {
 	}
 });
 
-/////////////////// Attach Disk /////////////////////
-/////////////////////////////////////////////////////
-const showAttachDiskModal = ref(false);
-
-
-function showAttachDisk(pool: PoolData, vdev: vDevData) {
-	selectedPool.value = pool;
-	selectedVDev.value = vdev;
-	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
-	showAttachDiskModal.value = true;
-}
-
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 // const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
@@ -723,11 +683,10 @@ const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 async function getTrimStatus() {
 	console.log('vDevElement', vDevElement.value);
 
-	await vDevElement.value.getDiskStatus();
+	await vDevElement.value[0].getDiskStatus();
 }
 
 /////////////////////////////////////////////////////
-
 
 const poolID = ref(props.pool.name);
 const scanActivity = computed(() => {
@@ -736,8 +695,6 @@ const scanActivity = computed(() => {
 const trimActivity = computed(() => {
 	return trimActivities.value.get(poolID.value);
 });
-
-
 
 
 // provide('show-wizard', showWizard);
@@ -764,7 +721,7 @@ provide('confirm-remove', confirmRemove);
 
 // provide("show-import-modal", showImportModal);
 provide("show-vdev-modal", showAddVDevModal);
-provide('show-attach-modal', showAttachDiskModal);
+// provide('show-attach-modal', showAttachDiskModal);
 // provide('show-detach-modal', showDetachDiskModal);
 // provide('confirm-detach', confirmDetach);
 // provide('show-replace-modal', showReplaceDiskModal);

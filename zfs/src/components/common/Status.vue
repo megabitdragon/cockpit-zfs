@@ -32,24 +32,29 @@
                 </div>
                 <div v-if="isTrim">
                     <div class="grid grid-cols-4 gap-1 justify-items-center">
-                        <div v-if="isTrimActive || isTrimSuspended || isTrimFinished || isTrimCanceled" v-for="disk, idx in poolDiskStats[props.pool.name]" class="col-span-4">
-                            <span class="col-span-4" :class="trimMessageClass(disk)">
-                                {{ trimMessage(disk) }}
-                            </span>
-                            <div class="col-span-4 grid grid-cols-4 justify-items-center">
-                                
-                                <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
-                                    <div :class="trimProgressBarClass(disk)" class="h-4 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))}%` }">
-                                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-                                            {{ handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2))) }}%
+                        <div v-for="disk, idx in poolDiskStats[props.pool.name]" class="col-span-4">
+                            <div v-if="disk.stats.trim_notsup !== 1" class="col-span-4">
+                                <div v-if="isTrimActive || isTrimSuspended || isTrimFinished || isTrimCanceled" class="col-span-4">
+                                    <span class="col-span-4" :class="trimMessageClass(disk)">
+                                        {{ trimMessage(disk) }}
+                                    </span>
+                                    <div class="col-span-4 grid grid-cols-4 justify-items-center">
+                                        
+                                        <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
+                                            <div :class="trimProgressBarClass(disk)" class="h-4 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))}%` }">
+                                                <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+                                                    {{ handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2))) }}%
+                                                </div>
+                                            </div>
                                         </div>
+                                        <span class="text-muted col-span-4">
+                                            {{ getTrimmedAmount(disk) }} of {{ getTrimmedTotal(disk) }} processed. <br/>
+                                        </span>
                                     </div>
                                 </div>
-                                <span class="text-muted col-span-4">
-                                    {{ getTrimmedAmount(disk) }} of {{ getTrimmedTotal(disk) }} processed. <br/>
-                                </span>
                             </div>
                         </div>
+                        
                         <div v-if="isTrimSuspended" class="col-span-4">
                             Resume to continue or cancel to stop.     
                         </div>

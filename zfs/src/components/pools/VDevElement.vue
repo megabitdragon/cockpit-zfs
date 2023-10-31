@@ -60,7 +60,9 @@
 		</Accordion>
 
     </div>
-	
+	<div v-if="showAttachDiskModal">
+		<AttachDiskModal @close="showAttachDiskModal = false" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
+	</div>
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted, nextTick } from "vue";
@@ -73,6 +75,7 @@ import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import ReplaceDiskModal from "../disks/ReplaceDiskModal.vue";
 import Accordion from "../common/Accordion.vue";
 import Status from "../common/Status.vue";
+import AttachDiskModal from "../disks/AttachDiskModal.vue";
 import DiskElement from '../pools/DiskElement.vue';
 
 interface VDevElementProps {
@@ -210,7 +213,6 @@ function showAttachDisk(pool: PoolData, vdev: vDevData) {
 	showAttachDiskModal.value = true;
 }
 
-
 //////////// Checking Disk Stats (Trim) /////////////
 /////////////////////////////////////////////////////
 const diskElement = ref();
@@ -219,7 +221,7 @@ async function getDiskStatus() {
 	console.log('diskElement', diskElement.value);
 
 	// Needed to specify index to work properly (treating as an array due to multiple pools error)
-	await diskElement.value.getDiskTrimStatus();
+	await diskElement.value[0].getDiskTrimStatus();
 }
 
 /////////////////////////////////////////////////////

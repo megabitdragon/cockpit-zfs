@@ -4,8 +4,8 @@
             <div class="py-4 mt-1 col-span-1">{{ props.disk.name }}</div>
             <div class="py-4 mt-1 col-span-1">{{ props.disk.health }}</div>
             <div class="py-4 mt-1 col-span-1">X</div>
-            <div class="py-4 mt-1 col-span-1">Y Writes</div>
-            <div class="py-4 mt-1 col-span-1">Z Checksum</div>
+            <div class="py-4 mt-1 col-span-1">Y</div>
+            <div class="py-4 mt-1 col-span-1">Z</div>
             <div class="py-4 mt-1 col-span-1">{{ props.disk.capacity }}</div>
             <div class="py-4 mt-1 col-span-2">
                 <Status class="-mt-1" :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"/>
@@ -276,7 +276,10 @@ watch(confirmOnline, async (newVal, oldVal) => {
 /////////////////////////////////////////////////////
 const showTrimDiskModal = ref(false);
 const confirmTrimDisk = ref(false);
-const trimmingDisk = ref(false);
+const startingDiskTrim = ref(false);
+const pausingDiskTrim = ref(false);
+const stoppingDiskTrim = ref(false);
+const resumingDiskTrim = ref(false);
 
 async function trimThisDisk(pool: PoolData, disk: DiskData) {
 	selectedPool.value = pool;
@@ -293,30 +296,119 @@ const updateShowTrimDisk = (newVal) => {
 	showTrimDiskModal.value = newVal;
 }
 
+async function trimDiskAndScan() {
+	startingDiskTrim.value = true;
+	if (firstOptionToggle.value) {
+		await trimPool(selectedPool.value!, firstOptionToggle.value);
+		getDiskTrimStatus();
+	} else {
+		await trimPool(selectedPool.value!);
+		getDiskTrimStatus();
+	}
+	startingDiskTrim.value = false;
+}
+
 watch(confirmTrimDisk, async (newVal, oldVal) => {
 	if (confirmTrimDisk.value == true) {
-		trimmingDisk.value = true;
 		operationRunning.value = true;
 		console.log('now Trimming:', selectedDisk.value);
 
 		if (firstOptionToggle.value) {
 			confirmTrimDisk.value = false;	
 			showTrimDiskModal.value = false;
-			await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+			await trimDiskAndScan();
+			// await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
 		} else {
 			confirmTrimDisk.value = false;
 			showTrimDiskModal.value = false;
-			await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
+			await trimDiskAndScan();
+			// await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
 		}
 
 		notifications.value.constructNotification('Trim Started', 'Trimming of disk ' + selectedDisk.value!.name + " started.", 'success');
-		// refreshAllData();
-		confirmTrimDisk.value = false;
-		showTrimDiskModal.value = false;
-		trimmingDisk.value = false;
+
 		operationRunning.value = false;
 	}
 });
+
+/*
+function pauseTrim(pool) {
+	selectedPool.value = pool;
+	showPauseTrimConfirm.value = true;
+	console.log('trim to pause:', selectedPool.value);
+}
+
+async function pauseTrimAndScan() {
+	pausingTrim.value = true;
+	await trimPool(selectedPool.value!, false, 'pause');
+	getTrimStatus();
+	pausingTrim.value = false;
+}
+
+async function resumeTrim(pool) {
+	resumingTrim.value = true;
+	// checkingDiskStats.value = true;
+	await trimPool(pool);
+	getTrimStatus();
+	// pollTrim();
+	resumingTrim.value = false
+}
+
+function stopTrim(pool) {
+	selectedPool.value = pool;
+	showStopTrimConfirm.value = true;
+	console.log('trim to stop:', selectedPool.value);
+}
+
+async function stopTrimAndScan() {
+	stoppingTrim.value = true;
+	await trimPool(selectedPool.value!, false, 'stop');
+	getTrimStatus();
+	stoppingTrim.value = false;
+}
+
+const showPauseTrimConfirm = ref(false);
+const confirmPauseTrim = ref(false);
+
+const confirmPauseThisTrim : ConfirmationCallback = () => {
+	confirmPauseTrim.value = true;
+}
+
+const updateShowPauseTrim = (newVal) => {
+	showPauseTrimConfirm.value = newVal;
+}
+
+watch(confirmPauseTrim, async (newVal, oldVal) => {
+	if (confirmPauseTrim.value == true) {
+		console.log('now pausing trim:', selectedPool.value);
+		showPauseTrimConfirm.value = false;
+		await pauseTrimAndScan();
+		confirmPauseTrim.value = false;
+		notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
+	}
+});
+
+const showStopTrimConfirm = ref(false);
+const confirmStopTrim = ref(false);
+
+const confirmStopThisTrim : ConfirmationCallback = () => {
+	confirmStopTrim.value = true;
+}
+
+const updateShowStopTrim = (newVal) => {
+	showStopTrimConfirm.value = newVal;
+}
+
+watch(confirmStopTrim, async (newVal, oldVal) => {
+	if (confirmStopTrim.value == true) {
+		console.log('now stopping trim:', selectedPool.value);
+		showStopTrimConfirm.value = false;
+		await stopTrimAndScan();
+		confirmStopTrim.value = false;
+		notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success');
+	}
+});
+*/
 
 /////////////////// Replace Disk ////////////////////
 /////////////////////////////////////////////////////
