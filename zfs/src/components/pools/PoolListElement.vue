@@ -119,9 +119,6 @@
 		<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="selectedPool!" :marginTop="'mt-28'"/>
 	</div>
 
-	<div v-if="showRemoveVDevConfirm">
-		<UniversalConfirmation :showFlag="showRemoveVDevConfirm" @close="updateShowRemoveVDev" :idKey="'confirm-remove-vdev'" :item="'vdev'" :operation="'remove'" :pool="selectedPool!" :vdev="selectedVDev!" :confirmOperation="confirmThisRemove" :hasChildren="false"/>
-	</div>
 
 	<div v-if="showPauseScrubConfirm">
 		<UniversalConfirmation :showFlag="showPauseScrubConfirm" @close="updateShowPauseScrub" :idKey="'confirm-pause-scrub'" :item="'pool'" :operation="'pause'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmPauseThisScrub" :hasChildren="false"/>
@@ -628,37 +625,6 @@ function showAddVDev(pool) {
 
 /////////////////////////////////////////////////////
 
-async function removeVDev(pool : PoolData, vDev : vDevData) {
-	selectedPool.value = pool;
-	selectedVDev.value = vDev;
-	showRemoveVDevConfirm.value = true;
-
-	console.log('premaring to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
-}
-
-const confirmThisRemove : ConfirmationCallback = () => {
-	confirmRemove.value = true;
-}
-
-const updateShowRemoveVDev = (newVal) => {
-	showRemoveVDevConfirm.value = newVal;
-}
-
-watch(confirmRemove, async (newValue, oldValue) => {
-	if (confirmRemove.value == true) {
-		operationRunning.value = true;
-		console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
-
-		await removeVDevFromPool(selectedVDev.value, selectedPool.value);
-
-		refreshAllData();
-		confirmRemove.value = false;
-		showRemoveVDevConfirm.value = false;
-		operationRunning.value = false;
-
-		notifications.value.constructNotification('Remove Completed', 'Removal of VDev '+ selectedVDev.value!.name + " from " + selectedVDev.value!.name + " completed.", 'success');
-	}
-});
 
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////

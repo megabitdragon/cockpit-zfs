@@ -70,16 +70,13 @@
 
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted, nextTick } from "vue";
-import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { ref, inject, Ref, watch } from "vue";
+import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
-import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
-import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { scrubPool, clearErrors, removeVDevFromPool } from "../../composables/pools";
+import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
-import ReplaceDiskModal from "../disks/ReplaceDiskModal.vue";
 import Accordion from "../common/Accordion.vue";
-import Status from "../common/Status.vue";
 import AttachDiskModal from "../disks/AttachDiskModal.vue";
 import DiskElement from '../pools/DiskElement.vue';
 

@@ -351,6 +351,16 @@ interface Activity {
 	isFinished: boolean;
 }
 
+type DiskActivity = {
+	isActive: boolean;
+	isPaused: boolean;
+	isCanceled: boolean;
+	isFinished: boolean;
+}
+
+type VDevActivity = Map<string, DiskActivity>;
+type PoolActivity = Map<string, VDevActivity>;
+
 type ConfirmationCallback = () => void;
 
 //object for navigation (generic)
