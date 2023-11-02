@@ -345,10 +345,26 @@ interface PoolDiskStats {
 }
 
 interface Activity {
-	isActive: boolean;
-	isPaused: boolean;
-	isCanceled: boolean;
-	isFinished: boolean;
+	// [itemName: string]: {
+		isActive: boolean;
+		isPaused: boolean;
+		isCanceled: boolean;
+		isFinished: boolean;
+	// }
+}
+
+interface FullActivity {
+	pool: string;
+	scan: Activity;
+	trim: TrimActivity[];
+}
+
+// interface ScanActivity {
+// 	[poolName: string]: Activity;
+// }
+
+interface TrimActivity {
+	[diskName: string]: Activity;
 }
 
 type ConfirmationCallback = () => void;
