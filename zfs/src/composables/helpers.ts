@@ -197,17 +197,23 @@ export function convertSecondsToString(seconds) {
 }
 
 export function addActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
-	const activity = ref<Activity>({
-		isActive: false,
-		isPaused: false,
-		isCanceled: false,
-		isFinished: false,
-	});
-	activities.value.set(id, activity);
+	// const activity = ref<Activity>({
+		// id: {
+			// isActive: false,
+			// isPaused: false,
+			// isCanceled: false,
+			// isFinished: false,
+		// }
+		
+	// });
+	// activities.value.set(id, activity);
+	// activities.value[id] = activity;
+
 }
 
-export function removeActivity(poolId: string, activities: Ref<Map<string, Ref<Activity>>>) {
-	activities.value.delete(poolId);
+export function removeActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
+	// activities.value.delete(id);
+	// delete activities.value[id];
 }
 
 // export function addDiskActivity(diskName: string, activities: Ref<Map<string, Ref<Activity>>>) {
