@@ -164,7 +164,7 @@ export async function replaceDisk(poolName, diskName, newDiskName, forceReplace?
 	}
 }
 
-export async function trimDisk(poolName, diskName, isSecure?) {
+export async function trimDisk(poolName : string, diskName : string, isSecure? : boolean, action? : string) {
 	try {
 		let cmdString = ['zpool', 'trim'];
 
@@ -173,6 +173,14 @@ export async function trimDisk(poolName, diskName, isSecure?) {
 		}
 		//wait to finish before returning (remove?)
 		// cmdString.push('-w');
+
+		if(action === 'pause') {
+			cmdString.push('-s');
+		}
+
+		if(action === 'stop') {
+			cmdString.push('-c');
+		}
 
 		cmdString.push(poolName);
 		cmdString.push(diskName);

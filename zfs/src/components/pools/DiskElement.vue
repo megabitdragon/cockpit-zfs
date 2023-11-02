@@ -38,21 +38,19 @@
                                     <MenuItem as="div" v-slot="{ active }">
                                         <a href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
                                     </MenuItem>
-                                    <MenuItem as="div" v-slot="{ active }">
+                                    <!-- <MenuItem as="div" v-slot="{ active }">
                                         <a href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">TRIM Disk</a>
-                                    </MenuItem>
+                                    </MenuItem> -->
 
-								<!-- 
-								**CHANGE THESE MENU ITEMS FROM POOL TO DISK**
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="trimThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
-										<a v-if="trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="resumeTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM</a>
-										<a v-if="trimActivity!.isActive && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="pauseTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM</a>
+										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="trimThisDisk(poolData[props.poolIdx], props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
+										<a v-if="trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="resumeTrim(poolData[props.poolIdx], props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM</a>
+										<a v-if="trimActivity!.isActive && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="pauseTrim(poolData[props.poolIdx], props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM</a>
 									</MenuItem>									
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="stopTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM</a>
+										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="stopTrim(poolData[props.poolIdx], props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM</a>
 									</MenuItem>
-								-->
+								
 
                                 </div>
                             </MenuItems>
@@ -81,6 +79,14 @@
 
 	<div v-if="showReplaceDiskModal">
 		<ReplaceDiskModal @close="showReplaceDiskModal = false" :idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!"/>
+	</div>
+
+	<div v-if="showPauseTrimConfirm">
+		<UniversalConfirmation :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showStopTrimConfirm">
+		<UniversalConfirmation :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/>
 	</div>
 	
 </template>
@@ -312,10 +318,10 @@ const updateShowTrimDisk = (newVal) => {
 async function trimDiskAndScan() {
 	startingDiskTrim.value = true;
 	if (firstOptionToggle.value) {
-		await trimPool(selectedPool.value!, firstOptionToggle.value);
+		await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
 		getDiskTrimStatus();
 	} else {
-		await trimPool(selectedPool.value!);
+		await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
 		getDiskTrimStatus();
 	}
 	startingDiskTrim.value = false;
@@ -344,40 +350,41 @@ watch(confirmTrimDisk, async (newVal, oldVal) => {
 	}
 });
 
-/*
-function pauseTrim(pool) {
+function pauseTrim(pool, disk) {
 	selectedPool.value = pool;
+	selectedDisk.value = disk;
 	showPauseTrimConfirm.value = true;
 	console.log('trim to pause:', selectedPool.value);
 }
 
 async function pauseTrimAndScan() {
-	pausingTrim.value = true;
-	await trimPool(selectedPool.value!, false, 'pause');
-	getTrimStatus();
-	pausingTrim.value = false;
+	pausingDiskTrim.value = true;
+	await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, false, 'pause');
+	getDiskTrimStatus();
+	pausingDiskTrim.value = false;
 }
 
-async function resumeTrim(pool) {
-	resumingTrim.value = true;
+async function resumeTrim(pool, disk) {
+	resumingDiskTrim.value = true;
 	// checkingDiskStats.value = true;
-	await trimPool(pool);
-	getTrimStatus();
+	await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
+	getDiskTrimStatus();
 	// pollTrim();
-	resumingTrim.value = false
+	resumingDiskTrim.value = false
 }
 
-function stopTrim(pool) {
+function stopTrim(pool, disk) {
 	selectedPool.value = pool;
+	selectedDisk.value = disk;
 	showStopTrimConfirm.value = true;
 	console.log('trim to stop:', selectedPool.value);
 }
 
 async function stopTrimAndScan() {
-	stoppingTrim.value = true;
-	await trimPool(selectedPool.value!, false, 'stop');
-	getTrimStatus();
-	stoppingTrim.value = false;
+	stoppingDiskTrim.value = true;
+	await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, false, 'stop');
+	getDiskTrimStatus();
+	stoppingDiskTrim.value = false;
 }
 
 const showPauseTrimConfirm = ref(false);
@@ -421,7 +428,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 		notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success');
 	}
 });
-*/
+
 
 /////////////////// Replace Disk ////////////////////
 /////////////////////////////////////////////////////
@@ -457,12 +464,14 @@ async function getDiskTrimStatus() {
 }
 
 /////////////////////////////////////////////////////
-// const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
-// const poolID = ref(props.pool.name);
-// const trimActivity = computed(() => {
-// 	return trimActivities.value.get(poolID.value);
-// });
+const poolID = ref(props.pool.name);
+const diskID = ref(props.disk.name);
+
+const trimActivity = computed(() => {
+	return trimActivities.value.get(poolID.value);
+});
 
 
 defineExpose({

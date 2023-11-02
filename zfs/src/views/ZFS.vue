@@ -87,6 +87,7 @@ async function loadScanActivities(pools, scanActivities) {
 	pools.value.forEach(pool => {
 		addActivity(pool.name, scanActivities);
 	});
+	console.log('scanActivities', scanActivities);
 }
 
 async function scanNow() {
@@ -106,6 +107,16 @@ async function loadTrimActivities(pools, trimActivities) {
 	pools.value.forEach(pool => {
 		addActivity(pool.name, trimActivities);
 	});
+
+	// pools.value.forEach(pool => {
+	// 	pool.vdevs.forEach(vDev => {
+	// 		vDev.disks.forEach(disk => {
+	// 			addActivity(disk.name, trimActivities);
+	// 		});
+	// 	});		
+	// });
+	
+	console.log('trimActivities', trimActivities);
 }
 
 async function checkDiskStats() {
