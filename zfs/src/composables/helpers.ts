@@ -196,16 +196,112 @@ export function convertSecondsToString(seconds) {
     return result.trim();
 }
 
-export function addActivity(poolId: string, activities: Ref<Map<string, Ref<Activity>>>) {
+export function addActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
 	const activity = ref<Activity>({
 		isActive: false,
 		isPaused: false,
 		isCanceled: false,
 		isFinished: false,
 	});
-	activities.value.set(poolId, activity);
+	activities.value.set(id, activity);
 }
 
 export function removeActivity(poolId: string, activities: Ref<Map<string, Ref<Activity>>>) {
 	activities.value.delete(poolId);
 }
+
+// export function addDiskActivity(diskName: string, activities: Ref<Map<string, Ref<Activity>>>) {
+// 	const activity = ref<Activity>({
+// 		isActive: false,
+// 		isPaused: false,
+// 		isCanceled: false,
+// 		isFinished: false,
+// 	});
+
+// 	activities.value.set(diskName, activity);
+// }
+
+// export function addPoolActivity(poolName: string, activities: Ref<Map<string, Ref<Activity>>>) {
+// 	const activity = ref<Activity>({
+// 		isActive: false,
+// 		isPaused: false,
+// 		isCanceled: false,
+// 		isFinished: false,
+// 	});
+
+// 	activities.value.set(poolName, activity);
+// }
+
+
+// export function addActivity(activities: Ref<Map<string, PoolActivity>>, poolId: string, vDevId?: string, diskId?: string) {
+// 	if (!activities.value.has(poolId)) {
+// 		activities.value.set(poolId, new Map());
+// 		console.log('activities:', activities);
+// 	}
+// 	const poolActivity = activities.value.get(poolId) as PoolActivity;
+
+// 	if (!poolActivity.has(vDevId!)) {
+// 		poolActivity.set(vDevId!, new Map());
+// 		console.log('poolActivity:', poolActivity);
+// 	}
+// 	const vDevActivity = poolActivity.get(vDevId!) as VDevActivity;
+
+// 	const diskActivity = {
+// 		isActive: false,
+// 		isPaused: false,
+// 		isCanceled: false,
+// 		isFinished: false,
+// 	};
+
+// 	vDevActivity.set(diskId!, diskActivity);
+// 	console.log('vDevActivity:', vDevActivity);
+// }
+
+// export function removeActivity(activities: Ref<Map<string, PoolActivity>>, poolId: string, vDevId?: string, diskId?: string) {
+// 	if (activities.value.has(poolId)) {
+// 		const poolActivity = activities.value.get(poolId) as PoolActivity;
+
+// 		if (poolActivity.has(vDevId!)) {
+// 			const vDevActivity= poolActivity.get(vDevId!) as VDevActivity;
+
+// 			if (vDevActivity.has(diskId!)) {
+// 				vDevActivity.delete(diskId!);
+
+// 				if (vDevActivity.size === 0) {
+// 					poolActivity.delete(vDevId!);
+// 				}
+
+// 				if (poolActivity.size === 0) {
+// 					activities.value.delete(poolId);
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+// 	};
+
+// 	vDevActivity.set(diskId!, diskActivity);
+// 	console.log('vDevActivity:', vDevActivity);
+// }
+
+// export function removeActivity(activities: Ref<Map<string, PoolActivity>>, poolId: string, vDevId?: string, diskId?: string) {
+// 	if (activities.value.has(poolId)) {
+// 		const poolActivity = activities.value.get(poolId) as PoolActivity;
+
+// 		if (poolActivity.has(vDevId!)) {
+// 			const vDevActivity= poolActivity.get(vDevId!) as VDevActivity;
+
+// 			if (vDevActivity.has(diskId!)) {
+// 				vDevActivity.delete(diskId!);
+
+// 				if (vDevActivity.size === 0) {
+// 					poolActivity.delete(vDevId!);
+// 				}
+
+// 				if (poolActivity.size === 0) {
+// 					activities.value.delete(poolId);
+// 				}
+// 			}
+// 		}
+// 	}
+// }

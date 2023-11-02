@@ -118,45 +118,6 @@ function importNewPoolBtn() {
 	showImportModal.value = true;
 }
 
-///////////////////// Scanning //////////////////////
-/////////////////////////////////////////////////////
-// const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
-// const scanStatusBox = ref();
-// const scanActivity = inject<Ref<Activity>>('scan-activity')!;
-
-// async function getScanStatus() {
-// 	console.log('scanStatusBox', scanStatusBox.value);
-// 	// Needed to specify index to work properly (treating as an array due to multiple pools error)
-// 	await scanStatusBox.value[0].pollScanStatus();
-
-// 	// console.log(`PoolList scan values for ${props.pool.name}: \n 
-//     //     isActive:${scanActivity.value.isActive}\n
-//     //     isPaused:${scanActivity.value.isPaused}\n
-//     //     isFinished:${scanActivity.value.isFinished}\n
-//     //     isCanceled:${scanActivity.value.isCanceled}\n
-//     //     ------`);
-// }
-
-//////////// Checking Disk Stats (Trim) /////////////
-/////////////////////////////////////////////////////
-// const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
-// const trimStatusBox = ref();
-// const trimActivity = inject<Ref<Activity>>('trim-activity')!;
-
-// async function getTrimStatus() {
-// 	console.log('trimStatusBox', trimStatusBox.value);
-// 	// Needed to specify index to work properly (treating as an array due to multiple pools error)
-// 	await trimStatusBox.value[0].pollTrimStatus();
-
-// 	// console.log(`PoolList trim values for ${props.pool.name}: \n 
-//     //     isActive:${trimActivity.value.isActive}\n
-//     //     isPaused:${trimActivity.value.isPaused}\n
-//     //     isFinished:${trimActivity.value.isFinished}\n
-//     //     isCanceled:${trimActivity.value.isCanceled}\n
-//     //     ******`);
-// }
-
-/////////////////////////////////////////////////////
 
 provide('show-wizard', showWizard);
 

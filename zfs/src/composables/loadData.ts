@@ -12,10 +12,10 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 	try {
 		const rawJSON = await getDiskStats();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('***Disk Stats JSON:', parsedJSON);
+		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
-		console.log("***PoolDiskStatsObject:", poolDiskStats.value);
+		console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
 	} catch (error) {
 		console.error("An error occurred getting disk stats:", error);
 	}
@@ -25,10 +25,10 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 	try {
 		const rawJSON = await getScanGroup();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('---Scan Object JSON:', parsedJSON);
+		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
-		console.log('---ScanObject:', scanObject.value);
+		console.log('---\nScanObject:', scanObject.value);
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}
@@ -39,7 +39,7 @@ export async function loadDisksThenPools(disks, pools) {
 	try {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Disks JSON:', parsedJSON);
+		// console.log('Disks JSON:', parsedJSON);
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -72,7 +72,7 @@ export async function loadDisksThenPools(disks, pools) {
 		try {
 			const rawJSON = await getPools();
 			const parsedJSON = JSON.parse(rawJSON);
-			console.log('Pools JSON:', parsedJSON);
+			// console.log('Pools JSON:', parsedJSON);
 
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
@@ -246,7 +246,7 @@ export async function loadDisks(disks) {
 	try {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Disks JSON:', parsedJSON);
+		// console.log('Disks JSON:', parsedJSON);
 		
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -320,13 +320,13 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			//console.log('phyPath match');
 			diskPath.value = diskVDev.value.phy_path;
 			diskName.value = diskVDev.value.phy_path.replace(phyPathPrefix, '');
-			console.log(diskName.value);
+			// console.log('disk:', diskName.value);
 		} else if (vDevData.path!.match(sdPathRegex)) {
 			diskVDev.value = disks.value.find(disk => disk.sd_path + '1' === vDevData.path)!;
 			//console.log('sdPath match');
 			diskPath.value = diskVDev.value.sd_path;
 			diskName.value = diskVDev.value.sd_path.replace(sdPathPrefix, '');
-			console.log(diskName.value);
+			// console.log('disk:', diskName.value);
 		} else if (vDevData.path!.match(vDevPathRegex)) {
 			diskVDev.value = disks.value.find(disk => disk.vdev_path  + '-part1' === vDevData.path)!;
 			//console.log('vDevPath match');
@@ -360,8 +360,8 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		}
 		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
-		console.log("Not A ChildDisk:", notAChildDisk);
-		console.log("vDevData (disk device):", vDevData);
+		// console.log("Not A ChildDisk:", notAChildDisk);
+		// console.log("vDevData (disk device):", vDevData);
 		
 		vDevs.value.push(vDevData);
 	} else {
@@ -378,19 +378,19 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 					//console.log('phyPath match');
 					diskPath.value = fullDiskData.value.phy_path;
 					diskName.value = fullDiskData.value.phy_path.replace(phyPathPrefix, '');
-					console.log(diskName.value);
+					// console.log('disk:', diskName.value);
 				} else if (child.path!.match(sdPathRegex)) {
 					fullDiskData.value = disks.value.find(disk => disk.sd_path + '1' === child.path)!;
 					//console.log('sdPath match');
 					diskPath.value = fullDiskData.value.sd_path;
 					diskName.value = fullDiskData.value.sd_path.replace(sdPathPrefix, '');
-					console.log(diskName.value);
+					// console.log('disk:', diskName.value);
 				} else if (child.path!.match(vDevPathRegex)) {
 					fullDiskData.value = disks.value.find(disk => disk.vdev_path  + '-part1' === child.path)!;
 					//console.log('vDevPath match');
 					diskPath.value = fullDiskData.value.vdev_path;
 					diskName.value = fullDiskData.value!.name;
-					console.log(diskName.value);
+					// console.log('disk:', diskName.value);
 				}
 				
 				const childDisk : DiskData = {
@@ -416,7 +416,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 					// children: newChildren.value,
 				}; 
 
-				console.log("ChildDisk:", childDisk);
+				// console.log("ChildDisk:", childDisk);
 				vDevData.disks.push(childDisk);
 		
 			} else if (child.type === 'replacing') {			
@@ -456,7 +456,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 						children: newChildren.value,
 					}
 
-					console.log("ChildDisk:", childDisk);
+					// console.log("ChildDisk:", childDisk);
 					vDevData.disks.push(childDisk);
 
 			} else {
