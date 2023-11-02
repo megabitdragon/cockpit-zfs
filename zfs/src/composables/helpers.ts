@@ -197,22 +197,22 @@ export function convertSecondsToString(seconds) {
 }
 
 export function addActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
-	// const activity = ref<Activity>({
-		// id: {
-			// isActive: false,
-			// isPaused: false,
-			// isCanceled: false,
-			// isFinished: false,
-		// }
+	const activity = ref<Activity>({
 		
-	// });
-	// activities.value.set(id, activity);
-	// activities.value[id] = activity;
+		isActive: false,
+		isPaused: false,
+		isCanceled: false,
+		isFinished: false,
+		
+	});
 
+	activities.value.set(id, activity);
+// 	activities.value[id] = activity;
 }
 
+
 export function removeActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
-	// activities.value.delete(id);
+	activities.value.delete(id);
 	// delete activities.value[id];
 }
 

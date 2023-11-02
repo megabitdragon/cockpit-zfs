@@ -345,12 +345,10 @@ interface PoolDiskStats {
 }
 
 interface Activity {
-	// [itemName: string]: {
-		isActive: boolean;
-		isPaused: boolean;
-		isCanceled: boolean;
-		isFinished: boolean;
-	// }
+	isActive: boolean;
+	isPaused: boolean;
+	isCanceled: boolean;
+	isFinished: boolean;
 }
 
 interface FullActivity {
