@@ -128,11 +128,16 @@ interface StatusProps {
 }
 
 const props = defineProps<StatusProps>();
+const poolID = ref(props.pool.name);
 
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 // const scanActivity = inject<Ref<Activity>>('scan-activity')!;
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const scanActivity = computed(() => {
+	return scanActivities.value.get(poolID.value);
+});
 
 function getScanStateBool(state) : ComputedRef<boolean> {
 	return computed(() => {
@@ -183,25 +188,14 @@ async function scanNow() {
     // console.log(`polling scanObject...`);
 }
 
-const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
-const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
-
-const poolID = ref(props.pool.name);
-const scanActivity = computed(() => {
-	return scanActivities.value.get(poolID.value);
-});
-const trimActivity = computed(() => {
-	return trimActivities.value.get(poolID.value);
-});
-
-function displayScanBools() {
-    console.log(`Status scan values for ${props.pool.name}: \n 
-        isActive:${scanActivity!.value!.isActive}\n
-        isPaused:${scanActivity!.value!.isPaused}\n
-        isFinished:${scanActivity!.value!.isFinished}\n
-        isCanceled:${scanActivity!.value!.isCanceled}\n
-        ------`);
-}
+// function displayScanBools() {
+//     console.log(`Status scan values for ${props.pool.name}: \n 
+//         isActive:${scanActivity!.value!.isActive}\n
+//         isPaused:${scanActivity!.value!.isPaused}\n
+//         isFinished:${scanActivity!.value!.isFinished}\n
+//         isCanceled:${scanActivity!.value!.isCanceled}\n
+//         ------`);
+// }
 
 async function pollScanStatus() {
 	// console.log('pollScanStatus fired');
@@ -374,6 +368,10 @@ function progressBarClass() {
 /////////////////////////////////////////////////////
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 // const trimActivity = inject<Ref<Activity>>('trim-activity')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+const trimActivity = computed(() => {
+	return trimActivities.value.get(poolID.value);
+});
 
 const selectedDisk = computed(() => {
     return poolDiskStats.value[props.pool.name].find(disk => disk.name == props.disk!.name);
@@ -422,14 +420,14 @@ async function checkDiskStats() {
     // console.log(`polling poolDiskStats...`);
 }
 
-function displayTrimBools() {
-    console.log(`Status trim values for ${props.pool.name}: \n 
-        isActive:${trimActivity!.value!.isActive}\n
-        isPaused:${trimActivity!.value!.isPaused}\n
-        isFinished:${trimActivity!.value!.isFinished}\n
-        isCanceled:${trimActivity!.value!.isCanceled}\n
-        ******`);
-}
+// function displayTrimBools() {
+//     console.log(`Status trim values for ${props.pool.name}: \n 
+//         isActive:${trimActivity!.value!.isActive}\n
+//         isPaused:${trimActivity!.value!.isPaused}\n
+//         isFinished:${trimActivity!.value!.isFinished}\n
+//         isCanceled:${trimActivity!.value!.isCanceled}\n
+//         ******`);
+// }
 
 async function pollTrimStatus() {
 	// console.log('pollTrimStatus fired');
