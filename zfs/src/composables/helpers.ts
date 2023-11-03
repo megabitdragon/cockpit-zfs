@@ -1,4 +1,4 @@
-import { reactive, ref, inject, Ref, computed, provide } from 'vue';
+import { reactive, ref, inject, Ref, computed, provide, ComputedRef } from 'vue';
 
 //change true to 'on' and false to 'off'
 export function isBoolOnOff(bool : boolean) {
@@ -196,20 +196,32 @@ export function convertSecondsToString(seconds) {
     return result.trim();
 }
 
+// export function getTrimStateRef(poolName: string, diskName: string, state: number, poolDiskStats: PoolDiskStats) : ComputedRef<boolean>  {
+//     return computed(()=> {
+//         return poolDiskStats.value[poolName].some(disk => disk.name === diskName && disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
+//     });
+// }
+
 export function addActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
 	const activity = ref<Activity>({
-		
 		isActive: false,
 		isPaused: false,
 		isCanceled: false,
 		isFinished: false,
-		
 	});
-
 	activities.value.set(id, activity);
-// 	activities.value[id] = activity;
 }
 
+// export function addTrimActivity(poolName: string, diskName: string, poolDiskStats: Ref<PoolDiskStats>, activities: Ref<Map<string, Ref<Activity>>>) {
+// 	const activity = ref<Activity>({
+// 		//STATE: 1 = active, 2 = canceled, 3 = suspended, 4 = finished
+// 		isActive: getTrimStateRef(poolName, diskName, 1, poolDiskStats.value).value,
+// 		isPaused: getTrimStateRef(poolName, diskName, 3, poolDiskStats.value).value,
+// 		isCanceled: getTrimStateRef(poolName, diskName, 2, poolDiskStats.value).value,
+// 		isFinished: getTrimStateRef(poolName, diskName, 4, poolDiskStats.value).value,
+// 	});
+// 	activities.value.set(diskName, activity);
+// }
 
 export function removeActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
 	activities.value.delete(id);

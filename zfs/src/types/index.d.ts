@@ -351,17 +351,17 @@ interface Activity {
 	isFinished: boolean;
 }
 
-interface FullActivity {
-	pool: string;
-	scan: Activity;
-	trim: TrimActivity[];
-}
+// interface FullActivity {
+// 	pool: string;
+// 	scan: Activity;
+// 	trim: TrimActivity[];
+// }
 
 // interface ScanActivity {
 // 	[poolName: string]: Activity;
 // }
 
-interface TrimActivity {
+interface DiskTrimActivity {
 	[diskName: string]: Activity;
 }
 
