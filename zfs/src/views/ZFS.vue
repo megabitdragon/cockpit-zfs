@@ -108,13 +108,13 @@ async function loadTrimActivities(pools, trimActivities) {
 		addActivity(pool.name, trimActivities);
 	});
 
-	// pools.value.forEach(pool => {
-	// 	pool.vdevs.forEach(vDev => {
-	// 		vDev.disks.forEach(disk => {
-	// 			addActivity(disk.name, trimActivities);
-	// 		});
-	// 	});		
-	// });
+	pools.value.forEach(pool => {
+		pool.vdevs.forEach(vDev => {
+			vDev.disks.forEach(disk => {
+				addActivity(disk.name, trimActivities);
+			});
+		});		
+	});
 	
 	console.log('trimActivities', trimActivities);
 }
