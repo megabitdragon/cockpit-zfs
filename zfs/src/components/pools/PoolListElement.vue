@@ -143,6 +143,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { removeActivity } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import PoolDetail from "./PoolDetail.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
@@ -238,6 +239,8 @@ watch(confirmDelete, async (newValue, oldValue) => {
 
 		if (secondOptionToggle.value == true) {
 			await destroyPool(selectedPool.value!, firstOptionToggle.value);
+			removeActivity(selectedPool.value!.name, scanActivities.value[selectedPool.value!.name]);
+			removeActivity(selectedPool.value!.name, trimActivities.value[selectedPool.value!.name]);
 			selectedPool.value!.vdevs.forEach(vDev => {
 				vDev.disks.forEach(async disk => {
 					selectedDisk.value = disk;

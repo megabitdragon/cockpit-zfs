@@ -267,31 +267,33 @@ const stateMessage = computed(() => {
     if (scanObjectGroup.value[props.pool.name].state === null) {
         return `No scan data found.`;
     } else {
-        if (scanObjectGroup.value[props.pool.name].pause !== 'None') {
+        if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause !== 'None') {
            return `${scanFunction.value} paused at  ${scanObjectGroup.value[props.pool.name].pause}`;
         } else {
-            switch (scanObjectGroup.value[props.pool.name].state) {
-                case 'SCANNING':
-                    //convertRawTimestampToString(getRawTimestampFromString(scanObjectGroup.value[props.pool.name].start_time))
-                    return `${scanFunction.value} started at ${scanObjectGroup.value[props.pool.name].start_time}`;
-                case 'FINISHED':
-                    return `${scanFunction.value} finished at ${scanObjectGroup.value[props.pool.name].end_time}`;
-                case 'CANCELED':
-                    return `${scanFunction.value} canceled at ${scanObjectGroup.value[props.pool.name].end_time}`;
-                case 'NONE':
-                    return 'N/A';
-                default:
-                    return '';
+            if (scanObjectGroup.value[props.pool.name]) {
+                switch (scanObjectGroup.value[props.pool.name].state) {
+                    case 'SCANNING':
+                        //convertRawTimestampToString(getRawTimestampFromString(scanObjectGroup.value[props.pool.name].start_time))
+                        return `${scanFunction.value} started at ${scanObjectGroup.value[props.pool.name].start_time}`;
+                    case 'FINISHED':
+                        return `${scanFunction.value} finished at ${scanObjectGroup.value[props.pool.name].end_time}`;
+                    case 'CANCELED':
+                        return `${scanFunction.value} canceled at ${scanObjectGroup.value[props.pool.name].end_time}`;
+                    case 'NONE':
+                        return 'N/A';
+                    default:
+                        return '';
+                }
             }
         }
     }
 });
 
 const miniStateMsg = computed(() => {
-    if (scanObjectGroup.value[props.pool.name].state === null) {
+    if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].state === null) {
         return `No scan data found.`;
     } else {
-        if (scanObjectGroup.value[props.pool.name].pause !== 'None') {
+        if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause !== 'None') {
             return `${scanFunction.value} Paused (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
         } else {
             switch (scanObjectGroup.value[props.pool.name].state) {
@@ -327,7 +329,7 @@ const timeRemaining = computed(() => {
 });
 
 function stateMessageClass() {
-    if (scanObjectGroup.value[props.pool.name].pause === 'None') {
+     if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause === 'None') {
         switch (scanObjectGroup.value[props.pool.name].state) {
             case 'SCANNING':
                 return 'text-default';
@@ -346,7 +348,7 @@ function stateMessageClass() {
 }
 
 function progressBarClass() {
-    if (scanObjectGroup.value[props.pool.name].pause === 'None') {
+     if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause === 'None') {
         switch (scanObjectGroup.value[props.pool.name].state) {
             case 'SCANNING':
                 return 'bg-blue-600';
