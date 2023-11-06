@@ -309,7 +309,9 @@ const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
 const allPools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
 const fileSystemConfiguration = ref();
-
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+	
 const disks = inject<Ref<DiskData[]>>('disks')!;
 
 const nameFeedback = inject<Ref<string>>('feedback-name')!;
@@ -329,8 +331,26 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 		const claimed = poolConfig.value.vdevs
 		.filter((_, idx) => idx !== vdevIdx)
 		.flatMap(vdev => vdev.selectedDisks);
-		return disks.value.filter(disk => disk.usable && !claimed.includes(disk.name));
+		return disks.value.filter(disk => !isDiskTaken.value(disk.name) && !claimed.includes(disk.name));
 	});
+});
+
+const isDiskTaken = computed(() => (diskName) => {
+	for (const poolName in poolDiskStats.value) {
+		if (poolDiskStats.value.hasOwnProperty(poolName)) {
+			const pool = poolDiskStats.value[poolName];
+			if (Array.isArray(pool)) {
+				for (const disk of pool) {
+					if (disk.name === diskName) {
+						//disk belongs to a pool
+						return true;
+					}
+				}
+			}
+		}
+	}
+	//disk does not belong to a pool
+	return false;
 });
 
 //change color of disk when selected
