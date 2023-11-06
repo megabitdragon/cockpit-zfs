@@ -79,7 +79,7 @@ import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import { newPool } from "../../composables/pools";
-import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { setRefreservation } from '../../composables/pools';
 
 const show = ref(true);
@@ -195,6 +195,8 @@ async function refreshAllData() {
 	datasets.value = [];
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
+	await loadScanObjectGroup(scanObjectGroup);
+	await loadDiskStats(poolDiskStats);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 }
@@ -202,6 +204,8 @@ async function refreshAllData() {
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 //const newPoolName = ref('');
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 //finish button method for creating pool
 async function finishBtn(newPoolData) {
