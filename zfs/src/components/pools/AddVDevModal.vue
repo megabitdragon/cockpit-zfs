@@ -133,7 +133,8 @@ import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
 import { addVDev } from '../../composables/pools';
-import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 
 interface AddVDevModalProps {
 	idKey: string;
@@ -168,7 +169,11 @@ const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 const availableDisks = computed<DiskData[]>(() => {
     return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
@@ -238,20 +243,28 @@ async function addVDevBtn() {
                 await addVDev(props.pool, newVDev.value);
                 showAddVDevModal.value = false;
                 adding.value = false;
-                disksLoaded.value = false;
-                poolsLoaded.value = false;
-                fileSystemsLoaded.value = false;
-                allDisks.value = [];
-                pools.value = [];
-                datasets.value = [];
-                await loadDisksThenPools(allDisks, pools);
-                await loadDatasets(datasets);
-                disksLoaded.value = true;
-                poolsLoaded.value = true;
-                fileSystemsLoaded.value = true;
+                await refreshAllData();
             }
         }
     }
+}
+
+async function refreshAllData() {
+    disksLoaded.value = false;
+    poolsLoaded.value = false;
+    fileSystemsLoaded.value = false;
+    allDisks.value = [];
+    pools.value = [];
+    datasets.value = [];
+    await loadDisksThenPools(allDisks, pools);
+    await loadDatasets(datasets);
+    await loadScanObjectGroup(scanObjectGroup);
+    await loadScanActivities(pools, scanActivities);
+    await loadDiskStats(poolDiskStats);
+    await loadTrimActivities(pools, trimActivities);
+    disksLoaded.value = true;
+    poolsLoaded.value = true;
+    fileSystemsLoaded.value = true;
 }
 
 /////////////////// Validation //////////////////////

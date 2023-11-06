@@ -1,5 +1,5 @@
 <template>
-    <Modal @close="showAttachDiskModal = false" :isOpen="showAttachDiskModal" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal :isOpen="showFlag" @close="updateShowFlag"  :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
         
         <template v-slot:title>
             Attach Disk
@@ -46,7 +46,7 @@
 				
 				<div class="button-group-row w-full justify-between row-start-2">
 					<div class="button-group-row mt-2">
-                        <button @click="showAttachDiskModal = false" :id="getIdKey('close-attach-disk-btn')" name="close-attach-disk-btn" class="btn btn-danger">Close</button>
+                        <button @click="closeModal" :id="getIdKey('close-attach-disk-btn')" name="close-attach-disk-btn" class="btn btn-danger">Close</button>
 
                         <div class="flex flex-row">
                             <label :for="getIdKey('force-add-vdev')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully Attach Disk</label>
@@ -95,9 +95,23 @@ interface AttachDiskModalProps {
 	idKey: string;
     pool: PoolData;
     vDev: vDevData;
+    showFlag: boolean;
 }
 
 const props = defineProps<AttachDiskModalProps>();
+const showFlag = ref(props.showFlag);
+
+const updateShowFlag = () => {
+    if (props.showFlag !== showFlag.value) {
+        showFlag.value = props.showFlag;
+    } 
+}
+
+const emit = defineEmits(['close']);
+
+const closeModal = () => {
+    emit('close');
+}
 
 const showAttachDiskModal = inject<Ref<boolean>>('show-attach-modal')!;
 
@@ -132,9 +146,29 @@ const diskVDevPoolData = ref({
     forceAttach: false,
 });
 
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
 const availableDisks = computed<DiskData[]>(() => {
-    return allDisks.value.filter(disk => disk.usable);
+    return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
 })
+
+const isDiskTaken = computed(() => (diskName) => {
+	for (const poolName in poolDiskStats.value) {
+		if (poolDiskStats.value.hasOwnProperty(poolName)) {
+			const pool = poolDiskStats.value[poolName];
+			if (Array.isArray(pool)) {
+				for (const disk of pool) {
+					if (disk.name === diskName) {
+						//disk belongs to a pool
+						return true;
+					}
+				}
+			}
+		}
+	}
+	//disk does not belong to a pool
+	return false;
+});
 
 //change color of disk when selected
 const diskCardClass = (diskName) => {

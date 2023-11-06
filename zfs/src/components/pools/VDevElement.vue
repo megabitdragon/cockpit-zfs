@@ -61,7 +61,7 @@
 
     </div>
 	<div v-if="showAttachDiskModal">
-		<AttachDiskModal @close="showAttachDiskModal = false" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
+		<AttachDiskModal :showFlag="showAttachDiskModal" @close="updateShowAttachDisk" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
 	</div>
 
 	<div v-if="showRemoveVDevConfirm">
@@ -208,13 +208,17 @@ watch(confirmRemove, async (newValue, oldValue) => {
 		showRemoveVDevConfirm.value = false;
 		operationRunning.value = false;
 
-		notifications.value.constructNotification('Remove Completed', 'Removal of VDev '+ selectedVDev.value!.name + " from " + selectedVDev.value!.name + " completed.", 'success');
+		notifications.value.constructNotification('Remove Completed', 'Removal of VDev '+ selectedVDev.value!.name + " from " + selectedPool.value!.name + " completed.", 'success');
 	}
 });
 
 /////////////////// Attach Disk /////////////////////
 /////////////////////////////////////////////////////
 const showAttachDiskModal = ref(false);
+
+const updateShowAttachDisk = (newVal) => {
+	showAttachDiskModal.value = newVal;
+}
 
 function showAttachDisk(pool: PoolData, vdev: vDevData) {
 	selectedPool.value = pool;

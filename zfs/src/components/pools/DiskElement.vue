@@ -450,7 +450,6 @@ const updateShowReplaceDisk = (newVal) => {
 	showReplaceDiskModal.value = newVal;
 }
 
-
 function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
