@@ -74,7 +74,8 @@ import { ref, inject, Ref, watch } from "vue";
 import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { scrubPool, clearErrors, removeVDevFromPool } from "../../composables/pools";
-import { loadDatasets, loadDisksThenPools } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import Accordion from "../common/Accordion.vue";
 import AttachDiskModal from "../disks/AttachDiskModal.vue";
@@ -111,6 +112,10 @@ const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -121,6 +126,10 @@ async function refreshAllData() {
 	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
 	await loadDatasets(filesystemData);
+	await loadScanObjectGroup(scanObjectGroup);
+	await loadScanActivities(poolData, scanActivities);
+	await loadDiskStats(poolDiskStats);
+	await loadTrimActivities(poolData, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;

@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
 import { loadDisks, loadDisksThenPools, loadScanObjectGroup, loadDiskStats  } from '../../composables/loadData';
-import { convertBytesToSize, convertSizeToBytes, convertSizeToBytesDecimal, convertBytesToSizeDecimal } from '../../composables/helpers';
+import { convertBytesToSize, convertSizeToBytes, convertSizeToBytesDecimal, convertBytesToSizeDecimal, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashDiskCard from './DashDiskCard.vue';
@@ -123,6 +123,8 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -131,7 +133,9 @@ async function refreshAllData() {
 	pools.value = [];
 	await loadDisksThenPools(disks, pools);
 	await loadScanObjectGroup(scanObjectGroup);
+	await loadScanActivities(pools, scanActivities);
 	await loadDiskStats(poolDiskStats);
+	await loadTrimActivities(pools, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 }

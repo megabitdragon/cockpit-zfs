@@ -26,7 +26,7 @@ import { reactive, ref, Ref, inject, computed, provide, watch } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../composables/loadData';
-import { addActivity, removeActivity } from '../composables/helpers';
+import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
 import FileSystemList from '../components/file-systems/FileSystemList.vue';
@@ -85,12 +85,6 @@ initialLoad(disks, pools, datasets);
 // 	isCanceled: false,
 // 	isFinished: false,
 // });
-async function loadScanActivities(pools, scanActivities) {
-	pools.value.forEach(pool => {
-		addActivity(pool.name, scanActivities);
-	});
-	console.log('scanActivities', scanActivities);
-}
 
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
@@ -104,21 +98,6 @@ async function scanNow() {
 // 	isFinished: false,
 // });
 
-async function loadTrimActivities(pools, trimActivities) {
-	pools.value.forEach(pool => {
-		addActivity(pool.name, trimActivities);
-	});
-
-	pools.value.forEach(pool => {
-		pool.vdevs.forEach(vDev => {
-			vDev.disks.forEach(disk => {
-				addActivity(disk.name, trimActivities);
-			});
-		});		
-	});
-	
-	console.log('trimActivities', trimActivities);
-}
 
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);

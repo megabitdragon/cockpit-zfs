@@ -147,6 +147,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
+import { loadScanActivities, loadTrimActivities } from '../../composables/helpers'
 import Card from '../common/Card.vue';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import PoolDetail from "../pools/PoolDetail.vue";
@@ -214,6 +215,8 @@ const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -221,6 +224,10 @@ async function refreshAllData() {
 	diskData.value = [];
 	poolData.value = [];
 	await loadDisksThenPools(diskData, poolData);
+	await loadScanObjectGroup(scanObjectGroup);
+	await loadScanActivities(poolData, scanActivities);
+	await loadDiskStats(poolDiskStats);
+	await loadTrimActivities(poolData, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 }

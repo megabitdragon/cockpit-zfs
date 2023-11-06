@@ -323,9 +323,6 @@ const isProperReplicationFeedback = inject<Ref<string>>('feedback-replication-le
 const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection
-//This currently ties in to the disk selection UI elements and shows/hides the disks based on whether they are in use or not
-//would like to change this so instead of hiding the in-use disks completely, simply grey them out or disable them from selection for better UI/UX.
-//Also need to find a better way to determine if disk is "usable" or not
 const vDevAvailDisks = computed<DiskData[][]>(() => {
 	return poolConfig.value.vdevs.map((vdev, vdevIdx) => {
 		const claimed = poolConfig.value.vdevs

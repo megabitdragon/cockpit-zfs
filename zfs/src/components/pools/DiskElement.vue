@@ -79,7 +79,7 @@
 	</div>
 
 	<div v-if="showReplaceDiskModal">
-		<ReplaceDiskModal @close="showReplaceDiskModal = false" :idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!"/>
+		<ReplaceDiskModal :showFlag="showReplaceDiskModal" @close="updateShowReplaceDisk" :idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!"/>
 	</div>
 
 	<div v-if="showPauseTrimConfirm">
@@ -98,6 +98,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadScanActivities, loadTrimActivities } from '../../composables/helpers'
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import ReplaceDiskModal from "../disks/ReplaceDiskModal.vue";
 import Status from "../common/Status.vue";
@@ -135,7 +136,8 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
-
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -147,7 +149,9 @@ async function refreshAllData() {
 	await loadDisksThenPools(diskData, poolData);
 	await loadDatasets(filesystemData);
 	await loadScanObjectGroup(scanObjectGroup);
+	await loadScanActivities(poolData, scanActivities);
 	await loadDiskStats(poolDiskStats);
+	await loadTrimActivities(poolData, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
@@ -442,6 +446,11 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 /////////////////////////////////////////////////////
 const showReplaceDiskModal = ref(false);
 
+const updateShowReplaceDisk = (newVal) => {
+	showReplaceDiskModal.value = newVal;
+}
+
+
 function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
@@ -472,7 +481,6 @@ async function getDiskTrimStatus() {
 }
 
 /////////////////////////////////////////////////////
-const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 const poolID = ref(props.pool.name);
 const diskID = ref(props.disk.name);

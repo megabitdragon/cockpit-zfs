@@ -212,114 +212,30 @@ export function addActivity(id: string, activities: Ref<Map<string, Ref<Activity
 	activities.value.set(id, activity);
 }
 
-// export function addTrimActivity(poolName: string, diskName: string, poolDiskStats: Ref<PoolDiskStats>, activities: Ref<Map<string, Ref<Activity>>>) {
-// 	const activity = ref<Activity>({
-// 		//STATE: 1 = active, 2 = canceled, 3 = suspended, 4 = finished
-// 		isActive: getTrimStateRef(poolName, diskName, 1, poolDiskStats.value).value,
-// 		isPaused: getTrimStateRef(poolName, diskName, 3, poolDiskStats.value).value,
-// 		isCanceled: getTrimStateRef(poolName, diskName, 2, poolDiskStats.value).value,
-// 		isFinished: getTrimStateRef(poolName, diskName, 4, poolDiskStats.value).value,
-// 	});
-// 	activities.value.set(diskName, activity);
-// }
-
 export function removeActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
 	activities.value.delete(id);
 	// delete activities.value[id];
 }
 
-// export function addDiskActivity(diskName: string, activities: Ref<Map<string, Ref<Activity>>>) {
-// 	const activity = ref<Activity>({
-// 		isActive: false,
-// 		isPaused: false,
-// 		isCanceled: false,
-// 		isFinished: false,
-// 	});
+export async function loadScanActivities(pools, scanActivities) {
+	pools.value.forEach(pool => {
+		addActivity(pool.name, scanActivities);
+	});
+	console.log('scanActivities', scanActivities);
+}
 
-// 	activities.value.set(diskName, activity);
-// }
+export async function loadTrimActivities(pools, trimActivities) {
+	pools.value.forEach(pool => {
+		addActivity(pool.name, trimActivities);
+	});
 
-// export function addPoolActivity(poolName: string, activities: Ref<Map<string, Ref<Activity>>>) {
-// 	const activity = ref<Activity>({
-// 		isActive: false,
-// 		isPaused: false,
-// 		isCanceled: false,
-// 		isFinished: false,
-// 	});
-
-// 	activities.value.set(poolName, activity);
-// }
-
-
-// export function addActivity(activities: Ref<Map<string, PoolActivity>>, poolId: string, vDevId?: string, diskId?: string) {
-// 	if (!activities.value.has(poolId)) {
-// 		activities.value.set(poolId, new Map());
-// 		console.log('activities:', activities);
-// 	}
-// 	const poolActivity = activities.value.get(poolId) as PoolActivity;
-
-// 	if (!poolActivity.has(vDevId!)) {
-// 		poolActivity.set(vDevId!, new Map());
-// 		console.log('poolActivity:', poolActivity);
-// 	}
-// 	const vDevActivity = poolActivity.get(vDevId!) as VDevActivity;
-
-// 	const diskActivity = {
-// 		isActive: false,
-// 		isPaused: false,
-// 		isCanceled: false,
-// 		isFinished: false,
-// 	};
-
-// 	vDevActivity.set(diskId!, diskActivity);
-// 	console.log('vDevActivity:', vDevActivity);
-// }
-
-// export function removeActivity(activities: Ref<Map<string, PoolActivity>>, poolId: string, vDevId?: string, diskId?: string) {
-// 	if (activities.value.has(poolId)) {
-// 		const poolActivity = activities.value.get(poolId) as PoolActivity;
-
-// 		if (poolActivity.has(vDevId!)) {
-// 			const vDevActivity= poolActivity.get(vDevId!) as VDevActivity;
-
-// 			if (vDevActivity.has(diskId!)) {
-// 				vDevActivity.delete(diskId!);
-
-// 				if (vDevActivity.size === 0) {
-// 					poolActivity.delete(vDevId!);
-// 				}
-
-// 				if (poolActivity.size === 0) {
-// 					activities.value.delete(poolId);
-// 				}
-// 			}
-// 		}
-// 	}
-// }
-// 	};
-
-// 	vDevActivity.set(diskId!, diskActivity);
-// 	console.log('vDevActivity:', vDevActivity);
-// }
-
-// export function removeActivity(activities: Ref<Map<string, PoolActivity>>, poolId: string, vDevId?: string, diskId?: string) {
-// 	if (activities.value.has(poolId)) {
-// 		const poolActivity = activities.value.get(poolId) as PoolActivity;
-
-// 		if (poolActivity.has(vDevId!)) {
-// 			const vDevActivity= poolActivity.get(vDevId!) as VDevActivity;
-
-// 			if (vDevActivity.has(diskId!)) {
-// 				vDevActivity.delete(diskId!);
-
-// 				if (vDevActivity.size === 0) {
-// 					poolActivity.delete(vDevId!);
-// 				}
-
-// 				if (poolActivity.size === 0) {
-// 					activities.value.delete(poolId);
-// 				}
-// 			}
-// 		}
-// 	}
-// }
+	pools.value.forEach(pool => {
+		pool.vdevs.forEach(vDev => {
+			vDev.disks.forEach(disk => {
+				addActivity(disk.name, trimActivities);
+			});
+		});		
+	});
+	
+	console.log('trimActivities', trimActivities);
+}

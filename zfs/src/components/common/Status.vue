@@ -381,11 +381,13 @@ function progressBarClass() {
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 // const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+
 const trimActivity = computed(() => {
     if (props.disk!) {
         return trimActivities.value.get(props.disk!.name);
     } else {
         return trimActivities.value.get(poolID.value);
+        //////////START HERE
     }
 });
 

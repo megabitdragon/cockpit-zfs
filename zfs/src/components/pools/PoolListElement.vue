@@ -143,7 +143,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { removeActivity } from '../../composables/helpers';
+import { removeActivity, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import PoolDetail from "./PoolDetail.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
@@ -207,7 +207,9 @@ async function refreshAllData() {
 	await loadDisksThenPools(diskData, poolData);
 	await loadDatasets(filesystemData);
 	await loadScanObjectGroup(scanObjectGroup);
+	await loadScanActivities(poolData, scanActivities);
 	await loadDiskStats(poolDiskStats);
+	await loadTrimActivities(poolData, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;

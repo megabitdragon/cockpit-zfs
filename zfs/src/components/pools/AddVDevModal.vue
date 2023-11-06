@@ -168,10 +168,29 @@ const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const availableDisks = computed<DiskData[]>(() => {
-    return allDisks.value.filter(disk => disk.usable);
-})
+    return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
+});
+
+const isDiskTaken = computed(() => (diskName) => {
+	for (const poolName in poolDiskStats.value) {
+		if (poolDiskStats.value.hasOwnProperty(poolName)) {
+			const pool = poolDiskStats.value[poolName];
+			if (Array.isArray(pool)) {
+				for (const disk of pool) {
+					if (disk.name === diskName) {
+						//disk belongs to a pool
+						return true;
+					}
+				}
+			}
+		}
+	}
+	//disk does not belong to a pool
+	return false;
+});
 
 //change color of disk when selected
 const diskCardClass = (diskName) => {

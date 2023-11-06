@@ -1,5 +1,5 @@
 <template>
-    <Modal @close="showReplaceDiskModal = false" :isOpen="showReplaceDiskModal" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
         <template v-slot:title>
             Replace Disk
         </template>
@@ -45,7 +45,7 @@
 				
 				<div class="button-group-row w-full justify-between row-start-2">
 					<div class="button-group-row mt-2">
-                        <button @click="showReplaceDiskModal = false" :id="getIdKey('close-replace-disk-btn')" name="close-replace-disk-btn" class="btn btn-danger">Close</button>
+                        <button @click="closeModal" :id="getIdKey('close-replace-disk-btn')" name="close-replace-disk-btn" class="btn btn-danger">Close</button>
 
                         <div class="flex flex-row">
                             <label :for="getIdKey('force-add-vdev')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully Replace Disk</label>
@@ -94,9 +94,24 @@ interface ReplaceDiskModalProps {
     pool: PoolData;
     vDev: vDevData;
     disk: DiskData;
+    showFlag: boolean;
 }
 
 const props = defineProps<ReplaceDiskModalProps>();
+
+const showFlag = ref(props.showFlag);
+
+const updateShowFlag = () => {
+    if (props.showFlag !== showFlag.value) {
+        showFlag.value = props.showFlag;
+    } 
+}
+
+const emit = defineEmits(['close']);
+
+const closeModal = () => {
+    emit('close');
+}
 
 const showReplaceDiskModal = inject<Ref<boolean>>('show-replace-modal')!;
 const selectedDisk = ref('');
@@ -121,6 +136,30 @@ const adding = ref(false);
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
+const availableDisks = computed<DiskData[]>(() => {
+    return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
+});
+
+const isDiskTaken = computed(() => (diskName) => {
+	for (const poolName in poolDiskStats.value) {
+		if (poolDiskStats.value.hasOwnProperty(poolName)) {
+			const pool = poolDiskStats.value[poolName];
+			if (Array.isArray(pool)) {
+				for (const disk of pool) {
+					if (disk.name === diskName) {
+						//disk belongs to a pool
+						return true;
+					}
+				}
+			}
+		}
+	}
+	//disk does not belong to a pool
+	return false;
+});
+
 
 const diskVDevPoolData = ref({
     existingDiskName: '',
@@ -129,10 +168,6 @@ const diskVDevPoolData = ref({
     poolName: props.pool.name,
     forceReplace: false,
 });
-
-const availableDisks = computed<DiskData[]>(() => {
-    return allDisks.value.filter(disk => disk.usable);
-})
 
 //change color of disk when selected
 const diskCardClass = (diskName) => {

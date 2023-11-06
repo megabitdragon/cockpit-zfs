@@ -80,7 +80,7 @@ import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import { newPool } from "../../composables/pools";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { addActivity, removeActivity } from '../../composables/helpers';
+import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { setRefreservation } from '../../composables/pools';
 
 const show = ref(true);
@@ -235,29 +235,6 @@ async function finishBtn(newPoolData) {
 			showWizard.value = false;
 		}
 	});
-}
-
-async function loadScanActivities(pools, scanActivities) {
-	pools.value.forEach(pool => {
-		addActivity(pool.name, scanActivities);
-	});
-	console.log('scanActivities', scanActivities);
-}
-
-async function loadTrimActivities(pools, trimActivities) {
-	pools.value.forEach(pool => {
-		addActivity(pool.name, trimActivities);
-	});
-
-	pools.value.forEach(pool => {
-		pool.vdevs.forEach(vDev => {
-			vDev.disks.forEach(disk => {
-				addActivity(disk.name, trimActivities);
-			});
-		});		
-	});
-	
-	console.log('trimActivities', trimActivities);
 }
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));

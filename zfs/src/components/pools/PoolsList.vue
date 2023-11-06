@@ -65,6 +65,7 @@
 import { ref, inject, Ref, provide } from "vue";
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolListElement from './PoolListElement.vue';
 import ImportPool from "./ImportPool.vue";
@@ -88,6 +89,8 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -99,7 +102,9 @@ async function refreshAllData() {
 	await loadDisksThenPools(diskData, poolData);
 	await loadDatasets(filesystemData);
 	await loadScanObjectGroup(scanObjectGroup);
+	await loadScanActivities(poolData, scanActivities);
 	await loadDiskStats(poolDiskStats);
+	await loadTrimActivities(poolData, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
