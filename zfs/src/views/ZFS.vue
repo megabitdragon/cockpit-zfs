@@ -52,7 +52,12 @@ const snapshotsLoaded = ref(true);
 const clearLabels = ref(false);
 
 const scanActivities = ref<Map<string, Ref<Activity>>>(new Map());
+const scanObjectGroup = ref<PoolScanObjectGroup>({});
+const scanIntervalID = ref();
+
 const trimActivities = ref<Map<string, Ref<Activity>>>(new Map());
+const poolDiskStats = ref<PoolDiskStats>({});
+const diskStatsIntervalID = ref();
 
 async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = false;
@@ -74,9 +79,6 @@ async function initialLoad(disks, pools, datasets) {
 initialLoad(disks, pools, datasets);
 
 /////////////////////////////////////////////////////
-/////////////////////////////////////////////////////
-const scanObjectGroup = ref<PoolScanObjectGroup>({});
-const scanIntervalID = ref();
 // const scanActivity = ref<Activity>({
 // 	isActive: false,
 // 	isPaused: false,
@@ -94,8 +96,7 @@ async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
-const poolDiskStats = ref<PoolDiskStats>({});
-const diskStatsIntervalID = ref();
+/////////////////////////////////////////////////////
 // const trimActivity = ref<Activity>({
 // 	isActive: false,
 // 	isPaused: false,

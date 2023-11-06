@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import {computed, ref, Ref, inject, provide} from 'vue';
-import { loadDisks, loadDisksThenPools, loadScanObjectGroup } from '../../composables/loadData';
+import { loadDisks, loadDisksThenPools, loadScanObjectGroup, loadDiskStats  } from '../../composables/loadData';
 import { convertBytesToSize, convertSizeToBytes, convertSizeToBytesDecimal, convertBytesToSizeDecimal } from '../../composables/helpers';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
@@ -121,12 +121,17 @@ const disks = inject<Ref<DiskData[]>>("disks")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
 async function refreshAllData() {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
 	disks.value = [];
 	pools.value = [];
 	await loadDisksThenPools(disks, pools);
+	await loadScanObjectGroup(scanObjectGroup);
+	await loadDiskStats(poolDiskStats);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 }

@@ -80,6 +80,7 @@ import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import { newPool } from "../../composables/pools";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { addActivity, removeActivity } from '../../composables/helpers';
 import { setRefreservation } from '../../composables/pools';
 
 const show = ref(true);
@@ -196,7 +197,9 @@ async function refreshAllData() {
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
 	await loadScanObjectGroup(scanObjectGroup);
+	await loadScanActivities(pools, scanActivities);
 	await loadDiskStats(poolDiskStats);
+	await loadTrimActivities(pools, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 }
@@ -206,6 +209,9 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 //const newPoolName = ref('');
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 //finish button method for creating pool
 async function finishBtn(newPoolData) {
@@ -229,6 +235,29 @@ async function finishBtn(newPoolData) {
 			showWizard.value = false;
 		}
 	});
+}
+
+async function loadScanActivities(pools, scanActivities) {
+	pools.value.forEach(pool => {
+		addActivity(pool.name, scanActivities);
+	});
+	console.log('scanActivities', scanActivities);
+}
+
+async function loadTrimActivities(pools, trimActivities) {
+	pools.value.forEach(pool => {
+		addActivity(pool.name, trimActivities);
+	});
+
+	pools.value.forEach(pool => {
+		pool.vdevs.forEach(vDev => {
+			vDev.disks.forEach(disk => {
+				addActivity(disk.name, trimActivities);
+			});
+		});		
+	});
+	
+	console.log('trimActivities', trimActivities);
 }
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));

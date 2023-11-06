@@ -164,6 +164,9 @@ const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
 const selectedVDev = ref<vDevData>();
 
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
 const clearLabels = inject<Ref<boolean>>('clear-labels')!;
 
 ///////// Values for Confirmation Modals ////////////
@@ -203,6 +206,8 @@ async function refreshAllData() {
 	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
 	await loadDatasets(filesystemData);
+	await loadScanObjectGroup(scanObjectGroup);
+	await loadDiskStats(poolDiskStats);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;

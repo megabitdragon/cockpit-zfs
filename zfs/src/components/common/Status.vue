@@ -140,14 +140,18 @@ const scanActivity = computed(() => {
 });
 
 function getScanStateBool(state) : ComputedRef<boolean> {
-	return computed(() => {
-		return scanObjectGroup.value[props.pool.name].state === state;
-	});
+    return computed(() => {
+        // return scanObjectGroup.value[props.pool.name].state === state;
+        const poolState = scanObjectGroup.value[props.pool.name].state;
+        return poolState !== 'null' && poolState === state;
+    });
 }
 
 function getScanPauseBool(pause) : ComputedRef<boolean> {
 	return computed(() => {
-		return scanObjectGroup.value[props.pool.name].pause !== pause;
+		// return scanObjectGroup.value[props.pool.name].pause !== pause;
+        const poolPause = scanObjectGroup.value[props.pool.name].pause;
+        return poolPause !== 'null' && poolPause !== pause;
 	});
 }
 
@@ -161,9 +165,15 @@ async function getScanComputedProps() {
 	isFinished.value = getScanStateBool('FINISHED').value;
 	isCanceled.value = getScanStateBool('CANCELED').value;
 	isPaused.value = getScanPauseBool('None').value;
+
+    console.log("getScanStateBool('SCANNING').value", getScanStateBool('SCANNING').value);
+    console.log("getScanStateBool('FINISHED').value", getScanStateBool('FINISHED').value);
+    console.log("getScanStateBool('CANCELED').value", getScanStateBool('CANCELED').value);
+    console.log("getScanPauseBool('None').value", getScanPauseBool('None').value);
 }
 
 async function setScanActivity(activity : Activity) {
+    console.log(`activity for ${props.pool.name}:`, activity);
     await getScanComputedProps();
     activity.isActive = isScanning.value;
     activity.isPaused = isPaused.value;
