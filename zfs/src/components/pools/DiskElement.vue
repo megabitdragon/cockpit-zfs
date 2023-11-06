@@ -133,6 +133,9 @@ const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -143,6 +146,8 @@ async function refreshAllData() {
 	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
 	await loadDatasets(filesystemData);
+	await loadScanObjectGroup(scanObjectGroup);
+	await loadDiskStats(poolDiskStats);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
@@ -160,7 +165,7 @@ async function scrubAndScan() {
 const scanStatusBox = ref();
 
 async function getScanStatus() {
-	console.log('scanStatusBox', scanStatusBox.value);
+	// console.log('scanStatusBox', scanStatusBox.value);
 
 	// Needed to specify index to work properly (treating as an array due to multiple pools error)
 	await scanStatusBox.value.pollScanStatus();
@@ -460,7 +465,7 @@ async function clearDiskErrors(poolName, diskName) {
 const trimStatusBox = ref();
 
 async function getDiskTrimStatus() {
-	console.log('trimStatusBox', trimStatusBox.value);
+	// console.log('trimStatusBox', trimStatusBox.value);
 
 	// Needed to specify index to work properly (treating as an array due to multiple pools error)
 	await trimStatusBox.value.pollTrimStatus();

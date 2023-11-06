@@ -166,14 +166,14 @@ async function getScanComputedProps() {
 	isCanceled.value = getScanStateBool('CANCELED').value;
 	isPaused.value = getScanPauseBool('None').value;
 
-    console.log("getScanStateBool('SCANNING').value", getScanStateBool('SCANNING').value);
-    console.log("getScanStateBool('FINISHED').value", getScanStateBool('FINISHED').value);
-    console.log("getScanStateBool('CANCELED').value", getScanStateBool('CANCELED').value);
-    console.log("getScanPauseBool('None').value", getScanPauseBool('None').value);
+    // console.log("getScanStateBool('SCANNING').value", getScanStateBool('SCANNING').value);
+    // console.log("getScanStateBool('FINISHED').value", getScanStateBool('FINISHED').value);
+    // console.log("getScanStateBool('CANCELED').value", getScanStateBool('CANCELED').value);
+    // console.log("getScanPauseBool('None').value", getScanPauseBool('None').value);
 }
 
 async function setScanActivity(activity : Activity) {
-    console.log(`activity for ${props.pool.name}:`, activity);
+    // console.log(`activity for ${props.pool.name}:`, activity);
     await getScanComputedProps();
     activity.isActive = isScanning.value;
     activity.isPaused = isPaused.value;
