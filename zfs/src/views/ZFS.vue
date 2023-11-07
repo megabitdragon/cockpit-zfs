@@ -72,33 +72,18 @@ async function initialLoad(disks, pools, datasets) {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	console.log(scanActivities.value);
-	console.log(trimActivities.value);
+	console.log('ZFS.vue scanActivities', scanActivities.value);
+	console.log('ZFS.vue trimActivities', trimActivities.value);
 }
 
 initialLoad(disks, pools, datasets);
 
 /////////////////////////////////////////////////////
-// const scanActivity = ref<Activity>({
-// 	isActive: false,
-// 	isPaused: false,
-// 	isCanceled: false,
-// 	isFinished: false,
-// });
-
 async function scanNow() {
 	await loadScanObjectGroup(scanObjectGroup);
 }
 
 /////////////////////////////////////////////////////
-// const trimActivity = ref<Activity>({
-// 	isActive: false,
-// 	isPaused: false,
-// 	isCanceled: false,
-// 	isFinished: false,
-// });
-
-
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
 }

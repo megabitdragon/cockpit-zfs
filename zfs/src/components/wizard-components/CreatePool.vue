@@ -105,9 +105,38 @@ const disks = inject<Ref<DiskData[]>>('disks')!;
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 
+//setting defaults for pool object
+const poolConfig = ref<PoolData>({
+	name: '',
+	status: '',
+	guid: '',
+	properties: {
+		rawsize: 0,
+		size: '',
+		allocated: '',
+		capacity: 0,
+		free: '',
+		sector: '12',
+		record: '128kib',
+		compression: true,
+		deduplication: false,
+		refreservationPercent: 10,
+		autoExpand: true,
+		autoReplace: false,
+		autoTrim: false,
+		forceCreate: false,
+		readOnly: false,
+	},
+	vdevs: [],
+	createFileSystem: false,
+	// fileSystem: fileSystemConfig.value,
+});
+
+// const fileSystemConfig = ref<FileSystemData>();
+
 //setting default values for file system object
 const fileSystemConfig = ref<FileSystemData>({
-	parentFS: '',
+	parentFS: poolConfig.value.name,
     name: '',
     id: '',
     mountpoint: '',
@@ -146,33 +175,6 @@ const fileSystemConfig = ref<FileSystemData>({
 		used: 0,
     },
     children: [],
-});
-
-//setting defaults for pool object
-const poolConfig = ref<PoolData>({
-	name: '',
-	status: '',
-	guid: '',
-	properties: {
-		rawsize: 0,
-		size: '',
-		allocated: '',
-		capacity: 0,
-		free: '',
-		sector: '12',
-		record: '128kib',
-		compression: true,
-		deduplication: false,
-		refreservationPercent: 10,
-		autoExpand: true,
-		autoReplace: false,
-		autoTrim: false,
-		forceCreate: false,
-		readOnly: false,
-	},
-	vdevs: [],
-	createFileSystem: false,
-	fileSystem: fileSystemConfig.value,
 });
 
 const newPoolData = ref<newPoolData>({
@@ -332,12 +334,17 @@ const next = () => {
 		//   console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
 		// }
 	} else if (currentItem!.tag === 'file-system') {
-		// if (poolConfiguration.value.validateAndProceed('file-system')) {
-		navTag.value = nextItem.tag;
-		tabError.value = false;
-		// } else {
-		//   console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
-		// }
+		if (poolConfig.value.createFileSystem!) {
+			if (poolConfiguration.value.validateAndProceed('file-system')) {
+				navTag.value = nextItem.tag;
+				tabError.value = false;
+			} else {
+			console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
+			}
+		}  else {
+			navTag.value = nextItem.tag;
+			tabError.value = false;
+		}
 	} 
 };
 
@@ -354,7 +361,7 @@ const prev = () => {
 	if (prevIndex >= navigation.length) return;
 	const prevItem = navigation[prevIndex];
 	navTag.value = prevItem.tag;
-  end.value = false;
+  	end.value = false;
 };
 
 //tabs for navigation

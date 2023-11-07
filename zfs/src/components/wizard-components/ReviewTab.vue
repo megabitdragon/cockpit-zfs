@@ -61,16 +61,16 @@
 				<p class="text-default"><b>File System Details</b></p>
 				
 
-				<p class="ml-10 text-default">ParentFS: {{ poolConfig.fileSystem?.parentFS }}</p>
-				<p class="ml-10 text-default">Name: {{ poolConfig.fileSystem?.name }}</p>
-				<p class="ml-10 text-default">Access Time: {{ poolConfig.fileSystem?.properties.accessTime }}</p>
-				<p class="ml-10 text-default">Deduplication: {{ poolConfig.fileSystem?.properties.deduplication }}</p>
-				<p class="ml-10 text-default">Record Size: {{ poolConfig.fileSystem?.properties.recordSize }}</p>
-				<p class="ml-10 text-default">Case Sensitivity: {{ poolConfig.fileSystem?.properties.caseSensitivity }}</p>
-				<p class="ml-10 text-default">DNode Size: {{ poolConfig.fileSystem?.properties.dNodeSize }}</p>
-				<p class="ml-10 text-default">Compression: {{ poolConfig.fileSystem?.properties.compression }}</p>
-				<p class="ml-10 text-default">Extended Attributes: {{ poolConfig.fileSystem?.properties.extendedAttributes }}</p>
-				<p class="ml-10 text-default">Quota: {{ poolConfig.fileSystem?.properties.quota.raw }} {{ poolConfig.fileSystem?.properties.quota.value }}</p>
+				<p class="ml-10 text-default">ParentFS: {{ fileSystemData.parentFS }}</p>
+				<p class="ml-10 text-default">Name: {{ fileSystemData.name }}</p>
+				<p class="ml-10 text-default">Access Time: {{ fileSystemData.properties.accessTime }}</p>
+				<p class="ml-10 text-default">Deduplication: {{ fileSystemData.properties.deduplication }}</p>
+				<p class="ml-10 text-default">Record Size: {{ fileSystemData.properties.recordSize }}</p>
+				<p class="ml-10 text-default">Case Sensitivity: {{ fileSystemData.properties.caseSensitivity }}</p>
+				<p class="ml-10 text-default">DNode Size: {{ fileSystemData.properties.dNodeSize }}</p>
+				<p class="ml-10 text-default">Compression: {{ fileSystemData.properties.compression }}</p>
+				<p class="ml-10 text-default">Extended Attributes: {{ fileSystemData.properties.extendedAttributes }}</p>
+				<p class="ml-10 text-default">Quota: {{ fileSystemData.properties.quota.raw }} {{ fileSystemData.properties.quota.value }}</p>
 				
 		</div>
 		<br/>
@@ -83,6 +83,7 @@ import { isBoolOnOff } from '../../composables/helpers';
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
 const allDisks = inject<DiskData[]>("disks");
+const fileSystemData = inject<Ref<FileSystemData>>('file-system-data')!;
 
 function isBoolCompression(bool : boolean) {
 	if (bool) {return 'lz4'} else {return 'off'}

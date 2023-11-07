@@ -6,7 +6,7 @@
 			<div>
 				<label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
 				<select :id="getIdKey('parent-filesystem')" v-model="fileSystemConfig.parentFS" disabled name="parent-filesystem" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-					<option :value="poolConfig.name!" class=text-default>{{ poolConfig.name! }}</option>
+					<option :value="poolConfig.name" class=text-default>{{ poolConfig.name }}</option>
 				</select>
 			</div>
 
@@ -482,11 +482,13 @@ const props = defineProps<FileSystemProps>();
 
 const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
 
-const poolConfig = inject<PoolData>("pool-config-data")!;
-
-const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
+const poolConfig = inject<Ref<PoolData>>("pool-config-data")!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+
+const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
+	
+fileSystemConfig.value.parentFS! = poolConfig.value.name;
 
 const parentFeedback = ref('');
 const nameFeedback = ref('');
@@ -572,20 +574,18 @@ function getInheritedProperties() {
 		if (newFileSystemConfig.value.properties.extendedAttributes == 'inherited') {
 			newFileSystemConfig.value.properties.extendedAttributes = selectedDataset?.properties.extendedAttributes!;
 		}
-
-		// console.log("newFileSystemConfig");
-		// console.log(newFileSystemConfig);
+		// console.log("newFileSystemConfig", newFileSystemConfig);
 	} else {
-		fileSystemConfig.value.parentFS = poolConfig.name;
+		fileSystemConfig.value.parentFS = poolConfig.value.name;
 
 		if (fileSystemConfig.value.properties.deduplication == 'inherited') {
-			fileSystemConfig.value.properties.deduplication = isBoolOnOff(poolConfig.properties.deduplication!);
+			fileSystemConfig.value.properties.deduplication = isBoolOnOff(poolConfig.value.properties.deduplication!);
 		}
 		if (fileSystemConfig.value.properties.compression == 'inherited') {
-			fileSystemConfig.value.properties.compression = isBoolCompression(poolConfig.properties.compression!);
+			fileSystemConfig.value.properties.compression = isBoolCompression(poolConfig.value.properties.compression!);
 		}
 		if (fileSystemConfig.value.properties.recordSize == 'inherited') {
-			fileSystemConfig.value.properties.recordSize = poolConfig.properties.record!;
+			fileSystemConfig.value.properties.recordSize = poolConfig.value.properties.record!;
 		}
 		if (fileSystemConfig.value.properties.accessTime == 'inherited') {
 			fileSystemConfig.value.properties.accessTime = 'on';
@@ -599,9 +599,7 @@ function getInheritedProperties() {
 		if (fileSystemConfig.value.properties.extendedAttributes == 'inherited') {
 			fileSystemConfig.value.properties.extendedAttributes = 'sa';
 		}
-
-		// console.log("fileSystemConfig");
-		// console.log(fileSystemConfig);
+		console.log("fileSystemConfig", fileSystemConfig);
 	}
 }
 
@@ -709,20 +707,35 @@ const newDataset = ref<NewDataset>({
 });
 
 function fillDatasetData() {
-	newDataset.value.name = newFileSystemConfig.value.name;
-	newDataset.value.parent = newFileSystemConfig.value.parentFS!;
-	newDataset.value.encrypted = newFileSystemConfig.value.encrypted;
-	newDataset.value.encryption = newFileSystemConfig.value.properties.encryption;
-	newDataset.value.atime = newFileSystemConfig.value.properties.accessTime;
-	newDataset.value.casesensitivity = newFileSystemConfig.value.properties.caseSensitivity;
-	newDataset.value.compression = newFileSystemConfig.value.properties.compression;
-	newDataset.value.dedup = newFileSystemConfig.value.properties.deduplication;
-	newDataset.value.dnodesize = newFileSystemConfig.value.properties.dNodeSize;
-	newDataset.value.xattr = newFileSystemConfig.value.properties.extendedAttributes;
-	newDataset.value.recordsize = newFileSystemConfig.value.properties.recordSize;
-	newDataset.value.quota = convertSizeToBytes((newFileSystemConfig.value.properties.quota.raw.toString() + newFileSystemConfig.value.properties.quota.unit)).toString();
-	newDataset.value.readonly = isBoolOnOff(newFileSystemConfig.value.properties.isReadOnly!);
-
+	if (props.isStandalone) {
+		newDataset.value.name = newFileSystemConfig.value.name;
+		newDataset.value.parent = newFileSystemConfig.value.parentFS!;
+		newDataset.value.encrypted = newFileSystemConfig.value.encrypted;
+		newDataset.value.encryption = newFileSystemConfig.value.properties.encryption;
+		newDataset.value.atime = newFileSystemConfig.value.properties.accessTime;
+		newDataset.value.casesensitivity = newFileSystemConfig.value.properties.caseSensitivity;
+		newDataset.value.compression = newFileSystemConfig.value.properties.compression;
+		newDataset.value.dedup = newFileSystemConfig.value.properties.deduplication;
+		newDataset.value.dnodesize = newFileSystemConfig.value.properties.dNodeSize;
+		newDataset.value.xattr = newFileSystemConfig.value.properties.extendedAttributes;
+		newDataset.value.recordsize = newFileSystemConfig.value.properties.recordSize;
+		newDataset.value.quota = convertSizeToBytes((newFileSystemConfig.value.properties.quota.raw.toString() + newFileSystemConfig.value.properties.quota.unit)).toString();
+		newDataset.value.readonly = isBoolOnOff(newFileSystemConfig.value.properties.isReadOnly!);
+	} else {
+		newDataset.value.name = fileSystemConfig.value.name;
+		newDataset.value.parent = fileSystemConfig.value.parentFS!;
+		newDataset.value.encrypted = fileSystemConfig.value.encrypted;
+		newDataset.value.encryption = fileSystemConfig.value.properties.encryption;
+		newDataset.value.atime = fileSystemConfig.value.properties.accessTime;
+		newDataset.value.casesensitivity = fileSystemConfig.value.properties.caseSensitivity;
+		newDataset.value.compression = fileSystemConfig.value.properties.compression;
+		newDataset.value.dedup = fileSystemConfig.value.properties.deduplication;
+		newDataset.value.dnodesize = fileSystemConfig.value.properties.dNodeSize;
+		newDataset.value.xattr = fileSystemConfig.value.properties.extendedAttributes;
+		newDataset.value.recordsize = fileSystemConfig.value.properties.recordSize;
+		newDataset.value.quota = convertSizeToBytes((fileSystemConfig.value.properties.quota.raw.toString() + fileSystemConfig.value.properties.quota.unit)).toString();
+		newDataset.value.readonly = isBoolOnOff(fileSystemConfig.value.properties.isReadOnly!);
+	}
 	console.log("newDataSetData sent:", newDataset);
 }
 
@@ -762,7 +775,6 @@ async function fsCreateBtn(fileSystem) {
 			}
 		}
 	}
-
 }
 
 function isBoolCompression(bool : boolean) {
@@ -773,6 +785,7 @@ const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 defineExpose({
 	nameCheck,
-	getInheritedProperties
+	getInheritedProperties,
+	fsCreateBtn
 })
 </script>

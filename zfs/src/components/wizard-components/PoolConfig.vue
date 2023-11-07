@@ -275,7 +275,7 @@
 				</label>
 			</button>
 			<!-- box-border py-2 px-4 font-medium rounded-lg shadow-md focus:outline-none focus:ring-0 -->
-			<FileSystem v-if="poolConfig.createFileSystem" ref="fileSystemConfiguration" idKey="file-system" :isStandalone="false"/>
+			<FileSystem v-if="poolConfig.createFileSystem" ref="fileSystemConfiguration" idKey="file-system" :isStandalone="false" />
 		</fieldset>
 	</div>
 
@@ -349,6 +349,9 @@ const isDiskTaken = computed(() => (diskName) => {
 	//disk does not belong to a pool
 	return false;
 });
+
+// //setting default values for file system object
+// const fileSystemConfig = ref<FileSystemData>();
 
 //change color of disk when selected
 const diskCardClass = (diskName, vDevIdx) => {
@@ -482,7 +485,6 @@ const diskSizeMatch = () => {
 
 				previousCapacity = currentCapacity;
 			}
-					
 		});
 	});
 
@@ -567,7 +569,12 @@ const validateAndProceed = (tabTag: string): boolean => {
 		if (nameCheck()) {
 			if (vDevCheck()) {
 				if (diskCheck()) {
-					//fileSystemConfiguration.value.nameCheck();
+					if (poolConfig.value.createFileSystem!) {
+						if (fileSystemConfiguration.value.nameCheck(fileSystemConfig.value)) {
+							return true;
+						}
+					}
+					
 				}
 			}
 		}
@@ -664,4 +671,6 @@ defineExpose({
 	fillNewPoolData,
 	addVDev
 });
+
+// provide('file-system-data', fileSystemConfig);
 </script>

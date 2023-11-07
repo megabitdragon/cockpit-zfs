@@ -245,9 +245,9 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		console.log('now deleting:', selectedPool.value);
 
 		if (secondOptionToggle.value == true) {
-			await destroyPool(selectedPool.value!, firstOptionToggle.value);
 			removeActivity(selectedPool.value!.name, scanActivities.value[selectedPool.value!.name]);
 			removeActivity(selectedPool.value!.name, trimActivities.value[selectedPool.value!.name]);
+			await destroyPool(selectedPool.value!, firstOptionToggle.value);
 			selectedPool.value!.vdevs.forEach(vDev => {
 				vDev.disks.forEach(async disk => {
 					selectedDisk.value = disk;

@@ -196,12 +196,6 @@ export function convertSecondsToString(seconds) {
     return result.trim();
 }
 
-// export function getTrimStateRef(poolName: string, diskName: string, state: number, poolDiskStats: PoolDiskStats) : ComputedRef<boolean>  {
-//     return computed(()=> {
-//         return poolDiskStats.value[poolName].some(disk => disk.name === diskName && disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
-//     });
-// }
-
 export function addActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
 	const activity = ref<Activity>({
 		isActive: false,
@@ -214,7 +208,6 @@ export function addActivity(id: string, activities: Ref<Map<string, Ref<Activity
 
 export function removeActivity(id: string, activities: Ref<Map<string, Ref<Activity>>>) {
 	activities.value.delete(id);
-	// delete activities.value[id];
 }
 
 export async function loadScanActivities(pools, scanActivities) {
