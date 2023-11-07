@@ -228,7 +228,10 @@ async function finishBtn(newPoolData) {
 
 		if (newPoolFound) {
 			console.log('newPoolFound:', newPoolFound);
+
 			setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
+
+			await newFS();
 			await refreshAllData();
 			showWizard.value = false;
 		} else {
@@ -236,7 +239,17 @@ async function finishBtn(newPoolData) {
 			await refreshAllData();
 			showWizard.value = false;
 		}
+
+		
 	});
+}
+
+async function newFS() {
+	if (poolConfig.value.createFileSystem!) {
+		console.log('creating File System...');
+		console.log('poolConfiguration', poolConfiguration.value);
+		await poolConfiguration.value.createNewFileSystem();
+	}
 }
 
 const currentNavigationItem = computed<StepsNavigationItem | undefined>(() => navigation.find(item => item.current));
@@ -280,8 +293,18 @@ const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) =
 		}
 	} else if (currentTag === 'file-system') {
 		if(item.tag === 'name-entry' || item.tag === 'virtual-devices' || item.tag === 'pool-settings') {
-			navTag.value = item.tag;
-			tabError.value = false;
+			if (poolConfig.value.createFileSystem!) {
+				if (poolConfiguration.value.validateAndProceed('file-system')) {
+					navTag.value = item.tag;
+					tabError.value = false;
+				} else {
+					console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${item.tag} tab.`);
+				}
+			} else {
+				navTag.value = item.tag;
+				tabError.value = false;
+			}
+			
 		} else if (item.tag === 'review') {
 			// } else if (item.tag === 'review' && poolConfiguration.value.validateAndProceed(currentTag)) {
 			navTag.value = item.tag;

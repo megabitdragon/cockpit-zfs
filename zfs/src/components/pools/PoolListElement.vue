@@ -25,7 +25,7 @@
 						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.allocated }}</div>
 						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.free }}</div>
 						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.size }}</div>
-						<div class="py-6 -mt-2 col-span-2">
+						<div class="py-6 -mt-1 col-span-2">
 							<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
 						</div>
 					</button>
@@ -245,8 +245,6 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		console.log('now deleting:', selectedPool.value);
 
 		if (secondOptionToggle.value == true) {
-			removeActivity(selectedPool.value!.name, scanActivities.value[selectedPool.value!.name]);
-			removeActivity(selectedPool.value!.name, trimActivities.value[selectedPool.value!.name]);
 			await destroyPool(selectedPool.value!, firstOptionToggle.value);
 			selectedPool.value!.vdevs.forEach(vDev => {
 				vDev.disks.forEach(async disk => {
@@ -257,6 +255,9 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		} else {
 			await destroyPool(selectedPool.value!);
 		}
+
+		// removeActivity(selectedPool.value!.name, scanActivities.value[selectedPool.value!.name]);
+		// removeActivity(selectedPool.value!.name, trimActivities.value[selectedPool.value!.name]);
 
 		refreshAllData();
 		confirmDelete.value = false;

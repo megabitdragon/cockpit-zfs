@@ -98,7 +98,7 @@
 	</div>
 
 	<!-- third tab: pool settings + advanced settings -->
-	<div v-if=" props.tag ==='pool-settings'">
+	<div v-if="props.tag ==='pool-settings'">
 		<fieldset>
 			<legend class="mb-1 text-base font-semibold leading-6 text-default">Pool Settings</legend>
 
@@ -260,8 +260,8 @@
 	</div>
 
 	<!-- tab four: file system creation (so user does not have a naked pool) -->
-	<!-- component has a toggle at the start so user can choose if they want to create a file system at pool creation, or not if they do in fact want a naked pool -->
-	<div v-if=" props.tag ==='file-system'">
+	<!-- component has a toggle so user can choose if they want to create a file system at pool creation, or not if they do in fact want a naked pool -->
+	<div v-if="props.tag ==='file-system'">
 		<fieldset>
 			<legend class="mb-1 text-base font-semibold leading-6 text-default">File System Settings</legend>
 
@@ -274,13 +274,14 @@
 					<input :id="getIdKey('create-filesystem')" v-model="poolConfig.createFileSystem" aria-describedby="create-filesystem" name="create-filesystem" type="checkbox" class="ml-2 h-4 w-4 rounded text-success"/>
 				</label>
 			</button>
-			<!-- box-border py-2 px-4 font-medium rounded-lg shadow-md focus:outline-none focus:ring-0 -->
-			<FileSystem v-if="poolConfig.createFileSystem" ref="fileSystemConfiguration" idKey="file-system" :isStandalone="false" />
+
+			<FileSystem v-show="poolConfig.createFileSystem" ref="fsConfig" idKey="file-system" :isStandalone="false" />
+			
 		</fieldset>
 	</div>
 
 	<!-- tab five: final tab - review all data selected -->
-	<div v-if=" props.tag ==='review'">
+	<div v-if="props.tag ==='review'">
 		<fieldset>
 			<legend class="mb-1 text-base font-semibold leading-6 text-default">Review Pool Details</legend>
 			<ReviewTab/>
@@ -292,7 +293,7 @@
 <script setup lang="ts">
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
-import { isBoolOnOff, convertSizeToBytes, upperCaseWord } from '../../composables/helpers';
+import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression } from '../../composables/helpers';
 import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
@@ -308,7 +309,7 @@ const props = defineProps<PoolConfigProps>();
 const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
 const allPools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
-const fileSystemConfiguration = ref();
+
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 	
@@ -570,7 +571,7 @@ const validateAndProceed = (tabTag: string): boolean => {
 			if (vDevCheck()) {
 				if (diskCheck()) {
 					if (poolConfig.value.createFileSystem!) {
-						if (fileSystemConfiguration.value.nameCheck(fileSystemConfig.value)) {
+						if (fsConfig.value.nameCheck(fileSystemConfig.value)) {
 							return true;
 						}
 					}
@@ -593,10 +594,6 @@ const validateAndProceed = (tabTag: string): boolean => {
 //method for removing vdev
 function removeVDev(index: number) {
   	poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
-}
-
-function isBoolCompression(bool : boolean) {
-	if (bool) {return 'lz4'} else {return 'off'}
 }
 
 const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
@@ -662,6 +659,18 @@ function fillNewPoolData() {
 	console.log("newPoolData sent:", newPoolData);
 }
 
+const fsConfig = ref();
+
+async function createNewFileSystem() {
+
+	console.log('fsConfig', fsConfig.value);
+	//	^^^^^^ WHY IS THIS NULL ^^^^^^
+	//lifecycle shit???
+
+
+	await fsConfig.value.newFileSystemInPoolWizard();
+}
+
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 
 if (poolConfig.value.vdevs.length < 1) initialVDev();
@@ -669,8 +678,8 @@ if (poolConfig.value.vdevs.length < 1) initialVDev();
 defineExpose({
 	validateAndProceed,
 	fillNewPoolData,
-	addVDev
+	addVDev,
+	createNewFileSystem,
 });
 
-// provide('file-system-data', fileSystemConfig);
 </script>

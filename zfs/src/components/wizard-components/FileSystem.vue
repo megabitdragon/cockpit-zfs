@@ -5,8 +5,8 @@
 			<!-- Name of Parent File System (Text) -->
 			<div>
 				<label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-				<select :id="getIdKey('parent-filesystem')" v-model="fileSystemConfig.parentFS" disabled name="parent-filesystem" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-					<option :value="poolConfig.name" class=text-default>{{ poolConfig.name }}</option>
+				<select :id="getIdKey('parent-filesystem')" disabled v-model="fileSystemConfig.parentFS" name="parent-filesystem" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<option :value="parentFileSystem" class=text-default>{{ parentFileSystem }}</option>
 				</select>
 			</div>
 
@@ -466,9 +466,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, inject } from 'vue';
+import { ref, Ref, inject, computed, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
-import { convertSizeToBytes, convertBytesToSize, isBoolOnOff, getParentPath } from '../../composables/helpers';
+import { convertSizeToBytes, convertBytesToSize, isBoolOnOff, getParentPath, isBoolCompression } from '../../composables/helpers';
 import { createDataset } from '../../composables/datasets';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
@@ -487,8 +487,14 @@ const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
-	
-fileSystemConfig.value.parentFS! = poolConfig.value.name;
+
+const parentFileSystem = computed(() => {
+	return poolConfig.value.name;
+});
+
+function setParentFS() {
+	fileSystemConfig.value.parentFS = parentFileSystem.value;
+}
 
 const parentFeedback = ref('');
 const nameFeedback = ref('');
@@ -542,8 +548,6 @@ const newFileSystemConfig = ref<FileSystemData>({
     children: [],
 });
 
-// console.log('poolConfig', poolConfig);
-
 function getInheritedProperties() {
 	if (props.isStandalone) {
 
@@ -551,7 +555,7 @@ function getInheritedProperties() {
 			return dataset.id === newFileSystemConfig.value.parentFS;
 		});
 
-		console.log('selectedDataset:', selectedDataset);
+		console.log('selectedDataset for inheritance:', selectedDataset);
 		
 		if (newFileSystemConfig.value.properties.deduplication == 'inherited') {
 			newFileSystemConfig.value.properties.deduplication = selectedDataset?.properties.deduplication!;
@@ -576,6 +580,8 @@ function getInheritedProperties() {
 		}
 		// console.log("newFileSystemConfig", newFileSystemConfig);
 	} else {
+		console.log('inheriting values...');
+
 		fileSystemConfig.value.parentFS = poolConfig.value.name;
 
 		if (fileSystemConfig.value.properties.deduplication == 'inherited') {
@@ -739,11 +745,27 @@ function fillDatasetData() {
 	console.log("newDataSetData sent:", newDataset);
 }
 
-async function fsCreateBtn(fileSystem) {
-	if (parentCheck(fileSystem)) {
-		if (nameCheck(fileSystem)) {
-			if (fileSystem.encrypted) {
-				if (encryptPasswordCheck(fileSystem)) {
+async function fsCreateBtn(fileSystem : FileSystemData) {
+	if (props.isStandalone) {
+		if (parentCheck(fileSystem)) {
+			if (nameCheck(fileSystem)) {
+				if (fileSystem.encrypted) {
+					if (encryptPasswordCheck(fileSystem)) {
+						if (checkQuota(fileSystem)) {
+							getInheritedProperties();
+							fillDatasetData();
+							saving.value = true;
+							createDataset(newDataset.value).then(async() => {
+								fileSystemsLoaded.value = false;
+								datasets.value = [];
+								await loadDatasets(datasets);
+								showFSWizard.value = false;
+								saving.value = false;
+								fileSystemsLoaded.value = true;
+							});
+						}
+					}
+				} else {
 					if (checkQuota(fileSystem)) {
 						getInheritedProperties();
 						fillDatasetData();
@@ -758,27 +780,40 @@ async function fsCreateBtn(fileSystem) {
 						});
 					}
 				}
-			} else {
-				if (checkQuota(fileSystem)) {
-					getInheritedProperties();
-					fillDatasetData();
-					saving.value = true;
-					createDataset(newDataset.value).then(async() => {
-						fileSystemsLoaded.value = false;
-						datasets.value = [];
-						await loadDatasets(datasets);
-						showFSWizard.value = false;
-						saving.value = false;
-						fileSystemsLoaded.value = true;
-					});
+			}
+		}
+	} 
+}
+
+async function newFileSystemInPoolWizard() {
+	const fileSystem = ref(fileSystemConfig.value);
+	if (!props.isStandalone) {
+		if (parentCheck(fileSystem.value)) {
+			if (nameCheck(fileSystem.value)) {
+				if (fileSystem.value.encrypted) {
+					if (encryptPasswordCheck(fileSystem.value)) {
+						if (checkQuota(fileSystem)) {
+							getInheritedProperties();
+							fillDatasetData();
+							createDataset(newDataset.value).then(async() => {
+								datasets.value = [];
+								await loadDatasets(datasets);
+							});
+						}
+					}
+				} else {
+					if (checkQuota(fileSystem)) {
+						getInheritedProperties();
+						fillDatasetData();
+						createDataset(newDataset.value).then(async() => {
+							datasets.value = [];
+							await loadDatasets(datasets);
+						});
+					}
 				}
 			}
 		}
 	}
-}
-
-function isBoolCompression(bool : boolean) {
-	if (bool) {return 'lz4'} else {return 'off'}
 }
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
@@ -786,6 +821,12 @@ const getIdKey = (name: string) => `${props.idKey}-${name}`;
 defineExpose({
 	nameCheck,
 	getInheritedProperties,
-	fsCreateBtn
-})
+	newFileSystemInPoolWizard,
+});
+
+onMounted(() => {
+	if (!props.isStandalone) {
+		setParentFS();
+	}
+});
 </script>

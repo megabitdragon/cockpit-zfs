@@ -5,6 +5,10 @@ export function isBoolOnOff(bool : boolean) {
 	if (bool) {return 'on'} else {return 'off'}
 }
 
+export function isBoolCompression(bool : boolean) {
+	if (bool) {return 'lz4'} else {return 'off'}
+}
+
 //change 'on' to true and 'off' to false
 export function onOffToBool(state : string) {
     if (state == 'on') { return true } else if (state == 'off') { return false }

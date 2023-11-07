@@ -165,11 +165,6 @@ async function getScanComputedProps() {
 	isFinished.value = getScanStateBool('FINISHED').value;
 	isCanceled.value = getScanStateBool('CANCELED').value;
 	isPaused.value = getScanPauseBool('None').value;
-
-    // console.log("getScanStateBool('SCANNING').value", getScanStateBool('SCANNING').value);
-    // console.log("getScanStateBool('FINISHED').value", getScanStateBool('FINISHED').value);
-    // console.log("getScanStateBool('CANCELED').value", getScanStateBool('CANCELED').value);
-    // console.log("getScanPauseBool('None').value", getScanPauseBool('None').value);
 }
 
 async function setScanActivity(activity : Activity) {
@@ -179,13 +174,6 @@ async function setScanActivity(activity : Activity) {
     activity.isPaused = isPaused.value;
     activity.isFinished = isFinished.value;
     activity.isCanceled = isCanceled.value;
-    
-    // console.log(`scanActivity for ${props.pool.name} set: \n 
-    //     isActive:${activity.isActive}\n
-    //     isPaused:${activity.isPaused}\n
-    //     isFinished:${activity.isFinished}\n
-    //     isCanceled:${activity.isCanceled}\n`);
-    // console.log(`scanActivity for ${props.pool.name} set`);
 
     // console.log('setScanActivity fired');
 }
@@ -395,33 +383,6 @@ const selectedDisk = computed(() => {
     return poolDiskStats.value[props.pool.name].find(disk => disk.name == props.disk!.name);
 });
 
-// function getTrimStateRef(state) : ComputedRef<boolean> {
-// 	return computed(() => {
-// 		return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === state);
-// 	});
-// }
-
-// const isTrimActive = ref(false);
-// const isTrimCanceled = ref(false);
-// const isTrimSuspended = ref(false);
-// const isTrimFinished = ref(false);
-
-// const isTrimActive = (disk) => {
-//     return disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1;
-// };
-
-// const isTrimCanceled = (disk) => {
-//     return disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 2;
-// };
-
-// const isTrimSuspended = (disk) => {
-//     return disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 3;
-// };
-
-// const isTrimFinished = (disk) => {
-//     return disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4;
-// };
-
 const isTrimActive = computed(() => {
     return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 1);
 });
@@ -438,26 +399,12 @@ const isTrimFinished = computed(() => {
     return poolDiskStats.value[props.pool.name].some(disk => disk.stats.trim_notsup !== 1 && disk.stats.trim_state === 4);
 });
 
-// async function getTrimComputedProps() {
-// 	isTrimActive.value = getTrimStateRef(1).value;
-// 	isTrimCanceled.value = getTrimStateRef(2).value;
-// 	isTrimSuspended.value = getTrimStateRef(3).value;
-// 	isTrimFinished.value = getTrimStateRef(4).value;
-// }
-
 async function setTrimActivity(activity : Activity) {
     // await getTrimComputedProps();
     activity.isActive = isTrimActive.value;
     activity.isPaused = isTrimSuspended.value;
     activity.isFinished = isTrimFinished.value;
     activity.isCanceled = isTrimCanceled.value;
-
-    // console.log(`trimActivity for ${props.pool.name} set: \n 
-    //     isActive:${activity.isActive}\n
-    //     isPaused:${activity.isPaused}\n
-    //     isFinished:${activity.isFinished}\n
-    //     isCanceled:${activity.isCanceled}\n`);
-    // console.log(`trimActivity for ${props.pool.name} set`);
 
     // console.log('setTrimActivity fired');
 }
