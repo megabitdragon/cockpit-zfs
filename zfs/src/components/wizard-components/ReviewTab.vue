@@ -1,93 +1,101 @@
 <template>
 	<div>
-		<div class="ml-4">
-			<!-- Pool Info -->
-			
-				<p class="text-default"><b>Pool Details</b></p>
-			
-				<p class="ml-10 text-default text-default">Name: {{ poolConfig.name }}</p>
-				<p class="ml-10 text-default">{{poolConfig.vdevs.length}} Virtual Device(s)</p>
-				<p class="ml-10 text-default">Sector Size: {{poolConfig.properties.sector}}</p>
-				<p class="ml-10 text-default">Record Size: {{poolConfig.properties.record}}</p>
-				<p class="ml-10 text-default">Compression: {{isBoolCompression(poolConfig.properties.compression)}}</p>
-				<p class="ml-10 text-default">
-					<div class="ml-4">
-						
-							<p><b>Advanced Settings</b></p>
-						
+		<div class="grid grid-cols grid-cols-4">
+			<div class="col-start-1 col-span-2">
+				<Card :bgColor="'bg-well'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-md border border-default text-default">
+					<template v-slot:title>
+						<p>Pool Name: <b>{{ poolConfig.name }}</b></p>
+					</template>
+					<template v-slot:content>
+						<p>Compression: <b>{{ isBoolCompression(poolConfig.properties.compression) }}</b></p>
+						<p>Sector Size: <b>{{ poolConfig.properties.sector }}</b></p>
+						<p>Record Size: <b>{{ poolConfig.properties.record }}</b></p>
+						<p>
+							<Accordion :btnColor="'bg-well'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-well text-default">
+								<template v-slot:title>
+									<p class="ml-2 mt-1">Advanced Settings</p>
+								</template>
+								<template v-slot:content>
+									<p>Deduplication: <b>{{ isBoolOnOff(poolConfig.properties.deduplication) }}</b></p>
+									<p>Auto-Expand: <b>{{ isBoolOnOff(poolConfig.properties.autoExpand) }}</b></p>
+									<p>Auto-Replace: <b>{{ isBoolOnOff(poolConfig.properties.autoReplace) }}</b></p>
+									<p>Auto-TRIM: <b>{{ isBoolOnOff(poolConfig.properties.autoTrim) }}</b></p>
+								</template>
+							</Accordion>
+						</p>
+					</template>
+					<template v-slot:footer>
+						<Accordion :btnColor="'bg-well'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-well text-default">
+							<template v-slot:title>
+								<p class="ml-2 mt-1">Virtual Devices <b>({{ poolConfig.vdevs.length }})</b></p>
+							</template>
+							<template v-slot:content>
+								<div v-for="vDev, vDevIdx in poolConfig.vdevs" :key="vDevIdx">
+									<Card :bgColor="'bg-well'" :titleSection="true" :contentSection="true" :footerSection="true" class="text-default">
+										<template v-slot:title>
+											<p><b>{{ vDev.name }}</b></p>
+										</template>
+										<template v-slot:content>
+											<p>Type: <b>{{ vDev.type }}</b></p>
+										</template>
+										<template v-slot:footer>
+											<p>Disks: <br/>
+												<b v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx">
+													{{ disk }} <br/>
+												</b>
+											</p>
+										</template>
+									</Card>
+								</div>
+							</template>
+						</Accordion>
+					</template>
+				</Card>
+			</div>
+			<div v-if="poolConfig.createFileSystem!" class="col-span-2 col-start-1">
+				<Card :bgColor="'bg-well'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-md border border-default text-default">
+					<template v-slot:title>
+						<p class="ml-2 mt-1">File System Name: <b>{{ fileSystemData.name }}</b></p>
+					</template>
+					<template v-slot:content>
+						<Accordion :btnColor="'bg-well'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-7'" :contentColSpan="'col-span-8'" :isOpen="false" class="bg-well text-default">					
+							<template v-slot:title>
+								<p>Settings: <b v-if="fileSystemData.inherit">Inherited</b></p>
+							</template>
+							<template v-slot:content>
+								<p>Compression: <b>{{ (fileSystemData.properties.compression) }}</b></p>
+								<p>Deduplication: <b>{{ (fileSystemData.properties.deduplication) }}</b></p>
+								<p>Record Size: <b>{{ (fileSystemData.properties.recordSize) }}</b></p>
+								<p>Access Time: <b>{{ (fileSystemData.properties.accessTime) }}</b></p>
+								<p>Case Sensitivity: <b>{{ (fileSystemData.properties.caseSensitivity) }}</b></p>
+								<p>DNode Size: <b>{{ (fileSystemData.properties.dNodeSize) }}</b></p>
+								<p>Extended Attributes: <b>{{ (fileSystemData.properties.extendedAttributes) }}</b></p>
+							</template>
+						</Accordion>
+					</template>
+					<template v-slot:footer>
+						<p>Quota: <b>{{ convertBytesToSize(fileSystemData.properties.quota.raw) }}</b></p>
+						<p>Read Only: <b>{{ (fileSystemData.properties.readOnly) }}</b></p>
+					</template>
+				</Card>
+			</div>
+		</div>
 		
-							<p class="ml-10 text-default">Deduplication: {{isBoolOnOff(poolConfig.properties.deduplication)}}</p>
-							<!-- <p class="ml-10 text-default">Refreservation Amount: {{(poolConfig.properties.refreservation)}}%</p> -->
-							<p class="ml-10 text-default">Auto-Expand Pool: {{isBoolOnOff(poolConfig.properties.autoExpand)}}</p>
-							<p class="ml-10 text-default">Auto-Replace Devices: {{isBoolOnOff(poolConfig.properties.autoReplace)}}</p>
-							<p class="ml-10 text-default">Automatic TRIM: {{isBoolOnOff(poolConfig.properties.autoTrim)}}</p>
-						
-					</div>
-				</p>
-			
-		</div>
-		<br/>
-		<div class="ml-4">
-			<!-- Virtual Device Info -->
-			
-				<p class="text-default"><b>VDev Details</b></p>
-			
-				<p class="ml-8">
-					<div v-for="(vDev, vDevIdx) in poolConfig.vdevs" :key="vDevIdx">
-						<div class="ml-4">
-							
-								<p class="text-default">{{poolConfig.vdevs[vDevIdx].name}} - ({{poolConfig.vdevs[vDevIdx].type}})</p>
-								<p class="text-default">({{ poolConfig.vdevs[vDevIdx].selectedDisks.length }} disks)</p>
-								
-				
-									<p class="ml-10 text-default">Type: {{poolConfig.vdevs[vDevIdx].type}}</p>
-
-								 <div v-for="(disk, diskIdx) in poolConfig.vdevs[vDevIdx].selectedDisks" :key="diskIdx">
-										<p class="ml-10 text-default">{{ disk }} </p>
-
-									</div>
-
-									<br/>
-								
-						</div>
-					</div>
-				</p>
-			
-		</div>
-		<br/>
-		<div class="ml-4" v-if="poolConfig.createFileSystem">
-		<!-- File System Info? -->
-			
-				<p class="text-default"><b>File System Details</b></p>
-				
-
-				<p class="ml-10 text-default">ParentFS: {{ fileSystemData.parentFS }}</p>
-				<p class="ml-10 text-default">Name: {{ fileSystemData.name }}</p>
-				<p class="ml-10 text-default">Access Time: {{ fileSystemData.properties.accessTime }}</p>
-				<p class="ml-10 text-default">Deduplication: {{ fileSystemData.properties.deduplication }}</p>
-				<p class="ml-10 text-default">Record Size: {{ fileSystemData.properties.recordSize }}</p>
-				<p class="ml-10 text-default">Case Sensitivity: {{ fileSystemData.properties.caseSensitivity }}</p>
-				<p class="ml-10 text-default">DNode Size: {{ fileSystemData.properties.dNodeSize }}</p>
-				<p class="ml-10 text-default">Compression: {{ fileSystemData.properties.compression }}</p>
-				<p class="ml-10 text-default">Extended Attributes: {{ fileSystemData.properties.extendedAttributes }}</p>
-				<p class="ml-10 text-default">Quota: {{ fileSystemData.properties.quota.raw }} {{ fileSystemData.properties.quota.value }}</p>
-				
-		</div>
-		<br/>
 	</div>
+
+
 </template>
 
 <script setup lang="ts">
 import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
-import { isBoolOnOff } from '../../composables/helpers';
+import Card from '../common/Card.vue';
+import Accordion from '../common/Accordion.vue';
+import { isBoolOnOff, isBoolCompression, convertBytesToSize } from '../../composables/helpers';
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
 const allDisks = inject<DiskData[]>("disks");
 const fileSystemData = inject<Ref<FileSystemData>>('file-system-data')!;
 
-function isBoolCompression(bool : boolean) {
-	if (bool) {return 'lz4'} else {return 'off'}
-}
 
 // console.log(poolConfig.vdevs)
 </script>

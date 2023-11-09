@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center bg-default">
+        <div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center bg-default text-default">
             <div class="py-4 mt-1 col-span-1">{{ props.disk.name }}</div>
             <div class="py-4 mt-1 col-span-1">{{ props.disk.health }}</div>
             <div class="py-4 mt-1 col-span-1">X</div>

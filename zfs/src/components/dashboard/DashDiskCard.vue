@@ -1,6 +1,6 @@
 <template>
 	<button v-on:dblclick="showDetails(props.disk)" class="w-full h-full">
-		<Card class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
+		<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
 			<template v-slot:title>
 				<div class="flex flex-row justify-between">
 					<div class="pr-2 text-default">

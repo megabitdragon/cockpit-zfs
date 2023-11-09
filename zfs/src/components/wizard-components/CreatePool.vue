@@ -88,6 +88,10 @@ const navTag = ref('name-entry');
 const tabError = ref(false);
 
 const finishPressed = ref(false);
+const creatingPool = ref(false);
+const poolCreated = ref(false);
+const creatingFilesystem = ref(false);
+const filesystemCreated = ref(false);
 
 const showWizard = inject<Ref<boolean>>('show-wizard')!;
 
@@ -427,4 +431,9 @@ provide('feedback-vdev', vDevFeedback);
 provide('feedback-disk', diskFeedback);
 provide('feedback-disk-size', diskSizeFeedback);
 provide('feedback-replication-level', isProperReplicationFeedback);
+
+provide('creating-pool', creatingPool);
+provide('pool-created', poolCreated);
+provide('creating-filesystem', creatingFilesystem);
+provide('filesystem-created', filesystemCreated);
 </script>

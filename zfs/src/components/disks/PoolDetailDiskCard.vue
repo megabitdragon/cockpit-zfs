@@ -1,5 +1,5 @@
 <template>
-	<Card class="mt-2 mb-4 overflow-visible card bg-default">
+	<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 overflow-visible card bg-default">
 		<template v-slot:title>
 			<div class="flex flex-row justify-between gap-1">
 				<div class="pr-2 text-default text-medium">
