@@ -230,7 +230,6 @@ async function finishBtn(newPoolData) {
 			console.log('newPoolFound:', newPoolFound);
 
 			setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
-
 			await newFS();
 			await refreshAllData();
 			showWizard.value = false;
@@ -239,8 +238,6 @@ async function finishBtn(newPoolData) {
 			await refreshAllData();
 			showWizard.value = false;
 		}
-
-		
 	});
 }
 

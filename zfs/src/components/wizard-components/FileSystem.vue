@@ -466,7 +466,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, inject, computed, onMounted } from 'vue';
+import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, convertBytesToSize, isBoolOnOff, getParentPath, isBoolCompression } from '../../composables/helpers';
 import { createDataset } from '../../composables/datasets';
@@ -685,7 +685,7 @@ const encryptPasswordCheck = (fileSystem : FileSystemData) => {
 	return result;
 }
 
-const checkQuota = (filesystem) => {
+const checkQuota = (filesystem : FileSystemData) => {
     let result = true;
     quotaFeedback.value = '';
 
@@ -746,9 +746,12 @@ function fillDatasetData() {
 }
 
 async function fsCreateBtn(fileSystem : FileSystemData) {
+	console.log('fsCreateBtn fired');
 	if (props.isStandalone) {
 		if (parentCheck(fileSystem)) {
+			console.log('parentCheck passed');
 			if (nameCheck(fileSystem)) {
+				console.log('nameCheck passed');
 				if (fileSystem.encrypted) {
 					if (encryptPasswordCheck(fileSystem)) {
 						if (checkQuota(fileSystem)) {
@@ -756,6 +759,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 							fillDatasetData();
 							saving.value = true;
 							createDataset(newDataset.value).then(async() => {
+								console.log('create Dataset fired');
 								fileSystemsLoaded.value = false;
 								datasets.value = [];
 								await loadDatasets(datasets);
@@ -763,7 +767,11 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 								saving.value = false;
 								fileSystemsLoaded.value = true;
 							});
+						} else {
+							console.log('quota check failed');
 						}
+					} else {
+						console.log('encryption check failed');
 					}
 				} else {
 					if (checkQuota(fileSystem)) {
@@ -771,6 +779,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 						fillDatasetData();
 						saving.value = true;
 						createDataset(newDataset.value).then(async() => {
+							console.log('create Dataset fired');
 							fileSystemsLoaded.value = false;
 							datasets.value = [];
 							await loadDatasets(datasets);
@@ -778,40 +787,56 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 							saving.value = false;
 							fileSystemsLoaded.value = true;
 						});
+					} else {
+						console.log('quota check failed');
 					}
 				}
+			} else {
+				console.log('name check failed');
 			}
+		} else {
+			console.log('parent check failed');
 		}
 	} 
 }
 
 async function newFileSystemInPoolWizard() {
+	console.log('newFileSystemInPool method fired');
 	const fileSystem = ref(fileSystemConfig.value);
+	console.log('fileSystem:', fileSystem);
 	if (!props.isStandalone) {
 		if (parentCheck(fileSystem.value)) {
+			console.log('parentCheck passed');
 			if (nameCheck(fileSystem.value)) {
+				console.log('nameCheck passed');
 				if (fileSystem.value.encrypted) {
 					if (encryptPasswordCheck(fileSystem.value)) {
-						if (checkQuota(fileSystem)) {
+						if (checkQuota(fileSystem.value)) {
 							getInheritedProperties();
 							fillDatasetData();
-							createDataset(newDataset.value).then(async() => {
-								datasets.value = [];
-								await loadDatasets(datasets);
-							});
+							createDataset(newDataset.value);
+							console.log('create Dataset fired');
+						} else {
+							console.log('quota check failed');
 						}
+					} else {
+						console.log('encryption check failed');
 					}
 				} else {
-					if (checkQuota(fileSystem)) {
+					if (checkQuota(fileSystem.value)) {
+						console.log('checkQuota passed');
 						getInheritedProperties();
 						fillDatasetData();
-						createDataset(newDataset.value).then(async() => {
-							datasets.value = [];
-							await loadDatasets(datasets);
-						});
+						createDataset(newDataset.value);
+					} else {
+						console.log('quota check failed');
 					}
 				}
+			} else {
+				console.log('name check failed');
 			}
+		} else {
+			console.log('parent check failed');
 		}
 	}
 }
@@ -828,5 +853,13 @@ onMounted(() => {
 	if (!props.isStandalone) {
 		setParentFS();
 	}
+	console.log('FileSystem component mounted');
+});
+
+onUpdated(() => {
+	if (!props.isStandalone) {
+		setParentFS();
+	}
+	console.log('FileSystem component updated');
 });
 </script>

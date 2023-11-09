@@ -261,7 +261,7 @@
 
 	<!-- tab four: file system creation (so user does not have a naked pool) -->
 	<!-- component has a toggle so user can choose if they want to create a file system at pool creation, or not if they do in fact want a naked pool -->
-	<div v-if="props.tag ==='file-system'">
+	<div v-show="props.tag ==='file-system'">
 		<fieldset>
 			<legend class="mb-1 text-base font-semibold leading-6 text-default">File System Settings</legend>
 
@@ -291,7 +291,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
+import { inject, provide, reactive, ref, Ref, computed, watch, onUpdated, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression } from '../../composables/helpers';
 import Accordion from '../common/Accordion.vue';
@@ -575,7 +575,6 @@ const validateAndProceed = (tabTag: string): boolean => {
 							return true;
 						}
 					}
-					
 				}
 			}
 		}
@@ -664,9 +663,6 @@ const fsConfig = ref();
 async function createNewFileSystem() {
 
 	console.log('fsConfig', fsConfig.value);
-	//	^^^^^^ WHY IS THIS NULL ^^^^^^
-	//lifecycle shit???
-
 
 	await fsConfig.value.newFileSystemInPoolWizard();
 }
@@ -682,4 +678,12 @@ defineExpose({
 	createNewFileSystem,
 });
 
+
+onMounted(() => {
+	console.log('fsConfig on PoolConfig mount', fsConfig.value);
+});
+
+onUpdated(() => {
+	console.log('fsConfig on PoolConfig update', fsConfig.value);
+});
 </script>
