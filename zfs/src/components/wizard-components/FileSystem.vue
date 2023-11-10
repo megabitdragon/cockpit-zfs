@@ -88,7 +88,7 @@
 				<div>
 					<label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-default">Compression</label>
 					<select v-model="fileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited ({{isBoolCompression(poolConfig.properties.compression)}})</option>
+						<option value="inherited">Inherited ({{isBoolCompression(poolConfig.properties.compression).toUpperCase()}})</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
 						<option value="gzip">GZIP</option>
@@ -101,16 +101,16 @@
 				<div>
 					<label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-default">Deduplication</label>
 					<select v-model="fileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited ({{isBoolOnOff(poolConfig.properties.deduplication)}})</option>
+						<option value="inherited">Inherited ({{upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication))}})</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
-						<option value="edon-r + verify">Edon-R + Verify</option>
-						<option value="sha-256">SHA-256</option>
-						<option value="sha-256 + verify">SHA-256 + Verify</option>
-						<option value="sha-512">SHA-512</option>
-						<option value="sha-512 + verify">SHA-512 + Verify</option>
+						<option value="edonr,verify">Edon-R + Verify</option>
+						<option value="sha256">SHA-256</option>
+						<option value="sha256,verify">SHA-256 + Verify</option>
+						<option value="sha512">SHA-512</option>
+						<option value="sha512,verify">SHA-512 + Verify</option>
 						<option value="skein">Skein</option>
-						<option value="skein + verify">Skein + Verify</option>
+						<option value="skein,verify">Skein + Verify</option>
 						<option value="verify">Verify</option>
 					</select>
 				</div>
@@ -118,14 +118,14 @@
 				<div>
 					<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
 					<select v-model="fileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
-						<option value="inherited">Inherited ({{ poolConfig.properties.record }})</option>
+						<option value="inherited">Inherited ({{ getValue('record', poolConfig.properties.record) }})</option>
 						<option value="512b">512 B</option>
 						<option value="4kib">4 KiB</option>
 						<option value="8kib">8 KiB</option>
 						<option value="16kib">16 KiB</option>
 						<option value="32kib">32 KiB</option>
 						<option value="64kib">64 KiB</option>
-						<option value="256kib">128 KiB</option>
+						<option value="128kib">128 KiB</option>
 						<option value="256kib">256 KiB</option>
 						<option value="512kib">512 KiB</option>
 						<option value="1mib">1 MiB</option>
@@ -157,11 +157,11 @@
 					<label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-default">DNode Size</label>
 					<select v-model="fileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
 						<option value="inherited">Default (Legacy)</option>
-						<option value="1kib">1 KiB</option>
-						<option value="2kib">2 KiB</option>
-						<option value="4kib">4 KiB</option>
-						<option value="8kib">8 KiB</option>
-						<option value="16kib">16 KiB</option>
+						<option value="1k">1 KiB</option>
+						<option value="2k">2 KiB</option>
+						<option value="4k">4 KiB</option>
+						<option value="8k">8 KiB</option>
+						<option value="16k">16 KiB</option>
 						<option value="auto">Auto</option>
 						<option value="legacy">Legacy</option>
 					</select>
@@ -384,16 +384,16 @@
 						<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
 						<select v-model="newFileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
 							<option value="inherited">Inherited</option>
-							<option value="512">512 B</option>
-							<option value="4K">4 KiB</option>
-							<option value="8K">8 KiB</option>
-							<option value="16K">16 KiB</option>
-							<option value="32K">32 KiB</option>
-							<option value="64K">64 KiB</option>
-							<option value="128K">128 KiB</option>
-							<option value="256K">256 KiB</option>
-							<option value="512K">512 KiB</option>
-							<option value="1M">1 MiB</option>
+							<option value="512b">512 B</option>
+							<option value="4kib">4 KiB</option>
+							<option value="8kib">8 KiB</option>
+							<option value="16kib">16 KiB</option>
+							<option value="32kib">32 KiB</option>
+							<option value="64kib">64 KiB</option>
+							<option value="128kib">128 KiB</option>
+							<option value="256kib">256 KiB</option>
+							<option value="512kib">512 KiB</option>
+							<option value="1mib">1 MiB</option>
 						</select>
 					</div>
 				</div>
@@ -468,7 +468,7 @@
 <script setup lang="ts">
 import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
-import { convertSizeToBytes, convertBytesToSize, isBoolOnOff, getParentPath, isBoolCompression } from '../../composables/helpers';
+import { convertSizeToBytes, convertBytesToSize, isBoolOnOff, getParentPath, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
 import { createDataset } from '../../composables/datasets';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';

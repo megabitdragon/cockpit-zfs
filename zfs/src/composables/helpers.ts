@@ -236,3 +236,158 @@ export async function loadTrimActivities(pools, trimActivities) {
 	
 	console.log('trimActivities', trimActivities);
 }
+
+export function getValue(type : string, value : string) {
+	if (type == 'sector') {
+		switch (value) {
+			case "auto":
+				return 'Auto Detect';
+			case "9":
+				return '512 B';
+			case "12":
+				return '4 KiB';
+			case "13":
+				return '8 KiB';
+			case "14":
+				return '16 KiB';
+			case "15":
+				return '32 KiB';
+			case "16":
+				return '64 KiB';
+			default:
+				return 'None';
+		}
+	} else if (type == 'record') {
+		switch (value) {
+			case "512b":
+				return '512 B';
+			case "4kib":
+				return '4 KiB';
+			case "8kib":
+				return '8 KiB';
+			case "16kib":
+				return '16 KiB';
+			case "32kib":
+				return '32 KiB';
+			case "64kib":
+				return '64 KiB';
+			case "128kib":
+				return '128 KiB';
+			case "256kib":
+				return '256 KiB';
+			case "512kib":
+				return '512 KiB';
+			case "1mib":
+				return '1 MiB';
+			default:
+				return 'None';
+		}
+	} else if (type == 'dnode') {
+		switch (value) {
+			case "1k":
+				return '1 KiB';
+			case "2k":
+				return '2 KiB';
+			case "4k":
+				return '4 KiB';
+			case "8k":
+				return '8 KiB';
+			case "16k":
+				return '16 KiB';
+			case "auto":
+				return 'Auto';
+			case "legacy":
+				return 'Legacy';
+			default:
+				return 'None';
+		}
+	} else if (type == 'compression') {
+		switch (value) {
+			case "on":
+				return 'On';
+			case "off":
+				return 'Off';
+			case "gzip":
+				return 'GZIP';
+			case "lz4":
+				return 'LZ4';
+			case "lzjb":
+				return 'LZJB';
+			case "zle":
+				return 'ZLE';
+			default:
+				return 'None';
+		}
+	} else if (type == 'dedup') {
+		switch (value) {
+			case "on":
+				return 'On';
+			case "off":
+				return 'Off';
+			case "edonr,verify":
+				return 'Edon-R + Verify';
+			case "sha256":
+				return 'SHA-256';
+			case "sha256,verify":
+				return 'SHA-256 + Verify';
+			case "sha512":
+				return 'SHA-512';
+			case "sha512,verify":
+				return 'SHA-512 + Verify';
+			case "skein":
+				return 'Skein';
+			case "skein,verify":
+				return 'Skein + Verify';
+			case "verify":
+				return 'Verify';
+			default:
+				return 'None';
+		}
+	}
+}
+
+export function checkInheritance(type: string, value : string, poolConfig : PoolData) {
+	if (type == 'compression') {
+		if (value == 'inherited') {
+			return `${upperCaseWord(value)} (${isBoolCompression(poolConfig.properties.compression).toUpperCase()})`
+		} else {
+			return getValue('compression', value);
+		}
+	} else if (type == 'dedup') {
+		if (value == 'inherited') {
+			return `${upperCaseWord(value)} (${upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication))})`
+		} else {
+			return getValue('dedup', value);
+		}
+	} else if (type == 'record') {
+		if (value == 'inherited') {
+			return `${upperCaseWord(value)} (${getValue('record', poolConfig.properties.record)})`
+		} else {
+			return getValue('record', value);
+		}
+	} else if (type == 'atime') {
+		if (value == 'inherited') {
+			return `${upperCaseWord(value)} (On)`
+		} else {
+			return upperCaseWord(value);
+		}
+	} else if (type == 'case') {
+		if (value == 'inherited') {
+			return `${upperCaseWord(value)} (Sensitive)`
+		} else {
+			return upperCaseWord(value);
+		}
+	} else if (type == 'dnode') {
+		if (value == 'inherited') {
+			return `${upperCaseWord(value)} (Legacy)`
+		} else {
+			return getValue('dnode', value);
+		}
+	} else if (type == 'xattr') {
+		if (value == 'inherited') {
+			return `${upperCaseWord(value)} (System Attribute)`
+		} else {
+			return upperCaseWord(value);
+		}
+	}
+}
