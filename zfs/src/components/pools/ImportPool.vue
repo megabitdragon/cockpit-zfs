@@ -50,7 +50,7 @@
                                 </div>
                             </div>
                             <div v-else>
-                                <LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
+                                <LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'" class="font-semibold text-lg my-0.5"/>                              
                             </div>
                           
                         </ul>

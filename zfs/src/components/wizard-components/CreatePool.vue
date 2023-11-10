@@ -432,6 +432,7 @@ provide('feedback-disk', diskFeedback);
 provide('feedback-disk-size', diskSizeFeedback);
 provide('feedback-replication-level', isProperReplicationFeedback);
 
+provide('finish-pressed', finishPressed);
 provide('creating-pool', creatingPool);
 provide('pool-created', poolCreated);
 provide('creating-filesystem', creatingFilesystem);

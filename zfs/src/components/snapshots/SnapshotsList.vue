@@ -17,7 +17,7 @@
 							</th>
 						</tr>
 						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
-							<LoadingSpinner baseColor="text-gray-200" fillColor="fill-slate-500"/>
+							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 						</tr>
 					</thead>
 					<tbody v-if="snapshotsLoaded && props.item == 'pool'" class="divide-y divide-x divide-default bg-default">

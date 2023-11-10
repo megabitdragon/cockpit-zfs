@@ -41,7 +41,7 @@
 					</div>
 					
 					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default rounded-md">
-						<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
+						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"  class="font-semibold text-lg my-0.5"/>
 					</div>
 					<div v-if="poolData.length < 1 && poolsLoaded == true" class="p-2 flex bg-default justify-center rounded-md">
 						<span class="font-semibold text-lg my-2">No Pools Found</span>

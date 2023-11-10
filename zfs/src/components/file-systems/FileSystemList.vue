@@ -107,7 +107,7 @@
 					</div>
 
 					<div v-if="fileSystemsLoaded == false" class="p-2 flex justify-center bg-default">
-						<LoadingSpinner class="font-semibold text-lg my-0.5" baseColor="text-gray-200" fillColor="fill-slate-500"/>
+						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'" class="font-semibold text-lg my-0.5"/>
 					</div>
 					<div v-if="fileSystems.length < 1 && fileSystemsLoaded == true" class="p-2 flex bg-default justify-center">
 						<span class="font-semibold text-lg my-2">No File Systems Found</span>
