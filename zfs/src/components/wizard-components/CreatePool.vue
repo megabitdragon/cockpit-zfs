@@ -235,17 +235,12 @@ async function finishBtn(newPoolData) {
 		if (newPoolFound) {
 			console.log('newPoolFound:', newPoolFound);
 			setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
-			creatingFilesystem.value = true;
-			await newFS();
-			await refreshAllData();
-			creatingFilesystem.value = false;
-			filesystemCreated.value = true;
-			showWizard.value = false;
 		} else {
 			console.log("Pool not found, refreservation unsuccessful");
-			await refreshAllData();
-			showWizard.value = false;
 		}
+		await newFS();	
+		await refreshAllData();
+		showWizard.value = false;
 		poolCreated.value = false;
 		filesystemCreated.value = false;
 		finishPressed.value = false;
@@ -254,9 +249,13 @@ async function finishBtn(newPoolData) {
 
 async function newFS() {
 	if (poolConfig.value.createFileSystem!) {
+		creatingFilesystem.value = true;
 		console.log('creating File System...');
-		console.log('poolConfiguration', poolConfiguration.value);
+		// console.log('poolConfiguration', poolConfiguration.value);
 		await poolConfiguration.value.createNewFileSystem();
+		creatingFilesystem.value = false;
+		filesystemCreated.value = true;
+		console.log('File System created.');
 	}
 }
 

@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<legend v-if="!finishPressed && !creatingPool && !poolCreated" class="mb-1 text-base font-semibold leading-6 text-default">Review Pool Details</legend>
-		
-		<div class="grid grid-cols-1 gap-1">
-			<div v-if="!finishPressed && !creatingPool && !poolCreated" class="">
+		<div v-if="!finishPressed" class="grid grid-cols-1 gap-1">
+			<legend v-if="!creatingPool && !poolCreated" class="mb-1 text-base font-semibold leading-6 text-default">Review Configuration</legend>
+
+			<div v-if="!creatingPool && !poolCreated" class="">
 				<Card :bgColor="'bg-well'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">
 					<template v-slot:title>
 						<div>
@@ -49,12 +49,12 @@
 									<template v-slot:footer>
 										<div class="rounded-lg">
 											<p>
-												Disks (<b>{{ vDev.selectedDisks.length }}</b>): <b>| </b>
-												<b v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx">
-													{{ disk }} |
-												</b>
+												Disks (<b>{{ vDev.selectedDisks.length }}</b>): | 
+												<span v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx">
+													<b>{{  disk  }}</b> |
+												</span>
 											</p>
-										</div>											
+										</div>
 									</template>
 								</Card>							
 							</template>
@@ -62,48 +62,8 @@
 					</template>
 				</Card>
 			</div>
-			<div v-if="finishPressed && creatingPool && !poolCreated" class="">
-				<div class="grid justify-center justify-items-center">
-					<legend class="text-lg text-default">Creating Pool...</legend>
-					<LoadingSpinner :width="'w-28'" :height="'h-28'" :baseColor="'text-gray-200'" :fillColor="'fill-green-500'" class="font-semibold text-lg my-0.5"/>
-				</div>
-			</div>
-			<div v-if="finishPressed && !creatingPool && poolCreated" class="">
-				<div class="grid justify-center justify-items-center">
-					<legend class="text-lg text-success">Pool Created!</legend>
-					<img class="aspect-square w-28 h-28 min-w-28 min-h-28" src="../../../public/icons/success.svg">
-				</div>
-			</div>
-		</div>
-
-
-
-		<div class="grid grid-cols-4 gap-1">
-			<div class="col-start-1 row-start-1 col-span-2">
-				
-			</div>
-			<div class="col-start-3 row-start-1 col-span-2">
-
-				<div>
-					<div>
-					
-					</div>
-				</div>
-
-				<div v-if="finishPressed && !creatingPool && poolCreated">
-
-				</div>
-			</div>
-
-			<!--
-			<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-cols-4 gap-2 justify-items-center">
-				<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'" class="col-span-4 my-2"/>
-			</div>
-
-
-			 -->
-
-			<div v-if="poolConfig.createFileSystem!" class="col-start-1 row-start-2 col-span-2 rounded-lg">
+			
+			<div v-if="poolConfig.createFileSystem! && !creatingFilesystem && !filesystemCreated" class="">
 				<Card :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">
 					<template v-slot:title>
 						<div class="rounded-lg">						
@@ -112,7 +72,7 @@
 					</template>
 					<template v-slot:footer>
 						<div>
-							<p>Quota: <b>{{ convertBytesToSize(fileSystemData.properties.quota.raw) }}</b></p>
+							<p>Quota: <b>{{ convertBytesToSize(convertSizeToBytes((fileSystemData.properties.quota.raw.toString()) + fileSystemData.properties.quota.unit)) }}</b></p>
 							<p>Read Only: <b>{{ upperCaseWord(isBoolOnOff(fileSystemData.properties.isReadOnly!)) }}</b></p>	
 							<p class="mt-1 border rounded-lg border-default">
 								<Accordion :wholeBtn="true" :btnColor="'bg-default'" :gridSize="'grid-cols-2'" :btnColSpan="'col-span-2'" :titleColSpan="'col-span-2'" :contentColSpan="'col-span-2'" :isOpen="false" class="bg-default text-default">					
@@ -144,28 +104,51 @@
 						</div>
 					</template>
 				</Card>
-				
-			</div>
-			<div v-if="poolConfig.createFileSystem!" class="col-start-3 row-start-2 col-span-2">
-				<!-- <div v-if="finishPressed && creatingFilesystem && !filesystemCreated" class="bg-well mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">				
-					<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-default'" :fillColor="'bg-secondary'"/>			
-				</div>
-				<div v-if="finishPressed && !creatingFilesystem && filesystemCreated">
-
-				</div> -->
 			</div>
 		</div>
-		
+
+		<div v-if="finishPressed" class="grid grid-cols-1 gap-1 bg-well rounded-md border border-default p-2">
+			<div v-if="creatingPool && !poolCreated">
+				<div class="grid justify-center justify-items-center">
+					<legend class="text-lg text-default animate-pulse">Creating Pool...</legend>
+					<LoadingSpinner :width="'w-24'" :height="'h-24'" :baseColor="'text-gray-200'" :fillColor="'fill-green-500'" class="font-semibold text-lg my-0.5"/>
+				</div>
+			</div>
+			<div v-if="!creatingPool && poolCreated" class="">
+				<div class="grid justify-center justify-items-center">
+					<legend class="text-lg text-success">Pool Created!</legend>
+					<img class="aspect-square w-24 h-24 min-w-24 min-h-24" src="../../../public/icons/success.svg">
+				</div>
+			</div>
+		</div>
+		<div v-if="finishPressed && poolConfig.createFileSystem!" class="mt-2 p-2 grid grid-cols-1 gap-1 bg-well rounded-md border border-default">
+			<div v-if="creatingPool">
+				<div class="grid justify-center justify-items-center">
+					<legend class="text-lg text-muted animate-pulse">Waiting for Pool...</legend>
+					<LoadingSpinner :width="'w-24'" :height="'h-24'" :baseColor="'text-gray-200'" :fillColor="'fill-gray-300'" class="font-semibold text-lg my-0.5"/>
+				</div>
+			</div>
+			<div v-if="!creatingPool && creatingFilesystem && !filesystemCreated">
+				<div class="grid justify-center justify-items-center">
+					<legend class="text-lg text-default animate-pulse">Creating File System...</legend>
+					<LoadingSpinner :width="'w-24'" :height="'h-24'" :baseColor="'text-gray-200'" :fillColor="'fill-green-500'" class="font-semibold text-lg my-0.5"/>
+				</div>
+			</div>
+			<div v-if="!creatingPool && !creatingFilesystem && filesystemCreated" class="">
+				<div class="grid justify-center justify-items-center">
+					<legend class="text-lg text-success">File System Created!</legend>
+					<img class="aspect-square w-24 h-24 min-w-24 min-h-24" src="../../../public/icons/success.svg">
+				</div>
+			</div>
+		</div>
 	</div>
-
-
 </template>
 
 <script setup lang="ts">
-import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
+import { inject, Ref} from 'vue';
 import Card from '../common/Card.vue';
 import Accordion from '../common/Accordion.vue';
-import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance } from '../../composables/helpers';
+import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
@@ -176,5 +159,7 @@ const creatingPool = inject<Ref<boolean>>('creating-pool')!;
 const poolCreated = inject<Ref<boolean>>('pool-created')!;
 const creatingFilesystem = inject<Ref<boolean>>('creating-filesystem')!;
 const filesystemCreated = inject<Ref<boolean>>('filesystem-created')!;
+
+console.log('fileSystemData:', fileSystemData.value);
 
 </script>

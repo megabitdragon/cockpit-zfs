@@ -4,14 +4,14 @@
             <div v-if="!isPoolList">
                 <div v-if="!isTrim">
                     <div class="grid grid-cols-4 gap-1 justify-items-center">
-                        <span class="col-span-4" :class="stateMessageClass()">
+                        <span class="col-span-4 mt-0.5" :class="stateMessageClass()">
                             {{ stateMessage }}
                         </span>
 
                         <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
                             <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
                                 <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                                    <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+                                    <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-1.5 leading-none">
                                         {{ parseFloat(scanPercentage.toFixed(2)) }}%
                                     </div>
                                 </div>
@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2">
+                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-1.5">
                         <span class="mt-2" :class="stateMessageClass()">
                             {{ miniStateMsg }}
                         </span>
