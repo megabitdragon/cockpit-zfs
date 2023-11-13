@@ -40,6 +40,7 @@
 								<template v-slot:title>
 									<div class="grid grid-cols-10 grid-flow-cols w-full justify-center text-center">
 										<!-- <button @click="showFSDetails(fileSystems[fsIdx])" class="grid grid-cols-9 col-span-6 hover:bg-accent pt-1 rounded-r-md"> -->
+										<button @click="loadFileSystemConfig(fileSystems[fsIdx])" class="grid grid-cols-9 col-span-9 hover:bg-accent pt-1 rounded-r-lg">
 											<div class="py-4 pl-4 pr-3 text-sm font-medium text-default"> {{ fileSystem.name }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedByDataset }}</div>
@@ -50,7 +51,7 @@
 											<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.snapshotCount) }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
-										<!-- </button> -->
+										</button>
 										<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 											<Menu as="div" class="relative inline-block text-left">
 												<div>
