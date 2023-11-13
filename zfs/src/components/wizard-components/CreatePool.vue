@@ -132,7 +132,7 @@ const poolConfig = ref<PoolData>({
 		readOnly: false,
 	},
 	vdevs: [],
-	createFileSystem: false,
+	createFileSystem: true,
 	// fileSystem: fileSystemConfig.value,
 });
 
@@ -223,25 +223,32 @@ const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 async function finishBtn(newPoolData) {
   	finishPressed.value = true;
 	poolConfiguration.value.fillNewPoolData();
+	creatingPool.value = true;
 	console.log('newPoolData received:', newPoolData);
 	//console.log('newPoolName received:', newPoolName.value);
 
 	newPool(newPoolData).then(async() => {
 		await refreshAllData();
 		const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
-
+		creatingPool.value = false;
+		poolCreated.value = true;
 		if (newPoolFound) {
 			console.log('newPoolFound:', newPoolFound);
-
 			setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
+			creatingFilesystem.value = true;
 			await newFS();
 			await refreshAllData();
+			creatingFilesystem.value = false;
+			filesystemCreated.value = true;
 			showWizard.value = false;
 		} else {
 			console.log("Pool not found, refreservation unsuccessful");
 			await refreshAllData();
 			showWizard.value = false;
 		}
+		poolCreated.value = false;
+		filesystemCreated.value = false;
+		finishPressed.value = false;
 	});
 }
 

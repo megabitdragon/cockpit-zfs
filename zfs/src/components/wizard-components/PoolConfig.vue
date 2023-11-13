@@ -154,7 +154,7 @@
 			</div>
 
 			<!-- Advanced Settings (hidden under accordion for better UI/UX) -->
-			<Accordion :wholeBtn="true" :btnColor="'bg-well'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-8'" :titleColSpan="'col-span-8'" :contentColSpan="'col-span-8'" :isOpen="false" class="mt-2 -ml-1 bg-well text-default border rounded-md border-default">
+			<Accordion :wholeBtn="true" :btnColor="'bg-well'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-8'" :titleColSpan="'col-span-8'" :contentColSpan="'col-span-8'" :isOpen="false" class="mt-2 -ml-1 bg-well text-default">
 				<template v-slot:title>
 					<div class="mt-1">
 						<span class="ml-3"><b>Advanced Settings</b></span>
@@ -283,7 +283,6 @@
 	<!-- tab five: final tab - review all data selected -->
 	<div v-if="props.tag ==='review'">
 		<fieldset>
-			<legend class="mb-1 text-base font-semibold leading-6 text-default">Review Pool Details</legend>
 			<ReviewTab/>
 		</fieldset>
 	</div>
