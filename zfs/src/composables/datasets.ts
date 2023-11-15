@@ -38,7 +38,6 @@ export async function createDataset(fileSystemData : NewDataset, passphrase? : s
 			const state = useSpawn(cmdString);
 			const output = await state.promise().then(async() => {
 				usePassphrase(passphrase!);
-				usePassphrase(passphrase!);
 			});
 			console.log(output)
 			return output.stdout;

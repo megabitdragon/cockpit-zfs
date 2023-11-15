@@ -25,7 +25,7 @@
 import { reactive, ref, Ref, inject, computed, provide, watch } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
@@ -59,12 +59,13 @@ const trimActivities = ref<Map<string, Ref<Activity>>>(new Map());
 const poolDiskStats = ref<PoolDiskStats>({});
 const diskStatsIntervalID = ref();
 
-async function initialLoad(disks, pools, datasets) {
+async function initialLoad(disks, pools, datasets, snapshots) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
+	await loadSnapshots(snapshots);
 	await scanNow();
 	await loadScanActivities(pools, scanActivities);
 	await checkDiskStats();
@@ -76,7 +77,7 @@ async function initialLoad(disks, pools, datasets) {
 	console.log('ZFS.vue trimActivities', trimActivities.value);
 }
 
-initialLoad(disks, pools, datasets);
+initialLoad(disks, pools, datasets, snapshots);
 
 /////////////////////////////////////////////////////
 async function scanNow() {
@@ -104,8 +105,6 @@ provide('scan-object-group', scanObjectGroup);
 provide('pool-disk-stats', poolDiskStats);
 provide('scan-interval', scanIntervalID);
 provide('disk-stats-interval', diskStatsIntervalID);
-// provide('scan-activity', scanActivity);
-// provide('trim-activity', trimActivity);
 provide('scan-activities', scanActivities);
 provide('trim-activities', trimActivities);
 </script>

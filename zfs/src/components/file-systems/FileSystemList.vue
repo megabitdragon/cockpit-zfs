@@ -146,6 +146,14 @@
 	<div v-if="showSnapshotModal">
 		<CreateSnapshotModal :idKey="'show-create-snap-modal'" @close="showSnapshotModal = false" :item="'filesystem'" />
 	</div>
+
+	<div v-if="showSendDataset">
+		<!-- <SendDataset/> -->
+	</div>
+
+	<div v-if="showReceiveDataset">
+		<!-- <ReceiveDataset/> -->
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -163,6 +171,8 @@ import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import RenameFileSystem from "./RenameFileSystem.vue";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
+import SendDataset from './SendDataset.vue';
+import ReceiveDataset from './ReceiveDataset.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -187,7 +197,6 @@ const selectedDataset = ref<FileSystemData>();
 // const snapshots = ref<Snapshot[]>([]);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 // const fileSystemsAndSnaps = ref<SnapDatasets[]>([]);
-// const snapshotsInFilesystem = ref<Snapshot[]>([]);
 
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
@@ -207,21 +216,22 @@ function loadFileSystemConfig(fileSystem) {
 function findPoolDataset(fileSystem) {
 	try {
 		return pools.value.find(pool => pool.name == fileSystem.name);
-	} catch {
-		console.log('error finding pool');
+	} catch (error) {
+		console.log('error finding pool:', error);
 	}
 }
 
 function findSnapDataset(fileSystem) {
-	try {
-		return snapshots.value.find(snapshot => snapshot.dataset == fileSystem.name);
-	} catch {
-		console.log('error finding snapshot');
-	}
+    try {
+        return snapshots.value.some(snapshot => snapshot.dataset === fileSystem.name);
+    } catch (error) {
+        console.error('Error finding snapshot:', error);
+    }
 }
 
-function showFSDetails(filesystem) {
-	
+async function refreshSnaps(filesystem) {
+	snapshots.value = [];
+	await loadSnapshotsInDataset(snapshots, filesystem);
 }
 
 ///////////////// Create Snapshots //////////////////
@@ -240,6 +250,7 @@ watch(confirmCreate, async (newVal, oldVal) => {
 	if (confirmCreate.value == true) {
 		operationRunning.value = true;
 		await refreshDatasets();
+		await refreshSnaps(selectedDataset.value);
 		confirmCreate.value = false;
 		operationRunning.value = false;
 		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
@@ -259,10 +270,15 @@ const isDeleting = ref(false);
 async function deleteFileSystem(fileSystem) {
 	operationRunning.value = false;
 	selectedDataset.value = fileSystem;
-	if (!findPoolDataset(selectedDataset.value) && selectedDataset.value!.children!.length > 0 || findSnapDataset(selectedDataset.value)) {
-		hasChildren.value = true;
-	} else { 
-		hasChildren.value = false;
+	await refreshSnaps(selectedDataset.value);
+	console.log('snapshots', snapshots.value);
+	console.log('findSnapDataset', findSnapDataset(selectedDataset.value));
+	if (selectedDataset.value) { 
+		if ((!findPoolDataset(selectedDataset.value) && selectedDataset.value!.children!.length > 0) || findSnapDataset(selectedDataset.value)) {
+			hasChildren.value = true;
+		} else {
+			hasChildren.value = false;
+		}
 	}
 
 	showDeleteFileSystemConfirm.value = true;
@@ -284,9 +300,9 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		await destroyDataset(selectedDataset.value!, firstOptionToggle.value, thirdOptionToggle.value, fourthOptionToggle.value);
 		operationRunning.value = false;
-		refreshDatasets();
+		await refreshDatasets();
+		await refreshSnaps(selectedDataset.value);
 		showDeleteFileSystemConfirm.value = false;
-
 		confirmDelete.value = false;
 		hasChildren.value = false;
 		console.log('deleted:', selectedDataset.value!);
@@ -331,6 +347,7 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 		confirmUnmount.value = false;
 		forceUnmount.value = false;
 		await refreshDatasets();
+		await refreshSnaps(selectedDataset.value);
 		unmounting.value = false;
 		operationRunning.value = false;
 	}
@@ -370,6 +387,7 @@ watch(confirmMount, async (newValue, oldValue) => {
 		confirmMount.value = false;
 		forceMount.value = false;
 		await refreshDatasets();
+		await refreshSnaps(selectedDataset.value);
 		mounting.value = false;
 		operationRunning.value = false;
 	}
@@ -387,6 +405,13 @@ function renameThisDataset(fileSystem) {
 	console.log('selected to be renamed:', selectedDataset.value);
 }
 
+//////////////////// Send Dataset ///////////////////
+/////////////////////////////////////////////////////
+const showSendDataset = ref(false);
+
+///////////////// Receive Dataset ///////////////////
+/////////////////////////////////////////////////////
+const showReceiveDataset = ref(false);
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
@@ -417,7 +442,8 @@ provide('create-snap-modal', showSnapshotModal);
 provide('creating', creating);
 provide('confirm-create', confirmCreate);
 
-// provide('snapshots-in-filesystem', snapshotsInFilesystem);
+provide('show-send-dataset', showSendDataset);
+provide('show-receive-dataset', showReceiveDataset);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);

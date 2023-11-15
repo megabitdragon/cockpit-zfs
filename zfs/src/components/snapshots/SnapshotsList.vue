@@ -58,6 +58,9 @@
 												<MenuItem as="div" v-slot="{ active }">
 													<a href="#" @click="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
 												</MenuItem>
+												<MenuItem as="div" v-slot="{ active }">
+													<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+												</MenuItem>
 											</div>
 										</MenuItems>
 									</transition>
