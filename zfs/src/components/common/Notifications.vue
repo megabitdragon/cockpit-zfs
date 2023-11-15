@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>.
 			<div v-for="notification in notificationList" :key="notification.id"
 				class="max-w-sm w-full shadow-lg pointer-events-auto overflow-hidden bg-default text-default"
 				@mouseenter="notification.clearTimeouts?.()" @mouseleave="notification.setTimeouts?.()">
-				<div class="p-4">
+				<div class="p-4 border rounded-md border-default">
 					<div class="flex items-start">
 						<div class="flex-shrink-0" aria-hidden="true">
 							<ExclamationCircleIcon v-if="notification.level === 'error'" class="icon-error size-icon-lg"

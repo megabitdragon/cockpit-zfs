@@ -5,7 +5,7 @@
 			<!-- Name of Parent File System (Text) -->
 			<div>
 				<label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-				<select :id="getIdKey('parent-filesystem')" disabled v-model="fileSystemConfig.parentFS" name="parent-filesystem" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+				<select :id="getIdKey('parent-filesystem')" disabled v-model="fileSystemConfig.parentFS" name="parent-filesystem" class="mt-1 block w-full input-textlike bg-default">
 					<option :value="parentFileSystem" class=text-default>{{ parentFileSystem }}</option>
 				</select>
 			</div>
@@ -13,7 +13,7 @@
 			<!-- Name of File System (Text) -->
 			<div>
 				<label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Name</label>
-				<input :id="getIdKey('filesystem-name')" type="name" name="pool-name" v-model="fileSystemConfig.name" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="File System Name" />
+				<input :id="getIdKey('filesystem-name')" type="text" name="file-system-name" v-model="fileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default" placeholder="File System Name" />
 				<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
 			</div>
 
@@ -41,17 +41,17 @@
 				<!-- Passphrase (Text) -->
 				<div>
 					<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
-					<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="Passphrase" />
+					<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" placeholder="Passphrase" />
 				</div>
 				<!-- Confirm Passphrase (Text) -->
 				<div>
 					<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
-					<input :id="getIdKey('passphrase-confirm')" type="password" name="passphrase-confirm" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="Confirm Passphrase" />
+					<input :id="getIdKey('passphrase-confirm')" type="password" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
 				</div>
 				<!-- Cipher (Select) -->
 				<div>
 					<label :for="getIdKey('cipher')" class="block text-sm font-medium leading-6 text-default">Cipher</label>
-					<select :id="getIdKey('cipher')" name="cipher" v-model="fileSystemConfig.properties.encryption" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<select :id="getIdKey('cipher')" name="cipher" v-model="fileSystemConfig.properties.encryption" class="mt-1 block w-full input-textlike bg-default">
 						<option value="aes-128-ccm">AES-128-CCM</option>
 						<option value="aes-192-ccm">AES-192-CCM</option>
 						<option value="aes-256-ccm">AES-256-CCM</option>
@@ -87,7 +87,7 @@
 				<!-- Compression (Select) -->
 				<div>
 					<label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-default">Compression</label>
-					<select v-model="fileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<select v-model="fileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="mt-1 block w-full input-textlike bg-default">
 						<option value="inherited">Inherited ({{isBoolCompression(poolConfig.properties.compression).toUpperCase()}})</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
@@ -100,7 +100,7 @@
 				<!-- Deduplication (Select) -->
 				<div>
 					<label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-default">Deduplication</label>
-					<select v-model="fileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<select v-model="fileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="mt-1 block w-full input-textlike bg-default">
 						<option value="inherited">Inherited ({{upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication))}})</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
@@ -117,7 +117,7 @@
 				<!-- Record Size (Select) -->
 				<div>
 					<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
-					<select v-model="fileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<select v-model="fileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="mt-1 block w-full input-textlike bg-default">
 						<option value="inherited">Inherited ({{ getValue('record', poolConfig.properties.record) }})</option>
 						<option value="512b">512 B</option>
 						<option value="4kib">4 KiB</option>
@@ -136,7 +136,7 @@
 				<!-- Access Time (Select) -->
 				<div>
 					<label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-default">Access Time</label>
-					<select v-model="fileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<select v-model="fileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="mt-1 block w-full input-textlike bg-default">
 						<option value="inherited">Default (On)</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
@@ -145,7 +145,7 @@
 				<!-- Case Sensitivity (Select) -->
 				<div>
 					<label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-default">Case Sensitivity</label>
-					<select v-model="fileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<select v-model="fileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="mt-1 block w-full input-textlike bg-default">
 						<option value="inherited">Default (Sensitive)</option>
 						<option value="insensitive">Insensitive</option>
 						<option value="mixed">Mixed</option>
@@ -155,7 +155,7 @@
 				<!-- DNode Size (Select) -->
 				<div>
 					<label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-default">DNode Size</label>
-					<select v-model="fileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<select v-model="fileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="mt-1 block w-full input-textlike bg-default">
 						<option value="inherited">Default (Legacy)</option>
 						<option value="1k">1 KiB</option>
 						<option value="2k">2 KiB</option>
@@ -169,7 +169,7 @@
 				<!-- Extended Attributes (Select) -->
 				<div>
 					<label :for="getIdKey('fs-extended-attributes')" class="block text-sm font-medium leading-6 text-default">Extended Attributes</label>
-					<select v-model="fileSystemConfig.properties.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+					<select v-model="fileSystemConfig.properties.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="mt-1 block w-full input-textlike bg-default">
 						<option value="inherited">Default (System Attribute)</option>
 						<option value="on">On</option>
 						<option value="off">Off</option>
@@ -229,7 +229,7 @@
 				<!-- Name of Parent File System (Text) -->
 				<div>
                     <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-                    <select :id="getIdKey('parent-filesystem')" name="parent-filesystem" v-model="newFileSystemConfig.parentFS" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+                    <select :id="getIdKey('parent-filesystem')" name="parent-filesystem" v-model="newFileSystemConfig.parentFS" class="mt-1 block w-full input-textlike bg-default">
                         <option v-for="dataset, datasetIdx in datasets" :key="datasetIdx" :value="dataset.name">{{ dataset.name }}</option>
                     </select>
                 </div>
@@ -237,7 +237,7 @@
 				<!-- Name of File System (Text) -->
 				<div>
 					<label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium text-default">Name</label>
-					<input :id="getIdKey('filesystem-name')" @keydown.enter="fsCreateBtn(newFileSystemConfig)" type="name" name="pool-name" v-model="newFileSystemConfig.name" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="File System Name" />
+					<input :id="getIdKey('filesystem-name')" @keydown.enter="fsCreateBtn(newFileSystemConfig)" type="text" name="file-system-name" v-model="newFileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default" placeholder="File System Name" />
 				</div>
 
 				<!-- Encryption (Toggle) -> Reveals extra fields-->
@@ -264,17 +264,17 @@
 					<!-- Passphrase (Text) -->
 					<div>
 						<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
-						<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="Passphrase" />
+						<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" placeholder="Passphrase" />
 					</div>
 					<!-- Confirm Passphrase (Text) -->
 					<div>
 						<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
-						<input :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="Confirm Passphrase" />
+						<input :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
 					</div>
 					<!-- Cipher (Select) -->
 					<div>
 						<label :for="getIdKey('cipher')" class="block text-sm font-medium leading-6 text-default">Cipher</label>
-						<select :id="getIdKey('cipher')" name="cipher" v-model="newFileSystemConfig.properties.encryption" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+						<select :id="getIdKey('cipher')" name="cipher" v-model="newFileSystemConfig.properties.encryption" class="mt-1 block w-full input-textlike bg-default">
 							<option value="aes-128-ccm">AES-128-CCM</option>
 							<option value="aes-192-ccm">AES-192-CCM</option>
 							<option value="aes-256-ccm">AES-256-CCM</option>
@@ -309,7 +309,7 @@
 					<!-- Access Time (Select) -->
 					<div>
 						<label :for="getIdKey('fs-access-time')" class="block text-sm font-medium leading-6 text-default">Access Time</label>
-						<select v-model="newFileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+						<select v-model="newFileSystemConfig.properties.accessTime" :id="getIdKey('fs-access-time')" name="fs-access-time" class="mt-1 block w-full input-textlike bg-default">
 							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
@@ -318,7 +318,7 @@
 					<!-- Case Sensitivity (Select) -->
 					<div>
 						<label :for="getIdKey('fs-case-sensitivity')" class="block text-sm font-medium leading-6 text-default">Case Sensitivity</label>
-						<select v-model="newFileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+						<select v-model="newFileSystemConfig.properties.caseSensitivity" :id="getIdKey('fs-case-sensitivity')" name="fs-case-sensitivity" class="mt-1 block w-full input-textlike bg-default">
 							<option value="inherited">Inherited</option>
 							<option value="insensitive">Insensitive</option>
 							<option value="mixed">Mixed</option>
@@ -328,7 +328,7 @@
 					<!-- Compression (Select) -->
 					<div>
 						<label :for="getIdKey('fs-compression')" class="block text-sm font-medium leading-6 text-default">Compression</label>
-						<select v-model="newFileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+						<select v-model="newFileSystemConfig.properties.compression" :id="getIdKey('fs-compression')" name="fs-compression" class="mt-1 block w-full input-textlike bg-default">
 							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
@@ -341,7 +341,7 @@
 					<!-- Deduplication (Select) -->
 					<div>
 						<label :for="getIdKey('fs-deduplication')" class="block text-sm font-medium leading-6 text-default">Deduplication</label>
-						<select v-model="newFileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+						<select v-model="newFileSystemConfig.properties.deduplication" :id="getIdKey('fs-deduplication')" name="fs-deduplication" class="mt-1 block w-full input-textlike bg-default">
 							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
@@ -358,7 +358,7 @@
 					<!-- DNode Size (Select) -->
 					<div>
 						<label :for="getIdKey('fs-dnode-size')" class="block text-sm font-medium leading-6 text-default">DNode Size</label>
-						<select v-model="newFileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+						<select v-model="newFileSystemConfig.properties.dNodeSize" :id="getIdKey('fs-dnode-size')" name="fs-dnode-size" class="mt-1 block w-full input-textlike bg-default">
 							<option value="inherited">Inherited</option>
 							<option value="1k">1 KiB</option>
 							<option value="2k">2 KiB</option>
@@ -372,7 +372,7 @@
 					<!-- Extended Attributes (Select) -->
 					<div>
 						<label :for="getIdKey('fs-extended-attributes')" class="block text-sm font-medium leading-6 text-default">Extended Attributes</label>
-						<select v-model="newFileSystemConfig.properties.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+						<select v-model="newFileSystemConfig.properties.extendedAttributes" :id="getIdKey('fs-extended-attributes')" name="fs-extended-attributes" class="mt-1 block w-full input-textlike bg-default">
 							<option value="inherited">Inherited</option>
 							<option value="on">On</option>
 							<option value="off">Off</option>
@@ -382,7 +382,7 @@
 					<!-- Record Size (Select) -->
 					<div>
 						<label :for="getIdKey('fs-record-size')" class="block text-sm font-medium leading-6 text-default">Record Size</label>
-						<select v-model="newFileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6">
+						<select v-model="newFileSystemConfig.properties.recordSize" :id="getIdKey('fs-record-size')" name="fs-record-size" class="mt-1 block w-full input-textlike bg-default">
 							<option value="inherited">Inherited</option>
 							<option value="512b">512 B</option>
 							<option value="4kib">4 KiB</option>
