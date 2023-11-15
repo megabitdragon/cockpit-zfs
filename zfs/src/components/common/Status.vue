@@ -115,7 +115,7 @@
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, computed, ComputedRef, onMounted, watch, onUpdated, defineExpose } from "vue";
-import { convertBytesToSize, convertSecondsToString, convertRawTimestampToString, upperCaseWord, getRawTimestampFromString } from "../../composables/helpers";
+import { convertBytesToSize, convertSecondsToString, convertRawTimestampToString, upperCaseWord, convertTimestampToLocal } from "../../composables/helpers";
 import { loadScanObjectGroup, loadDiskStats } from "../../composables/loadData";
 
 interface StatusProps {
@@ -268,15 +268,16 @@ const stateMessage = computed(() => {
         if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause !== 'None') {
            return `${scanFunction.value} paused at  ${scanObjectGroup.value[props.pool.name].pause}`;
         } else {
+            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // console.log('timeZone:', userTimeZone);
             if (scanObjectGroup.value[props.pool.name]) {
                 switch (scanObjectGroup.value[props.pool.name].state) {
                     case 'SCANNING':
-                        //convertRawTimestampToString(getRawTimestampFromString(scanObjectGroup.value[props.pool.name].start_time))
-                        return `${scanFunction.value} started at ${scanObjectGroup.value[props.pool.name].start_time}`;
+                        return `${scanFunction.value} started at ${convertTimestampToLocal(scanObjectGroup.value[props.pool.name].start_time)}`;
                     case 'FINISHED':
-                        return `${scanFunction.value} finished at ${scanObjectGroup.value[props.pool.name].end_time}`;
+                        return `${scanFunction.value} finished at ${convertTimestampToLocal(scanObjectGroup.value[props.pool.name].end_time)}`;
                     case 'CANCELED':
-                        return `${scanFunction.value} canceled at ${scanObjectGroup.value[props.pool.name].end_time}`;
+                        return `${scanFunction.value} canceled at ${convertTimestampToLocal(scanObjectGroup.value[props.pool.name].end_time)}`;
                     case 'NONE':
                         return 'N/A';
                     default:

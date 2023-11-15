@@ -147,6 +147,25 @@ export function convertRawTimestampToString(rawTimestamp) {
 	return timestamp;
 }
 
+export function convertTimestampToLocal(timestamp) {
+    const utcTimestamp = timestamp.replace(' ', 'T') + 'Z';
+
+    const localTimestamp = new Date(utcTimestamp).toLocaleString('en-US', {
+		year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+    });
+
+    const rearrangedTimestamp = localTimestamp.replace(/\//g, '-').replace(',', '');
+
+    const [date, time] = rearrangedTimestamp.split(' ');
+
+    const [month, day, year] = date.split('-');
+    const rearrangedDate = `${year}-${month}-${day}`;
+
+    const finalTimestamp = `${rearrangedDate} ${time}`;
+
+    return finalTimestamp;
+}
+
 export const getPoolDiskType = (pool) => {
 	let hasSSD = false;
 	let hasHDD = false;
