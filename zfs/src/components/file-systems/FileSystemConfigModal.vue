@@ -191,6 +191,7 @@
                         <option value="legacy">Legacy</option>
                     </select>
                 </div>
+
                <div class="mt-2">
                     <label :for="getIdKey('fs-config-xattr')" class="bg-default block text-base leading-6 text-default">Extended Attributes</label>
                     <select :id="getIdKey('fs-config-xattr')" v-model="fileSystemConfig.properties.extendedAttributes" name="fs-config-xattr" class="mt-1 block w-full input-textlike bg-default">
@@ -198,6 +199,11 @@
                         <option value="off">Off</option>
                         <option value="sa">System Attribute</option>
                     </select>
+                </div>
+
+                <div v-if="props.filesystem.encrypted" class="mt-2">
+                    <label :for="getIdKey('fs-config-encryption')" name="fs-config-encryption" class="bg-default block text-base leading-6 text-default">Encryption</label>
+                    <p class="mt-1 block w-full bg-default">{{ props.filesystem.properties.encryption.toUpperCase() }}</p>
                 </div>
             </div>
 
