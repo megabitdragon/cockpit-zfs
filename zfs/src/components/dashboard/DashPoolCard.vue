@@ -213,23 +213,29 @@ function showDetails(pool) {
 /////////////////////////////////////////////////////
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const diskData = inject<Ref<DiskData[]>>("disks")!;
+const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
-async function refreshAllData() {
+	async function refreshAllData() {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
+	fileSystemsLoaded.value = false;
 	diskData.value = [];
 	poolData.value = [];
+	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
+	await loadDatasets(filesystemData);
 	await loadScanObjectGroup(scanObjectGroup);
 	await loadScanActivities(poolData, scanActivities);
 	await loadDiskStats(poolDiskStats);
 	await loadTrimActivities(poolData, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
+	fileSystemsLoaded.value = true;
 }
 
 ////////////////// Destroy Pool /////////////////////

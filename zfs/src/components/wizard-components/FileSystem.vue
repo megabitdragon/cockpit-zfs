@@ -13,7 +13,7 @@
 			<!-- Name of File System (Text) -->
 			<div>
 				<label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Name</label>
-				<input :id="getIdKey('filesystem-name')" type="text" name="file-system-name" v-model="fileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default" placeholder="File System Name" />
+				<input @keydown.enter="fsCreateBtn(fileSystemConfig)" :id="getIdKey('filesystem-name')" type="text" name="file-system-name" v-model="fileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default" placeholder="File System Name" />
 				<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
 			</div>
 
@@ -46,7 +46,7 @@
 				<!-- Confirm Passphrase (Text) -->
 				<div>
 					<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
-					<input :id="getIdKey('passphrase-confirm')" type="password" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+					<input @keydown.enter="fsCreateBtn(fileSystemConfig)" :id="getIdKey('passphrase-confirm')" type="password" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
 				</div>
 				<!-- Cipher (Select) -->
 				<div>
@@ -269,7 +269,7 @@
 					<!-- Confirm Passphrase (Text) -->
 					<div>
 						<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
-						<input :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+						<input  @keydown.enter="fsCreateBtn(newFileSystemConfig)" :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
 					</div>
 					<!-- Cipher (Select) -->
 					<div>
@@ -469,7 +469,7 @@
 import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, convertBytesToSize, isBoolOnOff, getParentPath, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
-import { createDataset } from '../../composables/datasets';
+import { createDataset, createEncryptedDataset } from '../../composables/datasets';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
 
@@ -758,8 +758,9 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 							getInheritedProperties();
 							fillDatasetData();
 							saving.value = true;
-							createDataset(newDataset.value).then(async() => {
-								console.log('create Dataset fired');
+							console.log('create Dataset fired');
+							await createEncryptedDataset(newDataset.value, passphrase.value).then(async() => {
+								console.log('encryption check passed');
 								fileSystemsLoaded.value = false;
 								datasets.value = [];
 								await loadDatasets(datasets);
@@ -778,7 +779,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 						getInheritedProperties();
 						fillDatasetData();
 						saving.value = true;
-						createDataset(newDataset.value).then(async() => {
+						await createDataset(newDataset.value).then(async() => {
 							console.log('create Dataset fired');
 							fileSystemsLoaded.value = false;
 							datasets.value = [];
