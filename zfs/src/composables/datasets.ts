@@ -1,7 +1,9 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { useSpawn, errorString, process } from '@45drives/cockpit-helpers';
 import { convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from './helpers';
 // @ts-ignore
 import get_datasets_script from "../scripts/get-datasets.py?raw";
+// @ts-ignore
+import create_encrypted_dataset_script from "../scripts/create-encrypted-dataset.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -16,10 +18,63 @@ export async function getDatasets() {
     }
 }
 
-//command line based method (will replace with py-libzfs API method)
-export async function createDataset(fileSystemData : NewDataset, passphrase? : string) {
+
+export async function createEncryptedDataset(fileSystemData : NewDataset, passphrase? : string) {
+	try {
+		let quota = '';
+		if (Number(fileSystemData.quota) == 0) {
+			quota = 'quota=none';
+		} else {
+			quota = ('quota=' + fileSystemData.quota);
+		}
+		let args = {
+			cmd: 'zfs',
+			atime : 'atime=' + fileSystemData.atime,
+			case : 'casesensitivity=' + fileSystemData.casesensitivity,
+			compress : 'compression=' + fileSystemData.compression,
+			dedup : 'dedup=' + fileSystemData.dedup,
+			dnode : 'dnodesize=' + fileSystemData.dnodesize,
+			xattr : 'xattr=' + fileSystemData.xattr,
+			record : 'recordsize=' + fileSystemData.recordsize,
+			quota : quota,
+			readonly : 'readonly=' + fileSystemData.readonly,
+			encryption : 'encryption=' + fileSystemData.encryption!,
+			keyformat: 'keyformat=passphrase',
+			keylocation: 'keylocation=prompt',
+			path : (fileSystemData.parent + '/' + fileSystemData.name),
+			passphrase : passphrase!,
+		}
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_encrypted_dataset_script, args.cmd, args.atime, args.case, args.compress, args.dedup, args.dnode, args.xattr, args.record, args.quota, args.readonly, args.encryption, args.keyformat, args.keylocation, args.path, args.passphrase], { superuser: 'try', stderr: 'out'});
+
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+		
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+/*	example from pool using libzfs
+export async function createPool(poolName : string, vDevs: newVDev[]) {
+	try {
+		//console.log(vDevs);
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+*/
+
+export async function createDataset(fileSystemData : NewDataset) {
     try {
         let cmdString = ['zfs', 'create', '-o', 'atime=' + fileSystemData.atime, '-o', 'casesensitivity=' + fileSystemData.casesensitivity, '-o', 'compression=' + fileSystemData.compression, '-o', 'dedup=' + fileSystemData.dedup, '-o', 'dnodesize=' + fileSystemData.dnodesize, '-o', 'xattr=' + fileSystemData.xattr, '-o', 'recordsize=' + fileSystemData.recordsize, '-o', 'readonly=' + fileSystemData.readonly]
+		
 		
 		if (Number(fileSystemData.quota) == 0) {
 			cmdString.push('-o', 'quota=none');
@@ -27,49 +82,30 @@ export async function createDataset(fileSystemData : NewDataset, passphrase? : s
 			cmdString.push('-o', 'quota=' + fileSystemData.quota);
 		}
 
-	/*	if (fileSystemData.encrypted) {
-			cmdString.push('-o', 'encryption=' + fileSystemData.encryption!);
-			cmdString.push('-o', 'keyformat=passphrase');
+		cmdString.push(fileSystemData.parent + '/' + fileSystemData.name);
 
-			cmdString.push(fileSystemData.parent + '/' + fileSystemData.name);
-
-			console.log("cmdString:" , cmdString);
-			
-			const state = useSpawn(cmdString);
-			const output = await state.promise().then(async() => {
-				usePassphrase(passphrase!);
-			});
-			console.log(output)
-			return output.stdout;
-
-		} else { 
-	*/
-			cmdString.push(fileSystemData.parent + '/' + fileSystemData.name);
-
-			console.log("create cmdString:" , cmdString);
-			
-			const state = useSpawn(cmdString);
-			const output = await state.promise();
-			console.log(output)
-			return output.stdout;
-	//	}
-
+		console.log("create cmdString:" , cmdString);
+		
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+		
 	} catch (state) {
         console.error(errorString(state));
         return null;
     }
 }
 
-// async function usePassphrase(passphrase : string) {
-// 	let cmdString = [passphrase];
+async function usePassphrase(passphrase : string) {
+	let cmdString = [passphrase];
 
-// 	console.log("cmdString:", cmdString);
-// 	const state = useSpawn(cmdString);
-// 	const output = await state.promise();
-// 	console.log(output);
-// 	return output.stdout;
-
-// }
+	console.log("cmdString:", cmdString);
+	const state = useSpawn(cmdString);
+	const output = await state.promise();
+	console.log(output);
+	return output.stdout;
+}
 
 export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 	try {
