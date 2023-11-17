@@ -1,39 +1,57 @@
+# Python script for creating an encrypted ZFS dataset
+
 import subprocess
 import argparse
+import tempfile
+import os
 
-def create_encrypted_dataset(cmd, atime, case, compress, dedup, dnode, xattr, record, readonly, quota, encryption, keyformat, keylocation, path, passphrase):
+def create_encrypted_dataset(cmd, atime, case, compress, dedup, dnode, xattr, record, readonly, quota, encryption, keyformat, keylocation, path, passphrase_file):
     try:
-        process = subprocess.Popen(
-            [cmd, 'create',
-             '-o', atime,
-             '-o', case,
-             '-o', compress,
-             '-o', dedup,
-             '-o', dnode,
-             '-o', xattr,
-             '-o', record,
-             '-o', quota,
-             '-o', readonly,
-             '-o', encryption,
-             '-o', keyformat,
-             '-o', keylocation,
-             path],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        # Create a secure temporary file to store the passphrase
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_passphrase_file:
+            temp_passphrase_file.write(passphrase_file)
+            temp_passphrase_file_path = temp_passphrase_file.name
 
-        stdout, stderr = process.communicate(input=f"{passphrase}\n{passphrase}\n".encode())
+        try:
+            # Construct the ZFS create command with provided arguments
+            process = subprocess.Popen(
+                [cmd, 'create',
+                '-o', atime,
+                '-o', case,
+                '-o', compress,
+                '-o', dedup,
+                '-o', dnode,
+                '-o', xattr,
+                '-o', record,
+                '-o', quota,
+                '-o', readonly,
+                '-o', encryption,
+                '-o', keyformat,
+                '-o', keylocation,
+                path],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
 
-        if process.returncode != 0:
-            print(f"Error: {stderr}")
-        else:
-            print(stdout)
+            # Provide the passphrase file as input to the process
+            with open(temp_passphrase_file_path, 'rb') as f:
+                stdout, stderr = process.communicate(input=f.read())
+
+            if process.returncode != 0:
+                print(f"Error: {stderr}")
+            else:
+                print(stdout)
+
+        finally:
+            # Delete the temporary passphrase file after using it
+            os.remove(temp_passphrase_file_path)
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
 def main():
+    # Parse command-line arguments
     parser = argparse.ArgumentParser(description='Create and encrypt a ZFS Dataset')
     parser.add_argument('cmdString', type=str, help='zfs create')
     parser.add_argument('atime',type=str, help='access time')
@@ -53,6 +71,7 @@ def main():
 
     args = parser.parse_args()
 
+    # Extract values from command-line arguments
     cmdString = args.cmdString
     atime = args.atime
     case = args.case
@@ -71,6 +90,7 @@ def main():
 
     print(f"Executing command: {cmdString} create {atime} {case} {compress} {dedup} {dnode} {xattr} {record} {quota} {readonly} {encryption} {keyformat} {keylocation} {path}")
 
+    # Call the function to create the encrypted dataset
     create_encrypted_dataset(cmdString, atime, case, compress, dedup, dnode, xattr, record, quota, readonly, encryption, keyformat, keylocation, path, passphrase)
 
 if __name__ == '__main__':

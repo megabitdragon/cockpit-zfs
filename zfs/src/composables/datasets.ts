@@ -18,6 +18,31 @@ export async function getDatasets() {
     }
 }
 
+export async function createDataset(fileSystemData : NewDataset) {
+    try {
+        let cmdString = ['zfs', 'create', '-o', 'atime=' + fileSystemData.atime, '-o', 'casesensitivity=' + fileSystemData.casesensitivity, '-o', 'compression=' + fileSystemData.compression, '-o', 'dedup=' + fileSystemData.dedup, '-o', 'dnodesize=' + fileSystemData.dnodesize, '-o', 'xattr=' + fileSystemData.xattr, '-o', 'recordsize=' + fileSystemData.recordsize, '-o', 'readonly=' + fileSystemData.readonly]
+		
+		
+		if (Number(fileSystemData.quota) == 0) {
+			cmdString.push('-o', 'quota=none');
+		} else {
+			cmdString.push('-o', 'quota=' + fileSystemData.quota);
+		}
+
+		cmdString.push(fileSystemData.parent + '/' + fileSystemData.name);
+
+		console.log("create cmdString:" , cmdString);
+		
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+		
+	} catch (state) {
+        console.error(errorString(state));
+        return null;
+    }
+}
 
 export async function createEncryptedDataset(fileSystemData : NewDataset, passphrase? : string) {
 	try {
@@ -54,57 +79,6 @@ export async function createEncryptedDataset(fileSystemData : NewDataset, passph
 		console.error(errorString(state));
 		return null;
 	}
-}
-
-/*	example from pool using libzfs
-export async function createPool(poolName : string, vDevs: newVDev[]) {
-	try {
-		//console.log(vDevs);
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
-		const output = await state.promise();
-		console.log(output)
-		return output.stdout;
-	} catch (state) {
-		console.error(errorString(state));
-		return null;
-	}
-}
-*/
-
-export async function createDataset(fileSystemData : NewDataset) {
-    try {
-        let cmdString = ['zfs', 'create', '-o', 'atime=' + fileSystemData.atime, '-o', 'casesensitivity=' + fileSystemData.casesensitivity, '-o', 'compression=' + fileSystemData.compression, '-o', 'dedup=' + fileSystemData.dedup, '-o', 'dnodesize=' + fileSystemData.dnodesize, '-o', 'xattr=' + fileSystemData.xattr, '-o', 'recordsize=' + fileSystemData.recordsize, '-o', 'readonly=' + fileSystemData.readonly]
-		
-		
-		if (Number(fileSystemData.quota) == 0) {
-			cmdString.push('-o', 'quota=none');
-		} else {
-			cmdString.push('-o', 'quota=' + fileSystemData.quota);
-		}
-
-		cmdString.push(fileSystemData.parent + '/' + fileSystemData.name);
-
-		console.log("create cmdString:" , cmdString);
-		
-		const state = useSpawn(cmdString);
-		const output = await state.promise();
-		console.log(output)
-		return output.stdout;
-		
-	} catch (state) {
-        console.error(errorString(state));
-        return null;
-    }
-}
-
-async function usePassphrase(passphrase : string) {
-	let cmdString = [passphrase];
-
-	console.log("cmdString:", cmdString);
-	const state = useSpawn(cmdString);
-	const output = await state.promise();
-	console.log(output);
-	return output.stdout;
 }
 
 export async function configureDataset(fileSystemData : FileSystemEditConfig) {
