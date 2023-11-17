@@ -74,6 +74,7 @@
 						<div>
 							<p>Quota: <b>{{ convertBytesToSize(convertSizeToBytes((fileSystemData.properties.quota.raw.toString()) + fileSystemData.properties.quota.unit)) }}</b></p>
 							<p>Read Only: <b>{{ upperCaseWord(isBoolOnOff(fileSystemData.properties.isReadOnly!)) }}</b></p>	
+							<p v-if="fileSystemData.encrypted">Encryption: <b>{{ fileSystemData.properties.encryption.toUpperCase() }}</b></p>
 							<p class="mt-1 border rounded-lg border-default">
 								<Accordion :wholeBtn="true" :btnColor="'bg-default'" :gridSize="'grid-cols-2'" :btnColSpan="'col-span-2'" :titleColSpan="'col-span-2'" :contentColSpan="'col-span-2'" :isOpen="false" class="bg-default text-default">					
 									<template v-slot:title>

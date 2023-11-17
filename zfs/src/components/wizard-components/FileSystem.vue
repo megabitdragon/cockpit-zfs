@@ -46,7 +46,7 @@
 				<!-- Confirm Passphrase (Text) -->
 				<div>
 					<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
-					<input @keydown.enter="fsCreateBtn(fileSystemConfig)" :id="getIdKey('passphrase-confirm')" type="password" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+					<input :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
 				</div>
 				<!-- Cipher (Select) -->
 				<div>
@@ -815,8 +815,16 @@ async function newFileSystemInPoolWizard() {
 						if (checkQuota(fileSystem.value)) {
 							getInheritedProperties();
 							fillDatasetData();
-							createDataset(newDataset.value);
+							saving.value = true;
 							console.log('create Dataset fired');
+							await createEncryptedDataset(newDataset.value, passphrase.value).then(async() => {
+								console.log('encryption check passed');
+								fileSystemsLoaded.value = false;
+								datasets.value = [];
+								await loadDatasets(datasets);
+								saving.value = false;
+								fileSystemsLoaded.value = true;
+							});
 						} else {
 							console.log('quota check failed');
 						}
@@ -828,7 +836,15 @@ async function newFileSystemInPoolWizard() {
 						console.log('checkQuota passed');
 						getInheritedProperties();
 						fillDatasetData();
-						createDataset(newDataset.value);
+						saving.value = true;
+						await createDataset(newDataset.value).then(async() => {
+							console.log('create Dataset fired');
+							fileSystemsLoaded.value = false;
+							datasets.value = [];
+							await loadDatasets(datasets);
+							saving.value = false;
+							fileSystemsLoaded.value = true;
+						});
 					} else {
 						console.log('quota check failed');
 					}
