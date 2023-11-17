@@ -183,7 +183,7 @@ const closeModal = () => {
 const option1 = props.firstOption;
 const option1Toggle = inject<Ref<boolean>>('modal-option-one-toggle')!;
 
-//options: labelclear, scrub after online, temporary offline
+//options: labelclear, scrub after online, temporary offline, lock file system
 const option2 = props.secondOption;
 const option2Toggle = inject<Ref<boolean>>('modal-option-two-toggle')!;
 

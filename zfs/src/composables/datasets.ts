@@ -221,7 +221,7 @@ export async function unmountFileSystem(fileSystemData: FileSystemData, forceUnm
 			cmdString.push('-f');
 		}
 
-		cmdString.push(fileSystemData.name)
+		cmdString.push(fileSystemData.name);
 
 		console.log("***\ncmdString:", cmdString, "\n***");
 		const state = useSpawn(cmdString);
@@ -244,6 +244,38 @@ export async function mountFileSystem(fileSystemData: FileSystemData, forceMount
 
 		cmdString.push(fileSystemData.name)
 
+		console.log("***\ncmdString:", cmdString, "\n***");
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function lockFileSystem(fileSystemData: FileSystemData) {
+	try {
+		let cmdString = ['zfs', 'unload-key'];
+
+		cmdString.push(fileSystemData.name);
+		console.log("***\ncmdString:", cmdString, "\n***");
+		const state = useSpawn(cmdString);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}
+
+export async function unlockFileSystem(fileSystemData: FileSystemData, passphrase : string) {
+	try {
+		let cmdString = ['zfs', 'load-key'];
+
+		cmdString.push(fileSystemData.name);
 		console.log("***\ncmdString:", cmdString, "\n***");
 		const state = useSpawn(cmdString);
 		const output = await state.promise();

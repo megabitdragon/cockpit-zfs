@@ -132,11 +132,14 @@
 	</div>
 
 	<div v-if="showUnmountFileSystemConfirm">
-		<UniversalConfirmation  :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation v-if="selectedDataset!.encrypted" :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :second-Option="'lock file system'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation v-else :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
+
 	</div>
 
 	<div v-if="showMountFileSystemConfirm">
-		<UniversalConfirmation  :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation v-if="selectedDataset!.encrypted" :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :second-Option="'unlock file system'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation v-else :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showRenameModal">
@@ -158,6 +161,7 @@
 	<div v-if="showReceiveDataset">
 		<!-- <ReceiveDataset/> -->
 	</div>
+	
 </template>
 
 <script setup lang="ts">
@@ -166,7 +170,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
-import { destroyDataset, unmountFileSystem, mountFileSystem, changePassphrase } from "../../composables/datasets";
+import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem, unlockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import Accordion from "../common/Accordion.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
@@ -322,6 +326,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showUnmountFileSystemConfirm = ref(false);
 const forceUnmount = ref(false);
+const lockThisFileSystem = ref(false);
 const unmounting = ref(false);
 const confirmUnmount = ref(false);
 
@@ -347,14 +352,17 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		await unmountFileSystem(selectedDataset.value!, forceUnmount.value);
 		console.log('unmounted:', selectedDataset.value!);
+		if (lockThisFileSystem.value = true) {
+			lockFileSystem(selectedDataset.value!);
+		}
 		showUnmountFileSystemConfirm.value = false;
-		
 		confirmUnmount.value = false;
 		forceUnmount.value = false;
 		await refreshDatasets();
 		await refreshSnaps(selectedDataset.value);
 		unmounting.value = false;
 		operationRunning.value = false;
+		lockThisFileSystem.value = false;
 	}
 });
 
@@ -362,6 +370,8 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showMountFileSystemConfirm = ref(false);
 const forceMount = ref(true);
+const unlockThisFileSystem = ref(false);
+const showMountUnlockFileSystem = ref(false);
 const mounting = ref(false);
 const confirmMount = ref(false);
 
@@ -387,14 +397,17 @@ watch(confirmMount, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		await mountFileSystem(selectedDataset.value!, forceMount.value);
 		console.log('mounted:', selectedDataset.value!);
+		if (unlockThisFileSystem.value = true) {
+			// unlockFileSystem(selectedDataset.value!);
+		}
 		showMountFileSystemConfirm.value = false;
-		
 		confirmMount.value = false;
 		forceMount.value = false;
 		await refreshDatasets();
 		await refreshSnaps(selectedDataset.value);
 		mounting.value = false;
 		operationRunning.value = false;
+		unlockThisFileSystem.value = false;
 	}
 });
 
