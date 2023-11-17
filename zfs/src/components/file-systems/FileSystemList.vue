@@ -80,7 +80,7 @@
 																<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 															</MenuItem>
 															<MenuItem as="div" v-if="fileSystems[fsIdx].encrypted" v-slot="{ active }">
-																<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
+																<a href="#" @click="changeThisPassphrase(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 															</MenuItem>
 															<MenuItem as="div" v-slot="{ active }">
 																<a href="#" @click="createSnapshotBtn(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
@@ -147,6 +147,10 @@
 		<CreateSnapshotModal :idKey="'show-create-snap-modal'" @close="showSnapshotModal = false" :item="'filesystem'" />
 	</div>
 
+	<div v-if="showChangePassphrase">
+		<ChangePassphrase :idKey="'show-change-passphrase-modal'" @close="showChangePassphrase = false" :filesystem="selectedDataset!"/>
+	</div>
+
 	<div v-if="showSendDataset">
 		<!-- <SendDataset/> -->
 	</div>
@@ -162,7 +166,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
-import { destroyDataset, unmountFileSystem, mountFileSystem } from "../../composables/datasets";
+import { destroyDataset, unmountFileSystem, mountFileSystem, changePassphrase } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import Accordion from "../common/Accordion.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
@@ -173,6 +177,7 @@ import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
 import SendDataset from './SendDataset.vue';
 import ReceiveDataset from './ReceiveDataset.vue';
+import ChangePassphrase from "./ChangePassphrase.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -413,6 +418,18 @@ const showSendDataset = ref(false);
 /////////////////////////////////////////////////////
 const showReceiveDataset = ref(false);
 
+/////////////// Change Passphrase ///////////////////
+/////////////////////////////////////////////////////
+const showChangePassphrase = ref(false);
+const changing = ref(false);
+const confirmChange = ref(false);
+
+function changeThisPassphrase(fileSystem) {
+	showChangePassphrase.value = true;
+	selectedDataset.value = fileSystem;
+	console.log('selected to change passphrase:', selectedDataset.value);
+}
+
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 
@@ -444,6 +461,10 @@ provide('confirm-create', confirmCreate);
 
 provide('show-send-dataset', showSendDataset);
 provide('show-receive-dataset', showReceiveDataset);
+
+provide('show-change-passphrase', showChangePassphrase);
+provide('changing', changing);
+provide('confirm-change', confirmChange);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);

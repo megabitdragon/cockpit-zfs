@@ -5,7 +5,7 @@ import argparse
 import tempfile
 import os
 
-def create_encrypted_dataset(cmd, atime, case, compress, dedup, dnode, xattr, record, readonly, quota, encryption, keyformat, keylocation, path, passphrase_file):
+def create_encrypted_dataset(atime, case, compress, dedup, dnode, xattr, record, readonly, quota, encryption, keyformat, keylocation, path, passphrase_file):
     try:
         # Create a secure temporary file to store the passphrase
         with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_passphrase_file:
@@ -15,7 +15,7 @@ def create_encrypted_dataset(cmd, atime, case, compress, dedup, dnode, xattr, re
         try:
             # Construct the ZFS create command with provided arguments
             process = subprocess.Popen(
-                [cmd, 'create',
+                ['zfs', 'create',
                 '-o', atime,
                 '-o', case,
                 '-o', compress,
@@ -91,7 +91,7 @@ def main():
     print(f"Executing command: {cmdString} create {atime} {case} {compress} {dedup} {dnode} {xattr} {record} {quota} {readonly} {encryption} {keyformat} {keylocation} {path}")
 
     # Call the function to create the encrypted dataset
-    create_encrypted_dataset(cmdString, atime, case, compress, dedup, dnode, xattr, record, quota, readonly, encryption, keyformat, keylocation, path, passphrase)
+    create_encrypted_dataset(atime, case, compress, dedup, dnode, xattr, record, quota, readonly, encryption, keyformat, keylocation, path, passphrase)
 
 if __name__ == '__main__':
     main()

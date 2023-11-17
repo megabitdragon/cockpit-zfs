@@ -4,6 +4,8 @@ import { convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSiz
 import get_datasets_script from "../scripts/get-datasets.py?raw";
 // @ts-ignore
 import create_encrypted_dataset_script from "../scripts/create-encrypted-dataset.py?raw";
+// @ts-ignore
+import change_passphrase_script from "../scripts/change-encrypted-key.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -79,6 +81,19 @@ export async function createEncryptedDataset(fileSystemData : NewDataset, passph
 		console.error(errorString(state));
 		return null;
 	}
+}
+
+export async function changePassphrase(fileSystemName : string, newPassphrase : string) {
+	try {
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', change_passphrase_script, fileSystemName, newPassphrase], { superuser: 'try', stderr: 'out'});
+		const output = await state.promise();
+		console.log(output);
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+
 }
 
 export async function configureDataset(fileSystemData : FileSystemEditConfig) {
