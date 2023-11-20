@@ -8,6 +8,8 @@ import create_encrypted_dataset_script from "../scripts/create-encrypted-dataset
 import change_passphrase_script from "../scripts/change-encrypted-key.py?raw";
 // @ts-ignore
 import unlock_dataset_script from "../scripts/unlock-encrypted-dataset.py?raw";
+// @ts-ignore
+import validate_passphrase_script from "../scripts/encryption-key-validation.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -95,7 +97,25 @@ export async function changePassphrase(fileSystemName : string, newPassphrase : 
 		console.error(errorString(state));
 		return null;
 	}
+}
 
+export async function isPassphraseValid(fileSystemName : string, passphrase : string) {
+	try {
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', validate_passphrase_script, fileSystemName, passphrase], { superuser: 'try', stderr: 'out'});
+		const output = await state.promise();
+		console.log('passphrase output:', output.stdout);
+
+		// if (output.stdout == "true") {
+		// 	return true;
+		// } else {
+		// 	return false;
+		// }
+
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return false;
+	}
 }
 
 export async function configureDataset(fileSystemData : FileSystemEditConfig) {

@@ -12,7 +12,7 @@
             
                 <div>
                     <label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm New Passphrase</label>
-                    <input :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+                    <input :id="getIdKey('passphrase-confirm')" type="password" @keydown.enter="changeBtn()" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
                 </div>
             </div>
         </template>

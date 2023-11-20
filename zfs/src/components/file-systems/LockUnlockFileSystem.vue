@@ -11,7 +11,8 @@
                     </div>
                     <div class="grid grid-flow-row">
                         <label :for="getIdKey('passphrase')" class="mt-1 text-sm font-medium leading-6 text-default">Enter Passphrase</label>
-                        <input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="mt-1 w-full input-textlike bg-default" />
+                        <input :id="getIdKey('passphrase')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 w-full input-textlike bg-default" />
+                        <p class="text-danger mt-1">{{ passFeedback }}</p>
                     </div>
                     
                     <div>
@@ -51,8 +52,6 @@
                                 </span>
                             </Switch>
                         </div>
-
-
                     </div>
                 </div>
                 <div v-if="props.mode == 'lock'">
@@ -83,7 +82,7 @@
 import { Ref, inject, ref } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { upperCaseWord } from '../../composables/helpers';
-import { lockFileSystem, mountFileSystem, unlockFileSystem } from "../../composables/datasets";
+import { lockFileSystem, mountFileSystem, unlockFileSystem, isPassphraseValid } from "../../composables/datasets";
 import { loadDatasets, loadSnapshots } from "../../composables/loadData";
 import Modal from '../common/Modal.vue';
 
@@ -112,6 +111,8 @@ const closeModal = () => {
 }
 
 const passphrase = ref('');
+const passFeedback = ref('');
+const passValid = ref(false);
 const mountFS = ref(true);
 const forceMountFS = ref(false);
 
@@ -124,18 +125,26 @@ async function confirmBtn() {
         doingThing.value = true;
         await lockFileSystem(props.filesystem);
         doingThing.value = false;
+        await refreshDatasets();
         showLockUnlockModal.value = false;
         
     } else if (props.mode == 'unlock') {
-        doingThing.value = true;
-        await unlockFileSystem(props.filesystem, passphrase.value);
-        if (mountFS.value) {
-            await mountFileSystem(props.filesystem, forceMountFS.value);
+        passValid.value = await isPassphraseValid(props.filesystem.name, passphrase.value);
+        console.log(`passValid: ${passValid.value}, pass: ${passphrase.value}`);
+
+        if (passValid.value) {
+            doingThing.value = true;
+            await unlockFileSystem(props.filesystem, passphrase.value);
+            if (mountFS.value) {
+                await mountFileSystem(props.filesystem, forceMountFS.value);
+            }
+            doingThing.value = false;
+            await refreshDatasets();
+            showLockUnlockModal.value = false;         
+        } else {
+            passFeedback.value = 'Passphrase is invalid.';
         }
-        doingThing.value = false;
-        showLockUnlockModal.value = false;
-    }
-    await refreshDatasets();
+    } 
 }
 
 async function refreshDatasets() {
