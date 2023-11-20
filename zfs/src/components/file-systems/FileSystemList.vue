@@ -12,7 +12,7 @@
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
-							<tr class="bg-well rounded-t-md grid grid-cols-11">
+							<tr class="bg-well rounded-t-md grid grid-cols-12">
 
 								<th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
@@ -24,6 +24,7 @@
 								<th class="py-3.5 font-semibold text-default col-span-1">Compression</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Deduplication</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Encryption</th>
+								<th class="py-3.5 font-semibold text-default col-span-1">Mounted</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Snapshots</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Read Only</th>
 								<th class="relative py-3.5 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
@@ -36,12 +37,12 @@
 
 					<div v-if="fileSystems.length > 0 && fileSystemsLoaded == true">
 						<div v-for="fileSystem, fsIdx in fileSystems">
-							<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-11'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-10'" :contentColSpan="'col-span-11'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" :key="fsIdx">
+							<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-12'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-11'" :contentColSpan="'col-span-12'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" :key="fsIdx">
 								<template v-slot:title>
-									<div class="grid grid-cols-10 grid-flow-cols w-full justify-center text-center">
+									<div class="grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
 										<!-- <button @click="showFSDetails(fileSystems[fsIdx])" class="grid grid-cols-9 col-span-6 hover:bg-accent pt-1 rounded-r-md"> -->
-										<button @click="loadFileSystemConfig(fileSystems[fsIdx])" class="grid grid-cols-9 col-span-9 hover:bg-accent pt-1 rounded-r-lg">
-											<div class="py-4 pl-4 pr-3 text-sm font-medium text-default"> {{ fileSystem.name }}</div>
+										<button @click="loadFileSystemConfig(fileSystems[fsIdx])" class="grid grid-cols-10 col-span-10 hover:bg-accent pt-1 rounded-r-lg">
+											<div class="px-4 py-4 text-sm font-medium text-default"> {{ fileSystem.name }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedByDataset }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ fileSystem.properties.usedbyRefreservation }}</div>
@@ -49,6 +50,7 @@
 											<div v-else class="px-3 py-4 text-sm text-muted">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.deduplication) }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
+											<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.snapshotCount) }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
 										</button>
@@ -70,12 +72,24 @@
 															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																<a href="#" @click="renameThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 															</MenuItem>
+
 															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'yes'" v-slot="{ active }">
 																<a href="#" @click="unmountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 															</MenuItem>
-															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no'" v-slot="{ active }">
+															
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && !fileSystems[fsIdx].encrypted" v-slot="{ active }">
 																<a href="#" @click="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
 															</MenuItem>
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
+																<a href="#" @click="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+															</MenuItem>
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && !fileSystems[fsIdx].key_loaded" v-slot="{ active }">
+																<a href="#" @click="handleFileSystemEncryption(fileSystems[fsIdx], 'unlock')" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unlock File System</a>
+															</MenuItem>
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
+																<a href="#" @click="handleFileSystemEncryption(fileSystems[fsIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
+															</MenuItem>
+															
 															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 															</MenuItem>
@@ -132,14 +146,17 @@
 	</div>
 
 	<div v-if="showUnmountFileSystemConfirm">
-		<UniversalConfirmation v-if="selectedDataset!.encrypted" :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :second-Option="'lock file system'" :hasChildren="hasChildren"/>
+		<UniversalConfirmation v-if="selectedDataset!.encrypted" :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :secondOption="'lock file system'" :hasChildren="hasChildren"/>
 		<UniversalConfirmation v-else :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
-
 	</div>
 
 	<div v-if="showMountFileSystemConfirm">
-		<UniversalConfirmation v-if="selectedDataset!.encrypted" :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :second-Option="'unlock file system'" :hasChildren="hasChildren"/>
-		<UniversalConfirmation v-else :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
+		<!-- <UniversalConfirmation v-if="selectedDataset!.encrypted" :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :secondOption="'unlock file system'" :hasChildren="hasChildren"/> -->
+		<UniversalConfirmation :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
+	</div>
+
+	<div v-if="showLockUnlockModal">
+		<LockUnlockFileSystem :showFlag="showLockUnlockModal" @close="showLockUnlockModal = false" :idKey="'confirm-lock-or-unlock'" :mode="modeSelected!" :filesystem="selectedDataset!"/>
 	</div>
 
 	<div v-if="showRenameModal">
@@ -170,7 +187,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
-import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem, unlockFileSystem } from "../../composables/datasets";
+import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import Accordion from "../common/Accordion.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
@@ -182,6 +199,7 @@ import SnapshotsList from "../snapshots/SnapshotsList.vue";
 import SendDataset from './SendDataset.vue';
 import ReceiveDataset from './ReceiveDataset.vue';
 import ChangePassphrase from "./ChangePassphrase.vue";
+import LockUnlockFileSystem from "./LockUnlockFileSystem.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -210,7 +228,9 @@ const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
 	fileSystems.value = [];
+	snapshots.value = [];
 	await loadDatasets(fileSystems);
+	await loadSnapshots(snapshots);
 	fileSystemsLoaded.value = true;
 }
 
@@ -397,9 +417,9 @@ watch(confirmMount, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		await mountFileSystem(selectedDataset.value!, forceMount.value);
 		console.log('mounted:', selectedDataset.value!);
-		if (unlockThisFileSystem.value = true) {
-			// unlockFileSystem(selectedDataset.value!);
-		}
+		// if (unlockThisFileSystem.value = true) {
+		// 	// unlockFileSystem(selectedDataset.value!);
+		// }
 		showMountFileSystemConfirm.value = false;
 		confirmMount.value = false;
 		forceMount.value = false;
@@ -443,6 +463,21 @@ function changeThisPassphrase(fileSystem) {
 	console.log('selected to change passphrase:', selectedDataset.value);
 }
 
+/////////// Locking/Unlocking File System ///////////
+/////////////////////////////////////////////////////
+const showLockUnlockModal = ref(false);
+const confirmLockOrUnlock = ref(false);
+const lockingOrUnlocking = ref(false);
+const modeSelected = ref('');
+
+function handleFileSystemEncryption(fileSystem : FileSystemData, mode : 'lock' | 'unlock') {
+	showLockUnlockModal.value = true;
+	selectedDataset.value = fileSystem;
+	modeSelected.value = mode;
+	console.log(`selected to be ${mode}ed: ${selectedDataset.value.name}`);
+}
+
+
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 
@@ -478,6 +513,11 @@ provide('show-receive-dataset', showReceiveDataset);
 provide('show-change-passphrase', showChangePassphrase);
 provide('changing', changing);
 provide('confirm-change', confirmChange);
+
+provide('show-lock-unlock-modal', showLockUnlockModal);
+provide('locking-or-unlocking', lockingOrUnlocking);
+provide('confirm-lock-or-unlock', confirmLockOrUnlock);
+provide('mode-selected', modeSelected);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);

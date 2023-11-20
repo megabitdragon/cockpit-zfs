@@ -1,5 +1,4 @@
 # Python script for creating an encrypted ZFS dataset
-
 import subprocess
 import argparse
 import tempfile

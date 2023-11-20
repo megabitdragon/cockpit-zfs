@@ -6,6 +6,8 @@ import get_datasets_script from "../scripts/get-datasets.py?raw";
 import create_encrypted_dataset_script from "../scripts/create-encrypted-dataset.py?raw";
 // @ts-ignore
 import change_passphrase_script from "../scripts/change-encrypted-key.py?raw";
+// @ts-ignore
+import unlock_dataset_script from "../scripts/unlock-encrypted-dataset.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -273,13 +275,9 @@ export async function lockFileSystem(fileSystemData: FileSystemData) {
 
 export async function unlockFileSystem(fileSystemData: FileSystemData, passphrase : string) {
 	try {
-		let cmdString = ['zfs', 'load-key'];
-
-		cmdString.push(fileSystemData.name);
-		console.log("***\ncmdString:", cmdString, "\n***");
-		const state = useSpawn(cmdString);
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', unlock_dataset_script, fileSystemData.name, passphrase], { superuser: 'try', stderr: 'out'});
 		const output = await state.promise();
-		console.log(output)
+		console.log(output);
 		return output.stdout;
 	} catch (state) {
 		console.error(errorString(state));
