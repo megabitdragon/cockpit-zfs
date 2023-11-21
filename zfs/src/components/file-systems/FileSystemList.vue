@@ -93,7 +93,7 @@
 															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 															</MenuItem>
-															<MenuItem as="div" v-if="fileSystems[fsIdx].encrypted" v-slot="{ active }">
+															<MenuItem as="div" v-if="fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
 																<a href="#" @click="changeThisPassphrase(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 															</MenuItem>
 															<MenuItem as="div" v-slot="{ active }">

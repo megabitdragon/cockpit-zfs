@@ -7,14 +7,13 @@
             <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
                 <div v-if="props.mode == 'unlock'">
                     <div>
-                        <label :for="getIdKey('filesystem-name')" class="mt-1 text-sm font-medium leading-6 text-default">Name: <span class="font-normal">{{ props.filesystem.name }}</span></label>
+                        <label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Name: <span class="font-normal">{{ props.filesystem.name }}</span></label>
                     </div>
                     <div class="grid grid-flow-row">
-                        <label :for="getIdKey('passphrase')" class="mt-1 text-sm font-medium leading-6 text-default">Enter Passphrase</label>
-                        <input :id="getIdKey('passphrase')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 w-full input-textlike bg-default" />
+                        <label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Enter Passphrase</label>
+                        <input :id="getIdKey('passphrase')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" />
                         <p class="text-danger mt-1">{{ passFeedback }}</p>
                     </div>
-                    
                     <div>
                         <div class="flex flex-row">
                             <label :for="getIdKey('mount-switch')" class="mt-3 mr-2 block text-sm font-medium text-default">Mount File System</label>
