@@ -130,8 +130,7 @@ async function confirmBtn() {
         
     } else if (props.mode == 'unlock') {
         passValid.value = await isPassphraseValid(props.filesystem.name, passphrase.value);
-        console.log(`passValid: ${passValid.value}, pass: ${passphrase.value}`);
-
+   
         if (passValid.value) {
             doingThing.value = true;
             await unlockFileSystem(props.filesystem, passphrase.value);

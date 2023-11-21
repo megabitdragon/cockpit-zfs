@@ -22,7 +22,7 @@ def check_key(fileSystemName, passphrase):
 
             # Provide the passphrase file as input to the process
             with open(temp_passphrase_file_path, 'rb') as f:
-                stdout, stderr = process.communicate(input=f.read())
+                process.communicate(input=f.read())
 
             return process.returncode == 0
             

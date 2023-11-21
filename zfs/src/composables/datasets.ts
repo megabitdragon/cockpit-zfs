@@ -103,15 +103,14 @@ export async function isPassphraseValid(fileSystemName : string, passphrase : st
 	try {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', validate_passphrase_script, fileSystemName, passphrase], { superuser: 'try', stderr: 'out'});
 		const output = await state.promise();
-		console.log('passphrase output:', output.stdout);
+		console.log(`fileSystemName: ${fileSystemName}, pass: ${passphrase}, function call output: ${output.stdout}`);
 
-		// if (output.stdout == "true") {
-		// 	return true;
-		// } else {
-		// 	return false;
-		// }
+		if (output.stdout.includes('true')) {
+			return true;
+		} else {
+			return false;
+		}
 
-		return output.stdout;
 	} catch (state) {
 		console.error(errorString(state));
 		return false;

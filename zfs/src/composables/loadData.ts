@@ -569,7 +569,7 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 	try {
 			getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON (loadByDataset):', parsedJSON);
+			// console.log('Snapshots JSON (loadByDataset):', parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
 					if (dataset == datasetName) {
