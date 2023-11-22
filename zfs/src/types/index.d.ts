@@ -350,18 +350,19 @@ interface Activity {
 	isFinished: boolean;
 }
 
-// interface FullActivity {
-// 	pool: string;
-// 	scan: Activity;
-// 	trim: TrimActivity[];
-// }
-
-// interface ScanActivity {
-// 	[poolName: string]: Activity;
-// }
-
 interface DiskTrimActivity {
 	[diskName: string]: Activity;
+}
+
+interface SendingDataset {
+	sendName: string;
+	recvName: string;
+	recvHost: string;
+	recvPort: string;
+	sendOpts: {
+		compressed: boolean;
+		raw: boolean;
+	}
 }
 
 type ConfirmationCallback = () => void;

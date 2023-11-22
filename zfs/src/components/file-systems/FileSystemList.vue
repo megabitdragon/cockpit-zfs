@@ -40,7 +40,6 @@
 							<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-12'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-11'" :contentColSpan="'col-span-12'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" :key="fsIdx">
 								<template v-slot:title>
 									<div class="grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
-										<!-- <button @click="showFSDetails(fileSystems[fsIdx])" class="grid grid-cols-9 col-span-6 hover:bg-accent pt-1 rounded-r-md"> -->
 										<button @click="loadFileSystemConfig(fileSystems[fsIdx])" class="grid grid-cols-10 col-span-10 hover:bg-accent pt-1 rounded-r-lg">
 											<div class="px-4 py-4 text-sm font-medium text-default"> {{ fileSystem.name }}</div>
 											<div class="px-3 py-4 text-sm text-muted">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
@@ -100,7 +99,7 @@
 																<a href="#" @click="createSnapshotBtn(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 															</MenuItem>
 															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
-																<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
+																<a href="#" @click="sendThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
 															</MenuItem>
 															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																<a href="#" @click="deleteFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
@@ -151,7 +150,6 @@
 	</div>
 
 	<div v-if="showMountFileSystemConfirm">
-		<!-- <UniversalConfirmation v-if="selectedDataset!.encrypted" :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :secondOption="'unlock file system'" :hasChildren="hasChildren"/> -->
 		<UniversalConfirmation :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
 	</div>
 
@@ -172,12 +170,9 @@
 	</div>
 
 	<div v-if="showSendDataset">
-		<!-- <SendDataset/> -->
+		<SendDataset :idKey="'show-send-dataset-modal'" @close="showSendDataset = false" :dataset="selectedDataset!" :dataType="'filesystem'"/>
 	</div>
 
-	<div v-if="showReceiveDataset">
-		<!-- <ReceiveDataset/> -->
-	</div>
 	
 </template>
 
@@ -197,7 +192,6 @@ import RenameFileSystem from "./RenameFileSystem.vue";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
 import SendDataset from './SendDataset.vue';
-import ReceiveDataset from './ReceiveDataset.vue';
 import ChangePassphrase from "./ChangePassphrase.vue";
 import LockUnlockFileSystem from "./LockUnlockFileSystem.vue";
 
@@ -447,9 +441,11 @@ function renameThisDataset(fileSystem) {
 /////////////////////////////////////////////////////
 const showSendDataset = ref(false);
 
-///////////////// Receive Dataset ///////////////////
-/////////////////////////////////////////////////////
-const showReceiveDataset = ref(false);
+function sendThisDataset(fileSystem) {
+	showSendDataset.value = true;
+	selectedDataset.value = fileSystem;
+	console.log('selected to send:', selectedDataset.value);
+}
 
 /////////////// Change Passphrase ///////////////////
 /////////////////////////////////////////////////////
@@ -508,7 +504,6 @@ provide('creating', creating);
 provide('confirm-create', confirmCreate);
 
 provide('show-send-dataset', showSendDataset);
-provide('show-receive-dataset', showReceiveDataset);
 
 provide('show-change-passphrase', showChangePassphrase);
 provide('changing', changing);
