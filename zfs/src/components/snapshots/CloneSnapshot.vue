@@ -23,7 +23,8 @@
                     <!-- New Name -->
                     <div class="mt-2">
                         <label :for="getIdKey('new-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Clone Name</label>
-                        <input :id="getIdKey('new-name')" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="'Enter Name Here'" />
+                        <input :id="getIdKey('new-name')" type="text" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="'Enter Name Here'" />
+                        
                     </div>
                 
                     <!-- Create non-existent parent file systems -->

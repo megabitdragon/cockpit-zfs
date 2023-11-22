@@ -38,8 +38,8 @@
                     <!-- New Name -->
                     <div class="mt-2">
                         <label :for="getIdKey('new-name')" class="mt-1 block text-sm font-medium leading-6 text-default">New Name</label>
-                        <input v-if="creationDate" disabled :id="getIdKey('new-name')" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="`${convertRawTimestampToString(props.snapshot.properties.creation.rawTimestamp)}`" />
-                        <input v-else :id="getIdKey('new-name')" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="`${props.snapshot.name}`" />
+                        <input v-if="creationDate" disabled :id="getIdKey('new-name')" type="text" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="`${convertRawTimestampToString(props.snapshot.properties.creation.rawTimestamp)}`" />
+                        <input v-else :id="getIdKey('new-name')" type="text" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="`${props.snapshot.name}`" />
                     </div>
                 
                     <!-- Rename child snapshots with same name -->

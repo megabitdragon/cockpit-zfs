@@ -66,7 +66,7 @@ export async function loadDisksThenPools(disks, pools) {
 		// console.log("Disk:");
 		// console.log(disk);
 		}
-		console.log("Disks:", disks);
+		console.log("loaded Disks:", disks);
 
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
@@ -163,7 +163,7 @@ export async function loadDisksThenPools(disks, pools) {
 			});
 			  
 
-			console.log("Pools:", pools);
+			console.log("loaded Pools:", pools);
 		} catch (error) {
 			// Handle any errors that may occur during the asynchronous operation
 			console.error("An error occurred getting pools:", error);
@@ -234,7 +234,7 @@ export async function loadDatasets(datasets) {
 			datasets.value.push(dataset);
 		}
 
-		console.log("Datasets:", datasets);
+		console.log("loaded Datasets:", datasets);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
@@ -272,7 +272,7 @@ export async function loadDisks(disks) {
 			disks.value.push(disk);
 			// console.log("Disk:", disk);
 		}
-		console.log("Disks:", disks);
+		console.log("loaded Disks:", disks);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
@@ -465,7 +465,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	
 		});
 	
-		console.log("vDevData:", vDevData);
+		console.log("loaded vDevData:", vDevData);
 		vDevs.value.push(vDevData);
 	}
 }
@@ -510,7 +510,7 @@ export async function loadSnapshots(snapshots) {
 			
 		});
 
-		console.log('snapshots:', snapshots);
+		console.log('loaded snapshots:', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
@@ -553,13 +553,10 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 		
 						snapshots.value.push(snap);
 					}
-					
 				});
 			}
-			
 		});
-
-		console.log('snapshots in:', poolName, '\n', snapshots);
+		console.log('loaded snapshots in:', poolName, '\n', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
@@ -608,7 +605,7 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 			
 		});
 
-		console.log('snapshots in:', datasetName, '\n', snapshots);
+		console.log('loaded snapshots in:', datasetName, '\n', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
