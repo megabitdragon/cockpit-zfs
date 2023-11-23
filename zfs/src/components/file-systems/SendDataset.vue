@@ -42,7 +42,7 @@
             <template v-slot:footer>
                 <div class="button-group-row w-full row-start-2 justify-between mt-2">
                     <button id="cancel" class="mt-1 btn btn-danger object-left justify-start h-fit" @click="showSendDataset = false">Cancel</button>
-                    <button v-if="!sending" @click="" :id="getIdKey('send-btn')" name="send-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Send</button>
+                    <button v-if="!sending" @click="sendBtn(sendingData)" :id="getIdKey('send-btn')" name="send-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Send</button>
                     <button disabled v-if="sending" :id="getIdKey('sending-spinner')" type="button" class="btn btn-danger object-right justify-end">
                         <svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -58,6 +58,7 @@
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
 import { ref, Ref, inject, watch, onMounted } from 'vue';
+import { sendFileSystem } from '../../composables/datasets';
 
 interface SendDatasetProps {
     idKey: string;
@@ -94,6 +95,13 @@ const sendingData = ref<SendingDataset>({
 //         sendName.value = props.snapshot!.name;
 //     }
 // }
+
+async function sendBtn(sendingData : SendingDataset) {
+    sending.value = true;
+    await sendFileSystem(sendingData);
+    sending.value = false;
+    showSendDataset.value = false;
+}
 
 // onMounted(() => {
 //     getName();

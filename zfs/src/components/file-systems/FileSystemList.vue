@@ -440,6 +440,7 @@ function renameThisDataset(fileSystem) {
 //////////////////// Send Dataset ///////////////////
 /////////////////////////////////////////////////////
 const showSendDataset = ref(false);
+const sending = ref(false);
 
 function sendThisDataset(fileSystem) {
 	showSendDataset.value = true;
@@ -504,6 +505,7 @@ provide('creating', creating);
 provide('confirm-create', confirmCreate);
 
 provide('show-send-dataset', showSendDataset);
+provide('sending', sending);
 
 provide('show-change-passphrase', showChangePassphrase);
 provide('changing', changing);
