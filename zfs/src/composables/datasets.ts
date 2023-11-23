@@ -308,30 +308,6 @@ export async function unlockFileSystem(fileSystemData: FileSystemData, passphras
 
 export async function sendFileSystem(sendingData : SendingDataset) {
 	try {
-		// let cmdString = ['zfs', 'send', sendingData.sendName, '|', 'zfs', 'recv', sendingData.recvName];
-		// let cmdString = ['zfs', 'send'];
-		// cmdString.push(sendingData.sendName);
-		// cmdString.push('|');
-		// cmdString.push('zfs', 'recv');
-		// cmdString.push(sendingData.recvName);
-		
-		// if (sendingData.recvHost != '') {
-		// 	cmdString.push(sendingData.recvHost);
-		// }
-		// if (sendingData.recvPort != '22') {
-		// 	cmdString.push(sendingData.recvPort);
-		// }
-		// if (sendingData.sendOpts.compressed) {
-		// 	cmdString.push('-Lce');
-		// }
-		// if (sendingData.sendOpts.raw) {
-		// 	cmdString.push('-w');
-		// }
-
-		// console.log(`***\ncmdString for send: ${cmdString}\n***`);
-		// console.log("***\ncmdString for send:", cmdString, "\n***");
-		// const state = useSpawn(cmdString);
-
 		// const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.sendOpts.compressed, sendingData.sendOpts.raw], { superuser: 'try', stderr: 'out'});
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName], { superuser: 'try', stderr: 'out'});
 		

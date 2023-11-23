@@ -177,7 +177,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, computed } from "vue";
+import { ref, inject, Ref, provide, watch, computed, onMounted } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
@@ -222,13 +222,13 @@ const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 async function refreshDatasets() {
 	fileSystemsLoaded.value = false;
 	fileSystems.value = [];
-	snapshots.value = [];
+	// snapshots.value = [];
 	await loadDatasets(fileSystems);
-	await loadSnapshots(snapshots);
+	// await loadSnapshots(snapshots);
 	fileSystemsLoaded.value = true;
 }
 
-//refreshDatasets();
+refreshDatasets();
 
 function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
@@ -293,8 +293,8 @@ const isDeleting = ref(false);
 async function deleteFileSystem(fileSystem) {
 	operationRunning.value = false;
 	selectedDataset.value = fileSystem;
-	await refreshSnaps(selectedDataset.value);
-	console.log('snapshots', snapshots.value);
+	// await refreshSnaps(selectedDataset.value);
+	// console.log('snapshots', snapshots.value);
 	console.log('findSnapDataset', findSnapDataset(selectedDataset.value));
 	if (selectedDataset.value) { 
 		if ((!findPoolDataset(selectedDataset.value) && selectedDataset.value!.children!.length > 0) || findSnapDataset(selectedDataset.value)) {
@@ -327,7 +327,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		await refreshSnaps(selectedDataset.value);
 		showDeleteFileSystemConfirm.value = false;
 		confirmDelete.value = false;
-		hasChildren.value = false;
+		// hasChildren.value = false;
 		console.log('deleted:', selectedDataset.value!);
 		firstOptionToggle.value = false;
 		thirdOptionToggle.value = false;
@@ -366,7 +366,7 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		await unmountFileSystem(selectedDataset.value!, forceUnmount.value);
 		console.log('unmounted:', selectedDataset.value!);
-		if (lockThisFileSystem.value = true) {
+		if (selectedDataset.value?.encrypted && lockThisFileSystem.value == true) {
 			lockFileSystem(selectedDataset.value!);
 		}
 		showUnmountFileSystemConfirm.value = false;
@@ -384,8 +384,6 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showMountFileSystemConfirm = ref(false);
 const forceMount = ref(true);
-const unlockThisFileSystem = ref(false);
-const showMountUnlockFileSystem = ref(false);
 const mounting = ref(false);
 const confirmMount = ref(false);
 
@@ -411,9 +409,6 @@ watch(confirmMount, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		await mountFileSystem(selectedDataset.value!, forceMount.value);
 		console.log('mounted:', selectedDataset.value!);
-		// if (unlockThisFileSystem.value = true) {
-		// 	// unlockFileSystem(selectedDataset.value!);
-		// }
 		showMountFileSystemConfirm.value = false;
 		confirmMount.value = false;
 		forceMount.value = false;
@@ -421,7 +416,6 @@ watch(confirmMount, async (newValue, oldValue) => {
 		await refreshSnaps(selectedDataset.value);
 		mounting.value = false;
 		operationRunning.value = false;
-		unlockThisFileSystem.value = false;
 	}
 });
 
@@ -437,16 +431,31 @@ function renameThisDataset(fileSystem) {
 	console.log('selected to be renamed:', selectedDataset.value);
 }
 
+// watch(confirmRename, async (newVal, oldVal) => {
+// 	if (confirmRename.value == true) {
+// 		renaming.value = true;
+
+// 	}
+// });
+
 //////////////////// Send Dataset ///////////////////
 /////////////////////////////////////////////////////
 const showSendDataset = ref(false);
 const sending = ref(false);
+const confirmSend = ref(false);
 
 function sendThisDataset(fileSystem) {
 	showSendDataset.value = true;
 	selectedDataset.value = fileSystem;
+	confirmSend.value = false;
 	console.log('selected to send:', selectedDataset.value);
 }
+
+watch(confirmSend, async (newVal, oldVal) => {
+	if (confirmSend.value == true) {
+		await refreshDatasets();
+	}
+});
 
 /////////////// Change Passphrase ///////////////////
 /////////////////////////////////////////////////////
@@ -474,6 +483,9 @@ function handleFileSystemEncryption(fileSystem : FileSystemData, mode : 'lock' |
 	console.log(`selected to be ${mode}ed: ${selectedDataset.value.name}`);
 }
 
+// onMounted(() => {
+// 	refreshDatasets();
+// });
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
@@ -506,6 +518,7 @@ provide('confirm-create', confirmCreate);
 
 provide('show-send-dataset', showSendDataset);
 provide('sending', sending);
+provide('confirm-send', confirmSend);
 
 provide('show-change-passphrase', showChangePassphrase);
 provide('changing', changing);

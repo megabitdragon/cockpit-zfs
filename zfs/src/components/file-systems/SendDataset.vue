@@ -18,7 +18,7 @@
                     <div class="mt-2">
                         <!-- Receiving Host: (Add Tooltip (i): Optional-> If Empty, then Local) -->
                         <label :for="getIdKey('receiving-host-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Host:</label>
-                        <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="sendingData.recvHost" placeholder="Leave empty if sending locally"/>
+                        <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="sendingData.recvHost" placeholder="(Leave empty if sending locally.)"/>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Port: [Default -> 22?, User Can Change]-->
@@ -71,6 +71,7 @@ const props = defineProps<SendDatasetProps>();
 
 const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
 const sending = inject<Ref<boolean>>('sending')!;
+const confirmSend = inject<Ref<boolean>>('confirm-send')!;
 // const sendName = ref('');
 // const sendDataType = ref(props.dataType);
 const sendCompressed = ref(false);
@@ -101,6 +102,7 @@ async function sendBtn(sendingData : SendingDataset) {
     await sendFileSystem(sendingData);
     sending.value = false;
     showSendDataset.value = false;
+    confirmSend.value = true;
 }
 
 // onMounted(() => {
