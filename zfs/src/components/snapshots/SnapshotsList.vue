@@ -104,6 +104,9 @@
 													<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
+													<a href="#" @click="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+												</MenuItem>
+												<MenuItem as="div" v-slot="{ active }">
 													<a href="#" @click="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
 												</MenuItem>
 											</div>
@@ -133,6 +136,10 @@
 			<UniversalConfirmation :showFlag="showRollbackSnapshotModal" @close="updateShowRollbackSnapshot" :idKey="'confirm-rollback-snapshot'" :item="'snapshot'" :operation="'rollback'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisRollback" :firstOption="'Destroy all newer snapshots of file system'" :secondOption="'Force Destroy ALL newer datasets'" :hasChildren="hasChildren"/>
 		</div>
 
+		<div v-if="showSendSnapshot">
+			<SendDataset :idKey="'show-send-snapshot-modal'" @close="showSendSnapshot = false" :snapshot="selectedSnapshot!" :name="selectedSnapshot!.name" :dataType="'snapshot'"/>
+		</div>
+
 	</div>
 
 </template>
@@ -141,12 +148,13 @@ import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
-import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset } from '../../composables/loadData';
+import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset, loadDatasets } from '../../composables/loadData';
 import { destroySnapshot, rollbackSnapshot, cloneSnapshot, renameSnapshot } from '../../composables/snapshots';
 import CloneSnapshot from '../snapshots/CloneSnapshot.vue';
 import RenameSnapshot from '../snapshots/RenameSnapshot.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import UniversalConfirmation from '../common/UniversalConfirmation.vue';
+import SendDataset from '../file-systems/SendDataset.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -164,8 +172,8 @@ const props = defineProps<SnapshotsListProps>();
 // const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 // const disks = inject<Ref<DiskData[]>>('disks')!;
 // const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
-// const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
-// const datasetsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasetsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
@@ -182,6 +190,12 @@ refreshSnaps();
 // } else if (props.item == 'filesystem') {
 // 	loadTheseSnapshots();
 // }
+async function refreshDatasets() {
+	datasetsLoaded.value = false;
+	datasets.value = [];
+	await loadDatasets(datasets);
+	datasetsLoaded.value = true;
+}
 
 // loadSnapshots(snapshots);
 function loadTheseSnapshots() {
@@ -192,7 +206,7 @@ function loadTheseSnapshots() {
 	}
 }
 
-function refreshSnaps() {
+async function refreshSnaps() {
 	snapshotsLoaded.value = false;
 
 	if (props.item == 'pool') {
@@ -326,7 +340,25 @@ watch(confirmRename, async (newVal, oldVal) => {
 	}
 });
 
-const getIdKey = (name: string) => `${name}`;
+//////////////////// Send Dataset ///////////////////
+/////////////////////////////////////////////////////
+const showSendSnapshot = ref(false);
+const sendingSnap = ref(false);
+const confirmSendSnap = ref(false);
+
+function sendThisDataset(snapshot) {
+	showSendSnapshot.value = true;
+	selectedSnapshot.value = snapshot;
+	confirmSendSnap.value = false;
+	console.log('selected to send:', selectedSnapshot.value);
+}
+
+watch(confirmSendSnap, async (newVal, oldVal) => {
+	if (confirmSendSnap.value == true) {
+		await refreshSnaps();
+		await refreshDatasets();
+	}
+});
 
 // provide('snapshots-loaded', snapshotsLoaded)!;
 provide('cloning', cloning);
@@ -335,6 +367,11 @@ provide('show-clone-modal', showCloneSnapshotModal);
 provide('renaming', renaming);
 provide('confirm-rename', confirmRename);
 provide('show-rename-modal', showRenameSnapshotModal);
+
+provide('show-send-dataset', showSendSnapshot);
+provide('sending', sendingSnap);
+provide('confirm-send', confirmSendSnap);
+
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);

@@ -2,7 +2,7 @@
 	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
 		<div class="button-group-row">
 			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showNewFSWizard = true">Create File System</button>
-			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="refreshDatasets"><ArrowPathIcon class="w-5 h-5"/></button>
+			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="refreshData()"><ArrowPathIcon class="w-5 h-5"/></button>
 		</div>
 
 		<div class="mt-8 overflow-visible rounded-md max-w-7xl">
@@ -170,7 +170,7 @@
 	</div>
 
 	<div v-if="showSendDataset">
-		<SendDataset :idKey="'show-send-dataset-modal'" @close="showSendDataset = false" :dataset="selectedDataset!" :dataType="'filesystem'"/>
+		<SendDataset :idKey="'show-send-dataset-modal'" @close="showSendDataset = false" :dataset="selectedDataset!" :name="selectedDataset!.name" :dataType="'filesystem'"/>
 	</div>
 
 	
@@ -215,20 +215,21 @@ const showFSConfig = ref(false);
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const selectedDataset = ref<FileSystemData>();
-// const snapshots = ref<Snapshot[]>([]);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-// const fileSystemsAndSnaps = ref<SnapDatasets[]>([]);
+const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 
-async function refreshDatasets() {
+async function refreshData() {
 	fileSystemsLoaded.value = false;
+	snapshotsLoaded.value = false;
 	fileSystems.value = [];
-	// snapshots.value = [];
+	snapshots.value = [];
 	await loadDatasets(fileSystems);
-	// await loadSnapshots(snapshots);
+	await loadSnapshots(snapshots);
 	fileSystemsLoaded.value = true;
+	snapshotsLoaded.value = true;
 }
 
-refreshDatasets();
+refreshData();
 
 function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
@@ -252,7 +253,7 @@ function findSnapDataset(fileSystem) {
     }
 }
 
-async function refreshSnaps(filesystem) {
+async function refreshDatasetSnaps(filesystem) {
 	snapshots.value = [];
 	await loadSnapshotsInDataset(snapshots, filesystem);
 }
@@ -272,8 +273,8 @@ function createSnapshotBtn(filesystem) {
 watch(confirmCreate, async (newVal, oldVal) => {
 	if (confirmCreate.value == true) {
 		operationRunning.value = true;
-		await refreshDatasets();
-		await refreshSnaps(selectedDataset.value);
+		await refreshData();
+		await refreshDatasetSnaps(selectedDataset.value);
 		confirmCreate.value = false;
 		operationRunning.value = false;
 		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
@@ -293,7 +294,7 @@ const isDeleting = ref(false);
 async function deleteFileSystem(fileSystem) {
 	operationRunning.value = false;
 	selectedDataset.value = fileSystem;
-	// await refreshSnaps(selectedDataset.value);
+	// await refreshDatasetSnaps(selectedDataset.value);
 	// console.log('snapshots', snapshots.value);
 	console.log('findSnapDataset', findSnapDataset(selectedDataset.value));
 	if (selectedDataset.value) { 
@@ -323,8 +324,8 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		await destroyDataset(selectedDataset.value!, firstOptionToggle.value, thirdOptionToggle.value, fourthOptionToggle.value);
 		operationRunning.value = false;
-		await refreshDatasets();
-		await refreshSnaps(selectedDataset.value);
+		await refreshData();
+		await refreshDatasetSnaps(selectedDataset.value);
 		showDeleteFileSystemConfirm.value = false;
 		confirmDelete.value = false;
 		// hasChildren.value = false;
@@ -372,8 +373,8 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 		showUnmountFileSystemConfirm.value = false;
 		confirmUnmount.value = false;
 		forceUnmount.value = false;
-		await refreshDatasets();
-		await refreshSnaps(selectedDataset.value);
+		await refreshData();
+		await refreshDatasetSnaps(selectedDataset.value);
 		unmounting.value = false;
 		operationRunning.value = false;
 		lockThisFileSystem.value = false;
@@ -412,8 +413,8 @@ watch(confirmMount, async (newValue, oldValue) => {
 		showMountFileSystemConfirm.value = false;
 		confirmMount.value = false;
 		forceMount.value = false;
-		await refreshDatasets();
-		await refreshSnaps(selectedDataset.value);
+		await refreshData();
+		await refreshDatasetSnaps(selectedDataset.value);
 		mounting.value = false;
 		operationRunning.value = false;
 	}
@@ -453,7 +454,7 @@ function sendThisDataset(fileSystem) {
 
 watch(confirmSend, async (newVal, oldVal) => {
 	if (confirmSend.value == true) {
-		await refreshDatasets();
+		await refreshData();
 	}
 });
 
@@ -484,7 +485,7 @@ function handleFileSystemEncryption(fileSystem : FileSystemData, mode : 'lock' |
 }
 
 // onMounted(() => {
-// 	refreshDatasets();
+// 	refreshData();
 // });
 
 provide('show-fs-wizard', showNewFSWizard);

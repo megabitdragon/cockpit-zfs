@@ -7,12 +7,13 @@
                 <div class="">
                     <div class="mt-2">
                         <!-- Sending Dataset: (self -> also select?) -->
-                        <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Dataset To Send:</label>
+                        <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">{{ upperCaseWord(dataTypeStr) }} To Send:</label>
                         <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendingData.sendName}}</label>
+                        <p v-if="props.dataType == 'filesystem'" class="text-muted">(Dataset will be unmounted before send.)</p>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Dataset: [User Supplied] -->
-                        <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
+                        <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving {{ upperCaseWord(dataTypeStr) }}:</label>
                         <input @keydown.enter="" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="sendingData.recvName" placeholder="Destination Name Here"/>
                     </div>
                     <div class="mt-2">
@@ -57,14 +58,16 @@
 </template>
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
-import { ref, Ref, inject, watch, onMounted } from 'vue';
-import { sendFileSystem } from '../../composables/datasets';
+import { ref, Ref, inject, watch, computed } from 'vue';
+import { sendFileSystem, unmountFileSystem } from '../../composables/datasets';
+import { upperCaseWord } from '../../composables/helpers';
 
 interface SendDatasetProps {
     idKey: string;
-    dataset: FileSystemData;
-    // snapshot?: Snapshot;
+    dataset?: FileSystemData;
+    snapshot?: Snapshot;
     dataType: 'filesystem' | 'snapshot';
+    name: string;
 }
 
 const props = defineProps<SendDatasetProps>();
@@ -72,14 +75,19 @@ const props = defineProps<SendDatasetProps>();
 const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
 const sending = inject<Ref<boolean>>('sending')!;
 const confirmSend = inject<Ref<boolean>>('confirm-send')!;
-// const sendName = ref('');
-// const sendDataType = ref(props.dataType);
 const sendCompressed = ref(false);
 const sendRaw = ref(false);
 
+const dataTypeStr = computed(() => {
+    if (props.dataType == 'filesystem') {
+        return 'dataset';
+    } else if (props.dataType == 'snapshot') {
+        return 'snapshot';
+    }
+});
+
 const sendingData = ref<SendingDataset>({
-    // sendName: sendName.value,
-    sendName: props.dataset.name,
+    sendName: props.name,
     recvName: '',
     recvHost: '',
     recvPort: '22',
@@ -89,25 +97,16 @@ const sendingData = ref<SendingDataset>({
     },
 });
 
-// function getName() {
-//     if (sendDataType.value == 'filesystem') {
-//         sendName.value = props.dataset!.name;
-//     } else if (sendDataType.value == 'snapshot') {
-//         sendName.value = props.snapshot!.name;
-//     }
-// }
-
 async function sendBtn(sendingData : SendingDataset) {
     sending.value = true;
+    if (props.dataType == 'filesystem') {
+        await unmountFileSystem(props.dataset!);
+    }
     await sendFileSystem(sendingData);
     sending.value = false;
     showSendDataset.value = false;
     confirmSend.value = true;
 }
-
-// onMounted(() => {
-//     getName();
-// });
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 </script>
