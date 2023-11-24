@@ -356,13 +356,17 @@ interface DiskTrimActivity {
 
 interface SendingDataset {
 	sendName: string;
+	sendName2?: string;
 	recvName: string;
 	recvHost: string;
 	recvPort: string;
 	sendOpts: {
 		compressed: boolean;
 		raw: boolean;
+		incremental?: boolean;
+		forceOverwrite?: boolean;
 	}
+
 }
 
 type ConfirmationCallback = () => void;

@@ -168,28 +168,18 @@ const props = defineProps<SnapshotsListProps>();
 
 ////////////////// Loading Data /////////////////////
 /////////////////////////////////////////////////////
-// const pools = inject<Ref<PoolData[]>>('pools')!;
-// const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
-// const disks = inject<Ref<DiskData[]>>('disks')!;
-// const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const datasetsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-// const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
-// const snapshotsInFilesystem = inject<Ref<Snapshot[]>>('snapshots-in-filesystem')!;
-// const snapshots = ref<Snapshot[]>([]);
+
 const snapshotsInFilesystem = ref<Snapshot[]>([]);
 const selectedSnapshot = ref<Snapshot>();
 
 // loadTheseSnapshots();
 refreshSnaps();
-// if (props.item == 'pool') {
-// 	refreshSnaps();
-// } else if (props.item == 'filesystem') {
-// 	loadTheseSnapshots();
-// }
+
 async function refreshDatasets() {
 	datasetsLoaded.value = false;
 	datasets.value = [];
@@ -284,6 +274,15 @@ function cloneThisSnapshot(snapshot) {
 	console.log('clone snapshot modal triggered');
 }
 
+watch(confirmClone, async (newVal, oldVal) => {
+	if (confirmClone.value == true) {
+		operationRunning.value = true;
+		await refreshSnaps();
+		confirmClone.value = false;
+		operationRunning.value = false;
+		notifications.value.constructNotification('Snapshot Cloned', `Cloned snapshot ${selectedSnapshot.value!.name} .`, 'success');
+	}
+});
 
 /////////////// Rollback Snapshot ///////////////////
 /////////////////////////////////////////////////////
@@ -357,6 +356,7 @@ watch(confirmSendSnap, async (newVal, oldVal) => {
 	if (confirmSendSnap.value == true) {
 		await refreshSnaps();
 		await refreshDatasets();
+		notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${selectedSnapshot.value!.name} .`, 'success');
 	}
 });
 

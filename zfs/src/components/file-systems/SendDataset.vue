@@ -9,12 +9,13 @@
                         <!-- Sending Dataset: (self -> also select?) -->
                         <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">{{ upperCaseWord(dataTypeStr) }} To Send:</label>
                         <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendingData.sendName}}</label>
-                        <p v-if="props.dataType == 'filesystem'" class="text-muted">(Dataset will be unmounted before send.)</p>
+                        <p v-if="props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes'" class="text-xs text-muted">(Dataset will be unmounted before send.)</p>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Dataset: [User Supplied] -->
-                        <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving {{ upperCaseWord(dataTypeStr) }}:</label>
-                        <input @keydown.enter="" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="sendingData.recvName" placeholder="Destination Name Here"/>
+                        <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
+                        <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="sendingData.recvName" placeholder="Destination Name Here"/>
+                        <p v-if="doesRecvDatasetExist()" class="text-xs text-danger">Dataset already exists, toggle Force Overwrite to overwrite it.</p>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Host: (Add Tooltip (i): Optional-> If Empty, then Local) -->
@@ -26,17 +27,22 @@
                         <label :for="getIdKey('receiving-port')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Port:</label>
                         <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="sendingData.recvPort"/>
                     </div>
-                    <div class="mt-2 flex flex-row gap-32">
+                    <div class="mt-2 grid grid-flow-col grid-cols-2">
                         <!-- Send Compressed: [Checkbox -> (-Lce) options] *** Cannot be used if Encrypted -->
-                        <label :for="getIdKey('send-compressed-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default">
+                        <label :for="getIdKey('send-compressed-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                             Send Compressed: 
                             <input :id="getIdKey('send-compressed-toggle')" v-model="sendCompressed" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
                         <!-- Send Raw: [Checkbox -> (-w) option] *** If Encrypted, force this mode -->
-                        <label :for="getIdKey('send-raw-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default">
+                        <label :for="getIdKey('send-raw-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                             Send Raw:
                             <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
-                        </label>    
+                        </label>
+                         <!-- Force Overwrite: [Checkbox -> (-F) option] *** If Encrypted, force this mode -->
+                         <label v-if="doesRecvDatasetExist()" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
+                            Force Overwrite:
+                            <input :id="getIdKey('force-overwrite-toggle')" v-model="forceOverwrite" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
+                        </label>
                     </div>
                 </div>
             </template>
@@ -71,12 +77,14 @@ interface SendDatasetProps {
 }
 
 const props = defineProps<SendDatasetProps>();
-
+const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
 const sending = inject<Ref<boolean>>('sending')!;
 const confirmSend = inject<Ref<boolean>>('confirm-send')!;
 const sendCompressed = ref(false);
 const sendRaw = ref(false);
+const sendIncremental = ref(false);
+const forceOverwrite = ref(false);
 
 const dataTypeStr = computed(() => {
     if (props.dataType == 'filesystem') {
@@ -94,12 +102,22 @@ const sendingData = ref<SendingDataset>({
     sendOpts: {
         compressed: sendCompressed.value,
         raw: sendRaw.value,
+        incremental: sendIncremental.value,
+        forceOverwrite: forceOverwrite.value,
     },
 });
 
+function doesRecvDatasetExist() {
+    try {
+        return datasets.value.some(dataset => dataset.name === sendingData.value.recvName);
+    } catch (error) {
+        console.error('Dataset does not exist', error);
+    }
+}
+
 async function sendBtn(sendingData : SendingDataset) {
     sending.value = true;
-    if (props.dataType == 'filesystem') {
+    if (props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes') {
         await unmountFileSystem(props.dataset!);
     }
     await sendFileSystem(sendingData);

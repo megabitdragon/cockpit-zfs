@@ -309,7 +309,7 @@ export async function unlockFileSystem(fileSystemData: FileSystemData, passphras
 export async function sendFileSystem(sendingData : SendingDataset) {
 	try {
 		// const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.sendOpts.compressed, sendingData.sendOpts.raw], { superuser: 'try', stderr: 'out'});
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendOpts.forceOverwrite!], { superuser: 'try', stderr: 'out'});
 		
 		const output = await state.promise();
 		console.log(output);

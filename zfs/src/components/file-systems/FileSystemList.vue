@@ -378,6 +378,7 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 		unmounting.value = false;
 		operationRunning.value = false;
 		lockThisFileSystem.value = false;
+		notifications.value.constructNotification('File System Unmounted', selectedDataset.value!.name + " unmounted.", 'success');
 	}
 });
 
@@ -417,6 +418,7 @@ watch(confirmMount, async (newValue, oldValue) => {
 		await refreshDatasetSnaps(selectedDataset.value);
 		mounting.value = false;
 		operationRunning.value = false;
+		notifications.value.constructNotification('File System Mounted', selectedDataset.value!.name + " mounted.", 'success');
 	}
 });
 
@@ -432,12 +434,15 @@ function renameThisDataset(fileSystem) {
 	console.log('selected to be renamed:', selectedDataset.value);
 }
 
-// watch(confirmRename, async (newVal, oldVal) => {
-// 	if (confirmRename.value == true) {
-// 		renaming.value = true;
-
-// 	}
-// });
+watch(confirmRename, async (newVal, oldVal) => {
+	if (confirmRename.value == true) {
+		operationRunning.value = true;
+		await refreshData();
+		confirmRename.value = false;
+		operationRunning.value = false;
+		notifications.value.constructNotification('File System Renamed', `Renamed file system ${selectedDataset.value!.name} .`, 'success');
+	}
+});
 
 //////////////////// Send Dataset ///////////////////
 /////////////////////////////////////////////////////
@@ -454,7 +459,11 @@ function sendThisDataset(fileSystem) {
 
 watch(confirmSend, async (newVal, oldVal) => {
 	if (confirmSend.value == true) {
+		operationRunning.value = true;
 		await refreshData();
+		confirmRename.value = false;
+		operationRunning.value = false;
+		notifications.value.constructNotification('File System Sent', `Sent file system ${selectedDataset.value!.name} .`, 'success');
 	}
 });
 
@@ -470,6 +479,16 @@ function changeThisPassphrase(fileSystem) {
 	console.log('selected to change passphrase:', selectedDataset.value);
 }
 
+watch(confirmChange, async (newVal, oldVal) => {
+	if (confirmChange.value == true) {
+		operationRunning.value = true;
+		await refreshData();
+		confirmRename.value = false;
+		operationRunning.value = false;
+		notifications.value.constructNotification('Encryption passphrase changed', `Changed passphrase for ${selectedDataset.value!.name} .`, 'success');
+	}
+});
+
 /////////// Locking/Unlocking File System ///////////
 /////////////////////////////////////////////////////
 const showLockUnlockModal = ref(false);
@@ -484,9 +503,15 @@ function handleFileSystemEncryption(fileSystem : FileSystemData, mode : 'lock' |
 	console.log(`selected to be ${mode}ed: ${selectedDataset.value.name}`);
 }
 
-// onMounted(() => {
-// 	refreshData();
-// });
+watch(confirmLockOrUnlock, async (newVal, oldVal) => {
+	if (confirmLockOrUnlock.value == true) {
+		operationRunning.value = true;
+		await refreshData();
+		confirmRename.value = false;
+		operationRunning.value = false;
+		notifications.value.constructNotification('File system locked', `Locked file system ${selectedDataset.value!.name} .`, 'success');
+	}
+});
 
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
