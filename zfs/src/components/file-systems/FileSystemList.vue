@@ -98,9 +98,9 @@
 															<MenuItem as="div" v-slot="{ active }">
 																<a href="#" @click="createSnapshotBtn(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 															</MenuItem>
-															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
+															<!-- <MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																<a href="#" @click="sendThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
-															</MenuItem>
+															</MenuItem> -->
 															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																<a href="#" @click="deleteFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 															</MenuItem>											
@@ -169,9 +169,9 @@
 		<ChangePassphrase :idKey="'show-change-passphrase-modal'" @close="showChangePassphrase = false" :filesystem="selectedDataset!"/>
 	</div>
 
-	<div v-if="showSendDataset">
+	<!-- <div v-if="showSendDataset">
 		<SendDataset :idKey="'show-send-dataset-modal'" @close="showSendDataset = false" :dataset="selectedDataset!" :name="selectedDataset!.name" :dataType="'filesystem'"/>
-	</div>
+	</div> -->
 
 	
 </template>
@@ -446,26 +446,26 @@ watch(confirmRename, async (newVal, oldVal) => {
 
 //////////////////// Send Dataset ///////////////////
 /////////////////////////////////////////////////////
-const showSendDataset = ref(false);
-const sending = ref(false);
-const confirmSend = ref(false);
+// const showSendDataset = ref(false);
+// const sending = ref(false);
+// const confirmSend = ref(false);
 
-function sendThisDataset(fileSystem) {
-	showSendDataset.value = true;
-	selectedDataset.value = fileSystem;
-	confirmSend.value = false;
-	console.log('selected to send:', selectedDataset.value);
-}
+// function sendThisDataset(fileSystem) {
+// 	showSendDataset.value = true;
+// 	selectedDataset.value = fileSystem;
+// 	confirmSend.value = false;
+// 	console.log('selected to send:', selectedDataset.value);
+// }
 
-watch(confirmSend, async (newVal, oldVal) => {
-	if (confirmSend.value == true) {
-		operationRunning.value = true;
-		await refreshData();
-		confirmRename.value = false;
-		operationRunning.value = false;
-		notifications.value.constructNotification('File System Sent', `Sent file system ${selectedDataset.value!.name} .`, 'success');
-	}
-});
+// watch(confirmSend, async (newVal, oldVal) => {
+// 	if (confirmSend.value == true) {
+// 		operationRunning.value = true;
+// 		await refreshData();
+// 		confirmRename.value = false;
+// 		operationRunning.value = false;
+// 		notifications.value.constructNotification('File System Sent', `Sent file system ${selectedDataset.value!.name} .`, 'success');
+// 	}
+// });
 
 /////////////// Change Passphrase ///////////////////
 /////////////////////////////////////////////////////
@@ -542,9 +542,9 @@ provide('create-snap-modal', showSnapshotModal);
 provide('creating', creating);
 provide('confirm-create', confirmCreate);
 
-provide('show-send-dataset', showSendDataset);
-provide('sending', sending);
-provide('confirm-send', confirmSend);
+// provide('show-send-dataset', showSendDataset);
+// provide('sending', sending);
+// provide('confirm-send', confirmSend);
 
 provide('show-change-passphrase', showChangePassphrase);
 provide('changing', changing);

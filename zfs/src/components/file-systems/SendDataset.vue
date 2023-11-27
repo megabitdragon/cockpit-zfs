@@ -7,15 +7,15 @@
                 <div class="">
                     <div class="mt-2">
                         <!-- Sending Dataset: (self -> also select?) -->
-                        <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">{{ upperCaseWord(dataTypeStr) }} To Send:</label>
+                        <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
                         <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendingData.sendName}}</label>
-                        <p v-if="props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes'" class="text-xs text-muted">(Dataset will be unmounted before send.)</p>
+                        <!-- <p v-if="props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes'" class="text-xs text-muted">(Dataset will be unmounted before send.)</p> -->
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Dataset: [User Supplied] -->
                         <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
                         <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="sendingData.recvName" placeholder="Destination Name Here"/>
-                        <p v-if="doesRecvDatasetExist()" class="text-xs text-danger">Dataset already exists, toggle Force Overwrite to overwrite it.</p>
+                        <p v-if="doesRecvDatasetExist()" class="mt-1 text-sm text-danger">Dataset already exists, toggle Force Overwrite to overwrite it (Must not have existing snapshots).</p>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Host: (Add Tooltip (i): Optional-> If Empty, then Local) -->
@@ -38,8 +38,10 @@
                             Send Raw:
                             <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
-                         <!-- Force Overwrite: [Checkbox -> (-F) option] *** If Encrypted, force this mode -->
-                         <label v-if="doesRecvDatasetExist()" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
+
+                        <!-- Use INCREMENTAL INSTEAD -->
+                        <!-- Force Overwrite: [Checkbox -> (-F) option] -->
+                        <label v-if="doesRecvDatasetExist()" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                             Force Overwrite:
                             <input :id="getIdKey('force-overwrite-toggle')" v-model="forceOverwrite" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
@@ -70,9 +72,9 @@ import { upperCaseWord } from '../../composables/helpers';
 
 interface SendDatasetProps {
     idKey: string;
-    dataset?: FileSystemData;
+    // dataset?: FileSystemData;
     snapshot?: Snapshot;
-    dataType: 'filesystem' | 'snapshot';
+    // dataType: 'filesystem' | 'snapshot';
     name: string;
 }
 
@@ -86,13 +88,13 @@ const sendRaw = ref(false);
 const sendIncremental = ref(false);
 const forceOverwrite = ref(false);
 
-const dataTypeStr = computed(() => {
-    if (props.dataType == 'filesystem') {
-        return 'dataset';
-    } else if (props.dataType == 'snapshot') {
-        return 'snapshot';
-    }
-});
+// const dataTypeStr = computed(() => {
+//     if (props.dataType == 'filesystem') {
+//         return 'dataset';
+//     } else if (props.dataType == 'snapshot') {
+//         return 'snapshot';
+//     }
+// });
 
 const sendingData = ref<SendingDataset>({
     sendName: props.name,
@@ -117,9 +119,9 @@ function doesRecvDatasetExist() {
 
 async function sendBtn(sendingData : SendingDataset) {
     sending.value = true;
-    if (props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes') {
-        await unmountFileSystem(props.dataset!);
-    }
+    // if (props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes') {
+    //     await unmountFileSystem(props.dataset!);
+    // }
     await sendFileSystem(sendingData);
     sending.value = false;
     showSendDataset.value = false;

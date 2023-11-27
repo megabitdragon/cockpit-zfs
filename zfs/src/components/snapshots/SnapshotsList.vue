@@ -137,7 +137,7 @@
 		</div>
 
 		<div v-if="showSendSnapshot">
-			<SendDataset :idKey="'show-send-snapshot-modal'" @close="showSendSnapshot = false" :snapshot="selectedSnapshot!" :name="selectedSnapshot!.name" :dataType="'snapshot'"/>
+			<SendDataset :idKey="'show-send-snapshot-modal'" @close="showSendSnapshot = false" :snapshot="selectedSnapshot!" :name="selectedSnapshot!.name" />
 		</div>
 
 	</div>
@@ -356,7 +356,7 @@ watch(confirmSendSnap, async (newVal, oldVal) => {
 	if (confirmSendSnap.value == true) {
 		await refreshSnaps();
 		await refreshDatasets();
-		notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${selectedSnapshot.value!.name} .`, 'success');
+		notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${selectedSnapshot.value!.name}.`, 'success');
 	}
 });
 

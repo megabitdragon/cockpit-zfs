@@ -41,9 +41,6 @@ def send_dataset(sendName, recvName, forceOverwrite):
     try: 
         send_cmd = ['zfs', 'send']
 
-        # if forceOverwrite:
-        #     send_cmd.append('-F')
-
         send_cmd.append(sendName)
 
         process_send = subprocess.Popen(
@@ -51,7 +48,12 @@ def send_dataset(sendName, recvName, forceOverwrite):
             stdout=subprocess.PIPE,
         )
 
-        recv_cmd = ['zfs', 'recv', recvName]
+        recv_cmd = ['zfs', 'recv']
+
+        if forceOverwrite:
+            recv_cmd.append('-F')
+
+        recv_cmd.append(recvName)
 
         process_recv = subprocess.Popen(
             recv_cmd,
