@@ -73,16 +73,21 @@ import { upperCaseWord } from '../../composables/helpers';
 interface SendDatasetProps {
     idKey: string;
     // dataset?: FileSystemData;
-    snapshot?: Snapshot;
+    snapshot: Snapshot;
     // dataType: 'filesystem' | 'snapshot';
     name: string;
 }
 
 const props = defineProps<SendDatasetProps>();
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
 const sending = inject<Ref<boolean>>('sending')!;
 const confirmSend = inject<Ref<boolean>>('confirm-send')!;
+const sendName = ref(props.name);
+const destinationName = ref('');
+const destinationHost = ref('');
+const destinationPort = ref('22');
 const sendCompressed = ref(false);
 const sendRaw = ref(false);
 const sendIncremental = ref(false);
@@ -113,7 +118,15 @@ function doesRecvDatasetExist() {
     try {
         return datasets.value.some(dataset => dataset.name === sendingData.value.recvName);
     } catch (error) {
-        console.error('Dataset does not exist', error);
+        console.error('Error checking dataset', error);
+    }
+}
+
+function doesRecvSnapshotExist() {
+    try {
+        // return snapshots.value.find(snapshot => snapshot.guid === sendingData.value.)
+    } catch (error) {
+        console.error('Error checking snapshot', error);
     }
 }
 
@@ -122,6 +135,7 @@ async function sendBtn(sendingData : SendingDataset) {
     // if (props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes') {
     //     await unmountFileSystem(props.dataset!);
     // }
+    console.log(sendingData);
     await sendSnapshot(sendingData);
     sending.value = false;
     showSendDataset.value = false;

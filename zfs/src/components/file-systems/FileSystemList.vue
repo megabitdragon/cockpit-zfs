@@ -444,28 +444,6 @@ watch(confirmRename, async (newVal, oldVal) => {
 	}
 });
 
-//////////////////// Send Dataset ///////////////////
-/////////////////////////////////////////////////////
-// const showSendDataset = ref(false);
-// const sending = ref(false);
-// const confirmSend = ref(false);
-
-// function sendThisDataset(fileSystem) {
-// 	showSendDataset.value = true;
-// 	selectedDataset.value = fileSystem;
-// 	confirmSend.value = false;
-// 	console.log('selected to send:', selectedDataset.value);
-// }
-
-// watch(confirmSend, async (newVal, oldVal) => {
-// 	if (confirmSend.value == true) {
-// 		operationRunning.value = true;
-// 		await refreshData();
-// 		confirmRename.value = false;
-// 		operationRunning.value = false;
-// 		notifications.value.constructNotification('File System Sent', `Sent file system ${selectedDataset.value!.name} .`, 'success');
-// 	}
-// });
 
 /////////////// Change Passphrase ///////////////////
 /////////////////////////////////////////////////////

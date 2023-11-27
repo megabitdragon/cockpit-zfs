@@ -266,6 +266,7 @@ interface Snapshot {
 	pool: string;
 	mountpoint: string;
 	type: string;
+	guid: string;
 	properties: {
 		clones: string;
 		creation: {
@@ -280,7 +281,7 @@ interface Snapshot {
 		used: {
 			value: string;
 			rawNum: number;
-		}
+		},
 	}
 	holds: {}
 }

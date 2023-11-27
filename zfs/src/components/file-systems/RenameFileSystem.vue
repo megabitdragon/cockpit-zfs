@@ -147,12 +147,9 @@ async function renameBtn() {
         renaming.value = true;
         confirmRename.value = true;
         await renameFileSystem(props.filesystem.name, (parentFS.value + '/' + newName.value), forceUnmount.value, createNonExistParent.value);
-        fileSystemsLoaded.value = false;
-        datasets.value = [];
-        await loadDatasets(datasets);
+ 
         showRenameModal.value = false;
         renaming.value = false;
-        fileSystemsLoaded.value = true;
     }
 
 }

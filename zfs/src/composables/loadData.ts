@@ -485,6 +485,7 @@ export async function loadSnapshots(snapshots) {
 						pool: snapshot.pool,
 						mountpoint: snapshot.mountpoint,
 						type: snapshot.type,
+						guid: snapshot.properties.guid.value,
 						properties: {
 							clones: snapshot.properties.clones.parsed,
 							creation: {
@@ -531,7 +532,8 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 							dataset: snapshot.dataset,
 							pool: snapshot.pool,
 							mountpoint: snapshot.mountpoint,
-							type: snapshot.type,
+								type: snapshot.type,
+						guid: snapshot.properties.guid.value,
 							properties: {
 								clones: snapshot.properties.clones.parsed,
 								creation: {
@@ -577,7 +579,8 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 							dataset: snapshot.dataset,
 							pool: snapshot.pool,
 							mountpoint: snapshot.mountpoint,
-							type: snapshot.type,
+								type: snapshot.type,
+						guid: snapshot.properties.guid.value,
 							properties: {
 								clones: snapshot.properties.clones.parsed,
 								creation: {
