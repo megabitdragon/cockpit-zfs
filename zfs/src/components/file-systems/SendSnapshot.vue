@@ -9,7 +9,6 @@
                         <!-- Sending Dataset: (self -> also select?) -->
                         <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
                         <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendingData.sendName}}</label>
-                        <!-- <p v-if="props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes'" class="text-xs text-muted">(Dataset will be unmounted before send.)</p> -->
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Dataset: [User Supplied] -->
@@ -70,7 +69,7 @@ import { ref, Ref, inject, watch, computed } from 'vue';
 import { sendSnapshot } from '../../composables/snapshots';
 import { upperCaseWord } from '../../composables/helpers';
 
-interface SendDatasetProps {
+interface SendSnapshotProps {
     idKey: string;
     // dataset?: FileSystemData;
     snapshot: Snapshot;
@@ -78,7 +77,7 @@ interface SendDatasetProps {
     name: string;
 }
 
-const props = defineProps<SendDatasetProps>();
+const props = defineProps<SendSnapshotProps>();
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
@@ -93,13 +92,6 @@ const sendRaw = ref(false);
 const sendIncremental = ref(false);
 const forceOverwrite = ref(false);
 
-// const dataTypeStr = computed(() => {
-//     if (props.dataType == 'filesystem') {
-//         return 'dataset';
-//     } else if (props.dataType == 'snapshot') {
-//         return 'snapshot';
-//     }
-// });
 
 const sendingData = ref<SendingDataset>({
     sendName: props.name,
@@ -132,9 +124,6 @@ function doesRecvSnapshotExist() {
 
 async function sendBtn(sendingData : SendingDataset) {
     sending.value = true;
-    // if (props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes') {
-    //     await unmountFileSystem(props.dataset!);
-    // }
     console.log(sendingData);
     await sendSnapshot(sendingData);
     sending.value = false;

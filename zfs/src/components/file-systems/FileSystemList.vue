@@ -98,9 +98,7 @@
 															<MenuItem as="div" v-slot="{ active }">
 																<a href="#" @click="createSnapshotBtn(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 															</MenuItem>
-															<!-- <MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
-																<a href="#" @click="sendThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send File System</a>
-															</MenuItem> -->
+						
 															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																<a href="#" @click="deleteFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 															</MenuItem>											
@@ -168,11 +166,6 @@
 	<div v-if="showChangePassphrase">
 		<ChangePassphrase :idKey="'show-change-passphrase-modal'" @close="showChangePassphrase = false" :filesystem="selectedDataset!"/>
 	</div>
-
-	<!-- <div v-if="showSendDataset">
-		<SendDataset :idKey="'show-send-dataset-modal'" @close="showSendDataset = false" :dataset="selectedDataset!" :name="selectedDataset!.name" :dataType="'filesystem'"/>
-	</div> -->
-
 	
 </template>
 
@@ -191,7 +184,6 @@ import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 import RenameFileSystem from "./RenameFileSystem.vue";
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
-import SendDataset from './SendDataset.vue';
 import ChangePassphrase from "./ChangePassphrase.vue";
 import LockUnlockFileSystem from "./LockUnlockFileSystem.vue";
 

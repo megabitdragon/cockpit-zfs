@@ -137,7 +137,7 @@
 		</div>
 
 		<div v-if="showSendSnapshot">
-			<SendDataset :idKey="'show-send-snapshot-modal'" @close="showSendSnapshot = false" :snapshot="selectedSnapshot!" :name="selectedSnapshot!.name" />
+			<SendSnapshot idKey="'show-send-snapshot-modal'" @close="showSendSnapshot = false" :snapshot="selectedSnapshot!" :name="selectedSnapshot!.name" />
 		</div>
 
 	</div>
@@ -154,7 +154,7 @@ import CloneSnapshot from '../snapshots/CloneSnapshot.vue';
 import RenameSnapshot from '../snapshots/RenameSnapshot.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import UniversalConfirmation from '../common/UniversalConfirmation.vue';
-import SendDataset from '../file-systems/SendDataset.vue';
+import SendSnapshot from '../file-systems/SendSnapshot.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;
 
