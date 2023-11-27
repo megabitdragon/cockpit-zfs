@@ -10,8 +10,6 @@ import change_passphrase_script from "../scripts/change-encrypted-key.py?raw";
 import unlock_dataset_script from "../scripts/unlock-encrypted-dataset.py?raw";
 // @ts-ignore
 import validate_passphrase_script from "../scripts/encryption-key-validation.py?raw";
-// @ts-ignore
-import send_dataset_script from "../scripts/send-dataset.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -297,20 +295,6 @@ export async function lockFileSystem(fileSystemData: FileSystemData) {
 export async function unlockFileSystem(fileSystemData: FileSystemData, passphrase : string) {
 	try {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', unlock_dataset_script, fileSystemData.name, passphrase], { superuser: 'try', stderr: 'out'});
-		const output = await state.promise();
-		console.log(output);
-		return output.stdout;
-	} catch (state) {
-		console.error(errorString(state));
-		return null;
-	}
-}
-
-export async function sendFileSystem(sendingData : SendingDataset) {
-	try {
-		// const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.sendOpts.compressed, sendingData.sendOpts.raw], { superuser: 'try', stderr: 'out'});
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendOpts.forceOverwrite!], { superuser: 'try', stderr: 'out'});
-		
 		const output = await state.promise();
 		console.log(output);
 		return output.stdout;

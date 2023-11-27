@@ -1,6 +1,8 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
 // @ts-ignore
 import get_snapshots_script from "../scripts/get-snapshots.py?raw";
+// @ts-ignore
+import send_dataset_script from "../scripts/send-dataset.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -131,4 +133,16 @@ export async function cloneSnapshot(snapName, newParentFS, cloneName, createPare
     }
 }
 
-
+export async function sendSnapshot(sendingData : SendingDataset) {
+	try {
+		// const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.sendOpts.compressed, sendingData.sendOpts.raw], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendOpts.forceOverwrite!], { superuser: 'try', stderr: 'out'});
+		
+		const output = await state.promise();
+		console.log(output);
+		return output.stdout;
+	} catch (state) {
+		console.error(errorString(state));
+		return null;
+	}
+}

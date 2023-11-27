@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
 import { ref, Ref, inject, watch, computed } from 'vue';
-import { sendFileSystem, unmountFileSystem } from '../../composables/datasets';
+import { sendSnapshot } from '../../composables/snapshots';
 import { upperCaseWord } from '../../composables/helpers';
 
 interface SendDatasetProps {
@@ -122,7 +122,7 @@ async function sendBtn(sendingData : SendingDataset) {
     // if (props.dataType == 'filesystem' && props.dataset!.properties.mounted == 'yes') {
     //     await unmountFileSystem(props.dataset!);
     // }
-    await sendFileSystem(sendingData);
+    await sendSnapshot(sendingData);
     sending.value = false;
     showSendDataset.value = false;
     confirmSend.value = true;
