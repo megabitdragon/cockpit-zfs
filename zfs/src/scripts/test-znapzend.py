@@ -53,10 +53,14 @@ def send_recv_snapshots(self, src_dataset, dst_dataset, dst_name, mbuffer, mbuff
                             ' clean up destination ' + dst_dataset + ' (i.e. destroy existing snapshots)')
     mbuffer, mbuffer_port = mbuffer.split(':', 1) if mbuffer else (None, None)
     cmd = []
+
+    # ####################################
     if last_common:
         cmd.append([self.priv, 'zfs', 'send'] + send_opt + [incr_opt, last_common, last_snapshot])
     else:
         cmd.append([self.priv, 'zfs', 'send'] + send_opt + [last_snapshot])
+    # ####################################
+
     if remote and mbuffer_port and mbuffer != 'off':
         recv_pid = None
         recv_cmd = build_remote_ref_array(remote, [mbuffer] + self.mbuffer_param +
@@ -93,6 +97,7 @@ def send_recv_snapshots(self, src_dataset, dst_dataset, dst_name, mbuffer, mbuff
                                 + (f" on {remote}" if remote else ''))
     set_snapshot_properties(last_snapshot, snapshot_synced)
     return 1
+
 def split_host_data_set(data_set):
     parts = data_set.split('@')
     if len(parts) == 1:
@@ -101,28 +106,8 @@ def split_host_data_set(data_set):
         return parts[0], parts[1]
     else:
         raise ValueError("Invalid dataset format: " + data_set)
-def last_and_common_snapshots(src_dataset, dst_dataset, snap_filter, last_snapshot_to_see):
-    # Implement your logic to find last and common snapshots here
-    pass
-def set_snapshot_properties(snapshot, properties):
-    # Implement your logic to set snapshot properties here
-    pass
-def destroy_snapshots(snapshots):
-    # Implement your logic to destroy snapshots here
-    pass
-def list_snapshots(dataset, snap_filter):
-    # Implement your logic to list snapshots here
-    pass
-def build_remote_ref_array(remote, cmd1, cmd2):
-    # Implement your logic to build the remote reference array here
-    pass
-# Usage example
-send_recv_snapshots(self, "source_pool/source_dataset", "destination_pool/destination_dataset",
-                    "dstName", "mbuffer_config", "mbuffer_size", snap_filter=re.compile('.*'),
-                    last_snapshot_to_see=None, allow_dest_rollback=None)
-
-class YourClass:
-    def last_and_common_snapshots(self, src_data_set, dst_data_set, snapshot_filter=None, last_snapshot_to_see=None):
+    
+def last_and_common_snapshots(self, src_data_set, dst_data_set, snapshot_filter=None, last_snapshot_to_see=None):
         if snapshot_filter is None:
             snapshot_filter = re.compile('.*')
         if last_snapshot_to_see is not None:
@@ -146,35 +131,55 @@ class YourClass:
             src_snapshots[i] if i >= 0 and any(re.search(fr'@{re.escape(snap_name.group(1))}$', snap) for snap in dst_snapshots) else None,
             len(dst_snapshots)
         )
-    def most_recent_common_snapshot(self, src_data_set, dst_data_set, dst_name, snapshot_filter=None, recurse=False, inherit=None):
-        if snapshot_filter is None or not snapshot_filter:
-            snapshot_filter = re.compile('.*')
-        if inherit is None:
-            inherit = InheritLevels()
-            inherit.zfs_local = True
-            inherit.zfs_inherit = True
-            inherit.snapshot_recurse_parent = True
-        last_snapshot, last_common_snapshot, dst_snap_count = None, None, None
-        try:
-            last_snapshot, last_common_snapshot, dst_snap_count = self.last_and_common_snapshots(src_data_set, dst_data_set, snapshot_filter)[1]
-        except Exception as e:
-            if isinstance(e, MojoException):
-                self.zLog.warn(e.message)
-            else:
-                self.zLog.warn(e)
-        if not last_common_snapshot:
-            dst_synced_propname = f'{dst_name}_synced'
-            dst_synced_props = [dst_synced_propname, dst_name]
-            src_snapshots = self.list_snapshots(src_data_set, snapshot_filter)
-            i = len(src_snapshots) - 1
-            while i >= 0:
-                snapshot = src_snapshots[i]
-                properties = self.get_snapshot_properties(snapshot, recurse, inherit, *dst_synced_props)
-                if properties.get(dst_name) == dst_data_set and properties.get(dst_synced_propname):
-                    last_common_snapshot = snapshot
-                    break
-                i -= 1
-        return last_common_snapshot
+
+def most_recent_common_snapshot(self, src_data_set, dst_data_set, dst_name, snapshot_filter=None, recurse=False, inherit=None):
+    if snapshot_filter is None or not snapshot_filter:
+        snapshot_filter = re.compile('.*')
+    if inherit is None:
+        inherit = InheritLevels()
+        inherit.zfs_local = True
+        inherit.zfs_inherit = True
+        inherit.snapshot_recurse_parent = True
+    last_snapshot, last_common_snapshot, dst_snap_count = None, None, None
+    try:
+        last_snapshot, last_common_snapshot, dst_snap_count = self.last_and_common_snapshots(src_data_set, dst_data_set, snapshot_filter)[1]
+    except Exception as e:
+        if isinstance(e, MojoException):
+            self.zLog.warn(e.message)
+        else:
+            self.zLog.warn(e)
+    if not last_common_snapshot:
+        dst_synced_propname = f'{dst_name}_synced'
+        dst_synced_props = [dst_synced_propname, dst_name]
+        src_snapshots = self.list_snapshots(src_data_set, snapshot_filter)
+        i = len(src_snapshots) - 1
+        while i >= 0:
+            snapshot = src_snapshots[i]
+            properties = self.get_snapshot_properties(snapshot, recurse, inherit, *dst_synced_props)
+            if properties.get(dst_name) == dst_data_set and properties.get(dst_synced_propname):
+                last_common_snapshot = snapshot
+                break
+            i -= 1
+    return last_common_snapshot
+
+def set_snapshot_properties(snapshot, properties):
+    # Implement your logic to set snapshot properties here
+    pass
+def destroy_snapshots(snapshots):
+    # Implement your logic to destroy snapshots here
+    pass
+def list_snapshots(dataset, snap_filter):
+    # Implement your logic to list snapshots here
+    pass
+def build_remote_ref_array(remote, cmd1, cmd2):
+    # Implement your logic to build the remote reference array here
+    pass
+
+# Usage example
+send_recv_snapshots(self, "source_pool/source_dataset", "destination_pool/destination_dataset",
+                    "dstName", "mbuffer_config", "mbuffer_size", snap_filter=re.compile('.*'),
+                    last_snapshot_to_see=None, allow_dest_rollback=None)
+
 class InheritLevels:
     def __init__(self):
         self.zfs_local = False

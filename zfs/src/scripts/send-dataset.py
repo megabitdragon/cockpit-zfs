@@ -37,7 +37,7 @@ import argparse
 #     except Exception as e:
 #         print(f"An error occurred: {e}")
 
-def send_dataset(sendName, recvName, forceOverwrite):
+def send_dataset(sendName, recvName):
     try: 
         send_cmd = ['zfs', 'send']
 
@@ -50,8 +50,8 @@ def send_dataset(sendName, recvName, forceOverwrite):
 
         recv_cmd = ['zfs', 'recv']
 
-        if forceOverwrite:
-            recv_cmd.append('-F')
+        # if forceOverwrite:
+        #     recv_cmd.append('-F')
 
         recv_cmd.append(recvName)
 
@@ -76,7 +76,7 @@ def main() :
     parser = argparse.ArgumentParser(description='Send ZFS Dataset')
     parser.add_argument('sendName', type=str, help='sending dataset name')
     parser.add_argument('recvName', type=str, help='receiving dataset name')
-    parser.add_argument('forceOverwrite', type=str, help='forcefully overwrite existing dataset')
+    # parser.add_argument('forceOverwrite', type=str, help='forcefully overwrite existing dataset')
     # parser.add_argument('recvHost', type=str, help='receiving dataset host')
     # parser.add_argument('recvPort', type=str, help='receiving dataset port')
     # parser.add_argument('compression', type=bool, help='sending dataset compression')
@@ -86,7 +86,7 @@ def main() :
 
     sendName = args.sendName
     recvName = args.recvName
-    forceOverwrite = args.forceOverwrite
+    # forceOverwrite = args.forceOverwrite
     # recvHost = args.recvHost
     # recvPort = args.recvPort
     # compressed = args.compressed
@@ -95,7 +95,7 @@ def main() :
     print(f"Executing command: zfs send {sendName} | {recvName}")
 
     # send_dataset(sendName, recvName, recvHost, recvPort, compressed, raw)
-    send_dataset(sendName, recvName, forceOverwrite)
+    send_dataset(sendName, recvName)
 
 if __name__ == '__main__':
     main()

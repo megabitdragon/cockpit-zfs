@@ -267,6 +267,7 @@ interface Snapshot {
 	mountpoint: string;
 	type: string;
 	guid: string;
+	creationTimestamp: string;
 	properties: {
 		clones: string;
 		creation: {
@@ -357,7 +358,7 @@ interface DiskTrimActivity {
 
 interface SendingDataset {
 	sendName: string;
-	sendName2?: string;
+	sendIncName?: string;
 	recvName: string;
 	recvHost: string;
 	recvPort: string;
@@ -367,7 +368,6 @@ interface SendingDataset {
 		incremental?: boolean;
 		forceOverwrite?: boolean;
 	}
-
 }
 
 type ConfirmationCallback = () => void;

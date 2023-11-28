@@ -250,7 +250,7 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 		operationRunning.value = true;
 		await destroySnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
 		operationRunning.value = false;
-		refreshSnaps();
+		await refreshSnaps();
 		showDestroySnapshotModal.value = false;
 		
 		confirmDestroy.value = false;

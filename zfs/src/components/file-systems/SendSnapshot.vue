@@ -8,23 +8,23 @@
                     <div class="mt-2">
                         <!-- Sending Dataset: (self -> also select?) -->
                         <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
-                        <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendingData.sendName}}</label>
+                        <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendName}}</label>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Dataset: [User Supplied] -->
                         <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
-                        <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="sendingData.recvName" placeholder="Destination Name Here"/>
-                        <p v-if="doesRecvDatasetExist()" class="mt-1 text-sm text-danger">Dataset already exists, toggle Force Overwrite to overwrite it (Must not have existing snapshots).</p>
+                        <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="destinationName" placeholder="Destination Name Here"/>
+                        <!-- <p v-if="doesRecvDatasetExist()" class="mt-1 text-sm text-danger">Dataset already exists, toggle Force Overwrite to overwrite it (Must not have existing snapshots).</p> -->
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Host: (Add Tooltip (i): Optional-> If Empty, then Local) -->
                         <label :for="getIdKey('receiving-host-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Host:</label>
-                        <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="sendingData.recvHost" placeholder="(Leave empty if sending locally.)"/>
+                        <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="destinationHost" placeholder="(Leave empty if sending locally.)"/>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Port: [Default -> 22?, User Can Change]-->
                         <label :for="getIdKey('receiving-port')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Port:</label>
-                        <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="sendingData.recvPort"/>
+                        <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
                     </div>
                     <div class="mt-2 grid grid-flow-col grid-cols-2">
                         <!-- Send Compressed: [Checkbox -> (-Lce) options] *** Cannot be used if Encrypted -->
@@ -38,19 +38,21 @@
                             <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
 
+
                         <!-- Use INCREMENTAL INSTEAD -->
+
                         <!-- Force Overwrite: [Checkbox -> (-F) option] -->
-                        <label v-if="doesRecvDatasetExist()" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
+                        <!-- <label v-if="doesRecvDatasetExist()" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                             Force Overwrite:
                             <input :id="getIdKey('force-overwrite-toggle')" v-model="forceOverwrite" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
-                        </label>
+                        </label> -->
                     </div>
                 </div>
             </template>
             <template v-slot:footer>
                 <div class="button-group-row w-full row-start-2 justify-between mt-2">
                     <button id="cancel" class="mt-1 btn btn-danger object-left justify-start h-fit" @click="showSendDataset = false">Cancel</button>
-                    <button v-if="!sending" @click="sendBtn(sendingData)" :id="getIdKey('send-btn')" name="send-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Send</button>
+                    <button v-if="!sending" @click="sendBtn()" :id="getIdKey('send-btn')" name="send-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Send</button>
                     <button disabled v-if="sending" :id="getIdKey('sending-spinner')" type="button" class="btn btn-danger object-right justify-end">
                         <svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -67,13 +69,11 @@
 import Modal from '../common/Modal.vue';
 import { ref, Ref, inject, watch, computed } from 'vue';
 import { sendSnapshot } from '../../composables/snapshots';
-import { upperCaseWord } from '../../composables/helpers';
+import {  } from '../../composables/helpers';
 
 interface SendSnapshotProps {
     idKey: string;
-    // dataset?: FileSystemData;
     snapshot: Snapshot;
-    // dataType: 'filesystem' | 'snapshot';
     name: string;
 }
 
@@ -84,6 +84,7 @@ const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
 const sending = inject<Ref<boolean>>('sending')!;
 const confirmSend = inject<Ref<boolean>>('confirm-send')!;
 const sendName = ref(props.name);
+const secondNameIncremental = ref('');
 const destinationName = ref('');
 const destinationHost = ref('');
 const destinationPort = ref('22');
@@ -92,12 +93,12 @@ const sendRaw = ref(false);
 const sendIncremental = ref(false);
 const forceOverwrite = ref(false);
 
-
 const sendingData = ref<SendingDataset>({
-    sendName: props.name,
-    recvName: '',
-    recvHost: '',
-    recvPort: '22',
+    sendName: sendName.value,
+    sendIncName: secondNameIncremental.value,
+    recvName: destinationName.value,
+    recvHost: destinationHost.value,
+    recvPort: destinationPort.value,
     sendOpts: {
         compressed: sendCompressed.value,
         raw: sendRaw.value,
@@ -114,18 +115,55 @@ function doesRecvDatasetExist() {
     }
 }
 
-function doesRecvSnapshotExist() {
+const sortedSnapshots = snapshots.value.sort((a, b) => {
+    return b.creationTimestamp.localeCompare(a.creationTimestamp);
+});
+
+async function setSendData() {
+    sendingData.value.sendName = sendName.value;
+    
+    if (sendIncremental.value == true) {
+        sendingData.value.sendIncName! = 'second snap';
+    }
+
+    sendingData.value.recvName = destinationName.value;
+    sendingData.value.recvHost = destinationHost.value;
+    sendingData.value.recvPort = destinationPort.value;
+    sendingData.value.sendOpts.compressed = sendCompressed.value;
+    sendingData.value.sendOpts.raw = sendRaw.value;
+    sendingData.value.sendOpts.incremental = sendIncremental!.value;
+    sendingData.value.sendOpts.forceOverwrite = forceOverwrite.value;
+}
+
+async function checkForLastCommonSnap() {
     try {
-        // return snapshots.value.find(snapshot => snapshot.guid === sendingData.value.)
+        const sourceDataset = sendName.value.split("@").shift();
+        console.log(`sourceDataset: ${sourceDataset}, destinationDataset: ${destinationName}`);
+        const sourceDatasetSnaps = sortedSnapshots.filter(snapshot => snapshot.dataset == sourceDataset);
+        const destinationDatasetSnaps = sortedSnapshots.filter(snapshot => snapshot.dataset == destinationName.value);
+        console.log(`sourceDatasetSnaps: ${sourceDatasetSnaps}, destinationDatasetSnaps: ${destinationDatasetSnaps}`);
+        const sourceSnap = sourceDatasetSnaps.find(snap => snap.name == sendName.value);
+        compareTimestamp(destinationDatasetSnaps, sourceSnap!);
+        
     } catch (error) {
         console.error('Error checking snapshot', error);
     }
 }
 
-async function sendBtn(sendingData : SendingDataset) {
+function compareTimestamp(destinationDatasetSnaps : Snapshot[], sourceDataSnap : Snapshot) {
+    const mostRecentSnap = destinationDatasetSnaps.pop();
+    if (Number(mostRecentSnap?.creationTimestamp) < Number(sourceDataSnap.creationTimestamp)) {
+        return mostRecentSnap;
+    } else {
+        compareTimestamp(destinationDatasetSnaps, sourceDataSnap);
+    }
+}
+
+async function sendBtn() {
     sending.value = true;
-    console.log(sendingData);
-    await sendSnapshot(sendingData);
+    await setSendData();
+    console.log('Sending data:', sendingData.value);
+    await sendSnapshot(sendingData.value);
     sending.value = false;
     showSendDataset.value = false;
     confirmSend.value = true;
