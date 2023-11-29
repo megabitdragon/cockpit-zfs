@@ -15,6 +15,8 @@
                         <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
                         <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="destinationName" placeholder="Destination Name Here"/>
                         <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ invalidConfigMsg }}</p>
+                        <p v-if="invalidConfig" class="mt-1 text-sm text-default"><b>{{ mostRecentDestSnapMsg }}</b></p>
+                        <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ useForceOverwriteMsg }}</p>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Host: (Add Tooltip (i): Optional-> If Empty, then Local) -->
@@ -92,8 +94,11 @@ const sendRaw = ref(false);
 const sendIncremental = ref(false);
 const forceOverwrite = ref(false);
 const lastCommonSnap = ref();
+const mostRecentDestSnap = ref();
+const mostRecentDestSnapMsg = ref('');
 const invalidConfig = ref(false);
 const invalidConfigMsg = ref('');
+const useForceOverwriteMsg = ref("Use 'Force Overwrite' to force a COMPLETE OVERWRITE of Destination File System.");
 const invalidFlags = ref(false);
 const invalidFlagMsg = ref('');
 
@@ -160,7 +165,8 @@ async function setSendData() {
                 sendIncremental.value = false;
                 sendingData.value.sendIncName! = "";
                 invalidConfig.value = true;
-                invalidConfigMsg.value = "Destination already exists and has been modified since most recent snapshot.\n\nUse 'Force Overwrite' to force a COMPLETE OVERWRITE of Destination File System.";
+                invalidConfigMsg.value = "Destination already exists and has been modified since most recent snapshot.";
+                mostRecentDestSnapMsg.value = `Most recent snapshot: ${mostRecentDestSnap.value.name}`;
             }
         } else {
             sendIncremental.value = false;
@@ -199,6 +205,7 @@ async function checkForLastCommonSnap() {
         const sourceSnap = computed(() => {
             return sourceDatasetSnaps.value.find(snap => snap.name == sendName.value);
         });
+
         console.log('sourceSnap:', sourceSnap.value);
 
         return compareTimestamp(destinationDatasetSnaps.value, sourceDatasetSnaps.value, sourceSnap.value!); 
@@ -209,12 +216,12 @@ async function checkForLastCommonSnap() {
 }
 
 function compareTimestamp(destinationDatasetSnaps : Snapshot[], sourceDatasetSnaps : Snapshot[], sourceSendSnap : Snapshot) {
-    const mostRecentDestSnap = destinationDatasetSnaps[0];
+    mostRecentDestSnap.value = destinationDatasetSnaps[0];
     console.log('mostRecentDestSnap:', mostRecentDestSnap);
 
-    if (Number(mostRecentDestSnap.creationTimestamp) < Number(sourceSendSnap.creationTimestamp)) {
+    if (Number(mostRecentDestSnap.value.creationTimestamp) < Number(sourceSendSnap.creationTimestamp)) {
         const sourceSnapMatch = computed(() => {
-            return sourceDatasetSnaps.find(snap => snap.guid == mostRecentDestSnap?.guid);
+            return sourceDatasetSnaps.find(snap => snap.guid == mostRecentDestSnap.value.guid);
         });
         console.log('sourceSnapMatch:', sourceSnapMatch.value);
         return sourceSnapMatch.value;
