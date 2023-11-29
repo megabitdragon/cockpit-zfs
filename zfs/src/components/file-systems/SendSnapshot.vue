@@ -37,12 +37,14 @@
                             Send Raw:
                             <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
-
                         <!-- Force Overwrite: [Checkbox -> (-F) option] -->
                         <label v-if="invalidConfig" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                             Force Overwrite:
                             <input :id="getIdKey('force-overwrite-toggle')" v-model="forceOverwrite" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
+                    </div>
+                    <div class="mt-2">
+                        <p v-if="invalidFlags" class="mt-1 text-sm text-danger">{{ invalidFlagMsg }}</p>
                     </div>
                 </div>
             </template>
@@ -92,6 +94,8 @@ const forceOverwrite = ref(false);
 const lastCommonSnap = ref();
 const invalidConfig = ref(false);
 const invalidConfigMsg = ref('');
+const invalidFlags = ref(false);
+const invalidFlagMsg = ref('');
 
 const sendingData = ref<SendingDataset>({
     sendName: sendName.value,
@@ -118,29 +122,49 @@ function doesRecvDatasetExist() {
 async function setSendData() {
     sendingData.value.sendName = sendName.value;
 
-    sendingData.value.recvName = destinationName.value;
-    sendingData.value.recvHost = destinationHost.value;
-    sendingData.value.recvPort = destinationPort.value;
-    sendingData.value.sendOpts.compressed = sendCompressed.value;
-    sendingData.value.sendOpts.raw = sendRaw.value;
-    sendingData.value.sendOpts.incremental = sendIncremental!.value;
-    sendingData.value.sendOpts.forceOverwrite = forceOverwrite.value;
+    if (sendCompressed.value && sendRaw.value) {
+        invalidFlags.value = true;
+        invalidFlagMsg.value = "Cannot have Compressed and selected at the same time.";
+    } else {
+        invalidConfig.value = false;
+        invalidFlags.value = false;
 
-    if (doesRecvDatasetExist()) {
-        lastCommonSnap.value = await checkForLastCommonSnap();
-        console.log('lastCommonSnap:', lastCommonSnap.value);
-        if (lastCommonSnap.value) {
-            sendIncremental.value = true;
-            sendingData.value.sendIncName! = lastCommonSnap.value.name;
+        const sourceDataset = computed(() => {
+            const sourceDatasetName = sendName.value.split("@").shift();
+            return datasets.value.find(dataset => dataset.name == sourceDatasetName);
+        });
+
+        sendingData.value.recvName = destinationName.value;
+        sendingData.value.recvHost = destinationHost.value;
+        sendingData.value.recvPort = destinationPort.value;
+        sendingData.value.sendOpts.compressed = sendCompressed.value;
+
+        if (sourceDataset.value?.encrypted) {
+            sendingData.value.sendOpts.raw = true;
+        } else {
+            sendingData.value.sendOpts.raw = sendRaw.value;
+        }
+
+        sendingData.value.sendOpts.forceOverwrite = forceOverwrite.value;
+
+        if (doesRecvDatasetExist()) {
+            lastCommonSnap.value = await checkForLastCommonSnap();
+            console.log('lastCommonSnap:', lastCommonSnap.value);
+            if (lastCommonSnap.value) {
+                sendIncremental.value = true;
+                sendingData.value.sendOpts.incremental = sendIncremental!.value;
+                sendingData.value.sendIncName! = lastCommonSnap.value.name;
+                invalidConfig.value = false;
+            } else {
+                sendIncremental.value = false;
+                sendingData.value.sendIncName! = "";
+                invalidConfig.value = true;
+                invalidConfigMsg.value = "Destination already exists and has been modified since most recent snapshot.\n\nUse 'Force Overwrite' to force a COMPLETE OVERWRITE of Destination File System.";
+            }
         } else {
             sendIncremental.value = false;
             sendingData.value.sendIncName! = "";
-            invalidConfig.value = true;
-            invalidConfigMsg.value = "Destination already exists and has been modified since most recent snapshot.\n\nUse 'Force Overwrite' to force a COMPLETE OVERWRITE of Destination File System.";
         }
-    } else {
-        sendIncremental.value = false;
-        sendingData.value.sendIncName! = "";
     }
 }
 
@@ -204,13 +228,13 @@ async function sendBtn() {
         await setSendData();
         console.log('Sending data:', sendingData.value);
         
-        if (!invalidConfig.value) {
+        if (!invalidConfig.value && !invalidFlags.value) {
             sending.value = true;
             await sendSnapshot(sendingData.value);
             sending.value = false;
             showSendDataset.value = false;
             confirmSend.value = true;
-        } else {
+        } else if (invalidConfig.value) {
             if (forceOverwrite.value) {
                 sending.value = true;
                 await sendSnapshot(sendingData.value);
@@ -218,7 +242,7 @@ async function sendBtn() {
                 showSendDataset.value = false;
                 confirmSend.value = true;
             }
-        }
+        } 
 }
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;

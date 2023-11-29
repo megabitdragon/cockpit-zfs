@@ -2,8 +2,6 @@
 import subprocess
 import argparse
 
-# def send_dataset(sendName, recvName, recvHost=None, recvPort=None, compressed=False, raw=False):
-
 def destroyForOverwrite(recvName):
         destroy_cmd = ['zfs', 'destroy']
         destroy_cmd.append(recvName)
@@ -23,13 +21,18 @@ def destroyForOverwrite(recvName):
         else:
             print(stdout)
 
-def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False):
+def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False):
     try:
-
         if forceOverwrite:
             destroyForOverwrite(recvName)
 
         send_cmd = ['zfs', 'send', '-v']
+
+        if compressed:
+            send_cmd.append('-Lce')
+
+        if raw:
+            send_cmd.append('-w')
 
         if sendName2 is not "":
             send_cmd.append('-i')
@@ -74,8 +77,8 @@ def main() :
     parser.add_argument('forceOverwrite', type=str, default='False', help='forcefully overwrite existing dataset')
     # parser.add_argument('recvHost', type=str, help='receiving dataset host')
     # parser.add_argument('recvPort', type=str, help='receiving dataset port')
-    # parser.add_argument('compression', type=bool, help='sending dataset compression')
-    # parser.add_argument('raw', type=bool, help='sending dataset raw')
+    parser.add_argument('compressed', type=str, default='False', help='sending dataset compression')
+    parser.add_argument('raw', type=str, default='False', help='sending dataset raw')
 
     args = parser.parse_args()
 
@@ -85,8 +88,8 @@ def main() :
     forceOverwrite = args.forceOverwrite.lower() == 'true'
     # recvHost = args.recvHost
     # recvPort = args.recvPort
-    # compressed = args.compressed
-    # raw = args.raw
+    compressed = args.compressed.lower() == 'true'
+    raw = args.raw.lower() == 'true'
 
     if sendName2 is not "":
         print(f"Sending incrementally to {recvName} from {sendName2} to {sendName}")
@@ -94,7 +97,7 @@ def main() :
         print(f"Executing command: zfs send {sendName} | {recvName}")
 
     # send_dataset(sendName, recvName, recvHost, recvPort, compressed, raw)
-    send_dataset(sendName, recvName, sendName2, forceOverwrite)
+    send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw)
 
 if __name__ == '__main__':
     main()
