@@ -14,7 +14,7 @@
                         <!-- Receiving Dataset: [User Supplied] -->
                         <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
                         <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="destinationName" placeholder="Destination Name Here"/>
-                        <!-- <p v-if="doesRecvDatasetExist()" class="mt-1 text-sm text-danger">Dataset already exists, toggle Force Overwrite to overwrite it (Must not have existing snapshots).</p> -->
+                        <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ invalidConfigMsg }}</p>
                     </div>
                     <div class="mt-2">
                         <!-- Receiving Host: (Add Tooltip (i): Optional-> If Empty, then Local) -->
@@ -38,14 +38,11 @@
                             <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
 
-
-                        <!-- Use INCREMENTAL INSTEAD -->
-
                         <!-- Force Overwrite: [Checkbox -> (-F) option] -->
-                        <!-- <label v-if="doesRecvDatasetExist()" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
+                        <label v-if="invalidConfig" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                             Force Overwrite:
                             <input :id="getIdKey('force-overwrite-toggle')" v-model="forceOverwrite" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
-                        </label> -->
+                        </label>
                     </div>
                 </div>
             </template>
@@ -92,6 +89,9 @@ const sendCompressed = ref(false);
 const sendRaw = ref(false);
 const sendIncremental = ref(false);
 const forceOverwrite = ref(false);
+const lastCommonSnap = ref();
+const invalidConfig = ref(false);
+const invalidConfigMsg = ref('');
 
 const sendingData = ref<SendingDataset>({
     sendName: sendName.value,
@@ -115,16 +115,8 @@ function doesRecvDatasetExist() {
     }
 }
 
-const sortedSnapshots = snapshots.value.sort((a, b) => {
-    return b.creationTimestamp.localeCompare(a.creationTimestamp);
-});
-
 async function setSendData() {
     sendingData.value.sendName = sendName.value;
-    
-    if (sendIncremental.value == true) {
-        sendingData.value.sendIncName! = 'second snap';
-    }
 
     sendingData.value.recvName = destinationName.value;
     sendingData.value.recvHost = destinationHost.value;
@@ -133,40 +125,100 @@ async function setSendData() {
     sendingData.value.sendOpts.raw = sendRaw.value;
     sendingData.value.sendOpts.incremental = sendIncremental!.value;
     sendingData.value.sendOpts.forceOverwrite = forceOverwrite.value;
+
+    if (doesRecvDatasetExist()) {
+        lastCommonSnap.value = await checkForLastCommonSnap();
+        console.log('lastCommonSnap:', lastCommonSnap.value);
+        if (lastCommonSnap.value) {
+            sendIncremental.value = true;
+            sendingData.value.sendIncName! = lastCommonSnap.value.name;
+        } else {
+            sendIncremental.value = false;
+            sendingData.value.sendIncName! = "";
+            invalidConfig.value = true;
+            invalidConfigMsg.value = "Destination already exists and has been modified since most recent snapshot.\n\nUse 'Force Overwrite' to force a COMPLETE OVERWRITE of Destination File System.";
+        }
+    } else {
+        sendIncremental.value = false;
+        sendingData.value.sendIncName! = "";
+    }
 }
 
 async function checkForLastCommonSnap() {
     try {
-        const sourceDataset = sendName.value.split("@").shift();
-        console.log(`sourceDataset: ${sourceDataset}, destinationDataset: ${destinationName}`);
-        const sourceDatasetSnaps = sortedSnapshots.filter(snapshot => snapshot.dataset == sourceDataset);
-        const destinationDatasetSnaps = sortedSnapshots.filter(snapshot => snapshot.dataset == destinationName.value);
-        console.log(`sourceDatasetSnaps: ${sourceDatasetSnaps}, destinationDatasetSnaps: ${destinationDatasetSnaps}`);
-        const sourceSnap = sourceDatasetSnaps.find(snap => snap.name == sendName.value);
-        compareTimestamp(destinationDatasetSnaps, sourceSnap!);
-        
+        const sortedSnapshots = computed(() => {
+            return snapshots.value.sort((a, b) => {
+                return b.creationTimestamp.localeCompare(a.creationTimestamp);
+            });
+        });
+
+        console.log('sortedSnapshots:', sortedSnapshots.value);
+    
+        const sourceDataset = computed(() => {
+            return sendName.value.split("@").shift();
+        });
+
+        const sourceDatasetSnaps = computed(() => {
+            return sortedSnapshots.value.filter(snapshot => snapshot.dataset == sourceDataset.value);
+        });
+
+        const destinationDatasetSnaps = computed(() => {
+            return sortedSnapshots.value.filter(snapshot => snapshot.dataset == destinationName.value);
+        });
+
+        console.log(`sourceDataset: ${sourceDataset.value}`);
+        console.log(`destinationDataset: ${destinationName.value}`)
+        console.log('sourceDatasetSnaps:', sourceDatasetSnaps.value);
+        console.log('destinationDatasetSnaps:', destinationDatasetSnaps.value);
+
+        const sourceSnap = computed(() => {
+            return sourceDatasetSnaps.value.find(snap => snap.name == sendName.value);
+        });
+        console.log('sourceSnap:', sourceSnap.value);
+
+        return compareTimestamp(destinationDatasetSnaps.value, sourceDatasetSnaps.value, sourceSnap.value!); 
+       
     } catch (error) {
         console.error('Error checking snapshot', error);
     }
 }
 
-function compareTimestamp(destinationDatasetSnaps : Snapshot[], sourceDataSnap : Snapshot) {
-    const mostRecentSnap = destinationDatasetSnaps.pop();
-    if (Number(mostRecentSnap?.creationTimestamp) < Number(sourceDataSnap.creationTimestamp)) {
-        return mostRecentSnap;
+function compareTimestamp(destinationDatasetSnaps : Snapshot[], sourceDatasetSnaps : Snapshot[], sourceSendSnap : Snapshot) {
+    const mostRecentDestSnap = destinationDatasetSnaps[0];
+    console.log('mostRecentDestSnap:', mostRecentDestSnap);
+
+    if (Number(mostRecentDestSnap.creationTimestamp) < Number(sourceSendSnap.creationTimestamp)) {
+        const sourceSnapMatch = computed(() => {
+            return sourceDatasetSnaps.find(snap => snap.guid == mostRecentDestSnap?.guid);
+        });
+        console.log('sourceSnapMatch:', sourceSnapMatch.value);
+        return sourceSnapMatch.value;
+        
     } else {
-        compareTimestamp(destinationDatasetSnaps, sourceDataSnap);
+        console.log('invalid lastCommonSnap match');
+        return null;
     }
 }
 
 async function sendBtn() {
-    sending.value = true;
-    await setSendData();
-    console.log('Sending data:', sendingData.value);
-    await sendSnapshot(sendingData.value);
-    sending.value = false;
-    showSendDataset.value = false;
-    confirmSend.value = true;
+        await setSendData();
+        console.log('Sending data:', sendingData.value);
+        
+        if (!invalidConfig.value) {
+            sending.value = true;
+            await sendSnapshot(sendingData.value);
+            sending.value = false;
+            showSendDataset.value = false;
+            confirmSend.value = true;
+        } else {
+            if (forceOverwrite.value) {
+                sending.value = true;
+                await sendSnapshot(sendingData.value);
+                sending.value = false;
+                showSendDataset.value = false;
+                confirmSend.value = true;
+            }
+        }
 }
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;

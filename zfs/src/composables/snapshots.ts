@@ -135,8 +135,10 @@ export async function cloneSnapshot(snapName, newParentFS, cloneName, createPare
 
 export async function sendSnapshot(sendingData : SendingDataset) {
 	try {
+        console.log('sendingData (snapshots.ts):', sendingData);
+
 		// const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.sendOpts.compressed, sendingData.sendOpts.raw], { superuser: 'try', stderr: 'out'});
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!], { superuser: 'try', stderr: 'out'});
 		
 		const output = await state.promise();
 		console.log(output);

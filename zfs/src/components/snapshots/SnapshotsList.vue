@@ -180,12 +180,23 @@ const selectedSnapshot = ref<Snapshot>();
 // loadTheseSnapshots();
 refreshSnaps();
 
-async function refreshDatasets() {
+async function refreshData() {
 	datasetsLoaded.value = false;
+	snapshotsLoaded.value = false;
 	datasets.value = [];
+	snapshots.value = [];
 	await loadDatasets(datasets);
+	await loadSnapshots(snapshots);
 	datasetsLoaded.value = true;
+	snapshotsLoaded.value = true;
 }
+
+// async function refreshDatasets() {
+// 	datasetsLoaded.value = false;
+// 	datasets.value = [];
+// 	await loadDatasets(datasets);
+// 	datasetsLoaded.value = true;
+// }
 
 // loadSnapshots(snapshots);
 function loadTheseSnapshots() {
@@ -339,7 +350,7 @@ watch(confirmRename, async (newVal, oldVal) => {
 	}
 });
 
-//////////////////// Send Dataset ///////////////////
+/////////////////// Send Snapshot ///////////////////
 /////////////////////////////////////////////////////
 const showSendSnapshot = ref(false);
 const sendingSnap = ref(false);
@@ -354,8 +365,8 @@ function sendThisDataset(snapshot) {
 
 watch(confirmSendSnap, async (newVal, oldVal) => {
 	if (confirmSendSnap.value == true) {
+		await refreshData();
 		await refreshSnaps();
-		await refreshDatasets();
 		notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${selectedSnapshot.value!.name}.`, 'success');
 	}
 });
