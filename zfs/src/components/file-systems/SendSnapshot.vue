@@ -6,7 +6,7 @@
             <template v-slot:content>
                 <div class="">
                     <div class="mt-2">
-                        <!-- Sending Dataset: (self -> also select?) -->
+                        <!-- Sending Snapshot: (self) -->
                         <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
                         <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendName}}</label>
                     </div>
@@ -22,7 +22,7 @@
                         <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="destinationHost" placeholder="(Leave empty if sending locally.)"/>
                     </div>
                     <div class="mt-2">
-                        <!-- Receiving Port: [Default -> 22?, User Can Change]-->
+                        <!-- Receiving Port: [Default -> 22, User Can Change]-->
                         <label :for="getIdKey('receiving-port')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Port:</label>
                         <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
                     </div>
@@ -137,12 +137,13 @@ async function setSendData() {
         sendingData.value.recvName = destinationName.value;
         sendingData.value.recvHost = destinationHost.value;
         sendingData.value.recvPort = destinationPort.value;
-        sendingData.value.sendOpts.compressed = sendCompressed.value;
-
-        if (sourceDataset.value?.encrypted) {
+       
+        if (sourceDataset.value!.encrypted) {
             sendingData.value.sendOpts.raw = true;
+            sendingData.value.sendOpts.compressed = false;
         } else {
             sendingData.value.sendOpts.raw = sendRaw.value;
+            sendingData.value.sendOpts.compressed = sendCompressed.value;
         }
 
         sendingData.value.sendOpts.forceOverwrite = forceOverwrite.value;
