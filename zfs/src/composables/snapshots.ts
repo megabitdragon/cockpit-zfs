@@ -137,9 +137,8 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 	try {
         console.log('sendingData (snapshots.ts):', sendingData);
 
-		// const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.sendOpts.compressed, sendingData.sendOpts.raw], { superuser: 'try', stderr: 'out'});
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw], { superuser: 'try', stderr: 'out'});
-		
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser, sendingData.recvHostPass], { superuser: 'try', stderr: 'out'});
+
 		const output = await state.promise();
 		console.log(output);
 		return output.stdout;
@@ -147,4 +146,43 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 		console.error(errorString(state));
 		return null;
 	}
+}
+
+/*
+
+function getHostnamePromise() {
+    return new Promise((resolve, reject) => {
+        const state = useSpawn(['hostname'], { superuser: 'try' });
+        state.promise()
+            .then(({stdout}) => resolve(stdout))
+            .catch(state => {
+                console.error(errorString(state))
+                reject(null);
+            });
+    });
+}
+
+*/
+
+export async function getSendProgress(sendingData : SendingDataset) {
+    try {
+        const cmdString = ['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw];
+    
+        const state = useSpawn(cmdString, { superuser: 'try' });
+        const sendProgress = (await state.promise()).stdout;
+        return sendProgress;
+    } catch (state) {
+        console.error(errorString(state));
+        return null;
+    }
+}
+
+export async function loadSendProgress(sendingData : SendingDataset) {
+    try {
+        const rawJSON = await getSendProgress(sendingData);
+        const parsedJSON = JSON.parse(rawJSON);
+        console.log('Send Progress:', parsedJSON);
+    } catch (error) {
+        console.error("An error occurred getting send progress:", error);
+    }
 }

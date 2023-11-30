@@ -361,13 +361,15 @@ interface SendingDataset {
 	sendIncName?: string;
 	recvName: string;
 	recvHost: string;
-	recvPort: string;
+	recvPort: number;
 	sendOpts: {
 		compressed: boolean;
 		raw: boolean;
 		incremental?: boolean;
 		forceOverwrite?: boolean;
 	}
+	recvHostUser?: string;
+	recvHostPass?: string;
 }
 
 type ConfirmationCallback = () => void;

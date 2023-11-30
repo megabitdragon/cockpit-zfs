@@ -15,7 +15,7 @@
                         <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
                         <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="destinationName" placeholder="Destination Name Here"/>
                         <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ invalidConfigMsg }}</p>
-                        <p v-if="invalidConfig" class="mt-1 text-sm text-default"><b>{{ mostRecentDestSnapMsg }}</b></p>
+                        <p v-if="invalidConfig" class="mt-1 text-sm text-muted"><i>{{ mostRecentDestSnapMsg }}</i></p>
                         <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ useForceOverwriteMsg }}</p>
                     </div>
                     <div class="mt-2">
@@ -23,10 +23,17 @@
                         <label :for="getIdKey('receiving-host-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Host:</label>
                         <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="destinationHost" placeholder="(Leave empty if sending locally.)"/>
                     </div>
+                    <div v-if="destinationHost !== ''" class="mt-2">
+                        <!-- Host User + Password (Only if Receiving Host is not Empty) -->
+                        <label :for="getIdKey('receiving-host-user')" class="mt-1 block text-sm font-medium leading-6 text-default">User:</label>
+                        <input @keydown.enter="" :id="getIdKey('receiving-host-user')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-user" v-model="destinationHostUser" placeholder="Destination Host User"/>
+                        <label :for="getIdKey('receiving-host-pass')" class="mt-1 block text-sm font-medium leading-6 text-default">Password:</label>
+                        <input @keydown.enter="" :id="getIdKey('receiving-host-pass')" type="password" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-pass" v-model="destinationHostPass" placeholder="Destination Host User's Password"/>
+                    </div>
                     <div class="mt-2">
                         <!-- Receiving Port: [Default -> 22, User Can Change]-->
                         <label :for="getIdKey('receiving-port')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Port:</label>
-                        <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
+                        <input @keydown.enter="" :id="getIdKey('receiving-port')" type="number" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
                     </div>
                     <div class="mt-2 grid grid-flow-col grid-cols-2">
                         <!-- Send Compressed: [Checkbox -> (-Lce) options] *** Cannot be used if Encrypted -->
@@ -69,8 +76,7 @@
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
 import { ref, Ref, inject, watch, computed } from 'vue';
-import { sendSnapshot } from '../../composables/snapshots';
-import {  } from '../../composables/helpers';
+import { sendSnapshot, getSendProgress, loadSendProgress } from '../../composables/snapshots';
 
 interface SendSnapshotProps {
     idKey: string;
@@ -88,7 +94,7 @@ const sendName = ref(props.name);
 const secondNameIncremental = ref('');
 const destinationName = ref('');
 const destinationHost = ref('');
-const destinationPort = ref('22');
+const destinationPort = ref(22);
 const sendCompressed = ref(false);
 const sendRaw = ref(false);
 const sendIncremental = ref(false);
@@ -101,6 +107,8 @@ const invalidConfigMsg = ref('');
 const useForceOverwriteMsg = ref("Use 'Force Overwrite' to force a COMPLETE OVERWRITE of Destination File System.");
 const invalidFlags = ref(false);
 const invalidFlagMsg = ref('');
+const destinationHostUser = ref('');
+const destinationHostPass = ref('');
 
 const sendingData = ref<SendingDataset>({
     sendName: sendName.value,
@@ -114,6 +122,8 @@ const sendingData = ref<SendingDataset>({
         incremental: sendIncremental.value,
         forceOverwrite: forceOverwrite.value,
     },
+    recvHostUser: destinationHostUser.value,
+    recvHostPass: destinationHostPass.value,
 });
 
 function doesRecvDatasetExist() {
@@ -141,9 +151,16 @@ async function setSendData() {
 
         sendingData.value.recvName = destinationName.value;
         sendingData.value.recvHost = destinationHost.value;
-        sendingData.value.recvPort = destinationPort.value;
+
+        if (destinationPort.value != 22) {
+            sendingData.value.recvPort = destinationPort.value;
+        } else {
+            sendingData.value.recvPort = 22;
+        }
        
         if (sourceDataset.value!.encrypted) {
+            sendRaw.value = true;
+            sendCompressed.value = false;
             sendingData.value.sendOpts.raw = true;
             sendingData.value.sendOpts.compressed = false;
         } else {
@@ -172,6 +189,10 @@ async function setSendData() {
             sendIncremental.value = false;
             sendingData.value.sendIncName! = "";
         }
+
+        sendingData.value.recvHostUser = destinationHostUser.value;
+        sendingData.value.recvHostPass = destinationHostPass.value;
+    
     }
 }
 
@@ -239,12 +260,14 @@ async function sendBtn() {
         if (!invalidConfig.value && !invalidFlags.value) {
             sending.value = true;
             await sendSnapshot(sendingData.value);
+            // await loadSendProgress(sendingData.value);
             sending.value = false;
             showSendDataset.value = false;
             confirmSend.value = true;
         } else if (invalidConfig.value) {
             if (forceOverwrite.value) {
                 sending.value = true;
+                // await loadSendProgress(sendingData.value);
                 await sendSnapshot(sendingData.value);
                 sending.value = false;
                 showSendDataset.value = false;
