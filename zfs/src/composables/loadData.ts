@@ -2,7 +2,7 @@ import { reactive, ref, Ref, inject, computed, provide } from 'vue';
 import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
-import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath } from "./helpers";
+import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath, convertTimestampToLocal } from "./helpers";
 import { getSnapshots } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
 
@@ -491,7 +491,7 @@ export async function loadSnapshots(snapshots) {
 							clones: snapshot.properties.clones.parsed,
 							creation: {
 								rawTimestamp: snapshot.properties.creation.rawvalue,
-								parsed: snapshot.properties.creation.parsed,
+								parsed: convertTimestampToLocal(snapshot.properties.creation.parsed),
 								value: snapshot.properties.creation.value,
 							},
 							referenced: {
@@ -520,7 +520,7 @@ export async function loadSnapshots(snapshots) {
 
 export async function loadSnapshotsInPool(snapshots, poolName) {
 	try {
-			getSnapshots().then(rawJSON => {
+		getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
 			console.log('Snapshots JSON (loadByPool):', parsedJSON);
 			for (const dataset in parsedJSON) {
@@ -533,14 +533,14 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 							dataset: snapshot.dataset,
 							pool: snapshot.pool,
 							mountpoint: snapshot.mountpoint,
-								type: snapshot.type,
-						guid: snapshot.properties.guid.value,
-						creationTimestamp: snapshot.properties.creation.rawvalue,
+							type: snapshot.type,
+							guid: snapshot.properties.guid.value,
+							creationTimestamp: snapshot.properties.creation.rawvalue,
 							properties: {
 								clones: snapshot.properties.clones.parsed,
 								creation: {
 									rawTimestamp: snapshot.properties.creation.rawvalue,
-									parsed: snapshot.properties.creation.parsed,
+									parsed: convertTimestampToLocal(snapshot.properties.creation.parsed),
 									value: snapshot.properties.creation.value,
 								},
 								referenced: {
@@ -568,7 +568,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 
 export async function loadSnapshotsInDataset(snapshots, datasetName) {
 	try {
-			getSnapshots().then(rawJSON => {
+		getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
 			// console.log('Snapshots JSON (loadByDataset):', parsedJSON);
 			for (const dataset in parsedJSON) {
@@ -581,14 +581,14 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 							dataset: snapshot.dataset,
 							pool: snapshot.pool,
 							mountpoint: snapshot.mountpoint,
-								type: snapshot.type,
-						guid: snapshot.properties.guid.value,
-						creationTimestamp: snapshot.properties.creation.rawvalue,
+							type: snapshot.type,
+							guid: snapshot.properties.guid.value,
+							creationTimestamp: snapshot.properties.creation.rawvalue,
 							properties: {
 								clones: snapshot.properties.clones.parsed,
 								creation: {
 									rawTimestamp: snapshot.properties.creation.rawvalue,
-									parsed: snapshot.properties.creation.parsed,
+									parsed: convertTimestampToLocal(snapshot.properties.creation.parsed),
 									value: snapshot.properties.creation.value,
 								},
 								referenced: {
@@ -605,10 +605,8 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 		
 						snapshots.value.push(snap);
 					}
-					
 				});
 			}
-			
 		});
 
 		console.log('loaded snapshots in:', datasetName, '\n', snapshots);
