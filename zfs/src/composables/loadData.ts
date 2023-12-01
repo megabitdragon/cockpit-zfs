@@ -15,7 +15,7 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
-		console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
+		// console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
 	} catch (error) {
 		console.error("An error occurred getting disk stats:", error);
 	}
@@ -28,7 +28,7 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
-		console.log('---\nScanObject:', scanObject.value);
+		// console.log('---\nScanObject:', scanObject.value);
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}
@@ -66,7 +66,7 @@ export async function loadDisksThenPools(disks, pools) {
 		// console.log("Disk:");
 		// console.log(disk);
 		}
-		console.log("loaded Disks:", disks);
+		// console.log("loaded Disks:", disks);
 
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
@@ -163,7 +163,7 @@ export async function loadDisksThenPools(disks, pools) {
 			});
 			  
 
-			console.log("loaded Pools:", pools);
+			// console.log("loaded Pools:", pools);
 		} catch (error) {
 			// Handle any errors that may occur during the asynchronous operation
 			console.error("An error occurred getting pools:", error);
@@ -179,7 +179,7 @@ export async function loadDatasets(datasets) {
 	try {
 		const rawJSON = await getDatasets();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Datasets JSON:', parsedJSON);
+		// console.log('Datasets JSON:', parsedJSON);
 
 		//loops through JSON data and adds data to a Dataset object
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -234,7 +234,7 @@ export async function loadDatasets(datasets) {
 			datasets.value.push(dataset);
 		}
 
-		console.log("loaded Datasets:", datasets);
+		// console.log("loaded Datasets:", datasets);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
@@ -272,7 +272,7 @@ export async function loadDisks(disks) {
 			disks.value.push(disk);
 			// console.log("Disk:", disk);
 		}
-		console.log("loaded Disks:", disks);
+		// console.log("loaded Disks:", disks);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
@@ -465,7 +465,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	
 		});
 	
-		console.log("loaded vDevData:", vDevData);
+		// console.log("loaded vDevData:", vDevData);
 		vDevs.value.push(vDevData);
 	}
 }
@@ -474,7 +474,7 @@ export async function loadSnapshots(snapshots) {
 	try {
 		getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON (all):', parsedJSON);
+			// console.log('Snapshots JSON (all):', parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
 					const snap = {
@@ -512,7 +512,7 @@ export async function loadSnapshots(snapshots) {
 			
 		});
 
-		console.log('loaded snapshots:', snapshots);
+		// console.log('loaded snapshots:', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
@@ -522,7 +522,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 	try {
 		getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
-			console.log('Snapshots JSON (loadByPool):', parsedJSON);
+			// console.log('Snapshots JSON (loadByPool):', parsedJSON);
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
 					if (snapshot.pool == poolName) {
@@ -560,7 +560,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 				});
 			}
 		});
-		console.log('loaded snapshots in:', poolName, '\n', snapshots);
+		// console.log('loaded snapshots in:', poolName, '\n', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
@@ -609,7 +609,7 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 			}
 		});
 
-		console.log('loaded snapshots in:', datasetName, '\n', snapshots);
+		// console.log('loaded snapshots in:', datasetName, '\n', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}

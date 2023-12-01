@@ -23,17 +23,15 @@
                         <label :for="getIdKey('receiving-host-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Host:</label>
                         <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="destinationHost" placeholder="(Leave empty if sending locally.)"/>
                     </div>
-                    <div v-if="destinationHost !== ''" class="mt-2">
-                        <!-- Host User + Password (Only if Receiving Host is not Empty) -->
-                        <label :for="getIdKey('receiving-host-user')" class="mt-1 block text-sm font-medium leading-6 text-default">User:</label>
+                    <div class="mt-2">
+                        <!-- Host User -->
+                        <label :for="getIdKey('receiving-host-user')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving User:</label>
                         <input @keydown.enter="" :id="getIdKey('receiving-host-user')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-user" v-model="destinationHostUser" placeholder="Destination Host User"/>
-                        <label :for="getIdKey('receiving-host-pass')" class="mt-1 block text-sm font-medium leading-6 text-default">Password:</label>
-                        <input @keydown.enter="" :id="getIdKey('receiving-host-pass')" type="password" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-pass" v-model="destinationHostPass" placeholder="Destination Host User's Password"/>
-                    </div>
+                   </div>
                     <div class="mt-2">
                         <!-- Receiving Port: [Default -> 22, User Can Change]-->
                         <label :for="getIdKey('receiving-port')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Port:</label>
-                        <input @keydown.enter="" :id="getIdKey('receiving-port')" type="number" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
+                        <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
                     </div>
                     <div class="mt-2 grid grid-flow-col grid-cols-2">
                         <!-- Send Compressed: [Checkbox -> (-Lce) options] *** Cannot be used if Encrypted -->
@@ -76,7 +74,8 @@
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
 import { ref, Ref, inject, watch, computed } from 'vue';
-import { sendSnapshot, getSendProgress, loadSendProgress } from '../../composables/snapshots';
+import { sendSnapshot, doesDatasetExist, getRecentSnaps, formatRecentSnaps, getSendProgress, loadSendProgress } from '../../composables/snapshots';
+import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString,  } from '../../composables/helpers';
 
 interface SendSnapshotProps {
     idKey: string;
@@ -94,13 +93,14 @@ const sendName = ref(props.name);
 const secondNameIncremental = ref('');
 const destinationName = ref('');
 const destinationHost = ref('');
-const destinationPort = ref(22);
+const destinationPort = ref('22');
 const sendCompressed = ref(false);
 const sendRaw = ref(false);
 const sendIncremental = ref(false);
 const forceOverwrite = ref(false);
 const lastCommonSnap = ref();
-const mostRecentDestSnap = ref();
+const mostRecentLocalDestSnap = ref<Snapshot>();
+const mostRecentRemoteDestSnap = ref<SnapSnippet>();
 const mostRecentDestSnapMsg = ref('');
 const invalidConfig = ref(false);
 const invalidConfigMsg = ref('');
@@ -108,7 +108,8 @@ const useForceOverwriteMsg = ref("Use 'Force Overwrite' to force a COMPLETE OVER
 const invalidFlags = ref(false);
 const invalidFlagMsg = ref('');
 const destinationHostUser = ref('');
-const destinationHostPass = ref('');
+const datasetCheckResult = ref();
+const snapSnips = ref<SnapSnippet[]>([]);
 
 const sendingData = ref<SendingDataset>({
     sendName: sendName.value,
@@ -123,7 +124,14 @@ const sendingData = ref<SendingDataset>({
         forceOverwrite: forceOverwrite.value,
     },
     recvHostUser: destinationHostUser.value,
-    recvHostPass: destinationHostPass.value,
+});
+
+const isSendLocal = computed(() => {
+    if (destinationHost.value == "") {
+        return true;
+    } else {
+        return false;
+    }
 });
 
 function doesRecvDatasetExist() {
@@ -134,12 +142,20 @@ function doesRecvDatasetExist() {
     }
 }
 
+async function doesRemoteDatasetExist() {
+    try {
+        return await doesDatasetExist(sendingData.value);
+    } catch (error) {
+        console.error('Error checking dataset', error);
+    }
+}
+
 async function setSendData() {
     sendingData.value.sendName = sendName.value;
 
     if (sendCompressed.value && sendRaw.value) {
         invalidFlags.value = true;
-        invalidFlagMsg.value = "Cannot have Compressed and selected at the same time.";
+        invalidFlagMsg.value = "Cannot have Compressed and Raw selected at the same time.";
     } else {
         invalidConfig.value = false;
         invalidFlags.value = false;
@@ -152,10 +168,10 @@ async function setSendData() {
         sendingData.value.recvName = destinationName.value;
         sendingData.value.recvHost = destinationHost.value;
 
-        if (destinationPort.value != 22) {
+        if (destinationPort.value != '22') {
             sendingData.value.recvPort = destinationPort.value;
         } else {
-            sendingData.value.recvPort = 22;
+            sendingData.value.recvPort = '22';
         }
        
         if (sourceDataset.value!.encrypted) {
@@ -169,30 +185,51 @@ async function setSendData() {
         }
 
         sendingData.value.sendOpts.forceOverwrite = forceOverwrite.value;
+        sendingData.value.recvHostUser = destinationHostUser.value;
 
-        if (doesRecvDatasetExist()) {
-            lastCommonSnap.value = await checkForLastCommonSnap();
-            console.log('lastCommonSnap:', lastCommonSnap.value);
-            if (lastCommonSnap.value) {
-                sendIncremental.value = true;
-                sendingData.value.sendOpts.incremental = sendIncremental!.value;
-                sendingData.value.sendIncName! = lastCommonSnap.value.name;
-                invalidConfig.value = false;
+        if (isSendLocal.value) {
+            if (doesRecvDatasetExist()) {
+                lastCommonSnap.value = await checkForLastCommonSnap();
+                console.log('local lastCommonSnap:', lastCommonSnap.value);
+                if (lastCommonSnap.value) {
+                    sendIncremental.value = true;
+                    sendingData.value.sendOpts.incremental = sendIncremental!.value;
+                    sendingData.value.sendIncName! = lastCommonSnap.value.name;
+                    invalidConfig.value = false;
+                } else {
+                    sendIncremental.value = false;
+                    sendingData.value.sendIncName! = "";
+                    invalidConfig.value = true;
+                    invalidConfigMsg.value = "Destination already exists and has been modified since most recent snapshot.";
+                    mostRecentDestSnapMsg.value = `Most recent snapshot: ${mostRecentLocalDestSnap.value!.name}`;
+                }
             } else {
                 sendIncremental.value = false;
                 sendingData.value.sendIncName! = "";
-                invalidConfig.value = true;
-                invalidConfigMsg.value = "Destination already exists and has been modified since most recent snapshot.";
-                mostRecentDestSnapMsg.value = `Most recent snapshot: ${mostRecentDestSnap.value.name}`;
             }
         } else {
-            sendIncremental.value = false;
-            sendingData.value.sendIncName! = "";
+            datasetCheckResult.value = await doesRemoteDatasetExist();
+            if (datasetCheckResult.value) {
+                lastCommonSnap.value = await checkForLastCommonSnap();
+                console.log('remote lastCommonSnap:', lastCommonSnap.value);
+                if (lastCommonSnap.value) {
+                    sendIncremental.value = true;
+                    sendingData.value.sendOpts.incremental = sendIncremental!.value;
+                    sendingData.value.sendIncName! = lastCommonSnap.value.name;
+                    invalidConfig.value = false;
+                } else {
+                    sendIncremental.value = false;
+                    sendingData.value.sendIncName! = "";
+                    invalidConfig.value = true;
+                    invalidConfigMsg.value = "Remote destination already exists and has been modified since most recent snapshot.";
+                    mostRecentDestSnapMsg.value = `Most recent remote snapshot: ${mostRecentRemoteDestSnap.value!.name}`;
+                }
+            } else {
+                sendIncremental.value = false;
+                sendingData.value.sendIncName! = "";
+            }
         }
-
-        sendingData.value.recvHostUser = destinationHostUser.value;
-        sendingData.value.recvHostPass = destinationHostPass.value;
-    
+        
     }
 }
 
@@ -209,19 +246,14 @@ async function checkForLastCommonSnap() {
         const sourceDataset = computed(() => {
             return sendName.value.split("@").shift();
         });
+        console.log(`sourceDataset: ${sourceDataset.value}`);
 
         const sourceDatasetSnaps = computed(() => {
             return sortedSnapshots.value.filter(snapshot => snapshot.dataset == sourceDataset.value);
         });
-
-        const destinationDatasetSnaps = computed(() => {
-            return sortedSnapshots.value.filter(snapshot => snapshot.dataset == destinationName.value);
-        });
-
-        console.log(`sourceDataset: ${sourceDataset.value}`);
-        console.log(`destinationDataset: ${destinationName.value}`)
         console.log('sourceDatasetSnaps:', sourceDatasetSnaps.value);
-        console.log('destinationDatasetSnaps:', destinationDatasetSnaps.value);
+
+        console.log(`destinationDataset: ${destinationName.value}`)
 
         const sourceSnap = computed(() => {
             return sourceDatasetSnaps.value.find(snap => snap.name == sendName.value);
@@ -229,26 +261,66 @@ async function checkForLastCommonSnap() {
 
         console.log('sourceSnap:', sourceSnap.value);
 
-        return compareTimestamp(destinationDatasetSnaps.value, sourceDatasetSnaps.value, sourceSnap.value!); 
+        if (isSendLocal.value) {
+            const destinationDatasetSnaps = computed(() => {
+                return sortedSnapshots.value.filter(snapshot => snapshot.dataset == destinationName.value);
+            });
+            console.log('local destinationDatasetSnaps:', destinationDatasetSnaps.value);
+
+            return compareLocalTimestamp(destinationDatasetSnaps.value, sourceDatasetSnaps.value, sourceSnap.value!); 
+
+        } else {
+            await formatRecentSnaps(sendingData.value, snapSnips.value);
+            console.log('remote destinationDatasetSnaps:', snapSnips.value);
+
+            const result = await compareRemoteTimestamp(snapSnips.value, sourceDatasetSnaps.value, sourceSnap.value!);
+            return result; 
+        }
        
     } catch (error) {
         console.error('Error checking snapshot', error);
     }
 }
 
-function compareTimestamp(destinationDatasetSnaps : Snapshot[], sourceDatasetSnaps : Snapshot[], sourceSendSnap : Snapshot) {
-    mostRecentDestSnap.value = destinationDatasetSnaps[0];
-    console.log('mostRecentDestSnap:', mostRecentDestSnap);
+function compareLocalTimestamp(destinationDatasetSnaps : Snapshot[], sourceDatasetSnaps : Snapshot[], sourceSendSnap : Snapshot) {
+    mostRecentLocalDestSnap.value = destinationDatasetSnaps[0];
+    console.log('local mostRecentLocalDestSnap:', mostRecentLocalDestSnap.value);
 
-    if (Number(mostRecentDestSnap.value.creationTimestamp) < Number(sourceSendSnap.creationTimestamp)) {
+    if (Number(mostRecentLocalDestSnap.value.creationTimestamp) < Number(sourceSendSnap.creationTimestamp)) {
         const sourceSnapMatch = computed(() => {
-            return sourceDatasetSnaps.find(snap => snap.guid == mostRecentDestSnap.value.guid);
+            return sourceDatasetSnaps.find(snap => snap.guid == mostRecentLocalDestSnap.value!.guid);
         });
-        console.log('sourceSnapMatch:', sourceSnapMatch.value);
+        console.log('local sourceSnapMatch:', sourceSnapMatch.value);
         return sourceSnapMatch.value;
         
     } else {
-        console.log('invalid lastCommonSnap match');
+        console.log('invalid local lastCommonSnap match');
+        return null;
+    }
+}
+
+async function compareRemoteTimestamp(snapSnips : SnapSnippet[], sourceDatasetSnaps : Snapshot[], sourceSendSnap : Snapshot) {
+    console.log('snapSnips', snapSnips);
+    // console.log('snapSnips length', snapSnips.length);
+    mostRecentRemoteDestSnap.value = snapSnips[0];
+    console.log('remote mostRecentRemoteDestSnap:', mostRecentRemoteDestSnap.value);
+
+    console.log('Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation))', Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation)));
+    console.log('Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp))))', Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp)))));
+   
+    ////////////////////////////////////////HERE//////////////////////////////////
+
+    if (Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation)) < Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp))))) {
+        const sourceSnapMatch = computed(() => {
+            const source = sourceDatasetSnaps.find(snap => snap.guid == mostRecentLocalDestSnap.value!.guid);
+            console.log('source', source);
+            return source; 
+        });
+        console.log('remote sourceSnapMatch:', sourceSnapMatch.value);
+        return sourceSnapMatch.value;
+        
+    } else {
+        console.log('invalid remote lastCommonSnap match');
         return null;
     }
 }

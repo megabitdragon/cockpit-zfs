@@ -1,15 +1,10 @@
 # Python script for sending snapshots
 import subprocess
 import argparse
-import json
-import threading
-import tempfile
-import os
 
 def destroy_for_overwrite(recvName):
-        destroy_cmd = ['zfs', 'destroy']
-        destroy_cmd.append(recvName)
-        destroy_cmd.append('-R')
+        destroy_cmd = ['zfs', 'destroy', f'{recvName}', '-R']
+
         process_destroy = subprocess.Popen(
             destroy_cmd,
             stdout=subprocess.PIPE,
@@ -25,175 +20,115 @@ def destroy_for_overwrite(recvName):
         else:
             print(stdout)
 
-# def process_send_output(output_stream):
-#     total_size = None
+# def check_if_recv_dataset_exists(recvName, remote_user, remote_host):
+#     # Construct the SSH command
+#     ssh_cmd = ['ssh', f'{remote_user}@{remote_host}', f'zfs list -H -o name {recvName}']
 
-#     for line in output_stream:
-#         line_data = line.strip()
+#     # Run the SSH command
+#     process_check_dataset = subprocess.Popen(
+#         ssh_cmd,
+#         stdout=subprocess.PIPE,
+#         stderr=subprocess.PIPE,
+#         universal_newlines=True,  # Ensures text mode for stdout and stderr
+#     )
 
-#         if line_data.startswith("total estimated size"):
-#             total_size = line_data.split()[-1]
+#     # Wait for the command to complete and capture the output
+#     stdout, stderr = process_check_dataset.communicate()
 
-#         elif line_data.startswith("TIME"):
-#             # Skip header line
-#             continue
+#     # Check the return code
+#     if process_check_dataset.returncode != 0:
+#         print(f"Error: {stderr}")
+#         return False
+#     else:
+#         # Check if the output matches the recvName
+#         return stdout.strip() == recvName
 
-#         elif total_size:
-#             # Extract progress data and return as JSON
-#             time, sent, snapshot = line_data.split()
-#             progress_data = {
-#                 'time': time,
-#                 'sent': sent,
-#                 'snapshot': snapshot,
-#                 'total_size': total_size,
-#             }
-#             yield json.dumps({'progress': progress_data})
-
-# def read_output(output_stream):
-#     for progress_json in process_send_output(output_stream):
-#         print(progress_json)
-
-# def connect_remotely(host, port, user, password):
-#     try:
-#         with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_pass_file:
-#             temp_pass_file.write(password)
-#             temp_pass_file_path = temp_pass_file.name
-
-#         try:
-#             ssh_cmd = ['ssh']
-
-#             if port is not 22:
-#                 ssh_cmd.append('-p')
-#                 ssh_cmd.append(port)
-            
-#             ssh_cmd.append(user + "@")
-#             ssh_cmd.append(host)
-
-#             ssh_process = subprocess.Popen(
-#                 ssh_cmd,
-#                 stdin=subprocess.PIPE,
-#                 stdout=subprocess.PIPE,
-#                 stderr=subprocess.PIPE,
-#             )
-
-#             # Provide the pass file as input to the process
-#             with open(temp_pass_file_path, 'rb') as f:
-#                 stdout, stderr = ssh_process.communicate(input=f.read())
-
-#             if ssh_process.returncode != 0:
-#                 print(f"Error: {stderr}")
-#             else:
-#                 print(stdout)
-
-#         finally:
-#             # Delete the temporary pass file after using it
-#             os.remove(temp_pass_file_path)
-
-#     except Exception as e:
-#         print(f"An error occurred: {e}")
-
-def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False, recvHost="", recvPort=22, recvHostUser="", recvHostPass=""):
+def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False, recvHost="", recvPort=22, recvHostUser=""):
     try:
-        # Create a secure temporary file to store the passphrase
-        with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_recvHostPass:
-            temp_recvHostPass.write(recvHostPass)
-            temp_recvHostPass_path = temp_recvHostPass.name
+        if forceOverwrite:
+            destroy_for_overwrite(recvName)
 
-        try:
+        send_cmd = ['zfs', 'send', '-v']
+
+        if compressed:
+            send_cmd.append('-Lce')
+
+        if raw:
+            send_cmd.append('-w')
+
+        if sendName2 != "":
+            send_cmd.extend('-i', sendName2)
+
+        send_cmd.append(sendName)
+
+        print(f"SEND_CMD: {send_cmd}")
+
+        process_send = subprocess.Popen(
+            send_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+        if recvHost != "":
+            ssh_cmd = ['ssh']
+
+            if recvPort != '22':
+                ssh_cmd.extend('-p', recvPort)
+
+            ssh_cmd.append(recvHostUser + '@' + recvHost)
+
+            ssh_cmd.append('-v')
+
+            ssh_cmd.extend(['zfs', 'recv'])
+
             if forceOverwrite:
-                destroy_for_overwrite(recvName)
+                ssh_cmd.append('-F')
 
-            send_cmd = ['zfs', 'send', '-v']
+            ssh_cmd.append(recvName)
 
-            if compressed:
-                send_cmd.append('-Lce')
+            print(f"SSH_CMD: {ssh_cmd}")
 
-            if raw:
-                send_cmd.append('-w')
-
-            if sendName2 is not "":
-                send_cmd.append('-i')
-                send_cmd.append(sendName2)
-
-            send_cmd.append(sendName)
-
-            process_send = subprocess.Popen(
-                send_cmd,
+            process_ssh_recv = subprocess.Popen(
+                ssh_cmd,
+                stdin=process_send.stdout,
                 stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
             )
 
-            if recvHost is not "":
-                ssh_cmd = ['ssh']
+            stdout, stderr = process_ssh_recv.communicate()
 
-                if recvPort != 22:
-                    ssh_cmd.append('-p')
-                    ssh_cmd.append(recvPort)
-
-                ssh_cmd.append(recvHostUser + '@')
-                ssh_cmd.append(recvHost)
-
-                ssh_cmd.extend(['zfs', 'recv'])
-
-                if forceOverwrite:
-                    ssh_cmd.append('-F')
-
-                ssh_cmd.append(recvName)
-
-                process_ssh_recv = subprocess.Popen(
-                    ssh_cmd,
-                    stdin=process_send.stdout,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-
-                with open(temp_recvHostPass_path, 'rb') as f:
-                    stdout, stderr = process_ssh_recv.communicate(input=f.read())
-
-                if process_ssh_recv.returncode != 0:
-                    print(f"Error: {stderr}")
-                else:
-                    print(stdout)
-            
+            if process_ssh_recv.returncode != 0:
+                print(f"Error: {stderr}")
             else:
-                recv_cmd = ['zfs', 'recv']
+                print(stdout)
+        
+        else:
+            recv_cmd = ['zfs', 'recv']
 
-                if forceOverwrite:
-                    recv_cmd.append('-F')
+            if forceOverwrite:
+                recv_cmd.append('-F')
 
-                recv_cmd.append(recvName)
+            recv_cmd.append(recvName)
 
-                process_recv = subprocess.Popen(
-                    recv_cmd,
-                    stdin=process_send.stdout,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
+            print(f"RECV_CMD: {recv_cmd}")
 
-                # for progress_json in process_send_output(process_recv.stdout):
-                #     print(progress_json)
+            process_recv = subprocess.Popen(
+                recv_cmd,
+                stdin=process_send.stdout,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
 
-                # Start a separate thread to read and process the output in real-time
-                # output_thread = threading.Thread(target=read_output, args=(process_recv.stdout,), daemon=True)
-                # output_thread.start()
+            stdout, stderr = process_recv.communicate()
 
-                # # Wait for the subprocess to finish
-                # process_recv.wait()
+            if process_recv.returncode != 0:
+                print(f"Error: {stderr}")
+            else:
+                print(stdout)
 
-                stdout, stderr = process_recv.communicate()
-
-                if process_recv.returncode != 0:
-                    print(f"Error: {stderr}")
-                else:
-                    print(stdout)
-
-        finally:
-            # Delete the temporary passphrase file after using it
-            os.remove(temp_recvHostPass_path)
 
     except Exception as e:
         print(f"An error occurred: {e}")
-
-# def send_dataset_remotely():
     
 
 def main() :
@@ -205,9 +140,8 @@ def main() :
     parser.add_argument('compressed', type=str, default='False', help='sending dataset compression')
     parser.add_argument('raw', type=str, default='False', help='sending dataset raw')
     parser.add_argument('recvHost', type=str, help='receiving dataset host')
-    parser.add_argument('recvPort', default=22, type=int, help='receiving dataset port')
+    parser.add_argument('recvPort', type=str, default='22', help='receiving dataset port')
     parser.add_argument('recvHostUser', type=str, help='receiving dataset host user')
-    parser.add_argument('recvHostPass', type=str, help='receiving dataset host password')
 
     args = parser.parse_args()
 
@@ -220,19 +154,13 @@ def main() :
     recvHost = args.recvHost
     recvPort = args.recvPort
     recvHostUser = args.recvHostUser
-    recvHostPass = args.recvHostPass
-
-    # if recvHost is not "":
-    #     connect_remotely(recvHost, recvPort, recvHostUser, recvHostPass)
-    #     send_dataset_remotely()
-    # else:
 
     if sendName2 is not "":
         print(f"Sending incrementally to {recvName} from {sendName2} to {sendName}")
     else:
         print(f"Executing command: zfs send {sendName} | {recvName}")
 
-    send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw, recvHost, recvPort, recvHostUser, recvHostPass)
+    send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw, recvHost, recvPort, recvHostUser)
 
 if __name__ == '__main__':
     main()

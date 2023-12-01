@@ -147,7 +147,7 @@
 import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
+import { getTimestampString, upperCaseWord, isBoolOnOff, convertTimestampToLocal } from '../../composables/helpers';
 import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset, loadDatasets } from '../../composables/loadData';
 import { destroySnapshot, rollbackSnapshot, cloneSnapshot, renameSnapshot } from '../../composables/snapshots';
 import CloneSnapshot from '../snapshots/CloneSnapshot.vue';

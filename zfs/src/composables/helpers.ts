@@ -166,6 +166,23 @@ export function convertTimestampToLocal(timestamp) {
     return finalTimestamp;
 }
 
+export function convertTimestampFormat(timestamp) {
+    // Parse the provided timestamp string
+    const parsedTimestamp = new Date(timestamp);
+
+    // Get individual date and time components
+    const year = parsedTimestamp.getFullYear();
+    const month = (parsedTimestamp.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    const day = parsedTimestamp.getDate().toString().padStart(2, '0');
+    const hours = parsedTimestamp.getHours().toString().padStart(2, '0');
+    const minutes = parsedTimestamp.getMinutes().toString().padStart(2, '0');
+
+    // Create the desired format
+    const customFormat = `${year}-${month}-${day} ${hours}:${minutes}:00`;
+
+    return customFormat;
+}
+
 export const getPoolDiskType = (pool) => {
 	let hasSSD = false;
 	let hasHDD = false;

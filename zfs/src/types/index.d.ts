@@ -361,7 +361,7 @@ interface SendingDataset {
 	sendIncName?: string;
 	recvName: string;
 	recvHost: string;
-	recvPort: number;
+	recvPort: string;
 	sendOpts: {
 		compressed: boolean;
 		raw: boolean;
@@ -369,7 +369,12 @@ interface SendingDataset {
 		forceOverwrite?: boolean;
 	}
 	recvHostUser?: string;
-	recvHostPass?: string;
+}
+
+interface SnapSnippet {
+	name: string;
+	guid: string;
+	creation: string;
 }
 
 type ConfirmationCallback = () => void;
