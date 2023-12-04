@@ -135,16 +135,8 @@ export function getRawTimestampFromString(timestampString) {
 
 export function convertRawTimestampToString(rawTimestamp) {
 	const date = new Date(rawTimestamp * 1000);
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, '0'); 
-	const day = String(date.getDate()).padStart(2, '0');
-	const hours = String(date.getHours()).padStart(2, '0');
-	const minutes = String(date.getMinutes()).padStart(2, '0');
-	const seconds = String(date.getSeconds()).padStart(2, '0');
-
-	const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  
-	return timestamp;
+    const timestamp = date.toISOString().replace(/T|Z/g, ' ').trim();
+    return timestamp.substring(0, 19);
 }
 
 export function convertTimestampToLocal(timestamp) {
@@ -167,19 +159,14 @@ export function convertTimestampToLocal(timestamp) {
 }
 
 export function convertTimestampFormat(timestamp) {
-    // Parse the provided timestamp string
-    const parsedTimestamp = new Date(timestamp);
-
-    // Get individual date and time components
+	const parsedTimestamp = new Date(timestamp);
     const year = parsedTimestamp.getFullYear();
-    const month = (parsedTimestamp.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    const month = (parsedTimestamp.getMonth() + 1).toString().padStart(2, '0');
     const day = parsedTimestamp.getDate().toString().padStart(2, '0');
     const hours = parsedTimestamp.getHours().toString().padStart(2, '0');
     const minutes = parsedTimestamp.getMinutes().toString().padStart(2, '0');
 
-    // Create the desired format
     const customFormat = `${year}-${month}-${day} ${hours}:${minutes}:00`;
-
     return customFormat;
 }
 

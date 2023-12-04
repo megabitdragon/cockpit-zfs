@@ -305,14 +305,12 @@ async function compareRemoteTimestamp(snapSnips : SnapSnippet[], sourceDatasetSn
     mostRecentRemoteDestSnap.value = snapSnips[0];
     console.log('remote mostRecentRemoteDestSnap:', mostRecentRemoteDestSnap.value);
 
-    console.log('Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation))', Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation)));
-    console.log('Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp))))', Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp)))));
-   
-    ////////////////////////////////////////HERE//////////////////////////////////
+    console.log('mostRecentRemoteDestSnap.value.creation', Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation)));
+    console.log('sourceSendSnap.creationTimestamp', Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp)))));
 
     if (Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation)) < Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp))))) {
         const sourceSnapMatch = computed(() => {
-            const source = sourceDatasetSnaps.find(snap => snap.guid == mostRecentLocalDestSnap.value!.guid);
+            const source = sourceDatasetSnaps.find(snap => snap.guid == mostRecentRemoteDestSnap.value!.guid);
             console.log('source', source);
             return source; 
         });

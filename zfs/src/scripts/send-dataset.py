@@ -57,7 +57,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             send_cmd.append('-w')
 
         if sendName2 != "":
-            send_cmd.extend('-i', sendName2)
+            send_cmd.extend(['-i', sendName2])
 
         send_cmd.append(sendName)
 
@@ -73,7 +73,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             ssh_cmd = ['ssh']
 
             if recvPort != '22':
-                ssh_cmd.extend('-p', recvPort)
+                ssh_cmd.extend(['-p', recvPort])
 
             ssh_cmd.append(recvHostUser + '@' + recvHost)
 
