@@ -140,10 +140,15 @@ export function convertRawTimestampToString(rawTimestamp) {
 }
 
 export function convertTimestampToLocal(timestamp) {
-    const utcTimestamp = timestamp.replace(' ', 'T') + 'Z';
+    // Check if the timestamp already has a space between date and time
+    const hasSpace = timestamp.includes(' ');
+
+    // If it has a space, use it directly; otherwise, convert to the desired format
+    const utcTimestamp = hasSpace ? timestamp.replace(' ', 'T') + 'Z' : timestamp;
 
     const localTimestamp = new Date(utcTimestamp).toLocaleString('en-US', {
-		year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     });
 
     const rearrangedTimestamp = localTimestamp.replace(/\//g, '-').replace(',', '');
@@ -158,17 +163,20 @@ export function convertTimestampToLocal(timestamp) {
     return finalTimestamp;
 }
 
+
 export function convertTimestampFormat(timestamp) {
-	const parsedTimestamp = new Date(timestamp);
+    const parsedTimestamp = new Date(timestamp);
     const year = parsedTimestamp.getFullYear();
     const month = (parsedTimestamp.getMonth() + 1).toString().padStart(2, '0');
     const day = parsedTimestamp.getDate().toString().padStart(2, '0');
     const hours = parsedTimestamp.getHours().toString().padStart(2, '0');
     const minutes = parsedTimestamp.getMinutes().toString().padStart(2, '0');
+    const seconds = parsedTimestamp.getSeconds().toString().padStart(2, '0');
 
-    const customFormat = `${year}-${month}-${day} ${hours}:${minutes}:00`;
+    const customFormat = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     return customFormat;
 }
+
 
 export const getPoolDiskType = (pool) => {
 	let hasSSD = false;

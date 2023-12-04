@@ -196,17 +196,19 @@ export async function formatRecentSnaps(sendingData : SendingDataset, snapSnips 
         if (rawJSON) {
             const parsedJSON = (JSON.parse(rawJSON));
             parsedJSON.forEach(snap => {
+                console.log('snap:', snap);
                 const snapSnip : SnapSnippet = {
                     name: snap.name,
                     guid: snap.guid,
                     creation: convertTimestampToLocal(convertTimestampFormat(snap.creation)),
                 }
+                console.log('snapSnip after:', snapSnip);
                 snapSnips.push(snapSnip);
             });
         } else {
             console.error("No data received from getRecentSnaps");
         }
-        // console.log('loaded snapSnips:', snapSnips);
+        console.log('formatted snapSnips:', snapSnips);
 	} catch(error) {
 		console.error("An error occurred getting snapSnips:", error);
 	}

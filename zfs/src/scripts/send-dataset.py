@@ -2,51 +2,71 @@
 import subprocess
 import argparse
 
-def destroy_for_overwrite(recvName):
-        destroy_cmd = ['zfs', 'destroy', f'{recvName}', '-R']
+def destroy_for_overwrite_local(recvName):
+    destroy_cmd = ['zfs', 'destroy', f'{recvName}', '-R']
 
-        process_destroy = subprocess.Popen(
-            destroy_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+    process_destroy = subprocess.Popen(
+        destroy_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
 
-        print(f"Executing command: zfs destroy -R {recvName}")
-        
-        stdout, stderr = process_destroy.communicate()
+    print(f"Executing command: zfs destroy -R {recvName}")
+    
+    stdout, stderr = process_destroy.communicate()
 
-        if process_destroy.returncode != 0:
-            print(f"Error: {stderr}")
-        else:
-            print(stdout)
+    if process_destroy.returncode != 0:
+        print(f"Error: {stderr}")
+    else:
+        print(stdout)
 
-# def check_if_recv_dataset_exists(recvName, remote_user, remote_host):
-#     # Construct the SSH command
-#     ssh_cmd = ['ssh', f'{remote_user}@{remote_host}', f'zfs list -H -o name {recvName}']
+def destroy_for_overwrite_remote(recvName, recvHostUser, recvHost, recvPort=22):
+    ssh_cmd = ['ssh']
 
-#     # Run the SSH command
-#     process_check_dataset = subprocess.Popen(
-#         ssh_cmd,
-#         stdout=subprocess.PIPE,
-#         stderr=subprocess.PIPE,
-#         universal_newlines=True,  # Ensures text mode for stdout and stderr
-#     )
+    if recvPort != '22':
+        ssh_cmd.extend(['-p', recvPort])
 
-#     # Wait for the command to complete and capture the output
-#     stdout, stderr = process_check_dataset.communicate()
+    ssh_cmd.append(recvHostUser + '@' + recvHost)
 
-#     # Check the return code
-#     if process_check_dataset.returncode != 0:
-#         print(f"Error: {stderr}")
-#         return False
-#     else:
-#         # Check if the output matches the recvName
-#         return stdout.strip() == recvName
+    ssh_cmd.extend(['zfs', 'destroy', f'{recvName}', '-R'])
+
+    process_destroy = subprocess.Popen(
+        ssh_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    print(f"Executing command: zfs destroy -R {recvName}")
+    
+    stdout, stderr = process_destroy.communicate()
+
+    if process_destroy.returncode != 0:
+        print(f"Error: {stderr}")
+    else:
+        print(stdout)
+
+    # recv_command = ['zfs', 'recv', '-F', recvName]
+
+    # process_receive = subprocess.Popen(
+    #     recv_command,
+    #     stdout=subprocess.PIPE,
+    #     stderr=subprocess.PIPE,
+    # )
+
+    # print(f"Executing command: zfs recv -F {recvName}")
+    
+    # stdout, stderr = process_receive.communicate()
+
+    # if process_receive.returncode != 0:
+    #     print(f"Error: {stderr}")
+    # else:
+    #     print(stdout)
+
 
 def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False, recvHost="", recvPort=22, recvHostUser=""):
     try:
-        if forceOverwrite:
-            destroy_for_overwrite(recvName)
+        if recvHost != "" and forceOverwrite == True:
+            destroy_for_overwrite_local(recvName)
 
         send_cmd = ['zfs', 'send', '-v']
 
@@ -70,6 +90,9 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
         )
 
         if recvHost != "":
+            if forceOverwrite:
+                destroy_for_overwrite_remote(recvName, recvHostUser, recvHost, recvPort)
+
             ssh_cmd = ['ssh']
 
             if recvPort != '22':
@@ -77,7 +100,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
 
             ssh_cmd.append(recvHostUser + '@' + recvHost)
 
-            ssh_cmd.append('-v')
+            # ssh_cmd.append('-v')
 
             ssh_cmd.extend(['zfs', 'recv'])
 

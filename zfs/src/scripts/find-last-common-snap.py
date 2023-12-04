@@ -2,8 +2,6 @@ import subprocess
 import json
 import argparse
 
-from datetime import datetime
-
 def get_snapshots_info(recvName, recvHost, recvPort, recvHostUser):
     if recvPort == '22':
         ssh_cmd = ['ssh', f'{recvHostUser}@{recvHost}', f'zfs list -H -o name,guid,creation -t snapshot {recvName}']
