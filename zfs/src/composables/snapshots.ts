@@ -145,7 +145,7 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
 
 		const output = await state.promise();
-		console.log(output);
+		console.log('snapshot send completed:', output);
 		return output.stdout;
 	} catch (state) {
 		console.error(errorString(state));
