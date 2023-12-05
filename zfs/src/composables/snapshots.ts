@@ -115,7 +115,6 @@ export async function renameSnapshot(snapshotName, newName, renameChildren?) {
     }
 }
 
-
 export async function cloneSnapshot(snapName, newParentFS, cloneName, createParent?) {
     try {
         let cmdString = ['zfs', 'clone'];
@@ -145,7 +144,7 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
 
 		const output = await state.promise();
-		console.log('snapshot send completed:', output);
+		console.log('snapshot send completed:', output.stdout);
 		return output.stdout;
 	} catch (state) {
 		console.error(errorString(state));
@@ -214,26 +213,23 @@ export async function formatRecentSnaps(sendingData : SendingDataset, snapSnips 
 	}
 }
 
-
-export async function getSendProgress(sendingData : SendingDataset) {
+export async function readSendProgress(sendProgressData : SendProgress[]) {
     try {
-        const cmdString = ['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw];
+        // Replace 'path/to/your/file.json' with the actual path to your JSON file
+        const response = await fetch('path/to/your/file.json');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data. Status: ${response.status}`);
+        }
     
-        const state = useSpawn(cmdString, { superuser: 'try' });
-        const sendProgress = (await state.promise()).stdout;
-        return sendProgress;
-    } catch (state) {
-        console.error(errorString(state));
-        return null;
-    }
-}
+        const data = await response.json();
+        sendProgressData = data;
 
-export async function loadSendProgress(sendingData : SendingDataset) {
-    try {
-        const rawJSON = await getSendProgress(sendingData);
-        const parsedJSON = JSON.parse(rawJSON);
-        console.log('Send Progress:', parsedJSON);
-    } catch (error) {
-        console.error("An error occurred getting send progress:", error);
-    }
+        return sendProgressData;
+      } catch (error) {
+        console.error("An error occurred loading send progress:", error);
+        return null;
+      }
+    
+     
 }

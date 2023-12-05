@@ -51,7 +51,21 @@ def destroy_for_overwrite_remote(recvName, recvHostUser, recvHost, recvPort=22):
     else:
         print(stdout)
 
-def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False, recvHost="", recvPort=22, recvHostUser="", output_file_path=""):
+# def read_progress(file_path):
+#     while True:
+#         try:
+#             with open(file_path, 'r') as json_file:
+#                 progress_data = json.load(json_file)
+#                 for data in progress_data:
+#                     # Process the progress data as needed
+#                     print(data)
+#         except FileNotFoundError:
+#             pass  # File not found, handle accordingly
+#         except json.JSONDecodeError:
+#             pass  # JSON decoding error, handle accordingly
+#         time.sleep(1)  # Adjust the sleep duration as needed
+
+def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False, recvHost="", recvPort=22, recvHostUser=""):
     try:
         if recvHost != "" and forceOverwrite == True:
             destroy_for_overwrite_local(recvName)
@@ -159,7 +173,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
 
                     # Create a data dictionary
                     data = {
-                        "snapName": snapshot_name,
+                        "snapSent": snapshot_name,
                         "status": status,
                         "progSize": update_size,
                         "totalSize": total_size,
@@ -170,10 +184,6 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
 
                     # Print the data for verification
                     print(data)
-
-                    # Write the output_data list to a JSON file
-                    # with open("output.json", "w") as json_file:
-                    #     json.dump(output_data, json_file, indent=2)
 
         while process_recv.poll() is None:
             recv_output = process_recv.stdout.readline()
@@ -189,7 +199,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
                     status = "finished"
                     # Create the final data object
                     final_data = {
-                        "snapName": snapshot_name,
+                        "snapSent": snapshot_name,
                         "status": status,
                         "progSize": received_size,
                         "totalSize": total_size,
@@ -202,6 +212,9 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
         if final_data is not None and any(final_data):
             output_data.append(final_data)
 
+        print("Current Working Directory:", os.getcwd())
+        # When running script from Client, stores output.json in /run/user/0
+
         # Write the entire output_data list to the JSON file
         with open("output.json", "w") as json_file:
             json.dump(output_data, json_file, indent=2)
@@ -213,6 +226,8 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
         else:
             print(stdout)
 
+        # print(json.dumps(output_data, indent=2))
+        return(json.dumps(output_data, indent=2))
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -247,7 +262,7 @@ def main() :
     else:
         print(f"Executing command: zfs send {sendName} | {recvName}")
 
-    send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw, recvHost, recvPort, recvHostUser, 'output.txt')
+    send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw, recvHost, recvPort, recvHostUser)
 
 if __name__ == '__main__':
     main()

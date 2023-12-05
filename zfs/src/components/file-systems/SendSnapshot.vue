@@ -10,6 +10,9 @@
                         <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
                         <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendName}}</label>
                     </div>
+                    <!-- <div class="mt-2">
+                        <button id="cancel" class="mt-1 btn btn-secondary object-left justify-start h-fit" @click="showSendDataset = false">Test Passwordless SSH</button>
+                    </div> -->
                     <div class="mt-2">
                         <!-- Receiving Dataset: [User Supplied] -->
                         <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
@@ -37,12 +40,12 @@
                         <!-- Send Compressed: [Checkbox -> (-Lce) options] *** Cannot be used if Encrypted -->
                         <label :for="getIdKey('send-compressed-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                             Send Compressed: 
-                            <input :id="getIdKey('send-compressed-toggle')" v-model="sendCompressed" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
+                            <input :id="getIdKey('send-compressed-toggle')" v-model="sendCompressed" @change="handleCheckboxChange('sendCompressed')" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
                         <!-- Send Raw: [Checkbox -> (-w) option] *** If Encrypted, force this mode -->
                         <label :for="getIdKey('send-raw-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                             Send Raw:
-                            <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
+                            <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" @change="handleCheckboxChange('sendRaw')" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                         </label>
                         <!-- Force Overwrite: [Checkbox -> (-F) option] -->
                         <label v-if="invalidConfig" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-danger col-span-1">
@@ -58,6 +61,17 @@
             <template v-slot:footer>
                 <div class="button-group-row w-full row-start-2 justify-between mt-2">
                     <button id="cancel" class="mt-1 btn btn-danger object-left justify-start h-fit" @click="showSendDataset = false">Cancel</button>
+
+
+                <!--<div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                        <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                            <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-1.5 leading-none">
+                                {{ parseFloat(scanPercentage.toFixed(2)) }}%
+                            </div>
+                        </div>
+                    </div> -->
+
+
                     <button v-if="!sending && !invalidConfig" @click="sendBtn()" :id="getIdKey('send-btn')" name="send-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Send</button>
                     <button v-if="!sending && invalidConfig && !forceOverwrite" disabled @click="sendBtn()" :id="getIdKey('send-btn')" name="send-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Send</button>
                     <button v-if="!sending && invalidConfig && forceOverwrite" @click="sendBtn()" :id="getIdKey('send-btn')" name="send-btn" class="mt-1 btn btn-primary object-right justify-end h-fit">Send</button>
@@ -83,7 +97,7 @@
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
 import { ref, Ref, inject, watch, computed } from 'vue';
-import { sendSnapshot, doesDatasetExist, getRecentSnaps, formatRecentSnaps, getSendProgress, loadSendProgress } from '../../composables/snapshots';
+import { sendSnapshot, doesDatasetExist, formatRecentSnaps } from '../../composables/snapshots';
 import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString,  } from '../../composables/helpers';
 
 interface SendSnapshotProps {
@@ -134,6 +148,15 @@ const sendingData = ref<SendingDataset>({
     },
     recvHostUser: destinationHostUser.value,
 });
+
+function handleCheckboxChange(checkbox) {
+    // Ensure only one checkbox is selected at a time
+    if (checkbox === 'sendCompressed' && sendCompressed.value) {
+    sendRaw.value = false;
+    } else if (checkbox === 'sendRaw' && sendRaw.value) {
+    sendCompressed.value = false;
+    }
+}
 
 const isSendLocal = computed(() => {
     if (destinationHost.value == "") {

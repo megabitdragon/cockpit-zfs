@@ -155,13 +155,6 @@ interface newPoolData {
 	refreservationPercent: number;
 }
 
-//object for create-pools.py
-// interface newVDev {
-// 	root: string;
-// 	type: string;
-// 	devices: string[];
-// }
-
 interface newVDevData {
 	type: string;
 	disks: string[];
@@ -334,14 +327,11 @@ interface DiskStats {
 		trim_errors: number;
 		trim_notsup: number;
 		trim_state: number;
-		// trim: TrimStats;
 		write_errors: number;
 	}
 }
 
 interface PoolDiskStats {
-	// name: string;
-	// disks: DiskStats[];
 	[poolName: string]: DiskStats[];
 }
 
@@ -375,6 +365,13 @@ interface SnapSnippet {
 	name: string;
 	guid: string;
 	creation: string;
+}
+
+interface SendProgress {
+	snapSent: string;
+	status: string;
+	totalSize: string;
+	progSize: string;
 }
 
 type ConfirmationCallback = () => void;
