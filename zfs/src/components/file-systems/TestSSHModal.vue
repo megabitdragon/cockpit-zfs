@@ -6,7 +6,7 @@
         <template v-slot:content>
             <label :for="getIdKey('ssh-test')" class="mt-1 block text-sm font-medium leading-6 text-default">SSH Target:</label>
             <input @keydown.enter="" :id="getIdKey('ssh-test')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="ssh-target" v-model="sshTarget" placeholder="user@hostname or just hostname"/>
-            <p class="text-default mt-1 block">{{ resultMsg }}</p>
+            <p class="text-default mt-2">{{ resultMsg }}</p>
         </template>
         <template v-slot:footer>
             <div class="w-full grid grid-rows-1">
@@ -66,7 +66,7 @@ async function confirmTest(sshTarget) {
     if (result.value) {
         resultMsg.value = 'Connection Successful!';
     } else {
-        resultMsg.value = 'Connection Failed, please add SSH Key to server.';
+        resultMsg.value = `Connection Failed: Could not resolve hostname ${sshTarget}: Name or service not known.`;
     }
     testing.value = false;
 }

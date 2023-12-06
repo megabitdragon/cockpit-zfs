@@ -24,7 +24,7 @@
                         <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ useForceOverwriteMsg }}</p>
                     </div>
                     <div class="mt-2">
-                        <!-- Receiving Host: (Add Tooltip (i): Optional-> If Empty, then Local) -->
+                        <!-- Receiving Host: (Optional-> If Empty, then Local) -->
                         <label :for="getIdKey('receiving-host-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Host:</label>
                         <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="destinationHost" placeholder="(Leave empty if sending locally.)"/>
                     </div>
