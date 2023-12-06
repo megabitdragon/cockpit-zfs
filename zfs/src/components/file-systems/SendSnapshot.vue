@@ -5,14 +5,16 @@
             </template>
             <template v-slot:content>
                 <div class="">
-                    <div class="mt-2">
-                        <!-- Sending Snapshot: (self) -->
-                        <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
-                        <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendName}}</label>
+                    <div class="flex flex-row justify-between">
+                        <div class="mt-2">
+                            <!-- Sending Snapshot: (self) -->
+                            <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
+                            <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendName}}</label>
+                        </div>
+                        <div class="mt-2">
+                            <button id="test-ssh" class="mt-3 btn btn-secondary object-left justify-end h-fit" @click="showTestSSHModal()">Test Passwordless SSH</button>
+                        </div>
                     </div>
-                    <!-- <div class="mt-2">
-                        <button id="cancel" class="mt-1 btn btn-secondary object-left justify-start h-fit" @click="showSendDataset = false">Test Passwordless SSH</button>
-                    </div> -->
                     <div class="mt-2">
                         <!-- Receiving Dataset: [User Supplied] -->
                         <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
@@ -93,12 +95,17 @@
             </template>
     </Modal>
 
+    <div v-if="showTestSSH">
+        <TestSSHModal @close="updateShowTestSSH" :idKey="'test-ssh-modal'" :showFlag="showTestSSH"/>
+    </div>
+
 </template>
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
 import { ref, Ref, inject, watch, computed } from 'vue';
-import { sendSnapshot, doesDatasetExist, formatRecentSnaps } from '../../composables/snapshots';
-import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString,  } from '../../composables/helpers';
+import { sendSnapshot, doesDatasetExist, formatRecentSnaps, readSendProgress } from '../../composables/snapshots';
+import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, testSSH } from '../../composables/helpers';
+import TestSSHModal from './TestSSHModal.vue';
 
 interface SendSnapshotProps {
     idKey: string;
@@ -133,6 +140,18 @@ const invalidFlagMsg = ref('');
 const destinationHostUser = ref('');
 const datasetCheckResult = ref();
 const snapSnips = ref<SnapSnippet[]>([]);
+const sendProgressData = ref<SendProgress[]>([]);
+
+const showTestSSH = ref(false);
+
+function showTestSSHModal() {
+	showTestSSH.value = true;
+	console.log('test ssh modal triggered');
+}
+
+const updateShowTestSSH = (newVal) => {
+    showTestSSH.value = newVal;
+}
 
 const sendingData = ref<SendingDataset>({
     sendName: sendName.value,
@@ -352,10 +371,18 @@ async function compareRemoteTimestamp(snapSnips : SnapSnippet[], sourceDatasetSn
             return null;
         }
     }
-
 }
 
-   
+async function loadSendProgress(sendProgressData : SendProgress[]) {
+    console.log('sendProgressData before load:', sendProgressData);
+    await readSendProgress(sendProgressData);
+    console.log('sendProgressData after load:', sendProgressData);
+}
+
+async function sendAndCheckProgress(sendData : SendingDataset, sendProgress : SendProgress[]) {
+    sendSnapshot(sendData);
+    loadSendProgress(sendProgress);
+}
 
 async function sendBtn() {
     await setSendData();
@@ -363,17 +390,17 @@ async function sendBtn() {
     
     if (!invalidConfig.value && !invalidFlags.value) {
         sending.value = true;
-        await sendSnapshot(sendingData.value);
-        // await loadSendProgress(sendingData.value);
+        // await sendSnapshot(sendingData.value);
+        await sendAndCheckProgress(sendingData.value, sendProgressData.value);
         sending.value = false;
         showSendDataset.value = false;
         confirmSend.value = true;
     } else if (invalidConfig.value) {
         if (forceOverwrite.value) {
             sending.value = true;
-            // await loadSendProgress(sendingData.value);
             invalidConfig.value = false;
-            await sendSnapshot(sendingData.value);
+            // await sendSnapshot(sendingData.value);
+            await sendAndCheckProgress(sendingData.value, sendProgressData.value);
             sending.value = false;
             showSendDataset.value = false;
             confirmSend.value = true;

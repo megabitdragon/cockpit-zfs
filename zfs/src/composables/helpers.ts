@@ -1,4 +1,7 @@
+import { useSpawn, errorString } from '@45drives/cockpit-helpers';
 import { reactive, ref, inject, Ref, computed, provide, ComputedRef } from 'vue';
+// @ts-ignore
+import test_ssh_script from"../scripts/test-ssh.py?raw";
 
 //change true to 'on' and false to 'off'
 export function isBoolOnOff(bool : boolean) {
@@ -163,7 +166,6 @@ export function convertTimestampToLocal(timestamp) {
     return finalTimestamp;
 }
 
-
 export function convertTimestampFormat(timestamp) {
     const parsedTimestamp = new Date(timestamp);
     const year = parsedTimestamp.getFullYear();
@@ -176,7 +178,6 @@ export function convertTimestampFormat(timestamp) {
     const customFormat = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     return customFormat;
 }
-
 
 export const getPoolDiskType = (pool) => {
 	let hasSSD = false;
@@ -421,4 +422,23 @@ export function checkInheritance(type: string, value : string, poolConfig : Pool
 			return upperCaseWord(value);
 		}
 	}
+}
+
+export async function testSSH(sshTarget) {
+    try {
+        console.log(`target: ${sshTarget}`);
+        const state = useSpawn(['/usr/bin/env', 'python3', '-c', test_ssh_script, sshTarget], { superuser: 'try', stderr: 'out' });
+
+        const output = await state.promise();
+        console.log('testSSH output:', output);
+
+        if (output.stdout.includes('True')) {
+			return true;
+		} else {
+			return false;
+		}
+    } catch (error) {
+        console.error(errorString(error));
+        return false;
+    }
 }

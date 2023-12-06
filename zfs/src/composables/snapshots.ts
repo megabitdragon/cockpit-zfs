@@ -216,20 +216,27 @@ export async function formatRecentSnaps(sendingData : SendingDataset, snapSnips 
 export async function readSendProgress(sendProgressData : SendProgress[]) {
     try {
         // Replace 'path/to/your/file.json' with the actual path to your JSON file
-        const response = await fetch('path/to/your/file.json');
+        const response = await fetch('/run/user/0/send_output.json');
         
         if (!response.ok) {
-          throw new Error(`Failed to fetch data. Status: ${response.status}`);
+            throw new Error(`Failed to fetch data. Status: ${response.status}`);
         }
     
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('Invalid content type. Expected JSON.');
+            console.log('Raw response:', await response.text());  // Log the raw response
+        }
+      
         const data = await response.json();
-        sendProgressData = data;
+        console.log('Raw JSON data:', data);  // Log the raw data to inspect the response
+        // sendProgressData = data;
 
-        return sendProgressData;
+        // return sendProgressData;
       } catch (error) {
         console.error("An error occurred loading send progress:", error);
-        return null;
+        // return null;
       }
-    
-     
+
+      return sendProgressData;
 }

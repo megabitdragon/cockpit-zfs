@@ -207,7 +207,6 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
 
                     print(final_data)
 
-
        # Check if final_data is defined before appending to output_data
         if final_data is not None and any(final_data):
             output_data.append(final_data)
@@ -216,7 +215,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
         # When running script from Client, stores output.json in /run/user/0
 
         # Write the entire output_data list to the JSON file
-        with open("output.json", "w") as json_file:
+        with open('send_output.json', "w") as json_file:
             json.dump(output_data, json_file, indent=2)
 
         stdout, stderr = process_recv.communicate()
@@ -231,7 +230,6 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
 
     except Exception as e:
         print(f"An error occurred: {e}")
-
 
 def main() :
     parser = argparse.ArgumentParser(description='Send ZFS Dataset')

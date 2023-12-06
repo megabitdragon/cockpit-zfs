@@ -3,7 +3,7 @@ import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath, convertTimestampToLocal } from "./helpers";
-import { getSnapshots } from './snapshots';
+import { getSnapshots, readSendProgress } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
@@ -614,6 +614,24 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 		console.error("An error occurred getting snapshots:", error);
 	}
 }
+
+// export async function loadSendProgress(sendProgressData : SendProgress[]) {
+// 	try {
+// 		readSendProgress(sendProgressData).then(rawJSON => {
+// 			const parsedJSON = (JSON.parse(rawJSON));
+// 			// console.log('Snapshots JSON (loadByDataset):', parsedJSON);
+// 			for (const dataset in parsedJSON) {
+// 				parsedJSON[dataset].forEach(snapshot => {
+					
+// 				});
+// 			}
+// 		});
+
+// 		// console.log('loaded snapshots in:', datasetName, '\n', snapshots);
+// 	} catch(error) {
+// 		console.error("An error occurred getting snapshots:", error);
+// 	}
+// }
 
 function determineDiskType(vDev, disks) {
     const childDisks = vDev.children.map(child => child.name);
