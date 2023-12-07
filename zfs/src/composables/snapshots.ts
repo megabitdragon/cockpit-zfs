@@ -1,4 +1,4 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { useSpawn, errorString, BetterCockpitFile } from '@45drives/cockpit-helpers';
 import { convertTimestampToLocal, convertTimestampFormat } from '../composables/helpers';
 // @ts-ignore
 import get_snapshots_script from "../scripts/get-snapshots.py?raw";
@@ -144,13 +144,69 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
 
 		const output = await state.promise();
-		console.log('snapshot send completed:', output.stdout);
+		console.log('sendSnapshot completed');
 		return output.stdout;
 	} catch (state) {
 		console.error(errorString(state));
 		return null;
 	}
 }
+
+
+// export async function readSendProgress(sendProgressData : SendProgress[]) {
+//     try {
+//         const fileReader = new BetterCockpitFile('/run/user/0/full_output.json', { syntax: JSON });
+
+//         let initialRun = true;
+//         let nullRun = true;
+
+//         function fillProgressArray(content, sendProgressData : SendProgress[]) {
+//             if (initialRun && nullRun) {
+//                 initialRun = false;
+//             } else if (!initialRun && nullRun) {
+//                 nullRun = false;
+//             } else {
+//                 console.log('file changed')
+//                 sendProgressData.push(content)
+//             }
+//         }
+
+//         // const file = fileReader.watch((content) => {
+//         //     fillProgressArray(content, sendProgressData)
+//         //     console.log(content)
+//         // });
+        
+//         fileReader.watch((content) => {
+//             fillProgressArray(content, sendProgressData)
+//             console.log(content)
+//         });
+
+//         // file.remove();
+        
+//     } catch (error) {
+//         console.error("An error occurred loading send progress:", error);
+//         return null;
+//     }
+// }
+
+// // Function to run both functions concurrently
+// export async function sendAndReadProgress(sendingData : SendingDataset, sendProgress : SendProgress[]) {
+//     try {
+//         // Run both functions concurrently using Promise.all
+//         const [snapshotResult, sendProgressData] = await Promise.all([
+//             sendSnapshot(sendingData),
+//             readSendProgress(sendProgress),
+//         ]);
+
+//         console.log('Progress data:', sendProgress);
+//         console.log('Sent snapshot result:', snapshotResult);
+
+//         // return snapshotResult;
+//     } catch (error) {
+//         console.error("An error occurred in sendAndReadProgress:", error);
+//         // return null;
+//     }
+// }
 
 export async function doesDatasetExist(sendingData : SendingDataset) {
     try {
@@ -211,32 +267,4 @@ export async function formatRecentSnaps(sendingData : SendingDataset, snapSnips 
 	} catch(error) {
 		console.error("An error occurred getting snapSnips:", error);
 	}
-}
-
-export async function readSendProgress(sendProgressData : SendProgress[]) {
-    try {
-        // Replace 'path/to/your/file.json' with the actual path to your JSON file
-        const response = await fetch('/run/user/0/send_output.json');
-        
-        if (!response.ok) {
-            throw new Error(`Failed to fetch data. Status: ${response.status}`);
-        }
-    
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            console.error('Invalid content type. Expected JSON.');
-            console.log('Raw response:', await response.text());  // Log the raw response
-        }
-      
-        const data = await response.json();
-        console.log('Raw JSON data:', data);  // Log the raw data to inspect the response
-        // sendProgressData = data;
-
-        // return sendProgressData;
-      } catch (error) {
-        console.error("An error occurred loading send progress:", error);
-        // return null;
-      }
-
-      return sendProgressData;
 }

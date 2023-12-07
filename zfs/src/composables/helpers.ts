@@ -62,10 +62,13 @@ export const convertSizeToBytes = (size) => {
 };
 
 export const convertSizeToBytesDecimal = (size) => {
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const sizesWithoutByte = ['B', 'K', 'M', 'G', 'TB', 'P', 'E', 'Z', 'Y'];
+	const sizesWithByte = sizesWithoutByte.map(unit => unit + 'B');
+
+	const combinedSizes = [...sizesWithoutByte, ...sizesWithByte];
     const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
 
-    const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
+    const index = combinedSizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
     const bytes = parseFloat(value) * Math.pow(1000, index); // Use 1000 for decimal prefixes
 
     return bytes;

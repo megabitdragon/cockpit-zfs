@@ -2,6 +2,7 @@
 import subprocess
 import argparse
 import time
+import datetime
 import re
 import json
 import threading
@@ -50,20 +51,6 @@ def destroy_for_overwrite_remote(recvName, recvHostUser, recvHost, recvPort=22):
         print(f"Error: {stderr}")
     else:
         print(stdout)
-
-# def read_progress(file_path):
-#     while True:
-#         try:
-#             with open(file_path, 'r') as json_file:
-#                 progress_data = json.load(json_file)
-#                 for data in progress_data:
-#                     # Process the progress data as needed
-#                     print(data)
-#         except FileNotFoundError:
-#             pass  # File not found, handle accordingly
-#         except json.JSONDecodeError:
-#             pass  # JSON decoding error, handle accordingly
-#         time.sleep(1)  # Adjust the sleep duration as needed
 
 def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False, recvHost="", recvPort=22, recvHostUser=""):
     try:
@@ -146,17 +133,20 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             )
 
         # Initialize variables 
-        snapshot_name = None
+        snapshot_name = sendName
         total_size = None
         update_size = None
-        status = "ongoing"
+        status = None
         output_data = []
         final_data = None
 
-        # while True:
+        file_path = "full_output.json"
+        if os.path.exists(file_path):
+            os.remove(file_path)
+       
         while process_send.poll() is None:
             output = process_send.stderr.readline()
-          
+            
             if output:
                 # Extract total size
                 pattern_total = r'estimated size is (\d+(\.\d+)?[KMG])'
@@ -170,20 +160,23 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
                 if match_progress:
                     update_size = match_progress.group(2)
                     snapshot_name = match_progress.group(4)
+                    status = "ongoing"
 
                     # Create a data dictionary
                     data = {
-                        "snapSent": snapshot_name,
+                        "snapshot": snapshot_name,
                         "status": status,
-                        "progSize": update_size,
+                        "sent": update_size,
                         "totalSize": total_size,
                     }
-      
-                    # Append data to the output_data list
-                    output_data.append(data)
 
-                    # Print the data for verification
-                    print(data)
+                    output_data.append(data)
+                    # print(data)
+
+                    with open(file_path, 'w') as json_file:
+                        # Loop to append each line one at a time
+                        json_file.write(json.dumps(data) + '\n')
+                        json_file.flush()
 
         while process_recv.poll() is None:
             recv_output = process_recv.stdout.readline()
@@ -197,26 +190,22 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
                 if match_final_progress:
                     received_size = match_final_progress.group(1)
                     status = "finished"
+                    
                     # Create the final data object
                     final_data = {
-                        "snapSent": snapshot_name,
+                        "snapshot": snapshot_name,
                         "status": status,
-                        "progSize": received_size,
+                        "sent": received_size,
                         "totalSize": total_size,
                     }
 
-                    print(final_data)
+                    # Print the data for verification
+                    # print(final_data)
+                    output_data.append(final_data)
 
-       # Check if final_data is defined before appending to output_data
-        if final_data is not None and any(final_data):
-            output_data.append(final_data)
-
-        print("Current Working Directory:", os.getcwd())
-        # When running script from Client, stores output.json in /run/user/0
-
-        # Write the entire output_data list to the JSON file
-        with open('send_output.json', "w") as json_file:
-            json.dump(output_data, json_file, indent=2)
+                    with open(file_path, 'w') as json_file:
+                        json_file.write(json.dumps(final_data) + '\n')
+                        json_file.flush()
 
         stdout, stderr = process_recv.communicate()
 
@@ -225,13 +214,13 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
         else:
             print(stdout)
 
-        # print(json.dumps(output_data, indent=2))
-        return(json.dumps(output_data, indent=2))
+        # Print out entire JSON
+        print(json.dumps(output_data, indent=2))
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
-def main() :
+def main() : 
     parser = argparse.ArgumentParser(description='Send ZFS Dataset')
     parser.add_argument('sendName', type=str, help='sending dataset name')
     parser.add_argument('recvName', type=str, help='receiving dataset name')
@@ -255,10 +244,10 @@ def main() :
     recvPort = args.recvPort
     recvHostUser = args.recvHostUser
 
-    if sendName2 != "":
-        print(f"Sending incrementally to {recvName} from {sendName2} to {sendName}")
-    else:
-        print(f"Executing command: zfs send {sendName} | {recvName}")
+    # if sendName2 != "":
+    #     print(f"Sending incrementally to {recvName} from {sendName2} to {sendName}")
+    # else:
+    #     print(f"Executing command: zfs send {sendName} | {recvName}")
 
     send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw, recvHost, recvPort, recvHostUser)
 

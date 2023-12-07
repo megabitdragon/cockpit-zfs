@@ -368,10 +368,10 @@ interface SnapSnippet {
 }
 
 interface SendProgress {
-	snapSent: string;
+	snapshot: string;
 	status: string;
 	totalSize: string;
-	progSize: string;
+	sent: string;
 }
 
 type ConfirmationCallback = () => void;
