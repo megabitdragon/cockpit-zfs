@@ -408,10 +408,8 @@ const sendPercentage = computed(() => {
     }
 });
 
-async function readSendProgress(sendProgressData : SendProgress[]) {
+async function readSendProgress(sendProgressData : SendProgress[], fileReader : BetterCockpitFile) {
     try {
-        const fileReader = new BetterCockpitFile('/run/user/0/full_output.json', { syntax: JSON });
-
         let initialRun = true;
         let nullRun = true;
        
@@ -423,11 +421,16 @@ async function readSendProgress(sendProgressData : SendProgress[]) {
             } else {
                 // console.log('file changed')
                 tracking.value = true;
-                sendProgressData.push(content)
-                totalSendSize.value = getTotalSendSize(content.totalSize);
-                sendProgressAmount.value = getSendProgress(content.sent);
-                console.log(`content.totalSize: ${content.totalSize}, content.sent: ${content.sent}`);
-                console.log(`totalSendSize: ${totalSendSize.value}, sendProgAmount: ${sendProgressAmount.value}`);
+                if (content == null) {
+                    console.log('error: content nul, send data too small to track');
+                } else {
+                    sendProgressData.push(content)
+                    totalSendSize.value = getTotalSendSize(content.totalSize);
+                    sendProgressAmount.value = getSendProgress(content.sent);
+                    console.log(`content.totalSize: ${content.totalSize}, content.sent: ${content.sent}`);
+                    console.log(`totalSendSize: ${totalSendSize.value}, sendProgAmount: ${sendProgressAmount.value}`);
+                }
+               
             }
         }
 
@@ -442,6 +445,7 @@ async function readSendProgress(sendProgressData : SendProgress[]) {
         });
 
         // file.remove();
+        // fileReader.close();
 
     } catch (error) {
         console.error("An error occurred loading send progress:", error);
@@ -452,15 +456,17 @@ async function readSendProgress(sendProgressData : SendProgress[]) {
 // Function to run both functions concurrently
 async function sendAndReadProgress(sendingData : SendingDataset, sendProgress : SendProgress[]) {
     try {
+        const fileReader = new BetterCockpitFile('/run/user/0/full_output.json', { syntax: JSON });
         // Run both functions concurrently using Promise.all
         const [snapshotResult, sendProgressData] = await Promise.all([
             sendSnapshot(sendingData),
-            readSendProgress(sendProgress),
+            readSendProgress(sendProgress, fileReader),
         ]);
 
         console.log('Progress data:', sendProgress);
         console.log('Sent snapshot result:', snapshotResult);
 
+        fileReader.close();
         // return snapshotResult;
     } catch (error) {
         console.error("An error occurred in sendAndReadProgress:", error);

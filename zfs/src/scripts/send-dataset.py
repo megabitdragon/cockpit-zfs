@@ -177,42 +177,47 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
                         # Loop to append each line one at a time
                         json_file.write(json.dumps(data) + '\n')
                         json_file.flush()
-
-        while process_recv.poll() is None:
-            recv_output = process_recv.stdout.readline()
-
-            # Check for the "received" line structure
-            if "received" in str(recv_output):
-                # Extract the final progress information
-                pattern_final_progress = r'received\s+([\d.]+[KMG]?)\s+stream\s+in\s+(\d+)\s+seconds\s+\(([\d.]+[KMG]?)\/sec\)'
-
-                match_final_progress = re.search(pattern_final_progress, str(recv_output))
-                if match_final_progress:
-                    received_size = match_final_progress.group(1)
-                    status = "finished"
                     
-                    # Create the final data object
-                    final_data = {
-                        "snapshot": snapshot_name,
-                        "status": status,
-                        "sent": received_size,
-                        "totalSize": total_size,
-                    }
+                if match_progress is False:
+                    break
+        if recvHost == "":
+            while process_recv.poll() is None:
+                recv_output = process_recv.stdout.readline()
 
-                    # Print the data for verification
-                    # print(final_data)
-                    output_data.append(final_data)
+                # Check for the "received" line structure
+                if "received" in str(recv_output):
+                    # Extract the final progress information
+                    pattern_final_progress = r'received\s+([\d.]+[KMG]?)\s+stream\s+in\s+(\d+)\s+seconds\s+\(([\d.]+[KMG]?)\/sec\)'
 
-                    with open(file_path, 'w') as json_file:
-                        json_file.write(json.dumps(final_data) + '\n')
-                        json_file.flush()
+                    match_final_progress = re.search(pattern_final_progress, str(recv_output))
+                    if match_final_progress:
+                        received_size = match_final_progress.group(1)
+                        status = "finished"
+                        
+                        # Create the final data object
+                        final_data = {
+                            "snapshot": snapshot_name,
+                            "status": status,
+                            "sent": received_size,
+                            "totalSize": total_size,
+                        }
 
-        stdout, stderr = process_recv.communicate()
+                        # Print the data for verification
+                        # print(final_data)
+                        output_data.append(final_data)
 
-        if process_recv.returncode != 0:
-            print(f"Error: {stderr}")
+                        with open(file_path, 'w') as json_file:
+                            json_file.write(json.dumps(final_data) + '\n')
+                            json_file.flush()
+
+            stdout, stderr = process_recv.communicate()
+
+            if process_recv.returncode != 0:
+                print(f"Error: {stderr}")
+            else:
+                print(stdout)
         else:
-            print(stdout)
+            print('remote')
 
         # Print out entire JSON
         print(json.dumps(output_data, indent=2))
