@@ -141,7 +141,7 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 	try {
         console.log('sendingData (snapshots.ts - sendSnapshot):', sendingData);
 
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser, sendingData.mBufferConfig!.size, sendingData.mBufferConfig!.unit], { superuser: 'try', stderr: 'out'});
 
 		const output = await state.promise();
 		console.log('sendSnapshot completed');
@@ -151,62 +151,6 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 		return null;
 	}
 }
-
-
-// export async function readSendProgress(sendProgressData : SendProgress[]) {
-//     try {
-//         const fileReader = new BetterCockpitFile('/run/user/0/full_output.json', { syntax: JSON });
-
-//         let initialRun = true;
-//         let nullRun = true;
-
-//         function fillProgressArray(content, sendProgressData : SendProgress[]) {
-//             if (initialRun && nullRun) {
-//                 initialRun = false;
-//             } else if (!initialRun && nullRun) {
-//                 nullRun = false;
-//             } else {
-//                 console.log('file changed')
-//                 sendProgressData.push(content)
-//             }
-//         }
-
-//         // const file = fileReader.watch((content) => {
-//         //     fillProgressArray(content, sendProgressData)
-//         //     console.log(content)
-//         // });
-        
-//         fileReader.watch((content) => {
-//             fillProgressArray(content, sendProgressData)
-//             console.log(content)
-//         });
-
-//         // file.remove();
-        
-//     } catch (error) {
-//         console.error("An error occurred loading send progress:", error);
-//         return null;
-//     }
-// }
-
-// // Function to run both functions concurrently
-// export async function sendAndReadProgress(sendingData : SendingDataset, sendProgress : SendProgress[]) {
-//     try {
-//         // Run both functions concurrently using Promise.all
-//         const [snapshotResult, sendProgressData] = await Promise.all([
-//             sendSnapshot(sendingData),
-//             readSendProgress(sendProgress),
-//         ]);
-
-//         console.log('Progress data:', sendProgress);
-//         console.log('Sent snapshot result:', snapshotResult);
-
-//         // return snapshotResult;
-//     } catch (error) {
-//         console.error("An error occurred in sendAndReadProgress:", error);
-//         // return null;
-//     }
-// }
 
 export async function doesDatasetExist(sendingData : SendingDataset) {
     try {

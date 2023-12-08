@@ -38,7 +38,24 @@
                     <label :for="getIdKey('receiving-port')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Port:</label>
                     <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
                 </div>
-                <div class="mt-2 grid grid-flow-col grid-cols-2">
+                <!-- If Remote Send, have mBuffer size configurable -->
+                <div v-if="destinationHost != ''" class="mt-2 grid grid-cols-4 gap-2">
+                    <div class="col-span-2 grid grid-cols-2 justify-items-center">
+                        <label :for="getIdKey('mbuffer-size')" class="mt-1 text-sm font-medium leading-6 text-default w-full col-span-1">mBuffer Size:</label>
+                        <input @keydown.enter="" :id="getIdKey('mbuffer-size')" type="number" class="input-textlike bg-default mt-1 w-full py-1.5 px-1.5 text-default col-span-1" name="mbuffer-size" v-model="mBufferSize"/>
+                    </div>
+                    <div class="col-span-2 grid grid-cols-2 justify-items-center">
+                        <label :for="getIdKey('mbuffer-unit')" class="mt-1 text-sm font-medium leading-6 text-default w-full col-span-1">mBuffer Unit:</label>
+                        <select :id="getIdKey('mbuffer-unit')" name="mbuffer-unit" class="text-default bg-default mt-1 w-full input-textlike col-span-1" v-model="mBufferUnit">
+                            <option value="b">b</option>
+                            <option value="k">k</option>
+                            <option value="M">M</option>
+                            <option value="G">G</option>
+                        </select>
+                    </div>
+                </div>
+              
+                <div class="mt-2 grid grid-flow-col">
                     <!-- Send Compressed: [Checkbox -> (-Lce) options] *** Cannot be used if Encrypted -->
                     <label :for="getIdKey('send-compressed-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                         Send Compressed: 
@@ -132,6 +149,8 @@ const destinationHostUser = ref('');
 const datasetCheckResult = ref();
 const snapSnips = ref<SnapSnippet[]>([]);
 const sendProgressData = ref<SendProgress[]>([]);
+const mBufferSize = ref(1);
+const mBufferUnit = ref('G');
 
 const showTestSSH = ref(false);
 
@@ -157,6 +176,10 @@ const sendingData = ref<SendingDataset>({
         forceOverwrite: forceOverwrite.value,
     },
     recvHostUser: destinationHostUser.value,
+    mBufferConfig: {
+        size: mBufferSize.value,
+        unit: mBufferUnit.value,
+    }
 });
 
 function handleCheckboxChange(checkbox) {
@@ -270,6 +293,8 @@ async function setSendData() {
                 sendIncremental.value = false;
                 sendingData.value.sendIncName! = "";
             }
+            sendingData.value.mBufferConfig!.size = mBufferSize.value;
+            sendingData.value.mBufferConfig!.unit = mBufferUnit.value;
         }
     }
 }

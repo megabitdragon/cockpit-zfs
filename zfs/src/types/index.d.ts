@@ -359,6 +359,10 @@ interface SendingDataset {
 		forceOverwrite?: boolean;
 	}
 	recvHostUser?: string;
+	mBufferConfig?: {
+		size: number;
+		unit: string; 
+	}
 }
 
 interface SnapSnippet {

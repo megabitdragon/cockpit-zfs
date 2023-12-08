@@ -31,7 +31,8 @@
             "samba-common-bin",
             "systemd",
             "winbind",
-            "gawk"
+            "gawk",
+            "mbuffer"
         ]
     }
 }

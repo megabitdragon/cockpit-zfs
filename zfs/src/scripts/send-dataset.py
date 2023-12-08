@@ -64,7 +64,7 @@ def remove_remote_file(hostname, username, port=22):
     else:
         print(stdout)
 
-def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False, recvHost="", recvPort=22, recvHostUser=""):
+def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compressed=False, raw=False, recvHost="", recvPort=22, recvHostUser="", mBufferSize=1, mBufferUnit="G"):
     try:
         # Initialize variables 
         snapshot_name = sendName
@@ -212,6 +212,17 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             if forceOverwrite:
                 destroy_for_overwrite_remote(recvName, recvHostUser, recvHost, recvPort)
 
+            m_buff_cmd = ['mbuffer', '-s', '128k']
+            m_buff_cmd.extend(['-m', mBufferSize + mBufferUnit])
+
+            process_m_buff = subprocess.Popen(
+                m_buff_cmd,
+                stdin=process_send.stdout,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+            )
+
             ssh_cmd = ['ssh']
 
             if recvPort != '22':
@@ -232,11 +243,12 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
 
             process_ssh_recv = subprocess.Popen(
                 ssh_cmd,
-                stdin=process_send.stdout,
+                stdin=process_m_buff.stdout,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 universal_newlines=True,
             )
+
             while process_send.poll() is None:
                 output = process_send.stderr.readline()
                 
@@ -333,6 +345,8 @@ def main() :
     parser.add_argument('recvHost', type=str, help='receiving dataset host')
     parser.add_argument('recvPort', type=str, default='22', help='receiving dataset port')
     parser.add_argument('recvHostUser', type=str, help='receiving dataset host user')
+    parser.add_argument('mBufferSize', type=str, default='1', help='mbuffer size')
+    parser.add_argument('mBufferUnit', type=str, default="G", help='mbuffer unit')
 
     args = parser.parse_args()
 
@@ -345,13 +359,15 @@ def main() :
     recvHost = args.recvHost
     recvPort = args.recvPort
     recvHostUser = args.recvHostUser
+    mBufferSize = args.mBufferSize
+    mBufferUnit = args.mBufferUnit
 
     # if sendName2 != "":
     #     print(f"Sending incrementally to {recvName} from {sendName2} to {sendName}")
     # else:
     #     print(f"Executing command: zfs send {sendName} | {recvName}")
 
-    send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw, recvHost, recvPort, recvHostUser)
+    send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw, recvHost, recvPort, recvHostUser, mBufferSize, mBufferUnit)
 
 if __name__ == '__main__':
     main()
