@@ -212,7 +212,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             if forceOverwrite:
                 destroy_for_overwrite_remote(recvName, recvHostUser, recvHost, recvPort)
 
-            m_buff_cmd = ['mbuffer', '-s', '128k']
+            m_buff_cmd = ['mbuffer', '-s', '256k']
             m_buff_cmd.extend(['-m', mBufferSize + mBufferUnit])
 
             process_m_buff = subprocess.Popen(
