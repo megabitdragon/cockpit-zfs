@@ -6,7 +6,7 @@
 					{{ props.disk.name }} ({{ props.disk.type }})
 				</div>
 				<div class="px-1">
-					<img class="w-4 h-4" src="../../../public/icons/success.svg">
+					<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
 				</div>
 				<!-- <div id="menu-btn" class="ml-5">
 					<Menu as="div" class="relative inline-block text-right ">
@@ -78,7 +78,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed, provide } from 'vue';
-import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import DiskDetail from './DiskDetail.vue';
 import Card from '../common/Card.vue';

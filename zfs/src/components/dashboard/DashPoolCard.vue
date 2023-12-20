@@ -60,7 +60,7 @@
 						<span class="text-success">{{props.pool.status}}</span>
 					</div>
 					<div>
-						<img class="aspect-square w-4 h-4 min-w-4 min-h-4" src="../../../public/icons/success.svg">
+						<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
 					</div>					
 				</div>
 
@@ -142,7 +142,7 @@
 
 <script setup lang="ts">
 import { ref, inject, Ref, computed, provide, watch, watchEffect, ComputedRef, onMounted} from "vue";
-import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";

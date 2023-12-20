@@ -118,7 +118,7 @@
 			<div v-if="!creatingPool && poolCreated" class="">
 				<div class="grid justify-center justify-items-center">
 					<legend class="text-lg text-success">Pool Created!</legend>
-					<img class="aspect-square w-24 h-24 min-w-24 min-h-24" src="../../../public/icons/success.svg">
+					<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
 				</div>
 			</div>
 		</div>
@@ -138,7 +138,7 @@
 			<div v-if="!creatingPool && !creatingFilesystem && filesystemCreated" class="">
 				<div class="grid justify-center justify-items-center">
 					<legend class="text-lg text-success">File System Created!</legend>
-					<img class="aspect-square w-24 h-24 min-w-24 min-h-24" src="../../../public/icons/success.svg">
+					<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
 				</div>
 			</div>
 		</div>
@@ -149,6 +149,7 @@
 import { inject, Ref} from 'vue';
 import Card from '../common/Card.vue';
 import Accordion from '../common/Accordion.vue';
+import { EllipsisVerticalIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
