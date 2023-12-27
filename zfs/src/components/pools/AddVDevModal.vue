@@ -60,7 +60,7 @@
 
 				<!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
-                <ul :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
+                <ul v-if="availableDisks.length > 0" :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
                         :class="diskCardClass(disk.name)">
@@ -75,6 +75,9 @@
                         </button>
                     </li>
                 </ul>
+                <div v-if="availableDisks.length == 0">
+                    No Disks Available
+                </div>
 
             </div>
         </template>

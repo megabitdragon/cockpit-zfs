@@ -144,7 +144,7 @@
 
 </template>
 <script setup lang="ts">
-import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
+import { reactive, ref, inject, Ref, computed, provide, watch, onMounted } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
 import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { getTimestampString, upperCaseWord, isBoolOnOff, convertTimestampToLocal } from '../../composables/helpers';
@@ -178,7 +178,9 @@ const snapshotsInFilesystem = ref<Snapshot[]>([]);
 const selectedSnapshot = ref<Snapshot>();
 
 // loadTheseSnapshots();
-refreshSnaps();
+onMounted(() => {
+	refreshSnaps();
+});
 
 async function refreshData() {
 	datasetsLoaded.value = false;

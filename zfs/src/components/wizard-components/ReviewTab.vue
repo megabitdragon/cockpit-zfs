@@ -118,7 +118,7 @@
 			<div v-if="!creatingPool && poolCreated" class="">
 				<div class="grid justify-center justify-items-center">
 					<legend class="text-lg text-success">Pool Created!</legend>
-					<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
+					<CheckCircleIcon class="aspect-square w-10 h-10 text-green-400"/>
 				</div>
 			</div>
 		</div>
@@ -138,7 +138,7 @@
 			<div v-if="!creatingPool && !creatingFilesystem && filesystemCreated" class="">
 				<div class="grid justify-center justify-items-center">
 					<legend class="text-lg text-success">File System Created!</legend>
-					<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
+					<CheckCircleIcon class="aspect-square w-10 h-10 text-green-400"/>
 				</div>
 			</div>
 		</div>
