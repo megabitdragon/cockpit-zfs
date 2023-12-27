@@ -1,6 +1,6 @@
 <template>
-	<button v-on:dblclick="showDetails(props.pool)" class="w-full h-full">
-		<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
+	<button v-on:dblclick="showDetails(props.pool)" class="min-w-96 w-full min-h-96 h-full">
+		<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-96 w-full min-h-96 h-full overflow-visible bg-plugin-header rounded-md border border-default">
 			<template v-slot:title>
 				<div class="flex flex-row justify-between">
 					<div class="text-default">
@@ -80,16 +80,16 @@
 				
 			</template>
 			<template v-slot:content>
-				<div class="grid grid-cols-4 gap-1 w-full h-max rounded-sm justify-center">
-					<Status :pool="props.pool" :isTrim="false" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'scrub-status-box'" ref="scanStatus"/>
-					<Status :pool="props.pool" :isTrim="true" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'stats-status-box'" ref="trimStatus"/>
-				</div>
-			</template>
-			<template v-slot:footer>
 				<div class="grid grid-rows-3">
 					<p class="row-start-1">Used {{ props.pool.properties.allocated }}</p>
 					<p class="row-start-2">Free {{ props.pool.properties.free }}</p>
 					<p class="row-start-3"><b>Total {{ props.pool.properties.size }}</b></p>
+				</div>
+			</template>
+			<template v-slot:footer>
+				<div class="grid grid-cols-4 gap-1 min-h-full w-full h-max rounded-sm justify-center">
+					<Status :pool="props.pool" :isTrim="false" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'scrub-status-box'" ref="scanStatus"/>
+					<Status :pool="props.pool" :isTrim="true" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'stats-status-box'" ref="trimStatus"/>
 				</div>
 			</template>
 		</Card>
