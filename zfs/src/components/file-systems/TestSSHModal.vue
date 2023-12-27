@@ -6,7 +6,8 @@
         <template v-slot:content>
             <label :for="getIdKey('ssh-test')" class="mt-1 block text-sm font-medium leading-6 text-default">SSH Target:</label>
             <input @keydown.enter="" :id="getIdKey('ssh-test')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="ssh-target" v-model="sshTarget" placeholder="user@hostname or just hostname"/>
-            <p class="text-default mt-2">{{ resultMsg }}</p>
+            <p v-if="result" class="text-success mt-2">{{ resultMsg }}</p>
+            <p v-if="!result" class="text-danger mt-2">{{ resultMsg }}</p>
         </template>
         <template v-slot:footer>
             <div class="w-full grid grid-rows-1">
@@ -55,10 +56,10 @@ const closeModal = () => {
 const sshTarget = ref('');
 const testing = ref(false);
 const resultMsg = ref('');
+const result = ref(false);
 
 async function confirmTest(sshTarget) {
     testing.value = true;
-    const result = ref(false);
     resultMsg.value = "";
 
     result.value = await testSSH(sshTarget);

@@ -32,13 +32,18 @@
 								</th>
 							</tr>
 						</thead>
+						<tbody>
+							<tr>
+								<div v-if="poolData.length > 0 && poolsLoaded == true">
+									<div v-for="pool, poolIdx in poolData" :key="poolIdx" >
+										<PoolListElement :poolIdx="poolIdx" :pool="pool"/>
+									</div>
+								</div>
+							</tr>
+						</tbody>
 					</table>
 					
-					<div v-if="poolData.length > 0 && poolsLoaded == true">
-						<div v-for="pool, poolIdx in poolData" :key="poolIdx" >
-							<PoolListElement :poolIdx="poolIdx" :pool="pool"/>
-						</div>
-					</div>
+			
 					
 					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default rounded-md">
 						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"  class="font-semibold text-lg my-0.5"/>

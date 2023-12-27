@@ -187,8 +187,8 @@
 						<div class="ml-3">
 							<label :for="getIdKey('steps-range')" class="mt-1 block text-sm font-medium text-default">Refreservation</label>
 							<div class="flex flex-row">
-								<input :id="getIdKey('steps-range')" v-model="poolConfig.properties.refreservationPercent" type="range" min="0" max="20" value="10" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer ">
-								<input :id="getIdKey('steps-range')" v-model="poolConfig.properties.refreservationPercent" type="number" min="0" max="20" value="10" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-2 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
+								<input :id="getIdKey('steps-range')" v-model="poolConfig.properties.refreservationPercent" type="range" min="0" max="20" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer ">
+								<input :id="getIdKey('steps-range')" v-model="poolConfig.properties.refreservationPercent" type="number" min="0" max="20" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-2 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
 								<p class="mt-3">%</p>
 							</div>
 						</div>

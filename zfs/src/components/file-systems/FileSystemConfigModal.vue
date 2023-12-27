@@ -54,8 +54,8 @@
                <div class="mt-2">
                     <label :for="getIdKey('fs-config-quota')" class="mb-1 block text-sm font-medium leading-6 text-default">Quota</label>
                     <div class="flex flex-row">
-                        <input v-model="fileSystemConfig.properties.quota.raw" :id="getIdKey('fs-config-quota-amount')" name="fs-config-quota-slider" type="range" min="0" max="1000" value="0" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
-                        <input v-model="fileSystemConfig.properties.quota.raw" type="number" name="fs-config-quota-num" :id="getIdKey('fs-config-quota-num')" min="0" max="1000" value="0" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
+                        <input v-model="fileSystemConfig.properties.quota.raw" :id="getIdKey('fs-config-quota-amount')" name="fs-config-quota-slider" type="range" min="0" max="1000" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
+                        <input v-model="fileSystemConfig.properties.quota.raw" type="number" name="fs-config-quota-num" :id="getIdKey('fs-config-quota-num')" min="0" max="1000" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
                         <select v-model="fileSystemConfig.properties.quota.unit" :id="getIdKey('fs-config-quota-size')" name="fs-config-quota-size" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
                             <option value="kib">KiB</option>
                             <option value="mib">MiB</option>
@@ -93,8 +93,8 @@
                 <div class="mt-2">
                     <label :for="getIdKey('fs-config-refreservation')" class="mb-1 block text-sm font-medium leading-6 text-default">Refreservation</label>
                     <div class="flex flex-row">
-                        <input v-model="fileSystemConfig.properties.refreservation!.raw" :id="getIdKey('fs-config-refreservation-amount')"  name="fs-config-refreservation-slider" type="range" min="0" max="1000" value="0" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
-                        <input v-model="fileSystemConfig.properties.refreservation!.raw" type="number" name="fs-config-refreservation-num" :id="getIdKey('fs-config-refreservation-num')" min="0" max="1000" value="0" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
+                        <input v-model="fileSystemConfig.properties.refreservation!.raw" :id="getIdKey('fs-config-refreservation-amount')"  name="fs-config-refreservation-slider" type="range" min="0" max="1000" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
+                        <input v-model="fileSystemConfig.properties.refreservation!.raw" type="number" name="fs-config-refreservation-num" :id="getIdKey('fs-config-refreservation-num')" min="0" max="1000" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>
                         <select v-model="fileSystemConfig.properties.refreservation!.unit" :id="getIdKey('fs-config-refreservation-size')" name="fs-config-refreservation-size" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
                             <option value="kib">KiB</option>
                             <option value="mib">MiB</option>
