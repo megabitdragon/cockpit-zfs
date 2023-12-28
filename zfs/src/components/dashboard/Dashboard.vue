@@ -1,5 +1,5 @@
 <template>
-	<div class="min-w-full max-w-full max-h-full py-2 pb-4 align-middle sm:px-6 lg:px-8 sm:rounded-lg bg-accent rounded-md border border-default">
+	<div class="min-w-full max-w-full max-h-full py-2 pb-4 align-middle sm:px-4 lg:px-6 sm:rounded-lg bg-accent rounded-md border border-default">
 		<div name="pools">
 			<!-- Pools summary -->
 			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
@@ -13,14 +13,14 @@
 					<h6 class="mt-2"> Total Effective Space: {{ totalEffectivePoolSpace }} </h6>
 				</div>
 				<div class="p-2 flex justify-end">
-					<button class="btn btn-primary" @click="refreshAllData">
+					<button class="btn btn-secondary" @click="refreshAllData">
 						<ArrowPathIcon class="h-5 w-5 m-1" aria-hidden="true"/>
 					</button>
 				</div>
 			</div>
 
 			<!-- pools summary loading spinner -->
-			<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-flow-col grid-cols-4 bg-well gap-2 justify-items-center rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5 ">
+			<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-flow-col grid-cols-3 bg-well gap-2 justify-items-center rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5 ">
 				<LoadingSpinner :width="'w-11'" :height="'h-11'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'" class="col-span-4 my-2"/>
 			</div>
 
@@ -37,14 +37,14 @@
 			</div>
 
 			<!-- pools card layout -->
-			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-cols-4 auto-rows-max gap-2 mb-2">
+			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-cols-3 auto-rows-max gap-2 mb-2">
 				<div v-for="(pool, index) in pools" :key="index" class="col-span-1 w-full min-w-full h-full min-h-full">
 					<DashPoolCard :pool="pools[index]!"/>
 				</div>
 			</div>
 
 			<!-- pools card loading skeleton -->
-			<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-cols-4 justify-items-center">
+			<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-cols-3 justify-items-center">
 				<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 			</div>
 		</div>

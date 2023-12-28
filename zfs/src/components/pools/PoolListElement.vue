@@ -1,137 +1,37 @@
 <template>
 	<div>
-		<!-- <table>
-			<tbody>
-				<tr>
-					<td style="width: 100%;" colspan="9">
-						<Disclosure>
-							<DisclosureButton class="w-full grid grid-cols-9 grid-flow-cols bg-default rounded-b-md border border-solid border-default">
-								<td class="py-6 mt-1 col-span-1">
-									{{ poolData[props.poolIdx].name }}
-								</td>
-								<td class="py-6 mt-1 col-span-1">
-									{{ poolData[props.poolIdx].status }}
-								</td>
-								<td class="py-6 mt-1 col-span-1">
-									<div class="w-full bg-well rounded-full text-center">
-										<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
-											<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
-												{{ poolData[props.poolIdx].properties.capacity }}%
-											</div>
-										</div>
-										<div v-if="poolData[props.poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-6 mt-0.5 min-h-min max-h-max overflow-hidden">
-											<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
-												<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-													{{ poolData[props.poolIdx].properties.capacity }}%
-												</div>
-											</div>
-										</div>
-									</div>
-								</td>
-								<td class="py-6 mt-1 col-span-1">
-									{{ poolData[props.poolIdx].properties.allocated }}
-								</td>
-								<td class="py-6 mt-1 col-span-1">
-									{{ poolData[props.poolIdx].properties.free }}
-								</td>
-								<td class="py-6 mt-1 col-span-1">
-									{{ poolData[props.poolIdx].properties.size }}
-								</td>
-								<td class="py-6 -mt-1 col-span-2">
-									<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
-								</td>
-								<td class="py-6 mt-1 col-span-1 relative p-3 text-right font-medium sm:pr-6 lg:pr-8">
-									<Menu as="div" class="relative inline-block text-right -mt-1">
-										<div>
-											<MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-												<span class="sr-only">Open options</span>
-												<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
-											</MenuButton>
-										</div>
-
-										<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-											<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-												<div class="py-1">
-													<MenuItem as="div" v-slot="{ active }">
-														<a href="#" @click="showPoolModal(poolData[props.poolIdx])!" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
-													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a href="#" @click="clearPoolErrors(poolData[props.poolIdx].name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
-													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a href="#" @click="resilverThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
-													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a v-if="!scanActivity!.isActive" href="#" @click="scrubThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
-														<a v-if="scanActivity!.isActive && scanActivity!.isPaused" href="#" @click="resumeScrub(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume Scrub</a>
-														<a v-if="scanActivity!.isActive && !scanActivity!.isPaused" href="#" @click="pauseScrub(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause Scrub</a>
-													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a v-if="scanActivity!.isActive" href="#" @click="stopScrub(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
-													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="trimThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
-														<a v-if="trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="resumeTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM (Pool)</a>
-														<a v-if="trimActivity!.isActive && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="pauseTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Pool)</a>
-													</MenuItem>									
-													<MenuItem as="div" v-slot="{ active }">
-														<a v-if="trimActivity!.isActive || trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="stopTrim(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Pool)</a>
-													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a href="#" @click="showAddVDev(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
-													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a href="#" @click="exportThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
-													</MenuItem>
-													<MenuItem as="div" v-slot="{ active }">
-														<a href="#" @click="destroyPoolAndUpdate(poolData[props.poolIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
-													</MenuItem>
-												</div>
-											</MenuItems>
-										</transition>
-									</Menu>
-								</td>
-							</DisclosureButton>
-							<DisclosurePanel>
-								<div v-for="vDev, vDevIdx in poolData[props.poolIdx].vdevs" :key="vDevIdx">
-									<VDevElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="vDev" :vDevIdx="vDevIdx" ref="vDevElement"/> 
+		<div>
+			<Disclosure v-slot="{ open }">
+				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-default rounded-t-md justify-center text-center">
+					<div class="py-6 mt-1 col-span-1 justify-self-center justify-items-center">
+						<ChevronUpIcon
+							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+						/>
+					</div>
+					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].name }}</div>
+					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].status }}</div>
+					<div class="py-6 mt-1 col-span-1">
+						<div class="w-full bg-well rounded-full text-center">
+							<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
+								<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
+									{{ poolData[props.poolIdx].properties.capacity }}%
 								</div>
-							</DisclosurePanel>
-						</Disclosure>
-					</td>
-				</tr>
-			</tbody>
-		</table> -->
-		
-		<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-10'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-9'" :contentColSpan="'col-span-10'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default">
-			<template v-slot:title>
-				<div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center">
-					<button @click="showPoolModal(poolData[props.poolIdx])!" class="grid grid-cols-8 col-span-8 hover:bg-accent pt-1 rounded-r-md">
-						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].name }}</div>
-						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].status }}</div>
-						<div class="py-6 mt-1 col-span-1">
-							<div class="w-full bg-well rounded-full text-center">
-								<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
-									<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
+							</div>
+							<div v-if="poolData[props.poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-6 mt-0.5 min-h-min max-h-max overflow-hidden">
+								<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
+									<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
 										{{ poolData[props.poolIdx].properties.capacity }}%
-									</div>
-								</div>
-								<div v-if="poolData[props.poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-6 mt-0.5 min-h-min max-h-max overflow-hidden">
-									<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
-										<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-											{{ poolData[props.poolIdx].properties.capacity }}%
-										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.allocated }}</div>
-						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.free }}</div>
-						<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.size }}</div>
-						<div class="py-6 -mt-1 col-span-2">
-							<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
-						</div>
-					</button>
+					</div>
+					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.allocated }}</div>
+					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.free }}</div>
+					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.size }}</div>
+					<div class="py-6 -mt-2 col-span-2">
+						<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
+					</div>
 					<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 						<Menu as="div" class="relative inline-block text-right -mt-1">
 							<div>
@@ -183,15 +83,14 @@
 							</transition>
 						</Menu>
 					</div>
-				</div>
-				
-			</template>
-			<template v-slot:content>
-				<div v-for="vDev, vDevIdx in poolData[props.poolIdx].vdevs" :key="vDevIdx">
-					<VDevElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="vDev" :vDevIdx="vDevIdx" ref="vDevElement"/>
-				</div>
-			</template>
-		</Accordion>
+				</DisclosureButton>
+				<DisclosurePanel>
+					<div v-for="vDev, vDevIdx in poolData[props.poolIdx].vdevs" :key="vDevIdx">
+						<VDevElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="vDev" :vDevIdx="vDevIdx" ref="vDevElement"/>
+					</div>
+				</DisclosurePanel>
+			</Disclosure>
+		</div>
 	</div>
 
 	<div v-if="showPoolDetails">
@@ -241,7 +140,7 @@
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted, nextTick } from "vue";
-import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";

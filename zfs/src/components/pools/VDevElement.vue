@@ -1,12 +1,19 @@
 <template>
     <div>
-		<Accordion :btnColor="'btn-secondary'" :gridSize="'grid-cols-10'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-9'" :contentColSpan="'col-span-10'" :isOpen="false" class="btn-secondary rounded-md border border-solid border-default">
-			<template v-slot:title>
-				<div class="grid grid-cols-8 grid-flow-cols justify-center text-center btn-secondary w-full rounded-md mt-1">
-					<div class="col-span-7 text-center py-4 mt-1">
-						{{ props.vDev.name }} ({{ props.vDev.type }})
+		<div>
+			<Disclosure v-slot="{ open }">
+				<DisclosureButton class="grid grid-cols-9 bg-secondary grid-flow-cols justify-center justify-items-center text-center btn-secondary w-full border border-default rounded-t-md mt-1">
+					<div class="py-6 mt-1 col-span-1 justify-self-center justify-items-center">
+						<ChevronUpIcon
+							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+						/>
 					</div>
-					<div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+					<div class="col-span-7 text-center py-6 mt-2 justify-self-center justify-items-center">
+						<div>
+							{{ props.vDev.name }} ({{ props.vDev.type }})
+						</div>
+					</div>
+					<div class="col-span-1 relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-center justify-items-center">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
 								<MenuButton class="flex items-center rounded-full btn-primary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -32,33 +39,32 @@
 							</transition>
 						</Menu>
 					</div>
-				</div>
-			</template>
-			<template v-slot:content>
-				<table class="table-auto min-w-full divide-y divide-default rounded-md bg-secondary text-default">
-					<tr :key="props.vDevIdx" class="rounded-md">
-						<td colspan="9" class="">
-							<table class="min-w-full divide-y divide-default ">
-									<th class="py-3.5 font-semibold text-default col-span-1">Name</th>
-									<th class="py-3.5 font-semibold text-default col-span-1">State</th>
-									<th class="py-3.5 font-semibold text-default col-span-1">Reads</th>
-									<th class="py-3.5 font-semibold text-default col-span-1">Writes</th>
-									<th class="py-3.5 font-semibold text-default col-span-1">Checksum</th>
-									<th class="py-3.5 font-semibold text-default col-span-1">Capacity</th>
-									<th class="py-3.5 font-semibold text-default col-span-2">Message</th>
-									<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
-										<span class="sr-only"></span>
-									</th>
-							</table>
-						</td>
-					</tr>
-				</table>
-				<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx">
-					<DiskElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="props.vDev" :vDevIdx="props.vDevIdx" :disk="disk" :diskIdx="diskIdx" ref="diskElement"/>
-				</div>
-			</template>
-		</Accordion>
-
+				</DisclosureButton>
+				<DisclosurePanel>
+					<table class="table-auto min-w-full divide-y divide-default bg-secondary text-default">
+						<tr :key="props.vDevIdx" class="rounded-md">
+							<td colspan="9" class="">
+								<table class="min-w-full divide-y divide-default ">
+										<th class="py-3.5 font-semibold text-white col-span-1">Name</th>
+										<th class="py-3.5 font-semibold text-white col-span-1">State</th>
+										<th class="py-3.5 font-semibold text-white col-span-1">Reads</th>
+										<th class="py-3.5 font-semibold text-white col-span-1">Writes</th>
+										<th class="py-3.5 font-semibold text-white col-span-1">Checksum</th>
+										<th class="py-3.5 font-semibold text-white col-span-1">Capacity</th>
+										<th class="py-3.5 font-semibold text-white col-span-2">Message</th>
+										<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+											<span class="sr-only"></span>
+										</th>
+								</table>
+							</td>
+						</tr>
+					</table>
+					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx">
+						<DiskElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="props.vDev" :vDevIdx="props.vDevIdx" :disk="disk" :diskIdx="diskIdx" ref="diskElement"/>
+					</div>
+				</DisclosurePanel>
+			</Disclosure>
+		</div>
     </div>
 	<div v-if="showAttachDiskModal">
 		<AttachDiskModal :showFlag="showAttachDiskModal" @close="updateShowAttachDisk" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
@@ -71,8 +77,8 @@
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, watch } from "vue";
-import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
+import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { scrubPool, clearErrors, removeVDevFromPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';

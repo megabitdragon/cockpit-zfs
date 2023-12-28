@@ -1,22 +1,23 @@
 <template>
-	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
-		<!-- buttons for creating/importing pools and refreshing list -->
-		<div class="flex">
-			<div class="button-group-row">
+	<div class="inline-block min-w-full py-4 align-middle sm:px-4 lg:px-6 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
+		<div class="flex bg-well justify-between rounded-md p-2 shadow text-default rounded-b-md ring-1 ring-black ring-opacity-5">
+			<div class="button-group-row justify-start">
 				<button id="createPool" class="btn btn-primary" @click="newPoolWizardBtn">Create Storage Pool</button>
 				<button id="importPool" class="btn btn-secondary" @click="importNewPoolBtn">Import Storage Pool</button>
-				<button id="refreshPools" class="btn btn-secondary" @click="refreshAllData"><ArrowPathIcon class="w-5 h-5"/></button>
-			</div>			
+			</div>
+			<div class="button-group-row justify-end">
+				<button id="refreshPools" class="btn btn-secondary " @click="refreshAllData"><ArrowPathIcon class="w-5 h-5 m-1"/></button>
+			</div>
 		</div>
 
-		<div class="mt-8 overflow-visible rounded-md">
+		<div class="mt-4 overflow-visible rounded-md">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
-
-				<div class="overflow-visible ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+				<div class="overflow-visible ring-1 ring-black ring-opacity-5 sm:rounded-md">
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
 							<tr class="bg-well rounded-t-md grid grid-cols-10">
+
 								<th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -30,10 +31,12 @@
 								<th class="relative py-3.5 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
+
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
+						
+						<tbody class="">
+							<tr class="">
 								<div v-if="poolData.length > 0 && poolsLoaded == true">
 									<div v-for="pool, poolIdx in poolData" :key="poolIdx" >
 										<PoolListElement :poolIdx="poolIdx" :pool="pool"/>
@@ -42,9 +45,7 @@
 							</tr>
 						</tbody>
 					</table>
-					
-			
-					
+									
 					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default rounded-md">
 						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"  class="font-semibold text-lg my-0.5"/>
 					</div>

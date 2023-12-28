@@ -4,30 +4,48 @@
             <div v-if="!isPoolList">
                 <div v-if="!isTrim">
                     <div class="grid grid-cols-4 gap-1 justify-items-center">
-                        <span class="col-span-4 mt-0.5" :class="stateMessageClass()">
+                        <span class="col-span-4 mt-0.5 font-semibold" :class="stateMessageClass()">
                             {{ stateMessage }}
                         </span>
 
-                        <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
-                            <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
-                                <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                                    <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-white text-center p-1.5 leading-none">
-                                        {{ parseFloat(scanPercentage.toFixed(2)) }}%
+                        <div class="col-span-4">
+                            <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
+                                <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                                    <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-white text-center p-1.5 leading-none">
+                                            {{ parseFloat(scanPercentage.toFixed(2)) }}%
+                                        </div>
                                     </div>
                                 </div>
+
+                                <span class="text-muted col-span-4">
+                                    {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
+                                </span>
+
+                                <span v-if="isScanning && !isPaused && !isCanceled && !isFinished" class="col-span-4">
+                                    Completes in {{ timeRemaining }}.                    
+                                </span>
+                                <span v-if="isScanning && isPaused && !isCanceled && !isFinished" class="col-span-4">
+                                    Resume to continue or cancel to stop.                    
+                                </span>
                             </div>
 
-                            <span class="text-muted col-span-4">
-                                {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
-                            </span>
+                            <!-- <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-4 grid grid-cols-4 justify-items-center">
+                                <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                                    <div class="h-6 min-h-min max-h-max w-full">
+                                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+                                            ---
+                                        </div>
+                                    </div>
+                                </div>
 
-                            <span v-if="isScanning && !isPaused && !isCanceled && !isFinished" class="col-span-4">
-                                Completes in {{ timeRemaining }}.                    
-                            </span>
-                            <span v-if="isScanning && isPaused && !isCanceled && !isFinished" class="col-span-4">
-                                Resume to continue or cancel to stop.                    
-                            </span>
+                                <span class="text-muted col-span-4">
+                                    N/A
+                                </span>
+                            </div> -->
                         </div>
+                        
+                        
                     </div>
                 </div>
                 <div v-if="isTrim">
@@ -59,9 +77,8 @@
                                         Trim not supported on this disk ({{ disk.name }}).
                                     </span>
                                     <div class="col-span-4 grid grid-cols-4 justify-items-center">
-                                        
                                         <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
-                                            <div  class="h-6 min-h-min max-h-max w-full">
+                                            <div class="h-6 min-h-min max-h-max w-full">
                                                 <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
                                                    ---
                                                 </div>    
@@ -86,7 +103,7 @@
             <div v-if="isPoolList">
                 <div class="grid-grid-cols-2 gap-1 justify items-center">
                     <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-2">
-                        <span :class="stateMessageClass()">
+                        <span :class="stateMessageClass()" class="font-semibold">
                             {{ miniStateMsg }}
                         </span>
                         <div class="min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
@@ -108,7 +125,7 @@
         <div v-if="isDisk">
             <div v-if="selectedDisk!" class="grid grid-cols-2">
                 <div v-if="selectedDisk!.stats.trim_notsup === 0" class="col-span-2 flex flex-col items-center justify-center">
-                    <span :class="trimMessageClass(selectedDisk!)">
+                    <span :class="trimMessageClass(selectedDisk!)" class="font-semibold">
                         Disk {{selectedDisk!.name}} Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
                     </span>
                     <div class="min-w-fit w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">

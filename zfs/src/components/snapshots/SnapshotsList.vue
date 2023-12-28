@@ -2,7 +2,7 @@
 	<div>
 		<div class="inline-block min-w-full max-h-max align-middle rounded-md border border-default ">
 			<div class="ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-				<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-well">
+				<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-default">
 					<thead>
 						<tr v-if="props.item == 'pool' && snapshots.length < 1 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
 							<p class="text-default w-full justify-self-center">No snapshots found.</p>
@@ -16,26 +16,26 @@
 								<span class="sr-only"></span>
 							</th>
 						</tr>
-						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
+						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-default justify-center">
 							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 						</tr>
 					</thead>
-					<tbody v-if="snapshotsLoaded && props.item == 'pool'" class="divide-y divide-x divide-default bg-default">
-						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4">
-							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
+					<tbody v-if="snapshotsLoaded && props.item == 'pool'" class="divide-y divide-x divide-default bg-well">
+						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4 bg-well">
+							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default bg-well">
 								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted bg-well">
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted bg-well">
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted bg-well">
 								{{ snapshot.properties.referenced.value }}
 							</td>
-							<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-								<Menu as="div" class="relative inline-block text-right">
+							<td class="relative whitespace-nowrap py-y mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-well">
+								<Menu as="div" class="relative inline-block text-right -mt-1">
 									<div>
 										<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 											<span class="sr-only">Open options</span>

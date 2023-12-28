@@ -1,16 +1,16 @@
 <template>
 	<div>
-		<div class="w-full h-full min-h-max min-w-max overflow-visible px-8 bg-default text-default">
+		<div class="w-full h-full min-h-max min-w-max overflow-visible bg-default text-default">
 
-			<div v-if="props.tag === 'dashboard'" class="p-4">
+			<div v-if="props.tag === 'dashboard'" class="p-2">
 			   <Dashboard />
 			</div>
 
-			<div v-if="props.tag === 'pools'" class="p-4">
+			<div v-if="props.tag === 'pools'" class="p-2">
 			  	<PoolsList/>
 			</div>
 
-			<div v-if="props.tag === 'filesystems'" class="p-4">
+			<div v-if="props.tag === 'filesystems'" class="p-2">
 			  	<FileSystemList/>
 			</div>
 

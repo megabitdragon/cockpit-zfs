@@ -3,7 +3,7 @@ import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { getPoolDiskType, getTimestampString, convertBytesToSize, convertSizeToBytes, isBoolOnOff, onOffToBool, upperCaseWord, getQuotaRefreservUnit, getSizeNumberFromString, getSizeUnitFromString, getParentPath, convertTimestampToLocal } from "./helpers";
-import { getSnapshots, readSendProgress } from './snapshots';
+import { getSnapshots } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
 
 const vDevs = ref<vDevData[]>([]);
@@ -15,7 +15,7 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
-		// console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
+		console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
 	} catch (error) {
 		console.error("An error occurred getting disk stats:", error);
 	}
@@ -28,7 +28,7 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
-		// console.log('---\nScanObject:', scanObject.value);
+		console.log('---\nScanObject:', scanObject.value);
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}
@@ -66,7 +66,7 @@ export async function loadDisksThenPools(disks, pools) {
 		// console.log("Disk:");
 		// console.log(disk);
 		}
-		// console.log("loaded Disks:", disks);
+		console.log("loaded Disks:", disks);
 
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
@@ -133,8 +133,8 @@ export async function loadDisksThenPools(disks, pools) {
 
 				pools.value.push(poolData);
 
-				// console.log("poolData:");
-				// console.log(poolData);
+				console.log("poolData:");
+				console.log(poolData);
 				vDevs.value = [];
 			}
 
@@ -234,7 +234,7 @@ export async function loadDatasets(datasets) {
 			datasets.value.push(dataset);
 		}
 
-		// console.log("loaded Datasets:", datasets);
+		console.log("loaded Datasets:", datasets);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
@@ -272,7 +272,7 @@ export async function loadDisks(disks) {
 			disks.value.push(disk);
 			// console.log("Disk:", disk);
 		}
-		// console.log("loaded Disks:", disks);
+		console.log("loaded Disks:", disks);
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation
@@ -335,7 +335,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		}
 
 		// console.log('vDev', vDev);
-		// console.log('diskvdev:', diskVDev);
+		console.log('diskvdev:', diskVDev);
 
 		const notAChildDisk : DiskData = {
 			name: diskName!.value,
@@ -361,7 +361,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
 		// console.log("Not A ChildDisk:", notAChildDisk);
-		// console.log("vDevData (disk device):", vDevData);
+		console.log("vDevData (disk device):", vDevData);
 		
 		vDevs.value.push(vDevData);
 	} else {
@@ -465,7 +465,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	
 		});
 	
-		// console.log("loaded vDevData:", vDevData);
+		console.log("loaded vDevData:", vDevData);
 		vDevs.value.push(vDevData);
 	}
 }
@@ -512,7 +512,7 @@ export async function loadSnapshots(snapshots) {
 			
 		});
 
-		// console.log('loaded snapshots:', snapshots);
+		console.log('loaded snapshots:', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
@@ -560,7 +560,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 				});
 			}
 		});
-		// console.log('loaded snapshots in:', poolName, '\n', snapshots);
+		console.log('loaded snapshots in:', poolName, '\n', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
@@ -609,29 +609,11 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 			}
 		});
 
-		// console.log('loaded snapshots in:', datasetName, '\n', snapshots);
+		console.log('loaded snapshots in:', datasetName, '\n', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
 }
-
-// export async function loadSendProgress(sendProgressData : SendProgress[]) {
-// 	try {
-// 		readSendProgress(sendProgressData).then(rawJSON => {
-// 			const parsedJSON = (JSON.parse(rawJSON));
-// 			// console.log('Snapshots JSON (loadByDataset):', parsedJSON);
-// 			for (const dataset in parsedJSON) {
-// 				parsedJSON[dataset].forEach(snapshot => {
-					
-// 				});
-// 			}
-// 		});
-
-// 		// console.log('loaded snapshots in:', datasetName, '\n', snapshots);
-// 	} catch(error) {
-// 		console.error("An error occurred getting snapshots:", error);
-// 	}
-// }
 
 function determineDiskType(vDev, disks) {
     const childDisks = vDev.children.map(child => child.name);

@@ -1,6 +1,6 @@
 <template>
 	<div v-if="props.wholeBtn!" class="grid text-default w-full" :class="[props.gridSize]">
-		<button @click="toggleAccordion" class="btn flex justify-left items-center w-full h-full border border-default" :class="[props.btnColSpan, props.btnColor]" :aria-expanded="isOpen" :aria-controls="`collapse${uid}`">
+		<button @click="toggleAccordion" class="btn flex justify-left items-center w-full h-full border border-default" :class="[props.btnColor]" :aria-expanded="isOpen" :aria-controls="`collapse${uid}`">
 			<svg class="w-4 transition-all duration-200 transform" :class="{ 'rotate-0': isOpen, '-rotate-90': !isOpen, }" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 10" aria-hidden="true" >
 				<path d="M15 1.2l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 			</svg>

@@ -1,13 +1,16 @@
 <template>
-	<div class="inline-block min-w-full py-4 align-middle sm:px-6 lg:px-8 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">
-		<div class="button-group-row">
-			<button id="createFS" class="btn btn-primary object-left justify-start" @click="showNewFSWizard = true">Create File System</button>
-			<button id="refreshFS" class="btn btn-secondary object-right justify-end" @click="refreshData()"><ArrowPathIcon class="w-5 h-5"/></button>
+	<div class="inline-block min-w-full py-4 align-middle sm:px-4 lg:px-6 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">	
+		<div class="flex bg-well justify-between rounded-md p-2 shadow text-default rounded-b-md ring-1 ring-black ring-opacity-5">
+			<div class="button-group-row justify-start">
+				<button id="createFS" class="btn btn-primary object-left justify-start" @click="showNewFSWizard = true">Create File System</button>
+			</div>
+			<div class="button-group-row justify-end">
+				<button id="refreshFS" class="btn btn-secondary object-right justify-self-end" @click="refreshData()"><ArrowPathIcon class="w-5 h-5 m-1"/></button>
+			</div>
 		</div>
 
-		<div class="mt-8 overflow-visible rounded-md max-w-7xl">
+		<div class="mt-4 overflow-visible rounded-md max-w-7xl">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
-
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 
 					<table class="min-w-full divide-y divide-default rounded-md">
@@ -37,7 +40,7 @@
 
 					<div v-if="fileSystems.length > 0 && fileSystemsLoaded == true">
 						<div v-for="fileSystem, fsIdx in fileSystems">
-							<Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-12'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-11'" :contentColSpan="'col-span-12'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" :key="fsIdx">
+							<!-- <Accordion :btnColor="'btn-primary'" :gridSize="'grid-cols-12'" :btnColSpan="'col-span-1'" :titleColSpan="'col-span-11'" :contentColSpan="'col-span-12'" :isOpen="false" class="bg-default rounded-b-md border border-solid border-default" :key="fsIdx">
 								<template v-slot:title>
 									<div class="grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
 										<button @click="loadFileSystemConfig(fileSystems[fsIdx])" class="grid grid-cols-10 col-span-10 hover:bg-accent pt-1 rounded-r-lg">
@@ -114,7 +117,89 @@
 										<SnapshotsList :filesystem="fileSystems[fsIdx]" :item="'filesystem'"/>
 									</div>
 								</template>
-							</Accordion>
+							</Accordion> -->
+							<div>
+								<Disclosure v-slot="{ open }">
+									<DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full border border-default rounded-t-md justify-center text-center">
+										<div class="py-6 mt-1 col-span-1 justify-self-center justify-items-center">
+											<ChevronUpIcon
+												class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+											/>
+										</div>
+										<div class="py-6 mt-1 col-span-1">{{ fileSystem.name }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ fileSystem.properties.usedByDataset }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ fileSystem.properties.usedbyRefreservation }}</div>
+										<div v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="py-6 mt-1 col-span-1">{{ upperCaseWord(fileSystem.properties.compression) }}</div>
+										<div v-else class="py-6 mt-1 col-span-1">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ upperCaseWord(fileSystem.properties.deduplication) }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ upperCaseWord(fileSystem.properties.snapshotCount) }}</div>
+										<div class="py-6 mt-1 col-span-1">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
+
+										<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
+											<Menu as="div" class="relative inline-block text-right -mt-1">
+												<div>
+													<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+														<span class="sr-only">Open options</span>
+														<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+													</MenuButton>
+												</div>
+												<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+													<MenuItems class="absolute right-0 z-10 mt-1 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+														<div class="py-1">
+															<MenuItem as="div" v-slot="{ active }">
+																<a href="#" @click="loadFileSystemConfig(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
+															</MenuItem>
+														
+															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
+																<a href="#" @click="renameThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
+															</MenuItem>
+
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'yes'" v-slot="{ active }">
+																<a href="#" @click="unmountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
+															</MenuItem>
+															
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && !fileSystems[fsIdx].encrypted" v-slot="{ active }">
+																<a href="#" @click="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+															</MenuItem>
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
+																<a href="#" @click="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+															</MenuItem>
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && !fileSystems[fsIdx].key_loaded" v-slot="{ active }">
+																<a href="#" @click="handleFileSystemEncryption(fileSystems[fsIdx], 'unlock')" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unlock File System</a>
+															</MenuItem>
+															<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
+																<a href="#" @click="handleFileSystemEncryption(fileSystems[fsIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
+															</MenuItem>
+															
+															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
+																<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
+															</MenuItem>
+															<MenuItem as="div" v-if="fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
+																<a href="#" @click="changeThisPassphrase(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
+															</MenuItem>
+															<MenuItem as="div" v-slot="{ active }">
+																<a href="#" @click="createSnapshotBtn(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
+															</MenuItem>
+						
+															<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
+																<a href="#" @click="deleteFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+															</MenuItem>											
+														</div>
+													</MenuItems>
+												</transition>
+											</Menu>
+										</div>
+									</DisclosureButton>
+									<DisclosurePanel>
+										<div class="pl-4 bg-default">
+											<SnapshotsList :filesystem="fileSystems[fsIdx]" :item="'filesystem'"/>
+										</div>
+									</DisclosurePanel>
+								</Disclosure>
+							</div>
 						</div>
 					</div>
 
@@ -124,8 +209,9 @@
 					<div v-if="fileSystems.length < 1 && fileSystemsLoaded == true" class="p-2 flex bg-default justify-center">
 						<span class="font-semibold text-lg my-2">No File Systems Found</span>
 					</div>
-				</div>
+					
 
+				</div>
 			</div>
 		</div>
 	</div>
@@ -171,8 +257,8 @@
 
 <script setup lang="ts">
 import { ref, inject, Ref, provide, watch, computed, onMounted } from "vue";
-import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
+import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
