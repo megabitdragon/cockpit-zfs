@@ -40,8 +40,8 @@
                                     </span>
                                     <div class="col-span-4 grid grid-cols-4 justify-items-center">
                                         
-                                        <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
-                                            <div :class="trimProgressBarClass(disk)" class="h-4 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))}%` }">
+                                        <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                                            <div :class="trimProgressBarClass(disk)" class="h-6 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))}%` }">
                                                 <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-white text-center p-0.5 leading-none">
                                                     {{ handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2))) }}%
                                                 </div>
@@ -49,6 +49,27 @@
                                         </div>
                                         <span class="text-muted col-span-4">
                                             {{ getTrimmedAmount(disk) }} of {{ getTrimmedTotal(disk) }} processed. <br/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="disk.stats.trim_notsup == 1" class="col-span-4">
+                                <div class="">
+                                    <span class="text-default col-span-4">
+                                        Trim not supported on this disk ({{ disk.name }}).
+                                    </span>
+                                    <div class="col-span-4 grid grid-cols-4 justify-items-center">
+                                        
+                                        <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                                            <div  class="h-6 min-h-min max-h-max w-full">
+                                                <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+                                                   ---
+                                                </div>    
+                                            </div>
+                                        </div>
+                                        <span class="col-span-4 text-muted">
+                                            <!-- &nbsp; -->
+                                            N/A
                                         </span>
                                     </div>
                                 </div>

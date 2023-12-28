@@ -89,6 +89,8 @@
 			<template v-slot:footer>
 				<div class="grid grid-cols-4 gap-1 min-h-full w-full h-max rounded-sm justify-center">
 					<Status :pool="props.pool" :isTrim="false" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'scrub-status-box'" ref="scanStatus"/>
+				</div>
+				<div class="grid grid-cols-4 gap-1 min-h-full w-full h-max rounded-sm justify-center">
 					<Status :pool="props.pool" :isTrim="true" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'stats-status-box'" ref="trimStatus"/>
 				</div>
 			</template>
