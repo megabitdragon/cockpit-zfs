@@ -2,7 +2,7 @@
 	<div>
 		<div>
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-default rounded-t-md justify-center text-center">
+				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center">
 					<div class="py-6 mt-1 col-span-1 justify-self-center justify-items-center">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
@@ -35,7 +35,7 @@
 					<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 						<Menu as="div" class="relative inline-block text-right -mt-1">
 							<div>
-								<MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+								<MenuButton class="flex items-center rounded-full bg-default p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 									<span class="sr-only">Open options</span>
 									<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 								</MenuButton>
@@ -85,7 +85,7 @@
 					</div>
 				</DisclosureButton>
 				<DisclosurePanel>
-					<div v-for="vDev, vDevIdx in poolData[props.poolIdx].vdevs" :key="vDevIdx">
+					<div v-for="vDev, vDevIdx in poolData[props.poolIdx].vdevs" :key="vDevIdx" class="border border-b border-collapse border-default">
 						<VDevElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="vDev" :vDevIdx="vDevIdx" ref="vDevElement"/>
 					</div>
 				</DisclosurePanel>
@@ -121,7 +121,6 @@
 		<AddVDevModal @close="showAddVDevModal = false" :idKey="'show-vdev-modal'" :pool="selectedPool!" :marginTop="'mt-28'"/>
 	</div>
 
-
 	<div v-if="showPauseScrubConfirm">
 		<UniversalConfirmation :showFlag="showPauseScrubConfirm" @close="updateShowPauseScrub" :idKey="'confirm-pause-scrub'" :item="'pool'" :operation="'pause'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmPauseThisScrub" :hasChildren="false"/>
 	</div>
@@ -149,7 +148,6 @@ import { removeActivity, loadScanActivities, loadTrimActivities } from '../../co
 import VDevElement from "./VDevElement.vue";
 import PoolDetail from "./PoolDetail.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";
-import Accordion from '../common/Accordion.vue';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import Status from "../common/Status.vue";
 

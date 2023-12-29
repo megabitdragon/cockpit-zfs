@@ -138,7 +138,7 @@
                  
                 </div>
                 <div v-if="selectedDisk!.stats.trim_notsup === 1" class="col-span-2 flex items-center justify-center">
-                    <span class="mt-2 text-muted">
+                    <span class="mt-3 text-muted">
                         Trim not suppported.
                     </span>
                 </div>    

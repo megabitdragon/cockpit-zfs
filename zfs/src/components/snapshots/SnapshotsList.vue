@@ -1,45 +1,46 @@
 <template>
 	<div>
-		<div class="inline-block min-w-full max-h-max align-middle rounded-md border border-default ">
-			<div class="ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+		<div class="inline-block min-w-full max-h-max align-middle border border-default border-collapse">
+			<div class="">
 				<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-default">
 					<thead>
 						<tr v-if="props.item == 'pool' && snapshots.length < 1 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="text-default w-full justify-self-center">No snapshots found.</p>
+							<p class="text-default w-full text-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
-						<tr v-if="props.item == 'pool' && snapshots.length > 0 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md">
-							<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Name</th>
-							<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Created</th>
-							<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Used</th>
-							<th class="px-3 py-3.5 text-left text-sm font-semibold text-default">Referenced</th>
-							<th class="relative px-3 py-3.5 sm:pr-6 lg:pr-8">
+						<tr v-if="props.item == 'pool' && snapshots.length > 0 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
+							<th class="py-3.5 font-semibold text-default col-span-1">Name</th>
+							<th class="py-3.5 font-semibold text-default col-span-1">Created</th>
+							<th class="py-3.5 font-semibold text-default col-span-1">Used</th>
+							<th class="py-3.5 font-semibold text-default col-span-1">Referenced</th>
+							<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 								<span class="sr-only"></span>
 							</th>
 						</tr>
-						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-default justify-center">
+						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
 							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 						</tr>
 					</thead>
-					<tbody v-if="snapshotsLoaded && props.item == 'pool'" class="divide-y divide-x divide-default bg-well">
-						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default ml-4 bg-well">
-							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default bg-well">
+					<!-- POOLS -->
+					<tbody v-if="snapshotsLoaded && props.item == 'pool'" class="divide-y divide-default bg-default">
+						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default grid grid-cols-5">
+							<td class="whitespace-nowrap py-4 text-sm font-medium text-default bg-default col-span-1">
 								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted bg-well">
+							<td class="whitespace-nowrap py-4 text-sm text-default bg-default col-span-1">
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted bg-well">
+							<td class="whitespace-nowrap py-4 text-sm text-default bg-default col-span-1">
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted bg-well">
+							<td class="whitespace-nowrap py-4 text-sm text-default bg-default col-span-1">
 								{{ snapshot.properties.referenced.value }}
 							</td>
-							<td class="relative whitespace-nowrap py-y mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-well">
+							<td class="relative whitespace-nowrap py-y mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default col-span-1">
 								<Menu as="div" class="relative inline-block text-right -mt-1">
 									<div>
-										<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+										<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 											<span class="sr-only">Open options</span>
-											<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+											<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 										</MenuButton>
 									</div>
 
@@ -68,26 +69,28 @@
 							</td>
 						</tr>
 					</tbody>
-					<tbody v-if="snapshotsLoaded && props.item == 'filesystem'" class="divide-y divide-x divide-default bg-default">
-						<tr v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default ml-4">
-							<td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-default">
+
+					<!-- FILESYSTEMS -->
+					<tbody v-if="snapshotsLoaded && props.item == 'filesystem'" class="divide-y divide-default bg-accent">
+						<tr v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-5 justify-items-center items-center">
+							<td class="whitespace-nowrap py-4 text-sm font-medium text-default col-span-1"> 
 								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+							<td class="whitespace-nowrap py-4 text-sm text-default col-span-1"> 
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+							<td class="whitespace-nowrap py-4 text-sm text-default col-span-1"> 
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-sm text-muted">
+							<td class="whitespace-nowrap py-4 text-sm text-default col-span-1"> 
 								{{ snapshot.properties.referenced.value }}
 							</td>
-							<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+							<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 								<Menu as="div" class="relative inline-block text-right">
 									<div>
-										<MenuButton class="flex items-center rounded-full bg-accent text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+										<MenuButton class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 											<span class="sr-only">Open options</span>
-											<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+											<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 										</MenuButton>
 									</div>
 

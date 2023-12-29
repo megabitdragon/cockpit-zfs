@@ -1,20 +1,20 @@
 <template>
     <div>
-        <div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center bg-default text-default">
-            <div class="py-4 mt-1 col-span-1">{{ props.disk.name }}</div>
-            <div class="py-4 mt-1 col-span-1">{{ props.disk.health }}</div>
-            <div class="py-4 mt-1 col-span-1">X</div>
-            <div class="py-4 mt-1 col-span-1">Y</div>
-            <div class="py-4 mt-1 col-span-1">Z</div>
-            <div class="py-4 mt-1 col-span-1">{{ props.disk.capacity }}</div>
-            <div class="py-4 mt-1 col-span-2">
-                <Status class="-mt-1" :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"/>
+        <div class="grid grid-cols-9 grid-flow-cols w-full justify-center text-center bg-well text-default">
+            <div class="py-6 mt-1 col-span-1">{{ props.disk.name }}</div>
+            <div class="py-6 mt-1 col-span-1">{{ props.disk.health }}</div>
+            <div class="py-6 mt-1 col-span-1">X</div>
+            <div class="py-6 mt-1 col-span-1">Y</div>
+            <div class="py-6 mt-1 col-span-1">Z</div>
+            <div class="py-6 mt-1 col-span-1">{{ props.disk.capacity }}</div>
+            <div class="py-6 -mt-2 col-span-2">
+                <Status :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"/>
             </div>
             <div class="col-span-1">
-                <div class="relative py-4 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+                <div class="relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
                     <Menu as="div" class="relative inline-block text-right">
                         <div>
-                            <MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+                            <MenuButton class="flex items-center rounded-full bg-well p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
                                 <span class="sr-only">Open options</span>
                                 <EllipsisVerticalIcon class="w-5" aria-hidden="true" />
                             </MenuButton>
@@ -38,7 +38,6 @@
                                     <MenuItem as="div" v-slot="{ active }">
                                         <a href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
                                     </MenuItem>
-
 									<MenuItem as="div" v-slot="{ active }">
 										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD'" href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
 									</MenuItem>
@@ -51,8 +50,6 @@
 									<MenuItem as="div" v-slot="{ active }">
 										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && props.pool.diskType != 'HDD'" href="#" @click="stopTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Disk)</a>
 									</MenuItem>
-								
-
                                 </div>
                             </MenuItems>
                         </transition>

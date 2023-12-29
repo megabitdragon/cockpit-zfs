@@ -2,10 +2,10 @@
     <div>
 		<div>
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="grid grid-cols-9 bg-secondary grid-flow-cols justify-center justify-items-center text-center btn-secondary w-full border border-default rounded-t-md mt-1">
+				<DisclosureButton class="grid grid-cols-9 bg-secondary grid-flow-cols justify-center justify-items-center text-center btn-secondary w-full border border-collapse border-default">
 					<div class="py-6 mt-1 col-span-1 justify-self-center justify-items-center">
 						<ChevronUpIcon
-							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
 					<div class="col-span-7 text-center py-6 mt-2 justify-self-center justify-items-center">
@@ -16,7 +16,7 @@
 					<div class="col-span-1 relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-center justify-items-center">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
-								<MenuButton class="flex items-center rounded-full btn-primary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+								<MenuButton class="flex items-center rounded-full bg-secondary p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 									<span class="sr-only">Open options</span>
 									<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 								</MenuButton>
@@ -41,25 +41,23 @@
 					</div>
 				</DisclosureButton>
 				<DisclosurePanel>
-					<table class="table-auto min-w-full divide-y divide-default bg-secondary text-default">
-						<tr :key="props.vDevIdx" class="rounded-md">
-							<td colspan="9" class="">
-								<table class="min-w-full divide-y divide-default ">
-										<th class="py-3.5 font-semibold text-white col-span-1">Name</th>
-										<th class="py-3.5 font-semibold text-white col-span-1">State</th>
-										<th class="py-3.5 font-semibold text-white col-span-1">Reads</th>
-										<th class="py-3.5 font-semibold text-white col-span-1">Writes</th>
-										<th class="py-3.5 font-semibold text-white col-span-1">Checksum</th>
-										<th class="py-3.5 font-semibold text-white col-span-1">Capacity</th>
-										<th class="py-3.5 font-semibold text-white col-span-2">Message</th>
-										<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
-											<span class="sr-only"></span>
-										</th>
-								</table>
-							</td>
-						</tr>
+					<table class="min-w-full bg-secondary text-default border border-collapse border-default">
+						<thead>
+							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-9">
+								<th class="py-3.5 font-semibold text-white col-span-1">Name</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">State</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">Reads</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">Writes</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">Checksum</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">Capacity</th>
+								<th class="py-3.5 font-semibold text-white col-span-2">Message</th>
+								<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+									<span class="sr-only"></span>
+								</th>
+							</tr>
+						</thead>
 					</table>
-					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx">
+					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx" class="border border-collapse border-white dark:border-neutral-700">
 						<DiskElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="props.vDev" :vDevIdx="props.vDevIdx" :disk="disk" :diskIdx="diskIdx" ref="diskElement"/>
 					</div>
 				</DisclosurePanel>

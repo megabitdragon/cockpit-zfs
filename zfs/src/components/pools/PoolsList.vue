@@ -10,7 +10,7 @@
 			</div>
 		</div>
 
-		<div class="mt-4 overflow-visible rounded-md">
+		<div class="mt-4 overflow-visible rounded-md max-w-full">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 sm:rounded-md">
 
