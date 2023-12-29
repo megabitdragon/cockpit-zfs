@@ -8,11 +8,11 @@
 							<p class="text-default w-full text-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
 						<tr v-if="props.item == 'pool' && snapshots.length > 0 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
-							<th class="py-3.5 font-semibold text-default col-span-1">Name</th>
-							<th class="py-3.5 font-semibold text-default col-span-1">Created</th>
-							<th class="py-3.5 font-semibold text-default col-span-1">Used</th>
-							<th class="py-3.5 font-semibold text-default col-span-1">Referenced</th>
-							<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Name</th>
+							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Created</th>
+							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Used</th>
+							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Referenced</th>
+							<th class="relative px-4 py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 								<span class="sr-only"></span>
 							</th>
 						</tr>
@@ -23,20 +23,20 @@
 					<!-- POOLS -->
 					<tbody v-if="snapshotsLoaded && props.item == 'pool'" class="divide-y divide-default bg-default">
 						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default grid grid-cols-5">
-							<td class="whitespace-nowrap py-4 text-sm font-medium text-default bg-default col-span-1">
+							<td class="whitespace-nowrap py-4 px-4 text-sm font-medium text-default bg-default col-span-1">
 								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap py-4 text-sm text-default bg-default col-span-1">
+							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default col-span-1">
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap py-4 text-sm text-default bg-default col-span-1">
+							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default col-span-1">
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap py-4 text-sm text-default bg-default col-span-1">
+							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default col-span-1">
 								{{ snapshot.properties.referenced.value }}
 							</td>
-							<td class="relative whitespace-nowrap py-y mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default col-span-1">
-								<Menu as="div" class="relative inline-block text-right -mt-1">
+							<td class="relative whitespace-nowrap mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default col-span-1">
+								<Menu as="div" class="relative inline-block text-right">
 									<div>
 										<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 											<span class="sr-only">Open options</span>

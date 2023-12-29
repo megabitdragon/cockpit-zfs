@@ -8,9 +8,9 @@
 					</div>
 					<Menu as="div" class="relative inline-block text-right">
 						<div>
-							<MenuButton class="rounded-full bg-accent text-muted hover:text-gray-600">
+							<MenuButton class="rounded-full p-1 bg-default text-default hover:text-gray-600">
 								<span class="sr-only">Open options</span>
-								<EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
+								<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 							</MenuButton>
 						</div>
 						<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
@@ -57,11 +57,12 @@
 				</div>
 				<div class="flex flex-row justify-between">
 					<div>
-						<span class="text-success">{{props.pool.status}}</span>
+						<span v-if="props.pool.status == 'ONLINE'" class="text-success">{{props.pool.status}}</span>
+						<span v-else class="text-red-600">{{props.pool.status}}</span>
 					</div>
-					<div>
-						<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
-					</div>					
+					<div v-if="props.pool.status == 'ONLINE'">
+						<CheckCircleIcon class="aspect-square w-5 text-green-400"/>
+					</div>			
 				</div>
 
 				<div v-if="props.pool.properties.capacity >= 1" class="w-full bg-well rounded-full mt-2 relative flex h-6 min-h-min max-h-max overflow-hidden">

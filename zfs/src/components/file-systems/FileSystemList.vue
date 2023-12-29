@@ -1,5 +1,5 @@
 <template>
-	<div class="inline-block min-w-full py-4 align-middle sm:px-4 lg:px-6 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">	
+	<div class="inline-block min-w-full min-h-full py-4 align-middle sm:px-4 lg:px-6 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">	
 		<div class="flex bg-well justify-between rounded-md p-2 shadow text-default rounded-b-md ring-1 ring-black ring-opacity-5">
 			<div class="button-group-row justify-start">
 				<button id="createFS" class="btn btn-primary object-left justify-start" @click="showNewFSWizard = true">Create File System</button>
@@ -9,14 +9,14 @@
 			</div>
 		</div>
 
-		<div class="mt-4 overflow-visible rounded-md max-w-full">
+		<div class="mt-4 rounded-md max-w-full">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
 				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
 							<!-- <tr class="bg-well rounded-t-md grid grid-cols-12"> -->
-								<tr class="bg-well rounded-t-md grid grid-cols-11">
+							<tr class="bg-well rounded-t-md grid grid-cols-11">
 
 								<th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
@@ -131,7 +131,6 @@
 						<span class="font-semibold text-lg my-2">No File Systems Found</span>
 					</div>
 					
-
 				</div>
 			</div>
 		</div>
@@ -184,7 +183,6 @@ import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../compo
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
-import Accordion from "../common/Accordion.vue";
 import FileSystem from "../wizard-components/FileSystem.vue";
 import FileSystemConfigModal from "./FileSystemConfigModal.vue";
 import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';

@@ -3,15 +3,15 @@
         <div v-if="!isDisk">
             <div v-if="!isPoolList">
                 <div v-if="!isTrim">
-                    <div class="grid grid-cols-4 gap-1 justify-items-center">
+                    <div class="grid grid-cols-4 gap-1 justify-items-center w-full">
                         <span class="col-span-4 mt-0.5 font-semibold" :class="stateMessageClass()">
                             {{ stateMessage }}
                         </span>
 
                         <div class="col-span-4">
-                            <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center">
-                                <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
-                                    <div :class="progressBarClass()" class="h-6 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                            <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center w-full">
+                                <div class="col-span-4 w-full bg-well rounded-full relative flex h-6 min-h-min overflow-hidden">
+                                    <div :class="progressBarClass()" class="h-6 min-h-min w-full" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
                                         <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-white text-center p-1.5 leading-none">
                                             {{ parseFloat(scanPercentage.toFixed(2)) }}%
                                         </div>
@@ -29,27 +29,12 @@
                                     Resume to continue or cancel to stop.                    
                                 </span>
                             </div>
-
-                            <!-- <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-4 grid grid-cols-4 justify-items-center">
-                                <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
-                                    <div class="h-6 min-h-min max-h-max w-full">
-                                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-                                            ---
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <span class="text-muted col-span-4">
-                                    N/A
-                                </span>
-                            </div> -->
                         </div>
-                        
                         
                     </div>
                 </div>
                 <div v-if="isTrim">
-                    <div class="grid grid-cols-4 gap-1 justify-items-center">
+                    <div class="grid grid-cols-4 gap-1 justify-items-center w-full">
                         <div v-for="disk, idx in poolDiskStats[props.pool.name]" class="col-span-4">
                             <div v-if="disk.stats.trim_notsup !== 1" class="col-span-4">
                                 <div v-if="isTrimActive || isTrimSuspended || isTrimFinished || isTrimCanceled" class="col-span-4">
@@ -114,8 +99,8 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-1.5">
-                        <span class="mt-2" :class="stateMessageClass()">
+                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-2.5">
+                        <span class="mt-4" :class="stateMessageClass()">
                             {{ miniStateMsg }}
                         </span>
                     </div>

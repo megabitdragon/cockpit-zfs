@@ -81,7 +81,6 @@ import { scrubPool, clearErrors, removeVDevFromPool } from "../../composables/po
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
-import Accordion from "../common/Accordion.vue";
 import AttachDiskModal from "../disks/AttachDiskModal.vue";
 import DiskElement from '../pools/DiskElement.vue';
 

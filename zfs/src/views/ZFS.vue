@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="w-full h-full min-h-max min-w-max overflow-visible bg-default text-default">
+		<div class="w-full h-dvh min-h-dvh overflow-visible bg-default text-default">
 
 			<div v-if="props.tag === 'dashboard'" class="p-2">
 			   <Dashboard />
@@ -14,15 +14,12 @@
 			  	<FileSystemList/>
 			</div>
 
-			<!-- <div v-if="props.tag === 'settings'" class="p-4">
-			
-			</div> -->
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, Ref, inject, computed, provide, watch } from 'vue';
+import { ref, Ref, provide } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
