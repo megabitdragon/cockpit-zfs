@@ -3,12 +3,22 @@
 		<div>
 			<Disclosure v-slot="{ open }">
 				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center">
-					<div class="py-6 mt-1 col-span-1 justify-self-center justify-items-center">
+					<div class="py-6 mt-1 mr-2 col-span-2 ml-4 flex flex-row justify-start justify-items-center text-center" :title="poolData[props.poolIdx].name">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
+						<p class="ml-2 justify-center justify-items-center text-center">
+							{{ poolData[props.poolIdx].name.length > 20 ? poolData[props.poolIdx].name.slice(0, 20) + '...' : poolData[props.poolIdx].name }}
+						</p>
+						
 					</div>
-					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].name }}</div>
+					<!-- <div class="py-6 mt-1 mr-2 col-span-2 ml-4 justify-self-start flex flex-row justify-between" :title="fileSystem.name">
+						<ChevronUpIcon
+							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+						/>
+						{{ fileSystem.name.length > 20 ? fileSystem.name.slice(0, 20) + '...' : fileSystem.name }}
+					</div> -->
+					<!-- <div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].name }}</div> -->
 					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].status }}</div>
 					<div class="py-6 mt-1 col-span-1">
 						<div class="w-full bg-well rounded-full text-center">
@@ -144,7 +154,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, Di
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { removeActivity, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import PoolDetail from "./PoolDetail.vue";
 import AddVDevModal from "../pools/AddVDevModal.vue";

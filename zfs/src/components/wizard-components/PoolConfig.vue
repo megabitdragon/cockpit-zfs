@@ -156,16 +156,20 @@
 				</Switch>
 			</div>
 
-			<!-- Advanced Settings (hidden under accordion for better UI/UX) -->
-			<Accordion :wholeBtn="true" :btnColor="'bg-well'" :gridSize="'grid-cols-8'" :btnColSpan="'col-span-8'" :titleColSpan="'col-span-8'" :contentColSpan="'col-span-8'" :isOpen="false" class="mt-2 -ml-1 bg-well text-default">
-				<template v-slot:title>
-					<div class="mt-1">
-						<span class="ml-3"><b>Advanced Settings</b></span>
+			<!-- Advanced Settings (hidden for better UI/UX) -->
+			<Disclosure v-slot="{ open }">
+				<DisclosureButton class="bg-well mt-2 grid grid-cols-8 w-full justify-start text-center rounded-md">
+					<div class="m-1 col-span-1">
+						<ChevronUpIcon
+							class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+						/>
 					</div>
-					</template>
-				<template v-slot:content>
-					<div class="bg-default rounded-md my-2 py-2 mx-2">
-
+					<div class="-ml-8 mt-1.5 col-span-1">
+						<span class="text-start whitespace-nowrap text-base text-default"><b><u>Advanced Settings</u></b></span>
+					</div>
+				</DisclosureButton>
+				<DisclosurePanel>
+					<div class="bg-well rounded-md m-3">
 						<!-- Deduplication (Toggle) -->
 						<div class="ml-3">
 							<label :for="getIdKey('deduplication-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Deduplication</label>
@@ -215,7 +219,7 @@
 								</span>
 							</Switch>
 						</div>
-						
+
 						<!-- Auto-Replace Devices (Toggle) -->
 						<div class="ml-3">
 							<label :for="getIdKey('auto-replace-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Auto-Replace Devices</label>
@@ -235,7 +239,7 @@
 								</span>
 							</Switch>
 						</div>
-						
+
 						<!-- Auto-TRIM (Toggle) -->
 						<div class="ml-3">
 							<label :for="getIdKey('auto-trim-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">Automatic TRIM</label>
@@ -256,9 +260,9 @@
 							</Switch>
 						</div>
 					</div>	
-				</template>
-			</Accordion>
-
+				</DisclosurePanel>
+			</Disclosure>
+			
 		</fieldset>
 	</div>
 
@@ -294,9 +298,9 @@
 
 <script setup lang="ts">
 import { inject, provide, reactive, ref, Ref, computed, watch, onUpdated, onMounted } from 'vue';
-import { Switch } from '@headlessui/vue';
+import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
+import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression } from '../../composables/helpers';
-import Accordion from '../common/Accordion.vue';
 import FileSystem from './FileSystem.vue';
 import ReviewTab from './ReviewTab.vue';
 

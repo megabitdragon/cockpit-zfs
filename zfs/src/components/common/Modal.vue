@@ -55,7 +55,6 @@ interface ModalProps {
 }
 
 const props = defineProps<ModalProps>();
-//const modalControl = inject<Ref<boolean>>('modal-control');
 
 const open = ref(true)
 

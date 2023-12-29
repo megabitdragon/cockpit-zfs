@@ -3,25 +3,25 @@
 		<ol role="list" class="divide-y divide-default rounded-md border border-default md:flex md:divide-y-0">
 			<li v-for="(step, stepIdx) in props.navigationItems" :key="step.id" class="relative overflow-hidden lg:flex-1">
 				<a v-if="step.status === 'completed'" @click.prevent="navigationCallback(step)" class="group flex w-full items-center">
-					<span class="flex items-center px-6 py-4 text-sm font-medium">
-						<span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent group-hover:bg-slate-500 dark:group-hover:border-slate-600">
+					<span class="flex items-center px-2 py-4 text-sm font-medium">
+						<span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent group-hover:bg-slate-500 dark:group-hover:border-slate-600">
 							<CheckCircleIcon class="h-6 w-6 text-default" aria-hidden="true" />
 						</span>
-						<span class="ml-4 text-sm font-medium text-default">{{ step.name }}</span>
+						<span class="ml-1.5 text-sm font-medium text-default">{{ step.name }}</span>
 					</span>
 				</a>
-				<a v-else-if="step.status === 'current'" @click.prevent="navigationCallback(step)" class="flex items-center px-6 py-4 text-sm font-medium" aria-current="step">          
-						<span class="flex h-10 w-10 aspect-square items-center justify-center rounded-full border-2 border-green-600">
+				<a v-else-if="step.status === 'current'" @click.prevent="navigationCallback(step)" class="flex items-center px-2 py-4 text-sm font-medium" aria-current="step">          
+						<span class="flex h-8 w-8 aspect-square items-center justify-center rounded-full border-2 border-green-600">
 							<span class="text-success">{{ step.id }}</span>
 						</span>
-						<span class="ml-4 text-sm font-medium text-default">{{ step.name }}</span>
+						<span class="ml-1.5 text-sm font-medium text-default">{{ step.name }}</span>
 				</a>
 				<a v-else @click.prevent="navigationCallback(step)" class="group flex items-center">
-					<span class="flex items-center px-6 py-4 text-sm font-medium">
-						<span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-default group-hover:border-gray-400 dark:group-hover:border-gray-600">
+					<span class="flex items-center px-2 py-4 text-sm font-medium">
+						<span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-default group-hover:border-gray-400 dark:group-hover:border-gray-600">
 							<span class="text-secondary group-hover:text-default">{{ step.id }}</span>
 						</span>
-						<span class="ml-4 text-sm font-medium text-secondary group-hover:text-default">{{ step.name }}</span>
+						<span class="ml-1.5 text-sm font-medium text-secondary group-hover:text-default">{{ step.name }}</span>
 					</span>
 				</a>
 				<template v-if="stepIdx !== props.navigationItems.length - 1">

@@ -3,7 +3,7 @@
 		<div>
 			<Disclosure v-slot="{ open }">
 				<DisclosureButton class="grid grid-cols-9 bg-secondary grid-flow-cols justify-center justify-items-center text-center btn-secondary w-full border border-collapse border-default">
-					<div class="py-6 mt-1 col-span-1 justify-self-center justify-items-center">
+					<div class="py-6 mt-1 col-span-1 ml-8 justify-self-start justify-items-start">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>

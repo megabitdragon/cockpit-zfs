@@ -18,10 +18,10 @@
 							<!-- <tr class="bg-well rounded-t-md grid grid-cols-12"> -->
 							<tr class="bg-well rounded-t-md grid grid-cols-11">
 
-								<th class="relative py-3.5 rounded-tl-md col-span-1">
+								<!-- <th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
-								</th>
-								<th class="py-3.5 font-semibold text-default col-span-1">Name</th>
+								</th> -->
+								<th class="py-3.5 pl-4 font-semibold text-default col-span-2">Name</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Available</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Used</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Refreservation</th>
@@ -45,12 +45,16 @@
 								<Disclosure v-slot="{ open }">
 									<DisclosureButton class="bg-default grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
 									<!-- <DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full border border-default justify-center text-center"> -->
-										<div class="py-6 mt-1 col-span-1 justify-self-center justify-items-center">
+										<div class="py-6 mt-1 mr-2 col-span-2 ml-4 flex flex-row justify-start justify-items-center text-center" :title="fileSystem.name">
 											<ChevronUpIcon
 												class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 											/>
+											<p class="ml-2 justify-center justify-items-center text-center">
+												{{ fileSystem.name.length > 20 ? fileSystem.name.slice(0, 20) + '...' : fileSystem.name }}
+											</p>
 										</div>
-										<div class="py-6 mt-1 col-span-1">{{ fileSystem.name }}</div>
+										<!-- <div class="py-6 mt-1 col-span-1">{{ fileSystem.name }}</div> -->
+										<!-- <div class="py-6 mt-1 col-span-1" :title="fileSystem.name">{{ fileSystem.name.length > 20 ? fileSystem.name.slice(0, 20) + '...' : fileSystem.name }}</div> -->
 										<div class="py-6 mt-1 col-span-1">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ fileSystem.properties.usedByDataset }}</div>
 										<div class="py-6 mt-1 col-span-1">{{ fileSystem.properties.usedbyRefreservation }}</div>
@@ -65,7 +69,7 @@
 										<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 											<Menu as="div" class="relative inline-block text-right -mt-1">
 												<div>
-													<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+													<MenuButton class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 														<span class="sr-only">Open options</span>
 														<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 													</MenuButton>

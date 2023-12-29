@@ -16,49 +16,63 @@
 							<p>Sector Size: <b>{{ getValue('sector', poolConfig.properties.sector) }}</b></p>
 							<p>Record Size: <b>{{ getValue('record', poolConfig.properties.record) }}</b></p>
 							<p class="mt-1 border rounded-lg border-default">
-								<Accordion :wholeBtn="true" :btnColor="'bg-default'" :gridSize="'grid-cols-2'" :btnColSpan="'col-span-2'" :titleColSpan="'col-span-2'" :contentColSpan="'col-span-2'" :isOpen="false" class="bg-default text-default rounded-lg">
-									<template v-slot:title>
-										<p class="bg-default ml-2 mt-1 rounded-lg">Advanced Settings</p>
-									</template>
-									<template v-slot:content>
+								<Disclosure v-slot="{ open }">
+									<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center rounded-lg">
+										<div class="m-1 col-span-1">
+											<ChevronUpIcon
+												class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+											/>
+										</div>
+										<div class="-ml-8 mt-1.5 col-span-1">
+											<span class="text-start whitespace-nowrap text-base text-default">Advanced Settings</span>
+										</div>
+									</DisclosureButton>
+									<DisclosurePanel>
 										<div class="p-2 rounded-lg">
 											<p>Deduplication: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }}</b></p>
 											<p>Auto-Expand: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoExpand)) }}</b></p>
 											<p>Auto-Replace: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoReplace)) }}</b></p>
 											<p>Auto-TRIM: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoTrim)) }}</b></p>
 										</div>
-									</template>
-								</Accordion>
+									</DisclosurePanel>
+								</Disclosure>
 							</p>
 						</div>
 					</template>
 					<template v-slot:footer>
-						<Accordion :wholeBtn="true" :btnColor="'bg-default'" :gridSize="'grid-cols-2'" :btnColSpan="'col-span-2'" :titleColSpan="'col-span-2'" :contentColSpan="'col-span-2'" :isOpen="false" class="bg-default text-default border rounded-lg border-default">
-							<template v-slot:title>
-								<div>
-									<p class="bg-default ml-2 mt-1 rounded-lg">Virtual Devices <b>({{ poolConfig.vdevs.length }})</b></p>
+						<Disclosure v-slot="{ open }">
+							<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center rounded-lg">
+								<div class="m-1 col-span-1">
+									<ChevronUpIcon
+										class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+									/>
 								</div>
-							</template>
-							<template v-slot:content>							
-								<Card v-for="vDev, vDevIdx in poolConfig.vdevs" :key="vDevIdx" :bgColor="'bg-default'" :titleSection="true" :contentSection="false" :footerSection="true" class="rounded-lg text-default">
+								<div class="-ml-8 mt-1.5 col-span-1">
+									<span class="text-start whitespace-nowrap text-base text-default">Virtual Devices  <b>({{ poolConfig.vdevs.length }})</b></span>
+								</div>
+							</DisclosureButton>
+							<DisclosurePanel>
+								<Card v-for="vDev, vDevIdx in poolConfig.vdevs" :key="vDevIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="true" class="rounded-lg text-default">
 									<template v-slot:title>
-										<div class="rounded-lg">
+										<div class="">
 											<p>Type: <b>{{ upperCaseWord(vDev.type) }}</b></p>
 										</div>
 									</template>
 									<template v-slot:footer>
-										<div class="rounded-lg">
-											<p>
-												Disks (<b>{{ vDev.selectedDisks.length }}</b>): | 
-												<span v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx">
-													<b>{{  disk  }}</b> |
-												</span>
-											</p>
+										<div class="flex flex-row gap-1">
+											<p>Disks:</p>
+											<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
+												<template v-slot:title>
+													<div>
+														<b>{{ disk }}</b>
+													</div>
+												</template>
+											</Card>
 										</div>
 									</template>
-								</Card>							
-							</template>
-						</Accordion>
+								</Card>			
+							</DisclosurePanel>
+						</Disclosure>
 					</template>
 				</Card>
 			</div>
@@ -76,11 +90,18 @@
 							<p>Read Only: <b>{{ upperCaseWord(isBoolOnOff(fileSystemData.properties.isReadOnly!)) }}</b></p>	
 							<p v-if="fileSystemData.encrypted">Encryption: <b>{{ fileSystemData.properties.encryption.toUpperCase() }}</b></p>
 							<p class="mt-1 border rounded-lg border-default">
-								<Accordion :wholeBtn="true" :btnColor="'bg-default'" :gridSize="'grid-cols-2'" :btnColSpan="'col-span-2'" :titleColSpan="'col-span-2'" :contentColSpan="'col-span-2'" :isOpen="false" class="bg-default text-default">					
-									<template v-slot:title>
-										<p class="bg-default ml-2 mt-1">Settings: <b v-if="fileSystemData.inherit">Inherited</b></p>
-									</template>
-									<template v-slot:content>
+								<Disclosure v-slot="{ open }">
+									<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center rounded-lg">
+										<div class="m-1 col-span-1">
+											<ChevronUpIcon
+												class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+											/>
+										</div>
+										<div class="-ml-8 mt-1.5 col-span-1">
+											<span class="text-start whitespace-nowrap text-base text-default">Settings: <b v-if="fileSystemData.inherit">Inherited</b></span>
+										</div>
+									</DisclosureButton>
+									<DisclosurePanel>
 										<div v-if="fileSystemData.inherit" class="p-2 rounded-lg">
 											<p>Compression: <b>{{ upperCaseWord(fileSystemData.properties.compression) }} ({{ isBoolCompression(poolConfig.properties.compression).toUpperCase() }})</b></p>
 											<p>Deduplication: <b>{{ upperCaseWord(fileSystemData.properties.deduplication) }} ({{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }})</b></p>
@@ -99,8 +120,8 @@
 											<p>DNode Size: <b>{{ checkInheritance('dnode', fileSystemData.properties.dNodeSize, poolConfig) }}</b></p>
 											<p>Extended Attributes: <b>{{ checkInheritance('xattr', fileSystemData.properties.extendedAttributes, poolConfig) }}</b></p>
 										</div>
-									</template>
-								</Accordion>
+									</DisclosurePanel>
+								</Disclosure>
 							</p>					
 						</div>
 					</template>
@@ -148,8 +169,8 @@
 <script setup lang="ts">
 import { inject, Ref} from 'vue';
 import Card from '../common/Card.vue';
-import Accordion from '../common/Accordion.vue';
-import { EllipsisVerticalIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
+import { CheckCircleIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
