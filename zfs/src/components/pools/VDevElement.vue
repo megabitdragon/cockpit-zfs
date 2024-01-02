@@ -2,21 +2,26 @@
     <div>
 		<div>
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="grid grid-cols-9 bg-secondary grid-flow-cols justify-center justify-items-center text-center btn-secondary w-full border border-collapse border-default">
-					<div class="py-6 mt-1 col-span-1 ml-8 justify-self-start justify-items-start">
+				<DisclosureButton class="bg-secondary text-white grid grid-cols-4 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center">
+					<div class="py-6 mt-1 mr-2 col-span-1 ml-8 flex flex-row justify-start justify-items-center text-center" :title="props.vDev.name">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
+						<p class="ml-2 justify-center justify-items-center text-center">
+							{{ props.vDev.name }}
+						</p>
 					</div>
-					<div class="col-span-7 text-center py-6 mt-2 justify-self-center justify-items-center">
+					<div class="py-6 mt-1 col-span-1">{{ props.vDev.disks.length }} Disks</div>
+					<div class="py-6 mt-1 col-span-1">{{ upperCaseWord(props.vDev.type) }} Device</div>
+					<!-- <div class="ml-4 col-span-7 text-center py-6 mt-2 justify-self-center justify-items-center">
 						<div>
 							{{ props.vDev.name }} ({{ props.vDev.type }})
 						</div>
-					</div>
-					<div class="col-span-1 relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-center justify-items-center">
+					</div> -->
+					<div class="col-span-1 relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
-								<MenuButton class="flex items-center rounded-full bg-secondary p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+								<MenuButton class="flex items-center rounded-full bg-secondary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 									<span class="sr-only">Open options</span>
 									<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 								</MenuButton>
@@ -79,7 +84,7 @@ import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/v
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { scrubPool, clearErrors, removeVDevFromPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { loadScanActivities, loadTrimActivities, upperCaseWord } from '../../composables/helpers';
 import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import AttachDiskModal from "../disks/AttachDiskModal.vue";
 import DiskElement from '../pools/DiskElement.vue';

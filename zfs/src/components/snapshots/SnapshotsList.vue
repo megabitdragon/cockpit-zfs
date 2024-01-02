@@ -5,7 +5,7 @@
 				<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-default">
 					<thead>
 						<tr v-if="props.item == 'pool' && snapshots.length < 1 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="text-default w-full text-center p-4 justify-self-center">No snapshots found.</p>
+							<p class="bg-accent text-default w-full text-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
 						<tr v-if="props.item == 'pool' && snapshots.length > 0 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
 							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Name</th>

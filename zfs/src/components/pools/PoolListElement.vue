@@ -45,7 +45,7 @@
 					<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 						<Menu as="div" class="relative inline-block text-right -mt-1">
 							<div>
-								<MenuButton class="flex items-center rounded-full bg-default p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+								<MenuButton class="flex items-center rounded-full bg-default p-2 hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 									<span class="sr-only">Open options</span>
 									<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 								</MenuButton>

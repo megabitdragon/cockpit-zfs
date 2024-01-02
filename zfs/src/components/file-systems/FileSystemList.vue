@@ -47,7 +47,7 @@
 									<!-- <DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full border border-default justify-center text-center"> -->
 										<div class="py-6 mt-1 mr-2 col-span-2 ml-4 flex flex-row justify-start justify-items-center text-center" :title="fileSystem.name">
 											<ChevronUpIcon
-												class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+												class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform justify-start justify-self-start" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 											/>
 											<p class="ml-2 justify-center justify-items-center text-center">
 												{{ fileSystem.name.length > 20 ? fileSystem.name.slice(0, 20) + '...' : fileSystem.name }}
@@ -68,7 +68,7 @@
 
 										<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 											<Menu as="div" class="relative inline-block text-right -mt-1">
-												<div>
+												<div>		
 													<MenuButton class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 														<span class="sr-only">Open options</span>
 														<EllipsisVerticalIcon class="w-5" aria-hidden="true" />

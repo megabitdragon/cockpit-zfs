@@ -5,7 +5,7 @@
             Add Virtual Device
         </template>
         <template v-slot:content>
-            <div v-for="(vDev, vDevIdx) in props.pool.vdevs" :key="vDevIdx">
+            <div>
                 <!-- Virtual Device (Select) -->
 				<div>
 					<label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-default">Type</label>
