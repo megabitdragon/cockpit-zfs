@@ -8,12 +8,7 @@ def main():
 
         for p in zfs.pools:
             pool = p.asdict()
-            # pool['scan']['start_time'] = str(pool['scan']['start_time'])
-            # pool['scan']['end_time'] = str(pool['scan']['end_time'])
-            # pool['scan']['pause'] = str(pool['scan']['pause'])
-            # pool['scan']['name'] = pool['name']
-
-            # z_pools[pool['name']] = pool['scan']
+        
                 
     print(json.dumps(z_pools, indent=4))
     

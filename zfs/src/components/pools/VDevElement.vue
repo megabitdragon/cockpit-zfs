@@ -2,7 +2,7 @@
     <div>
 		<div>
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="bg-secondary text-white grid grid-cols-4 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center">
+				<DisclosureButton class="bg-secondary text-white grid grid-cols-7 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center">
 					<div class="py-6 mt-1 mr-2 col-span-1 ml-8 flex flex-row justify-start justify-items-center text-center" :title="props.vDev.name">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
@@ -11,13 +11,11 @@
 							{{ props.vDev.name }}
 						</p>
 					</div>
-					<div class="py-6 mt-1 col-span-1">{{ props.vDev.disks.length }} Disks</div>
 					<div class="py-6 mt-1 col-span-1">{{ upperCaseWord(props.vDev.type) }} Device</div>
-					<!-- <div class="ml-4 col-span-7 text-center py-6 mt-2 justify-self-center justify-items-center">
-						<div>
-							{{ props.vDev.name }} ({{ props.vDev.type }})
-						</div>
-					</div> -->
+					<div class="py-6 mt-1 col-span-1">{{ props.vDev.disks.length }} Disks</div>
+					<div class="py-6 mt-1 col-span-1">{{ props.vDev.stats.read_errors }} Read Errors</div>
+					<div class="py-6 mt-1 col-span-1">{{ props.vDev.stats.write_errors }} Write Errors</div>
+					<div class="py-6 mt-1 col-span-1">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
 					<div class="col-span-1 relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
@@ -28,16 +26,16 @@
 							</div>
 
 							<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-								<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+								<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-secondary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">												
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
+											<a href="#" @click="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 										</MenuItem>
 										<MenuItem v-if="vDevIdx != 0" as="div" v-slot="{ active }">
-											<a href="#" @click="removeVDev(props.pool, props.pool.vdevs[vDevIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
+											<a href="#" @click="removeVDev(props.pool, props.pool.vdevs[vDevIdx])" :class="[active ? 'bg-danger text-white' : 'text-white', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="showAttachDisk(props.pool, props.vDev)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Attach Disk</a>
+											<a href="#" @click="showAttachDisk(props.pool, props.vDev)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Attach Disk</a>
 										</MenuItem>
 									</div>
 								</MenuItems>
@@ -48,12 +46,11 @@
 				<DisclosurePanel>
 					<table class="min-w-full bg-secondary text-default border border-collapse border-default">
 						<thead>
-							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-9">
+							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-8">
 								<th class="py-3.5 font-semibold text-white col-span-1">Name</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">State</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">Reads</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">Writes</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">Checksum</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">Health</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">Type</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">Temperature</th>
 								<th class="py-3.5 font-semibold text-white col-span-1">Capacity</th>
 								<th class="py-3.5 font-semibold text-white col-span-2">Message</th>
 								<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">

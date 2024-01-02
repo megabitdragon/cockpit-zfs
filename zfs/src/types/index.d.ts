@@ -42,7 +42,11 @@ interface vDevData {
 	type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
 	status: string;
 	guid: string;
-	stats: {};
+	stats: {
+		read_errors: number;
+		write_errors: number;
+		checksum_errors: number;
+	};
 	disks: DiskData[];
 	selectedDisks: string[];
 	forceAdd?: boolean;

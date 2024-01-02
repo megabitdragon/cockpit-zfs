@@ -13,8 +13,6 @@ def main():
             if not disk['occupied']:
                 continue
 
-            partitions = int(disk['partitions'])
-
             device_path = disk['dev']
 
             disks.append({
@@ -26,7 +24,6 @@ def main():
                 'serial': disk['serial'],
                 'capacity': disk['capacity'],
                 'type': disk['disk_type'],
-                # 'usable': True if partitions == 0 else False,
                 'usable': True,
                 'temp': disk['temp-c'],
                 'health': disk['health'],
