@@ -32,7 +32,12 @@
 				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2 m-2 rounded-md border border-default col-span-2 bg-accent">
 					<legend class="mb-1 text-base font-medium leading-6 text-default">{{ vDev.name }} ({{ vDev.type }})</legend>
 					
-					<div class="grid grid-cols-2">
+					<div v-if="vDev.disks.length > 1" class="grid grid-cols-2">
+						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-1">
+							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
+						</div>
+					</div>
+					<div v-if="vDev.disks.length == 1" class="grid grid-cols-1">
 						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-1">
 							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
 						</div>

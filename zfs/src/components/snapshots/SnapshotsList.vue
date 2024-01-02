@@ -1,18 +1,18 @@
 <template>
 	<div>
-		<div class="inline-block min-w-full max-h-max align-middle border border-default border-collapse">
+		<div v-if="props.item == 'pool'" class="inline-block max-h-max align-middle border border-default border-collapse">
 			<div class="">
-				<table class="table-fixed min-w-full min-h-full divide-y divide-default bg-default">
+				<table class="table-auto min-h-full divide-y divide-default bg-default">
 					<thead>
-						<tr v-if="props.item == 'pool' && snapshots.length < 1 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="bg-accent text-default w-full text-center p-4 justify-self-center">No snapshots found.</p>
+						<tr v-if="snapshots.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
+							<p class="bg-accent text-defaulttext-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
-						<tr v-if="props.item == 'pool' && snapshots.length > 0 && snapshotsLoaded || props.item == 'filesystem' && snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
-							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Name</th>
-							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Created</th>
-							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Used</th>
-							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Referenced</th>
-							<th class="relative px-4 py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+						<tr v-if="snapshots.length > 0 && snapshotsLoaded" class="rounded-md ">
+							<th class="px-4 py-3.5 font-semibold text-default">Name</th>
+							<th class="px-4 py-3.5 font-semibold text-default">Created</th>
+							<th class="px-4 py-3.5 font-semibold text-default">Used</th>
+							<th class="px-4 py-3.5 font-semibold text-default">Referenced</th>
+							<th class="relative px-4 py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
 								<span class="sr-only"></span>
 							</th>
 						</tr>
@@ -21,21 +21,21 @@
 						</tr>
 					</thead>
 					<!-- POOLS -->
-					<tbody v-if="snapshotsLoaded && props.item == 'pool'" class="divide-y divide-default bg-default">
-						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default grid grid-cols-5">
-							<td class="whitespace-nowrap py-4 px-4 text-sm font-medium text-default bg-default col-span-1">
+					<tbody class="divide-y divide-default bg-default">
+						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default ">
+							<td class="whitespace-nowrap py-4 px-4 text-sm font-medium text-default bg-default">
 								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default col-span-1">
+							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default">
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default col-span-1">
+							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default">
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default col-span-1">
+							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default">
 								{{ snapshot.properties.referenced.value }}
 							</td>
-							<td class="relative whitespace-nowrap mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default col-span-1">
+							<td class="relative whitespace-nowrap mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default">
 								<Menu as="div" class="relative inline-block text-right">
 									<div>
 										<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -69,9 +69,31 @@
 							</td>
 						</tr>
 					</tbody>
-
+				</table>
+			</div>
+		</div>
+		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-max align-middle border border-default border-collapse">
+			<div class="">
+				<table class="table-auto min-w-full min-h-full divide-y divide-default bg-default">
+					<thead>
+						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
+							<p class="bg-accent text-default w-full text-center p-4 justify-self-center">No snapshots found.</p>
+						</tr>
+						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
+							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Name</th>
+							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Created</th>
+							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Used</th>
+							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Referenced</th>
+							<th class="relative px-4 py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+								<span class="sr-only"></span>
+							</th>
+						</tr>
+						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
+							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
+						</tr>
+					</thead>
 					<!-- FILESYSTEMS -->
-					<tbody v-if="snapshotsLoaded && props.item == 'filesystem'" class="divide-y divide-default bg-accent">
+					<tbody  class="divide-y divide-default bg-accent">
 						<tr v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-5 justify-items-center items-center">
 							<td class="whitespace-nowrap py-4 text-sm font-medium text-default col-span-1"> 
 								{{ snapshot.name }}
@@ -174,7 +196,8 @@ const props = defineProps<SnapshotsListProps>();
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const datasetsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
-const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+// const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+const snapshotsLoaded = ref(false);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 
 const snapshotsInFilesystem = ref<Snapshot[]>([]);
