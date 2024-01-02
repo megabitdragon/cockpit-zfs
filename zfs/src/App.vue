@@ -1,5 +1,5 @@
 <template>
- <div class="h-full w-full min-w-fit min-h-dvh flex flex-col bg-default">
+ <div class="min-h-screen h-full w-full min-w-fit flex flex-col bg-default overflow-auto">
 		<HoustonHeader moduleName="ZFS" sourceURL=""
 			issuesURL="" :pluginVersion="Number(pluginVersion)"
 			:infoNudgeScrollbar="true" />
