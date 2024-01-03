@@ -113,7 +113,7 @@ import { BetterCockpitFile } from '@45drives/cockpit-helpers';
 import { ref, Ref, inject, watch, computed } from 'vue';
 import { sendSnapshot, doesDatasetExist, formatRecentSnaps } from '../../composables/snapshots';
 import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, testSSH, convertSizeToBytes, convertSizeToBytesDecimal } from '../../composables/helpers';
-import TestSSHModal from './TestSSHModal.vue';
+import TestSSHModal from '../file-systems/TestSSHModal.vue';
 
 interface SendSnapshotProps {
     idKey: string;

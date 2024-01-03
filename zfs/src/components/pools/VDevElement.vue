@@ -2,7 +2,7 @@
     <div>
 		<div>
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="bg-secondary text-white grid grid-cols-7 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center">
+				<DisclosureButton class="bg-primary text-white grid grid-cols-7 grid-flow-cols w-full border border-t border-collapse border-default justify-center text-center">
 					<div class="py-6 mt-1 mr-2 col-span-1 ml-8 flex flex-row justify-start justify-items-center text-center" :title="props.vDev.name">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
@@ -19,14 +19,14 @@
 					<div class="col-span-1 relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
-								<MenuButton class="flex items-center rounded-full bg-secondary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+								<MenuButton class="flex items-center rounded-full bg-primary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 									<span class="sr-only">Open options</span>
 									<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 								</MenuButton>
 							</div>
 
 							<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-								<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-secondary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+								<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">												
 										<MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
@@ -44,7 +44,7 @@
 					</div>
 				</DisclosureButton>
 				<DisclosurePanel>
-					<table class="min-w-full bg-secondary text-default border border-collapse border-default">
+					<table class="min-w-full bg-secondary text-default border-l border-r border-collapse border-default">
 						<thead>
 							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-8">
 								<th class="py-3.5 font-semibold text-white col-span-1">Name</th>
@@ -59,7 +59,7 @@
 							</tr>
 						</thead>
 					</table>
-					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx" class="border border-collapse border-white dark:border-neutral-700">
+					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx" class="border border-l border-r border-collapse border-default">
 						<DiskElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="props.vDev" :vDevIdx="props.vDevIdx" :disk="disk" :diskIdx="diskIdx" ref="diskElement"/>
 					</div>
 				</DisclosurePanel>

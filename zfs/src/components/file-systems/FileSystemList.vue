@@ -21,7 +21,7 @@
 								<!-- <th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th> -->
-								<th class="py-3.5 pl-4 font-semibold text-default col-span-2">Name</th>
+								<th class="py-3.5 font-semibold text-default col-span-2">Name</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Available</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Used</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Refreservation</th>
@@ -43,8 +43,8 @@
 						<div v-for="fileSystem, fsIdx in fileSystems">
 							<div class="border border-default">
 								<Disclosure v-slot="{ open }">
-									<DisclosureButton class="bg-default grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
-									<!-- <DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full border border-default justify-center text-center"> -->
+								<DisclosureButton class="bg-default grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
+									<!-- <DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full justify-center text-center"> -->
 										<div class="py-6 mt-1 mr-2 col-span-2 ml-4 flex flex-row justify-start justify-items-center text-center" :title="fileSystem.name">
 											<ChevronUpIcon
 												class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform justify-start justify-self-start" :class="{ 'rotate-90': !open, 'rotate-180': open, }"

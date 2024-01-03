@@ -74,16 +74,16 @@
 		</div>
 		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-max align-middle border border-default border-collapse">
 			<div class="">
-				<table class="table-auto min-w-full min-h-full divide-y divide-default bg-default">
+				<table class="table-auto min-w-full min-h-full divide-y divide-default bg-secondary">
 					<thead>
 						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="bg-accent text-default w-full text-center p-4 justify-self-center">No snapshots found.</p>
+							<p class="bg-default text-white w-full text-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
 						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
-							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Name</th>
-							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Created</th>
-							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Used</th>
-							<th class="px-4 py-3.5 font-semibold text-default col-span-1">Referenced</th>
+							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Name</th>
+							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Created</th>
+							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Used</th>
+							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Referenced</th>
 							<th class="relative px-4 py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 								<span class="sr-only"></span>
 							</th>
@@ -93,7 +93,7 @@
 						</tr>
 					</thead>
 					<!-- FILESYSTEMS -->
-					<tbody  class="divide-y divide-default bg-accent">
+					<tbody  class="divide-y divide-default bg-default">
 						<tr v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-5 justify-items-center items-center">
 							<td class="whitespace-nowrap py-4 text-sm font-medium text-default col-span-1"> 
 								{{ snapshot.name }}
@@ -110,26 +110,26 @@
 							<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 								<Menu as="div" class="relative inline-block text-right">
 									<div>
-										<MenuButton class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+										<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 											<span class="sr-only">Open options</span>
 											<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 										</MenuButton>
 									</div>
 
 									<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-										<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+										<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 											<div class="py-1">
 												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+													<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+													<a href="#" @click="renameThisSnapshot(snapshot)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+													<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+													<a href="#" @click="sendThisDataset(snapshot)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
 													<a href="#" @click="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
@@ -179,7 +179,7 @@ import CloneSnapshot from '../snapshots/CloneSnapshot.vue';
 import RenameSnapshot from '../snapshots/RenameSnapshot.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import UniversalConfirmation from '../common/UniversalConfirmation.vue';
-import SendSnapshot from '../file-systems/SendSnapshot.vue';
+import SendSnapshot from './SendSnapshot.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;
 
