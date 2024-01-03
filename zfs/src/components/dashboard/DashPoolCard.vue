@@ -99,48 +99,63 @@
 	</button>
 
 	<div v-if="showPoolDetails">
-		<PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/>
+		<!-- <PoolDetail :pool="selectedPool!" @close="showPoolDetails = false"/> -->
+		<component :is="poolDetailsComponent" :pool="selectedPool!" @close="showPoolDetails = false"/>
 	</div>
 
 	<div v-if="showAddVDevModal">
-		<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="selectedPool!" :marginTop="'mt-28'"/>
+		<!-- <AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="selectedPool!" :marginTop="'mt-28'"/> -->
+		<component :is="showAddVDevComponent" @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="selectedPool!" :marginTop="'mt-28'"/>
 	</div>
 
 	<div v-if="showDeletePoolConfirm">
-		<UniversalConfirmation :showFlag="showDeletePoolConfirm" @close="updateShowDestroyPool" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/>
+		<!-- <UniversalConfirmation :showFlag="showDeletePoolConfirm" @close="updateShowDestroyPool" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/> -->
+		<component :is="deleteConfirmComponent" :showFlag="showDeletePoolConfirm" @close="updateShowDestroyPool" :idKey="'confirm-destroy-pool'" :item="'pool'" :operation="'destroy'" :pool="selectedPool!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :secondOption="'clear disk labels'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showResilverModal">
-		<UniversalConfirmation :showFlag="showResilverModal" @close="updateShowResilverPool" :idKey="'confirm-resilver-pool'" :item="'pool'" :operation="'resilver'" :pool="selectedPool!" :confirmOperation="confirmThisResilver" :hasChildren="false"/>
+		<!-- <UniversalConfirmation :showFlag="showResilverModal" @close="updateShowResilverPool" :idKey="'confirm-resilver-pool'" :item="'pool'" :operation="'resilver'" :pool="selectedPool!" :confirmOperation="confirmThisResilver" :hasChildren="false"/> -->
+		<component :is="resilverConfirmComponent" :showFlag="showResilverModal" @close="updateShowResilverPool" :idKey="'confirm-resilver-pool'" :item="'pool'" :operation="'resilver'" :pool="selectedPool!" :confirmOperation="confirmThisResilver" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showTrimModal">
-		<UniversalConfirmation :showFlag="showTrimModal" @close="updateShowTrimPool" :idKey="'confirm-trim-pool'" :item="'pool'" :operation="'trim'" :pool="selectedPool!" :confirmOperation="confirmThisTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
-	</div>
-
-	<div v-if="showScrubModal">
-		<UniversalConfirmation :showFlag="showScrubModal" @close="updateShowScrubPool" :idKey="'confirm-scrub-pool'" :item="'pool'" :operation="'scrub'" :pool="selectedPool!" :confirmOperation="confirmThisScrub" :hasChildren="false"/>
-	</div>
-
-	<div v-if="showExportModal">
-		<UniversalConfirmation :showFlag="showExportModal" @close="updateShowExportPool" :idKey="'confirm-export-pool'" :item="'pool'" :operation="'export'" :pool="selectedPool!" :confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false"/>
-	</div>
-
-	<div v-if="showPauseScrubConfirm">
-		<UniversalConfirmation :showFlag="showPauseScrubConfirm" @close="updateShowPauseScrub" :idKey="'confirm-pause-scrub'" :item="'pool'" :operation="'pause'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmPauseThisScrub" :hasChildren="false"/>
-	</div>
-
-	<div v-if="showStopScrubConfirm">
-		<UniversalConfirmation :showFlag="showStopScrubConfirm" @close="updateShowStopScrub" :idKey="'confirm-stop-scrub'" :item="'pool'" :operation="'stop'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmStopThisScrub" :hasChildren="false"/>
+		<!-- <UniversalConfirmation :showFlag="showTrimModal" @close="updateShowTrimPool" :idKey="'confirm-trim-pool'" :item="'pool'" :operation="'trim'" :pool="selectedPool!" :confirmOperation="confirmThisTrim" :firstOption="'secure TRIM'" :hasChildren="false"/> -->
+		<component :is="trimConfirmComponent" :showFlag="showTrimModal" @close="updateShowTrimPool" :idKey="'confirm-trim-pool'" :item="'pool'" :operation="'trim'" :pool="selectedPool!" :confirmOperation="confirmThisTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showPauseTrimConfirm">
-		<UniversalConfirmation :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/>
+		<!-- <UniversalConfirmation :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/> -->
+		<component :is="trimPauseConfirmComponent" :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showStopTrimConfirm">
-		<UniversalConfirmation :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/>
+		<!-- <UniversalConfirmation :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/> -->
+		<component :is="trimStopConfirmComponent" :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/>
 	</div>
+	
+	<div v-if="showScrubModal">
+		<!-- <UniversalConfirmation :showFlag="showScrubModal" @close="updateShowScrubPool" :idKey="'confirm-scrub-pool'" :item="'pool'" :operation="'scrub'" :pool="selectedPool!" :confirmOperation="confirmThisScrub" :hasChildren="false"/> -->
+		<component :is="scrubConfirmComponent" :showFlag="showScrubModal" @close="updateShowScrubPool" :idKey="'confirm-scrub-pool'" :item="'pool'" :operation="'scrub'" :pool="selectedPool!" :confirmOperation="confirmThisScrub" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showPauseScrubConfirm">
+		<!-- <UniversalConfirmation :showFlag="showPauseScrubConfirm" @close="updateShowPauseScrub" :idKey="'confirm-pause-scrub'" :item="'pool'" :operation="'pause'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmPauseThisScrub" :hasChildren="false"/> -->
+		<component :is="scrubPauseConfirmComponent" :showFlag="showPauseScrubConfirm" @close="updateShowPauseScrub" :idKey="'confirm-pause-scrub'" :item="'pool'" :operation="'pause'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmPauseThisScrub" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showStopScrubConfirm">
+		<!-- <UniversalConfirmation :showFlag="showStopScrubConfirm" @close="updateShowStopScrub" :idKey="'confirm-stop-scrub'" :item="'pool'" :operation="'stop'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmStopThisScrub" :hasChildren="false"/> -->
+		<component :is="scrubStopConfirmComponent" :showFlag="showStopScrubConfirm" @close="updateShowStopScrub" :idKey="'confirm-stop-scrub'" :item="'pool'" :operation="'stop'" :operation2="'scrub'" :pool="selectedPool!" :confirmOperation="confirmStopThisScrub" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showExportModal">
+		<!-- <UniversalConfirmation :showFlag="showExportModal" @close="updateShowExportPool" :idKey="'confirm-export-pool'" :item="'pool'" :operation="'export'" :pool="selectedPool!" :confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false"/> -->
+		<component :is="exportConfirmComponent" :showFlag="showExportModal" @close="updateShowExportPool" :idKey="'confirm-export-pool'" :item="'pool'" :operation="'export'" :pool="selectedPool!" :confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false"/>
+	</div>
+
+
+
+
 </template>
 
 <script setup lang="ts">
@@ -152,10 +167,10 @@ import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool
 import { labelClear } from "../../composables/disks";
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers'
 import Card from '../common/Card.vue';
-import UniversalConfirmation from "../common/UniversalConfirmation.vue";
-import PoolDetail from "../pools/PoolDetail.vue";
 import Status from '../common/Status.vue';
-import AddVDevModal from "../pools/AddVDevModal.vue";
+// import UniversalConfirmation from "../common/UniversalConfirmation.vue";
+// import PoolDetail from "../pools/PoolDetail.vue";
+// import AddVDevModal from "../pools/AddVDevModal.vue";
 
 interface DashPoolCardProps {
 	pool: PoolData;
@@ -194,6 +209,7 @@ const poolConfig = ref<PoolData>({
 	comment: props.pool.comment,
 });
 
+
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
 const operationRunning = ref(false);
@@ -205,10 +221,16 @@ const fourthOptionToggle = ref(false);
 ////////////// Show Pool/Disk Details ///////////////
 /////////////////////////////////////////////////////
 const showPoolDetails = ref(false);
+const poolDetailsComponent = ref();
+const loadShowPoolComponent = async () => {
+	const module = await import('../pools/PoolDetail.vue');
+	poolDetailsComponent.value = module.default;
+}
 
-function showDetails(pool) {
+async function showDetails(pool) {
 	selectedPool.value = pool;
 	console.log('loading:', selectedPool);
+	await loadShowPoolComponent();
 	showPoolDetails.value = true;
 }
 
@@ -248,10 +270,17 @@ const showDeletePoolConfirm = ref(false);
 const clearLabels = inject<Ref<boolean>>('clear-labels')!;
 const selectedDisk = ref<DiskData>();
 
+const deleteConfirmComponent = ref();
+const loadDeleteConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	deleteConfirmComponent.value = module.default;
+}
+
 async function destroyPoolAndUpdate(pool) {
 	operationRunning.value = false;
 	selectedPool.value = pool;
 	clearLabels.value = false;
+	await loadDeleteConfirmComponent();
 	showDeletePoolConfirm.value = true;
 
 	console.log('preparing to delete:', selectedPool.value);
@@ -298,8 +327,15 @@ const showResilverModal = ref(false);
 const resilvered = ref(false);
 const resilvering = ref(false);
 
+const resilverConfirmComponent = ref();
+const loadResilverConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	resilverConfirmComponent.value = module.default;
+}
+
 async function resilverThisPool(pool) {
 	selectedPool.value = pool;
+	await loadResilverConfirmComponent();
 	showResilverModal.value = true;
 
 	console.log('preparing to resilver:', selectedPool.value);
@@ -346,9 +382,28 @@ const pausing = ref(false);
 const stopping = ref(false);
 const resuming = ref(false);
 
-function scrubThisPool(pool) {
+const scrubConfirmComponent = ref();
+const loadScrubConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	scrubConfirmComponent.value = module.default;
+}
+
+const scrubPauseConfirmComponent = ref();
+const loadScrubPauseConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	scrubPauseConfirmComponent.value = module.default;
+}
+
+const scrubStopConfirmComponent = ref();
+const loadScrubStopConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	scrubStopConfirmComponent.value = module.default;
+}
+
+async function scrubThisPool(pool) {
 	// cleared.value = false;
 	selectedPool.value = pool;
+	await loadScrubConfirmComponent();
 	showScrubModal.value = true;
 	console.log('preparing to scrub:', selectedPool.value);
 }
@@ -383,8 +438,9 @@ watch(confirmScrub, async (newVal, oldVal) => {
 	}
 });
 
-function pauseScrub(pool) {
+async function pauseScrub(pool) {
 	selectedPool.value = pool;
+	await loadScrubPauseConfirmComponent();
 	showPauseScrubConfirm.value = true;
 	console.log('scrub to pause:', selectedPool.value);
 }
@@ -403,8 +459,9 @@ async function resumeScrub(pool) {
 	resuming.value = false
 }
 
-function stopScrub(pool) {
+async function stopScrub(pool) {
 	selectedPool.value = pool;
+	await loadScrubPauseConfirmComponent();
 	showStopScrubConfirm.value = true;
 	console.log('scrub to pause:', selectedPool.value);
 }
@@ -469,9 +526,28 @@ const pausingTrim = ref(false);
 const stoppingTrim = ref(false);
 const resumingTrim = ref(false);
 
+const trimConfirmComponent = ref();
+const loadTrimConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	trimConfirmComponent.value = module.default;
+}
+
+const trimPauseConfirmComponent = ref();
+const loadTrimPauseConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	trimPauseConfirmComponent.value = module.default;
+}
+
+const trimStopConfirmComponent = ref();
+const loadTrimStopConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	trimStopConfirmComponent.value = module.default;
+}
+
 async function trimThisPool(pool) {
 	// cleared.value = false;
 	selectedPool.value = pool;
+	await loadTrimConfirmComponent();
 	showTrimModal.value = true;
 
 	console.log("preparing to trim:", selectedPool.value);
@@ -517,8 +593,9 @@ watch(confirmTrim, async (newValue, oldValue) => {
 	}
 });
 
-function pauseTrim(pool) {
+async function pauseTrim(pool) {
 	selectedPool.value = pool;
+	await loadTrimPauseConfirmComponent();
 	showPauseTrimConfirm.value = true;
 	console.log('trim to pause:', selectedPool.value);
 }
@@ -539,8 +616,9 @@ async function resumeTrim(pool) {
 	resumingTrim.value = false
 }
 
-function stopTrim(pool) {
+async function stopTrim(pool) {
 	selectedPool.value = pool;
+	await loadTrimStopConfirmComponent();
 	showStopTrimConfirm.value = true;
 	console.log('trim to stop:', selectedPool.value);
 }
@@ -601,9 +679,16 @@ const confirmExport = ref(false);
 const forceUnmount = ref(false);
 const exporting = ref(false);
 
+const exportConfirmComponent = ref();
+const loadExportConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	exportConfirmComponent.value = module.default;
+}
+
 async function exportThisPool(pool) {
 	// cleared.value = false;
 	selectedPool.value = pool;
+	await loadExportConfirmComponent();
 	showExportModal.value = true;
 
 	console.log('preparing to export:', selectedPool.value);
@@ -649,10 +734,16 @@ async function clearPoolErrors(poolName) {
 ///////////////////// Add VDev //////////////////////
 /////////////////////////////////////////////////////
 const showAddVDevModal = ref(false);
+const showAddVDevComponent = ref();
+const loadShowAddVDevComponent = async () => {
+	const module = await import('../pools/AddVDevModal.vue');
+	showAddVDevComponent.value = module.default;
+}
 
-function showAddVDev(pool) {
+async function showAddVDev(pool) {
 	selectedPool.value = pool;
 	console.log(selectedPool);
+	await loadShowAddVDevComponent();
 	showAddVDevModal.value = true;
 }
 

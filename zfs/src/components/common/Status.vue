@@ -93,7 +93,7 @@
                         </span>
                         <div class="min-w-max w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
                             <div :class="progressBarClass()" class="h-4 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                                <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-white text-center p-0.5 leading-none">
+                                <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                     {{ amountProcessed }}/{{ amountTotal }} 
                                 </div>
                             </div>
@@ -115,7 +115,7 @@
                     </span>
                     <div class="min-w-fit w-full bg-well rounded-full relative flex h-4 min-h-min max-h-max overflow-hidden">
                         <div :class="trimProgressBarClass(selectedDisk!)" class="h-4 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
-                            <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-white text-center p-0.5 leading-none">
+                            <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                 {{ getTrimmedAmount(selectedDisk!) }}/{{ getTrimmedTotal(selectedDisk!) }}
                             </div>
                         </div>

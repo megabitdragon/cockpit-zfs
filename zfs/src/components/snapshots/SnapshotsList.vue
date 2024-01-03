@@ -76,9 +76,6 @@
 			<div class="">
 				<table class="table-auto min-w-full min-h-full divide-y divide-default bg-secondary">
 					<thead>
-						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="bg-default text-white w-full text-center p-4 justify-self-center">No snapshots found.</p>
-						</tr>
 						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
 							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Name</th>
 							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Created</th>
@@ -93,8 +90,11 @@
 						</tr>
 					</thead>
 					<!-- FILESYSTEMS -->
-					<tbody  class="divide-y divide-default bg-default">
-						<tr v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-5 justify-items-center items-center">
+					<tbody class="divide-y divide-default bg-default">
+						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
+							<p class="bg-well text-muted w-full text-center p-4 justify-self-center">No snapshots found.</p>
+						</tr>
+						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-5 justify-items-center items-center">
 							<td class="whitespace-nowrap py-4 text-sm font-medium text-default col-span-1"> 
 								{{ snapshot.name }}
 							</td>
