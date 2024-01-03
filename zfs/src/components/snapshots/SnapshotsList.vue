@@ -17,12 +17,12 @@
 								<span class="sr-only"></span>
 							</th>
 						</tr>
-						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
+						<!-- <tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
 							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
-						</tr>
+						</tr> -->
 					</thead>
 					<tbody class="divide-y divide-default bg-default">
-						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default ">
+						<tr v-if="snapshots.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default ">
 							<td class="whitespace-nowrap py-4 px-4 text-sm font-medium text-default bg-default">
 								{{ snapshot.name }}
 							</td>
@@ -68,16 +68,19 @@
 								</Menu>
 							</td>
 						</tr>
+						<tr v-if="!snapshotsLoaded && snapshotsLoading" class="rounded-md flex bg-well justify-center">
+							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
+						</tr>
 					</tbody>
 				</table>
 			</div>
 		</div>
 
 		<!-- FILESYSTEMS -->
-		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-max align-middle border border-l border-r border-default border-collapse">
+		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-max align-middle border-collapse">
 			<div class="">
 				<table class="table-auto min-w-full min-h-full divide-y divide-default">
-					<thead class="bg-secondary border border-l border-r border-default border-collapse">
+					<thead class="bg-secondary border-collapse">
 						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
 							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Name</th>
 							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Created</th>
@@ -87,11 +90,11 @@
 								<span class="sr-only"></span>
 							</th>
 						</tr>
-						<tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
+						<tr v-if="!snapshotsLoaded && snapshotsLoading" class="rounded-md flex bg-well justify-center">
 							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 						</tr>
 					</thead>
-					<tbody class="divide-y divide-default bg-accent border border-l border-r border-default border-collapse">
+					<tbody class="divide-y divide-default bg-accent border-collapse">
 						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
 							<p class="bg-well text-muted w-full text-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
@@ -194,6 +197,7 @@ const datasetsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 // const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 const snapshotsLoaded = ref(false);
+const snapshotsLoading = ref(false);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 
 const snapshotsInFilesystem = ref<Snapshot[]>([]);
@@ -209,8 +213,10 @@ async function refreshData() {
 	snapshotsLoaded.value = false;
 	datasets.value = [];
 	snapshots.value = [];
+	snapshotsLoading.value = true;
 	await loadDatasets(datasets);
 	await loadSnapshots(snapshots);
+	snapshotsLoading.value = false;
 	datasetsLoaded.value = true;
 	snapshotsLoaded.value = true;
 }
@@ -222,26 +228,18 @@ async function refreshData() {
 // 	datasetsLoaded.value = true;
 // }
 
-// loadSnapshots(snapshots);
-function loadTheseSnapshots() {
-	if (props.item == 'pool') {
-		loadSnapshotsInPool(snapshots, props.pool!.name);
-	} else if (props.item == 'filesystem') {
-		loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name);
-	}
-}
-
 async function refreshSnaps() {
 	snapshotsLoaded.value = false;
-
+	snapshotsLoading.value = true;
 	if (props.item == 'pool') {
 		snapshots.value = [];
+		await loadSnapshotsInPool(snapshots, props.pool!.name);
 	} else if (props.item == 'filesystem') {
 		snapshotsInFilesystem.value = [];
+		await loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name);
 	}
-	
-	loadTheseSnapshots();
 	snapshotsLoaded.value = true;
+	snapshotsLoading.value = false;
 }
 
 ///////// Values for Confirmation Modals ////////////
