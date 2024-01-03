@@ -82,12 +82,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, inject, Ref, computed, provide } from 'vue';
-import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
+import { ref, inject, Ref, computed } from 'vue';
+import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { getSnapshotTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
-import { loadSnapshots, loadSnapshotsInDataset, loadSnapshotsInPool } from '../../composables/loadData';
+import { loadSnapshotsInDataset, loadSnapshotsInPool } from '../../composables/loadData';
 
 interface CreateSnapshotModalProps {
     item: 'pool' | 'filesystem';
@@ -104,9 +104,6 @@ const datasetsInSamePool = computed<FileSystemData[]>(() => {
 const defaultFileSystem = ref();
 const selectedDataset= inject<Ref<FileSystemData>>('selected-dataset')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-// const snapshotsInPool = inject<Ref<Snapshot[]>>('snapshots-in-pool')!;
-// const snapshotsInDataset = ref<Snapshot[]>([]);
-// const snapshots = ref<Snapshot[]>([]);
 
 const showSnapshotModal = inject<Ref<boolean>>('create-snap-modal')!;
 const creating = inject<Ref<boolean>>('creating')!;

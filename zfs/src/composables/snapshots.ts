@@ -1,4 +1,4 @@
-import { useSpawn, errorString, BetterCockpitFile } from '@45drives/cockpit-helpers';
+import { useSpawn, errorString } from '@45drives/cockpit-helpers';
 import { convertTimestampToLocal, convertTimestampFormat } from '../composables/helpers';
 // @ts-ignore
 import get_snapshots_script from "../scripts/get-snapshots.py?raw";

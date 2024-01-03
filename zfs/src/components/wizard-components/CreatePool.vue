@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
+import { inject, provide, reactive, ref, Ref, computed, watch, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
@@ -426,7 +426,9 @@ const updateStatus = () => {
 
 watch(navTag, updateStatus);
 
-updateStatus();
+onMounted(() => {
+	updateStatus();
+});
 
 provide('new-pool-data', newPoolData);
 provide('show-wizard', showWizard);

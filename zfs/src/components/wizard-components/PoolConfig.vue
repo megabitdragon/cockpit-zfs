@@ -282,7 +282,7 @@
 				</label>
 			</button>
 
-			<FileSystem v-show="poolConfig.createFileSystem" ref="fsConfig" idKey="file-system" :isStandalone="false" />
+			<component v-show="poolConfig.createFileSystem" :is="createFileSystemComponent" ref="fsConfig" idKey="file-system" :isStandalone="false" />
 			
 		</fieldset>
 	</div>
@@ -290,19 +290,18 @@
 	<!-- tab five: final tab - review all data selected -->
 	<div v-if="props.tag ==='review'">
 		<fieldset>
-			<ReviewTab/>
+			<!-- <ReviewTab/> -->
+			<component :is="reviewTabComponent"/>
 		</fieldset>
 	</div>
 
 </template>
 
 <script setup lang="ts">
-import { inject, provide, reactive, ref, Ref, computed, watch, onUpdated, onMounted } from 'vue';
-import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
+import { inject, ref, Ref, computed, watchEffect } from 'vue';
+import { ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression } from '../../composables/helpers';
-import FileSystem from './FileSystem.vue';
-import ReviewTab from './ReviewTab.vue';
 
 interface PoolConfigProps {
 	tag: string;
@@ -312,13 +311,10 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
-// const FileSystem = () => import('./FileSystem.vue');
-
 const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
 const allPools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
 
-const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 	
 const disks = inject<Ref<DiskData[]>>('disks')!;
@@ -329,7 +325,26 @@ const diskFeedback = inject<Ref<string>>('feedback-disk')!;
 const diskSizeFeedback = inject<Ref<string>>('feedback-disk-size')!;
 const isProperReplicationFeedback = inject<Ref<string>>('feedback-replication-level')!;
 
-const diskIdentifier = ref<DiskIdentifier>('vdev_path');
+const createFileSystemComponent = ref();
+const loadCreateFileSystemComponent = async () => {
+	const module = await import('./FileSystem.vue');
+	createFileSystemComponent.value = module.default;
+}
+
+const reviewTabComponent = ref();
+const loadReviewTabComponent = async () => {
+	const module = await import('./ReviewTab.vue');
+	reviewTabComponent.value = module.default;
+}
+
+watchEffect(() => {
+	if (props.tag === 'file-system' && poolConfig.value.createFileSystem) {
+		loadCreateFileSystemComponent();
+	}
+	if (props.tag === 'review') {
+		loadReviewTabComponent();
+	}
+});
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection
 const vDevAvailDisks = computed<DiskData[][]>(() => {
@@ -359,9 +374,6 @@ const isDiskTaken = computed(() => (diskName) => {
 	return false;
 });
 
-// //setting default values for file system object
-// const fileSystemConfig = ref<FileSystemData>();
-
 //change color of disk when selected
 const diskCardClass = (diskName, vDevIdx) => {
   const isSelected = poolConfig.value.vdevs[vDevIdx].selectedDisks.includes(diskName);
@@ -380,7 +392,11 @@ function initialVDev() {
 		type: 'mirror',
 		status: '',
 		guid: '',
-		stats: {},
+		stats: {
+			write_errors: 0,
+			read_errors: 0,
+			checksum_errors: 0,
+		},
 		disks: [],
 		selectedDisks: [],
 		diskIdentifier: 'vdev_path',
@@ -396,7 +412,11 @@ function addVDev() {
 		type: poolConfig.value.vdevs[0].type,
 		status: '',
 		guid: '',
-		stats: {},
+		stats: {
+			write_errors: 0,
+			read_errors: 0,
+			checksum_errors: 0,
+		},
 		disks: [],
 		selectedDisks: [],
 		diskIdentifier: 'vdev_path',
@@ -607,9 +627,6 @@ const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
 const newVDevs = ref<newVDevData[]>([]);
 const newVDevDisks = ref<string[]>([]);
 
-// const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
-// const sdPathRegex = `\/dev\/sd[a-z][0-9]+$`;
-// const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9\-]+(?:-part[0-9]+)?$`;
 const phyPathPrefix = '/dev/disk/by-path/';
 const sdPathPrefix = '/dev/';
 const newDisk = ref();
@@ -669,7 +686,6 @@ function fillNewPoolData() {
 const fsConfig = ref();
 
 async function createNewFileSystem() {
-
 	console.log('fsConfig', fsConfig.value);
 
 	await fsConfig.value.newFileSystemInPoolWizard();
@@ -684,14 +700,5 @@ defineExpose({
 	fillNewPoolData,
 	addVDev,
 	createNewFileSystem,
-});
-
-
-onMounted(() => {
-	console.log('fsConfig on PoolConfig mount', fsConfig.value);
-});
-
-onUpdated(() => {
-	console.log('fsConfig on PoolConfig update', fsConfig.value);
 });
 </script>

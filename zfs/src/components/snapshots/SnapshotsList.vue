@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<!-- POOLS -->
 		<div v-if="props.item == 'pool'" class="inline-block max-h-max align-middle border border-default border-collapse">
 			<div class="">
 				<table class="table-auto min-h-full divide-y divide-default bg-default">
@@ -20,7 +21,6 @@
 							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 						</tr>
 					</thead>
-					<!-- POOLS -->
 					<tbody class="divide-y divide-default bg-default">
 						<tr v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default ">
 							<td class="whitespace-nowrap py-4 px-4 text-sm font-medium text-default bg-default">
@@ -72,10 +72,12 @@
 				</table>
 			</div>
 		</div>
-		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-max align-middle border border-default border-collapse">
+
+		<!-- FILESYSTEMS -->
+		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-max align-middle border border-l border-r border-default border-collapse">
 			<div class="">
-				<table class="table-auto min-w-full min-h-full divide-y divide-default bg-secondary">
-					<thead>
+				<table class="table-auto min-w-full min-h-full divide-y divide-default">
+					<thead class="bg-secondary border border-l border-r border-default border-collapse">
 						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
 							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Name</th>
 							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Created</th>
@@ -89,8 +91,7 @@
 							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 						</tr>
 					</thead>
-					<!-- FILESYSTEMS -->
-					<tbody class="divide-y divide-default bg-default">
+					<tbody class="divide-y divide-default bg-accent border border-l border-r border-default border-collapse">
 						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
 							<p class="bg-well text-muted w-full text-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
@@ -110,26 +111,26 @@
 							<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 								<Menu as="div" class="relative inline-block text-right">
 									<div>
-										<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+										<MenuButton class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 											<span class="sr-only">Open options</span>
 											<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 										</MenuButton>
 									</div>
 
 									<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-										<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+										<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 											<div class="py-1">
 												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+													<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click="renameThisSnapshot(snapshot)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+													<a href="#" @click="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+													<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click="sendThisDataset(snapshot)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+													<a href="#" @click="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
 												</MenuItem>
 												<MenuItem as="div" v-slot="{ active }">
 													<a href="#" @click="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
@@ -146,40 +147,35 @@
 		</div>
 	
 		<div v-if="showDestroySnapshotModal">
-			<UniversalConfirmation  :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy child snapshots with same name'" :secondOption="'Force Destroy ALL child datasets'" :hasChildren="hasChildren"/>
+			<component :is="destroySnapshotComponent" :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy child snapshots with same name'" :secondOption="'Force Destroy ALL child datasets'" :hasChildren="hasChildren"/>
 		</div>
 
 		<div v-if="showCloneSnapshotModal">
-			<CloneSnapshot @close="showCloneSnapshotModal = false" :idKey="'clone-snapshot-modal'" :snapshot="selectedSnapshot!"/>
+			<component :is="cloneSnapshotComponent" @close="updateShowCloneSnapshot" :idKey="'clone-snapshot-modal'" :snapshot="selectedSnapshot!"/>
 		</div>
 
 		<div v-if="showRenameSnapshotModal">
-			<RenameSnapshot @close="showRenameSnapshotModal = false" :idKey="'rename-snapshot-modal'" :snapshot="selectedSnapshot!"/>
+			<component :is="renameSnapshotComponent" @close="updateShowRenameSnapshot" :idKey="'rename-snapshot-modal'" :snapshot="selectedSnapshot!"/>
 		</div>
 
 		<div v-if="showRollbackSnapshotModal">
-			<UniversalConfirmation :showFlag="showRollbackSnapshotModal" @close="updateShowRollbackSnapshot" :idKey="'confirm-rollback-snapshot'" :item="'snapshot'" :operation="'rollback'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisRollback" :firstOption="'Destroy all newer snapshots of file system'" :secondOption="'Force Destroy ALL newer datasets'" :hasChildren="hasChildren"/>
+			<component :is="rollbackSnapshotComponent" :showFlag="showRollbackSnapshotModal" @close="updateShowRollbackSnapshot" :idKey="'confirm-rollback-snapshot'" :item="'snapshot'" :operation="'rollback'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisRollback" :firstOption="'Destroy all newer snapshots of file system'" :secondOption="'Force Destroy ALL newer datasets'" :hasChildren="hasChildren"/>
 		</div>
 
 		<div v-if="showSendSnapshot">
-			<SendSnapshot idKey="'show-send-snapshot-modal'" @close="showSendSnapshot = false" :snapshot="selectedSnapshot!" :name="selectedSnapshot!.name" />
+			<component :is="sendSnapshotComponent" @close="updateShowSendSnapshot" idKey="'show-send-snapshot-modal'" :snapshot="selectedSnapshot!" :name="selectedSnapshot!.name" />
 		</div>
 
 	</div>
 
 </template>
 <script setup lang="ts">
-import { reactive, ref, inject, Ref, computed, provide, watch, onMounted } from 'vue';
-import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
-import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { getTimestampString, upperCaseWord, isBoolOnOff, convertTimestampToLocal } from '../../composables/helpers';
-import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset, loadDatasets } from '../../composables/loadData';
-import { destroySnapshot, rollbackSnapshot, cloneSnapshot, renameSnapshot } from '../../composables/snapshots';
-import CloneSnapshot from '../snapshots/CloneSnapshot.vue';
-import RenameSnapshot from '../snapshots/RenameSnapshot.vue';
+import { ref, inject, Ref, provide, watch, onMounted } from 'vue';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
+import { loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset, loadDatasets } from '../../composables/loadData';
+import { destroySnapshot, rollbackSnapshot } from '../../composables/snapshots';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import UniversalConfirmation from '../common/UniversalConfirmation.vue';
-import SendSnapshot from './SendSnapshot.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -262,7 +258,13 @@ const showDestroySnapshotModal = ref(false);
 const hasChildren = ref(false);
 const confirmDestroy = ref(false);
 
-function destroyThisSnapshot(snapshot) {
+const destroySnapshotComponent = ref();
+const loadDestroySnapshotComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	destroySnapshotComponent.value = module.default;
+}
+
+async function destroyThisSnapshot(snapshot) {
 	operationRunning.value = false;
 	selectedSnapshot.value = snapshot;
 	
@@ -270,6 +272,7 @@ function destroyThisSnapshot(snapshot) {
 		hasChildren.value = true;
 	}
 
+	await loadDestroySnapshotComponent();
 	showDestroySnapshotModal.value = true;
 	console.log('selected for destroy:', selectedSnapshot.value);
 }
@@ -307,10 +310,21 @@ const showCloneSnapshotModal = ref(false);
 const cloning = ref(false);
 const confirmClone = ref(false);
 
-function cloneThisSnapshot(snapshot) {
-	showCloneSnapshotModal.value = true;
+const cloneSnapshotComponent = ref();
+const loadCloneSnapshotComponent = async () => {
+	const module = await import('./CloneSnapshot.vue');
+	cloneSnapshotComponent.value = module.default;
+}
+
+async function cloneThisSnapshot(snapshot) {
 	selectedSnapshot.value = snapshot;
 	console.log('clone snapshot modal triggered');
+	await loadCloneSnapshotComponent();
+	showCloneSnapshotModal.value = true;
+}
+
+const updateShowCloneSnapshot = (newVal) => {
+	showCloneSnapshotModal.value = newVal;
 }
 
 watch(confirmClone, async (newVal, oldVal) => {
@@ -328,10 +342,17 @@ watch(confirmClone, async (newVal, oldVal) => {
 const showRollbackSnapshotModal = ref(false);
 const confirmRollback = ref(false);
 
-function rollbackThisSnapshot(snapshot) {
-	showRollbackSnapshotModal.value = true;
+const rollbackSnapshotComponent = ref();
+const loadRollbackSnapshotComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	rollbackSnapshotComponent.value = module.default;
+}
+
+async function rollbackThisSnapshot(snapshot) {
 	selectedSnapshot.value = snapshot;
 	console.log('selected to be rolled back:', selectedSnapshot.value);
+	await loadRollbackSnapshotComponent();
+	showRollbackSnapshotModal.value = true;
 }
 
 const confirmThisRollback : ConfirmationCallback = () => {
@@ -362,10 +383,21 @@ const showRenameSnapshotModal = ref(false);
 const renaming = ref(false);
 const confirmRename = ref(false);
 
-function renameThisSnapshot(snapshot) {
-	showRenameSnapshotModal.value = true;
+const renameSnapshotComponent = ref();
+const loadRenameSnapshotComponent = async () => {
+	const module = await import('./RenameSnapshot.vue');
+	renameSnapshotComponent.value = module.default;
+}
+
+async function renameThisSnapshot(snapshot) {
 	selectedSnapshot.value = snapshot;
 	console.log('rename snapshot modal triggered');
+	await loadRenameSnapshotComponent();
+	showRenameSnapshotModal.value = true;
+}
+
+const updateShowRenameSnapshot = (newVal) => {
+	showRenameSnapshotModal.value = newVal;
 }
 
 watch(confirmRename, async (newVal, oldVal) => {
@@ -378,17 +410,29 @@ watch(confirmRename, async (newVal, oldVal) => {
 	}
 });
 
+
 /////////////////// Send Snapshot ///////////////////
 /////////////////////////////////////////////////////
 const showSendSnapshot = ref(false);
 const sendingSnap = ref(false);
 const confirmSendSnap = ref(false);
 
-function sendThisDataset(snapshot) {
-	showSendSnapshot.value = true;
+const sendSnapshotComponent = ref();
+const loadSendSnapshotComponent = async () => {
+	const module = await import('./SendSnapshot.vue');
+	sendSnapshotComponent.value = module.default;
+}
+
+async function sendThisDataset(snapshot) {
 	selectedSnapshot.value = snapshot;
 	confirmSendSnap.value = false;
 	console.log('selected to send:', selectedSnapshot.value);
+	await loadSendSnapshotComponent();
+	showSendSnapshot.value = true;
+}
+
+const updateShowSendSnapshot = (newVal) => {
+	showSendSnapshot.value = newVal;
 }
 
 watch(confirmSendSnap, async (newVal, oldVal) => {

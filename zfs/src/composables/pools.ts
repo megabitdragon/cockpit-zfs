@@ -1,14 +1,12 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
 import { convertSizeToBytes } from './helpers';
-import { inject, provide, reactive, ref, Ref, computed, watch } from 'vue';
+import { ref } from 'vue';
 // @ts-ignore
 import get_pools_script from "../scripts/get-pools.py?raw";
 // @ts-ignore
 import get_importable_pools_script from "../scripts/get-importable-pools.py?raw";
 // @ts-ignore
 import get_importable_destroyed_pools_script from "../scripts/get-importable-destroyed-pools.py?raw";
-// @ts-ignore
-import create_pools_script from "./create-pool.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -22,21 +20,6 @@ export async function getPools() {
 		return null;
 	}
 }
-
-/*	OLD METHOD USING py-libzfs API
-export async function createPool(poolName : string, vDevs: newVDev[]) {
-	try {
-		//console.log(vDevs);
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_pools_script, poolName, '--vdev-topology', JSON.stringify(vDevs)], { superuser: 'try', stderr: 'out'});
-		const output = await state.promise();
-		console.log(output)
-		return output.stdout;
-	} catch (state) {
-		console.error(errorString(state));
-		return null;
-	}
-}
-*/
 
 const newPoolDisks = ref<string[]>([]);
 const newVDevs = ref<newVDevData[]>([]);
@@ -301,8 +284,6 @@ export async function scrubPool(pool, action?) {
 		return null;
 	}
 }
-
-
 
 export async function resilverPool(pool) {
 	try {

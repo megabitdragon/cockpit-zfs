@@ -5,8 +5,8 @@
 			<!-- Name of Parent File System (Text) -->
 			<div>
 				<label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-				<select :id="getIdKey('parent-filesystem')" disabled v-model="fileSystemConfig.parentFS" name="parent-filesystem" class="mt-1 block w-full input-textlike bg-default">
-					<option :value="parentFileSystem" class=text-default>{{ parentFileSystem }}</option>
+				<select :id="getIdKey('parent-filesystem')" disabled v-model="fileSystemConfig.parentFS" name="parent-filesystem" class="mt-1 block w-full input-textlike bg-default text-default">
+					<option :value="parentFileSystem" class="text-default">{{ parentFileSystem }}</option>
 				</select>
 			</div>
 
@@ -131,7 +131,6 @@
 						<option value="1mib">1 MiB</option>
 					</select>
 				</div>
-
 
 				<!-- Access Time (Select) -->
 				<div>
@@ -468,7 +467,7 @@
 <script setup lang="ts">
 import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
-import { convertSizeToBytes, convertBytesToSize, isBoolOnOff, getParentPath, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
+import { convertSizeToBytes, isBoolOnOff, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
 import { createDataset, createEncryptedDataset } from '../../composables/datasets';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';

@@ -103,17 +103,16 @@
     </Modal>
 
     <div v-if="showTestSSH">
-        <TestSSHModal @close="updateShowTestSSH" :idKey="'test-ssh-modal'" :showFlag="showTestSSH"/>
+        <component :is="testSSHComponent" @close="updateShowTestSSH" :idKey="'test-ssh-modal'" :showFlag="showTestSSH"/>
     </div>
 
 </template>
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
 import { BetterCockpitFile } from '@45drives/cockpit-helpers';
-import { ref, Ref, inject, watch, computed } from 'vue';
+import { ref, Ref, inject, computed } from 'vue';
 import { sendSnapshot, doesDatasetExist, formatRecentSnaps } from '../../composables/snapshots';
-import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, testSSH, convertSizeToBytes, convertSizeToBytesDecimal } from '../../composables/helpers';
-import TestSSHModal from '../file-systems/TestSSHModal.vue';
+import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, convertSizeToBytesDecimal } from '../../composables/helpers';
 
 interface SendSnapshotProps {
     idKey: string;
@@ -154,7 +153,14 @@ const mBufferUnit = ref('G');
 
 const showTestSSH = ref(false);
 
-function showTestSSHModal() {
+const testSSHComponent = ref();
+const loadTestSSHComponent = async () => {
+	const module = await import('../file-systems/TestSSHModal.vue');
+	testSSHComponent.value = module.default;
+}
+
+async function showTestSSHModal() {
+    await loadTestSSHComponent();
 	showTestSSH.value = true;
 	console.log('test ssh modal triggered');
 }

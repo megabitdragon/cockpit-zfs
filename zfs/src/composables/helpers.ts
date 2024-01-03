@@ -1,5 +1,5 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
-import { reactive, ref, inject, Ref, computed, provide, ComputedRef } from 'vue';
+import { ref, Ref } from 'vue';
 // @ts-ignore
 import test_ssh_script from"../scripts/test-ssh.py?raw";
 
