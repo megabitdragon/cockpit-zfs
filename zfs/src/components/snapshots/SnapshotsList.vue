@@ -3,7 +3,7 @@
 		<div v-if="props.item == 'pool'" class="inline-block max-h-max align-middle border border-default border-collapse">
 			<div class="">
 				<table class="table-auto min-h-full divide-y divide-default bg-default">
-					<thead>
+					<thead class="bg-well">
 						<tr v-if="snapshots.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
 							<p class="bg-accent text-defaulttext-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>

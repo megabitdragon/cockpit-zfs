@@ -59,44 +59,42 @@
     </div>
 
 	<div v-if="showDetachDiskModal">
-		<UniversalConfirmation :showFlag="showDetachDiskModal" @close="updateShowDetachDisk" :idKey="'confirm-detach-disk'" :item="'disk'" :operation="'detach'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDetach" :secondOption="'clear disk labels'" :hasChildren="false"/>
+		<component :is="detachDiskComponent" :showFlag="showDetachDiskModal" @close="updateShowDetachDisk" :idKey="'confirm-detach-disk'" :item="'disk'" :operation="'detach'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDetach" :secondOption="'clear disk labels'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showOfflineDiskModal">
-		<UniversalConfirmation :showFlag="showOfflineDiskModal" @close="updateShowOfflineDisk" :idKey="'confirm-offline-disk'" :item="'disk'" :operation="'offline'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisOffline" :firstOption="'forcefully offline'" :secondOption="'temporarily offline until next reboot'" :hasChildren="false"/>
+		<component :is="offlineDiskComponent" :showFlag="showOfflineDiskModal" @close="updateShowOfflineDisk" :idKey="'confirm-offline-disk'" :item="'disk'" :operation="'offline'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisOffline" :firstOption="'forcefully offline'" :secondOption="'temporarily offline until next reboot'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showOnlineDiskModal">
-		<UniversalConfirmation :showFlag="showOnlineDiskModal" @close="updateShowOnlineDisk" :idKey="'confirm-online-disk'" :item="'disk'" :operation="'online'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisOnline" :firstOption="'expand devices to use whole disk'" :secondOption="'scrub pool after coming online'" :hasChildren="false"/>
+		<component :is="onlineDiskComponent" :showFlag="showOnlineDiskModal" @close="updateShowOnlineDisk" :idKey="'confirm-online-disk'" :item="'disk'" :operation="'online'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisOnline" :firstOption="'expand devices to use whole disk'" :secondOption="'scrub pool after coming online'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showTrimDiskModal">
-		<UniversalConfirmation :showFlag="showTrimDiskModal" @close="updateShowTrimDisk" :idKey="'confirm-trim-disk'" :item="'disk'" :operation="'trim'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDiskTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
-	</div>
-
-	<div v-if="showReplaceDiskModal">
-		<ReplaceDiskModal :showFlag="showReplaceDiskModal" @close="updateShowReplaceDisk" :idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!"/>
+		<component :is="trimDiskComponent" :showFlag="showTrimDiskModal" @close="updateShowTrimDisk" :idKey="'confirm-trim-disk'" :item="'disk'" :operation="'trim'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDiskTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showPauseTrimConfirm">
-		<UniversalConfirmation :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/>
+		<component :is="trimPauseDiskComponent" :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/>
 	</div>
 
 	<div v-if="showStopTrimConfirm">
-		<UniversalConfirmation :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/>
+		<component :is="trimStopDiskComponent" :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/>
+	</div>
+
+	<div v-if="showReplaceDiskModal">
+		<component :is="replaceDiskComponent" :showFlag="showReplaceDiskModal" @close="updateShowReplaceDisk" :idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!"/>
 	</div>
 	
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, computed, ComputedRef, onMounted, nextTick } from "vue";
-import { EllipsisVerticalIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { ref, inject, Ref, watch, computed } from "vue";
+import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, removeVDevFromPool } from "../../composables/pools";
+import { scrubPool, clearErrors } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers'
-import UniversalConfirmation from "../common/UniversalConfirmation.vue";
-import ReplaceDiskModal from "../disks/ReplaceDiskModal.vue";
 import Status from "../common/Status.vue";
 
 interface DiskListElementProps {
@@ -177,9 +175,16 @@ const showDetachDiskModal = ref(false);
 const confirmDetach = ref(false);
 const detaching = ref(false);
 
+const detachDiskComponent = ref();
+const loadDetachDiskComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	detachDiskComponent.value = module.default;
+}
+
 async function detachThisDisk(pool : PoolData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
+	await loadDetachDiskComponent();
 	showDetachDiskModal.value = true;
 	console.log("Preparing to detach:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 }
@@ -221,10 +226,17 @@ const showOfflineDiskModal = ref(false);
 const confirmOffline = ref(false);
 const offlining = ref(false);
 
+const offlineDiskComponent = ref();
+const loadOfflineDiskComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	offlineDiskComponent.value = module.default;
+}
+
 async function offlineThisDisk(pool: PoolData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	await loadOfflineDiskComponent();
 	showOfflineDiskModal.value = true;
 }
 
@@ -258,10 +270,17 @@ const showOnlineDiskModal = ref(false);
 const confirmOnline = ref(false);
 const onlining = ref(false);
 
+const onlineDiskComponent = ref();
+const loadOnlineDiskComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	onlineDiskComponent.value = module.default;
+}
+
 async function onlineThisDisk(pool: PoolData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	await loadOnlineDiskComponent();
 	showOnlineDiskModal.value = true;
 }
 
@@ -306,10 +325,29 @@ const pausingDiskTrim = ref(false);
 const stoppingDiskTrim = ref(false);
 const resumingDiskTrim = ref(false);
 
+const trimDiskComponent = ref();
+const loadTrimDiskComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	trimDiskComponent.value = module.default;
+}
+
+const trimPauseDiskComponent = ref();
+const loadTrimPauseDiskComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	trimPauseDiskComponent.value = module.default;
+}
+
+const trimStopDiskComponent = ref();
+const loadTrimStopDiskComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	trimStopDiskComponent.value = module.default;
+}
+
 async function trimThisDisk(pool: PoolData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	await loadTrimDiskComponent();
 	showTrimDiskModal.value = true;
 }
 
@@ -356,9 +394,10 @@ watch(confirmTrimDisk, async (newVal, oldVal) => {
 	}
 });
 
-function pauseTrim(pool, disk) {
+async function pauseTrim(pool, disk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
+	await loadTrimPauseDiskComponent();
 	showPauseTrimConfirm.value = true;
 	console.log('trim to pause:', selectedPool.value);
 }
@@ -381,9 +420,10 @@ async function resumeTrim(pool, disk) {
 	resumingDiskTrim.value = false
 }
 
-function stopTrim(pool, disk) {
+async function stopTrim(pool, disk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
+	await loadTrimStopDiskComponent();
 	showStopTrimConfirm.value = true;
 	console.log('trim to stop:', selectedPool.value);
 }
@@ -442,15 +482,22 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 /////////////////////////////////////////////////////
 const showReplaceDiskModal = ref(false);
 
+const replaceDiskComponent = ref();
+const loadReplaceDiskComponent = async () => {
+	const module = await import('../disks/ReplaceDiskModal.vue');
+	replaceDiskComponent.value = module.default;
+}
+
 const updateShowReplaceDisk = (newVal) => {
 	showReplaceDiskModal.value = newVal;
 }
 
-function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
+async function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	selectedVDev.value = vdev;
 	console.log('selected pool:', selectedPool.value, 'selectedVDev:', selectedVDev, 'selected disk:', selectedDisk.value);
+	await loadReplaceDiskComponent();
 	showReplaceDiskModal.value = true;
 }
 
@@ -477,7 +524,6 @@ async function getDiskTrimStatus() {
 
 /////////////////////////////////////////////////////
 
-const poolID = ref(props.pool.name);
 const diskID = ref(props.disk.name);
 
 const trimActivity = computed(() => {

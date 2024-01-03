@@ -67,23 +67,22 @@
 		</div>
     </div>
 	<div v-if="showAttachDiskModal">
-		<AttachDiskModal :showFlag="showAttachDiskModal" @close="updateShowAttachDisk" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
+		<!-- <AttachDiskModal :showFlag="showAttachDiskModal" @close="updateShowAttachDisk" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/> -->
+		<component :is="showAttachDiskComponent" :showFlag="showAttachDiskModal" @close="updateShowAttachDisk" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
 	</div>
 
 	<div v-if="showRemoveVDevConfirm">
-		<UniversalConfirmation :showFlag="showRemoveVDevConfirm" @close="updateShowRemoveVDev" :idKey="'confirm-remove-vdev'" :item="'vdev'" :operation="'remove'" :pool="selectedPool!" :vdev="selectedVDev!" :confirmOperation="confirmThisRemove" :hasChildren="false"/>
+		<component :is="showRemoveVDevComponent" :showFlag="showRemoveVDevConfirm" @close="updateShowRemoveVDev" :idKey="'confirm-remove-vdev'" :item="'vdev'" :operation="'remove'" :pool="selectedPool!" :vdev="selectedVDev!" :confirmOperation="confirmThisRemove" :hasChildren="false"/>
 	</div>
 
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, watch } from "vue";
-import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { scrubPool, clearErrors, removeVDevFromPool } from "../../composables/pools";
+import { clearErrors, removeVDevFromPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, upperCaseWord } from '../../composables/helpers';
-import UniversalConfirmation from "../common/UniversalConfirmation.vue";
-import AttachDiskModal from "../disks/AttachDiskModal.vue";
 import DiskElement from '../pools/DiskElement.vue';
 
 interface VDevElementProps {
@@ -91,8 +90,6 @@ interface VDevElementProps {
 	poolIdx: number;
 	vDev: vDevData;
 	vDevIdx: number;
-	// disk: DiskData;
-    // diskIdx: number;
 }
 
 const props = defineProps<VDevElementProps>();
@@ -100,14 +97,9 @@ const props = defineProps<VDevElementProps>();
 const notifications = inject<Ref<any>>('notifications')!;
 
 const selectedPool = ref<PoolData>();
-const selectedDisk = ref<DiskData>();
 const selectedVDev = ref<vDevData>();
 
 const operationRunning = ref(false);
-const firstOptionToggle = ref(false);
-const secondOptionToggle = ref(false);
-const thirdOptionToggle = ref(false);
-const fourthOptionToggle = ref(false);
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
@@ -140,25 +132,6 @@ async function refreshAllData() {
 	fileSystemsLoaded.value = true;
 }
 
-const starting = ref(false);
-
-async function scrubAndScan() {
-	starting.value = true;
-	await scrubPool(selectedPool.value!);
-	getScanStatus();
-	starting.value = false;
-}
-
-const scanStatusBox = ref();
-
-async function getScanStatus() {
-	console.log('scanStatusBox', scanStatusBox.value);
-
-	// Needed to specify index to work properly (treating as an array due to multiple pools error)
-	await scanStatusBox.value.pollScanStatus();
-}
-
-
 /////////////////// Clear Errors ////////////////////
 /////////////////////////////////////////////////////
 // const cleared = ref(false);
@@ -170,24 +143,21 @@ async function clearVDevErrors(poolName, vDevName) {
 }
 
 
-///////////////// Add/Remove VDev ///////////////////
+/////////////////// Remove VDev /////////////////////
 /////////////////////////////////////////////////////
-const showAddVDevModal = ref(false);
-
 const showRemoveVDevConfirm = ref(false);
 const confirmRemove = ref(false);
 
-function showAddVDev(pool) {
-	selectedPool.value = pool;
-	console.log(selectedPool);
-	showAddVDevModal.value = true;
+const showRemoveVDevComponent = ref();
+const loadShowRemoveVDevComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	showRemoveVDevComponent.value = module.default;
 }
-
-/////////////////////////////////////////////////////
 
 async function removeVDev(pool : PoolData, vDev : vDevData) {
 	selectedPool.value = pool;
 	selectedVDev.value = vDev;
+	await loadShowRemoveVDevComponent();
 	showRemoveVDevConfirm.value = true;
 
 	console.log('preparing to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
@@ -221,14 +191,21 @@ watch(confirmRemove, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showAttachDiskModal = ref(false);
 
+const showAttachDiskComponent = ref();
+const loadShowAttachDiskComponent = async () => {
+	const module = await import('../disks/AttachDiskModal.vue');
+	showAttachDiskComponent.value = module.default;
+}
+
 const updateShowAttachDisk = (newVal) => {
 	showAttachDiskModal.value = newVal;
 }
 
-function showAttachDisk(pool: PoolData, vdev: vDevData) {
+async function showAttachDisk(pool: PoolData, vdev: vDevData) {
 	selectedPool.value = pool;
 	selectedVDev.value = vdev;
 	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
+	await loadShowAttachDiskComponent();
 	showAttachDiskModal.value = true;
 }
 

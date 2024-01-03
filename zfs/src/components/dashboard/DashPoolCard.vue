@@ -445,9 +445,9 @@ async function resumeScrub(pool) {
 
 async function stopScrub(pool) {
 	selectedPool.value = pool;
-	await loadScrubPauseConfirmComponent();
+	await loadScrubStopConfirmComponent();
 	showStopScrubConfirm.value = true;
-	console.log('scrub to pause:', selectedPool.value);
+	console.log('scrub to stop:', selectedPool.value);
 }
 
 async function stopScrubAndScan() {

@@ -58,12 +58,12 @@
 		</div>
 	</div>
 
-	<div v-if="showWizard">
-		<CreatePool @close="showWizard = false"/>
+	<div v-if="showNewPoolWizard">
+		<component :is="createPoolComponent" @close="showNewPoolWizard = false"/>
 	</div>
 
 	<div v-if="showImportModal">
-		<ImportPool :idKey="'import-pool'"/>
+		<component :is="importPoolComponent" :idKey="'import-pool'"/>
 	</div>
 </template>
 
@@ -72,18 +72,8 @@ import { ref, inject, Ref, provide } from "vue";
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
-import CreatePool from '../wizard-components/CreatePool.vue';
 import PoolListElement from './PoolListElement.vue';
-import ImportPool from "./ImportPool.vue";
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-
-///////// Values for Confirmation Modals ////////////
-/////////////////////////////////////////////////////
-const operationRunning = ref(false);
-const firstOptionToggle = ref(false);
-const secondOptionToggle = ref(false);
-const thirdOptionToggle = ref(false);
-const fourthOptionToggle = ref(false);
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
@@ -118,29 +108,32 @@ async function refreshAllData() {
 
 /////////////// Create/Import Pool //////////////////
 /////////////////////////////////////////////////////
-const showWizard = ref(false);
-const showImportModal = ref(false);
+const showNewPoolWizard = ref(false);
 
-function newPoolWizardBtn() {
-	if (!showWizard.value) {
-		showWizard.value = true;	
-	} else {
-		showWizard.value = false;
-	}
+const createPoolComponent = ref();
+const loadCreatePoolComponent = async () => {
+	const module = await import('../wizard-components/CreatePool.vue');
+	createPoolComponent.value = module.default;
 }
 
-function importNewPoolBtn() {
+async function newPoolWizardBtn() {
+	await loadCreatePoolComponent();
+	showNewPoolWizard.value = true;
+}
+
+const showImportModal = ref(false);
+
+const importPoolComponent = ref();
+const loadImportPoolComponent = async () => {
+	const module = await import('./ImportPool.vue');
+	importPoolComponent.value = module.default;
+}
+
+async function importNewPoolBtn() {
+	await loadImportPoolComponent();
 	showImportModal.value = true;
 }
 
-
-provide('show-wizard', showWizard);
-
+provide('show-wizard', showNewPoolWizard);
 provide("show-import-modal", showImportModal);
-
-provide('modal-confirm-running', operationRunning);
-provide('modal-option-one-toggle', firstOptionToggle);
-provide('modal-option-two-toggle', secondOptionToggle);
-provide('modal-option-three-toggle', thirdOptionToggle);
-provide('modal-option-four-toggle', fourthOptionToggle);
 </script>

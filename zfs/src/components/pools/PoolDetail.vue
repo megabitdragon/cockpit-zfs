@@ -47,6 +47,7 @@
 			
 			<div v-if="navTag == 'snapshots'" class="">
 				<SnapshotsList :pool="props.pool" :item="'pool'"/>
+				<!-- <component :is=""/> -->
 			</div>
 
 			<div v-if="navTag == 'settings'">
@@ -232,9 +233,13 @@
 		</template>
 	</Modal>
 
-	<CreateSnapshotModal @close="showSnapshotModal = false" :poolName="props.pool.name" :item="'pool'"/>
-	<AddVDevModal @close="showAddVDevModal = false" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
-	
+	<div v-if="showSnapshotModal">
+		<component :is="createSnapshotComponent" @close="updateShowNewSnapshot" :poolName="props.pool.name" :item="'pool'"/>
+	</div>
+	<div v-if="showAddVDevModal">
+		<component :is="addVDevComponent" @close="updateShowAddVDev" :idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'"/>
+	</div>
+
 </template>
 
 <script setup lang="ts">
@@ -242,12 +247,10 @@ import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { configurePool } from '../../composables/pools';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
-import { loadDisksThenPools, loadSnapshots, loadSnapshotsInPool } from '../../composables/loadData';
+import { loadDisksThenPools } from '../../composables/loadData';
 import Modal from '../common/Modal.vue';
 import CircleProgress from '../common/CircleProgress.vue';
 import Navigation from '../common/Navigation.vue';
-import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
-import AddVDevModal from './AddVDevModal.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import SnapshotsList from '../snapshots/SnapshotsList.vue';
 
@@ -341,9 +344,20 @@ const fourthOptionToggle = ref(false);
 /////////////////////////////////////////////////////
 const showAddVDevModal = ref(false);
 
-function addVDevButton() {
+const addVDevComponent = ref();
+const loadAddVDevComponent = async () => {
+	const module = await import('./AddVDevModal.vue');
+	addVDevComponent.value = module.default;
+}
+
+async function addVDevButton() {
+	await loadAddVDevComponent();
 	showAddVDevModal.value = true;
-	console.log('add vdev modal triggred');
+	// console.log('add vdev modal triggred');
+}
+
+const updateShowAddVDev = (newVal) => {
+	showAddVDevModal.value = newVal;
 }
 
 ///////////////// Create Snapshots //////////////////
@@ -352,9 +366,20 @@ const showSnapshotModal = ref(false);
 const creating = ref(false);
 const confirmCreate = ref(false);
 
-function createSnapshotBtn() {
+const createSnapshotComponent = ref();
+const loadCreateSnapshotComponent = async () => {
+	const module = await import('../snapshots/CreateSnapshotModal.vue');
+	createSnapshotComponent.value = module.default;
+}
+
+async function createSnapshotBtn() {
+	await loadCreateSnapshotComponent();
 	showSnapshotModal.value = true;
-	console.log('create snapshot modal triggered');
+	// console.log('create snapshot modal triggered');
+}
+
+const updateShowNewSnapshot = (newVal) => {
+	showSnapshotModal.value = newVal;
 }
 
 watch(confirmCreate, async (newVal, oldVal) => {

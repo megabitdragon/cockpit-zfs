@@ -180,7 +180,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch } from "vue";
+import { ref, inject, Ref, provide, watch, onMounted } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
@@ -223,31 +223,9 @@ async function refreshData() {
 	snapshotsLoaded.value = true;
 }
 
-refreshData();
-
-const newFileSystemComponent = ref();
-const loadNewFileSystemComponent = async () => {
-	const module = await import('../wizard-components/FileSystem.vue');
-	newFileSystemComponent.value = module.default;
-}
-
-async function newFileSystemWizard() {
-	await loadNewFileSystemComponent();
-	showNewFSWizard.value = true;
-}
-
-const configFileSystemComponent = ref();
-const loadConfigFileSystemComponent = async () => {
-	const module = await import('./FileSystemConfigModal.vue');
-	configFileSystemComponent.value = module.default;
-}
-
-async function loadFileSystemConfig(fileSystem) {
-	selectedDataset.value = fileSystem;
-	console.log('loading:', selectedDataset);
-	await loadConfigFileSystemComponent();
-	showFSConfig.value = true
-}
+onMounted(async () => {
+	await refreshData();
+});
 
 function findPoolDataset(fileSystem) {
 	try {
@@ -268,6 +246,34 @@ function findSnapDataset(fileSystem) {
 async function refreshDatasetSnaps(filesystem) {
 	snapshots.value = [];
 	await loadSnapshotsInDataset(snapshots, filesystem);
+}
+
+///////////////// New File System ///////////////////
+/////////////////////////////////////////////////////
+const newFileSystemComponent = ref();
+const loadNewFileSystemComponent = async () => {
+	const module = await import('../wizard-components/FileSystem.vue');
+	newFileSystemComponent.value = module.default;
+}
+
+async function newFileSystemWizard() {
+	await loadNewFileSystemComponent();
+	showNewFSWizard.value = true;
+}
+
+////////////// Configure File System ////////////////
+/////////////////////////////////////////////////////
+const configFileSystemComponent = ref();
+const loadConfigFileSystemComponent = async () => {
+	const module = await import('./FileSystemConfigModal.vue');
+	configFileSystemComponent.value = module.default;
+}
+
+async function loadFileSystemConfig(fileSystem) {
+	selectedDataset.value = fileSystem;
+	console.log('loading:', selectedDataset);
+	await loadConfigFileSystemComponent();
+	showFSConfig.value = true
 }
 
 ///////////////// Create Snapshots //////////////////
@@ -578,10 +584,6 @@ provide('confirm-rename', confirmRename);
 provide('create-snap-modal', showSnapshotModal);
 provide('creating', creating);
 provide('confirm-create', confirmCreate);
-
-// provide('show-send-dataset', showSendDataset);
-// provide('sending', sending);
-// provide('confirm-send', confirmSend);
 
 provide('show-change-passphrase', showChangePassphrase);
 provide('changing', changing);

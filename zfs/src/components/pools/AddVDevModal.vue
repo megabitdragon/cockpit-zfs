@@ -131,8 +131,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, inject, Ref, computed, provide } from 'vue';
-import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
+import { ref, inject, Ref, computed } from 'vue';
+import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
 import { addVDev } from '../../composables/pools';
