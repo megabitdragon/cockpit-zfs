@@ -137,7 +137,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, computed, ComputedRef, onMounted, watch, onUpdated, defineExpose } from "vue";
+import { ref, inject, Ref, computed, ComputedRef, onMounted, watch, defineExpose } from "vue";
 import { convertBytesToSize, convertSecondsToString, convertRawTimestampToString, upperCaseWord, convertTimestampToLocal } from "../../composables/helpers";
 import { loadScanObjectGroup, loadDiskStats } from "../../composables/loadData";
 

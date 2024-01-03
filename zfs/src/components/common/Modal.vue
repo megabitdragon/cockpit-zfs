@@ -43,9 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, Ref, inject } from 'vue'
+import { ref, defineProps } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { XMarkIcon } from '@heroicons/vue/24/outline'
+// import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 interface ModalProps {
 	isOpen: boolean;

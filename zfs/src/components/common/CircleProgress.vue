@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, provide } from 'vue';
+import { computed} from 'vue';
 
 
 interface CircleProgress {

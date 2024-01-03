@@ -71,16 +71,10 @@
 		</template>
 	</Card>
 
-	<div v-if="showDiskDetails">
-		<!-- <DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="true"/> -->
-	</div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, provide } from 'vue';
-import { EllipsisVerticalIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import DiskDetail from './DiskDetail.vue';
+import { CheckCircleIcon } from '@heroicons/vue/24/outline';
 import Card from '../common/Card.vue';
 
 interface PoolDetailDiskCardProps {
@@ -98,17 +92,5 @@ interface PoolDetailDiskCardProps {
 // });
 
 const props = defineProps<PoolDetailDiskCardProps>();
-
-const showDiskDetails = ref(false);
-
-const selectedDisk = ref<DiskData>();
-
-//method to show Disk details when button is clicked
-function showDetails(disk) {
-	selectedDisk.value = disk;
-	console.log(selectedDisk);
-	showDiskDetails.value = true;
-}
-
 
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         <template v-slot:title>
             Replace Disk
         </template>
@@ -82,10 +82,10 @@
     </Modal>
 </template>
 <script setup lang="ts">
-import { reactive, ref, inject, Ref, computed, provide } from 'vue';
-import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
+import { ref, inject, Ref, computed } from 'vue';
+import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
+import { convertSizeToBytes } from '../../composables/helpers';
 import { replaceDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
 

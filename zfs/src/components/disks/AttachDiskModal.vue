@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag"  :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal :isOpen="showFlag" @close="updateShowFlag"  :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         
         <template v-slot:title>
             Attach Disk

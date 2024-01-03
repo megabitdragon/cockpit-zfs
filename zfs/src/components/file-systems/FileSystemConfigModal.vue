@@ -1,5 +1,5 @@
 <template>
-	<Modal :isOpen="showFSConfig" @close="showFSConfig = false" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+	<Modal :isOpen="showFSConfig" @close="showFSConfig = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         <template v-slot:title>
             <legend class="flex justify-center">Configure File System</legend>
         </template>
@@ -234,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, inject, watch } from 'vue';
+import { ref, Ref, inject } from 'vue';
 import { onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from '../../composables/helpers';
 import { configureDataset } from '../../composables/datasets';
 import { Switch } from '@headlessui/vue';

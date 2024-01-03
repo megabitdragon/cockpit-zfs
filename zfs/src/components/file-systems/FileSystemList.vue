@@ -2,7 +2,7 @@
 	<div class="inline-block min-w-full min-h-full py-4 align-middle sm:px-4 lg:px-6 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">	
 		<div class="flex bg-well justify-between rounded-md p-2 shadow text-default rounded-b-md ring-1 ring-black ring-opacity-5">
 			<div class="button-group-row justify-start">
-				<button id="createFS" class="btn btn-primary object-left justify-start" @click="showNewFSWizard = true">Create File System</button>
+				<button id="createFS" class="btn btn-primary object-left justify-start" @click="newFileSystemWizard()">Create File System</button>
 			</div>
 			<div class="button-group-row justify-end">
 				<button id="refreshFS" class="btn btn-secondary object-right justify-self-end" @click="refreshData()"><ArrowPathIcon class="w-5 h-5 m-1"/></button>
@@ -141,60 +141,53 @@
 	</div>
 
 	<div v-if="showNewFSWizard">
-		<FileSystem :isStandalone="true" idKey="fs-wizard" @close="showNewFSWizard = false"/>
+		<component :is="newFileSystemComponent" :isStandalone="true" idKey="fs-wizard" @close="showNewFSWizard = false"/> 
 	</div>
 
 	<div v-if="showFSConfig">
-		<FileSystemConfigModal ref="fileSystemConfiguration" :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
+		<component :is="configFileSystemComponent" ref="fileSystemConfiguration" :filesystem="selectedDataset!" idKey="fs-config" @close="showFSConfig = false"/>
 	</div>
 
 	<div v-if="showDeleteFileSystemConfirm">
-		<UniversalConfirmation  :showFlag="showDeleteFileSystemConfirm" @close="updateShowDestroyFileSystem" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
+		<component :is="deleteFileSystemComponent" :showFlag="showDeleteFileSystemConfirm" @close="updateShowDestroyFileSystem" :idKey="'confirm-destroy-filesystem'" :item="'filesystem'" :operation="'destroy'" :filesystem="selectedDataset!" :confirmOperation="confirmThisDestroy" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showUnmountFileSystemConfirm">
-		<UniversalConfirmation v-if="selectedDataset!.encrypted" :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :secondOption="'lock file system'" :hasChildren="hasChildren"/>
-		<UniversalConfirmation v-else :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
+		<component :is="unmountFileSystemComponent" v-if="selectedDataset!.encrypted" :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :secondOption="'lock file system'" :hasChildren="hasChildren"/>
+		<component :is="unmountFileSystemComponent" v-else :showFlag="showUnmountFileSystemConfirm" @close="updateShowUnmountFileSystem" :idKey="'confirm-unmount-filesystem'" :item="'filesystem'" :operation="'unmount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisUnmount" :firstOption="'force unmount'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showMountFileSystemConfirm">
-		<UniversalConfirmation :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
+		<component :is="mountFileSystemComponent" :showFlag="showMountFileSystemConfirm" @close="updateShowMountFileSystem" :idKey="'confirm-mount-filesystem'" :item="'filesystem'" :operation="'mount'" :filesystem="selectedDataset!" :confirmOperation="confirmThisMount" :firstOption="'force mount'" :hasChildren="hasChildren"/>
 	</div>
 
 	<div v-if="showLockUnlockModal">
-		<LockUnlockFileSystem :showFlag="showLockUnlockModal" @close="showLockUnlockModal = false" :idKey="'confirm-lock-or-unlock'" :mode="modeSelected!" :filesystem="selectedDataset!"/>
+		<component :is="lockUnlockFileSystemComponent" :showFlag="showLockUnlockModal" @close="showLockUnlockModal = false" :idKey="'confirm-lock-or-unlock'" :mode="modeSelected!" :filesystem="selectedDataset!"/>
 	</div>
 
 	<div v-if="showRenameModal">
-		<RenameFileSystem :idKey="'show-rename-modal'" :filesystem="selectedDataset!" @close="showRenameModal = false" />
+		<component :is="renameFileSystemComponent" :idKey="'show-rename-modal'" :filesystem="selectedDataset!" @close="showRenameModal = false" />
 	</div>
 
 	<div v-if="showSnapshotModal">
-		<CreateSnapshotModal :idKey="'show-create-snap-modal'" @close="showSnapshotModal = false" :item="'filesystem'" />
+		<component :is="createSnapshotComponent" :idKey="'show-create-snap-modal'" @close="showSnapshotModal = false" :item="'filesystem'" />
 	</div>
 
 	<div v-if="showChangePassphrase">
-		<ChangePassphrase :idKey="'show-change-passphrase-modal'" @close="showChangePassphrase = false" :filesystem="selectedDataset!"/>
+		<component :is="changePassphraseComponent" :idKey="'show-change-passphrase-modal'" @close="showChangePassphrase = false" :filesystem="selectedDataset!"/>
 	</div>
 	
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, computed, onMounted } from "vue";
+import { ref, inject, Ref, provide, watch } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
-import FileSystem from "../wizard-components/FileSystem.vue";
-import FileSystemConfigModal from "./FileSystemConfigModal.vue";
-import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
-import RenameFileSystem from "./RenameFileSystem.vue";
-import UniversalConfirmation from "../common/UniversalConfirmation.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
-import ChangePassphrase from "./ChangePassphrase.vue";
-import LockUnlockFileSystem from "./LockUnlockFileSystem.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -232,9 +225,27 @@ async function refreshData() {
 
 refreshData();
 
-function loadFileSystemConfig(fileSystem) {
+const newFileSystemComponent = ref();
+const loadNewFileSystemComponent = async () => {
+	const module = await import('../wizard-components/FileSystem.vue');
+	newFileSystemComponent.value = module.default;
+}
+
+async function newFileSystemWizard() {
+	await loadNewFileSystemComponent();
+	showNewFSWizard.value = true;
+}
+
+const configFileSystemComponent = ref();
+const loadConfigFileSystemComponent = async () => {
+	const module = await import('./FileSystemConfigModal.vue');
+	configFileSystemComponent.value = module.default;
+}
+
+async function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log('loading:', selectedDataset);
+	await loadConfigFileSystemComponent();
 	showFSConfig.value = true
 }
 
@@ -265,8 +276,15 @@ const showSnapshotModal = ref(false);
 const creating = ref(false);
 const confirmCreate = ref(false);
 
-function createSnapshotBtn(filesystem) {
+const createSnapshotComponent = ref();
+const loadCreateSnapshotComponent = async () => {
+	const module = await import('../snapshots/CreateSnapshotModal.vue');
+	createSnapshotComponent.value = module.default;
+}
+
+async function createSnapshotBtn(filesystem) {
 	selectedDataset.value = filesystem;
+	await loadCreateSnapshotComponent();
 	showSnapshotModal.value = true;
 	console.log('create snapshot modal triggered');
 }
@@ -290,7 +308,12 @@ const destroyChildren = ref(false);
 const destroyAllDependents = ref(false);
 const showDeleteFileSystemConfirm = ref(false);
 const confirmDelete = ref(false);
-const isDeleting = ref(false);
+
+const deleteFileSystemComponent = ref();
+const loadDeleteFileSystemComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	deleteFileSystemComponent.value = module.default;
+}
 
 async function deleteFileSystem(fileSystem) {
 	operationRunning.value = false;
@@ -305,7 +328,7 @@ async function deleteFileSystem(fileSystem) {
 			hasChildren.value = false;
 		}
 	}
-
+	await loadDeleteFileSystemComponent();
 	showDeleteFileSystemConfirm.value = true;
 	console.log('selected for deletion:', selectedDataset.value);
 }
@@ -346,10 +369,17 @@ const lockThisFileSystem = ref(false);
 const unmounting = ref(false);
 const confirmUnmount = ref(false);
 
-function unmountThisFileSystem(fileSystem) {
-	showUnmountFileSystemConfirm.value = true;
+const unmountFileSystemComponent = ref();
+const loadUnmountFileSystemComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	unmountFileSystemComponent.value = module.default;
+}
+
+async function unmountThisFileSystem(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log('selected to be unmounted:', selectedDataset.value);
+	await loadUnmountFileSystemComponent();
+	showUnmountFileSystemConfirm.value = true;
 }
 
 const confirmThisUnmount : ConfirmationCallback = () => {
@@ -390,10 +420,17 @@ const forceMount = ref(true);
 const mounting = ref(false);
 const confirmMount = ref(false);
 
-function mountThisFileSystem(fileSystem) {
-	showMountFileSystemConfirm.value = true;
+const mountFileSystemComponent = ref();
+const loadMountFileSystemComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	mountFileSystemComponent.value = module.default;
+}
+
+async function mountThisFileSystem(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log('selected to be mounted:', selectedDataset.value);
+	await loadMountFileSystemComponent();
+	showMountFileSystemConfirm.value = true;
 }
 
 const confirmThisMount : ConfirmationCallback = () => {
@@ -429,10 +466,17 @@ const showRenameModal = ref(false);
 const renaming = ref(false);
 const confirmRename = ref(false);
 
-function renameThisDataset(fileSystem) {
-	showRenameModal.value = true;
+const renameFileSystemComponent = ref();
+const loadRenameFileSystemComponent = async () => {
+	const module = await import('./RenameFileSystem.vue');
+	renameFileSystemComponent.value = module.default;
+}
+
+async function renameThisDataset(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log('selected to be renamed:', selectedDataset.value);
+	await loadRenameFileSystemComponent();
+	showRenameModal.value = true;
 }
 
 watch(confirmRename, async (newVal, oldVal) => {
@@ -452,10 +496,17 @@ const showChangePassphrase = ref(false);
 const changing = ref(false);
 const confirmChange = ref(false);
 
-function changeThisPassphrase(fileSystem) {
-	showChangePassphrase.value = true;
+const changePassphraseComponent = ref();
+const loadChangePassphraseComponent = async () => {
+	const module = await import('./ChangePassphrase.vue');
+	changePassphraseComponent.value = module.default;
+}
+
+async function changeThisPassphrase(fileSystem) {
 	selectedDataset.value = fileSystem;
 	console.log('selected to change passphrase:', selectedDataset.value);
+	await loadChangePassphraseComponent();
+	showChangePassphrase.value = true;
 }
 
 watch(confirmChange, async (newVal, oldVal) => {
@@ -475,11 +526,18 @@ const confirmLockOrUnlock = ref(false);
 const lockingOrUnlocking = ref(false);
 const modeSelected = ref('');
 
-function handleFileSystemEncryption(fileSystem : FileSystemData, mode : 'lock' | 'unlock') {
-	showLockUnlockModal.value = true;
+const lockUnlockFileSystemComponent = ref();
+const loadlockUnlockFileSystemComponent = async () => {
+	const module = await import('./LockUnlockFileSystem.vue');
+	lockUnlockFileSystemComponent.value = module.default;
+}
+
+async function handleFileSystemEncryption(fileSystem : FileSystemData, mode : 'lock' | 'unlock') {
 	selectedDataset.value = fileSystem;
 	modeSelected.value = mode;
 	console.log(`selected to be ${mode}ed: ${selectedDataset.value.name}`);
+	await loadlockUnlockFileSystemComponent();
+	showLockUnlockModal.value = true;
 }
 
 watch(confirmLockOrUnlock, async (newVal, oldVal) => {

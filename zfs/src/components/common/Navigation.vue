@@ -29,15 +29,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref } from 'vue';
+import { inject, Ref } from 'vue';
 import Notifications from "../common/Notifications.vue";
 import { FIFO } from '@45drives/cockpit-helpers';
 
 interface NavigationProps {
-		show: boolean;
-		navigationItems: NavigationItem[];
-		currentNavigationItem?: NavigationItem;
-		navigationCallback: NavigationCallback;
+	show: boolean;
+	navigationItems: NavigationItem[];
+	currentNavigationItem?: NavigationItem;
+	navigationCallback: NavigationCallback;
 }
 
 const props = defineProps<NavigationProps>();

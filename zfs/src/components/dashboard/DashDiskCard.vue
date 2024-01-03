@@ -1,5 +1,5 @@
 <template>
-	<button v-on:dblclick="showDetails(props.disk)" class="w-full h-full">
+	<div class="w-full h-full">
 		<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible bg-plugin-header rounded-md border border-default">
 			<template v-slot:title>
 				<div class="flex flex-row justify-between">
@@ -65,20 +65,15 @@
 				
 			</template>
 		</Card>
-	</button>
-
-	<div v-if="showDiskDetails">
-		<DiskDetail :disk="selectedDisk!" @close="showDiskDetails = false" :isModalChild="false"/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, provide, inject, Ref } from 'vue';
+import { ref, inject, Ref } from 'vue';
 import { EllipsisVerticalIcon} from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { loadDisks, loadDatasets, loadDisksThenPools } from '../../composables/loadData';
+import { loadDisks } from '../../composables/loadData';
 import { clearPartitions } from "../../composables/disks";
-import DiskDetail from '../disks/DiskDetail.vue';
 import Card from '../common/Card.vue';
 
 interface DashDiskCardProps {
@@ -97,9 +92,6 @@ interface DashDiskCardProps {
 
 const props = defineProps<DashDiskCardProps>();
 
-const showDiskDetails = ref(false);
-
-const selectedDisk = ref<DiskData>();
 
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const disks = inject<Ref<DiskData[]>>('disks')!; 
@@ -108,27 +100,20 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 // console.log("Props.Disk");
 // console.log(props.disk);
 
-//method to show Disk details when button is clicked
-function showDetails(disk) {
-	getDiskFromPool(disk);
-	selectedDisk.value = disk;
-	console.log(selectedDisk);
-	showDiskDetails.value = true;
-}
 
-function getDiskFromPool(disk) {
-  pools.value.some((pool) => {
-    return pool.vdevs.some((vDev) => {
-      return vDev.disks.some((vDisk) => {
-        if (vDisk.name === disk.name) {
-          disk.poolName = vDisk.poolName;
-          disk.vDevName = vDisk.vDevName;
-          return true; 
-        }
-      });
-    });
-  });
-}
+// function getDiskFromPool(disk) {
+//   pools.value.some((pool) => {
+//     return pool.vdevs.some((vDev) => {
+//       return vDev.disks.some((vDisk) => {
+//         if (vDisk.name === disk.name) {
+//           disk.poolName = vDisk.poolName;
+//           disk.vDevName = vDisk.vDevName;
+//           return true; 
+//         }
+//       });
+//     });
+//   });
+// }
 
 async function clearPartAndRefreshDisks(disk) {
 	disksLoaded.value = false;

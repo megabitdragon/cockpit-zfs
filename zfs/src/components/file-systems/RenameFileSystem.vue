@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showRenameModal" @close="showRenameModal = false" :marginTop="'mt-28'" :width="'w-8/12'" :minWidth="'min-w-8/12'">
+    <Modal :isOpen="showRenameModal" @close="showRenameModal = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         <template v-slot:title>
             <legend class="flex justify-center">Rename {{props.filesystem.name}}</legend>
         </template>
@@ -90,12 +90,10 @@
     </Modal>
 </template>
 <script setup lang="ts">
-import { ref, Ref, inject, watch, computed } from 'vue';
-// import { onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from '../../composables/helpers';
+import { ref, Ref, inject, computed } from 'vue';
 import { renameFileSystem } from '../../composables/datasets';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { loadDatasets } from '../../composables/loadData';
 
 interface RenameFileSystemProps {
     idKey: string;

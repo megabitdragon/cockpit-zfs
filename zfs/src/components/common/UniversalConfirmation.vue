@@ -150,7 +150,7 @@
 </template>
 <script setup lang="ts">
 import { Switch } from '@headlessui/vue';
-import { Ref, inject, watch, ref, computed} from 'vue';
+import { Ref, inject, ref, computed} from 'vue';
 import { upperCaseWord } from '../../composables/helpers';
 import Modal from './Modal.vue';
 

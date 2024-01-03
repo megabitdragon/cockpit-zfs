@@ -106,12 +106,12 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, Ref, inject, provide} from 'vue';
+import {computed, Ref, inject} from 'vue';
 import { loadDisks, loadDisksThenPools, loadScanObjectGroup, loadDiskStats  } from '../../composables/loadData';
-import { convertBytesToSize, convertSizeToBytes, convertSizeToBytesDecimal, convertBytesToSizeDecimal, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { convertBytesToSize, convertSizeToBytesDecimal, convertBytesToSizeDecimal, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
-import DashDiskCard from './DashDiskCard.vue';
+// import DashDiskCard from './DashDiskCard.vue';
 import DashboardLoadingSkeleton from './DashboardLoadingSkeleton.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
