@@ -4,14 +4,17 @@
 
 			<div v-if="props.tag === 'dashboard'" class="p-2">
 			   <Dashboard />
+			   	<!-- <component :is="dashboardComponent"/>  -->
 			</div>
 
 			<div v-if="props.tag === 'pools'" class="p-2">
 			  	<PoolsList/>
+				<!-- <component :is="poolListComponent"/> -->
 			</div>
 
 			<div v-if="props.tag === 'filesystems'" class="p-2">
 			  	<FileSystemList/>
+				<!-- <component :is="fileSystemListComponent"/> -->
 			</div>
 
 		</div>
@@ -19,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, provide } from 'vue';
+import { ref, Ref, provide, watchEffect } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
@@ -85,6 +88,38 @@ async function scanNow() {
 async function checkDiskStats() {
 	await loadDiskStats(poolDiskStats);
 }
+
+/////////////////////////////////////////////////////
+// const dashboardComponent = ref();
+// const loadDashboardComponent = async () => {
+// 	const module = await import('../components/dashboard/Dashboard.vue');
+// 	dashboardComponent.value = module.default;
+// }
+
+// const poolListComponent = ref();
+// const loadPoolListComponent = async () => {
+// 	const module = await import('../components/pools/PoolsList.vue');
+// 	poolListComponent.value = module.default;
+// }
+
+// const fileSystemListComponent = ref();
+// const loadFileSystemListComponent = async () => {
+// 	const module = await import('../components/file-systems/FileSystemList.vue');
+// 	fileSystemListComponent.value = module.default;
+// }
+
+// watchEffect(() => {
+// 	if (props.tag === 'dashboard') {
+// 		loadDashboardComponent();
+// 	}
+// 	if (props.tag === 'pools') {
+// 		loadPoolListComponent();
+// 	}
+// 	if (props.tag === 'filesystems') {
+// 		loadFileSystemListComponent();
+// 	}
+// });
+/////////////////////////////////////////////////////
 
 //provide data for other components to inject
 provide("pools", pools);
