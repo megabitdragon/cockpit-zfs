@@ -57,12 +57,11 @@
 				</div>
 				<div class="flex flex-row justify-between">
 					<div>
-						<span v-if="props.pool.status == 'ONLINE'" class="text-success">{{props.pool.status}}</span>
-						<span v-else class="text-red-600">{{props.pool.status}}</span>
+						<span class="font-semibold" :class="formatStatus(props.pool.status)">{{props.pool.status}}</span>
 					</div>
 					<div v-if="props.pool.status == 'ONLINE'">
 						<CheckCircleIcon class="aspect-square w-5 text-green-400"/>
-					</div>			
+					</div>
 				</div>
 
 				<div v-if="props.pool.properties.capacity >= 1" class="w-full bg-well rounded-full mt-2 relative flex h-6 min-h-min max-h-max overflow-hidden">
@@ -145,13 +144,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, provide, watch, onMounted} from "vue";
+import { ref, inject, Ref, computed, provide, watch} from "vue";
 import { EllipsisVerticalIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
-import { loadScanActivities, loadTrimActivities } from '../../composables/helpers'
+import { loadScanActivities, loadTrimActivities, formatStatus } from '../../composables/helpers'
 import Card from '../common/Card.vue';
 import Status from '../common/Status.vue';
 
@@ -777,14 +776,6 @@ const trimActivity = computed(() => {
 	return trimActivities.value.get(poolID.value);
 });
 
-/////////////////////////////////////////////////////
-
-onMounted(() => {
-	// getScanStatus();
-	// getTrimStatus();
-});
-
-/////////////////////////////////////////////////////
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 

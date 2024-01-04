@@ -1,6 +1,6 @@
 import { ref, Ref } from 'vue';
 import { getPools } from "./pools";
-import { getDisks } from "./disks";
+import { getDisks, getDisksStatus } from "./disks";
 import { getDatasets } from "./datasets";
 import { convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal } from "./helpers";
 import { getSnapshots } from './snapshots';
@@ -15,7 +15,7 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
-		console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
+		// console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
 	} catch (error) {
 		console.error("An error occurred getting disk stats:", error);
 	}
@@ -28,10 +28,38 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
-		console.log('---\nScanObject:', scanObject.value);
+		// console.log('---\nScanObject:', scanObject.value);
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}
+}
+
+export async function loadDiskStatus(diskStatuses: Ref<PoolDiskStatus[]>) {
+    try {
+        const rawJSON = await getDisksStatus();
+        const parsedJSON = JSON.parse(rawJSON);
+        console.log('DiskStatus[] JSON:', parsedJSON);
+
+        // Iterate through the keys (pool names) in the parsed JSON
+        for (const poolName in parsedJSON) {
+            if (parsedJSON.hasOwnProperty(poolName)) {
+                const diskStatusArray = parsedJSON[poolName];
+
+                // Create a DiskStatus object for each item in the array
+                const diskStatus: DiskStatus[] = diskStatusArray.map(item => ({
+                    name: item.name,
+                    status: item.status,
+                }));
+
+                // Store the diskStatus array in the diskStatuses object with poolName as key
+                diskStatuses.value[poolName] = diskStatus;
+            }
+        }
+        console.log('diskStatuses:', diskStatuses.value);
+
+    } catch (error) {
+        console.error("An error occurred getting disk statuses:", error);
+    }
 }
 
 export async function loadDisksThenPools(disks, pools) {
@@ -39,7 +67,7 @@ export async function loadDisksThenPools(disks, pools) {
 	try {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON);
-		// console.log('Disks JSON:', parsedJSON);
+		console.log('Disks JSON:', parsedJSON);
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -72,7 +100,7 @@ export async function loadDisksThenPools(disks, pools) {
 		try {
 			const rawJSON = await getPools();
 			const parsedJSON = JSON.parse(rawJSON);
-			// console.log('Pools JSON:', parsedJSON);
+			console.log('Pools JSON:', parsedJSON);
 
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
@@ -107,6 +135,7 @@ export async function loadDisksThenPools(disks, pools) {
 						delegation: parsedJSON[i].properties.delegation.parsed,
 						listSnapshots: parsedJSON[i].properties.listsnapshots.parsed,
 						multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
+						health: parsedJSON[i].properties.health.parsed,
 					},
 					failMode: parsedJSON[i].properties.failmode.parsed,
 					comment: parsedJSON[i].properties.comment.value,

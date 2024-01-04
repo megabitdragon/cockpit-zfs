@@ -2,20 +2,19 @@
     <div>
 		<div>
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="bg-primary text-white grid grid-cols-7 grid-flow-cols w-full border border-t border-collapse border-default justify-center text-center">
-					<div class="py-6 mt-1 mr-2 col-span-1 ml-8 flex flex-row justify-start justify-items-center text-center" :title="props.vDev.name">
+				<DisclosureButton class="text-sm bg-primary text-white grid grid-cols-9 grid-flow-cols w-full justify-center text-center">
+					<div class="py-6 mt-1 mr-2 col-span-1 flex flex-row justify-end ml-4 text-center" :title="props.vDev.name">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
-						<p class="ml-2 justify-center justify-items-center text-center">
-							{{ props.vDev.name }}
-						</p>
 					</div>
-					<div class="py-6 mt-1 col-span-1">{{ upperCaseWord(props.vDev.type) }} Device</div>
-					<div class="py-6 mt-1 col-span-1">{{ props.vDev.disks.length }} Disks</div>
-					<div class="py-6 mt-1 col-span-1">{{ props.vDev.stats.read_errors }} Read Errors</div>
-					<div class="py-6 mt-1 col-span-1">{{ props.vDev.stats.write_errors }} Write Errors</div>
-					<div class="py-6 mt-1 col-span-1">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
+					<div class="py-6 mt-1 col-span-1 text-base">{{ props.vDev.name }}</div>
+					<div class="py-6 mt-1 col-span-1 font-semibold text-base" :class="formatStatus(props.vDev.status)">{{ props.vDev.status }}</div>
+					<div class="py-6 mt-2 col-span-1">{{ upperCaseWord(props.vDev.type) }} Device</div>
+					<div class="py-6 mt-2 col-span-1">{{ props.vDev.disks.length }} Disks</div>
+					<div class="py-6 mt-2 col-span-1">{{ props.vDev.stats.read_errors }} Read Errors</div>
+					<div class="py-6 mt-2 col-span-1">{{ props.vDev.stats.write_errors }} Write Errors</div>
+					<div class="py-6 mt-2 col-span-1">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
 					<div class="col-span-1 relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
@@ -44,11 +43,14 @@
 					</div>
 				</DisclosureButton>
 				<DisclosurePanel>
-					<table class="min-w-full bg-secondary text-default border-l border-r border-collapse border-default">
+					<table class="min-w-full bg-secondary text-default">
 						<thead>
 							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-8">
+								<!-- <th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+									<span class="sr-only"></span>
+								</th> -->
 								<th class="py-3.5 font-semibold text-white col-span-1">Name</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">Health</th>
+								<th class="py-3.5 font-semibold text-white col-span-1">State</th>
 								<th class="py-3.5 font-semibold text-white col-span-1">Type</th>
 								<th class="py-3.5 font-semibold text-white col-span-1">Temperature</th>
 								<th class="py-3.5 font-semibold text-white col-span-1">Capacity</th>
@@ -59,7 +61,7 @@
 							</tr>
 						</thead>
 					</table>
-					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx" class="border border-l border-r border-collapse border-default">
+					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx" class="border border-collapse border-default">
 						<DiskElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="props.vDev" :vDevIdx="props.vDevIdx" :disk="disk" :diskIdx="diskIdx" ref="diskElement"/>
 					</div>
 				</DisclosurePanel>
@@ -82,7 +84,7 @@ import { EllipsisVerticalIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { clearErrors, removeVDevFromPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities, upperCaseWord } from '../../composables/helpers';
+import { formatStatus, loadScanActivities, loadTrimActivities, upperCaseWord } from '../../composables/helpers';
 import DiskElement from '../pools/DiskElement.vue';
 
 interface VDevElementProps {

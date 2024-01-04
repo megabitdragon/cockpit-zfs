@@ -276,7 +276,7 @@
 			<button :class="createFileSystemCardClass(poolConfig.createFileSystem!)" 
 			class="box-border rounded-lg shadow-md focus:outline-none focus:ring-0 w-full h-full bg-45d mb-2">
 				<label :for="getIdKey('create-filesystem')" :class="createFileSystemCardClass(poolConfig.createFileSystem!)" 
-				class="block py-3 w-full h-full font-medium text-default justify-center rounded">
+				class="block py-3 w-full h-full font-medium text-white justify-center rounded">
 					Create a File System?
 					<input :id="getIdKey('create-filesystem')" v-model="poolConfig.createFileSystem" aria-describedby="create-filesystem" name="create-filesystem" type="checkbox" class="ml-2 h-4 w-4 rounded text-success"/>
 				</label>

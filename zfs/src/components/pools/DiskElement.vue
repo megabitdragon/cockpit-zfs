@@ -1,8 +1,11 @@
 <template>
     <div>
         <div class="grid grid-cols-8 grid-flow-cols w-full justify-center text-center bg-accent text-default">
+			<!-- <div class="py-6 mt-1 col-span-1">
+				<span class="sr-only"></span>
+			</div> -->
             <div class="py-6 mt-1 col-span-1">{{ props.disk.name }}</div>
-            <div class="py-6 mt-1 col-span-1">{{ props.disk.health }}</div>
+            <div class="py-6 mt-1 col-span-1 font-semibold" :class="formatStatus(diskState)">{{ diskState }}</div>
             <div class="py-6 mt-1 col-span-1">{{ props.disk.type }}</div>
             <div class="py-6 mt-1 col-span-1">{{ props.disk.temp }}</div>
             <div class="py-6 mt-1 col-span-1">{{ props.disk.capacity }}</div>
@@ -93,8 +96,8 @@ import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { scrubPool, clearErrors } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
-import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities } from '../../composables/helpers'
+import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats, loadDiskStatus } from '../../composables/loadData';
+import { loadScanActivities, loadTrimActivities, formatStatus } from '../../composables/helpers'
 import Status from "../common/Status.vue";
 
 interface DiskListElementProps {
@@ -130,6 +133,7 @@ const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -139,6 +143,7 @@ async function refreshAllData() {
 	poolData.value = [];
 	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
+	await loadDiskStatus(diskStatus);
 	await loadDatasets(filesystemData);
 	await loadScanObjectGroup(scanObjectGroup);
 	await loadScanActivities(poolData, scanActivities);
@@ -163,9 +168,15 @@ const scanStatusBox = ref();
 async function getScanStatus() {
 	// console.log('scanStatusBox', scanStatusBox.value);
 
-	// Needed to specify index to work properly (treating as an array due to multiple pools error)
 	await scanStatusBox.value.pollScanStatus();
 }
+
+const diskState = computed(() => {
+	const diskArray = diskStatus.value[props.pool.name];
+	const diskState = diskArray.find(disk => disk.name === props.disk.name);
+
+	return diskState.status;
+});
 
 /////////////////// Detach Disk /////////////////////
 /////////////////////////////////////////////////////

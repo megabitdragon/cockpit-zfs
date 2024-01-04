@@ -2,24 +2,14 @@
 	<div>
 		<div>
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center">
-					<div class="py-6 mt-1 mr-2 col-span-2 ml-4 flex flex-row justify-start justify-items-center text-center" :title="poolData[props.poolIdx].name">
+				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center" >
+					<div class="py-6 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="poolData[props.poolIdx].name">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
-						<p class="ml-2 justify-center justify-items-center text-center">
-							{{ poolData[props.poolIdx].name.length > 20 ? poolData[props.poolIdx].name.slice(0, 20) + '...' : poolData[props.poolIdx].name }}
-						</p>
-						
-					</div>
-					<!-- <div class="py-6 mt-1 mr-2 col-span-2 ml-4 justify-self-start flex flex-row justify-between" :title="fileSystem.name">
-						<ChevronUpIcon
-							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
-						/>
-						{{ fileSystem.name.length > 20 ? fileSystem.name.slice(0, 20) + '...' : fileSystem.name }}
-					</div> -->
-					<!-- <div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].name }}</div> -->
-					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].status }}</div>
+					</div> 
+					<div class="py-6 mt-1 col-span-1 flex flex-row justify-start" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name.length > 20 ? poolData[props.poolIdx].name.slice(0, 20) + '...' : poolData[props.poolIdx].name }}</div>
+					<div class="py-6 mt-1 col-span-1 font-semibold" :class="formatStatus(poolData[props.poolIdx].status)">{{ poolData[props.poolIdx].status }}</div>
 					<div class="py-6 mt-1 col-span-1">
 						<div class="w-full bg-well rounded-full text-center">
 							<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
@@ -155,7 +145,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, Di
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { loadScanActivities, loadTrimActivities, formatStatus } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import Status from "../common/Status.vue";
 
@@ -713,9 +703,6 @@ async function showAddVDev(pool) {
 	await loadShowAddVDevComponent();
 	showAddVDevModal.value = true;
 }
-
-/////////////////////////////////////////////////////
-
 
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////

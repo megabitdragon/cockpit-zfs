@@ -23,6 +23,7 @@ interface PoolData {
 		delegation?: boolean;
 		listSnapshots?: boolean;
 		multiHost?: boolean;
+		health?: string;
 	}
 	vdevs: vDevData[];
 	createFileSystem?: boolean;
@@ -89,6 +90,15 @@ interface ChildDiskData {
 	status: string;
 	type: string;
 	children?:[];
+}
+
+interface PoolDiskStatus {
+	poolName: DiskStatus[];
+}
+
+interface DiskStatus {
+	name: string;
+	status: string;
 }
 
 //object for importing pools

@@ -18,10 +18,10 @@
 						<thead class="rounded-md">
 							<tr class="bg-well rounded-t-md grid grid-cols-10">
 
-								<!-- <th class="relative py-3.5 rounded-tl-md col-span-1">
+								<th class="relative py-3.5 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
-								</th> -->
-								<th class="py-3.5 font-semibold text-default col-span-2">Name</th>
+								</th>
+								<th class="py-3.5 font-semibold text-default col-span-1 flex flex-row justify-start">Name</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Status</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Used (%)</th>
 								<th class="py-3.5 font-semibold text-default col-span-1">Used</th>
