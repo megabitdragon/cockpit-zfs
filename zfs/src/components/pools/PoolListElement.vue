@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<div>
+		<div class="border border-default">
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center" >
+				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full justify-center text-center" >
 					<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="poolData[props.poolIdx].name">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"

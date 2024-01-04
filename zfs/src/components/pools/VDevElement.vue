@@ -1,8 +1,8 @@
 <template>
     <div>
-		<div>
+		<div class="border border-default">
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="text-sm bg-primary text-white grid grid-cols-10 grid-flow-cols w-full justify-center text-center">
+				<DisclosureButton class="text-sm bg-primary text-white grid grid-cols-10 grid-flow-cols w-full justify-center text-center ">
 					<div class="py-1 mt-1.5 col-span-1 flex flex-row justify-center text-center" >
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
