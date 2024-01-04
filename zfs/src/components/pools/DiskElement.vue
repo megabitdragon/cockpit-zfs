@@ -4,7 +4,7 @@
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
-            <div class="py-1 mt-1 col-span-2" :title="props.disk.name">{{ props.disk.name.length > 20 ? props.disk.name.slice(0, 20) + '...' : props.disk.name }}</div>
+            <div class="py-1 mt-1 col-span-2" :title="props.disk.name">{{ props.disk.name.length > 30 ? props.disk.name.slice(0, 30) + '...' : props.disk.name }}</div>
             <div class="py-1 mt-1 col-span-1 font-semibold" :class="formatStatus(diskState)">{{ diskState }}</div>
             <div class="py-1 mt-1 col-span-1">{{ props.disk.type }}</div>
             <div class="py-1 mt-1 col-span-1">{{ props.disk.temp }}</div>

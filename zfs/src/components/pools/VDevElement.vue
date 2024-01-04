@@ -8,7 +8,7 @@
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="py-1 mt-1.5 col-span-2 text-base justify-self-start" :title="props.vDev.name">{{ props.vDev.name.length > 20 ? props.vDev.name.slice(0, 20) + '...' : props.vDev.name }}</div>
+					<div class="py-1 mt-1.5 col-span-2 text-base justify-self-start" :title="props.vDev.name">{{ props.vDev.name.length > 30 ? props.vDev.name.slice(0, 30) + '...' : props.vDev.name }}</div>
 					<div class="py-1 mt-1.5 col-span-1 font-semibold text-base" :class="formatStatus(props.vDev.status)">{{ props.vDev.status }}</div>
 					<div class="py-1 mt-2 col-span-1">{{ upperCaseWord(props.vDev.type) }} Device</div>
 					<div class="py-1 mt-2 col-span-1">{{ props.vDev.disks.length }} Disks</div>

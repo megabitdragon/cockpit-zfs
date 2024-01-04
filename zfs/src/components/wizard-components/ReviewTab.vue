@@ -4,7 +4,7 @@
 			<legend v-if="!creatingPool && !poolCreated" class="mb-1 text-base font-semibold leading-6 text-default">Review Configuration</legend>
 
 			<div v-if="!creatingPool && !poolCreated" class="">
-				<Card :bgColor="'bg-well'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">
+				<Card :bgColor="'bg-accent'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">
 					<template v-slot:title>
 						<div>
 							<p class="text-md">Pool Name: <b>{{ poolConfig.name }}</b></p>	
@@ -15,9 +15,9 @@
 							<p>Compression: <b>{{ isBoolCompression(poolConfig.properties.compression).toUpperCase() }}</b></p>
 							<p>Sector Size: <b>{{ getValue('sector', poolConfig.properties.sector) }}</b></p>
 							<p>Record Size: <b>{{ getValue('record', poolConfig.properties.record) }}</b></p>
-							<p class="mt-1 border rounded-lg border-default">
+							<div class="rounded-lg mt-1 border border-default">
 								<Disclosure v-slot="{ open }">
-									<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center rounded-lg">
+									<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center">
 										<div class="m-1 col-span-1">
 											<ChevronUpIcon
 												class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
@@ -36,43 +36,46 @@
 										</div>
 									</DisclosurePanel>
 								</Disclosure>
-							</p>
+							</div>	
 						</div>
 					</template>
 					<template v-slot:footer>
-						<Disclosure v-slot="{ open }">
-							<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center rounded-lg">
-								<div class="m-1 col-span-1">
-									<ChevronUpIcon
-										class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
-									/>
-								</div>
-								<div class="-ml-8 mt-1.5 col-span-1">
-									<span class="text-start whitespace-nowrap text-base text-default">Virtual Devices  <b>({{ poolConfig.vdevs.length }})</b></span>
-								</div>
-							</DisclosureButton>
-							<DisclosurePanel>
-								<Card v-for="vDev, vDevIdx in poolConfig.vdevs" :key="vDevIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="true" class="rounded-lg text-default">
-									<template v-slot:title>
-										<div class="">
-											<p>Type: <b>{{ upperCaseWord(vDev.type) }}</b></p>
-										</div>
-									</template>
-									<template v-slot:footer>
-										<div class="flex flex-row gap-1">
-											<p>Disks:</p>
-											<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
-												<template v-slot:title>
-													<div>
-														<b>{{ disk }}</b>
-													</div>
-												</template>
-											</Card>
-										</div>
-									</template>
-								</Card>			
-							</DisclosurePanel>
-						</Disclosure>
+						<div class="rounded-lg mt-1 border border-default">
+							<Disclosure v-slot="{ open }">
+								<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
+									<div class="m-1 col-span-1">
+										<ChevronUpIcon
+											class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+										/>
+									</div>
+									<div class="-ml-8 mt-1.5 col-span-1">
+										<span class="text-start whitespace-nowrap text-base text-default">Virtual Devices  <b>({{ poolConfig.vdevs.length }})</b></span>
+									</div>
+								</DisclosureButton>
+								<DisclosurePanel>
+									<Card v-for="vDev, vDevIdx in poolConfig.vdevs" :key="vDevIdx" :bgColor="'bg-default'" :titleSection="true" :contentSection="false" :footerSection="true" class="rounded-lg text-default">
+										<template v-slot:title>
+											<div class="">
+												<p>Type: <b>{{ upperCaseWord(vDev.type) }}</b></p>
+											</div>
+										</template>
+										<template v-slot:footer>
+											<div class="flex flex-row gap-1">
+												<p>Disks:</p>
+												<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
+													<template v-slot:title>
+														<div>
+															<b>{{ disk }}</b>
+														</div>
+													</template>
+												</Card>
+											</div>
+										</template>
+									</Card>			
+								</DisclosurePanel>
+							</Disclosure>
+						</div>
+						
 					</template>
 				</Card>
 			</div>

@@ -105,8 +105,8 @@
 							<!-- <td class="relative py-2 col-span-1">
 								<span class="sr-only"></span>
 							</td> -->
-							<td class="whitespace-nowrap py-1 text-sm font-medium text-default col-span-2"> 
-								{{ snapshot.name }}
+							<td class="whitespace-nowrap py-1 text-sm font-medium text-default col-span-2" :title="snapshot.name"> 
+								{{ snapshot.name.length > 30 ? snapshot.name.slice(0, 30) + '...' : snapshot.name }}
 							</td>
 							<td class="whitespace-nowrap py-1 text-sm text-default col-span-1"> 
 								{{ snapshot.properties.creation.parsed }}
