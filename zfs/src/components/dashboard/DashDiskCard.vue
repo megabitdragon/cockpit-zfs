@@ -22,7 +22,7 @@
 								<div class="py-1">
 								
 									<MenuItem v-slot="{ active }">
-										<a href="#" @click="clearPartAndRefreshDisks(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Partitions (wipefs -a)</a>
+										<a href="#" @click="clearPartAndRefreshDisks(props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Partitions (wipefs -a)</a>
 									</MenuItem>
 								</div>
 							</MenuItems>

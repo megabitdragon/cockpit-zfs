@@ -9,11 +9,11 @@
 							<p class="bg-accent text-defaulttext-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
 						<tr v-if="snapshots.length > 0 && snapshotsLoaded" class="rounded-md ">
-							<th class="px-4 py-3.5 font-semibold text-default">Name</th>
-							<th class="px-4 py-3.5 font-semibold text-default">Created</th>
-							<th class="px-4 py-3.5 font-semibold text-default">Used</th>
-							<th class="px-4 py-3.5 font-semibold text-default">Referenced</th>
-							<th class="relative px-4 py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
+							<th class="px-4 py-2 font-semibold text-default">Snapshot</th>
+							<th class="px-4 py-2 font-semibold text-default">Created On</th>
+							<th class="px-4 py-2 font-semibold text-default">Used</th>
+							<th class="px-4 py-2 font-semibold text-default">Referenced</th>
+							<th class="relative px-4 py-2 pl-3 pr-4 sm:pr-6 lg:pr-8">
 								<span class="sr-only"></span>
 							</th>
 						</tr>
@@ -23,16 +23,16 @@
 					</thead>
 					<tbody class="divide-y divide-default bg-default">
 						<tr v-if="snapshots.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default ">
-							<td class="whitespace-nowrap py-4 px-4 text-sm font-medium text-default bg-default">
+							<td class="whitespace-nowrap py-1 px-4 text-sm font-medium text-default bg-default">
 								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default">
+							<td class="whitespace-nowrap py-1 px-4 text-sm text-default bg-default">
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default">
+							<td class="whitespace-nowrap py-1 px-4 text-sm text-default bg-default">
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap py-4 px-4 text-sm text-default bg-default">
+							<td class="whitespace-nowrap py-1 px-4 text-sm text-default bg-default">
 								{{ snapshot.properties.referenced.value }}
 							</td>
 							<td class="relative whitespace-nowrap mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default">
@@ -81,12 +81,15 @@
 			<div class="">
 				<table class="table-auto min-w-full min-h-full divide-y divide-default">
 					<thead class="bg-secondary border-collapse">
-						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-5">
-							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Name</th>
-							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Created</th>
-							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Used</th>
-							<th class="px-4 py-3.5 font-semibold text-white col-span-1">Referenced</th>
-							<th class="relative px-4 py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-6 font-semibold text-white">
+							<!-- <th class="relative py-2 rounded-tl-md col-span-1">
+								<span class="sr-only"></span>
+							</th> -->
+							<th class="py-2 col-span-2">Snapshot</th>
+							<th class="py-2 col-span-1">Created On</th>
+							<th class="py-2 col-span-1">Used</th>
+							<th class="py-2 col-span-1">Referenced</th>
+							<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 								<span class="sr-only"></span>
 							</th>
 						</tr>
@@ -98,20 +101,23 @@
 						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
 							<p class="bg-well text-muted w-full text-center p-4 justify-self-center">No snapshots found.</p>
 						</tr>
-						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-5 justify-items-center items-center">
-							<td class="whitespace-nowrap py-4 text-sm font-medium text-default col-span-1"> 
+						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-6 justify-items-center items-center">
+							<!-- <td class="relative py-2 col-span-1">
+								<span class="sr-only"></span>
+							</td> -->
+							<td class="whitespace-nowrap py-1 text-sm font-medium text-default col-span-2"> 
 								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap py-4 text-sm text-default col-span-1"> 
+							<td class="whitespace-nowrap py-1 text-sm text-default col-span-1"> 
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap py-4 text-sm text-default col-span-1"> 
+							<td class="whitespace-nowrap py-1 text-sm text-default col-span-1"> 
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap py-4 text-sm text-default col-span-1"> 
+							<td class="whitespace-nowrap py-1 text-sm text-default col-span-1"> 
 								{{ snapshot.properties.referenced.value }}
 							</td>
-							<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
+							<td class="relative whitespace-nowrap py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 								<Menu as="div" class="relative inline-block text-right">
 									<div>
 										<MenuButton class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">

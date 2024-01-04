@@ -49,6 +49,7 @@ export async function loadDiskStatus(diskStatuses: Ref<PoolDiskStatus[]>) {
                 const diskStatus: DiskStatus[] = diskStatusArray.map(item => ({
                     name: item.name,
                     status: item.status,
+					guid: item.guid,
                 }));
 
                 // Store the diskStatus array in the diskStatuses object with poolName as key

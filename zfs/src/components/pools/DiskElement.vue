@@ -1,22 +1,22 @@
 <template>
     <div>
-        <div class="grid grid-cols-8 grid-flow-cols w-full justify-center text-center bg-accent text-default">
-			<!-- <div class="py-6 mt-1 col-span-1">
+        <div class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
+			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
-            <div class="py-6 mt-1 col-span-1">{{ props.disk.name }}</div>
-            <div class="py-6 mt-1 col-span-1 font-semibold" :class="formatStatus(diskState)">{{ diskState }}</div>
-            <div class="py-6 mt-1 col-span-1">{{ props.disk.type }}</div>
-            <div class="py-6 mt-1 col-span-1">{{ props.disk.temp }}</div>
-            <div class="py-6 mt-1 col-span-1">{{ props.disk.capacity }}</div>
-            <div class="py-6 -mt-2 col-span-2">
+            <div class="py-1 mt-1 col-span-2" :title="props.disk.name">{{ props.disk.name.length > 20 ? props.disk.name.slice(0, 20) + '...' : props.disk.name }}</div>
+            <div class="py-1 mt-1 col-span-1 font-semibold" :class="formatStatus(diskState)">{{ diskState }}</div>
+            <div class="py-1 mt-1 col-span-1">{{ props.disk.type }}</div>
+            <div class="py-1 mt-1 col-span-1">{{ props.disk.temp }}</div>
+            <div class="py-1 mt-1 col-span-1">{{ props.disk.capacity }}</div>
+            <div class="py-1 -mt-1 col-span-2">
                 <Status :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"/>
             </div>
             <div class="col-span-1">
-                <div class="relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+                <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
                     <Menu as="div" class="relative inline-block text-right">
                         <div>
-                            <MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+                            <MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
                                 <span class="sr-only">Open options</span>
                                 <EllipsisVerticalIcon class="w-5" aria-hidden="true" />
                             </MenuButton>
@@ -26,19 +26,19 @@
                             <MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <div class="py-1">
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a href="#" @click="clearDiskErrors(props.pool.name, props.disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
+                                        <a href="#" @click="clearDiskErrors(props.pool.name, props.disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a v-if="props.vDev.disks.length > 1" href="#" @click="detachThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Detach Disk</a>
+                                        <a v-if="props.vDev.disks.length > 1" href="#" @click="detachThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach Disk</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a href="#" @click="offlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Offline Disk</a>
+                                        <a href="#" @click="offlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Offline Disk</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a href="#" @click="onlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Online Disk</a>
+                                        <a href="#" @click="onlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Online Disk</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted',, 'block px-4 py-2 text-sm']">Replace Disk</a>
+                                        <a href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace Disk</a>
                                     </MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
 										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD'" href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>

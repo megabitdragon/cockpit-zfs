@@ -99,6 +99,7 @@ interface PoolDiskStatus {
 interface DiskStatus {
 	name: string;
 	status: string;
+	guid: string;
 }
 
 //object for importing pools

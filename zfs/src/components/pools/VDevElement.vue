@@ -2,20 +2,20 @@
     <div>
 		<div>
 			<Disclosure v-slot="{ open }">
-				<DisclosureButton class="text-sm bg-primary text-white grid grid-cols-9 grid-flow-cols w-full justify-center text-center">
-					<div class="py-6 mt-1 mr-2 col-span-1 flex flex-row justify-end ml-4 text-center" :title="props.vDev.name">
+				<DisclosureButton class="text-sm bg-primary text-white grid grid-cols-10 grid-flow-cols w-full justify-center text-center">
+					<div class="py-1 mt-1.5 col-span-1 flex flex-row justify-center text-center" >
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="py-6 mt-1 col-span-1 text-base">{{ props.vDev.name }}</div>
-					<div class="py-6 mt-1 col-span-1 font-semibold text-base" :class="formatStatus(props.vDev.status)">{{ props.vDev.status }}</div>
-					<div class="py-6 mt-2 col-span-1">{{ upperCaseWord(props.vDev.type) }} Device</div>
-					<div class="py-6 mt-2 col-span-1">{{ props.vDev.disks.length }} Disks</div>
-					<div class="py-6 mt-2 col-span-1">{{ props.vDev.stats.read_errors }} Read Errors</div>
-					<div class="py-6 mt-2 col-span-1">{{ props.vDev.stats.write_errors }} Write Errors</div>
-					<div class="py-6 mt-2 col-span-1">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
-					<div class="col-span-1 relative py-6 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
+					<div class="py-1 mt-1.5 col-span-2 text-base justify-self-start" :title="props.vDev.name">{{ props.vDev.name.length > 20 ? props.vDev.name.slice(0, 20) + '...' : props.vDev.name }}</div>
+					<div class="py-1 mt-1.5 col-span-1 font-semibold text-base" :class="formatStatus(props.vDev.status)">{{ props.vDev.status }}</div>
+					<div class="py-1 mt-2 col-span-1">{{ upperCaseWord(props.vDev.type) }} Device</div>
+					<div class="py-1 mt-2 col-span-1">{{ props.vDev.disks.length }} Disks</div>
+					<div class="py-1 mt-2 col-span-1">{{ props.vDev.stats.read_errors }} Read Errors</div>
+					<div class="py-1 mt-2 col-span-1">{{ props.vDev.stats.write_errors }} Write Errors</div>
+					<div class="py-1 mt-2 col-span-1">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
+					<div class="col-span-1 relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
 								<MenuButton class="flex items-center rounded-full bg-primary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -43,19 +43,19 @@
 					</div>
 				</DisclosureButton>
 				<DisclosurePanel>
-					<table class="min-w-full bg-secondary text-default">
+					<table class="min-w-full bg-secondary text-default border border-collapse border-default">
 						<thead>
-							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-8">
-								<!-- <th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-9 font-semibold text-white">
+								<!-- <th class="relative py-2 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 									<span class="sr-only"></span>
 								</th> -->
-								<th class="py-3.5 font-semibold text-white col-span-1">Name</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">State</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">Type</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">Temperature</th>
-								<th class="py-3.5 font-semibold text-white col-span-1">Capacity</th>
-								<th class="py-3.5 font-semibold text-white col-span-2">Message</th>
-								<th class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
+								<th class="py-2 col-span-2">Name</th>
+								<th class="py-2 col-span-1">State</th>
+								<th class="py-2 col-span-1">Type</th>
+								<th class="py-2 col-span-1">Temperature</th>
+								<th class="py-2 col-span-1">Capacity</th>
+								<th class="py-2 col-span-2">Message</th>
+								<th class="relative py-2 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 									<span class="sr-only"></span>
 								</th>
 							</tr>

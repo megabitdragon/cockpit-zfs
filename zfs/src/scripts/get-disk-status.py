@@ -8,7 +8,8 @@ def get_disks(group):
         if vdev['type'] == 'disk':
             disks.append({
                 'name': vdev['name'],
-                'status':vdev['status'],
+                'status': vdev['status'],
+                'guid': vdev['guid'],
             })
         else:
             newDisks = get_disks(vdev['children'])

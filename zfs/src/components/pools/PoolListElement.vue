@@ -3,36 +3,36 @@
 		<div>
 			<Disclosure v-slot="{ open }">
 				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center" >
-					<div class="py-6 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="poolData[props.poolIdx].name">
+					<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="poolData[props.poolIdx].name">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div> 
-					<div class="py-6 mt-1 col-span-1 flex flex-row justify-start" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name.length > 20 ? poolData[props.poolIdx].name.slice(0, 20) + '...' : poolData[props.poolIdx].name }}</div>
-					<div class="py-6 mt-1 col-span-1 font-semibold" :class="formatStatus(poolData[props.poolIdx].status)">{{ poolData[props.poolIdx].status }}</div>
-					<div class="py-6 mt-1 col-span-1">
+					<div class="py-1 mt-1 col-span-1 flex flex-row justify-start" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name.length > 20 ? poolData[props.poolIdx].name.slice(0, 20) + '...' : poolData[props.poolIdx].name }}</div>
+					<div class="py-1 mt-1 col-span-1 font-semibold" :class="formatStatus(poolData[props.poolIdx].status)">{{ poolData[props.poolIdx].status }}</div>
+					<div class="py-1 mt-1 col-span-1">
 						<div class="w-full bg-well rounded-full text-center">
-							<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-6 mt-0.5 text-center relative flex">
-								<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
+							<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex">
+								<div class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
 									{{ poolData[props.poolIdx].properties.capacity }}%
 								</div>
 							</div>
-							<div v-if="poolData[props.poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-6 mt-0.5 min-h-min max-h-max overflow-hidden">
-								<div class="bg-green-600 h-6 min-h-min max-h-max" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
-									<div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+							<div v-if="poolData[props.poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-4 mt-1 min-h-min max-h-max overflow-hidden">
+								<div class="bg-green-600 h-4 min-h-min max-h-max" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
+									<div class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default text-center p-0.5 leading-none">
 										{{ poolData[props.poolIdx].properties.capacity }}%
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.allocated }}</div>
-					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.free }}</div>
-					<div class="py-6 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.size }}</div>
-					<div class="py-6 -mt-2 col-span-2">
+					<div class="py-1 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.allocated }}</div>
+					<div class="py-1 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.free }}</div>
+					<div class="py-1 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.size }}</div>
+					<div class="py-1 -mt-1 col-span-2">
 						<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
 					</div>
-					<div class="relative py-6 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
+					<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 						<Menu as="div" class="relative inline-block text-right -mt-1">
 							<div>
 								<MenuButton class="flex items-center rounded-full bg-default p-2 hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
