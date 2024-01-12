@@ -1,3 +1,4 @@
+<!-- Status component for showing progress of Scrub/Resilver and Trim operations -->
 <template>
     <div>
         <div v-if="!isDisk">

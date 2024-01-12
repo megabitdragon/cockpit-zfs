@@ -136,7 +136,7 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
 import { addVDev } from '../../composables/pools';
-import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadDiskStatus } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 
 interface AddVDevModalProps {
@@ -174,6 +174,7 @@ const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
@@ -259,7 +260,9 @@ async function refreshAllData() {
     allDisks.value = [];
     pools.value = [];
     datasets.value = [];
+    diskStatus.value = [];
     await loadDisksThenPools(allDisks, pools);
+    await loadDiskStatus(diskStatus);
     await loadDatasets(datasets);
     await loadScanObjectGroup(scanObjectGroup);
     await loadScanActivities(pools, scanActivities);

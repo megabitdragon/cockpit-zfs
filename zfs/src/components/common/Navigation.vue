@@ -4,7 +4,7 @@
 			<label for="tabs" class="sr-only">Select a tab</label>
 			<!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
 			<select id="tabs" name="tabs" class="block w-full rounded-md border-default py-2 pl-3 pr-10 text-base focus:border-fefault focus:outline-none focus:ring-slate-500 sm:text-sm">
-				<option v-for="item in props.navigationItems" :key="item.name" @onChange="navigationCallback(item)" :selected="item.current">{{ item.name }}</option>
+				<option v-for="item in props.navigationItems" :key="item.name" @change="navigationCallback(item)" :selected="item.current">{{ item.name }}</option>
 			</select>
 		</div>
 		<!--^^^ Mobile or very small screen --- DOES NOT WORK YET (onChange wont work for some reason) ^^^-->

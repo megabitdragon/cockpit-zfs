@@ -2,19 +2,20 @@
     <div>
 		<div class="border border-default">
 			<Disclosure v-slot="{ open }" :defaultOpen="true">
-				<DisclosureButton class="text-sm bg-primary text-white grid grid-cols-10 grid-flow-cols w-full justify-center text-center ">
+				<DisclosureButton class="text-sm bg-primary text-white grid grid-cols-9 grid-flow-cols w-full justify-center text-center ">
 					<div class="py-1 mt-1.5 col-span-1 flex flex-row justify-center text-center" >
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="py-1 mt-1.5 col-span-2 text-base justify-self-start" :title="props.vDev.name">{{ props.vDev.name.length > 30 ? props.vDev.name.slice(0, 30) + '...' : props.vDev.name }}</div>
-					<div class="py-1 mt-1.5 col-span-1 font-semibold text-base justify-self-start" :class="formatStatus(props.vDev.status)">{{ props.vDev.status }}</div>
-					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ upperCaseWord(props.vDev.type) }} Device</div>
-					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ props.vDev.disks.length }} Disks</div>
-					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ props.vDev.stats.read_errors }} Read Errors</div>
-					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ props.vDev.stats.write_errors }} Write Errors</div>
-					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
+					<div class="py-1 mt-1.5 col-span-1 text-base justify-self-start" :title="props.vDev.name">{{ props.vDev.name.length > 20 ? props.vDev.name.slice(0, 20) + '...' : props.vDev.name }}</div>
+					<div class="py-1 mt-1.5 col-span-1 text-base justify-self-start">{{ upperCaseWord(props.vDev.type) }} Device</div>
+					<div class="py-1 mt-1.5 col-span-1 text-base justify-self-start">{{ props.vDev.disks.length }} Disks</div>
+					<div class="py-1 mt-1.5 col-span-1 text-base justify-self-start">{{ props.vDev.stats.read_errors }} Read Errors</div>
+					<div class="py-1 mt-1.5 col-span-1 text-base justify-self-start">{{ props.vDev.stats.write_errors }} Write Errors</div>
+					<div class="py-1 mt-1.5 col-span-1 text-base justify-self-start">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
+					<!-- <div class="py-1 mt-1.5 col-span-1 font-semibold text-base" :class="formatStatus(props.vDev.status)"><span class="bg-default py-0.5 px-1 rounded-lg">{{ props.vDev.status }}</span></div> -->
+					<div class="py-1 mt-1.5 col-span-1 font-semibold text-base" :class="formatStatus(props.vDev.status)">{{ props.vDev.status }}</div>
 					<div class="col-span-1 relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
