@@ -129,6 +129,7 @@ function loadTheseSnapshots() {
 }
 
 function initialize() {
+    clearSnapshots();
     loadTheseSnapshots();
     if (props.item == 'pool') {
         defaultFileSystem.value = datasetsInSamePool.value[0];

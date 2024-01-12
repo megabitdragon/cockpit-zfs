@@ -1,7 +1,7 @@
 <template>
     <div>
 		<div class="border border-default">
-			<Disclosure v-slot="{ open }">
+			<Disclosure v-slot="{ open }" :defaultOpen="true">
 				<DisclosureButton class="text-sm bg-primary text-white grid grid-cols-10 grid-flow-cols w-full justify-center text-center ">
 					<div class="py-1 mt-1.5 col-span-1 flex flex-row justify-center text-center" >
 						<ChevronUpIcon
@@ -9,12 +9,12 @@
 						/>
 					</div>
 					<div class="py-1 mt-1.5 col-span-2 text-base justify-self-start" :title="props.vDev.name">{{ props.vDev.name.length > 30 ? props.vDev.name.slice(0, 30) + '...' : props.vDev.name }}</div>
-					<div class="py-1 mt-1.5 col-span-1 font-semibold text-base" :class="formatStatus(props.vDev.status)">{{ props.vDev.status }}</div>
-					<div class="py-1 mt-2 col-span-1">{{ upperCaseWord(props.vDev.type) }} Device</div>
-					<div class="py-1 mt-2 col-span-1">{{ props.vDev.disks.length }} Disks</div>
-					<div class="py-1 mt-2 col-span-1">{{ props.vDev.stats.read_errors }} Read Errors</div>
-					<div class="py-1 mt-2 col-span-1">{{ props.vDev.stats.write_errors }} Write Errors</div>
-					<div class="py-1 mt-2 col-span-1">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
+					<div class="py-1 mt-1.5 col-span-1 font-semibold text-base justify-self-start" :class="formatStatus(props.vDev.status)">{{ props.vDev.status }}</div>
+					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ upperCaseWord(props.vDev.type) }} Device</div>
+					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ props.vDev.disks.length }} Disks</div>
+					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ props.vDev.stats.read_errors }} Read Errors</div>
+					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ props.vDev.stats.write_errors }} Write Errors</div>
+					<div class="py-1 mt-2 col-span-1 justify-self-start">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
 					<div class="col-span-1 relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
@@ -25,7 +25,7 @@
 							</div>
 
 							<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-								<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+								<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-right rounded-md bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">												
 										<MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
@@ -49,7 +49,7 @@
 								<!-- <th class="relative py-2 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 									<span class="sr-only"></span>
 								</th> -->
-								<th class="py-2 col-span-2">Name</th>
+								<th class="py-2 col-span-2">Disk</th>
 								<th class="py-2 col-span-1">State</th>
 								<th class="py-2 col-span-1">Type</th>
 								<th class="py-2 col-span-1">Temperature</th>

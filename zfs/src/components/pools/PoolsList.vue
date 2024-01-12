@@ -12,10 +12,11 @@
 
 		<div class="mt-4 overflow-visible rounded-md max-w-full">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
-				<div class="overflow-visible ring-1 ring-black ring-opacity-5 sm:rounded-md">
+				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md">
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
+
 							<tr class="bg-well rounded-t-md grid grid-cols-10">
 
 								<th class="relative py-2 rounded-tl-md col-span-1">

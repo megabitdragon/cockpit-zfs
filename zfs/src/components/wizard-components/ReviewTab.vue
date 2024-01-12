@@ -15,9 +15,9 @@
 							<p>Compression: <b>{{ isBoolCompression(poolConfig.properties.compression).toUpperCase() }}</b></p>
 							<p>Sector Size: <b>{{ getValue('sector', poolConfig.properties.sector) }}</b></p>
 							<p>Record Size: <b>{{ getValue('record', poolConfig.properties.record) }}</b></p>
-							<div class="rounded-lg mt-1 border border-default">
+							<div class="rounded-lg mt-1 border border-default bg-well">
 								<Disclosure v-slot="{ open }">
-									<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center">
+									<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center rounded-lg">
 										<div class="m-1 col-span-1">
 											<ChevronUpIcon
 												class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
@@ -28,7 +28,7 @@
 										</div>
 									</DisclosureButton>
 									<DisclosurePanel>
-										<div class="p-2 rounded-lg">
+										<div class="p-2 rounded-lg bg-well">
 											<p>Deduplication: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }}</b></p>
 											<p>Auto-Expand: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoExpand)) }}</b></p>
 											<p>Auto-Replace: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoReplace)) }}</b></p>
@@ -40,7 +40,7 @@
 						</div>
 					</template>
 					<template v-slot:footer>
-						<div class="rounded-lg mt-1 border border-default">
+						<div class="bg-default rounded-lg mt-1 border border-default">
 							<Disclosure v-slot="{ open }">
 								<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
 									<div class="m-1 col-span-1">

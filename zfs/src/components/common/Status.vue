@@ -12,7 +12,7 @@
                             <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center w-full">
                                 <div class="col-span-4 w-full bg-well rounded-full relative flex h-6 min-h-min overflow-hidden">
                                     <div :class="progressBarClass()" class="h-6 min-h-min w-full" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-white text-center p-1.5 leading-none">
+                                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-1.5 leading-none">
                                             {{ parseFloat(scanPercentage.toFixed(2)) }}%
                                         </div>
                                     </div>
@@ -45,7 +45,7 @@
                                         
                                         <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
                                             <div :class="trimProgressBarClass(disk)" class="h-6 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))}%` }">
-                                                <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-white text-center p-0.5 leading-none">
+                                                <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
                                                     {{ handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2))) }}%
                                                 </div>
                                             </div>

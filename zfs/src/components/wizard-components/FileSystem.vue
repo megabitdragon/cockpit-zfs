@@ -181,7 +181,7 @@
 				<!-- Quota (Slider + Select) -->
 				<div>
 					<label :for="getIdKey('fs-quota')" class="mb-1 block text-sm font-medium leading-6 text-default">Quota</label>
-					<div class="flex flex-row">
+					<div class="flex flex-row gap-1">
 						<input v-model="fileSystemConfig.properties.quota.raw" :id="getIdKey('fs-quota-amount')" type="range" min="0" max="1000" step="1" class="text-default mt-5 w-3/4 h-2 bg-accent rounded-lg appearance-none cursor-pointer "/>
 						<input v-model="fileSystemConfig.properties.quota.raw" type="number" name="fs-quota-num" :id="getIdKey('fs-quota-amount')" min="0" max="1000" class="text-default bg-default mt-1 w-fit block py-1.5 px-1.5 ml-1 text-default placeholder:text-muted input-textlike sm:text-sm sm:leading-6"/>      
 						<select v-model="fileSystemConfig.properties.quota.unit" :id="getIdKey('fs-quota-size')" name="fs-quota-slider" class="block sm:col-span-1 bg-default py-1.5 pl-3 pr-10 text-default input-textlike sm:text-sm sm:leading-6">
@@ -212,7 +212,6 @@
 						</span>
 					</Switch>
 				</div>
-
 
 			</div>
 		</div>

@@ -6,7 +6,7 @@
 				<table class="table-auto min-h-full divide-y divide-default bg-default">
 					<thead class="bg-well">
 						<tr v-if="snapshots.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="bg-accent text-defaulttext-center p-4 justify-self-center">No snapshots found.</p>
+							<p class="bg-accent text-defaulttext-center py-2 justify-self-center">No snapshots found.</p>
 						</tr>
 						<tr v-if="snapshots.length > 0 && snapshotsLoaded" class="rounded-md ">
 							<th class="px-4 py-2 font-semibold text-default">Snapshot</th>
@@ -99,7 +99,7 @@
 					</thead>
 					<tbody class="divide-y divide-default bg-accent border-collapse">
 						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="bg-well text-muted w-full text-center p-4 justify-self-center">No snapshots found.</p>
+							<p class="bg-well text-muted w-full text-center py-2 justify-self-center">No snapshots found.</p>
 						</tr>
 						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-6 justify-items-center items-center">
 							<!-- <td class="relative py-2 col-span-1">

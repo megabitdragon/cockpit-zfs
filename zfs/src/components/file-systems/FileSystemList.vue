@@ -3,6 +3,7 @@
 		<div class="flex bg-well justify-between rounded-md p-2 shadow text-default rounded-b-md ring-1 ring-black ring-opacity-5">
 			<div class="button-group-row justify-start">
 				<button id="createFS" class="btn btn-primary object-left justify-start" @click="newFileSystemWizard()">Create File System</button>
+
 			</div>
 			<div class="button-group-row justify-end">
 				<button id="refreshFS" class="btn btn-secondary object-right justify-self-end" @click="refreshData()"><ArrowPathIcon class="w-5 h-5 m-1"/></button>
@@ -11,7 +12,7 @@
 
 		<div class="mt-4 rounded-md max-w-full">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
-				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md sm:rounded-lg">
+				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md">
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
@@ -43,7 +44,7 @@
 						<div v-for="fileSystem, fsIdx in fileSystems">
 							<div class="border border-default">
 								<Disclosure v-slot="{ open }">
-								<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full border border-b border-collapse border-default justify-center text-center">
+									<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full justify-center text-center">
 									<!-- <DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full justify-center text-center"> -->
 										<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="fileSystem.name">
 											<ChevronUpIcon
