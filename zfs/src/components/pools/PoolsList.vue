@@ -16,7 +16,6 @@
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
-
 							<tr class="bg-well rounded-t-md grid grid-cols-10">
 
 								<th class="relative py-2 rounded-tl-md col-span-1">
