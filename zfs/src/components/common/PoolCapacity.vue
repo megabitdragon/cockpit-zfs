@@ -1,14 +1,17 @@
 <template>
-    <div class="flex items-center flex-wrap max-w-sm px-10 bg-default rounded-2xl h-20">
-        <div class="flex items-center justify-center -m-6 overflow-visible bg-default rounded-full">
+    <div class="flex flex-row justify-between items-center flex-wrap max-w-sm px-10 bg-default rounded-2xl h-20">
+        <div class="flex items-center justify-center overflow-visible bg-default rounded-full">
             <svg class="w-32 h-32 transform translate-x-1 translate-y-1" aria-hidden="true">
                 <circle :id="getIdKey('circle-empty')" class="text-gray-300 dark:text-gray-500" :stroke-width="props.strokeWidth" stroke="currentColor" fill="transparent" :r="props.radius" :cx="props.coordX" :cy="props.coordY" />
                 <circle :id="getIdKey('circle-filled')" :class="props.fillColor" :stroke-width="props.strokeWidth" :stroke-dasharray="circumference" :stroke-dashoffset="offset" stroke-linecap="round" stroke="currentColor" fill="transparent" :r="props.radius" :cx="props.coordX" :cy="props.coordY" />
             </svg>
             <span :class="['absolute', props.percentFontSize, props.fillColor]">{{props.percentage}}%</span>
         </div>
-        <p class="ml-10 font-medium text-default sm:text-xl">{{ props.name }}</p>
-        <span :class="['ml-auto', 'text-xl', 'font-medium', props.fillColor, 'hidden', 'sm:block']">{{ props.totalSize }}</span>
+        <div class="flex flex-col">
+            <p class="font-medium text-default sm:text-xl">{{ props.name }}</p>
+            <span :class="['ml-auto', 'text-xl', 'font-medium', props.fillColor, 'hidden', 'sm:block']">{{ props.totalSize }}</span>
+        </div>
+     
     </div>
 </template>
 
@@ -16,7 +19,7 @@
 import { computed} from 'vue';
 
 
-interface CircleProgress {
+interface PoolCapacity {
     id: string;
     fillColor: string;
 	radius: number;
@@ -29,7 +32,7 @@ interface CircleProgress {
     percentFontSize: string;
 }
 
-const props = defineProps<CircleProgress>();
+const props = defineProps<PoolCapacity>();
 
 const circumference = computed(() => {
     const radius = props.radius;

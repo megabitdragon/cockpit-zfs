@@ -86,8 +86,8 @@
                     <legend class="text-danger font-medium">All data that has changed since the snapshot will be discarded.</legend>
                 </div>
                 
-                <div v-if="props.firstOption" class="flex flex-row">
-                    <label :for="getIdKey('option-one')" class="mt-3 mr-2 block text-sm font-medium text-default">{{upperCaseWord(option1)}}</label>
+                <div v-if="props.firstOption" class="flex flex-row justify-between mt-1">
+                    <label :for="getIdKey('option-one')" class="mt-1 mr-2 block text-sm font-medium text-default">{{upperCaseWord(option1)}}</label>
                     <Switch v-model="option1Toggle" :id="getIdKey('option-one')" :class="[option1Toggle ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                         <span class="sr-only">Use setting</span>
                         <span :class="[option1Toggle ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -105,9 +105,9 @@
                     </Switch>
                 </div>
 
-                <div v-if="props.secondOption" class="flex flex-row">
-                    <label :for="getIdKey('option-two')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">{{upperCaseWord(option2)}}</label>
-                    <Switch v-model="option2Toggle" :id="getIdKey('option-two')" :class="[option2Toggle! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                <div v-if="props.secondOption" class="flex flex-row justify-around mt-1">
+                    <label :for="getIdKey('option-two')" class="mt-1 mr-2 block text-sm font-medium leading-6 text-default">{{upperCaseWord(option2)}}</label>
+                    <Switch v-model="option2Toggle" :id="getIdKey('option-two')" :class="[option2Toggle! ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                         <span class="sr-only">Use setting</span>
                         <span :class="[option2Toggle! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
                             <span :class="[option2Toggle! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">

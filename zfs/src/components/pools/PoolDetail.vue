@@ -1,12 +1,12 @@
 <template>
-	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-fit'" :minWidth="'min-w-3/5'">
+	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
 		<template v-slot:content>
 			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
 				<div class="col-span-2">
-					<CircleProgress :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
+					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
 					:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
 					:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'"/>
 				</div>
@@ -45,9 +45,12 @@
 				</div>
 			</div>
 			
-			<div v-if="navTag == 'snapshots'" class="">
-				<SnapshotsList :pool="props.pool" :item="'pool'"/>
-				<!-- <component :is=""/> -->
+			<div v-if="navTag == 'snapshots' && snapshotsLoaded" class="" >
+				<!-- <SnapshotsList :pool="props.pool" :item="'pool'"/> -->
+				<component :is="snapshotListComponent" :pool="props.pool" :item="'pool'"/>
+			</div>
+			<div v-if="navTag == 'snapshots' && !snapshotsLoaded" class="rounded-md flex bg-well justify-center">
+				<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 			</div>
 
 			<div v-if="navTag == 'settings'">
@@ -84,6 +87,8 @@
 							<option value="panic">Panic</option>
 						</select>
 					</div>
+
+
 					<div class="mt-2 col-span-3 col-start-2 row-start-2">
 						<p :for="getIdKey('settings-pool-comment')" class="text-base text-default">Comment</p>
 						<input :id="getIdKey('settings-pool-comment')" v-model="poolConfig.comment" name="setting-pool-comment" placeholder="Enter a comment here" type="text" class="input-textlike mt-1 block w-full rounded-md border-0 py-1.5 px-1.5 text-default shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-muted focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"/>
@@ -249,10 +254,10 @@ import { configurePool } from '../../composables/pools';
 import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
 import { loadDisksThenPools } from '../../composables/loadData';
 import Modal from '../common/Modal.vue';
-import CircleProgress from '../common/CircleProgress.vue';
+import PoolCapacity from '../common/PoolCapacity.vue';
 import Navigation from '../common/Navigation.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
-import SnapshotsList from '../snapshots/SnapshotsList.vue';
+import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;
 
@@ -299,10 +304,16 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 
 // const snapshotsLoaded = ref(true);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-// const snapshotsLoaded = inject<Ref<Snapshot[]>>('snapshots-loaded')!;
+const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 // const snapshotsInPool = ref<Snapshot[]>([]);
 
 // loadSnapshotsInPool(snapshots, props.pool.name);
+const snapshotListComponent = ref();
+const loadSnapshotListComponent = async () => {
+	const module = await import('../snapshots/SnapshotsList.vue');
+	snapshotListComponent.value = module.default;
+	snapshotsLoaded.value = true;
+}
 
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
@@ -488,6 +499,14 @@ const currentNavigationItem = computed<NavigationItem | undefined>(() => navigat
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;
 };
+
+watch(navTag, (newVal, oldVal) => {
+	if (navTag.value == 'snapshots') {
+		snapshotsLoaded.value = false;
+		loadSnapshotListComponent();
+	}
+}, {immediate: true});
+
 
 const navigation = reactive<NavigationItem[]>([
 	{ name: 'Stats', tag: 'stats', current: computed(() => navTag.value == 'stats') as unknown as boolean, show: true, },

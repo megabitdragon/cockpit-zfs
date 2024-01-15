@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<!-- POOLS -->
-		<div v-if="props.item == 'pool'" class="inline-block max-h-max align-middle border border-default border-collapse">
-			<div class="">
-				<table class="table-auto min-h-full divide-y divide-default bg-default">
-					<thead class="bg-well">
-						<tr v-if="snapshots.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="bg-accent text-defaulttext-center py-2 justify-self-center">No snapshots found.</p>
+		<div v-if="props.item == 'pool'" class="w-full inline-block max-h-max align-middle border border-default border-collapse">
+			<div class="w-full">
+				<table class="table-auto min-w-full w-full min-h-full divide-y divide-default bg-default">
+					<thead class="bg-well w-full">
+						<tr v-if="snapshots.length < 1 && snapshotsLoaded" class="flex flex-row items-center">
+							<p class="bg-accent text-default text-center p-2 justify-self-center w-full">No snapshots found.</p>
 						</tr>
 						<tr v-if="snapshots.length > 0 && snapshotsLoaded" class="rounded-md ">
 							<th class="px-4 py-2 font-semibold text-default">Snapshot</th>
