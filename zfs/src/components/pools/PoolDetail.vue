@@ -4,7 +4,7 @@
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
 		<template v-slot:content>
-			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4">
+			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4 text-default">
 				<div class="col-span-2">
 					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
 					:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
@@ -342,6 +342,8 @@ function calculateSectorSize(exponent) {
 	}
 	  return result.value;
 }
+
+const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////

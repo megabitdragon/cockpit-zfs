@@ -292,7 +292,7 @@ const stateMessage = computed(() => {
         if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause !== 'None') {
            return `${scanFunction.value} paused at  ${scanObjectGroup.value[props.pool.name].pause}`;
         } else {
-            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             // console.log('timeZone:', userTimeZone);
             if (scanObjectGroup.value[props.pool.name]) {
                 switch (scanObjectGroup.value[props.pool.name].state) {

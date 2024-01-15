@@ -155,45 +155,45 @@ const totalEffectivePoolSpace = computed(() => {
 //get all disks in use by pools
 // const disksInPools = inject<Ref<DiskData[]>>("disks-in-pools")!;
 
-async function refreshDiskData() {
-	disksLoaded.value = false;
-	disks.value = [];
-	await loadDisks(disks);
-	disksLoaded.value = true;
-}
+// async function refreshDiskData() {
+// 	disksLoaded.value = false;
+// 	disks.value = [];
+// 	await loadDisks(disks);
+// 	disksLoaded.value = true;
+// }
 
-//find highest disk temperature
-const maxTemp = computed(() => {
-	let maxTemperature = 0;
+// //find highest disk temperature
+// const maxTemp = computed(() => {
+// 	let maxTemperature = 0;
 
-	disks.value.forEach((disk) => {
-		const temperature = parseFloat(disk.temp.replace(/\D/g, ''));
-		if (!isNaN(temperature) && temperature > maxTemperature) {
-		maxTemperature = temperature;
-		}
-	});
+// 	disks.value.forEach((disk) => {
+// 		const temperature = parseFloat(disk.temp.replace(/\D/g, ''));
+// 		if (!isNaN(temperature) && temperature > maxTemperature) {
+// 		maxTemperature = temperature;
+// 		}
+// 	});
 
-	return maxTemperature.toString();
-});
+// 	return maxTemperature.toString();
+// });
 
-//get total raw space of disks
-const totalRawDiskSpace = computed(() => {
-	let totalRaw = 0;
-	disks.value.forEach(disk => {
-		totalRaw += convertSizeToBytesDecimal(disk.capacity);
-	});
-	return (convertBytesToSizeDecimal(totalRaw));
-})
+// //get total raw space of disks
+// const totalRawDiskSpace = computed(() => {
+// 	let totalRaw = 0;
+// 	disks.value.forEach(disk => {
+// 		totalRaw += convertSizeToBytesDecimal(disk.capacity);
+// 	});
+// 	return (convertBytesToSizeDecimal(totalRaw));
+// })
 
-//determine number of SSDs
-const disksSSD = computed(() => {
-	return disks.value.filter(disk => disk.type == 'SSD');
-});
+// //determine number of SSDs
+// const disksSSD = computed(() => {
+// 	return disks.value.filter(disk => disk.type == 'SSD');
+// });
 
-//determine number of HDDs
-const disksHDD = computed(() => {
-	return disks.value.filter(disk => disk.type == 'HDD');
-});
+// //determine number of HDDs
+// const disksHDD = computed(() => {
+// 	return disks.value.filter(disk => disk.type == 'HDD');
+// });
 
 // const scanObjectGroup = ref<PoolScanObjectGroup>({});
 
