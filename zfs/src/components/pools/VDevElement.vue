@@ -80,7 +80,7 @@
 
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, watch } from "vue";
+import { ref, inject, Ref, watch, provide } from "vue";
 import { EllipsisVerticalIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { clearErrors, removeVDevFromPool } from "../../composables/pools";
@@ -236,4 +236,5 @@ defineExpose({
     getDiskStatus,
 });
 
+provide('show-attach-modal', showAttachDiskModal);
 </script>

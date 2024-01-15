@@ -91,7 +91,7 @@
 	
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, watch, computed } from "vue";
+import { ref, inject, Ref, watch, computed, provide } from "vue";
 import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { scrubPool, clearErrors } from "../../composables/pools";
@@ -486,7 +486,6 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 	}
 });
 
-
 /////////////////// Replace Disk ////////////////////
 /////////////////////////////////////////////////////
 const showReplaceDiskModal = ref(false);
@@ -527,7 +526,6 @@ const trimStatusBox = ref();
 async function getDiskTrimStatus() {
 	// console.log('trimStatusBox', trimStatusBox.value);
 
-	// Needed to specify index to work properly (treating as an array due to multiple pools error)
 	await trimStatusBox.value.pollTrimStatus();
 }
 
@@ -544,4 +542,5 @@ defineExpose({
     getDiskTrimStatus,
 });
 
+provide('modal-confirm-running', operationRunning);
 </script>

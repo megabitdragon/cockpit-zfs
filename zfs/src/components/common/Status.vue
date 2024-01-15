@@ -522,7 +522,7 @@ watch(checkingDiskStats, (newVal, oldVal) => {
 //////////////////////////////////////////////////////////////////
 
 function getTrimTimestamp(disk) {
-    return (convertRawTimestampToString(disk.stats.trim_action_time));
+    return (convertTimestampToLocal(convertRawTimestampToString(disk.stats.trim_action_time)));
 }
 
 function getTrimPercentage(disk) {

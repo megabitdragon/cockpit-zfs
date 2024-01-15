@@ -88,12 +88,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, inject, Ref, computed, provide } from 'vue';
-import { Menu, MenuButton, MenuItem, MenuItems, Switch } from '@headlessui/vue';
+import { ref, inject, Ref, computed } from 'vue';
+import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
+import { convertSizeToBytes, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { attachDisk } from '../../composables/disks';
-import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadDiskStatus, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 
 interface AttachDiskModalProps {
 	idKey: string;
@@ -138,9 +138,11 @@ const diskExistPath = ref('');
 const diskExistName = ref('');
 const adding = ref(false);
 
+const poolData = inject<Ref<PoolData[]>>("pools")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 const diskVDevPoolData = ref({
     existingDiskName: '',
@@ -150,6 +152,9 @@ const diskVDevPoolData = ref({
     forceAttach: false,
 });
 
+// const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+// const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const availableDisks = computed<DiskData[]>(() => {
@@ -242,8 +247,12 @@ async function attachDiskBtn() {
         allDisks.value = [];
         pools.value = [];
         datasets.value = [];
+        diskStatus.value = [];
         await loadDisksThenPools(allDisks, pools);
+        await loadDiskStatus(diskStatus);
         await loadDatasets(datasets);
+        await loadDiskStats(poolDiskStats);
+	    await loadTrimActivities(poolData, trimActivities);
         disksLoaded.value = true;
         poolsLoaded.value = true;
         fileSystemsLoaded.value = true;
