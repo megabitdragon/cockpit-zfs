@@ -112,7 +112,7 @@ const showNewPoolWizard = ref(false);
 
 const createPoolComponent = ref();
 const loadCreatePoolComponent = async () => {
-	const module = await import('../wizard-components/CreatePool.vue');
+	const module = await import('../pool-creation-wizard/CreatePool.vue');
 	createPoolComponent.value = module.default;
 }
 

@@ -1,5 +1,5 @@
 <template>
-	<Modal :isOpen="showImportModal" @close="showImportModal = false" :marginTop="'mt-28'" :width="'w-2/3'" :minWidth="'min-w-2/3'">
+	<Modal :isOpen="showImportModal" @close="showImportModal = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         <template v-slot:title>
             <legend class="flex justify-center">Import Pool</legend>
         </template>

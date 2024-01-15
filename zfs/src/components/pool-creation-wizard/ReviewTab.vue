@@ -15,9 +15,9 @@
 							<p>Compression: <b>{{ isBoolCompression(poolConfig.properties.compression).toUpperCase() }}</b></p>
 							<p>Sector Size: <b>{{ getValue('sector', poolConfig.properties.sector) }}</b></p>
 							<p>Record Size: <b>{{ getValue('record', poolConfig.properties.record) }}</b></p>
-							<div class="rounded-lg mt-1 border border-default bg-well">
+							<div class="rounded-lg mt-1 border border-default bg-default">
 								<Disclosure v-slot="{ open }">
-									<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center rounded-lg">
+									<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
 										<div class="m-1 col-span-1">
 											<ChevronUpIcon
 												class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
@@ -28,7 +28,7 @@
 										</div>
 									</DisclosureButton>
 									<DisclosurePanel>
-										<div class="p-2 rounded-lg bg-well">
+										<div class="p-2 rounded-lg bg-default">
 											<p>Deduplication: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }}</b></p>
 											<p>Auto-Expand: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoExpand)) }}</b></p>
 											<p>Auto-Replace: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoReplace)) }}</b></p>
@@ -81,7 +81,7 @@
 			</div>
 			
 			<div v-if="poolConfig.createFileSystem! && !creatingFilesystem && !filesystemCreated" class="">
-				<Card :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">
+				<Card :bgColor="'bg-accent'" :titleSection="true" :contentSection="false" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">
 					<template v-slot:title>
 						<div class="rounded-lg">						
 							<p>File System Name: <b>{{ fileSystemData.name }}</b></p>
@@ -92,9 +92,9 @@
 							<p>Quota: <b>{{ convertBytesToSize(convertSizeToBytes((fileSystemData.properties.quota.raw.toString()) + fileSystemData.properties.quota.unit)) }}</b></p>
 							<p>Read Only: <b>{{ upperCaseWord(isBoolOnOff(fileSystemData.properties.isReadOnly!)) }}</b></p>	
 							<p v-if="fileSystemData.encrypted">Encryption: <b>{{ fileSystemData.properties.encryption.toUpperCase() }}</b></p>
-							<p class="mt-1 border rounded-lg border-default">
+							<p class="mt-1 border rounded-lg border-default bg-default">
 								<Disclosure v-slot="{ open }">
-									<DisclosureButton class="bg-well grid grid-cols-8 w-full justify-start text-center rounded-lg">
+									<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
 										<div class="m-1 col-span-1">
 											<ChevronUpIcon
 												class="h-7 w-7 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"

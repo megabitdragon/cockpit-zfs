@@ -249,7 +249,7 @@ async function refreshDatasetSnaps(filesystem) {
 /////////////////////////////////////////////////////
 const newFileSystemComponent = ref();
 const loadNewFileSystemComponent = async () => {
-	const module = await import('../wizard-components/FileSystem.vue');
+	const module = await import('../pool-creation-wizard/FileSystem.vue');
 	newFileSystemComponent.value = module.default;
 }
 
