@@ -16,12 +16,12 @@
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
-							<tr class="bg-well rounded-t-md grid grid-cols-10">
+							<tr class="bg-well rounded-t-md grid grid-cols-11">
 
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="py-2 font-semibold text-default col-span-1 flex flex-row justify-start">Dataset</th>
+								<th class="py-2 font-semibold text-default col-span-2 flex flex-row justify-start">Dataset</th>
 								<th class="py-2 font-semibold text-default col-span-1">Available</th>
 								<th class="py-2 font-semibold text-default col-span-1">Used</th>
 								<th class="py-2 font-semibold text-default col-span-1">Refreservation</th>
@@ -42,13 +42,13 @@
 									<div v-for="fileSystem, fsIdx in fileSystems">
 										<div class="border border-default">
 											<Disclosure v-slot="{ open }">
-												<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full justify-center text-center">
+												<DisclosureButton class="bg-default grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
 													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="fileSystem.name">
 														<ChevronUpIcon
 															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 														/>
 													</div>
-													<div class="py-1 mt-1 col-span-1 flex flex-row justify-start whitespace-nowrap" :title="fileSystem.name">{{ fileSystem.name.length > 18 ? fileSystem.name.slice(0, 18) + '...' : fileSystem.name }}</div>
+													<div class="py-1 mt-1 col-span-2 flex flex-row justify-start whitespace-nowrap" :title="fileSystem.name">{{ fileSystem.name.length > 30 ? fileSystem.name.slice(0, 30) + '...' : fileSystem.name }}</div>
 													<div class="py-1 mt-1 col-span-1">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
 													<div class="py-1 mt-1 col-span-1">{{ fileSystem.properties.usedByDataset }}</div>
 													<div class="py-1 mt-1 col-span-1">{{ fileSystem.properties.usedbyRefreservation }}</div>
