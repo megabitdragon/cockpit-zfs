@@ -51,7 +51,7 @@
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5">
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
 								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
-								<p class="truncate text-sm font-medium text-default">{{ disk.name }}</p>
+								<p class="truncate text-sm font-medium text-default">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk.name) }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk[poolConfig.vdevs[vDevIdx].diskIdentifier!] }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
@@ -304,7 +304,7 @@
 import { inject, ref, Ref, computed, watchEffect } from 'vue';
 import { ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression } from '../../composables/helpers';
+import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName } from '../../composables/helpers';
 
 interface PoolConfigProps {
 	tag: string;
@@ -630,12 +630,6 @@ const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
 const newVDevs = ref<newVDevData[]>([]);
 const newVDevDisks = ref<string[]>([]);
 
-const phyPathPrefix = '/dev/disk/by-path/';
-const sdPathPrefix = '/dev/';
-const newDisk = ref();
-const diskName = ref('');
-const diskPath = ref('');
-
 function fillNewPoolData() {
 	newPoolData.value.name = poolConfig.value.name;
 	poolConfig.value.vdevs.forEach(vDev => {
@@ -647,31 +641,15 @@ function fillNewPoolData() {
 		newVDev.isMirror = vDev.isMirror;
 
 		vDev.selectedDisks.forEach(selectedDisk => {
-			newDisk.value = disks.value.find(disk => disk.name === selectedDisk);
-			switch (vDev.diskIdentifier!) {
-				case 'vdev_path':
-					diskPath.value = newDisk.value!.vdev_path;
-					diskName.value = selectedDisk;
-					break;
-				case 'phy_path':
-					diskPath.value = newDisk.value!.phy_path;
-					diskName.value = diskPath.value.replace(phyPathPrefix, '');
-					break;
-				case 'sd_path':
-					diskPath.value = newDisk.value!.sd_path;
-					diskName.value = diskPath.value.replace(sdPathPrefix, '');
-					break;	
-				default:
-					console.log('error with selectedDisks/diskIdentifier'); 
-					break;
-			}
-			//newVDevDisks.value.push(selectedDisk);
-			newVDevDisks.value.push(diskName.value);
+			const diskNameFinal = getDiskIDName(disks.value, vDev.diskIdentifier!, selectedDisk);
+			newVDevDisks.value.push(diskNameFinal);
 		});
+
 		newVDev.disks = newVDevDisks.value;
 		newVDevDisks.value = [];
 		newVDevs.value.push(newVDev);
 	});
+
 	newPoolData.value.vdevs = newVDevs.value;
 	newPoolData.value.autoexpand = isBoolOnOff(poolConfig.value.properties.autoTrim);
 	newPoolData.value.autoreplace = isBoolOnOff(poolConfig.value.properties.autoReplace);
@@ -685,6 +663,8 @@ function fillNewPoolData() {
 
 	console.log("newPoolData sent:", newPoolData);
 }
+
+
 
 const fsConfig = ref();
 

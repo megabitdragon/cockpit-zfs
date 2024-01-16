@@ -65,7 +65,7 @@
 												<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
 													<template v-slot:title>
 														<div>
-															<b>{{ disk }}</b>
+															<b>{{ getDiskIDName(disks, vDev.diskIdentifier!, disk) }}</b>
 														</div>
 													</template>
 												</Card>
@@ -174,10 +174,11 @@ import { inject, Ref} from 'vue';
 import Card from '../common/Card.vue';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { CheckCircleIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
-import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes } from '../../composables/helpers';
+import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
+const disks = inject<Ref<DiskData[]>>('disks')!;
 const fileSystemData = inject<Ref<FileSystemData>>('file-system-data')!;
 
 const finishPressed = inject<Ref<boolean>>('finish-pressed')!;

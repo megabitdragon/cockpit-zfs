@@ -467,3 +467,33 @@ export function formatStatus(status) {
 			break;
 	}
 }
+
+export function getDiskIDName(disks : DiskData[], diskIdentifier : string, selectedDisk : string) {
+	console.log('disks:', disks, 'diskID:', diskIdentifier, 'selectedDisk:', selectedDisk);
+	const phyPathPrefix = '/dev/disk/by-path/';
+	const sdPathPrefix = '/dev/';
+	const newDisk = ref();
+	const diskName = ref('');
+	const diskPath = ref('');
+
+	newDisk.value = disks.find(disk => disk.name === selectedDisk);
+	switch (diskIdentifier) {
+		case 'vdev_path':
+			diskPath.value = newDisk.value!.vdev_path;
+			diskName.value = selectedDisk;
+			break;
+		case 'phy_path':
+			diskPath.value = newDisk.value!.phy_path;
+			diskName.value = diskPath.value.replace(phyPathPrefix, '');
+			break;
+		case 'sd_path':
+			diskPath.value = newDisk.value!.sd_path;
+			diskName.value = diskPath.value.replace(sdPathPrefix, '');
+			break;	
+		default:
+			console.log('error with selectedDisks/diskIdentifier'); 
+			break;
+	}
+
+	return diskName.value;
+};
