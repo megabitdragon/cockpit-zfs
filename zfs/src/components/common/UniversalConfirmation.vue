@@ -11,26 +11,28 @@
             <legend class="flex justify-center">{{ upperCaseWord(props.operation) }} {{ upperCaseWord(props.item) }}</legend>
         </template>
         <template v-slot:content>
-            <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
+            <div class="grid grid-flow-row mt-3 justify-items-center">
                 <p v-if="!operation2" class="text-default row-start-1">Are you sure you wish to {{props.operation}} <b>{{ props[props.item].name }}</b>?</p>
                 <p v-if="operation2" class="text-default row-start-1">Are you sure you wish to {{props.operation}} {{props.operation2!}} on <b>{{ props[props.item].name }}</b>?</p>
-                <div v-if="props.operation == 'destroy' && props.hasChildren!" >
+
+                <div v-if="props.operation == 'destroy' && props.hasChildren!">
+
                     <div v-if="props.item == 'pool'">
                         <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center gap-0.5">
                             <p class="text-danger font-medium row-start-1 mt-3">WARNING!!!</p>
-                            <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> has children.</p>
+                            <p class="text-default row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> <span class="text-danger">has children.</span></p>
                             <p class="text-default row-start-3">If you wish to {{ props.operation }}, use <span class="text-danger">{{upperCaseWord(option1)}}</span>.</p>
                         </div>
                     </div>
 
-                    <div v-if="props.item == 'filesystem'">
-                        <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-center justify-items-center gap-0.5">
-                            <p class="justify-self-center text-danger font-medium row-start-1 mt-3">WARNING!!!</p>
-                            <p class="justify-self-center text-danger row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> has children.</p>
-                            <p class="justify-self-center whitespace-nowrap text-default row-start-3">If you wish to destroy, use <span class="text-danger">Destroy all children/dependents</span>.</p>            
+                    <div v-if="props.item == 'filesystem'" class="w-full">
+                        <div class="font-medium text-sm grid grid-flow-row justify-items-center justify-center gap-0.5">
+                            <p class="justify-self-center text-danger font-medium mt-3">WARNING!!!</p>
+                            <p class="justify-self-center text-default">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> <span class="text-danger">has children.</span></p>
+                            <p class="justify-self-center grid grid-flow-row justify-center justify-items-center text-default w-full">If you wish to destroy, use either <br/><span class="text-danger">Destroy all children</span> or <br/><span class="text-danger">Destroy all dependents.</span></p>            
                         </div>
 
-                        <div class="grid grid-rows-2 justify-center">
+                        <div class="grid grid-rows-2 justify-center mt-1">
                             <div class="flex flex-row">
                                 <label :for="getIdKey('destroy-children')" class="mt-2 mr-2 block text-sm font-medium text-default">Destroy all children</label>
                                 <Switch v-model="destroyChildrenToggle" :id="getIdKey('destroy-children')" :class="[destroyChildrenToggle ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
@@ -105,7 +107,7 @@
                     </Switch>
                 </div>
 
-                <div v-if="props.secondOption" class="flex flex-row justify-around mt-1">
+                <div v-if="props.secondOption" class="flex flex-row justify-between mt-1">
                     <label :for="getIdKey('option-two')" class="mt-1 mr-2 block text-sm font-medium leading-6 text-default">{{upperCaseWord(option2)}}</label>
                     <Switch v-model="option2Toggle" :id="getIdKey('option-two')" :class="[option2Toggle! ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                         <span class="sr-only">Use setting</span>
@@ -127,7 +129,7 @@
         </template>
         <template v-slot:footer>
             <div class="w-full grid grid-rows-1">
-                <div class="button-group-row mt-2 justify-between">
+                <div class="button-group-row justify-between">
                     <button @click="closeModal" :id="getIdKey('confirm-no')" name="button-no" class="mt-1 btn btn-secondary object-left justify-start h-fit">Cancel</button>
 
                     <button v-if="props.item != 'snapshot' && !operationRunning && !hasChildren && !option1" @click="confirmOperation" :id="getIdKey('confirm-yes-A')" name="button-yes-A" class="mt-1 btn btn-danger object-right justify-end h-fit">{{upperCaseWord(props.operation)}}</button>
