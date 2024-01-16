@@ -5,7 +5,7 @@
             Attach Disk
         </template>
         <template v-slot:content>
-            <div v-for="(vDev, vDevIdx) in props.pool.vdevs" :key="vDevIdx">
+            <div>
                 <!-- Disk ID (Select) -->
 				<div>
 					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
