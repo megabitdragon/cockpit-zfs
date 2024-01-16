@@ -54,13 +54,21 @@
 											<a href="#" @click="resilverThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
+											<a v-if="!scanActivity!.isActive" href="#" @click="scrubThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">{{scanOperation}} Pool</a>
+											<a v-if="scanActivity!.isActive && scanActivity!.isPaused" href="#" @click="resumeScrub(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume {{scanOperation}}</a>
+											<a v-if="scanActivity!.isActive && !scanActivity!.isPaused" href="#" @click="pauseScrub(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause {{scanOperation}}</a>
+										</MenuItem>
+										<MenuItem as="div" v-slot="{ active }">
+											<a v-if="scanActivity!.isActive" href="#" @click="stopScrub(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel {{scanOperation}}</a>
+										</MenuItem>
+										<!-- <MenuItem as="div" v-slot="{ active }">
 											<a v-if="!scanActivity!.isActive" href="#" @click="scrubThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
 											<a v-if="scanActivity!.isActive && scanActivity!.isPaused" href="#" @click="resumeScrub(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume Scrub</a>
 											<a v-if="scanActivity!.isActive && !scanActivity!.isPaused" href="#" @click="pauseScrub(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause Scrub</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
 											<a v-if="scanActivity!.isActive" href="#" @click="stopScrub(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
-										</MenuItem>
+										</MenuItem> -->
 										<MenuItem as="div" v-slot="{ active }">
 											<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="trimThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
 											<a v-if="trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="resumeTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM (Pool)</a>
@@ -199,6 +207,7 @@ const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const scanOperation = ref('');
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -324,6 +333,7 @@ watch(confirmResilver, async (newValue, oldValue) => {
 		operationRunning.value = false;
 
 		notifications.value.constructNotification('Resilver Started', 'Resilver on ' + selectedPool.value!.name + " started.", 'success');
+		scanOperation.value = 'Resilver';
 	}
 });
 
@@ -391,6 +401,7 @@ watch(confirmScrub, async (newVal, oldVal) => {
 		operationRunning.value = false;
 		
 		notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
+		scanOperation.value = 'Scrub';
 	}
 });
 
