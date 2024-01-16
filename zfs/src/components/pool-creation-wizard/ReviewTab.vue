@@ -61,7 +61,7 @@
 										</template>
 										<template v-slot:footer>
 											<div class="flex flex-row gap-1">
-												<p>Disks:</p>
+												<p class="mt-3">Disks:</p>
 												<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
 													<template v-slot:title>
 														<div>
