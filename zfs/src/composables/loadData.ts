@@ -28,7 +28,7 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
-		// console.log('---\nScanObject:', scanObject.value);
+		console.log('---\nScanObject:', scanObject.value);
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}

@@ -19,8 +19,9 @@ export function onOffToBool(state : string) {
 
 //change the first letter of a word to upper case
 export const upperCaseWord = (word => {
-	let firstLetter  = word.charAt(0);
-	let remainingLetters = word.substring(1);
+	let lowerCaseWord = word.toLowerCase();
+	let firstLetter  = lowerCaseWord.charAt(0);
+	let remainingLetters = lowerCaseWord.substring(1);
 	let firstLetterCap = firstLetter.toUpperCase();
 	return firstLetterCap + remainingLetters;
 });
