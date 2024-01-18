@@ -395,15 +395,13 @@ const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 // const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
-// const trimActivity = computed(() => {
-//     if (props.disk!) {
-//         return trimActivities.value.get(props.disk!.name);
-//     } else {
-//         return trimActivities.value.get(poolID.value);
-//     }
-// });
-
-const trimActivity = computed(() => { return trimActivities.value.get(props.disk!.name) || trimActivities.value.get(poolID.value) });
+const trimActivity = computed(() => {
+    if (props.disk!) {
+        return trimActivities.value.get(props.disk!.name);
+    } else {
+        return trimActivities.value.get(poolID.value);
+    }
+});
 
 const selectedDisk = computed(() => {
     return poolDiskStats.value[props.pool.name].find(disk => disk.name == props.disk!.name);
@@ -436,6 +434,7 @@ const isTrimFinished = computed(() => {
 // }
 
 async function setTrimActivity(activity: Activity) {
+    // const trimActivity = trimActivities.value.get(props.disk!.name) || trimActivities.value.get(poolID.value);
 
     if (activity) {
         activity.isActive = isTrimActive.value;
@@ -443,7 +442,7 @@ async function setTrimActivity(activity: Activity) {
         activity.isFinished = isTrimFinished.value;
         activity.isCanceled = isTrimCanceled.value;
 
-        trimActivities.value.set(props.disk!.name, activity);
+        // trimActivities.value.set(props.disk!.name, activity);
     }
 
     // console.log('setTrimActivity fired');

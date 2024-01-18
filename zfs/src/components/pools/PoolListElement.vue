@@ -548,9 +548,11 @@ watch(confirmTrim, async (newValue, oldValue) => {
 			showTrimModal.value = false;
 			await trimAndScan();
 		}
+		refreshAllData();
 		operationRunning.value = false;
 
 		notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
+		
 	}
 });
 
@@ -607,8 +609,10 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 		console.log('now pausing trim:', selectedPool.value);
 		showPauseTrimConfirm.value = false;
 		await pauseTrimAndScan();
+		refreshAllData();
 		confirmPauseTrim.value = false;
 		notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
+	
 	}
 });
 
@@ -628,6 +632,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 		console.log('now stopping trim:', selectedPool.value);
 		showStopTrimConfirm.value = false;
 		await stopTrimAndScan();
+		refreshAllData();
 		confirmStopTrim.value = false;
 		notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success');
 	}
