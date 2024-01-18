@@ -577,6 +577,7 @@ async function resumeTrim(pool) {
 	getTrimStatus();
 	// pollTrim();
 	resumingTrim.value = false
+	refreshAllData();
 }
 
 async function stopTrim(pool) {
