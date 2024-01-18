@@ -138,6 +138,7 @@ async function refreshAllData() {
 	await loadTrimActivities(pools, trimActivities);
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
+	console.log('Dashboard trimActivities', trimActivities.value);
 }
 
 //determine total effective space of pools

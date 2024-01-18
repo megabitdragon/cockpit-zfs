@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="border border-default">
-			<Disclosure v-slot="{ open }">
+			<Disclosure v-slot="{ open }" :defaultOpen="true">
 				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full justify-center text-center" >
 					<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="poolData[props.poolIdx].name">
 						<ChevronUpIcon
@@ -45,38 +45,38 @@
 								<MenuItems class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="showPoolModal(poolData[props.poolIdx])!" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
+											<a href="#" @click.stop="showPoolModal(poolData[props.poolIdx])!" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="clearPoolErrors(poolData[props.poolIdx].name)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
+											<a href="#" @click.stop="clearPoolErrors(poolData[props.poolIdx].name)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a v-if="!scanActivity!.isActive" href="#" @click="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
+											<a v-if="!scanActivity!.isActive" href="#" @click.stop="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a v-if="!scanActivity!.isActive" href="#" @click="scrubThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
-											<a v-if="scanActivity!.isActive && scanActivity!.isPaused && scanOperation == 'SCRUB'" href="#" @click="resumeScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume Scrub</a>
-											<a v-if="scanActivity!.isActive && !scanActivity!.isPaused && scanOperation == 'SCRUB'" href="#" @click="pauseScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause Scrub</a>
+											<a v-if="!scanActivity!.isActive" href="#" @click.stop="scrubThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub Pool</a>
+											<a v-if="scanActivity!.isActive && scanActivity!.isPaused && scanOperation == 'SCRUB'" href="#" @click.stop="resumeScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume Scrub</a>
+											<a v-if="scanActivity!.isActive && !scanActivity!.isPaused && scanOperation == 'SCRUB'" href="#" @click.stop="pauseScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause Scrub</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a v-if="scanActivity!.isActive && scanOperation == 'SCRUB'" href="#" @click="stopScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
+											<a v-if="scanActivity!.isActive && scanOperation == 'SCRUB'" href="#" @click.stop="stopScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="trimThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
-											<a v-if="trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="resumeTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM (Pool)</a>
-											<a v-if="trimActivity!.isActive && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="pauseTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Pool)</a>
+											<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click.stop="trimThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+											<a v-if="trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click.stop="resumeTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM (Pool)</a>
+											<a v-if="trimActivity!.isActive && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click.stop="pauseTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Pool)</a>
 										</MenuItem>									
 										<MenuItem as="div" v-slot="{ active }">
-											<a v-if="trimActivity!.isActive || trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="stopTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Pool)</a>
+											<a v-if="trimActivity!.isActive || trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click.stop="stopTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Pool)</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="showAddVDev(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
+											<a href="#" @click.stop="showAddVDev(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="exportThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
+											<a href="#" @click.stop="exportThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export Pool</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="destroyPoolAndUpdate(poolData[props.poolIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
+											<a href="#" @click.stop="destroyPoolAndUpdate(poolData[props.poolIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Pool</a>
 										</MenuItem>
 									</div>
 								</MenuItems>
@@ -221,6 +221,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
+	console.log('PoolListElement trimActivities', trimActivities.value);
 }
 
 ////////////////// Destroy Pool /////////////////////
@@ -729,11 +730,25 @@ const vDevElement = ref();
 // const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 	
-async function getTrimStatus() {
-	console.log('vDevElement', vDevElement.value);
+// async function getTrimStatus() {
+// 	console.log('vDevElement', vDevElement.value);
 
-	await vDevElement.value[0].getDiskStatus();
+// 	await vDevElement.value[0].getDiskStatus();
+// }
+
+async function getTrimStatus() {
+    console.log('vDevElement', vDevElement.value);
+	console.log('trimActivity:', trimActivity.value);
+    // Check if vDevElement is defined and is an array
+    if (vDevElement.value && Array.isArray(vDevElement.value) && vDevElement.value.length > 0) {
+     	await vDevElement.value[0].getDiskStatus();
+    } else {
+        console.error('vDevElement is not defined or does not contain an array with elements.');
+    }
+
+	// await vDevElement.value[0].getDiskStatus();
 }
+
 
 /////////////////////////////////////////////////////
 

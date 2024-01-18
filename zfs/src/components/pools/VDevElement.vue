@@ -29,13 +29,13 @@
 								<MenuItems class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">												
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
+											<a href="#" @click.stop="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 										</MenuItem>
 										<MenuItem v-if="vDevIdx != 0" as="div" v-slot="{ active }">
-											<a href="#" @click="removeVDev(props.pool, props.pool.vdevs[vDevIdx])" :class="[active ? 'bg-danger text-white' : 'text-white', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
+											<a href="#" @click.stop="removeVDev(props.pool, props.pool.vdevs[vDevIdx])" :class="[active ? 'bg-danger text-white' : 'text-white', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a href="#" @click="showAttachDisk(props.pool, props.vDev)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Attach Disk</a>
+											<a href="#" @click.stop="showAttachDisk(props.pool, props.vDev)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Attach Disk</a>
 										</MenuItem>
 									</div>
 								</MenuItems>
@@ -133,6 +133,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
+	console.log('VDevElement trimActivities', trimActivities.value);
 }
 
 /////////////////// Clear Errors ////////////////////

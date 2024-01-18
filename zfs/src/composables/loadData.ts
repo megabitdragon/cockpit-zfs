@@ -15,7 +15,7 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
-		// console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
+		console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
 	} catch (error) {
 		console.error("An error occurred getting disk stats:", error);
 	}

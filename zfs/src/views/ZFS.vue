@@ -3,18 +3,18 @@
 		<div class="w-full h-dvh min-h-dvh overflow-visible bg-default text-default">
 
 			<div v-if="props.tag === 'dashboard'" class="p-2">
-			   <Dashboard />
-			   	<!-- <component :is="dashboardComponent"/>  -->
+			   <!-- <Dashboard /> -->
+			   	<component :is="dashboardComponent"/> 
 			</div>
 
 			<div v-if="props.tag === 'pools'" class="p-2">
-			  	<PoolsList/>
-				<!-- <component :is="poolListComponent"/> -->
+			  	<!-- <PoolsList/> -->
+				<component :is="poolListComponent"/>
 			</div>
 
 			<div v-if="props.tag === 'filesystems'" class="p-2">
-			  	<FileSystemList/>
-				<!-- <component :is="fileSystemListComponent"/> -->
+			  	<!-- <FileSystemList/> -->
+				<component :is="fileSystemListComponent"/>
 			</div>
 
 		</div>
@@ -92,35 +92,35 @@ async function checkDiskStats() {
 }
 
 /////////////////////////////////////////////////////
-// const dashboardComponent = ref();
-// const loadDashboardComponent = async () => {
-// 	const module = await import('../components/dashboard/Dashboard.vue');
-// 	dashboardComponent.value = module.default;
-// }
+const dashboardComponent = ref();
+const loadDashboardComponent = async () => {
+	const module = await import('../components/dashboard/Dashboard.vue');
+	dashboardComponent.value = module.default;
+}
 
-// const poolListComponent = ref();
-// const loadPoolListComponent = async () => {
-// 	const module = await import('../components/pools/PoolsList.vue');
-// 	poolListComponent.value = module.default;
-// }
+const poolListComponent = ref();
+const loadPoolListComponent = async () => {
+	const module = await import('../components/pools/PoolsList.vue');
+	poolListComponent.value = module.default;
+}
 
-// const fileSystemListComponent = ref();
-// const loadFileSystemListComponent = async () => {
-// 	const module = await import('../components/file-systems/FileSystemList.vue');
-// 	fileSystemListComponent.value = module.default;
-// }
+const fileSystemListComponent = ref();
+const loadFileSystemListComponent = async () => {
+	const module = await import('../components/file-systems/FileSystemList.vue');
+	fileSystemListComponent.value = module.default;
+}
 
-// watchEffect(() => {
-// 	if (props.tag === 'dashboard') {
-// 		loadDashboardComponent();
-// 	}
-// 	if (props.tag === 'pools') {
-// 		loadPoolListComponent();
-// 	}
-// 	if (props.tag === 'filesystems') {
-// 		loadFileSystemListComponent();
-// 	}
-// });
+watchEffect(() => {
+	if (props.tag === 'dashboard') {
+		loadDashboardComponent();
+	}
+	if (props.tag === 'pools') {
+		loadPoolListComponent();
+	}
+	if (props.tag === 'filesystems') {
+		loadFileSystemListComponent();
+	}
+});
 /////////////////////////////////////////////////////
 
 //provide data for other components to inject
