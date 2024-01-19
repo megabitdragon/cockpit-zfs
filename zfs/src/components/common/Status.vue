@@ -63,16 +63,16 @@
                                         Trim not supported on this disk <br/>({{ disk.name }}).
                                     </span>
                                     <div class="col-span-4 grid grid-cols-4 justify-items-center">
-                                        <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
+                                        <!-- <div class="col-span-4 min-w-max w-full bg-well rounded-full relative flex h-6 min-h-min max-h-max overflow-hidden">
                                             <div class="h-6 min-h-min max-h-max w-full">
                                                 <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-                                                   ---
+                                                   
                                                 </div>    
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <span class="col-span-4 text-muted">
                                             <!-- &nbsp; -->
-                                            N/A
+                                            <!-- N/A -->
                                         </span>
                                     </div>
                                 </div>
@@ -116,8 +116,11 @@
         <div v-if="isDisk">
             <div v-if="selectedDisk!" class="grid grid-cols-2 gap-1 justify-center items-center">
                 <div v-if="selectedDisk!.stats.trim_notsup === 0" class="col-span-2 flex flex-col items-center justify-center">
-                    <span :class="trimMessageClass(selectedDisk!)" class="font-semibold text-sm">
+                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" :class="trimMessageClass(selectedDisk!)" class="font-semibold text-sm">
                         Disk {{selectedDisk!.name}} Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
+                    </span>
+                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) == 'none'" :class="trimMessageClass(selectedDisk!)" class="font-semibold text-sm">
+                        No Trim Activity
                     </span>
                     <div class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
                         <div :class="trimProgressBarClass(selectedDisk!)" class="h-3 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">

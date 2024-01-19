@@ -4,7 +4,7 @@
 			<!-- Pools summary -->
 			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-start mt-1">
-					<span class="font-semibold text-lg mt-1 justify-self-start">Pools</span>
+					<span class="px-3 font-semibold text-lg mt-1 justify-self-start">Pools</span>
 				</div>
 				<div class="p-2 flex justify-start mt-1">
 					<h6 class="mt-2"> {{ pools.length }} Pool(s) </h6>

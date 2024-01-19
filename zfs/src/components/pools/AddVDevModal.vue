@@ -67,9 +67,9 @@
                             <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-                                <h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
+                                <h3 class="truncate text-sm font-medium text-default">{{ getDiskIDName(allDisks, diskIdentifier, disk.name) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
-                                <p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
+                                <!-- <p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p> -->
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
                         </button>
@@ -137,7 +137,7 @@ import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
 import { addVDev } from '../../composables/pools';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadDiskStatus } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { loadScanActivities, loadTrimActivities, getDiskIDName } from '../../composables/helpers';
 
 interface AddVDevModalProps {
 	idKey: string;
@@ -183,6 +183,15 @@ const availableDisks = computed<DiskData[]>(() => {
     return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
 });
 
+// const availableDisks = computed<DiskData[][]>(() => {
+// 	return props.pool.vdevs.map((vdev, vdevIdx) => {
+// 		const claimed = props.pool.vdevs
+// 		.filter((_, idx) => idx !== vdevIdx)
+// 		.flatMap(vdev => vdev.selectedDisks);
+// 		return allDisks.value.filter(disk => !isDiskTaken.value(disk.name) && !claimed.includes(disk.name));
+// 	});
+// });
+
 const isDiskTaken = computed(() => (diskName) => {
 	for (const poolName in poolDiskStats.value) {
 		if (poolDiskStats.value.hasOwnProperty(poolName)) {
@@ -207,11 +216,11 @@ const diskCardClass = (diskName) => {
     return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
-const phyPathPrefix = '/dev/disk/by-path/';
-const sdPathPrefix = '/dev/';
-const newDisk = ref();
-const diskName = ref('');
-const diskPath = ref('');
+// const phyPathPrefix = '/dev/disk/by-path/';
+// const sdPathPrefix = '/dev/';
+// const newDisk = ref();
+// const diskName = ref('');
+// const diskPath = ref('');
 const adding = ref(false);
 
 async function addVDevBtn() {
@@ -219,28 +228,9 @@ async function addVDevBtn() {
         if (diskSizeMatch()) {
             if (diskCheck()) {
                 selectedDisks.value.forEach(selectedDisk => {
-                    newDisk.value = allDisks.value.find(disk => disk.name === selectedDisk);
-                    console.log('newDisk.value:', newDisk.value);
-                    console.log('selectedDisks:', selectedDisks.value);
-                    switch (diskIdentifier.value) {
-                        case 'vdev_path':
-                            diskPath.value = newDisk.value!.vdev_path;
-                            diskName.value = selectedDisk;
-                            break;
-                        case 'phy_path':
-                            diskPath.value = newDisk.value!.phy_path;
-                            diskName.value = diskPath.value.replace(phyPathPrefix, '');
-                            break;
-                        case 'sd_path':
-                            diskPath.value = newDisk.value!.sd_path;
-                            diskName.value = diskPath.value.replace(sdPathPrefix, '');
-                            break;	
-                        default:
-                            console.log('error with selectedDisks/diskIdentifier'); 
-                            break;
-                    }
-                    console.log('disk:', diskName.value);
-                    newVDev.value.disks.push(diskName.value);
+                    const diskNameFinal = getDiskIDName(allDisks.value, diskIdentifier.value, selectedDisk)
+                    console.log('disk:', diskNameFinal);
+                    newVDev.value.disks.push(diskNameFinal);
                     console.log('newVdev.disks:', newVDev.value.disks);
                 });
                 adding.value = true;

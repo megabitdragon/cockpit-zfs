@@ -25,9 +25,9 @@
                             <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisk" type="radio" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-                                <h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
+                                <h3 class="truncate text-sm font-medium text-default">{{ getDiskIDName(allDisks, diskIdentifier, disk.name) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
-                                <p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
+                                <!-- <p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p> -->
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
                         </button>
@@ -88,12 +88,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed } from 'vue';
+import { ref, inject, Ref, computed, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { convertSizeToBytes, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { convertSizeToBytes, loadTrimActivities, getDiskIDName } from '../../composables/helpers';
 import { attachDisk } from '../../composables/disks';
-import { loadDisksThenPools, loadDatasets, loadDiskStatus, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadDiskStatus, loadDiskStats } from '../../composables/loadData';
 
 interface AttachDiskModalProps {
 	idKey: string;
@@ -115,6 +115,20 @@ const emit = defineEmits(['close']);
 
 const closeModal = () => {
     emit('close');
+}
+
+onMounted(() => {
+    debuggingInfo();
+});
+
+function debuggingInfo() {
+    console.log('pool:', props.pool);
+    console.log('vDev:', props.vDev);
+    console.log('allDisks:', allDisks.value);
+    availableDisks.value.forEach(availableDisk => {
+        console.log(getDiskIDName(allDisks.value, diskIdentifier.value, availableDisk.name));
+    });
+    
 }
 
 const showAttachDiskModal = inject<Ref<boolean>>('show-attach-modal')!;
@@ -159,7 +173,7 @@ const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const availableDisks = computed<DiskData[]>(() => {
     return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
-})
+});
 
 const isDiskTaken = computed(() => (diskName) => {
 	for (const poolName in poolDiskStats.value) {
@@ -182,7 +196,7 @@ const isDiskTaken = computed(() => (diskName) => {
 //change color of disk when selected
 const diskCardClass = (diskName) => {
     const isSelected = selectedDisk.value === diskName;
-    console.log('DISK SELECTED:', selectedDisk.value);
+    // console.log('DISK SELECTED:', selectedDisk.value);
     return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
@@ -234,6 +248,7 @@ async function attachDiskBtn() {
     if (diskSizeMatch()) {
         setDiskNamePath();
         diskVDevPoolData.value.newDiskName = diskNewName.value;
+        // diskVDevPoolData.value.newDiskName = getDiskIDName(allDisks.value, diskIdentifier.value, diskNewName.value);
         diskVDevPoolData.value.existingDiskName = diskExistName.value;
         console.log('all data of disk being attached:', diskVDevPoolData.value);
             
