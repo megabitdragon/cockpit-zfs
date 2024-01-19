@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
+        <div class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default ">
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
@@ -59,7 +59,14 @@
                 </div>
             </div>
         </div>
-    </div>
+		<div v-if="diskState == 'REPLACING'" class="border border-collapse border-default">
+			<div v-for="disk in props.disk.children" class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
+				<div class="py-1 mt-1 col-span-3" :title="disk.name">{{ disk.name.length > 30 ? disk.name.slice(0, 30) + '...' : disk.name }}</div>
+				<div class="py-1 mt-1 col-span-3"></div>
+				<div class="py-1 mt-1 col-span-3"></div>
+			</div>
+		</div>
+	</div>
 
 	<div v-if="showDetachDiskModal">
 		<component :is="detachDiskComponent" :showFlag="showDetachDiskModal" @close="updateShowDetachDisk" :idKey="'confirm-detach-disk'" :item="'disk'" :operation="'detach'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDetach" :secondOption="'clear disk labels'" :hasChildren="false"/>
@@ -176,7 +183,12 @@ const diskState = computed(() => {
 	const diskArray = diskStatus.value[props.pool.name];
 	const diskState = diskArray.find(disk => disk.name === props.disk.name);
 
-	return diskState.status;
+	if (diskState) {
+		return diskState.status;
+	} else {
+		return 'REPLACING';
+	}
+
 });
 
 /////////////////// Detach Disk /////////////////////
@@ -544,4 +556,7 @@ defineExpose({
 });
 
 provide('modal-confirm-running', operationRunning);
+provide('show-replace-modal', showReplaceDiskModal);
+// provide('', );
+// provide('', );
 </script>

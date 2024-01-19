@@ -87,7 +87,7 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { convertSizeToBytes } from '../../composables/helpers';
 import { replaceDisk } from '../../composables/disks';
-import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadDiskStatus } from '../../composables/loadData';
 
 interface ReplaceDiskModalProps {
     idKey: string;
@@ -137,6 +137,7 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 const availableDisks = computed<DiskData[]>(() => {
     return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
@@ -240,8 +241,10 @@ async function replaceDiskBtn() {
         allDisks.value = [];
         pools.value = [];
         datasets.value = [];
+        diskStatus.value = [];
         await loadDisksThenPools(allDisks, pools);
         await loadDatasets(datasets);
+        await loadDiskStatus(diskStatus);
         disksLoaded.value = true;
         poolsLoaded.value = true;
         fileSystemsLoaded.value = true;

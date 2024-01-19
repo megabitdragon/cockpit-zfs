@@ -78,7 +78,12 @@
                                 </div>
                             </div>
                         </div>
-                        
+                        <!-- <div v-if="!selectedDisk" class="col-span-2 flex items-center justify-center mt-2">
+                            <span class="text-muted">
+                                Disk replacing in progress...
+                            </span>
+                        </div> -->
+                                    
                         <div v-if="isTrimSuspended" class="col-span-4">
                             Resume to continue or cancel to stop.     
                         </div>
@@ -210,14 +215,14 @@ async function scanNow() {
     // console.log(`polling scanObject...`);
 }
 
-// function displayScanBools() {
-//     console.log(`Status scan values for ${props.pool.name}: \n 
-//         isActive:${scanActivity!.value!.isActive}\n
-//         isPaused:${scanActivity!.value!.isPaused}\n
-//         isFinished:${scanActivity!.value!.isFinished}\n
-//         isCanceled:${scanActivity!.value!.isCanceled}\n
-//         ------`);
-// }
+function displayScanBools() {
+    console.log(`Status scan values for ${props.pool.name}: \n 
+        isActive:${scanActivity!.value!.isActive}\n
+        isPaused:${scanActivity!.value!.isPaused}\n
+        isFinished:${scanActivity!.value!.isFinished}\n
+        isCanceled:${scanActivity!.value!.isCanceled}\n
+        ------`);
+}
 
 async function pollScanStatus() {
 	// console.log('pollScanStatus fired');
@@ -494,7 +499,7 @@ async function pollTrimStatus() {
 
 	// console.log('checkingDiskStats set:', checkingDiskStats.value);
     // console.log(`checkDiskStats for ${props.pool.name} set: ${checkingDiskStats.value}`)
-    displayTrimBools();
+    // displayTrimBools();
     // console.log('polling diskStats...', checkingDiskStats.value);
 }
 

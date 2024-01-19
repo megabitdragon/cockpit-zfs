@@ -241,6 +241,7 @@ async function attachDiskBtn() {
         await attachDisk(diskVDevPoolData.value);
         showAttachDiskModal.value = false;
         adding.value = false;
+        
         disksLoaded.value = false;
         poolsLoaded.value = false;
         fileSystemsLoaded.value = false;

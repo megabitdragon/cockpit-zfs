@@ -452,17 +452,19 @@ export async function testSSH(sshTarget) {
 export function formatStatus(status) {
 	switch(status) {
 		case 'ONLINE':
-			return 'text-green-600'
+			return 'text-green-600';
 		case 'DEGRADED':
-			return 'text-orange-600'
+			return 'text-orange-600';
 		case 'FAULTED':
-			return 'text-red-600'
+			return 'text-red-600';
 		case 'OFFLINE':
-			return 'text-red-600'
+			return 'text-red-600';
 		case 'REMOVED':
-			return 'text-red-600'
+			return 'text-red-600';
 		case 'UNAVAIL':
-			return 'text-red-600'
+			return 'text-red-600';
+		case 'REPLACING':
+			return 'text-orange-600';
 		default:
 			break;
 	}
