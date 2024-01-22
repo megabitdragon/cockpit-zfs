@@ -2,7 +2,7 @@ import { ref, Ref } from 'vue';
 import { getPools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
-import { convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal } from "./helpers";
+import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal } from "./helpers";
 import { getSnapshots } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
 
@@ -34,98 +34,12 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 	}
 }
 
-// export async function loadDiskStatus(diskStatuses: Ref<PoolDiskStatus[]>) {
-//     try {
-//         const rawJSON = await getDisksStatus();
-//         const parsedJSON = JSON.parse(rawJSON);
-//         // console.log('DiskStatus JSON:', parsedJSON);
-
-//         // Iterate through the keys (pool names) in the parsed JSON
-//         for (const poolName in parsedJSON) {
-//             if (parsedJSON.hasOwnProperty(poolName)) {
-//                 const diskStatusArray = parsedJSON[poolName];
-
-//                 // Create a DiskStatus object for each item in the array
-//                 const diskStatus: DiskStatus[] = diskStatusArray.map(item => ({
-//                     name: item.name,
-//                     status: item.status,
-// 					guid: item.guid,
-//                 }));
-
-//                 // Store the diskStatus array in the diskStatuses object with poolName as key
-//                 diskStatuses.value[poolName] = diskStatus;
-//             }
-//         }
-//         console.log('diskStatuses:', diskStatuses.value);
-
-//     } catch (error) {
-//         console.error("An error occurred getting disk statuses:", error);
-//     }
-// }
-
-// export async function assignGUIDsToDisks(disks, pools, diskStatuses) {
-// 	try {
-// 		// Assuming you have a function to retrieve and assign GUIDs to disks
-// 	 	assignGUIDsToUsedDisks(disks, pools, diskStatuses);
-// 		console.log('GUIDs assigned to disks successfully.');
-// 	} catch (error) {
-// 		console.error('Error assigning GUIDs to disks:', error);
-// 	}
-// } 
-
-// export async function assignGUIDsToUsedDisks(disks, pools, diskStatuses) {
-//     console.log('assignGUIDsToUsedDisks: Start');
-//     try {
-//         for (let i = 0; i < pools.length; i++) {
-//             const pool = pools[i];
-//             console.log(`assignGUIDsToUsedDisks: Processing pool ${pool.name}`);
-
-//             for (let j = 0; j < pool.vDevs.length; j++) {
-//                 const vDev = pool.vDevs[j];
-//                 console.log(`assignGUIDsToUsedDisks: Processing vDev ${j + 1} in pool ${pool.name}`);
-
-//                 vDev.forEach(vDevDisk => {
-//                     console.log(`assignGUID -> vDevDisk: ${JSON.stringify(vDevDisk)}`);
-//                     const diskStatus = diskStatuses[pool.name].find(disk => disk.name === vDevDisk.name);
-
-//                     if (diskStatus) {
-//                         console.log(`assignGUID -> diskStatus: ${JSON.stringify(diskStatus)}`);
-//                         vDevDisk.guid = diskStatus.guid;
-//                     } else {
-//                         console.log('no disk match');
-//                         vDevDisk.guid = 'none';
-//                     }
-//                 });
-//             }
-//         }
-
-//         console.log('assignGUIDsToUsedDisks: End');
-//     } catch (error) {
-//         console.error('Error in assignGUIDsToUsedDisks:', error);
-//         throw error; // Rethrow the error to ensure it's caught in the calling function
-//     }
-// }
-
-
-// export function matchDiskData(disk : DiskData, poolDisk) {
-// 	const phyPathPrefix = '/dev/disk/by-path/';
-// 	const sdPathPrefix = '/dev/';
-// 	const vDevPathPrefix= '/dev/disk/by-vdev/';
-
-// 	console.log(`matchData -> disk: ${disk}, poolDisk: ${poolDisk}`);
-// 	const isMatch = (disk.vdev_path == vDevPathPrefix + poolDisk.name) ||
-// 		(disk.sd_path == sdPathPrefix + poolDisk.name) ||
-// 		(disk.phy_path == phyPathPrefix + poolDisk.name);
-
-// 	return isMatch;
-// }
-
 export async function loadDisksThenPools(disks, pools) {
 	//executes a python script to retrieve all disk data and outputs a JSON
 	try {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON);
-		// console.log('Disks JSON:', parsedJSON);
+		console.log('Disks JSON:', parsedJSON);
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -153,13 +67,13 @@ export async function loadDisksThenPools(disks, pools) {
 		// console.log("Disk:");
 		// console.log(disk);
 		}
-		console.log("loaded Disks:", disks);
+		console.log("pre-loaded Disks:", disks);
 
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
 			const rawJSON = await getPools();
 			const parsedJSON = JSON.parse(rawJSON);
-			// console.log('Pools JSON:', parsedJSON);
+			console.log('Pools JSON:', parsedJSON);
 
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
@@ -251,6 +165,10 @@ export async function loadDisksThenPools(disks, pools) {
 			  
 			console.log("loaded Pools:", pools);
 
+			await loadDisksExtraData(disks.value, pools.value);
+
+			console.log("loaded Disks:", disks);
+
 		} catch (error) {
 			// Handle any errors that may occur during the asynchronous operation
 			console.error("An error occurred getting pools:", error);
@@ -333,7 +251,7 @@ export async function loadDisks(disks) {
 	try {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON);
-		// console.log('Disks JSON:', parsedJSON);
+		console.log('Disks JSON:', parsedJSON);
 		
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -362,10 +280,50 @@ export async function loadDisks(disks) {
 		console.log("loaded Disks:", disks);
 
 	} catch (error) {
-		// Handle any errors that may occur during the asynchronous operation
+		// Handle any errors that may occur during the asynchronous operation	console.log('selectedDisk', selectedDisk);
 		console.error("An error occurred getting disks:", error);
 	}
 }
+
+export async function loadDisksExtraData(disks, pools) {
+    try {
+        pools.forEach((pool) => {
+            pool.vdevs.forEach((vDev) => {
+                vDev.disks.forEach((usedDisk) => {
+                    const selectedDisk = findDiskByPath(disks, usedDisk.path);
+
+					 // Check if the selectedDisk is found
+					if (selectedDisk) {
+						
+						selectedDisk!.guid = usedDisk.guid;
+						selectedDisk!.path = usedDisk.path;
+						selectedDisk!.stats = usedDisk.stats;
+						console.log('selectedDisk', selectedDisk);
+
+						// Find the index of the original disk in the disks array
+						const index = disks.findIndex(disk => [disk.sd_path, disk.phy_path, disk.vdev_path].includes(usedDisk.path));
+
+						// Check if the original disk is found in the disks array
+						if (index !== -1) {
+							// Replace the original disk with the updated selectedDisk
+							disks[index] = { ...selectedDisk }; // Use spread operator to create a new object
+							console.log('Updated disks array:', disks);
+						} else {
+							console.error('Original disk not found in the disks array');
+						}
+					} else {
+						console.error('Selected disk not found');
+					}
+                });
+            });
+        });
+
+    } catch (error) {
+        // Handle any errors that may occur during the asynchronous operation
+        console.error("An error occurred getting extra disk data:", error);
+    }
+}
+
 
 //method for parsing through VDevs to add to array (VDev array is added to Pool)
 export function parseVDevData(vDev, poolName, disks, vDevType) {
@@ -390,13 +348,6 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 
 	//checks if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
 	if (vDev.children.length < 1) {
-		// console.log(vDevPath);
-		// console.log(vDevPathRegex);
-		// if (vDevPath.match(vDevPathRegex)) {
-		// 	console.log('match');
-		// } else {
-		// 	console.log('no match');
-		// }
 
 		const diskVDev = ref();
 		const diskName = ref('');
@@ -447,7 +398,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		}
 		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
-		// console.log("Not A ChildDisk:", notAChildDisk);
+		console.log("Not A ChildDisk:", notAChildDisk);
 		console.log("vDevData (disk device):", vDevData);
 		
 		vDevs.value.push(vDevData);
@@ -483,7 +434,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 				const childDisk : DiskData = {
 					name: diskName.value,
 					path: diskPath.value,
-					guid: fullDiskData.value.guid,
+					guid: child.guid,
 					type: fullDiskData.value.type,
 					health: fullDiskData.value.status,
 					stats: child.stats,
@@ -503,7 +454,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 					// children: newChildren.value,
 				}; 
 
-				// console.log("ChildDisk:", childDisk);
+				console.log("ChildDisk:", childDisk);
 				vDevData.disks.push(childDisk);
 		
 			} else if (child.type === 'replacing') {			
@@ -543,7 +494,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 						children: newChildren.value,
 					}
 
-					// console.log("ChildDisk:", childDisk);
+					console.log("ChildDisk:", childDisk);
 					vDevData.disks.push(childDisk);
 
 			} else {

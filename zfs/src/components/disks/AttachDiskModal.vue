@@ -27,7 +27,6 @@
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
                                 <h3 class="truncate text-sm font-medium text-default">{{ getDiskIDName(allDisks, diskIdentifier, disk.name) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
-                                <!-- <p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p> -->
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
                         </button>
@@ -117,7 +116,7 @@ const closeModal = () => {
 }
 
 onMounted(() => {
-    debuggingInfo();
+    // debuggingInfo();
 });
 
 function debuggingInfo() {
@@ -127,7 +126,6 @@ function debuggingInfo() {
     availableDisks.value.forEach(availableDisk => {
         console.log(getDiskIDName(allDisks.value, diskIdentifier.value, availableDisk.name));
     });
-    
 }
 
 const showAttachDiskModal = inject<Ref<boolean>>('show-attach-modal')!;
@@ -170,25 +168,7 @@ const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const availableDisks = computed<DiskData[]>(() => {
-    return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
-});
-
-const isDiskTaken = computed(() => (diskName) => {
-	for (const poolName in poolDiskStats.value) {
-		if (poolDiskStats.value.hasOwnProperty(poolName)) {
-			const pool = poolDiskStats.value[poolName];
-			if (Array.isArray(pool)) {
-				for (const disk of pool) {
-					if (disk.name === diskName) {
-						//disk belongs to a pool
-						return true;
-					}
-				}
-			}
-		}
-	}
-	//disk does not belong to a pool
-	return false;
+    return allDisks.value.filter(disk => disk.guid === "");
 });
 
 //change color of disk when selected

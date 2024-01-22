@@ -498,4 +498,8 @@ export function getDiskIDName(disks : DiskData[], diskIdentifier : string, selec
 	}
 
 	return diskName.value;
-};
+}
+
+export function findDiskByPath(disks : DiskData[], path : string) {
+	return disks.find((disk) => [disk.sd_path, disk.phy_path, disk.vdev_path].includes(path));
+}

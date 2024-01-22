@@ -51,7 +51,8 @@
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 px-2 text-sm gap-0.5">
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
 								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
-								<p class="truncate text-sm font-medium text-default">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk.name) }}</p>
+								<!-- :title="props.vDev.name">{{ props.vDev.name.length > 16 ? props.vDev.name.slice(0, 16) + '...' : props.vDev.name }} -->
+								<p class="truncate text-sm font-medium text-default" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk.name)">{{ (getDiskIDName(disks, vDev.diskIdentifier!, disk.name)).length > 16 ? (getDiskIDName(disks, vDev.diskIdentifier!, disk.name)).slice(0, 16) + '...' : (getDiskIDName(disks, vDev.diskIdentifier!, disk.name)) }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
 								<!-- <p class="mt-1 truncate text-sm text-default">{{ disk[poolConfig.vdevs[vDevIdx].diskIdentifier!] }}</p> -->
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
@@ -305,7 +306,7 @@
 import { inject, ref, Ref, computed, watchEffect } from 'vue';
 import { ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName } from '../../composables/helpers';
+import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, findDiskByPath } from '../../composables/helpers';
 
 interface PoolConfigProps {
 	tag: string;
@@ -356,28 +357,10 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 		const claimed = poolConfig.value.vdevs
 		.filter((_, idx) => idx !== vdevIdx)
 		.flatMap(vdev => vdev.selectedDisks);
-		// return disks.value.filter(disk => !isDiskTaken.value(disk.name) && !claimed.includes(disk.name));
-		return disks.value.filter(disk => !isDiskTaken.value(getDiskIDName(disks.value, vdev.diskIdentifier!, disk.name)) && !claimed.includes(disk.name));
+		return disks.value.filter(disk => disk.guid === "" && !claimed.includes(disk.name));
 	});
 });
 
-const isDiskTaken = computed(() => (diskName) => {
-	for (const poolName in poolDiskStats.value) {
-		if (poolDiskStats.value.hasOwnProperty(poolName)) {
-			const pool = poolDiskStats.value[poolName];
-			if (Array.isArray(pool)) {
-				for (const disk of pool) {
-					if (disk.name === diskName) {
-						//disk belongs to a pool
-						return true;
-					}
-				}
-			}
-		}
-	}
-	//disk does not belong to a pool
-	return false;
-});
 
 //change color of disk when selected
 const diskCardClass = (diskName, vDevIdx) => {

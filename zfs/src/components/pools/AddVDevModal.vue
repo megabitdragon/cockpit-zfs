@@ -179,34 +179,7 @@ const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 const availableDisks = computed<DiskData[]>(() => {
-    return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
-});
-
-// const availableDisks = computed<DiskData[][]>(() => {
-// 	return props.pool.vdevs.map((vdev, vdevIdx) => {
-// 		const claimed = props.pool.vdevs
-// 		.filter((_, idx) => idx !== vdevIdx)
-// 		.flatMap(vdev => vdev.selectedDisks);
-// 		return allDisks.value.filter(disk => !isDiskTaken.value(disk.name) && !claimed.includes(disk.name));
-// 	});
-// });
-
-const isDiskTaken = computed(() => (diskName) => {
-	for (const poolName in poolDiskStats.value) {
-		if (poolDiskStats.value.hasOwnProperty(poolName)) {
-			const pool = poolDiskStats.value[poolName];
-			if (Array.isArray(pool)) {
-				for (const disk of pool) {
-					if (disk.name === diskName) {
-						//disk belongs to a pool
-						return true;
-					}
-				}
-			}
-		}
-	}
-	//disk does not belong to a pool
-	return false;
+    return allDisks.value.filter(disk => disk.guid === "");
 });
 
 //change color of disk when selected
@@ -215,11 +188,6 @@ const diskCardClass = (diskName) => {
     return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
-// const phyPathPrefix = '/dev/disk/by-path/';
-// const sdPathPrefix = '/dev/';
-// const newDisk = ref();
-// const diskName = ref('');
-// const diskPath = ref('');
 const adding = ref(false);
 
 async function addVDevBtn() {
@@ -227,6 +195,7 @@ async function addVDevBtn() {
         if (diskSizeMatch()) {
             if (diskCheck()) {
                 selectedDisks.value.forEach(selectedDisk => {
+                    console.log('selectedDisk', selectedDisk);
                     const diskNameFinal = getDiskIDName(allDisks.value, diskIdentifier.value, selectedDisk)
                     console.log('disk:', diskNameFinal);
                     newVDev.value.disks.push(diskNameFinal);

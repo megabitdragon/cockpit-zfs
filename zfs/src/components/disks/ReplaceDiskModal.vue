@@ -17,21 +17,23 @@
 
 				<!-- Disk selection, shows disks that are not in use -->
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
-                <ul :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
+                <ul v-if="availableDisks.length > 0" :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
                         :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisk" type="radio" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-                                <h3 class="truncate text-sm font-medium text-default">{{ disk.name }}</h3>
+                                <h3 class="truncate text-sm font-medium text-default">{{ getDiskIDName(allDisks, diskIdentifier, disk.name) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
-                                <p class="mt-1 truncate text-sm text-default">{{ disk[diskIdentifier] }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
                         </button>
                     </li>
                 </ul>
+                <div v-if="availableDisks.length == 0">
+                    No Disks Available
+                </div>
 
             </div>
         </template>
@@ -85,7 +87,7 @@
 import { ref, inject, Ref, computed } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { convertSizeToBytes } from '../../composables/helpers';
+import { convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
 import { replaceDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
 
@@ -139,27 +141,8 @@ const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const availableDisks = computed<DiskData[]>(() => {
-    return allDisks.value.filter(disk => !isDiskTaken.value(disk.name));
+    return allDisks.value.filter(disk => disk.guid === "");
 });
-
-const isDiskTaken = computed(() => (diskName) => {
-	for (const poolName in poolDiskStats.value) {
-		if (poolDiskStats.value.hasOwnProperty(poolName)) {
-			const pool = poolDiskStats.value[poolName];
-			if (Array.isArray(pool)) {
-				for (const disk of pool) {
-					if (disk.name === diskName) {
-						//disk belongs to a pool
-						return true;
-					}
-				}
-			}
-		}
-	}
-	//disk does not belong to a pool
-	return false;
-});
-
 
 const diskVDevPoolData = ref({
     existingDiskName: '',

@@ -430,8 +430,10 @@ export async function addVDev(pool, vdev) {
 		}
 
 		cmdString.push(pool.name);
-		cmdString.push(vdev.type);
-
+		if (vdev.type != 'disk') {
+			cmdString.push(vdev.type);
+		}
+		
 		//console.log('vdev.disks', vdev.disks);
 		vdev.disks.forEach(disk => {
 			//console.log(disk);
