@@ -81,7 +81,6 @@ import PoolConfig from './PoolConfig.vue';
 import { newPool } from "../../composables/pools";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
-import { loadDiskStatus } from '../../composables/loadData';
 import { setRefreservation } from '../../composables/pools';
 
 const show = ref(true);
@@ -109,7 +108,6 @@ const isProperReplicationFeedback = ref('');
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
-const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 //setting defaults for pool object
 const poolConfig = ref<PoolData>({
@@ -202,9 +200,7 @@ async function refreshAllData() {
 	disks.value = [];
 	pools.value = [];
 	datasets.value = [];
-	diskStatus.value = [];
 	await loadDisksThenPools(disks, pools);
-	await loadDiskStatus(diskStatus);
 	await loadDatasets(datasets);
 	await loadScanObjectGroup(scanObjectGroup);
 	await loadScanActivities(pools, scanActivities);

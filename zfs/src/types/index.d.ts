@@ -92,15 +92,15 @@ interface ChildDiskData {
 	children?:[];
 }
 
-interface PoolDiskStatus {
-	poolName: DiskStatus[];
-}
+// interface PoolDiskStatus {
+// 	poolName: DiskStatus[];
+// }
 
-interface DiskStatus {
-	name: string;
-	status: string;
-	guid: string;
-}
+// interface DiskStatus {
+// 	name: string;
+// 	status: string;
+// 	guid: string;
+// }
 
 //object for importing pools
 interface ImportedPool {
@@ -343,7 +343,9 @@ interface DiskStats {
 		trim_notsup: number;
 		trim_state: number;
 		write_errors: number;
-	}
+	},
+	guid: string,
+	status: string,
 }
 
 interface PoolDiskStats {

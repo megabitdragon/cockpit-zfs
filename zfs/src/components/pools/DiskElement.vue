@@ -103,7 +103,7 @@ import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { scrubPool, clearErrors } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
-import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats, loadDiskStatus } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, formatStatus } from '../../composables/helpers'
 import Status from "../common/Status.vue";
 
@@ -140,7 +140,6 @@ const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
-const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;
@@ -150,7 +149,7 @@ async function refreshAllData() {
 	poolData.value = [];
 	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
-	await loadDiskStatus(diskStatus);
+
 	await loadDatasets(filesystemData);
 	await loadScanObjectGroup(scanObjectGroup);
 	await loadScanActivities(poolData, scanActivities);
@@ -180,7 +179,7 @@ async function getScanStatus() {
 }
 
 const diskState = computed(() => {
-	const diskArray = diskStatus.value[props.pool.name];
+	const diskArray = poolDiskStats.value[props.pool.name];
 	const diskState = diskArray.find(disk => disk.name === props.disk.name);
 
 	if (diskState) {

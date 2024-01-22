@@ -37,7 +37,6 @@
                     No Disks Available
                 </div>
 
-
             </div>
         </template>
         <template v-slot:footer>
@@ -93,7 +92,7 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { convertSizeToBytes, loadTrimActivities, getDiskIDName } from '../../composables/helpers';
 import { attachDisk } from '../../composables/disks';
-import { loadDisksThenPools, loadDatasets, loadDiskStatus, loadDiskStats } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadDiskStats } from '../../composables/loadData';
 
 interface AttachDiskModalProps {
 	idKey: string;
@@ -156,7 +155,6 @@ const poolData = inject<Ref<PoolData[]>>("pools")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
-const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 const diskVDevPoolData = ref({
     existingDiskName: '',
@@ -263,9 +261,7 @@ async function attachDiskBtn() {
         allDisks.value = [];
         pools.value = [];
         datasets.value = [];
-        diskStatus.value = [];
         await loadDisksThenPools(allDisks, pools);
-        await loadDiskStatus(diskStatus);
         await loadDatasets(datasets);
         await loadDiskStats(poolDiskStats);
 	    await loadTrimActivities(poolData, trimActivities);

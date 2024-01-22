@@ -25,7 +25,7 @@
 import { ref, Ref, provide, watchEffect } from 'vue';
 import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
-import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots, loadDiskStatus } from '../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
 import PoolsList from "../components/pools/PoolsList.vue";
 import Dashboard from '../components/dashboard/Dashboard.vue';
@@ -39,7 +39,7 @@ const props = defineProps<ZFSProps>();
 
 const pools = ref<PoolData[]>([]);
 const disks = ref<DiskData[]>([]);
-const diskStatus = ref<PoolDiskStatus[]>([]);
+// const diskStatus = ref<PoolDiskStatus[]>([]);
 const datasets = ref<FileSystemData[]>([]);
 const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
@@ -60,12 +60,14 @@ const trimActivities = ref<Map<string, Ref<Activity>>>(new Map());
 const poolDiskStats = ref<PoolDiskStats>({});
 const diskStatsIntervalID = ref();
 
-async function initialLoad(disks, pools, datasets, snapshots, diskStatus) {
+async function initialLoad(disks, pools, datasets, snapshots) {
 	disksLoaded.value = false;
 	poolsLoaded.value = false;
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
-	await loadDiskStatus(diskStatus);
+
+	// await assignGUIDsToDisks(disks, pools, diskStatus);
+
 	await loadDatasets(datasets);
 	await loadSnapshots(snapshots);
 	await scanNow();
@@ -79,7 +81,7 @@ async function initialLoad(disks, pools, datasets, snapshots, diskStatus) {
 	console.log('ZFS.vue trimActivities', trimActivities.value);
 }
 
-initialLoad(disks, pools, datasets, snapshots, diskStatus);
+initialLoad(disks, pools, datasets, snapshots);
 
 /////////////////////////////////////////////////////
 async function scanNow() {
@@ -128,7 +130,7 @@ provide("pools", pools);
 provide("importable-pools", importablePools);
 provide("importable-destroyed-pools", importableDestroyedPools);
 provide("disks", disks);
-provide("pool-disk-status", diskStatus);
+// provide("pool-disk-status", diskStatus);
 provide("datasets", datasets);
 provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);

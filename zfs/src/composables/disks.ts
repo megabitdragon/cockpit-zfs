@@ -1,8 +1,8 @@
 import { useSpawn, errorString } from '@45drives/cockpit-helpers';
 // @ts-ignore
 import script_py from "../scripts/get-disks.py?raw";
-// @ts-ignore
-import disk_status_script_py from "../scripts/get-disk-status.py?raw";
+// // @ts-ignore
+// import disk_status_script_py from "../scripts/get-disk-status.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 
@@ -17,16 +17,16 @@ export async function getDisks() {
     }
 }
 
-export async function getDisksStatus() {
-	try {
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', disk_status_script_py], { superuser: 'try' });
-		const output = (await state.promise()).stdout;
-		return output;
-	} catch (state) {
-		console.error(errorString(state));
-		return null;
-	}
-}
+// export async function getDisksStatus() {
+// 	try {
+// 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', disk_status_script_py], { superuser: 'try' });
+// 		const output = (await state.promise()).stdout;
+// 		return output;
+// 	} catch (state) {
+// 		console.error(errorString(state));
+// 		return null;
+// 	}
+// }
 
 export async function clearPartitions(disk) {
     try {
@@ -39,7 +39,6 @@ export async function clearPartitions(disk) {
         return null;
       }
 }
-
 
 export async function labelClear(disk) {
     try {
@@ -57,7 +56,6 @@ export async function labelClear(disk) {
         return null;
       }
 }
-
 
 export async function attachDisk(diskVDevPoolData) {
 	try {

@@ -250,7 +250,7 @@ import Modal from '../common/Modal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { loadImportablePools, loadImportableDestroyedPools } from '../../composables/loadImportables';
 import { importPool } from '../../composables/pools';
-import { loadDatasets, loadDisksThenPools, loadDiskStatus } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools, loadDiskStats } from '../../composables/loadData';
 
 interface ImportPoolProps {
     idKey: string;
@@ -275,9 +275,9 @@ const importableDestroyedPools = computed<ImportablePoolData[]>(() => {
 
 const importing = ref(false);
 const loading = ref(true);
-const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
 
 const nameFeedback = ref('');
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const poolSelectedClass = (poolGUID) => {
    return poolGUID === importedPool.value.poolGUID ? 'bg-green-300 dark:bg-green-700' : '';
@@ -388,10 +388,9 @@ async function importPoolBtn() {
         disks.value = [];
         pools.value = [];
         datasets.value = [];
-        diskStatus.value = [];
         await loadDisksThenPools(disks, pools);
-        await loadDiskStatus(diskStatus);
         await loadDatasets(datasets);
+        await loadDiskStats(poolDiskStats);
         importing.value = false;
         showImportModal.value = false;
     }

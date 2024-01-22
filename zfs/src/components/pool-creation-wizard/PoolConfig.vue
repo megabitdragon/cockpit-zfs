@@ -356,7 +356,8 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 		const claimed = poolConfig.value.vdevs
 		.filter((_, idx) => idx !== vdevIdx)
 		.flatMap(vdev => vdev.selectedDisks);
-		return disks.value.filter(disk => !isDiskTaken.value(disk.name) && !claimed.includes(disk.name));
+		// return disks.value.filter(disk => !isDiskTaken.value(disk.name) && !claimed.includes(disk.name));
+		return disks.value.filter(disk => !isDiskTaken.value(getDiskIDName(disks.value, vdev.diskIdentifier!, disk.name)) && !claimed.includes(disk.name));
 	});
 });
 

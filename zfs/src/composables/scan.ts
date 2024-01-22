@@ -23,8 +23,8 @@ export async function getDiskStats() {
 	try {
 		const cmdString = ['/usr/bin/env', 'python3', '-c', get_disk_stats_script];
 		const state = useSpawn(cmdString, { superuser: 'try' });
-		const trimInfo = (await state.promise()).stdout;
-		return trimInfo;
+		const diskStats = (await state.promise()).stdout;
+		return diskStats;
 	} catch (state) {
 		console.error(errorString(state));
 		return null;

@@ -343,8 +343,6 @@ function calculateSectorSize(exponent) {
 	  return result.value;
 }
 
-const diskStatus = inject<Ref<PoolDiskStatus[]>>('pool-disk-status')!;
-
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
 const operationRunning = ref(false);
