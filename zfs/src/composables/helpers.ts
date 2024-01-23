@@ -504,12 +504,6 @@ export function findDiskByPath(disks : DiskData[], path : string) {
 	return disks.find((disk) => [disk.sd_path, disk.phy_path, disk.vdev_path].includes(path));
 }
 
-export function shouldTruncate(name : string, threshold : number) {
-    if (name.length > threshold) {
-        return 'overflow-hidden whitespace-no-wrap overflow-ellipsis';
-    }
-}
-
 export function truncateName(name : string, threshold : number) {
     return (name.length > threshold ? name.slice(0, threshold) + '...' : name)
 }

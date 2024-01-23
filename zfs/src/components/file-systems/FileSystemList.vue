@@ -21,14 +21,14 @@
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="py-2 font-semibold text-default col-span-2 flex flex-row justify-start">Dataset</th>
-								<th class="py-2 font-semibold text-default col-span-1">Available</th>
-								<th class="py-2 font-semibold text-default col-span-1">Used</th>
-								<th class="py-2 font-semibold text-default col-span-1">Refreservation</th>
-								<th class="py-2 font-semibold text-default col-span-1">Compression</th>
-								<th class="py-2 font-semibold text-default col-span-1">Encryption</th>
-								<th class="py-2 font-semibold text-default col-span-1">Mounted</th>
-								<th class="py-2 font-semibold text-default col-span-1">Read Only</th>
+								<th class="py-2 font-semibold text-default col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" title="Dataset">Dataset</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Available">Available</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Used">Used</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Refreservation">Refreservation</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Compression">Compression</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Encryption">Encryption</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Mounted">Mounted</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Read Only">Read Only</th>
 								<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -48,15 +48,15 @@
 															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 														/>
 													</div>
-													<div class="py-1 mt-1 col-span-2 flex flex-row justify-start whitespace-nowrap" :title="fileSystem.name" :class="shouldTruncate(fileSystem.name, 30)">{{ truncateName(fileSystem.name, 30) }}</div>
-													<div class="py-1 mt-1 col-span-1">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
-													<div class="py-1 mt-1 col-span-1">{{ fileSystem.properties.usedByDataset }}</div>
-													<div class="py-1 mt-1 col-span-1">{{ fileSystem.properties.usedbyRefreservation }}</div>
-													<div v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="py-1 mt-1 col-span-1">{{ upperCaseWord(fileSystem.properties.compression) }}</div>
-													<div v-else class="py-1 mt-1 col-span-1">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
-													<div class="py-1 mt-1 col-span-1">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
-													<div class="py-1 mt-1 col-span-1">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
-													<div class="py-1 mt-1 col-span-1">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
+													<div class="py-1 mt-1 col-span-2 justify-start overflow-hidden whitespace-nowrap text-ellipsis" :title="fileSystem.name">{{ fileSystem.name }}</div>
+													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="convertBytesToSize(fileSystem.properties.available)">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
+													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="fileSystem.properties.usedByDataset">{{ fileSystem.properties.usedByDataset }}</div>
+													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="fileSystem.properties.usedbyRefreservation">{{ fileSystem.properties.usedbyRefreservation }}</div>
+													<div v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(fileSystem.properties.compression)">{{ upperCaseWord(fileSystem.properties.compression) }}</div>
+													<div v-else class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(fileSystem.properties.compression).toUpperCase()">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
+													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(isBoolOnOff(fileSystem.encrypted))">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
+													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(fileSystem.properties.mounted)">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
+													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(fileSystem.properties.readOnly)">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
 
 													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 														<Menu as="div" class="relative inline-block text-right -mt-1">
@@ -181,7 +181,7 @@ import { ref, inject, Ref, provide, watch, onMounted } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
-import { isBoolOnOff, convertBytesToSize, upperCaseWord, shouldTruncate, truncateName  } from '../../composables/helpers';
+import { isBoolOnOff, convertBytesToSize, upperCaseWord,   } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";

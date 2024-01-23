@@ -51,7 +51,7 @@
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 px-2 text-sm gap-0.5">
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
 								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
-								<p class="truncate text-sm font-medium text-default" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk.name)" :class="shouldTruncate(getDiskIDName(disks, vDev.diskIdentifier!, disk.name), 8)">{{ truncateName(getDiskIDName(disks, vDev.diskIdentifier!, disk.name), 8) }}</p>
+								<p class="truncate text-sm font-medium text-default overflow-hidden whitespace-nowrap text-ellipsis" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk.name)">{{ truncateName(getDiskIDName(disks, vDev.diskIdentifier!, disk.name), 8) }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
 							</label>
@@ -304,7 +304,7 @@
 import { inject, ref, Ref, computed, watchEffect } from 'vue';
 import { ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, findDiskByPath, shouldTruncate, truncateName } from '../../composables/helpers';
+import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, findDiskByPath, truncateName } from '../../composables/helpers';
 
 interface PoolConfigProps {
 	tag: string;

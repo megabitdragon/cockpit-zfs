@@ -3,7 +3,7 @@
 		<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-96 w-full min-h-96 h-full overflow-visible bg-plugin-header rounded-md border border-default">
 			<template v-slot:title>
 				<div class="flex flex-row justify-between">
-					<div class="text-default">
+					<div class="text-default overflow-hidden whitespace-nowrap text-ellipsis">
 						{{ props.pool.name }}
 					</div>
 					<Menu as="div" class="relative inline-block text-right">

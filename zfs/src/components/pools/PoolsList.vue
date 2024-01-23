@@ -10,9 +10,9 @@
 			</div>
 		</div>
 
-		<div class="mt-4 overflow-visible rounded-md max-w-full">
+		<div class="mt-4 rounded-md max-w-full">
 			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md border border-default">
-				<div class="overflow-visible ring-1 ring-black ring-opacity-5 rounded-md">
+				<div class="whitespace-nowrap text-ellipsis ring-1 ring-black ring-opacity-5 rounded-md">
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
@@ -21,13 +21,13 @@
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="py-2 font-semibold text-default col-span-1 flex flex-row justify-start">Name</th>
-								<th class="py-2 font-semibold text-default col-span-1">Status</th>
-								<th class="py-2 font-semibold text-default col-span-1">Used (%)</th>
-								<th class="py-2 font-semibold text-default col-span-1">Used</th>
-								<th class="py-2 font-semibold text-default col-span-1">Free</th>
-								<th class="py-2 font-semibold text-default col-span-1">Total</th>
-								<th class="py-2 font-semibold text-default col-span-2">Message</th>
+								<th class="py-2 font-semibold text-default col-span-1 flex flex-row justify-start overflow-hidden whitespace-nowrap text-ellipsis" title="Name">Name</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Status">Status</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Used (%)">Used (%)</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Used">Used</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Free">Free</th>
+								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Total">Total</th>
+								<th class="py-2 font-semibold text-default col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" title="Message">Message</th>
 								<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>

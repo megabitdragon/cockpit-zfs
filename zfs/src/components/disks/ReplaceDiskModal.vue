@@ -24,7 +24,7 @@
                             <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisk" type="radio" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-                                <h3 class="truncate text-sm font-medium text-default" :class="shouldTruncate(getDiskIDName(allDisks, diskIdentifier, disk.name), 8)">{{truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
+                                <h3 class="truncate text-sm font-medium text-default overflow-hidden whitespace-nowrap text-ellipsis">{{truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
@@ -87,7 +87,7 @@
 import { ref, inject, Ref, computed } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { convertSizeToBytes, getDiskIDName, shouldTruncate, truncateName } from '../../composables/helpers';
+import { convertSizeToBytes, getDiskIDName, truncateName } from '../../composables/helpers';
 import { replaceDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
 

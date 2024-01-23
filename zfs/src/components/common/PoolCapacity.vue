@@ -8,8 +8,8 @@
             <span :class="['absolute', props.percentFontSize, props.fillColor]">{{props.percentage}}%</span>
         </div>
         <div class="flex flex-col">
-            <p class="font-medium text-default sm:text-xl">{{ props.name }}</p>
-            <span :class="['ml-auto', 'text-xl', 'font-medium', props.fillColor, 'hidden', 'sm:block']">{{ props.totalSize }}</span>
+            <p class="font-medium text-default sm:text-xl overflow-hidden whitespace-nowrap text-ellipsis" :title="props.name">{{ truncateName(props.name!, 12 )}}</p>
+            <span class="ml-auto text-xl font-medium hidden sm:block" :class="props.fillColor">{{ props.totalSize }}</span>
         </div>
      
     </div>
@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { computed} from 'vue';
-
+import { truncateName } from '../../composables/helpers';
 
 interface PoolCapacity {
     id: string;

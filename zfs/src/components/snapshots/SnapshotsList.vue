@@ -3,16 +3,16 @@
 		<!-- POOLS -->
 		<div v-if="props.item == 'pool'" class="w-full inline-block max-h-max align-middle border border-default border-collapse">
 			<div class="w-full">
-				<table class="table-auto min-w-full w-full min-h-full divide-y divide-default bg-default">
+				<table class="w-full min-h-full divide-y divide-default bg-default">
 					<thead class="bg-well w-full">
 						<tr v-if="snapshots.length < 1 && snapshotsLoaded" class="flex flex-row items-center">
 							<p class="bg-accent text-default text-center p-2 justify-self-center w-full">No snapshots found.</p>
 						</tr>
 						<tr v-if="snapshots.length > 0 && snapshotsLoaded" class="rounded-md ">
-							<th class="px-4 py-2 font-semibold text-default">Snapshot</th>
-							<th class="px-4 py-2 font-semibold text-default">Created On</th>
-							<th class="px-4 py-2 font-semibold text-default">Used</th>
-							<th class="px-4 py-2 font-semibold text-default">Referenced</th>
+							<th class="px-4 py-2 font-semibold text-default overflow-hidden whitespace-nowrap text-ellipsis" title="Snapshot">Snapshot</th>
+							<th class="px-4 py-2 font-semibold text-default overflow-hidden whitespace-nowrap text-ellipsis" title="Created On">Created On</th>
+							<th class="px-4 py-2 font-semibold text-default overflow-hidden whitespace-nowrap text-ellipsis" title="Used">Used</th>
+							<th class="px-4 py-2 font-semibold text-default overflow-hidden whitespace-nowrap text-ellipsis" title="Referenced">Referenced</th>
 							<th class="relative px-4 py-2 pl-3 pr-4 sm:pr-6 lg:pr-8">
 								<span class="sr-only"></span>
 							</th>
@@ -23,19 +23,19 @@
 					</thead>
 					<tbody class="divide-y divide-default bg-default">
 						<tr v-if="snapshots.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default ">
-							<td class="whitespace-nowrap py-1 px-4 text-sm font-medium text-default bg-default">
+							<td class="py-1 px-4 text-sm font-medium text-default bg-default overflow-hidden whitespace-nowrap text-ellipsis" :title=" snapshot.name">
 								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap py-1 px-4 text-sm text-default bg-default">
+							<td class="py-1 px-4 text-sm text-default bg-default overflow-hidden whitespace-nowrap text-ellipsis" :title=" snapshot.properties.creation.parsed">
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap py-1 px-4 text-sm text-default bg-default">
+							<td class="py-1 px-4 text-sm text-default bg-default overflow-hidden whitespace-nowrap text-ellipsis" :title=" snapshot.properties.used.value">
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap py-1 px-4 text-sm text-default bg-default">
+							<td class="py-1 px-4 text-sm text-default bg-default overflow-hidden whitespace-nowrap text-ellipsis" :title=" snapshot.properties.referenced.value">
 								{{ snapshot.properties.referenced.value }}
 							</td>
-							<td class="relative whitespace-nowrap mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default">
+							<td class="relative mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default">
 								<Menu as="div" class="relative inline-block text-right">
 									<div>
 										<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -85,10 +85,10 @@
 							<!-- <th class="relative py-2 rounded-tl-md col-span-1">
 								<span class="sr-only"></span>
 							</th> -->
-							<th class="py-2 col-span-2">Snapshot</th>
-							<th class="py-2 col-span-1">Created On</th>
-							<th class="py-2 col-span-1">Used</th>
-							<th class="py-2 col-span-1">Referenced</th>
+							<th class="py-2 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" title="Snapshot">Snapshot</th>
+							<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Created On">Created On</th>
+							<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Used">Used</th>
+							<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Referenced">Referenced</th>
 							<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 								<span class="sr-only"></span>
 							</th>
@@ -105,19 +105,19 @@
 							<!-- <td class="relative py-2 col-span-1">
 								<span class="sr-only"></span>
 							</td> -->
-							<td class="whitespace-nowrap py-1 text-sm font-medium text-default col-span-2" :title="snapshot.name" :class="shouldTruncate(snapshot.name, 30)"> 
-								{{ truncateName(snapshot.name, 30) }}
+							<td class="py-1 text-sm font-medium text-default col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.name"> 
+								{{ snapshot.name }}
 							</td>
-							<td class="whitespace-nowrap py-1 text-sm text-default col-span-1"> 
+							<td class="py-1 text-sm text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.creation.parsed">
 								{{ snapshot.properties.creation.parsed }}
 							</td>
-							<td class="whitespace-nowrap py-1 text-sm text-default col-span-1"> 
+							<td class="py-1 text-sm text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.used.value">
 								{{ snapshot.properties.used.value }}
 							</td>
-							<td class="whitespace-nowrap py-1 text-sm text-default col-span-1"> 
+							<td class="py-1 text-sm text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.referenced.value">
 								{{ snapshot.properties.referenced.value }}
 							</td>
-							<td class="relative whitespace-nowrap py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
+							<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 								<Menu as="div" class="relative inline-block text-right">
 									<div>
 										<MenuButton class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -184,7 +184,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset, loadDatasets } from '../../composables/loadData';
 import { destroySnapshot, rollbackSnapshot } from '../../composables/snapshots';
-import { truncateName, shouldTruncate } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;

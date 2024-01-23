@@ -7,11 +7,11 @@
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
-					</div> 
-					<div class="py-1 mt-1 col-span-1 flex flex-row justify-start" :title="poolData[props.poolIdx].name" :class="shouldTruncate(poolData[props.poolIdx].name, 20)">{{ truncateName(poolData[props.poolIdx].name, 20)}}</div>
-					<div class="py-1 mt-1 col-span-1 font-semibold" :class="formatStatus(poolData[props.poolIdx].status)">{{ poolData[props.poolIdx].status }}</div>
+					</div>
+					<div class="py-1 mt-1 col-span-1 justify-start overflow-hidden whitespace-nowrap text-ellipsis" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name}}</div>
+					<div class="py-1 mt-1 col-span-1 font-semibold overflow-hidden whitespace-nowrap text-ellipsis" :class="formatStatus(poolData[props.poolIdx].status)"  :title="poolData[props.poolIdx].status">{{ poolData[props.poolIdx].status }}</div>
 					<div class="py-1 mt-1 col-span-1">
-						<div class="w-full bg-well rounded-full text-center">
+						<div class="w-full bg-well rounded-full text-center" :title="poolData[props.poolIdx].properties.capacity + '%'">
 							<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex">
 								<div class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
 									{{ poolData[props.poolIdx].properties.capacity }}%
@@ -26,9 +26,9 @@
 							</div>
 						</div>
 					</div>
-					<div class="py-1 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.allocated }}</div>
-					<div class="py-1 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.free }}</div>
-					<div class="py-1 mt-1 col-span-1">{{ poolData[props.poolIdx].properties.size }}</div>
+					<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="poolData[props.poolIdx].properties.allocated">{{ poolData[props.poolIdx].properties.allocated }}</div>
+					<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="poolData[props.poolIdx].properties.free">{{ poolData[props.poolIdx].properties.free }}</div>
+					<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="poolData[props.poolIdx].properties.size">{{ poolData[props.poolIdx].properties.size }}</div>
 					<div class="py-1 -mt-1 col-span-2">
 						<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
 					</div>
@@ -145,7 +145,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, Di
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities, formatStatus, shouldTruncate, truncateName } from '../../composables/helpers';
+import { loadScanActivities, loadTrimActivities, formatStatus,  } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import Status from "../common/Status.vue";
 
