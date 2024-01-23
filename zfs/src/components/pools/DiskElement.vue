@@ -4,7 +4,7 @@
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
-            <div class="py-1 mt-1 col-span-2" :title="props.disk.name" :class="shouldTruncate(props.disk.name, 15)">{{ truncateName(props.disk.name, 15)}}</div>
+            <div class="py-1 mt-1 col-span-2" :title="props.disk.name" :class="shouldTruncate(props.disk.name, 30)">{{ truncateName(props.disk.name, 30)}}</div>
             <div class="py-1 mt-1 col-span-1 font-semibold" :class="formatStatus(diskState)">{{ diskState }}</div>
             <div class="py-1 mt-1 col-span-1">{{ props.disk.type }}</div>
             <div class="py-1 mt-1 col-span-1">{{ props.disk.temp }}</div>
@@ -16,7 +16,7 @@
                 <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
                     <Menu as="div" class="relative inline-block text-right">
                         <div>
-                            <MenuButton class="flex items-center rounded-full bg-accent p-2 hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+                            <MenuButton @click.stop class="flex items-center rounded-full bg-accent p-2 hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
                                 <span class="sr-only">Open options</span>
                                 <EllipsisVerticalIcon class="w-5" aria-hidden="true" />
                             </MenuButton>
