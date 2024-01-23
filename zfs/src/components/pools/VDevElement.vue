@@ -8,7 +8,7 @@
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="py-1 mt-1 col-span-1 text-base justify-self-start" :title="props.vDev.name">{{ props.vDev.name.length > 11 ? props.vDev.name.slice(0, 11) + '...' : props.vDev.name }}</div>
+					<div class="py-1 mt-1 col-span-1 text-base justify-self-start" :title="props.vDev.name" :class="shouldTruncate(vDev.name, 11)">{{ truncateName(vDev.name, 11)}}</div>
 					<div class="py-1 mt-1 col-span-1 text-base justify-self-start">{{ upperCaseWord(props.vDev.type) }} Device</div>
 					<div class="py-1 mt-1 col-span-1 text-base justify-self-start">{{ props.vDev.disks.length }} Disks</div>
 					<div class="py-1 mt-1 col-span-1 text-base justify-self-start">{{ props.vDev.stats.read_errors }} Read Errors</div>
@@ -85,7 +85,7 @@ import { EllipsisVerticalIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { clearErrors, removeVDevFromPool } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { formatStatus, loadScanActivities, loadTrimActivities, upperCaseWord } from '../../composables/helpers';
+import { formatStatus, loadScanActivities, loadTrimActivities, upperCaseWord, shouldTruncate, truncateName } from '../../composables/helpers';
 import DiskElement from '../pools/DiskElement.vue';
 
 interface VDevElementProps {

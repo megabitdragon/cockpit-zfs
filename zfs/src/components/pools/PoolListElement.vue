@@ -8,7 +8,7 @@
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div> 
-					<div class="py-1 mt-1 col-span-1 flex flex-row justify-start" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name.length > 20 ? poolData[props.poolIdx].name.slice(0, 20) + '...' : poolData[props.poolIdx].name }}</div>
+					<div class="py-1 mt-1 col-span-1 flex flex-row justify-start" :title="poolData[props.poolIdx].name" :class="shouldTruncate(poolData[props.poolIdx].name, 20)">{{ truncateName(poolData[props.poolIdx].name, 20)}}</div>
 					<div class="py-1 mt-1 col-span-1 font-semibold" :class="formatStatus(poolData[props.poolIdx].status)">{{ poolData[props.poolIdx].status }}</div>
 					<div class="py-1 mt-1 col-span-1">
 						<div class="w-full bg-well rounded-full text-center">
@@ -145,7 +145,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, Di
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities, formatStatus } from '../../composables/helpers';
+import { loadScanActivities, loadTrimActivities, formatStatus, shouldTruncate, truncateName } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import Status from "../common/Status.vue";
 

@@ -4,7 +4,7 @@
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
-            <div class="py-1 mt-1 col-span-2" :title="props.disk.name">{{ props.disk.name.length > 20 ? props.disk.name.slice(0, 20) + '...' : props.disk.name }}</div>
+            <div class="py-1 mt-1 col-span-2" :title="props.disk.name" :class="shouldTruncate(props.disk.name, 15)">{{ truncateName(props.disk.name, 15)}}</div>
             <div class="py-1 mt-1 col-span-1 font-semibold" :class="formatStatus(diskState)">{{ diskState }}</div>
             <div class="py-1 mt-1 col-span-1">{{ props.disk.type }}</div>
             <div class="py-1 mt-1 col-span-1">{{ props.disk.temp }}</div>
@@ -61,7 +61,7 @@
         </div>
 		<div v-if="diskState == 'REPLACING'" class="border border-collapse border-default">
 			<div v-for="disk in props.disk.children" class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
-				<div class="py-1 mt-1 col-span-3" :title="disk.name">{{ disk.name.length > 30 ? disk.name.slice(0, 30) + '...' : disk.name }}</div>
+				<div class="py-1 mt-1 col-span-3" :title="disk.name" :class="shouldTruncate(props.disk.name, 15)">{{ truncateName(props.disk.name, 15)}}</div>
 				<div class="py-1 mt-1 col-span-3"></div>
 				<div class="py-1 mt-1 col-span-3"></div>
 			</div>
@@ -104,7 +104,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { scrubPool, clearErrors } from "../../composables/pools";
 import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities, formatStatus } from '../../composables/helpers'
+import { loadScanActivities, loadTrimActivities, formatStatus, shouldTruncate, truncateName } from '../../composables/helpers'
 import Status from "../common/Status.vue";
 
 interface DiskListElementProps {

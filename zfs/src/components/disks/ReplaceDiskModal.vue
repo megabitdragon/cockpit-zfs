@@ -19,12 +19,12 @@
 				<label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select Disks</label>
                 <ul v-if="availableDisks.length > 0" :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
-                        <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
+                        <button class="flex min-w-fit w-full h-full border border-default rounded-lg" :title="getDiskIDName(allDisks, diskIdentifier, disk.name)"
                         :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisk" type="radio" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-                                <h3 class="truncate text-sm font-medium text-default">{{ getDiskIDName(allDisks, diskIdentifier, disk.name) }}</h3>
+                                <h3 class="truncate text-sm font-medium text-default" :class="shouldTruncate(getDiskIDName(allDisks, diskIdentifier, disk.name), 8)">{{truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
@@ -87,7 +87,7 @@
 import { ref, inject, Ref, computed } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
+import { convertSizeToBytes, getDiskIDName, shouldTruncate, truncateName } from '../../composables/helpers';
 import { replaceDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
 
@@ -114,6 +114,8 @@ const emit = defineEmits(['close']);
 const closeModal = () => {
     emit('close');
 }
+
+
 
 const showReplaceDiskModal = inject<Ref<boolean>>('show-replace-modal')!;
 const selectedDisk = ref('');

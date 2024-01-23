@@ -105,8 +105,8 @@
 							<!-- <td class="relative py-2 col-span-1">
 								<span class="sr-only"></span>
 							</td> -->
-							<td class="whitespace-nowrap py-1 text-sm font-medium text-default col-span-2" :title="snapshot.name"> 
-								{{ snapshot.name.length > 30 ? snapshot.name.slice(0, 30) + '...' : snapshot.name }}
+							<td class="whitespace-nowrap py-1 text-sm font-medium text-default col-span-2" :title="snapshot.name" :class="shouldTruncate(snapshot.name, 30)"> 
+								{{ truncateName(snapshot.name, 30) }}
 							</td>
 							<td class="whitespace-nowrap py-1 text-sm text-default col-span-1"> 
 								{{ snapshot.properties.creation.parsed }}
@@ -184,6 +184,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { loadSnapshots, loadSnapshotsInPool, loadSnapshotsInDataset, loadDatasets } from '../../composables/loadData';
 import { destroySnapshot, rollbackSnapshot } from '../../composables/snapshots';
+import { truncateName, shouldTruncate } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const notifications = inject<Ref<any>>('notifications')!;

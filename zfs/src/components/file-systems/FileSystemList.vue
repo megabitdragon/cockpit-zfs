@@ -48,7 +48,7 @@
 															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 														/>
 													</div>
-													<div class="py-1 mt-1 col-span-2 flex flex-row justify-start whitespace-nowrap" :title="fileSystem.name">{{ fileSystem.name.length > 30 ? fileSystem.name.slice(0, 30) + '...' : fileSystem.name }}</div>
+													<div class="py-1 mt-1 col-span-2 flex flex-row justify-start whitespace-nowrap" :title="fileSystem.name" :class="shouldTruncate(fileSystem.name, 30)">{{ truncateName(fileSystem.name, 30) }}</div>
 													<div class="py-1 mt-1 col-span-1">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
 													<div class="py-1 mt-1 col-span-1">{{ fileSystem.properties.usedByDataset }}</div>
 													<div class="py-1 mt-1 col-span-1">{{ fileSystem.properties.usedbyRefreservation }}</div>
@@ -181,7 +181,7 @@ import { ref, inject, Ref, provide, watch, onMounted } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
-import { isBoolOnOff, convertBytesToSize, upperCaseWord } from '../../composables/helpers';
+import { isBoolOnOff, convertBytesToSize, upperCaseWord, shouldTruncate, truncateName  } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
