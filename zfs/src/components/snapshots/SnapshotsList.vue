@@ -2,6 +2,9 @@
 	<div>
 		<!-- POOLS -->
 		<div v-if="props.item == 'pool'" class="inline-block min-w-full max-h-max align-middle border border-default border-collapse">
+			<tr v-if="snapshots.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center w-full">
+				<p class="bg-accent text-default text-center py-2 justify-self-center w-full">No snapshots found.</p>
+			</tr>
 			<table class="table-auto min-w-full min-h-full divide-y divide-default">
 				<thead class="bg-well border-collapse">
 					<tr v-if="snapshots.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-7 font-semibold text-white">
@@ -22,9 +25,9 @@
 					</tr>
 				</thead>
 				<tbody class="divide-y divide-default bg-default border-collapse">
-					<tr v-if="snapshots.length < 1 && snapshotsLoaded"  class="grid grid-cols-1 items-center justify-center rounded-md bg-well justify-self-center w-full">
+					<!-- <tr v-if="snapshots.length < 1 && snapshotsLoaded"  class="grid grid-cols-1 items-center justify-center rounded-md justify-self-center w-full">
 						<p class="bg-well text-muted text-center py-2 justify-self-center w-full">No snapshots found.</p>
-					</tr>
+					</tr> -->
 					<tr v-if="snapshots.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default grid grid-cols-7 justify-center items-center">
 						<!-- <td class="relative py-2 col-span-1">
 							<span class="sr-only"></span>

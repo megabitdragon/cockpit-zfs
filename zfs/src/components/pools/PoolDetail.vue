@@ -56,7 +56,7 @@
 			<div v-if="navTag == 'settings'">
 				<div class="grid grid-cols-4 gap-2">
 					<div class="mt-2 col-span-1 col-start-1 row-start-1">
-						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-default">Pool</p><p class="mt-1 py-1.5">{{ poolConfig.name }}</p>
+						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-default">Pool</p><p class="mt-1 py-1.5 overflow-hidden whitespace-nowrap text-ellipsis" :title="poolConfig.name">{{ poolConfig.name }}</p>
 					</div>
 					<div class="mt-2 col-span-1 col-start-2 row-start-1">
 						<p :id="getIdKey('settings-pool-readonly')" name="settings-pool-readonly" class="text-base text-default">Read Only</p><p class="mt-1 py-1.5">{{ upperCaseWord(isBoolOnOff(poolConfig.properties.readOnly)) }}</p>
