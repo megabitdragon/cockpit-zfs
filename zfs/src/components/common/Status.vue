@@ -39,7 +39,7 @@
                         <div v-for="disk, idx in poolDiskStats[props.pool.name]" class="col-span-4">
                             <div v-if="disk.stats.trim_notsup !== 1" class="col-span-4">
                                 <div v-if="isTrimActive || isTrimSuspended || isTrimFinished || isTrimCanceled" class="col-span-4">
-                                    <div class="grid grid-cols-4 justify-items-center w-full whitespace-nowrap text-ellipsis mt-1">
+                                    <div class="grid grid-cols-4 justify-items-center w-full whitespace-nowrap text-ellipsis">
                                         <span class="col-span-4 font-semibold overflow-hidden whitespace-nowrap text-ellipsis" :class="trimMessageClass(disk)">
                                         {{ trimMessage(disk) }}
                                         </span>

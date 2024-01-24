@@ -1,158 +1,165 @@
 <template>
 	<div>
 		<!-- POOLS -->
-		<div v-if="props.item == 'pool'" class="w-full inline-block max-h-max align-middle border border-default border-collapse">
-			<div class="w-full">
-				<table class="w-full min-h-full divide-y divide-default bg-default">
-					<thead class="bg-well w-full">
-						<tr v-if="snapshots.length < 1 && snapshotsLoaded" class="flex flex-row items-center">
-							<p class="bg-accent text-default text-center p-2 justify-self-center w-full">No snapshots found.</p>
-						</tr>
-						<tr v-if="snapshots.length > 0 && snapshotsLoaded" class="rounded-md ">
-							<th class="px-4 py-2 font-semibold text-default overflow-hidden whitespace-nowrap text-ellipsis" title="Snapshot">Snapshot</th>
-							<th class="px-4 py-2 font-semibold text-default overflow-hidden whitespace-nowrap text-ellipsis" title="Created On">Created On</th>
-							<th class="px-4 py-2 font-semibold text-default overflow-hidden whitespace-nowrap text-ellipsis" title="Used">Used</th>
-							<th class="px-4 py-2 font-semibold text-default overflow-hidden whitespace-nowrap text-ellipsis" title="Referenced">Referenced</th>
-							<th class="relative px-4 py-2 pl-3 pr-4 sm:pr-6 lg:pr-8">
-								<span class="sr-only"></span>
-							</th>
-						</tr>
-						<!-- <tr v-if="!snapshotsLoaded" class="rounded-md flex bg-well justify-center">
-							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
-						</tr> -->
-					</thead>
-					<tbody class="divide-y divide-default bg-default">
-						<tr v-if="snapshots.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default bg-default ">
-							<td class="py-1 px-4 text-sm font-medium text-default bg-default overflow-hidden whitespace-nowrap text-ellipsis" :title=" snapshot.name">
-								{{ snapshot.name }}
-							</td>
-							<td class="py-1 px-4 text-sm text-default bg-default overflow-hidden whitespace-nowrap text-ellipsis" :title=" snapshot.properties.creation.parsed">
-								{{ snapshot.properties.creation.parsed }}
-							</td>
-							<td class="py-1 px-4 text-sm text-default bg-default overflow-hidden whitespace-nowrap text-ellipsis" :title=" snapshot.properties.used.value">
-								{{ snapshot.properties.used.value }}
-							</td>
-							<td class="py-1 px-4 text-sm text-default bg-default overflow-hidden whitespace-nowrap text-ellipsis" :title=" snapshot.properties.referenced.value">
-								{{ snapshot.properties.referenced.value }}
-							</td>
-							<td class="relative mt-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 bg-default">
-								<Menu as="div" class="relative inline-block text-right">
-									<div>
-										<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-											<span class="sr-only">Open options</span>
-											<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
-										</MenuButton>
-									</div>
+		<div v-if="props.item == 'pool'" class="inline-block min-w-full max-h-max align-middle border border-default border-collapse">
+			<table class="table-auto min-w-full min-h-full divide-y divide-default">
+				<thead class="bg-well border-collapse">
+					<tr v-if="snapshots.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-7 font-semibold text-white">
+						<!-- <th class="relative py-2 rounded-tl-md col-span-1">
+							<span class="sr-only"></span>
+						</th> -->
+						<th class="py-2 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Snapshot">Snapshot</th>
+						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Created On">Created On</th>
+						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Used">Used</th>
+						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Referenced">Referenced</th>
+						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Clones">Clones</th>
+						<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
+							<span class="sr-only"></span>
+						</th>
+					</tr>
+					<tr v-if="!snapshotsLoaded && snapshotsLoading" class="rounded-md flex bg-well justify-center justify-self-center w-full">
+						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-default bg-default border-collapse">
+					<tr v-if="snapshots.length < 1 && snapshotsLoaded"  class="grid grid-cols-1 items-center justify-center rounded-md bg-well justify-self-center w-full">
+						<p class="bg-well text-muted text-center py-2 justify-self-center w-full">No snapshots found.</p>
+					</tr>
+					<tr v-if="snapshots.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshots" :key="snapshotIdx" class="text-default grid grid-cols-7 justify-center items-center">
+						<!-- <td class="relative py-2 col-span-1">
+							<span class="sr-only"></span>
+						</td> -->
+						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.name"> 
+							{{ snapshot.name }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.creation.parsed">
+							{{ snapshot.properties.creation.parsed }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.used.value">
+							{{ snapshot.properties.used.value }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.referenced.value">
+							{{ snapshot.properties.referenced.value }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.clones">
+							{{ snapshot.properties.clones.length > 0 ? snapshot.properties.clones : '-' }}
+						</td>
+						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
+							<Menu as="div" class="relative inline-block text-right">
+								<div>
+									<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+										<span class="sr-only">Open options</span>
+										<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+									</MenuButton>
+								</div>
 
-									<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-										<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-											<div class="py-1">
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
-												</MenuItem>
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
-												</MenuItem>
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
-												</MenuItem>
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
-												</MenuItem>
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
-												</MenuItem>
-											</div>
-										</MenuItems>
-									</transition>
-								</Menu>
-							</td>
-						</tr>
-						<tr v-if="!snapshotsLoaded && snapshotsLoading" class="rounded-md flex bg-well justify-center">
-							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+								<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+									<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+										<div class="py-1">
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+											</MenuItem>
+										</div>
+									</MenuItems>
+								</transition>
+							</Menu>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 
 		<!-- FILESYSTEMS -->
 		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-max align-middle border-collapse">
-			<div class="">
-				<table class="table-auto min-w-full min-h-full divide-y divide-default">
-					<thead class="bg-secondary border-collapse">
-						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-6 font-semibold text-white">
-							<!-- <th class="relative py-2 rounded-tl-md col-span-1">
-								<span class="sr-only"></span>
-							</th> -->
-							<th class="py-2 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" title="Snapshot">Snapshot</th>
-							<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Created On">Created On</th>
-							<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Used">Used</th>
-							<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Referenced">Referenced</th>
-							<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
-								<span class="sr-only"></span>
-							</th>
-						</tr>
-						<tr v-if="!snapshotsLoaded && snapshotsLoading" class="rounded-md flex bg-well justify-center">
-							<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-default bg-accent border-collapse">
-						<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
-							<p class="bg-well text-muted w-full text-center py-2 justify-self-center">No snapshots found.</p>
-						</tr>
-						<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-6 justify-items-center items-center">
-							<!-- <td class="relative py-2 col-span-1">
-								<span class="sr-only"></span>
-							</td> -->
-							<td class="py-1 text-sm font-medium text-default col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.name"> 
-								{{ snapshot.name }}
-							</td>
-							<td class="py-1 text-sm text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.creation.parsed">
-								{{ snapshot.properties.creation.parsed }}
-							</td>
-							<td class="py-1 text-sm text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.used.value">
-								{{ snapshot.properties.used.value }}
-							</td>
-							<td class="py-1 text-sm text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.referenced.value">
-								{{ snapshot.properties.referenced.value }}
-							</td>
-							<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
-								<Menu as="div" class="relative inline-block text-right">
-									<div>
-										<MenuButton class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-											<span class="sr-only">Open options</span>
-											<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
-										</MenuButton>
-									</div>
+			<table class="table-auto min-w-full min-h-full divide-y divide-default">
+				<thead class="bg-secondary border-collapse">
+					<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" class="rounded-md grid grid-cols-7 font-semibold text-white">
+						<!-- <th class="relative py-2 rounded-tl-md col-span-1">
+							<span class="sr-only"></span>
+						</th> -->
+						<th class="py-2 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Snapshot">Snapshot</th>
+						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Created On">Created On</th>
+						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Used">Used</th>
+						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Referenced">Referenced</th>
+						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Clones">Clones</th>
+						<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
+							<span class="sr-only"></span>
+						</th>
+					</tr>
+					<tr v-if="!snapshotsLoaded && snapshotsLoading" class="rounded-md flex bg-well justify-center">
+						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-default bg-accent border-collapse">
+					<tr v-if="snapshotsInFilesystem.length < 1 && snapshotsLoaded" class="grid grid-cols-1 items-center justify-center">
+						<p class="bg-well text-muted text-center py-2 justify-self-center w-full">No snapshots found.</p>
+					</tr>
+					<tr v-if="snapshotsInFilesystem.length > 0 && snapshotsLoaded" v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-7 justify-center items-center">
+						<!-- <td class="relative py-2 col-span-1">
+							<span class="sr-only"></span>
+						</td> -->
+						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.name"> 
+							{{ snapshot.name }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.creation.parsed">
+							{{ snapshot.properties.creation.parsed }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.used.value">
+							{{ snapshot.properties.used.value }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.referenced.value">
+							{{ snapshot.properties.referenced.value }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.clones">
+							{{ snapshot.properties.clones.length > 0 ? snapshot.properties.clones : '-' }}
+						</td>
+						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
+							<Menu as="div" class="relative inline-block text-right">
+								<div>
+									<MenuButton class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+										<span class="sr-only">Open options</span>
+										<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+									</MenuButton>
+								</div>
 
-									<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-										<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-											<div class="py-1">
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
-												</MenuItem>
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
-												</MenuItem>
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
-												</MenuItem>
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
-												</MenuItem>
-												<MenuItem as="div" v-slot="{ active }">
-													<a href="#" @click.stop="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
-												</MenuItem>
-											</div>
-										</MenuItems>
-									</transition>
-								</Menu>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+								<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+									<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+										<div class="py-1">
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click.stop="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+											</MenuItem>
+										</div>
+									</MenuItems>
+								</transition>
+							</Menu>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	
 		<div v-if="showDestroySnapshotModal">

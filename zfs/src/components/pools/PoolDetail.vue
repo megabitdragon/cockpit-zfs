@@ -45,7 +45,7 @@
 				</div>
 			</div>
 			
-			<div v-if="navTag == 'snapshots' && snapshotsLoaded" class="" >
+			<div v-if="navTag == 'snapshots' && snapshotsLoaded" class="justify-center w-fit min-w-fit" >
 				<!-- <SnapshotsList :pool="props.pool" :item="'pool'"/> -->
 				<component :is="snapshotListComponent" :pool="props.pool" :item="'pool'"/>
 			</div>
