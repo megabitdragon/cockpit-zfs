@@ -1,55 +1,53 @@
 <template>
-    <Modal :isOpen="showCloneSnapModal" @close="showCloneSnapModal = false" :marginTop="'mt-52'" :width="'w-fit'" :minWidth="'min-w-3/5'">
+    <Modal :isOpen="showCloneSnapModal" @close="showCloneSnapModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'">
         <template v-slot:title>
             <legend class="flex justify-center">Clone Snapshot</legend>
         </template>
         <template v-slot:content>
-            <div>
-                <div class="">
-                    <!-- Snapshot Name -->
-                    <div class="mt-2">
-                        <label :for="getIdKey('snap-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot Name</label>
-                        <p>{{ props.snapshot.name }}</p>
-                    </div>
-
-                    <!-- Parent File System -->
-                    <div class="mt-2">
-                        <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-                        <select v-model="parentFS" :id="getIdKey('parent-filesystem')" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
-                            <option v-for="dataset, datasetIdx in datasetsInSamePool" :key="datasetIdx">{{ dataset.name }}</option>
-                        </select>
-                    </div>
-
-                    <!-- New Name -->
-                    <div class="mt-2">
-                        <label :for="getIdKey('new-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Clone Name</label>
-                        <input :id="getIdKey('new-name')" type="text" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="'Enter Name Here'" />
-                        
-                    </div>
-                
-                    <!-- Create non-existent parent file systems -->
-                    <div class="mt-2">
-                        <div class="flex flex-row">
-                            <label :for="getIdKey('create-parent-filesystems')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Create Non-Existent Parent File Systems</label>
-                            <Switch v-model="createNonExistParent" :id="getIdKey('create-parent-filesystems')" :class="[createNonExistParent! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
-                                <span class="sr-only">Use setting</span>
-                                <span :class="[createNonExistParent! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-                                    <span :class="[createNonExistParent! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                                        <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-                                            <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </span>
-                                    <span :class="[createNonExistParent! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
-                                        <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-                                            <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-                                        </svg>
-                                    </span>
-                                </span>
-                            </Switch>
-                        </div>
-                    </div>
-
+            <div class="grid grid-cols-1">
+                <!-- Snapshot Name -->
+                 <div class="mt-2 col-span-1">
+                    <label :for="getIdKey('snap-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot Name</label>
+                    <p :class="truncateText" :title="props.snapshot.name">{{ props.snapshot.name }}</p>
                 </div>
+
+                <!-- Parent File System -->
+                 <div class="mt-2 col-span-1">
+                    <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
+                    <select v-model="parentFS" :id="getIdKey('parent-filesystem')" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
+                        <option v-for="dataset, datasetIdx in datasetsInSamePool" :key="datasetIdx" :class="truncateText" :title="dataset.name">{{ dataset.name }}</option>
+                    </select>
+                </div>
+
+                <!-- New Name -->
+                 <div class="mt-2 col-span-1">
+                    <label :for="getIdKey('new-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Clone Name</label>
+                    <input :id="getIdKey('new-name')" type="text" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="'Enter Name Here'" />
+                    
+                </div>
+            
+                <!-- Create non-existent parent file systems -->
+                 <div class="mt-2 col-span-1">
+                    <div class="flex flex-row justify-center">
+                        <label :for="getIdKey('create-parent-filesystems')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Create Non-Existent Parent File Systems</label>
+                        <Switch v-model="createNonExistParent" :id="getIdKey('create-parent-filesystems')" :class="[createNonExistParent! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                            <span class="sr-only">Use setting</span>
+                            <span :class="[createNonExistParent! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                <span :class="[createNonExistParent! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
+                                        <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                <span :class="[createNonExistParent! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                    <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    </svg>
+                                </span>
+                            </span>
+                        </Switch>
+                    </div>
+                </div>
+
             </div>
         </template>
         <template v-slot:footer>
@@ -88,6 +86,8 @@ interface CloneSnapshotProps {
 }
 
 const props = defineProps<CloneSnapshotProps>();
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
+
 const showCloneSnapModal = inject<Ref<boolean>>('show-clone-modal')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;

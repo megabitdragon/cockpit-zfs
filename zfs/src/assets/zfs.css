@@ -3,3 +3,9 @@
 /* div, td, th, tr, table, ul, li, p, h1, h2, h3, button, input {
   border: 1px dotted gray;
 } */
+
+/* .truncateText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+} */

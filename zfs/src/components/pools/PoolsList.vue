@@ -21,13 +21,13 @@
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="py-2 font-semibold text-default col-span-1 flex flex-row justify-start overflow-hidden whitespace-nowrap text-ellipsis" title="Name">Name</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Status">Status</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Used (%)">Used (%)</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Used">Used</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Free">Free</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Total">Total</th>
-								<th class="py-2 font-semibold text-default col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" title="Message">Message</th>
+								<th class="py-2 font-semibold text-default col-span-1 flex flex-row justify-start" :class="truncateText" title="Name">Name</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Status">Status</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used (%)">Used (%)</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used">Used</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Free">Free</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Total">Total</th>
+								<th class="py-2 font-semibold text-default col-span-2" :class="truncateText" title="Message">Message</th>
 								<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -87,6 +87,7 @@ const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 async function refreshAllData() {
 	disksLoaded.value = false;

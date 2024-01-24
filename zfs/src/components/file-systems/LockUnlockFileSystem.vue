@@ -4,19 +4,19 @@
             <legend class="flex justify-center">{{ upperCaseWord(props.mode) }} File System</legend>
         </template>
         <template v-slot:content>
-            <div class="grid grid-flow-row mt-3 justify-items-center gap-1">
-                <div v-if="props.mode == 'unlock'">
-                    <div>
-                        <label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Name: <span class="font-normal">{{ props.filesystem.name }}</span></label>
+            <div class="grid grid-flow-row mt-3 text-center">
+                <div v-if="props.mode == 'unlock'" class="w-full grid grid-cols-2">
+                    <div class="col-span-2 flex flex-row">
+                        <label :for="getIdKey('filesystem-name')" :class="truncateText" :title="props.filesystem.name" class="mt-1 block text-sm font-medium leading-6 text-default">Name: <span :class="truncateText" :title="props.filesystem.name" class="font-normal">{{ props.filesystem.name }}</span></label>
                     </div>
-                    <div class="grid grid-flow-row">
+                    <div class="col-span-2 flex flex-row justify-between">
                         <label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Enter Passphrase</label>
-                        <input :id="getIdKey('passphrase')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" />
+                        <input :id="getIdKey('passphrase')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" />
                         <p class="text-danger mt-1">{{ passFeedback }}</p>
                     </div>
-                    <div>
-                        <div class="flex flex-row">
-                            <label :for="getIdKey('mount-switch')" class="mt-3 mr-2 block text-sm font-medium text-default">Mount File System</label>
+                    <div class="grid grid-rows-2 col-span-2">
+                        <div class="flex flex-row justify-between">
+                            <label :for="getIdKey('mount-switch')" class="mt-3 mr-2 block text-sm font-medium text-default whitespace-nowrap">Mount File System</label>
                             <Switch v-model="mountFS" :id="getIdKey('mount-file-system')" :class="[mountFS ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                 <span class="sr-only">Use setting</span>
                                 <span :class="[mountFS ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -33,8 +33,8 @@
                                 </span>
                             </Switch>
                         </div>
-                        <div class="flex flex-row">
-                            <label :for="getIdKey('force-mount-switch')" class="mt-3 mr-2 block text-sm font-medium text-default">Forcefully Mount File System</label>
+                        <div class="flex flex-row justify-between">
+                            <label :for="getIdKey('force-mount-switch')" class="mt-3 mr-2 block text-sm font-medium text-default whitespace-nowrap">Forcefully Mount File System</label>
                             <Switch v-model="forceMountFS" :id="getIdKey('force-mount-file-system')" :class="[forceMountFS ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                 <span class="sr-only">Use setting</span>
                                 <span :class="[forceMountFS ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -53,9 +53,9 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="props.mode == 'lock'">
-                    <div>
-                        <legend>Lock filesystem {{ props.filesystem.name }}?</legend>
+                <div v-if="props.mode == 'lock'" class="w-full grid grid-cols-2">
+                    <div class="col-span-2">
+                        <legend :class="truncateText" :title="props.filesystem.name">Lock filesystem {{ props.filesystem.name }}?</legend>
                     </div>
                 </div>
             </div>
@@ -94,6 +94,8 @@ interface LockUnlockFileSystemProps {
 
 const props = defineProps<LockUnlockFileSystemProps>();
 const emit = defineEmits(['close']);
+
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const showFlag = ref(props.showFlag);
 const doingThing = inject<Ref<boolean>>('locking-or-unlocking')!;

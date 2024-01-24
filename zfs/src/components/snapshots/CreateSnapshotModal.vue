@@ -7,11 +7,11 @@
             <div>
                 <div>
 					<label :for="getIdKey('file-system')" class="block text-sm font-medium leading-6 text-default">File System</label>
-					<select v-if="props.item == 'pool'" id="file-system" v-model="newSnapshot.filesystem" name="file-system" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option v-for="dataset in datasetsInSamePool" :value="dataset.name">{{ dataset.name }}</option>
+					<select v-if="props.item == 'pool'" id="file-system" v-model="newSnapshot.filesystem" name="file-system" :class="truncateText" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<option v-for="dataset in datasetsInSamePool" :value="dataset.name" :class="truncateText" :title="dataset.name">{{ dataset.name }}</option>
 					</select>
-                    <select v-if="props.item == 'filesystem'" id="file-system" v-model="newSnapshot.filesystem" name="file-system" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-						<option v-for="dataset in datasets" :value="dataset.name">{{ dataset.name }}</option>
+                    <select v-if="props.item == 'filesystem'" id="file-system" v-model="newSnapshot.filesystem" name="file-system" :class="truncateText" class="text-default bg-default mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
+						<option v-for="dataset in datasets" :value="dataset.name" :class="truncateText" :title="dataset.name">{{ dataset.name }}</option>
 					</select>
 				</div>
                 <div>
@@ -95,7 +95,7 @@ interface CreateSnapshotModalProps {
 }
 
 const props = defineProps<CreateSnapshotModalProps>();
-
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const datasetsInSamePool = computed<FileSystemData[]>(() => {
     return datasets.value.filter(dataset => dataset.pool === props.poolName);

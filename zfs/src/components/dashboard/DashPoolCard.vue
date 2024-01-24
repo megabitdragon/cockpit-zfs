@@ -3,7 +3,7 @@
 		<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-96 w-full min-h-96 h-full overflow-visible bg-plugin-header rounded-md border border-default">
 			<template v-slot:title>
 				<div class="flex flex-row justify-between">
-					<div class="text-default overflow-hidden whitespace-nowrap text-ellipsis">
+					<div class="text-default" :class="truncateText">
 						{{ props.pool.name }}
 					</div>
 					<Menu as="div" class="relative inline-block text-right">
@@ -19,9 +19,9 @@
 									<MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click.stop="showDetails(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<!-- <MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click.stop="clearPoolErrors(props.pool.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
-									</MenuItem>
+									</MenuItem> -->
 									<MenuItem as="div" v-slot="{ active }">
 										<a v-if="!scanActivity!.isActive" href="#" @click.stop="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 									</MenuItem>
@@ -159,7 +159,8 @@ interface DashPoolCardProps {
 }
 
 const notifications = inject<Ref<any>>('notifications')!;
-	
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
+
 const props = defineProps<DashPoolCardProps>();
 const selectedPool = ref<PoolData>();
 

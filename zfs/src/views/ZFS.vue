@@ -37,6 +37,8 @@ interface ZFSProps {
 
 const props = defineProps<ZFSProps>();
 
+const truncateText = ref('overflow-hidden whitespace-nowrap text-ellipsis');
+
 const pools = ref<PoolData[]>([]);
 const disks = ref<DiskData[]>([]);
 // const diskStatus = ref<PoolDiskStatus[]>([]);
@@ -130,7 +132,7 @@ provide("pools", pools);
 provide("importable-pools", importablePools);
 provide("importable-destroyed-pools", importableDestroyedPools);
 provide("disks", disks);
-// provide("pool-disk-status", diskStatus);
+provide("style-truncate-text", truncateText);
 provide("datasets", datasets);
 provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);

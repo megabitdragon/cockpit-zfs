@@ -4,11 +4,11 @@
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
-            <div class="py-1 mt-1 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" :title="props.disk.name">{{ props.disk.name }}</div>
-            <div class="py-1 mt-1 col-span-1 font-semibold overflow-hidden whitespace-nowrap text-ellipsis" :class="formatStatus(diskState)" :title="diskState">{{ diskState }}</div>
-            <div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="props.disk.type">{{ props.disk.type }}</div>
-            <div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="props.disk.temp">{{ props.disk.temp }}</div>
-            <div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="props.disk.capacity">{{ props.disk.capacity }}</div>
+            <div class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">{{ props.disk.name }}</div>
+            <div class="py-1 mt-1 col-span-1 font-semibold" :class="[formatStatus(diskState), truncateText]" :title="diskState">{{ diskState }}</div>
+            <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.type">{{ props.disk.type }}</div>
+            <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.temp">{{ props.disk.temp }}</div>
+            <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.capacity">{{ props.disk.capacity }}</div>
             <div class="py-1 -mt-1 col-span-2">
                 <Status :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"/>
             </div>
@@ -25,17 +25,17 @@
                         <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                             <MenuItems class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <div class="py-1">
-                                    <MenuItem as="div" v-slot="{ active }">
+                                    <!-- <MenuItem as="div" v-slot="{ active }">
                                         <a href="#" @click.stop="clearDiskErrors(props.pool.name, props.disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
+                                    </MenuItem> -->
+                                    <MenuItem as="div" v-slot="{ active }">
+                                        <a v-if="props.vDev.disks.length > 1" href="#" @click.stop="detachThisDisk(props.pool, props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach Disk</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a v-if="props.vDev.disks.length > 1" href="#" @click.stop="detachThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach Disk</a>
+                                        <a v-if="diskState == 'ONLINE'" href="#" @click.stop="offlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Offline Disk</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a href="#" @click.stop="offlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Offline Disk</a>
-                                    </MenuItem>
-                                    <MenuItem as="div" v-slot="{ active }">
-                                        <a href="#" @click.stop="onlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Online Disk</a>
+                                        <a v-if="diskState == 'OFFLINE'" href="#" @click.stop="onlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Online Disk</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
                                         <a href="#" @click.stop="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace Disk</a>
@@ -61,7 +61,7 @@
         </div>
 		<div v-if="diskState == 'REPLACING'" class="border border-collapse border-default">
 			<div v-for="disk in props.disk.children" class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
-				<div class="py-1 mt-1 col-span-3 overflow-hidden whitespace-nowrap text-ellipsis" :title="disk.name">{{ props.disk.name }}</div>
+				<div class="py-1 mt-1 col-span-3" :class="truncateText" :title="disk.name">{{ props.disk.name }}</div>
 				<div class="py-1 mt-1 col-span-3"></div>
 				<div class="py-1 mt-1 col-span-3"></div>
 			</div>
@@ -127,6 +127,7 @@ const selectedVDev = ref<vDevData>();
 const operationRunning = ref(false);
 const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////

@@ -4,18 +4,16 @@
             <legend class="flex justify-center">Send Dataset</legend>
         </template>
         <template v-slot:content>
-            <div class="">
-                <div class="flex flex-row justify-between">
-                    <div class="mt-2">
-                        <!-- Sending Snapshot: (self) -->
-                        <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
-                        <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default">{{sendName}}</label>
-                    </div>
-                    <div class="mt-2">
-                        <button id="test-ssh" class="mt-3 btn btn-secondary object-left justify-end h-fit" @click="showTestSSHModal()">Test Passwordless SSH</button>
-                    </div>
+            <div class="grid grid-cols-2 justify-between">
+                <div class="mt-2 col-span-1">
+                    <!-- Sending Snapshot: (self) -->
+                    <label :for="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Snapshot To Send:</label>
+                    <label :id="getIdKey('sending-dataset-name')" class="mt-1 block text-sm font-base leading-6 text-default" :class="truncateText" :title="sendName">{{sendName}}</label>
                 </div>
-                <div class="mt-2">
+                <div class="mt-2 col-span-1 justify-self-center">
+                    <button id="test-ssh" class="mt-3 btn btn-secondary h-fit" @click="showTestSSHModal()">Test Passwordless SSH</button>
+                </div>
+                <div class="mt-2 col-span-2">
                     <!-- Receiving Dataset: [User Supplied] -->
                     <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
                     <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="destinationName" placeholder="Destination Name Here"/>
@@ -23,23 +21,23 @@
                     <p v-if="invalidConfig" class="mt-1 text-sm text-muted"><i>{{ mostRecentDestSnapMsg }}</i></p>
                     <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ useForceOverwriteMsg }}</p>
                 </div>
-                <div class="mt-2">
+                <div class="mt-2 col-span-2">
                     <!-- Receiving Host: (Optional-> If Empty, then Local) -->
                     <label :for="getIdKey('receiving-host-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Host:</label>
                     <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="destinationHost" placeholder="(Leave empty if sending locally.)"/>
                 </div>
-                <div class="mt-2">
+                <div class="mt-2 col-span-2">
                     <!-- Host User -->
                     <label :for="getIdKey('receiving-host-user')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving User:</label>
                     <input @keydown.enter="" :id="getIdKey('receiving-host-user')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-user" v-model="destinationHostUser" placeholder="Destination Host User"/>
                 </div>
-                <div class="mt-2">
+                <div class="mt-2 col-span-2">
                     <!-- Receiving Port: [Default -> 22, User Can Change]-->
                     <label :for="getIdKey('receiving-port')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Port:</label>
                     <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
                 </div>
                 <!-- If Remote Send, have mBuffer size configurable -->
-                <div v-if="destinationHost != ''" class="mt-2 grid grid-cols-4 gap-2">
+                <div v-if="destinationHost != ''" class="mt-2 grid grid-cols-4 gap-2 col-span-2">
                     <div class="col-span-2 grid grid-cols-2 justify-items-center">
                         <label :for="getIdKey('mbuffer-size')" class="mt-1 text-sm font-medium leading-6 text-default w-full col-span-1">mBuffer Size:</label>
                         <input @keydown.enter="" :id="getIdKey('mbuffer-size')" type="number" class="input-textlike bg-default mt-1 w-full py-1.5 px-1.5 text-default col-span-1" name="mbuffer-size" v-model="mBufferSize"/>
@@ -55,7 +53,7 @@
                     </div>
                 </div>
               
-                <div class="mt-2 grid grid-flow-col">
+                <div class="mt-2 grid grid-flow-col col-span-2">
                     <!-- Send Compressed: [Checkbox -> (-Lce) options] *** Cannot be used if Encrypted -->
                     <label :for="getIdKey('send-compressed-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                         Send Compressed: 
@@ -72,7 +70,7 @@
                         <input :id="getIdKey('force-overwrite-toggle')" v-model="forceOverwrite" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
                     </label>
                 </div>
-                <div class="mt-2">
+                <div class="mt-2 col-span-2">
                     <p v-if="invalidFlags" class="mt-1 text-sm text-danger">{{ invalidFlagMsg }}</p>
                 </div>
             </div>
@@ -150,6 +148,7 @@ const snapSnips = ref<SnapSnippet[]>([]);
 const sendProgressData = ref<SendProgress[]>([]);
 const mBufferSize = ref(1);
 const mBufferUnit = ref('G');
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const showTestSSH = ref(false);
 

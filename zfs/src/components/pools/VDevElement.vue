@@ -8,12 +8,12 @@
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="p-1 mt-1 col-span-1 text-base overflow-hidden whitespace-nowrap text-ellipsis" :title="props.vDev.name">{{ props.vDev.name }}</div>
-					<div class="p-1 mt-1 col-span-1 font-semibold text-base overflow-hidden whitespace-nowrap text-ellipsis" :class="formatStatus(props.vDev.status)" :title="props.vDev.status">{{ props.vDev.status }}</div>
-					<div class="p-1 mt-1 col-span-1 text-base overflow-hidden whitespace-nowrap text-ellipsis " :title="upperCaseWord(props.vDev.type) + ' Device'">{{ upperCaseWord(props.vDev.type) }} Device</div>
-					<div class="p-1 mt-1 col-span-1 text-base overflow-hidden whitespace-nowrap text-ellipsis " :title="props.vDev.stats.read_errors + ' Read Errors'">{{ props.vDev.stats.read_errors }} Read Errors</div>
-					<div class="p-1 mt-1 col-span-1 text-base overflow-hidden whitespace-nowrap text-ellipsis " :title="props.vDev.stats.write_errors + ' Write Errors'">{{ props.vDev.stats.write_errors }} Write Errors</div>
-					<div class="p-1 mt-1 col-span-1 text-base overflow-hidden whitespace-nowrap text-ellipsis " :title="props.vDev.stats.checksum_errors + ' Checksum Errors'">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
+					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.name">{{ props.vDev.name }}</div>
+					<div class="p-1 mt-1 col-span-1 font-semibold text-base" :class="[formatStatus(props.vDev.status), truncateText]" :title="props.vDev.status">{{ props.vDev.status }}</div>
+					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="upperCaseWord(props.vDev.type) + ' Device'">{{ upperCaseWord(props.vDev.type) }} Device</div>
+					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.read_errors + ' Read Errors'">{{ props.vDev.stats.read_errors }} Read Errors</div>
+					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.write_errors + ' Write Errors'">{{ props.vDev.stats.write_errors }} Write Errors</div>
+					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.checksum_errors + ' Checksum Errors'">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
 					<div class="col-span-1 relative p-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
@@ -26,9 +26,9 @@
 							<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
 								<MenuItems class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">												
-										<MenuItem as="div" v-slot="{ active }">
+										<!-- <MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click.stop="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
-										</MenuItem>
+										</MenuItem> -->
 										<MenuItem v-if="vDevIdx != 0" as="div" v-slot="{ active }">
 											<a href="#" @click.stop="removeVDev(props.pool, props.pool.vdevs[vDevIdx])" :class="[active ? 'bg-danger text-white' : 'text-white', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
 										</MenuItem>
@@ -48,12 +48,12 @@
 								<!-- <th class="relative py-2 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 									<span class="sr-only"></span>
 								</th> -->
-								<th class="py-2 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" title="Disk">Disk</th>
-								<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="State">State</th>
-								<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Type">Type</th>
-								<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Temperature">Temperature</th>
-								<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Capacity">Capacity</th>
-								<th class="py-2 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" title="Message">Message</th>
+								<th class="py-2 col-span-2" :class="truncateText" title="Disk">Disk</th>
+								<th class="py-2 col-span-1" :class="truncateText" title="State">State</th>
+								<th class="py-2 col-span-1" :class="truncateText" title="Type">Type</th>
+								<th class="py-2 col-span-1" :class="truncateText" title="Temperature">Temperature</th>
+								<th class="py-2 col-span-1" :class="truncateText" title="Capacity">Capacity</th>
+								<th class="py-2 col-span-2" :class="truncateText" title="Message">Message</th>
 								<th class="relative py-2 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -94,6 +94,7 @@ interface VDevElementProps {
 }
 
 const props = defineProps<VDevElementProps>();
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const notifications = inject<Ref<any>>('notifications')!;
 

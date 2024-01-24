@@ -4,28 +4,30 @@
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
 		<template v-slot:content>
-			<div v-if="navTag == 'stats'" class="mt-6 grid grid-cols-4 text-default">
-				<div class="col-span-2">
-					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
-					:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
-					:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'"/>
-				</div>
-				
-				<div class="mt-2 col-span-2 col-start-3 row-start-1">
-					<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span class="text-success">{{ props.pool.status }}</span></p>
-					<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: None currently detected - {{ getTimestampString() }}</p>
-				</div>
-
-				<div class="mt-2 col-span-1 col-start-3 row-start-2">
-					<p :id="getIdKey('pool-size')" name="pool-size" class="text-base">Size: {{ props.pool.properties.size }}</p>
-					<p :id="getIdKey('pool-allocated')" name="pool-allocated" class="text-base">Used: {{ props.pool.properties.allocated }}</p>
-					<p :id="getIdKey('pool-free')" name="pool-free" class="text-base">Free: {{ props.pool.properties.free }}</p>
-				</div>
-				<div class="mt-2 col-span-1 col-start-4 row-start-2">
-					<p :id="getIdKey('pool-devices')" name="pool-devices" class="text-base">Devices: {{ getNumDevices }}</p>
-					<p :id="getIdKey('pool-disks')" name="pool-disks" class="text-base">Disks: {{  getNumDisks}}</p>
-					<!-- <p :id="getIdKey('pool-datasets')" name="pool-datasets" class="text-base">Datasets: X</p> -->
-				</div>
+			<div v-if="navTag == 'stats'">
+				<div class="mt-6 grid grid-cols-4 grid-rows-2 text-default justify-center justift-items-stretch">
+					<div class="col-span-4 row-start-1 w-full flex flex-row flex-stretch text-center items-center">
+						<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
+						:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
+						:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'"/>
+					</div>
+					<div class="mt-6 col-span-4 row-start-2 flex flex-row justify-between">
+						<div class="m-2">
+							<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span class="text-success">{{ props.pool.status }}</span></p>
+							<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: {{ props.pool.scan!.errors === 0 ? '0' : props.pool.scan!.errors }} @ {{ getTimestampString() }}</p>
+						</div>
+						<div class="m-2">
+							<p :id="getIdKey('pool-size')" name="pool-size" class="text-base">Size: {{ props.pool.properties.size }}</p>
+							<p :id="getIdKey('pool-allocated')" name="pool-allocated" class="text-base">Used: {{ props.pool.properties.allocated }}</p>
+							<p :id="getIdKey('pool-free')" name="pool-free" class="text-base">Free: {{ props.pool.properties.free }}</p>
+						</div>
+						<div class="m-2">
+							<p :id="getIdKey('pool-devices')" name="pool-devices" class="text-base">Devices: {{ getNumDevices }}</p>
+							<p :id="getIdKey('pool-disks')" name="pool-disks" class="text-base">Disks: {{  getNumDisks}}</p>
+							<!-- <p :id="getIdKey('pool-datasets')" name="pool-datasets" class="text-base">Datasets: X</p> -->
+						</div>
+					</div>
+				</div>	
 			</div>
 
 			<div v-if="navTag == 'topology'" class="mt-2 grid grid-cols-4 grid-flow-row">
@@ -45,7 +47,7 @@
 				</div>
 			</div>
 			
-			<div v-if="navTag == 'snapshots' && snapshotsLoaded" class="justify-center w-fit min-w-fit" >
+			<div v-if="navTag == 'snapshots' && snapshotsLoaded" class="w-full text-center min-w-fit" >
 				<!-- <SnapshotsList :pool="props.pool" :item="'pool'"/> -->
 				<component :is="snapshotListComponent" :pool="props.pool" :item="'pool'"/>
 			</div>
@@ -56,7 +58,7 @@
 			<div v-if="navTag == 'settings'">
 				<div class="grid grid-cols-4 gap-2">
 					<div class="mt-2 col-span-1 col-start-1 row-start-1">
-						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-default">Pool</p><p class="mt-1 py-1.5 overflow-hidden whitespace-nowrap text-ellipsis" :title="poolConfig.name">{{ poolConfig.name }}</p>
+						<p :id="getIdKey('settings-pool-name')" name="settings-pool-name" class="text-base text-default">Pool</p><p class="mt-1 py-1.5" :class="truncateText" :title="poolConfig.name">{{ poolConfig.name }}</p>
 					</div>
 					<div class="mt-2 col-span-1 col-start-2 row-start-1">
 						<p :id="getIdKey('settings-pool-readonly')" name="settings-pool-readonly" class="text-base text-default">Read Only</p><p class="mt-1 py-1.5">{{ upperCaseWord(isBoolOnOff(poolConfig.properties.readOnly)) }}</p>
@@ -266,6 +268,7 @@ interface PoolDetailsProps {
 }
 
 const props = defineProps<PoolDetailsProps>();
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const poolConfig = ref<PoolData>({
 	name: props.pool.name,

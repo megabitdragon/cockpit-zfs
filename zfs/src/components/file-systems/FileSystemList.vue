@@ -21,14 +21,14 @@
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="py-2 font-semibold text-default col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" title="Dataset">Dataset</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Available">Available</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Used">Used</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Refreservation">Refreservation</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Compression">Compression</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Encryption">Encryption</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Mounted">Mounted</th>
-								<th class="py-2 font-semibold text-default col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" title="Read Only">Read Only</th>
+								<th class="py-2 font-semibold text-default col-span-2" :class="truncateText" title="Dataset">Dataset</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Available">Available</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used">Used</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Refreservation">Refreservation</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Compression">Compression</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Encryption">Encryption</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Mounted">Mounted</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Read Only">Read Only</th>
 								<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -48,15 +48,15 @@
 															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 														/>
 													</div>
-													<div class="py-1 mt-1 col-span-2 justify-start overflow-hidden whitespace-nowrap text-ellipsis" :title="fileSystem.name">{{ fileSystem.name }}</div>
-													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="convertBytesToSize(fileSystem.properties.available)">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
-													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="fileSystem.properties.usedByDataset">{{ fileSystem.properties.usedByDataset }}</div>
-													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="fileSystem.properties.usedbyRefreservation">{{ fileSystem.properties.usedbyRefreservation }}</div>
-													<div v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(fileSystem.properties.compression)">{{ upperCaseWord(fileSystem.properties.compression) }}</div>
-													<div v-else class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(fileSystem.properties.compression).toUpperCase()">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
-													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(isBoolOnOff(fileSystem.encrypted))">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
-													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(fileSystem.properties.mounted)">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
-													<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="upperCaseWord(fileSystem.properties.readOnly)">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
+													<div class="py-1 mt-1 col-span-2 justify-start" :class="truncateText" :title="fileSystem.name">{{ fileSystem.name }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="convertBytesToSize(fileSystem.properties.available)">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="fileSystem.properties.usedByDataset">{{ fileSystem.properties.usedByDataset }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="fileSystem.properties.usedbyRefreservation">{{ fileSystem.properties.usedbyRefreservation }}</div>
+													<div v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.compression)">{{ upperCaseWord(fileSystem.properties.compression) }}</div>
+													<div v-else class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.compression).toUpperCase()">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(isBoolOnOff(fileSystem.encrypted))">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.mounted)">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.readOnly)">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
 
 													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 														<Menu as="div" class="relative inline-block text-right -mt-1">
@@ -73,7 +73,6 @@
 																		<MenuItem as="div" v-slot="{ active }">
 																			<a href="#" @click.stop="loadFileSystemConfig(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
 																		</MenuItem>
-																	
 																		<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																			<a href="#" @click.stop="renameThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 																		</MenuItem>
@@ -91,10 +90,12 @@
 																		</MenuItem>
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
 																			<a href="#" @click.stop="handleFileSystemEncryption(fileSystems[fsIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
-																		</MenuItem>													
-																		<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
+																		</MenuItem>					
+
+																		<!-- <MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
 																			<a href="#" @click.stop="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
-																		</MenuItem>
+																		</MenuItem> -->
+																		
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
 																			<a href="#" @click.stop="changeThisPassphrase(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 																		</MenuItem>
@@ -187,6 +188,7 @@ import LoadingSpinner from "../common/LoadingSpinner.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
 
 const notifications = inject<Ref<any>>('notifications')!;
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////

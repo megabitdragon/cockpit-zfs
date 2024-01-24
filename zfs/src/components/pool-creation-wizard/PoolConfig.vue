@@ -51,7 +51,7 @@
 							<label :for="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" class="flex flex-col w-full py-4 px-2 text-sm gap-0.5">
 								<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)" v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
 								class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
-								<p class="truncate text-sm font-medium text-default overflow-hidden whitespace-nowrap text-ellipsis" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk.name)">{{ truncateName(getDiskIDName(disks, vDev.diskIdentifier!, disk.name), 8) }}</p>
+								<p class="truncate text-sm font-medium text-default" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk.name)">{{ truncateName(getDiskIDName(disks, vDev.diskIdentifier!, disk.name), 8) }}</p>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
 							</label>
@@ -313,6 +313,7 @@ interface PoolConfigProps {
 }
 
 const props = defineProps<PoolConfigProps>();
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
 const allPools = inject<Ref<PoolData[]>>('pools')!;

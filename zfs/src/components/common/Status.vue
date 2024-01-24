@@ -40,7 +40,7 @@
                             <div v-if="disk.stats.trim_notsup !== 1" class="col-span-4">
                                 <div v-if="isTrimActive || isTrimSuspended || isTrimFinished || isTrimCanceled" class="col-span-4">
                                     <div class="grid grid-cols-4 justify-items-center w-full whitespace-nowrap text-ellipsis">
-                                        <span class="col-span-4 font-semibold overflow-hidden whitespace-nowrap text-ellipsis" :class="trimMessageClass(disk)">
+                                        <span class="col-span-4 font-semibold" :class="[trimMessageClass(disk), truncateText]">
                                         {{ trimMessage(disk) }}
                                         </span>
                                         <span class="col-span-4" :class="trimMessageClass(disk)" :title="disk.name">
@@ -68,7 +68,7 @@
                             </div>
                             <div v-if="disk.stats.trim_notsup == 1" class="col-span-4">
                                 <div class="">
-                                    <span class="text-default col-span-4 overflow-hidden whitespace-nowrap text-ellipsis" :title="disk.name">
+                                    <span class="text-default col-span-4" :class="truncateText" :title="disk.name">
                                         Trim not supported on this disk <br/>Disk: {{ disk.name }}.
                                     </span>
                                     <div class="col-span-4 grid grid-cols-4 justify-items-center">
@@ -103,7 +103,7 @@
             <div v-if="isPoolList">
                 <div class="grid grid-cols-2 gap-1 justify-center items-center">
                     <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-2">
-                        <span :class="stateMessageClass()" class="font-semibold text-sm overflow-hidden whitespace-nowrap text-ellipsis" :title="miniStateMsg">
+                        <span :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm" :title="miniStateMsg">
                             {{ miniStateMsg }}
                         </span>
                         <div class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
@@ -114,7 +114,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-2 overflow-hidden whitespace-nowrap text-ellipsis">
+                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-2" :class="truncateText">
                         <span :class="stateMessageClass()">
                             {{ miniStateMsg }}
                         </span>
@@ -125,10 +125,10 @@
         <div v-if="isDisk">
             <div v-if="selectedDisk!" class="grid grid-cols-2 gap-1 justify-center items-center">
                 <div v-if="selectedDisk!.stats.trim_notsup === 0" class="col-span-2 flex flex-col items-center justify-center">
-                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" :class="trimMessageClass(selectedDisk!)" class="font-semibold text-sm overflow-hidden whitespace-nowrap text-ellipsis">
+                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" :class="[trimMessageClass(selectedDisk!), truncateText]" class="font-semibold text-sm">
                         Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
                     </span>
-                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) == 'none'" :class="trimMessageClass(selectedDisk!)" class="font-semibold text-sm overflow-hidden whitespace-nowrap text-ellipsis">
+                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) == 'none'" :class="[trimMessageClass(selectedDisk!), truncateText]" class="font-semibold text-sm">
                         No Trim Activity
                     </span>
                     <div class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
@@ -141,13 +141,13 @@
                  
                 </div>
                 <div v-if="selectedDisk!.stats.trim_notsup === 1" class="col-span-2 flex items-center justify-center mt-2">
-                    <span class="text-muted overflow-hidden whitespace-nowrap text-ellipsis">
+                    <span class="text-muted" :class="truncateText">
                         Trim not suppported.
                     </span>
                 </div>    
             </div>
             <div v-if="!selectedDisk" class="col-span-2 flex items-center justify-center mt-2">
-                <span class="text-muted overflow-hidden whitespace-nowrap text-ellipsis">
+                <span class="text-muted" :class="truncateText">
                     Disk replacing in progress...
                 </span>
             </div>
@@ -170,6 +170,7 @@ interface StatusProps {
 
 const props = defineProps<StatusProps>();
 const poolID = ref(props.pool.name);
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////

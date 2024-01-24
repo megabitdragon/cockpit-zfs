@@ -1,7 +1,7 @@
 <template>
     <Modal :isOpen="showRenameModal" @close="showRenameModal = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         <template v-slot:title>
-            <legend class="flex justify-center">Rename {{props.filesystem.name}}</legend>
+            <legend class="flex justify-center">Rename File System</legend>
         </template>
         <template v-slot:content>
             <div>
@@ -9,20 +9,20 @@
                     <!-- Parent File System -->
                     <div class="mt-2">
                         <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-                        <select v-model="parentFS" :id="getIdKey('parent-filesystem')" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
-                            <option v-for="dataset, datasetIdx in datasetsInSamePool" :key="datasetIdx">{{ dataset.name }}</option>
+                        <select v-model="parentFS" :id="getIdKey('parent-filesystem')" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6" :class="truncateText">
+                            <option v-for="dataset, datasetIdx in datasetsInSamePool" :class="truncateText" :title="dataset.name" :key="datasetIdx">{{ dataset.name }}</option>
                         </select>
                     </div>
 
                     <!-- New Name -->
                     <div class="mt-2">
                         <label :for="getIdKey('new-name')" class="mt-1 block text-sm font-medium leading-6 text-default">New Name</label>
-                        <input :id="getIdKey('new-name')" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" :placeholder="`${ props.filesystem.name}`" />
+                        <input :id="getIdKey('new-name')" type="text" v-model="newName" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default placeholder:text-muted sm:text-sm sm:leading-6" placeholder="New Name" />
                     </div>
                   
                      <!-- Force Unmount -->
                      <div class="mt-2">
-                        <div class="flex flex-row">
+                        <div class="flex flex-row justify-between">
                             <label :for="getIdKey('force-unmount-filesystem')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully Unmount File System</label>
                             <Switch v-model="forceUnmount" :id="getIdKey('force-unmount-filesystem')" :class="[forceUnmount! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                 <span class="sr-only">Use setting</span>
@@ -43,7 +43,7 @@
                     </div>
                     <!-- Create non-existent parent file systems -->
                     <div class="mt-2">
-                        <div class="flex flex-row">
+                        <div class="flex flex-row justify-between">
                             <label :for="getIdKey('create-parent-filesystems')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Create Non-Existent Parent File Systems</label>
                             <Switch v-model="createNonExistParent" :id="getIdKey('create-parent-filesystems')" :class="[createNonExistParent! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                 <span class="sr-only">Use setting</span>
@@ -104,7 +104,7 @@ const props = defineProps<RenameFileSystemProps>();
 const showRenameModal = inject<Ref<boolean>>('show-rename-modal')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
-
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const renaming = inject<Ref<boolean>>('renaming')!;
 const confirmRename = inject<Ref<boolean>>('confirm-rename')!;
 const nameFeedback = ref('');

@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-row justify-between items-center flex-wrap max-w-sm px-10 bg-default rounded-2xl h-20">
+    <div class="flex flex-row justify-between items-center max-w-full px-4 bg-default rounded-2xl h-20">
         <div class="flex items-center justify-center overflow-visible bg-default rounded-full">
             <svg class="w-32 h-32 transform translate-x-1 translate-y-1" aria-hidden="true">
                 <circle :id="getIdKey('circle-empty')" class="text-gray-300 dark:text-gray-500" :stroke-width="props.strokeWidth" stroke="currentColor" fill="transparent" :r="props.radius" :cx="props.coordX" :cy="props.coordY" />
@@ -7,8 +7,8 @@
             </svg>
             <span :class="['absolute', props.percentFontSize, props.fillColor]">{{props.percentage}}%</span>
         </div>
-        <div class="flex flex-col">
-            <p class="font-medium text-default sm:text-xl overflow-hidden whitespace-nowrap text-ellipsis" :title="props.name">{{ truncateName(props.name!, 12 )}}</p>
+        <div class="flex flex-col justify-self-end">
+            <p class="font-medium text-default sm:text-xl" :class="truncateText" :title="props.name">{{ props.name!}}</p>
             <span class="ml-auto text-xl font-medium hidden sm:block" :class="props.fillColor">{{ props.totalSize }}</span>
         </div>
      
@@ -16,8 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed} from 'vue';
-import { truncateName } from '../../composables/helpers';
+import { inject, Ref, computed } from 'vue';
 
 interface PoolCapacity {
     id: string;
@@ -33,6 +32,8 @@ interface PoolCapacity {
 }
 
 const props = defineProps<PoolCapacity>();
+
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const circumference = computed(() => {
     const radius = props.radius;

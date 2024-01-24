@@ -11,11 +11,11 @@
 						<!-- <th class="relative py-2 rounded-tl-md col-span-1">
 							<span class="sr-only"></span>
 						</th> -->
-						<th class="py-2 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Snapshot">Snapshot</th>
-						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Created On">Created On</th>
-						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Used">Used</th>
-						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Referenced">Referenced</th>
-						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Clones">Clones</th>
+						<th class="py-2 col-span-2 text-center" :class="truncateText" title="Snapshot">Snapshot</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Created On">Created On</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Used">Used</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Referenced">Referenced</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Clones">Clones</th>
 						<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 							<span class="sr-only"></span>
 						</th>
@@ -32,19 +32,19 @@
 						<!-- <td class="relative py-2 col-span-1">
 							<span class="sr-only"></span>
 						</td> -->
-						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.name"> 
+						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2" :class="truncateText" :title="snapshot.name"> 
 							{{ snapshot.name }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.creation.parsed">
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.creation.parsed">
 							{{ snapshot.properties.creation.parsed }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.used.value">
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.used.value">
 							{{ snapshot.properties.used.value }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.referenced.value">
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.referenced.value">
 							{{ snapshot.properties.referenced.value }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.clones">
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.clones">
 							{{ snapshot.properties.clones.length > 0 ? snapshot.properties.clones : '-' }}
 						</td>
 						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
@@ -69,10 +69,10 @@
 												<a href="#" @click.stop="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+												<a href="#" @click.stop="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+												<a href="#" @click.stop="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
 											</MenuItem>
 										</div>
 									</MenuItems>
@@ -92,11 +92,11 @@
 						<!-- <th class="relative py-2 rounded-tl-md col-span-1">
 							<span class="sr-only"></span>
 						</th> -->
-						<th class="py-2 col-span-2 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Snapshot">Snapshot</th>
-						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Created On">Created On</th>
-						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Used">Used</th>
-						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Referenced">Referenced</th>
-						<th class="py-2 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis text-center" title="Clones">Clones</th>
+						<th class="py-2 col-span-2 text-center" :class="truncateText" title="Snapshot">Snapshot</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Created On">Created On</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Used">Used</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Referenced">Referenced</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Clones">Clones</th>
 						<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 							<span class="sr-only"></span>
 						</th>
@@ -113,19 +113,19 @@
 						<!-- <td class="relative py-2 col-span-1">
 							<span class="sr-only"></span>
 						</td> -->
-						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.name"> 
+						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2" :class="truncateText" :title="snapshot.name"> 
 							{{ snapshot.name }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.creation.parsed">
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.creation.parsed">
 							{{ snapshot.properties.creation.parsed }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.used.value">
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.used.value">
 							{{ snapshot.properties.used.value }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.referenced.value">
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.referenced.value">
 							{{ snapshot.properties.referenced.value }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="snapshot.properties.clones">
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.clones">
 							{{ snapshot.properties.clones.length > 0 ? snapshot.properties.clones : '-' }}
 						</td>
 						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
@@ -205,6 +205,7 @@ interface SnapshotsListProps {
 }
 
 const props = defineProps<SnapshotsListProps>();
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 ////////////////// Loading Data /////////////////////
 /////////////////////////////////////////////////////

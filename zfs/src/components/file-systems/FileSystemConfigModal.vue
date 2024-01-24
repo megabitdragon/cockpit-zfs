@@ -8,7 +8,7 @@
                 <div class="grid grid-cols-4 gap-2">
                     <div class="mt-2 ">
                         <label :for="getIdKey('fs-config-name')" name="fs-config-name" class="mt-1 block text-sm leading-6 text-default">File System Name</label>
-                        <p>{{ props.filesystem.name }}</p>
+                        <p :class="truncateText" :title="props.filesystem.name">{{ props.filesystem.name }}</p>
                     </div>
                     <div class="mt-2">
                         <label :for="getIdKey('fs-config-guid')" name="fs-config-guid" class="mt-1 block text-sm leading-6 text-default">GUID</label>
@@ -247,7 +247,7 @@ interface FileSystemConfigModalProps {
 }
 
 const props = defineProps<FileSystemConfigModalProps>();
-
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const showFSConfig = inject<Ref<boolean>>('show-fs-config')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 

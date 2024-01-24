@@ -8,8 +8,8 @@
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="py-1 mt-1 col-span-1 justify-start overflow-hidden whitespace-nowrap text-ellipsis" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name}}</div>
-					<div class="py-1 mt-1 col-span-1 font-semibold overflow-hidden whitespace-nowrap text-ellipsis" :class="formatStatus(poolData[props.poolIdx].status)"  :title="poolData[props.poolIdx].status">{{ poolData[props.poolIdx].status }}</div>
+					<div class="py-1 mt-1 col-span-1 justify-start" :class="truncateText" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name}}</div>
+					<div class="py-1 mt-1 col-span-1 font-semibold" :class="[formatStatus(poolData[props.poolIdx].status), truncateText]"  :title="poolData[props.poolIdx].status">{{ poolData[props.poolIdx].status }}</div>
 					<div class="py-1 mt-1 col-span-1">
 						<div class="w-full bg-well rounded-full text-center" :title="poolData[props.poolIdx].properties.capacity + '%'">
 							<div v-if="poolData[props.poolIdx].properties.capacity! < 1" class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex">
@@ -26,9 +26,9 @@
 							</div>
 						</div>
 					</div>
-					<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="poolData[props.poolIdx].properties.allocated">{{ poolData[props.poolIdx].properties.allocated }}</div>
-					<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="poolData[props.poolIdx].properties.free">{{ poolData[props.poolIdx].properties.free }}</div>
-					<div class="py-1 mt-1 col-span-1 overflow-hidden whitespace-nowrap text-ellipsis" :title="poolData[props.poolIdx].properties.size">{{ poolData[props.poolIdx].properties.size }}</div>
+					<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="poolData[props.poolIdx].properties.allocated">{{ poolData[props.poolIdx].properties.allocated }}</div>
+					<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="poolData[props.poolIdx].properties.free">{{ poolData[props.poolIdx].properties.free }}</div>
+					<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="poolData[props.poolIdx].properties.size">{{ poolData[props.poolIdx].properties.size }}</div>
 					<div class="py-1 -mt-1 col-span-2">
 						<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
 					</div>
@@ -47,9 +47,9 @@
 										<MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click.stop="showPoolModal(poolData[props.poolIdx])!" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
 										</MenuItem>
-										<MenuItem as="div" v-slot="{ active }">
+										<!-- <MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click.stop="clearPoolErrors(poolData[props.poolIdx].name)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
-										</MenuItem>
+										</MenuItem> -->
 										<MenuItem as="div" v-slot="{ active }">
 											<a v-if="!scanActivity!.isActive" href="#" @click.stop="resilverThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver Pool</a>
 										</MenuItem>
@@ -155,6 +155,7 @@ interface PoolListElementProps {
 }
 
 const props = defineProps<PoolListElementProps>();
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const notifications = inject<Ref<any>>('notifications')!;
 

@@ -11,29 +11,20 @@
             <legend class="flex justify-center">{{ upperCaseWord(props.operation) }} {{ upperCaseWord(props.item) }}</legend>
         </template>
         <template v-slot:content>
-            <div class="grid grid-flow-row mt-3 justify-items-center">
-                <p v-if="!operation2" class="text-default row-start-1">Are you sure you wish to {{props.operation}} <b>{{ props[props.item].name }}</b>?</p>
-                <p v-if="operation2" class="text-default row-start-1">Are you sure you wish to {{props.operation}} {{props.operation2!}} on <b>{{ props[props.item].name }}</b>?</p>
+            <div class="grid grid-flow-row mt-3 text-center">
+                <p v-if="!operation2" class="text-default row-start-1" :class="truncateText" :title="props[props.item].name">Are you sure you wish to {{props.operation}} <b :class="truncateText" :title="props[props.item].name">{{ props[props.item].name }}</b>?</p>
+                <p v-if="operation2" class="text-default row-start-1" :class="truncateText" :title="props[props.item].name">Are you sure you wish to {{props.operation}} {{props.operation2!}} on <b :class="truncateText" :title="props[props.item].name">{{ props[props.item].name }}</b>?</p>
 
                 <div v-if="props.operation == 'destroy' && props.hasChildren!">
-
-                    <div v-if="props.item == 'pool'">
-                        <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center gap-0.5">
-                            <p class="text-danger font-medium row-start-1 mt-3">WARNING!!!</p>
-                            <p class="text-default row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> <span class="text-danger">has children.</span></p>
-                            <p class="text-default row-start-3">If you wish to {{ props.operation }}, use <span class="text-danger">{{upperCaseWord(option1)}}</span>.</p>
-                        </div>
-                    </div>
-
                     <div v-if="props.item == 'filesystem'" class="w-full">
-                        <div class="font-medium text-sm grid grid-flow-row justify-items-center justify-center gap-0.5">
+                        <div class="font-medium text-sm grid grid-flow-row justify-items-center justify-center">
                             <p class="justify-self-center text-danger font-medium mt-3">WARNING!!!</p>
-                            <p class="justify-self-center text-default">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> <span class="text-danger">has children.</span></p>
+                            <p class="justify-self-center text-default">This {{ props.item }} <span class="text-danger">has children.</span></p>
                             <p class="justify-self-center grid grid-flow-row justify-center justify-items-center text-default w-full">If you wish to destroy, use either <br/><span class="text-danger">Destroy all children</span> or <br/><span class="text-danger">Destroy all dependents.</span></p>            
                         </div>
 
-                        <div class="grid grid-rows-2 justify-center mt-1">
-                            <div class="flex flex-row">
+                        <div class="grid grid-rows-2">
+                            <div class="flex flex-row justify-between">
                                 <label :for="getIdKey('destroy-children')" class="mt-2 mr-2 block text-sm font-medium text-default">Destroy all children</label>
                                 <Switch v-model="destroyChildrenToggle" :id="getIdKey('destroy-children')" :class="[destroyChildrenToggle ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                     <span class="sr-only">Use setting</span>
@@ -52,7 +43,7 @@
                                 </Switch>
                             </div>
                         
-                            <div class="flex flex-row">
+                            <div class="flex flex-row justify-between">
                                 <label :for="getIdKey('destroy-dependents')" class="mt-2 mr-2 block text-sm font-medium text-default">Destroy all dependents (children + clones)</label>
                                 <Switch v-model="destroyAllDependentsToggle" :id="getIdKey('destroy-dependents')" :class="[destroyAllDependentsToggle ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                     <span class="sr-only">Use setting</span>
@@ -77,8 +68,8 @@
                     <div v-if="props.item == 'snapshot'">
                         <div class="text-danger font-medium grid grid-rows-3 row-span-3 row-start-2 justify-items-center gap-0.5">
                             <p class="text-danger font-medium row-start-1 mt-3">WARNING!!!</p>
-                            <p class="text-danger row-start-2">{{ upperCaseWord(props.item) }} <b>{{ props[props.item]!.name }}</b> has dependent clones.</p>
-                            <p class="text-default row-start-3">If you wish to {{ props.operation }}, use <span class="text-danger">{{upperCaseWord(option2)}}</span>.</p>
+                            <p class="text-danger row-start-2">This {{ props.item }} has dependent clones.</p>
+                            <p class="text-default row-start-3">If you wish to {{ props.operation }}, use <br/><span class="text-danger">{{upperCaseWord(option2)}}</span>.</p>
                         </div>
                     </div>
 
@@ -89,7 +80,7 @@
                 </div>
                 
                 <div v-if="props.firstOption" class="flex flex-row justify-between mt-1">
-                    <label :for="getIdKey('option-one')" class="mt-1 mr-2 block text-sm font-medium text-default">{{upperCaseWord(option1)}}</label>
+                    <label :for="getIdKey('option-one')" class="mt-1.5 mr-2 block text-sm font-medium text-default">{{upperCaseWord(option1)}}</label>
                     <Switch v-model="option1Toggle" :id="getIdKey('option-one')" :class="[option1Toggle ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                         <span class="sr-only">Use setting</span>
                         <span :class="[option1Toggle ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -108,7 +99,7 @@
                 </div>
 
                 <div v-if="props.secondOption" class="flex flex-row justify-between mt-1">
-                    <label :for="getIdKey('option-two')" class="mt-1 mr-2 block text-sm font-medium leading-6 text-default">{{upperCaseWord(option2)}}</label>
+                    <label :for="getIdKey('option-two')" class="mt-1.5 mr-2 block text-sm font-medium leading-6 text-default">{{upperCaseWord(option2)}}</label>
                     <Switch v-model="option2Toggle" :id="getIdKey('option-two')" :class="[option2Toggle! ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                         <span class="sr-only">Use setting</span>
                         <span :class="[option2Toggle! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -193,8 +184,11 @@ const updateShowFlag = () => {
 }
 
 const closeModal = () => {
+    // updateShowFlag(); 
     emit('close');
 }
+
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 //options: force (mount, unmount, destroy, replace, offline), secureTRIM, expand device
 const option1 = props.firstOption;

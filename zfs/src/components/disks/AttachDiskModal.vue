@@ -25,7 +25,7 @@
                             <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisk" type="radio" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
-                                <h3 class="truncate text-sm font-medium text-default overflow-hidden whitespace-nowrap text-ellipsis">{{truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
+                                <h3 class="truncate text-sm font-medium text-default">{{truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
@@ -102,6 +102,7 @@ interface AttachDiskModalProps {
 
 const props = defineProps<AttachDiskModalProps>();
 const showFlag = ref(props.showFlag);
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const updateShowFlag = () => {
     if (props.showFlag !== showFlag.value) {
