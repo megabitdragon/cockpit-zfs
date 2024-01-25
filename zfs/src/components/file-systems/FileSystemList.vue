@@ -16,8 +16,8 @@
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
-							<tr class="bg-well rounded-t-md grid grid-cols-11">
-
+							<!-- <tr class="bg-well rounded-t-md grid grid-cols-12"> -->
+								<tr class="bg-well rounded-t-md grid grid-cols-11">
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -26,6 +26,7 @@
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used">Used</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Refreservation">Refreservation</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Compression">Compression</th>
+								<!-- <th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Deduplication">Deduplication</th> -->
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Encryption">Encryption</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Mounted">Mounted</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Read Only">Read Only</th>
@@ -42,6 +43,7 @@
 									<div v-for="fileSystem, fsIdx in fileSystems">
 										<div class="border border-default">
 											<Disclosure v-slot="{ open }">
+												<!-- <DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full justify-center text-center"> -->
 												<DisclosureButton class="bg-default grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
 													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="fileSystem.name">
 														<ChevronUpIcon
@@ -54,6 +56,7 @@
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="fileSystem.properties.usedbyRefreservation">{{ fileSystem.properties.usedbyRefreservation }}</div>
 													<div v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.compression)">{{ upperCaseWord(fileSystem.properties.compression) }}</div>
 													<div v-else class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.compression).toUpperCase()">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
+													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.deduplication)">{{ upperCaseWord(fileSystem.properties.deduplication) }}</div> -->
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(isBoolOnOff(fileSystem.encrypted))">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.mounted)">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.readOnly)">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>

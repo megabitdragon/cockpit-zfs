@@ -1,6 +1,6 @@
 <template>
     <div>
-		<div class="border border-default">
+		<div class="">
 			<Disclosure v-slot="{ open }" :defaultOpen="true">
 				<DisclosureButton class="grid grid-cols-8 grid-flow-cols w-full text-center bg-primary text-sm text-white">
 					<div class="p-1 mt-1 col-span-1 flex flex-row justify-center text-center">
@@ -42,7 +42,7 @@
 					</div>
 				</DisclosureButton>
 				<DisclosurePanel>
-					<table class="min-w-full bg-secondary text-default border border-collapse border-default">
+					<table class="min-w-full bg-secondary text-default">
 						<thead>
 							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-9 font-semibold text-white">
 								<!-- <th class="relative py-2 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
@@ -60,7 +60,7 @@
 							</tr>
 						</thead>
 					</table>
-					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx" class="border border-collapse border-default">
+					<div v-for="disk, diskIdx in props.vDev.disks" :key="diskIdx" class="">
 						<DiskElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="props.vDev" :vDevIdx="props.vDevIdx" :disk="disk" :diskIdx="diskIdx" ref="diskElement"/>
 					</div>
 				</DisclosurePanel>

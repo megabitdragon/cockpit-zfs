@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="border-b border-t border-collapse border-default">
         <div class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default ">
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>

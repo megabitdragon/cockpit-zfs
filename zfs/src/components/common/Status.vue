@@ -107,7 +107,8 @@
                             {{ miniStateMsg }}
                         </span>
                         <div class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
-                            <div :class="progressBarClass()" class="h-3 min-h-min max-h-max" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                            <div :class="progressBarClass()" class="h-3 min-h-min max-h-max" :style="{ width: `${ parseFloat(scanPercentage.toFixed(2)) }%` }">
+                                <!-- <div :class="progressBarClass()" class="h-3 min-h-min max-h-max" :style="{ width: `${scanObjectGroup[props.pool.name].state === 'FINISHED' &&  parseFloat(scanPercentage.toFixed(2)) < 1 ? 100 : parseFloat(scanPercentage.toFixed(2))} %` }"> -->
                                 <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                     {{ amountProcessed }}/{{ amountTotal }} 
                                 </div>
@@ -405,6 +406,8 @@ function progressBarClass() {
     } else {
         return 'bg-orange-600';
     }
+
+    // ${scanObjectGroup[props.pool.name].state === 'FINISHED' &&  parseFloat(scanPercentage.toFixed(2)) < 1 ? parseFloat(scanPercentage.toFixed(2)) : 100}
 }
 
 //////////// Checking Disk Stats (Trim) /////////////

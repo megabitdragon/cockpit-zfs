@@ -185,6 +185,8 @@ const updateShowFlag = () => {
 
 const closeModal = () => {
     // updateShowFlag(); 
+    option1Toggle.value = false;
+    option2Toggle.value = false;
     emit('close');
 }
 
