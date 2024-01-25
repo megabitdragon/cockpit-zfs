@@ -2,8 +2,8 @@
 	<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 overflow-visible card bg-default">
 		<template v-slot:title>
 			<div class="flex flex-row justify-between gap-1">
-				<div class="pr-2 text-default text-medium">
-					{{ props.disk.name }} ({{ props.disk.type }})
+				<div class="pr-2 text-default text-medium" :class="truncateText" :title="props.disk.name">
+					{{ props.disk.name }}
 				</div>
 				<div class="px-1">
 					<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
@@ -49,6 +49,7 @@
 					<!-- alias, name, model/serial, temp, status -->	
 		<template v-slot:content>
 		<div>
+			<p>({{ props.disk.type }})</p>
 			<span class="text-success">{{ props.disk.health }}</span>
 		</div>
 		<div>
@@ -75,12 +76,14 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon } from '@heroicons/vue/24/outline';
+import {inject, Ref} from 'vue';
 import Card from '../common/Card.vue';
 
 interface PoolDetailDiskCardProps {
 	disk: DiskData;
 }
 
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 // const usedSpaceAmount = computed(() => {
 //   const total = props.totalSize * (props.spaceUsed / 100);
 //   return total;

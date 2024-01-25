@@ -1,30 +1,27 @@
 <template>
-	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
+	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
 		<template v-slot:content>
 			<div v-if="navTag == 'stats'">
-				<div class="mt-6 grid grid-cols-4 grid-rows-2 text-default justify-center justift-items-stretch">
-					<div class="col-span-4 row-start-1 w-full flex flex-row flex-stretch text-center items-center">
+				<div class="mt-6 grid grid-cols-3 grid-rows-2 text-default">
 						<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
 						:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
-						:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'"/>
-					</div>
-					<div class="mt-6 col-span-4 row-start-2 flex flex-row justify-between">
-						<div class="m-2">
+						:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'" class="w-full col-span-3"/>
+					<div class="mt-6 px-8 col-span-3 row-start-2 grid grid-cols-3 justify-items-center min-w-fit max-w-fit">
+						<div class="m-2 col-span-1">
 							<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span class="text-success">{{ props.pool.status }}</span></p>
-							<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: {{ props.pool.scan!.errors === 0 ? '0' : props.pool.scan!.errors }} @ {{ getTimestampString() }}</p>
+							<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: {{ props.pool.scan && props.pool.scan.errors ? props.pool.scan.errors : '0' }} <br/>@ {{ getTimestampString() }}</p>
 						</div>
-						<div class="m-2">
-							<p :id="getIdKey('pool-size')" name="pool-size" class="text-base">Size: {{ props.pool.properties.size }}</p>
+						<div class="m-2 col-span-1">
+							<p :id="getIdKey('pool-devices')" name="pool-devices" class="text-base">Devices: {{ getNumDevices }}</p>
+							<p :id="getIdKey('pool-disks')" name="pool-disks" class="text-base">Disks: {{ getNumDisks }}</p>
+						</div>
+						<div class="m-2 col-span-1">
 							<p :id="getIdKey('pool-allocated')" name="pool-allocated" class="text-base">Used: {{ props.pool.properties.allocated }}</p>
 							<p :id="getIdKey('pool-free')" name="pool-free" class="text-base">Free: {{ props.pool.properties.free }}</p>
-						</div>
-						<div class="m-2">
-							<p :id="getIdKey('pool-devices')" name="pool-devices" class="text-base">Devices: {{ getNumDevices }}</p>
-							<p :id="getIdKey('pool-disks')" name="pool-disks" class="text-base">Disks: {{  getNumDisks}}</p>
-							<!-- <p :id="getIdKey('pool-datasets')" name="pool-datasets" class="text-base">Datasets: X</p> -->
+							<p :id="getIdKey('pool-size')" name="pool-size" class="text-base">Total: {{ props.pool.properties.size }}</p>
 						</div>
 					</div>
 				</div>	
