@@ -65,7 +65,7 @@
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg" :title="getDiskIDName(allDisks, diskIdentifier, disk.name)"
                         :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
-                                <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisks" type="radio" :value="`${disk.name}`" :name="`disk-${disk.name}`"
+                                <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`"
                                 class="w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>
                                 <h3 class="truncate text-sm font-medium text-default">{{truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed } from 'vue';
+import { ref, inject, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
@@ -182,6 +182,9 @@ const availableDisks = computed<DiskData[]>(() => {
     return allDisks.value.filter(disk => disk.guid === "");
 });
 
+watch(selectedDisks, (newVal, oldVal) => {
+    console.log('selectedDisks:', selectedDisks.value);
+});
 
 //change color of disk when selected
 const diskCardClass = (diskName) => {
