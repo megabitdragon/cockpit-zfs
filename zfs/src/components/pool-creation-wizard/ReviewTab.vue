@@ -4,10 +4,10 @@
 			<legend v-if="!creatingPool && !poolCreated" class="mb-1 text-base font-semibold leading-6 text-default">Review Configuration</legend>
 
 			<div v-if="!creatingPool && !poolCreated" class="">
-				<Card :bgColor="'bg-accent'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">
+				<Card :bgColor="'bg-accent'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 truncate rounded-lg border border-default text-default">
 					<template v-slot:title>
 						<div>
-							<p class="text-md">Pool Name: <b>{{ poolConfig.name }}</b></p>	
+							<p class="text-md" :class="truncateText" :title="poolConfig.name">Pool Name: <b :class="truncateText" :title="poolConfig.name">{{ poolConfig.name }}</b></p>	
 						</div>
 					</template>
 					<template v-slot:content>
@@ -53,7 +53,7 @@
 									</div>
 								</DisclosureButton>
 								<DisclosurePanel>
-									<Card v-for="vDev, vDevIdx in poolConfig.vdevs" :key="vDevIdx" :bgColor="'bg-default'" :titleSection="true" :contentSection="false" :footerSection="true" class="rounded-lg text-default">
+									<Card v-for="vDev, vDevIdx in poolConfig.vdevs" :key="vDevIdx" :bgColor="'bg-default'" :titleSection="true" :contentSection="false" :footerSection="true" class="truncate rounded-lg text-default">
 										<template v-slot:title>
 											<div class="">
 												<p>Type: <b>{{ upperCaseWord(vDev.type) }}</b></p>
@@ -65,7 +65,7 @@
 												<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
 													<template v-slot:title>
 														<div>
-															<b>{{ getDiskIDName(disks, vDev.diskIdentifier!, disk) }}</b>
+															<b :class="truncateText" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk)">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk) }}</b>
 														</div>
 													</template>
 												</Card>
@@ -81,10 +81,10 @@
 			</div>
 			
 			<div v-if="poolConfig.createFileSystem! && !creatingFilesystem && !filesystemCreated" class="">
-				<Card :bgColor="'bg-accent'" :titleSection="true" :contentSection="false" :footerSection="true" class="mt-2 mb-4 min-w-fit overflow-visible rounded-lg border border-default text-default">
+				<Card :bgColor="'bg-accent'" :titleSection="true" :contentSection="false" :footerSection="true" class="mt-2 mb-4 truncate rounded-lg border border-default text-default" :class="truncateText" :title="fileSystemData.name">
 					<template v-slot:title>
 						<div class="rounded-lg">						
-							<p>File System Name: <b>{{ fileSystemData.name }}</b></p>
+							<p :class="truncateText" :title="fileSystemData.name">File System Name: <b :class="truncateText" :title="fileSystemData.name">{{ fileSystemData.name }}</b></p>
 						</div>
 					</template>
 					<template v-slot:footer>
@@ -186,6 +186,8 @@ const creatingPool = inject<Ref<boolean>>('creating-pool')!;
 const poolCreated = inject<Ref<boolean>>('pool-created')!;
 const creatingFilesystem = inject<Ref<boolean>>('creating-filesystem')!;
 const filesystemCreated = inject<Ref<boolean>>('filesystem-created')!;
+
+const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 console.log('fileSystemData:', fileSystemData.value);
 
