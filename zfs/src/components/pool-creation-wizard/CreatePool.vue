@@ -19,6 +19,7 @@
 					<div v-if="navTag == 'virtual-devices'" class="justify-self-center mt-2">
 						<p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
 						<p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
+						<p class="text-danger" v-if="diskBelongsFeedback">{{ diskBelongsFeedback }}</p>
 						<p class="text-danger" v-if="isProperReplicationFeedback">{{ isProperReplicationFeedback }}</p>
 						<p class="text-danger" v-if="vDevFeedback">{{ vDevFeedback }}</p>
 					</div>
@@ -102,6 +103,7 @@ const nameFeedback = ref('');
 const vDevFeedback = ref('');
 const diskFeedback = ref('');
 const diskSizeFeedback = ref('');
+const diskBelongsFeedback = ref('');
 const isProperReplicationFeedback = ref('');
 
 //injecting provided disk and pools rray
@@ -438,6 +440,7 @@ provide('feedback-name', nameFeedback);
 provide('feedback-vdev', vDevFeedback);
 provide('feedback-disk', diskFeedback);
 provide('feedback-disk-size', diskSizeFeedback);
+provide('feedback-disk-belongs', diskBelongsFeedback);
 provide('feedback-replication-level', isProperReplicationFeedback);
 
 provide('finish-pressed', finishPressed);

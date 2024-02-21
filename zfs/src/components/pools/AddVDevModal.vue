@@ -87,6 +87,7 @@
                         <p class="text-danger" v-if="diskFeedback">{{ diskFeedback }}</p>
                         <p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
                         <p class="text-danger" v-if="isProperReplicationFeedback">{{ isProperReplicationFeedback }}</p>
+                        <p class="text-danger" v-if="diskBelongsFeedback">{{ diskBelongsFeedback }}</p>
                     </div>
 				</div>
 				
@@ -130,13 +131,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, watch } from 'vue';
+import { ref, inject, Ref, computed, watch, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
 import { addVDev } from '../../composables/pools';
-import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadImportablePools } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, getDiskIDName, truncateName } from '../../composables/helpers';
+// import { loadImportablePools } from '../../composables/loadImportables';
 
 interface AddVDevModalProps {
 	idKey: string;
@@ -158,9 +160,10 @@ const newVDev = ref<newVDevData>({
 const selectedDisks = ref<string[]>([])!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-const diskFeedback = ref('')
-const diskSizeFeedback = ref('')
-const isProperReplicationFeedback = ref('')
+const diskFeedback = ref('');
+const diskSizeFeedback = ref('');
+const isProperReplicationFeedback = ref('');
+const diskBelongsFeedback = ref('');
 
 const pools = inject<Ref<PoolData[]>>('pools')!;
 
@@ -198,18 +201,20 @@ async function addVDevBtn() {
     if (replicationLevelCheck()) {
         if (diskSizeMatch()) {
             if (diskCheck()) {
-                selectedDisks.value.forEach(selectedDisk => {
-                    console.log('selectedDisk', selectedDisk);
-                    const diskNameFinal = getDiskIDName(allDisks.value, diskIdentifier.value, selectedDisk)
-                    console.log('disk:', diskNameFinal);
-                    newVDev.value.disks.push(diskNameFinal);
-                    console.log('newVdev.disks:', newVDev.value.disks);
-                });
-                adding.value = true;
-                await addVDev(props.pool, newVDev.value);
-                showAddVDevModal.value = false;
-                adding.value = false;
-                await refreshAllData();
+                if (!diskBelongsToImportablePool() || newVDev.value.forceAdd!){
+                    selectedDisks.value.forEach(selectedDisk => {
+                        console.log('selectedDisk', selectedDisk);
+                        const diskNameFinal = getDiskIDName(allDisks.value, diskIdentifier.value, selectedDisk)
+                        console.log('disk:', diskNameFinal);
+                        newVDev.value.disks.push(diskNameFinal);
+                        console.log('newVdev.disks:', newVDev.value.disks);
+                    });
+                    adding.value = true;
+                    await addVDev(props.pool, newVDev.value);
+                    showAddVDevModal.value = false;
+                    adding.value = false;
+                    await refreshAllData();
+                }
             }
         }
     }
@@ -280,6 +285,38 @@ const diskSizeMatch = () => {
 	return result;
 }
 
+const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const diskBelongsToImportablePool = () => {
+	let result = false;
+	diskBelongsFeedback.value = '';
+
+	if (newVDev.value.forceAdd) {
+		return false;
+	}
+	
+        selectedDisks.value.forEach(diskName => {
+			const selectedDisk = allDisks.value.find(fullDisk => fullDisk.name == diskName);
+			console.log('selectedDisk:', selectedDisk);
+			importablePools.value.forEach(pool => {
+				console.log('importablePool:', pool);
+				pool.vdevs.forEach(importableVDev => {
+					console.log('importableVDev:', importableVDev);
+					importableVDev.disks.forEach(disk => {
+						console.log('importableDisk:', disk);
+						if (selectedDisk!.name == disk.name) {
+							result = true;
+							diskBelongsFeedback.value = `This disk was used in exported pool '${pool.name}'.\n Use Force Add to override and use disk in new Vdev.`;
+							console.log(`Disk belongs to importable pool: ${pool.name}`);
+						}
+					});
+				});
+			});
+		});
+
+	console.log('diskBelongsFeedback:', diskBelongsFeedback.value);
+	return result;
+}
+
 //method for validating disk selection per vdev type
 const diskCheck = () => {
 	let result = true;
@@ -319,6 +356,10 @@ const diskCheck = () => {
 
 	return result;
 }
+
+onMounted(() => {
+	loadImportablePools(allDisks, importablePools, pools);
+});
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 </script>

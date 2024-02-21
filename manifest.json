@@ -1,7 +1,7 @@
 {
     "__version": "45D-R1",
     "name": "cockpit-zfs",
-    "title": "Cockpit File Sharing",
+    "title": "Cockpit ZFS Module",
     "prerelease": false,
     "version": "0.0.0",
     "buildVersion": "0",

@@ -250,7 +250,8 @@ import Modal from '../common/Modal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { loadImportablePools, loadImportableDestroyedPools } from '../../composables/loadImportables';
 import { importPool } from '../../composables/pools';
-import { loadDatasets, loadDisksThenPools, loadDiskStats } from '../../composables/loadData';
+import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 
 interface ImportPoolProps {
     idKey: string;
@@ -277,7 +278,15 @@ const importing = ref(false);
 const loading = ref(true);
 
 const nameFeedback = ref('');
+
+const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 const poolSelectedClass = (poolGUID) => {
    return poolGUID === importedPool.value.poolGUID ? 'bg-green-300 dark:bg-green-700' : '';
@@ -376,6 +385,24 @@ function importableNameExists() {
     });
 }
 
+async function refreshAllData() {
+    disksLoaded.value = false;
+    poolsLoaded.value = false;
+    fileSystemsLoaded.value = false;
+    disks.value = [];
+    pools.value = [];
+    datasets.value = [];
+    await loadDisksThenPools(disks, pools);
+    await loadDatasets(datasets);
+    await loadScanObjectGroup(scanObjectGroup);
+    await loadScanActivities(pools, scanActivities);
+    await loadDiskStats(poolDiskStats);
+    await loadTrimActivities(pools, trimActivities);
+    disksLoaded.value = true;
+    poolsLoaded.value = true;
+    fileSystemsLoaded.value = true;
+}
+
 async function importPoolBtn() {
     if (nameCheck()) {
         if (isPoolDestroyed()) {
@@ -385,12 +412,7 @@ async function importPoolBtn() {
         console.log('importing pool:', importedPool.value);
         importing.value = true;
         await importPool(importedPool.value);
-        disks.value = [];
-        pools.value = [];
-        datasets.value = [];
-        await loadDisksThenPools(disks, pools);
-        await loadDatasets(datasets);
-        await loadDiskStats(poolDiskStats);
+        await refreshAllData();
         importing.value = false;
         showImportModal.value = false;
     }

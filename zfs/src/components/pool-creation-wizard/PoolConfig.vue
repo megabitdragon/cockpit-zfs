@@ -301,10 +301,12 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, Ref, computed, watchEffect } from 'vue';
+import { inject, ref, Ref, computed, watchEffect, onMounted } from 'vue';
 import { ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, findDiskByPath, truncateName } from '../../composables/helpers';
+import { loadImportablePools } from '../../composables/loadData';
+//import { loadImportablePools } from '../../composables/loadImportables';
 
 interface PoolConfigProps {
 	tag: string;
@@ -327,6 +329,7 @@ const nameFeedback = inject<Ref<string>>('feedback-name')!;
 const vDevFeedback = inject<Ref<string>>('feedback-vdev')!;
 const diskFeedback = inject<Ref<string>>('feedback-disk')!;
 const diskSizeFeedback = inject<Ref<string>>('feedback-disk-size')!;
+const diskBelongsFeedback = inject<Ref<string>>('feedback-disk-belongs')!;
 const isProperReplicationFeedback = inject<Ref<string>>('feedback-replication-level')!;
 
 const createFileSystemComponent = ref();
@@ -506,6 +509,40 @@ const diskSizeMatch = () => {
 
 	return result;
 }
+const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const diskBelongsToImportablePool = () => {
+	let result = false;
+	diskBelongsFeedback.value = '';
+
+	if (poolConfig.value.properties.forceCreate) {
+		return false;
+	}
+
+	poolConfig.value.vdevs.forEach(vdev => {
+		console.log('vDev:', vdev);
+		vdev.selectedDisks.forEach(diskName => {
+			const selectedDisk = disks.value.find(fullDisk => fullDisk.name == diskName);
+			console.log('selectedDisk:', selectedDisk);
+			importablePools.value.forEach(pool => {
+				console.log('importablePool:', pool);
+				pool.vdevs.forEach(importableVDev => {
+					console.log('importableVDev:', importableVDev);
+					importableVDev.disks.forEach(disk => {
+						console.log('importableDisk:', disk);
+						if (selectedDisk!.name == disk.name) {
+							result = true;
+							diskBelongsFeedback.value = `This disk was used in exported pool '${pool.name}'.\n Use Force Create to override and use disk in new pool.`;
+							console.log(`Disk belongs to importable pool: ${pool.name}`);
+						}
+					});
+				});
+			});
+		});
+	});
+
+	console.log('diskBelongsFeedback:', diskBelongsFeedback.value);
+	return result;
+}
 
 //method for validating disk selection per vdev type
 const diskCheck = () => {
@@ -569,7 +606,9 @@ const validateAndProceed = (tabTag: string): boolean => {
 		if (nameCheck()) {
 			if (vDevCheck()) {
 				if (diskCheck() && diskSizeMatch()) {
-					return replicationLevelCheck();
+					if (!diskBelongsToImportablePool() || poolConfig.value.properties.forceCreate) {
+						return replicationLevelCheck();
+					}
 				}
 			}
 		}
@@ -577,7 +616,7 @@ const validateAndProceed = (tabTag: string): boolean => {
 		if (nameCheck()) {
 			if (vDevCheck()) {
 				if (diskCheck()) {
-				return true;
+					return true;
 				}
 			}
 		}
@@ -648,7 +687,9 @@ function fillNewPoolData() {
 	console.log("newPoolData sent:", newPoolData);
 }
 
-
+onMounted(() => {
+	loadImportablePools(disks, importablePools, allPools);
+});
 
 const fsConfig = ref();
 

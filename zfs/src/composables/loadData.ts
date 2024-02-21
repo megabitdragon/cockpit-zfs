@@ -1,5 +1,5 @@
 import { ref, Ref } from 'vue';
-import { getPools } from "./pools";
+import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal } from "./helpers";
@@ -669,4 +669,82 @@ function determineDiskType(vDev, disks) {
     } else {
         return 'Hybrid'; // Mixed SSD and HDD
     }
+}
+
+export async function loadImportablePools(disks, importablePools, pools) {
+	try {
+		console.log("pre-loaded Disks:", disks);
+
+		//executes a python script to retrieve all importable pool data and outputs a JSON
+		try {
+			const rawJSON = await getImportablePools();
+			const parsedJSON = JSON.parse(rawJSON);
+			console.log('Importable Pools JSON:', parsedJSON);
+
+			//loops through pool JSON
+			for (let i = 0; i < parsedJSON.length; i++) {
+				//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
+				parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'data'));
+				parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'cache'));
+				parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'dedup'));
+				parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'log'));
+				parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'spare'));
+				parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'special'));
+				
+				//adds pool data from JSON into pool data object, pushes into array 
+				const poolData = {
+					name: parsedJSON[i].name,
+					status: parsedJSON[i].status,
+					guid: parsedJSON[i].guid,
+					
+					//adds VDev array to Pool data object
+					vdevs: vDevs.value,
+
+					// fileSystems: parsedJSON[i].root_dataset.value,
+				}
+
+				importablePools.value.push(poolData);
+
+				console.log("poolData:", poolData);
+				vDevs.value = [];
+			}
+
+			const poolDiskTypes = importablePools.value.map(pool => {
+				const vDevDiskTypes = pool.vdevs.map(vDev => {
+					// Map over the disks within each VDev and extract their types
+					const diskTypes = vDev.disks.map(disk => disk.type);
+					
+					// Check if all disk types within this VDev are the same
+					// does not currently account for 'replacing' type
+					const allSameDiskType = diskTypes.every(type => type === diskTypes[0]);
+				
+					// Return the disk type for this VDev
+					return allSameDiskType ? diskTypes[0] : 'Hybrid';
+				});
+			
+				// Check if all VDev disk types within the pool are the same
+				const allSameDiskType = vDevDiskTypes.every(type => type === vDevDiskTypes[0]);
+			
+				// Determine the pool's diskType based on VDev diskTypes
+				return allSameDiskType ? vDevDiskTypes[0] : 'Hybrid';
+			});
+			
+			importablePools.value.forEach((pool, index) => {
+				pool.diskType = poolDiskTypes[index];
+			});
+			  
+			console.log("loaded Importable Pools:", importablePools);
+
+			await loadDisksExtraData(disks.value, pools.value);
+
+			console.log("loaded Disks:", disks);
+
+		} catch (error) {
+			// Handle any errors that may occur during the asynchronous operation
+			console.error("An error occurred getting Importable pools:", error);
+		}
+	} catch (error) {
+		// Handle any errors that may occur during the asynchronous operation
+		console.error("An error occurred getting disks/importable pools:", error);
+	}
 }
