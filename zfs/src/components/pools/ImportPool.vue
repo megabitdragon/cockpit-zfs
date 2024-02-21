@@ -295,14 +295,14 @@ const poolSelectedClass = (poolGUID) => {
 function loadImports() {
     loading.value = true;
     importablePools.value = [];
-    loadImportablePools(importablePools.value);
+    loadImportablePools(importablePools.value, disks, pools);
     loading.value = false;    
 }
 
 function loadDestroyedImports() {
     loading.value = true;
     allImportableDestroyedPools.value = [];
-    loadImportableDestroyedPools(allImportableDestroyedPools.value);    
+    loadImportableDestroyedPools(allImportableDestroyedPools.value, disks, pools);    
     loading.value = false;
 }
 
@@ -403,6 +403,26 @@ async function refreshAllData() {
     fileSystemsLoaded.value = true;
 }
 
+/* async function importPoolBtn() {
+    if (nameCheck()) {
+        if (isPoolDestroyed()) {
+            importedPool.value.isDestroyed = true;
+        }
+        
+        console.log('importing pool:', importedPool.value);
+        importing.value = true;
+        await importPool(importedPool.value);
+        disks.value = [];
+        pools.value = [];
+        datasets.value = [];
+        await loadDisksThenPools(disks, pools);
+        await loadDatasets(datasets);
+        await loadDiskStats(poolDiskStats);
+        importing.value = false;
+        showImportModal.value = false;
+    }
+} */
+
 async function importPoolBtn() {
     if (nameCheck()) {
         if (isPoolDestroyed()) {
@@ -412,9 +432,9 @@ async function importPoolBtn() {
         console.log('importing pool:', importedPool.value);
         importing.value = true;
         await importPool(importedPool.value);
-        await refreshAllData();
         importing.value = false;
         showImportModal.value = false;
+        await refreshAllData();
     }
 }
 

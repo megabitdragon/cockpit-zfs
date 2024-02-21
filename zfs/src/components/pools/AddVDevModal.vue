@@ -136,9 +136,9 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
 import { addVDev } from '../../composables/pools';
-import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadImportablePools } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, getDiskIDName, truncateName } from '../../composables/helpers';
-// import { loadImportablePools } from '../../composables/loadImportables';
+import { loadImportablePools } from '../../composables/loadImportables';
 
 interface AddVDevModalProps {
 	idKey: string;
@@ -358,7 +358,7 @@ const diskCheck = () => {
 }
 
 onMounted(() => {
-	loadImportablePools(allDisks, importablePools, pools);
+	loadImportablePools(importablePools.value, allDisks, pools);
 });
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;

@@ -305,8 +305,7 @@ import { inject, ref, Ref, computed, watchEffect, onMounted } from 'vue';
 import { ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, findDiskByPath, truncateName } from '../../composables/helpers';
-import { loadImportablePools } from '../../composables/loadData';
-//import { loadImportablePools } from '../../composables/loadImportables';
+import { loadImportablePools } from '../../composables/loadImportables';
 
 interface PoolConfigProps {
 	tag: string;
@@ -318,12 +317,11 @@ const props = defineProps<PoolConfigProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
+const disks = inject<Ref<DiskData[]>>('disks')!;
 const allPools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
 
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
-	
-const disks = inject<Ref<DiskData[]>>('disks')!;
 
 const nameFeedback = inject<Ref<string>>('feedback-name')!;
 const vDevFeedback = inject<Ref<string>>('feedback-vdev')!;
@@ -688,7 +686,7 @@ function fillNewPoolData() {
 }
 
 onMounted(() => {
-	loadImportablePools(disks, importablePools, allPools);
+	loadImportablePools(importablePools.value, disks, allPools);
 });
 
 const fsConfig = ref();
