@@ -66,6 +66,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Need to check ALL disks and if No trim supported, show in list Ex: Trim not supported on disks : 1-1, 1-2, etc. -->
                             <div v-if="disk.stats.trim_notsup == 1" class="col-span-4">
                                 <div class="">
                                     <span class="text-default col-span-4" :class="truncateText" :title="disk.name">

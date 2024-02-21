@@ -42,6 +42,7 @@
                 <div class="w-full row-start-1 justify-center items-center">
                     <div class="justify-self-start mt-2">
                         <p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
+                        <p class="text-danger" v-if="diskBelongsFeedback">{{ diskBelongsFeedback }}</p>
                     </div>
 				</div> 
 				
@@ -84,12 +85,13 @@
     </Modal>
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, computed } from 'vue';
+import { ref, inject, Ref, computed, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { convertSizeToBytes, getDiskIDName, truncateName } from '../../composables/helpers';
+import { convertSizeToBytes, getDiskIDName, loadScanActivities, loadTrimActivities, truncateName } from '../../composables/helpers';
 import { replaceDisk } from '../../composables/disks';
-import { loadDisksThenPools, loadDatasets } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
+import { loadImportablePools } from '../../composables/loadImportables';
 
 interface ReplaceDiskModalProps {
     idKey: string;
@@ -116,8 +118,6 @@ const closeModal = () => {
     emit('close');
 }
 
-
-
 const showReplaceDiskModal = inject<Ref<boolean>>('show-replace-modal')!;
 const selectedDisk = ref('');
 
@@ -136,12 +136,17 @@ const diskNewName = ref('');
 const diskNewPath = ref('');
 const diskExistPath = ref('');
 const diskExistName = ref('');
+const diskBelongsFeedback = ref('');
 const adding = ref(false);
 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 const availableDisks = computed<DiskData[]>(() => {
     return allDisks.value.filter(disk => disk.guid === "");
@@ -210,27 +215,19 @@ function setDiskNamePath() {
 async function replaceDiskBtn() {
     
     if (diskSizeMatch()) {
-        setDiskNamePath();
-        diskVDevPoolData.value.newDiskName = diskNewName.value;
-        diskVDevPoolData.value.existingDiskName = diskExistName.value;
-        console.log('all data of disk being replaceed:', diskVDevPoolData.value);
-            
-        adding.value = true;
-        await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
-        showReplaceDiskModal.value = false;
-        adding.value = false;
-        // scanNow();
-        disksLoaded.value = false;
-        poolsLoaded.value = false;
-        fileSystemsLoaded.value = false;
-        allDisks.value = [];
-        pools.value = [];
-        datasets.value = [];
-        await loadDisksThenPools(allDisks, pools);
-        await loadDatasets(datasets);
-        disksLoaded.value = true;
-        poolsLoaded.value = true;
-        fileSystemsLoaded.value = true;
+        if (!diskBelongsToImportablePool() || diskVDevPoolData.value.forceReplace) {
+            setDiskNamePath();
+            diskVDevPoolData.value.newDiskName = diskNewName.value;
+            diskVDevPoolData.value.existingDiskName = diskExistName.value;
+            console.log('all data of disk being replaceed:', diskVDevPoolData.value);
+                
+            adding.value = true;
+            await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
+            showReplaceDiskModal.value = false;
+            adding.value = false;
+            // scanNow();
+            await refreshAllData();
+        }
     }
 }
 
@@ -267,6 +264,57 @@ const diskSizeMatch = () => {
 
     return result;
 };
+
+const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const diskBelongsToImportablePool = () => {
+	let result = false;
+	diskBelongsFeedback.value = '';
+
+	if (diskVDevPoolData.value.forceReplace) {
+		return false;
+	}
+    const selectedNewDisk = allDisks.value.find(fullDisk => fullDisk.name == selectedDisk.value);
+        console.log('selectedDisk:', selectedDisk);
+        importablePools.value.forEach(pool => {
+            console.log('importablePool:', pool);
+            pool.vdevs.forEach(importableVDev => {
+                console.log('importableVDev:', importableVDev);
+                importableVDev.disks.forEach(disk => {
+                    console.log('importableDisk:', disk);
+                    if (selectedNewDisk!.name == disk.name) {
+                        result = true;
+                        diskBelongsFeedback.value = `This disk was used in exported pool '${pool.name}'.\n Use Force Add to override and use disk in new Vdev.`;
+                        console.log(`Disk belongs to importable pool: ${pool.name}`);
+                    }
+                });
+            });
+        });
+
+	console.log('diskBelongsFeedback:', diskBelongsFeedback.value);
+	return result;
+}
+
+async function refreshAllData() {
+    disksLoaded.value = false;
+    poolsLoaded.value = false;
+    fileSystemsLoaded.value = false;
+    allDisks.value = [];
+    pools.value = [];
+    datasets.value = [];
+    await loadDisksThenPools(allDisks, pools);
+    await loadDatasets(datasets);
+    await loadScanObjectGroup(scanObjectGroup);
+    await loadScanActivities(pools, scanActivities);
+    await loadDiskStats(poolDiskStats);
+    await loadTrimActivities(pools, trimActivities);
+    disksLoaded.value = true;
+    poolsLoaded.value = true;
+    fileSystemsLoaded.value = true;
+}
+
+onMounted(() => {
+	loadImportablePools(importablePools.value, allDisks, pools);
+});
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 </script>

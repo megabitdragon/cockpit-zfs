@@ -330,7 +330,7 @@ export async function loadDisksExtraData(disks, pools) {
 
 //method for parsing through VDevs to add to array (VDev array is added to Pool)
 export function parseVDevData(vDev, poolName, disks, vDevType) {
-	vDevs.value = [];
+	// vDevs.value = [];
 	
 	const vDevData : vDevData = {
 		name: vDev.name,

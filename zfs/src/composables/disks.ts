@@ -48,6 +48,9 @@ export async function attachDisk(diskVDevPoolData) {
 	try {
 		let cmdString = ['zpool', 'attach'];
 
+		if (diskVDevPoolData.forceAttach) {
+			cmdString.push('-f');
+		}
 		cmdString.push(diskVDevPoolData.poolName);
 		//cmdString.push(diskVDevPoolData.vDevName);
 		cmdString.push(diskVDevPoolData.existingDiskName);

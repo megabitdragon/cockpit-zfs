@@ -166,7 +166,6 @@ const isProperReplicationFeedback = ref('');
 const diskBelongsFeedback = ref('');
 
 const pools = inject<Ref<PoolData[]>>('pools')!;
-
 const allDisks = inject<Ref<DiskData[]>>('disks')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 

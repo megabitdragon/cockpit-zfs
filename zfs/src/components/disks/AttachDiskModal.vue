@@ -1,6 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag"  :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
-        
+    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         <template v-slot:title>
             Attach Disk
         </template>
@@ -43,6 +42,7 @@
                 <div class="w-full row-start-1 justify-center items-center">
                     <div class="justify-self-start mt-2">
                         <p class="text-danger" v-if="diskSizeFeedback">{{ diskSizeFeedback }}</p>
+                        <p class="text-danger" v-if="diskBelongsFeedback">{{ diskBelongsFeedback }}</p>
                     </div>
 				</div> 
 				
@@ -89,9 +89,10 @@
 import { ref, inject, Ref, computed, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName } from '../../composables/helpers';
+import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, loadScanActivities } from '../../composables/helpers';
 import { attachDisk } from '../../composables/disks';
-import { loadDisksThenPools, loadDatasets, loadDiskStats } from '../../composables/loadData';
+import { loadDisksThenPools, loadDatasets, loadDiskStats, loadScanObjectGroup } from '../../composables/loadData';
+import { loadImportablePools } from '../../composables/loadImportables';
 
 interface AttachDiskModalProps {
 	idKey: string;
@@ -148,12 +149,19 @@ const diskNewName = ref('');
 const diskNewPath = ref('');
 const diskExistPath = ref('');
 const diskExistName = ref('');
+const diskBelongsFeedback = ref('');
+
 const adding = ref(false);
 
 const poolData = inject<Ref<PoolData[]>>("pools")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 const diskVDevPoolData = ref({
     existingDiskName: '',
@@ -163,10 +171,6 @@ const diskVDevPoolData = ref({
     forceAttach: false,
 });
 
-// const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
-const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
-// const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
-const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const availableDisks = computed<DiskData[]>(() => {
     return allDisks.value.filter(disk => disk.guid === "");
@@ -223,32 +227,22 @@ function setDiskNamePath() {
 }
 
 async function attachDiskBtn() {
-    
     if (diskSizeMatch()) {
-        setDiskNamePath();
-        diskVDevPoolData.value.newDiskName = diskNewName.value;
-        // diskVDevPoolData.value.newDiskName = getDiskIDName(allDisks.value, diskIdentifier.value, diskNewName.value);
-        diskVDevPoolData.value.existingDiskName = diskExistName.value;
-        console.log('all data of disk being attached:', diskVDevPoolData.value);
+        if (!diskBelongsToImportablePool() || diskVDevPoolData.value.forceAttach) {
+            setDiskNamePath();
+            diskVDevPoolData.value.newDiskName = diskNewName.value;
+            // diskVDevPoolData.value.newDiskName = getDiskIDName(allDisks.value, diskIdentifier.value, diskNewName.value);
+            diskVDevPoolData.value.existingDiskName = diskExistName.value;
+            console.log('all data of disk being attached:', diskVDevPoolData.value);
+                
+            adding.value = true;
+            await attachDisk(diskVDevPoolData.value);
+            showAttachDiskModal.value = false;
+            adding.value = false;
             
-        adding.value = true;
-        await attachDisk(diskVDevPoolData.value);
-        showAttachDiskModal.value = false;
-        adding.value = false;
-        
-        disksLoaded.value = false;
-        poolsLoaded.value = false;
-        fileSystemsLoaded.value = false;
-        allDisks.value = [];
-        pools.value = [];
-        datasets.value = [];
-        await loadDisksThenPools(allDisks, pools);
-        await loadDatasets(datasets);
-        await loadDiskStats(poolDiskStats);
-	    await loadTrimActivities(poolData, trimActivities);
-        disksLoaded.value = true;
-        poolsLoaded.value = true;
-        fileSystemsLoaded.value = true;
+           await refreshAllData();
+        }
+       
     }
 }
 
@@ -285,6 +279,57 @@ const diskSizeMatch = () => {
 
     return result;
 };
+
+const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const diskBelongsToImportablePool = () => {
+	let result = false;
+	diskBelongsFeedback.value = '';
+
+	if (diskVDevPoolData.value.forceAttach) {
+		return false;
+	}
+        const selectedNewDisk = allDisks.value.find(fullDisk => fullDisk.name == selectedDisk.value);
+        console.log('selectedDisk:', selectedDisk);
+        importablePools.value.forEach(pool => {
+            console.log('importablePool:', pool);
+            pool.vdevs.forEach(importableVDev => {
+                console.log('importableVDev:', importableVDev);
+                importableVDev.disks.forEach(disk => {
+                    console.log('importableDisk:', disk);
+                    if (selectedNewDisk!.name == disk.name) {
+                        result = true;
+                        diskBelongsFeedback.value = `This disk was used in exported pool '${pool.name}'.\n Use Force Add to override and use disk in new Vdev.`;
+                        console.log(`Disk belongs to importable pool: ${pool.name}`);
+                    }
+                });
+            });
+        });
+
+	console.log('diskBelongsFeedback:', diskBelongsFeedback.value);
+	return result;
+}
+
+async function refreshAllData() {
+    disksLoaded.value = false;
+    poolsLoaded.value = false;
+    fileSystemsLoaded.value = false;
+    allDisks.value = [];
+    pools.value = [];
+    datasets.value = [];
+    await loadDisksThenPools(allDisks, pools);
+    await loadDatasets(datasets);
+    await loadScanObjectGroup(scanObjectGroup);
+    await loadScanActivities(pools, scanActivities);
+    await loadDiskStats(poolDiskStats);
+    await loadTrimActivities(pools, trimActivities);
+    disksLoaded.value = true;
+    poolsLoaded.value = true;
+    fileSystemsLoaded.value = true;
+}
+
+onMounted(() => {
+	loadImportablePools(importablePools.value, allDisks, pools);
+});
 
 const getIdKey = (name: string) => `${props.idKey}-${name}`;
 </script>

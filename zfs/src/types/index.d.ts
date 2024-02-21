@@ -123,7 +123,8 @@ interface ImportablePoolData {
 	status: string;
 	guid: string;
 	properties: {}
-	vdevs: ImportablePoolvDevData[];
+	// vdevs: ImportablePoolvDevData[];
+	vdevs: vDevData[];
 	scan: {}
 	isDestroyed?: boolean;
 }
