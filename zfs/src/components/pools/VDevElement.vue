@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="">
 		<div class="">
 			<Disclosure v-slot="{ open }" :defaultOpen="true">
 				<DisclosureButton class="grid grid-cols-8 grid-flow-cols w-full text-center bg-primary text-sm text-white">
@@ -24,7 +24,7 @@
 							</div>
 
 							<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-								<MenuItems class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+								<MenuItems class="absolute right-0 z-10 w-max origin-top-right  bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">												
 										<!-- <MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click.stop="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
@@ -44,7 +44,7 @@
 				<DisclosurePanel>
 					<table class="min-w-full bg-secondary text-default">
 						<thead>
-							<tr :key="props.vDevIdx" class="rounded-md grid grid-cols-9 font-semibold text-white">
+							<tr :key="props.vDevIdx" class=" grid grid-cols-9 font-semibold text-white">
 								<!-- <th class="relative py-2 pl-3 pr-4 sm:pr-6 lg:pr-8 col-span-1">
 									<span class="sr-only"></span>
 								</th> -->

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="">
 		<div class="">
 			<Disclosure v-slot="{ open }" :defaultOpen="true">
 				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full justify-center text-center" >
@@ -42,7 +42,7 @@
 							</div>
 
 							<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-								<MenuItems class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+								<MenuItems class="absolute right-0 z-10 w-max origin-top-right  bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">
 										<MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click.stop="showPoolModal(poolData[props.poolIdx])!" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool Details</a>
@@ -84,7 +84,7 @@
 						</Menu>
 					</div>
 				</DisclosureButton>
-				<DisclosurePanel>
+				<DisclosurePanel class="">
 					<div v-for="vDev, vDevIdx in poolData[props.poolIdx].vdevs" :key="vDevIdx" class="">
 						<VDevElement :pool="poolData[props.poolIdx]" :poolIdx="props.poolIdx" :vDev="vDev" :vDevIdx="vDevIdx" ref="vDevElement"/>
 					</div>

@@ -10,12 +10,12 @@
 			</div>
 		</div>
 
-		<div class="mt-4 rounded-md max-w-full">
-			<div class="inline-block min-w-full min-h-full shadow align-middle rounded-md">
-				<div class="whitespace-nowrap text-ellipsis ring-1 ring-black ring-opacity-5 rounded-md">
+		<div class="mt-4  max-w-full">
+			<div class="inline-block min-w-full min-h-full shadow align-middle ">
+				<div class="whitespace-nowrap text-ellipsis ring-1 ring-black ring-opacity-5 ">
 
-					<table class="min-w-full divide-y divide-default rounded-md">
-						<thead class="rounded-md">
+					<table class="min-w-full divide-y divide-default ">
+						<thead class="">
 							<tr class="bg-well rounded-t-md grid grid-cols-10">
 
 								<th class="relative py-2 rounded-tl-md col-span-1">
@@ -36,9 +36,9 @@
 						</thead>
 						
 						<tbody class="">
-							<tr class="border border-collapse border-default rounded-md">
-								<div v-if="poolData.length > 0 && poolsLoaded == true">
-									<div v-for="pool, poolIdx in poolData" :key="poolIdx" >
+							<tr class="border border-collapse border-default ">
+								<div v-if="poolData.length > 0 && poolsLoaded == true" class="">
+									<div v-for="pool, poolIdx in poolData" :key="poolIdx" class="">
 										<PoolListElement :poolIdx="poolIdx" :pool="pool"/>
 									</div>
 								</div>
@@ -46,10 +46,10 @@
 						</tbody>
 					</table>
 									
-					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default rounded-md">
+					<div v-if="poolsLoaded == false" class="p-2 flex justify-center bg-default ">
 						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"  class="font-semibold text-lg my-0.5"/>
 					</div>
-					<div v-if="poolData.length < 1 && poolsLoaded == true" class="p-2 flex bg-default justify-center rounded-md">
+					<div v-if="poolData.length < 1 && poolsLoaded == true" class="p-2 flex bg-default justify-center ">
 						<span class="font-semibold text-lg my-2">No Pools Found</span>
 					</div>
 	

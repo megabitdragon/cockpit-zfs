@@ -1,5 +1,5 @@
 <template>
-    <div class="border-b border-t border-collapse border-default">
+    <div class="border-b border-t border-collapse border-default ">
         <div class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default ">
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
@@ -23,7 +23,7 @@
                         </div>
 
                         <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                            <MenuItems class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <MenuItems class="absolute right-0 z-10 w-max origin-top-right  bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <div class="py-1">
                                     <!-- <MenuItem as="div" v-slot="{ active }">
                                         <a href="#" @click.stop="clearDiskErrors(props.pool.name, props.disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
@@ -59,7 +59,7 @@
                 </div>
             </div>
         </div>
-		<div v-if="diskState == 'REPLACING'" class="border border-collapse border-default">
+		<div v-if="diskState == 'REPLACING'" class="border border-collapse border-default ">
 			<div v-for="disk in props.disk.children" class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
 				<div class="py-1 mt-1 col-span-3" :class="truncateText" :title="disk.name">{{ props.disk.name }}</div>
 				<div class="py-1 mt-1 col-span-3"></div>
