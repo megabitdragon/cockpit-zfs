@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
+    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         <template v-slot:title>
             Attach Disk
         </template>
@@ -104,12 +104,6 @@ interface AttachDiskModalProps {
 const props = defineProps<AttachDiskModalProps>();
 const showFlag = ref(props.showFlag);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
-
-const updateShowFlag = () => {
-    if (props.showFlag !== showFlag.value) {
-        showFlag.value = props.showFlag;
-    } 
-}
 
 const emit = defineEmits(['close']);
 

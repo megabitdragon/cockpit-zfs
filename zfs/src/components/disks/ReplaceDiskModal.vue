@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
+    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
         <template v-slot:title>
             Replace Disk
         </template>
@@ -105,12 +105,6 @@ const props = defineProps<ReplaceDiskModalProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const showFlag = ref(props.showFlag);
-
-const updateShowFlag = () => {
-    if (props.showFlag !== showFlag.value) {
-        showFlag.value = props.showFlag;
-    } 
-}
 
 const emit = defineEmits(['close']);
 

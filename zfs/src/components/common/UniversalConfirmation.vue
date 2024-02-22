@@ -6,7 +6,7 @@
  -->
 
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'">
+    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'">
         <template v-slot:title>
             <legend class="flex justify-center">{{ upperCaseWord(props.operation) }} {{ upperCaseWord(props.item) }}</legend>
         </template>
@@ -177,16 +177,10 @@ const emit = defineEmits(['close']);
 const operationRunning = inject<Ref<boolean>>('modal-confirm-running')!;
 const showFlag = ref(props.showFlag);
 
-const updateShowFlag = () => {
-    if (props.showFlag !== showFlag.value) {
-        showFlag.value = props.showFlag;
-    } 
-}
-
 const closeModal = () => {
-    // updateShowFlag(); 
     option1Toggle.value = false;
     option2Toggle.value = false;
+    // console.log('closing modal:', props.idKey);
     emit('close');
 }
 
