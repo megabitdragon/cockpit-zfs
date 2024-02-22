@@ -78,7 +78,7 @@
 
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, watch, provide } from "vue";
+import { ref, inject, Ref, watch, provide, onMounted } from "vue";
 import { EllipsisVerticalIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { clearErrors, removeVDevFromPool } from "../../composables/pools";
@@ -102,6 +102,23 @@ const selectedPool = ref<PoolData>();
 const selectedVDev = ref<vDevData>();
 
 const operationRunning = ref(false);
+
+// const isDataDevice = ref(true);
+
+// function checkVDevType() {
+// 	if (props.vDev.type == 'data') {
+// 		isDataDevice.value = true;
+// 	} else {
+// 		isDataDevice.value = false;
+// 	}
+// }
+
+
+// onMounted(() => {
+// 	checkVDevType();
+// });
+
+
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////

@@ -38,6 +38,7 @@
                     <div class="grid grid-cols-4 gap-1 justify-items-center w-full">
                         <div v-for="disk, idx in poolDiskStats[props.pool.name]" class="col-span-4">
                             <div v-if="disk.stats.trim_notsup !== 1" class="col-span-4">
+                                <!--  <div v-if="disk.stats.trim_notsup !== 1 && props.isData!" class="col-span-4"> -->
                                 <div v-if="isTrimActive || isTrimSuspended || isTrimFinished || isTrimCanceled" class="col-span-4">
                                     <div class="grid grid-cols-4 justify-items-center w-full whitespace-nowrap text-ellipsis">
                                         <span class="col-span-4 font-semibold" :class="[trimMessageClass(disk), truncateText]">
@@ -66,6 +67,12 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- <div v-if="disk.stats.trim_notsup !== 1 && !props.isData!" class="col-span-4">
+                                <span class="col-span-4 font-semibold" :class="truncateText" :title="disk!.name!">
+                                    Not a data device - Cannot Trim {{ disk!.name }}
+                                </span>
+                            </div> -->
+                            
                         </div>
                         <!-- Need to check ALL disks and if No trim supported, show in list Ex: Trim not supported on disks : 1-1, 1-2, etc. -->
                         <div v-if="poolDiskStats[props.pool.name].some(disk => disk.stats.trim_notsup == 1)" class="col-span-4">
@@ -111,7 +118,7 @@
         </div>
         <div v-if="isDisk">
             <div v-if="selectedDisk!" class="grid grid-cols-2 gap-1 justify-center items-center">
-                <div v-if="selectedDisk!.stats.trim_notsup === 0" class="col-span-2 flex flex-col items-center justify-center">
+                <div v-if="selectedDisk!.stats.trim_notsup === 0 && props.isData!" class="col-span-2 flex flex-col items-center justify-center">
                     <span v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" :class="[trimMessageClass(selectedDisk!), truncateText]" class="font-semibold text-sm">
                         Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
                     </span>
@@ -126,7 +133,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="selectedDisk!.stats.trim_notsup === 1" class="col-span-2 flex items-center justify-center mt-2">
+                <div v-if="selectedDisk!.stats.trim_notsup === 1 || selectedDisk!.stats.trim_notsup === 0 && !props.isData!" class="col-span-2 flex items-center justify-center mt-2">
                     <span class="text-muted" :class="truncateText">
                         Trim not suppported.
                     </span>
@@ -152,6 +159,7 @@ interface StatusProps {
     isPoolDetail: boolean;
     isDisk: boolean;
     isTrim: boolean;
+    isData?: boolean;
 }
 
 const props = defineProps<StatusProps>();
@@ -640,6 +648,7 @@ function trimProgressBarClass(disk) {
 onMounted(() => {
 	pollScanStatus();
 	pollTrimStatus();
+    console.log('isData:', props.isData!);
 });
 
 defineExpose({

@@ -82,6 +82,7 @@ interface DiskData {
 	poolName?: string;
 	identifier?: DiskIdentifier;
 	children?: ChildDiskData[];
+	vDevType?: 'data' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
 }
 
 interface ChildDiskData {
@@ -92,6 +93,7 @@ interface ChildDiskData {
 	status: string;
 	type: string;
 	children?:[];
+	vDevType?: 'data' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
 }
 
 // interface PoolDiskStatus {

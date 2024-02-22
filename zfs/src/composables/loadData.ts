@@ -15,7 +15,7 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
-		// console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
+		console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
 	} catch (error) {
 		console.error("An error occurred getting disk stats:", error);
 	}
@@ -28,7 +28,7 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
-		// console.log('---\nScanObject:', scanObject.value);
+		console.log('---\nScanObject:', scanObject.value);
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}
@@ -401,6 +401,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			rotationRate: diskVDev.value!.rotationRate,
 			vDevName: vDev.name,
 			poolName: poolName,
+			vDevType: vDevType,
 		}
 		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
@@ -458,6 +459,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 					vDevName: vDev.name,
 					poolName: poolName,
 					// children: newChildren.value,
+					vDevType: vDevType,
 				}; 
 
 				console.log("ChildDisk:", childDisk);
@@ -498,6 +500,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 						vDevName: vDev.name,
 						poolName: poolName,
 						children: newChildren.value,
+						vDevType: vDevType,
 					}
 
 					console.log("ChildDisk:", childDisk);
