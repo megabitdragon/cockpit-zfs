@@ -301,7 +301,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 			await destroyPool(selectedPool.value!);
 		}
 
-		refreshAllData();
+		await refreshAllData();
 		confirmDelete.value = false;
 		showDeletePoolConfirm.value = false;
 		operationRunning.value = false;
@@ -702,7 +702,7 @@ watch(confirmExport, async (newVal, oldVal) => {
 			exportPool(selectedPool.value!);
 		}
 		notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
-		refreshAllData();
+		await refreshAllData();
 		confirmExport.value = false;
 		showExportModal.value = false;
 		exporting.value = false;

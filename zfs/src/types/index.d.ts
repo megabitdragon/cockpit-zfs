@@ -24,6 +24,7 @@ interface PoolData {
 		listSnapshots?: boolean;
 		multiHost?: boolean;
 		health?: string;
+		altroot?: string;
 	}
 	vdevs: vDevData[];
 	createFileSystem?: boolean;

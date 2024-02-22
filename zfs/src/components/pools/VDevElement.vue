@@ -181,7 +181,7 @@ watch(confirmRemove, async (newValue, oldValue) => {
 
 		await removeVDevFromPool(selectedVDev.value, selectedPool.value);
 
-		refreshAllData();
+		await refreshAllData();
 		confirmRemove.value = false;
 		showRemoveVDevConfirm.value = false;
 		operationRunning.value = false;

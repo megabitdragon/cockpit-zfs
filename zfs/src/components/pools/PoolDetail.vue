@@ -6,15 +6,16 @@
 		<template v-slot:content>
 			<div v-if="navTag == 'stats'">
 				<div class="mt-6 grid grid-cols-3 grid-rows-2 text-default">
-						<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
-						:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
-						:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'" class="w-full col-span-3"/>
-					<div class="mt-6 px-8 col-span-3 row-start-2 grid grid-cols-3 justify-items-center min-w-fit max-w-fit">
+					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
+					:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
+					:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'" class="w-full col-span-3"/>
+					<div class="mt-2 px-8 col-span-3 row-start-2 grid grid-cols-3 justify-items-center min-w-fit max-w-fit">
 						<div class="m-2 col-span-1">
 							<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span class="text-success">{{ props.pool.status }}</span></p>
 							<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: {{ props.pool.scan && props.pool.scan.errors ? props.pool.scan.errors : '0' }} <br/>@ {{ getTimestampString() }}</p>
-						</div>
+							</div>
 						<div class="m-2 col-span-1">
+							<p :id="getIdKey('pool-altroot')" name="pool-altroot" class="text-base" :title="props.pool.properties.altroot == '' || props.pool.properties.altroot == '-' ? 'None' : props.pool.properties.altroot" :class="truncateText">Alt Root: {{ props.pool.properties.altroot == '' || props.pool.properties.altroot == '-' ? 'None' : props.pool.properties.altroot }}</p>
 							<p :id="getIdKey('pool-devices')" name="pool-devices" class="text-base">Devices: {{ getNumDevices }}</p>
 							<p :id="getIdKey('pool-disks')" name="pool-disks" class="text-base">Disks: {{ getNumDisks }}</p>
 						</div>
@@ -31,16 +32,12 @@
 				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx" class="p-2 m-2 rounded-md border border-default col-span-2 bg-accent">
 					<legend class="mb-1 text-base font-medium leading-6 text-default">{{ vDev.name }} ({{ vDev.type }})</legend>
 					
-					<div v-if="vDev.disks.length > 1" class="grid grid-cols-2">
+					<div class="grid" :class="vDev.disks.length < 2 ? 'grid-cols-1' : `grid-cols-2`">
 						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-1">
 							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
 						</div>
 					</div>
-					<div v-if="vDev.disks.length == 1" class="grid grid-cols-1">
-						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1 col-span-1">
-							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]"/>
-						</div>
-					</div>
+				
 				</div>
 			</div>
 			
@@ -133,7 +130,7 @@
 						</Switch>
 					</div>
 
-					<!-- auto-trim -->
+					<!-- display snapshots in filesystem list -->
 					<div class="col-span-2 col-start-3 row-start-3">
 						<label :for="getIdKey('settings-pool-display-snapshots')" class="mt-1 block text-sm leading-6 text-default">List Snapshots With File Systems</label>
 						<Switch v-model="poolConfig.properties.listSnapshots" :id="getIdKey('settings-pool-display-snapshots')" :class="[poolConfig.properties.listSnapshots ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
@@ -153,10 +150,12 @@
 						</Switch>
 					</div>
 
-					<!-- delegation (Allow non-priveleged user access based on the dataset permissions)-->
+					<!-- delegation (Allow non-privileged user access based on the dataset permissions)-->
 					<div class="col-span-2 col-start-1 row-start-4">
-						<label :for="getIdKey('settings-pool-delegation')" class="mt-1 block text-sm leading-6 text-default">Delegation</label>
-						<p class="text-xs">(non-privleged access based on dataset permissions)</p>
+						<div class="col-span-1 flex flex-row gap-2 mt-1 text-center leading-6">
+							<label :for="getIdKey('settings-pool-delegation')" class="block text-sm text-default">Delegation</label>
+							<p class="text-xs text-muted mt-0.5">(Access based on dataset permissions)</p>
+						</div>
 						<Switch v-model="poolConfig.properties.delegation" :id="getIdKey('settings-pool-delegation')" :class="[poolConfig.properties.delegation ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span :class="[poolConfig.properties.delegation ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
@@ -174,7 +173,7 @@
 						</Switch>
 					</div>
 
-					<!-- display snapshots in filesystem list -->
+					<!-- auto-trim -->
 					<div v-if="props.pool.diskType == 'SSD' || props.pool.diskType == 'Hybrid'" class="col-span-1 col-start-3 row-start-4">						
 						<label :for="getIdKey('settings-pool-auto-trim')" class="mt-1 block text-sm leading-6 text-default">Auto-TRIM Pool</label>
 						<Switch v-model="poolConfig.properties.autoTrim" :id="getIdKey('settings-pool-auto-trim')" :class="[poolConfig.properties.autoTrim ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
@@ -266,6 +265,7 @@ interface PoolDetailsProps {
 
 const props = defineProps<PoolDetailsProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
+// const comment = ref(props.pool.comment!);
 
 const poolConfig = ref<PoolData>({
 	name: props.pool.name,
@@ -292,7 +292,7 @@ const poolConfig = ref<PoolData>({
 	},
 	vdevs: props.pool.vdevs,
 	failMode: props.pool.failMode,
-	comment: props.pool.comment,
+	comment: props.pool.comment!,
 });
 
 ////////////////// Loading Data /////////////////////

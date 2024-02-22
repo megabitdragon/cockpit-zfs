@@ -276,7 +276,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		// removeActivity(selectedPool.value!.name, scanActivities.value[selectedPool.value!.name]);
 		// removeActivity(selectedPool.value!.name, trimActivities.value[selectedPool.value!.name]);
 
-		refreshAllData();
+		await refreshAllData();
 		confirmDelete.value = false;
 		showDeletePoolConfirm.value = false;
 		operationRunning.value = false;
@@ -549,7 +549,7 @@ watch(confirmTrim, async (newValue, oldValue) => {
 			showTrimModal.value = false;
 			await trimAndScan();
 		}
-		refreshAllData();
+		await refreshAllData();
 		operationRunning.value = false;
 
 		notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
@@ -578,7 +578,7 @@ async function resumeTrim(pool) {
 	getTrimStatus();
 	// pollTrim();
 	resumingTrim.value = false
-	refreshAllData();
+	await refreshAllData();
 }
 
 async function stopTrim(pool) {
@@ -611,7 +611,7 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 		console.log('now pausing trim:', selectedPool.value);
 		showPauseTrimConfirm.value = false;
 		await pauseTrimAndScan();
-		refreshAllData();
+		await refreshAllData();
 		confirmPauseTrim.value = false;
 		notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
 	
@@ -634,7 +634,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 		console.log('now stopping trim:', selectedPool.value);
 		showStopTrimConfirm.value = false;
 		await stopTrimAndScan();
-		refreshAllData();
+		await refreshAllData();
 		confirmStopTrim.value = false;
 		notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success');
 	}
@@ -682,7 +682,7 @@ watch(confirmExport, async (newVal, oldVal) => {
 		}
 
 		notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
-		refreshAllData();
+		await refreshAllData();
 		confirmExport.value = false;
 		showExportModal.value = false;
 		exporting.value = false;

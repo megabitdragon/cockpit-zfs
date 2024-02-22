@@ -10,7 +10,7 @@
 			</div>
 		</div>
 
-		<div class="mt-4  max-w-full">
+		<div class="mt-4 max-w-full">
 			<div class="inline-block min-w-full min-h-full shadow align-middle ">
 				<div class="whitespace-nowrap text-ellipsis ring-1 ring-black ring-opacity-5 ">
 

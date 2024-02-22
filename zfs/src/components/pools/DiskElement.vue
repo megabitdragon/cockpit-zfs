@@ -231,7 +231,7 @@ watch(confirmDetach, async (newValue, oldValue) => {
 		} else {
 			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
 		}
-		refreshAllData();
+		await refreshAllData();
 		
 		confirmDetach.value = false;
 		showDetachDiskModal.value = false;
@@ -278,7 +278,7 @@ watch(confirmOffline, async (newVal, oldVal) => {
 		await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
 
 		notifications.value.constructNotification('Offline Completed', 'Offlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
-		refreshAllData();
+		await refreshAllData();
 		confirmOffline.value = false;
 		showOfflineDiskModal.value = false;
 		offlining.value = false;
@@ -327,7 +327,7 @@ watch(confirmOnline, async (newVal, oldVal) => {
 		} else {
 			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
 		}
-		refreshAllData();
+		await refreshAllData();
 
 		confirmOnline.value = false;
 		showOnlineDiskModal.value = false;

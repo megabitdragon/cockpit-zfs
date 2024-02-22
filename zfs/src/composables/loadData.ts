@@ -15,7 +15,7 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
-		// console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
+		console.log("***\nPoolDiskStatsObject:", poolDiskStats.value);
 	} catch (error) {
 		console.error("An error occurred getting disk stats:", error);
 	}
@@ -28,7 +28,7 @@ export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) 
 		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
-		// console.log('---\nScanObject:', scanObject.value);
+		console.log('---\nScanObject:', scanObject.value);
 	} catch (error) {
 		console.error("An error occurred getting scan object group:", error);
 	}
@@ -109,9 +109,10 @@ export async function loadDisksThenPools(disks, pools) {
 						listSnapshots: parsedJSON[i].properties.listsnapshots.parsed,
 						multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
 						health: parsedJSON[i].properties.health.parsed,
+						altroot: parsedJSON[i].properties.altroot.value,
 					},
 					failMode: parsedJSON[i].properties.failmode.parsed,
-					comment: parsedJSON[i].properties.comment.value,
+					comment: parsedJSON[i].properties.comment.value !== '-' ? parsedJSON[i].properties.comment.value : '',
 					scan: {
 						name: parsedJSON[i].name,
 						function: parsedJSON[i].scan.function,

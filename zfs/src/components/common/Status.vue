@@ -66,26 +66,19 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Need to check ALL disks and if No trim supported, show in list Ex: Trim not supported on disks : 1-1, 1-2, etc. -->
-                            <!-- <div v-if="disk.stats.trim_notsup == 1" class="col-span-4">
-                                <div class="">
-                                    <span class="text-default col-span-4" :class="truncateText" :title="disk.name">
-                                        Trim not supported on this disk <br/>Disk: {{ disk.name }}.
-                                    </span>
-                                </div>
-                            </div> -->
                         </div>
                         <!-- Need to check ALL disks and if No trim supported, show in list Ex: Trim not supported on disks : 1-1, 1-2, etc. -->
-                            <div v-if="poolDiskStats[props.pool.name].some(disk => disk.stats.trim_notsup == 1)" class="col-span-4">
-                                <div class="">
-                                    <span class="text-default col-span-4">
-                                        Trim not supported on: <br/>
-                                        <div class="grid grid-cols-4 col-span-4 gap-1 mt-1 justify-center">
-                                            <span v-for="disk in poolDiskStats[props.pool.name]" :title="disk.name" :class="truncateText" class="">{{ disk.name }} </span>
-                                        </div>
-                                    </span>
-                                </div>
+                        <div v-if="poolDiskStats[props.pool.name].some(disk => disk.stats.trim_notsup == 1)" class="col-span-4">
+                            <div class="">
+                                <span class="text-default col-span-4">
+                                    Trim not supported on: <br/>
+                                    <div :class="(poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1)).length < 5 ? `grid-cols-${poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1).length}` : 'grid-cols-4'" class="grid col-span-4 gap-1 mt-1 justify-center">
+                                        <span v-for="disk, idx in (poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1))" :title="disk.name" :class="truncateText" class="">{{ disk.name }} </span>
+                                    </div>
+                                </span>
                             </div>
+                        </div>
+
                         <div v-if="isTrimSuspended" class="col-span-4">
                             Resume to continue or cancel to stop.     
                         </div>
