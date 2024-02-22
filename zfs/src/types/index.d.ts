@@ -41,7 +41,8 @@ interface PoolData {
 //object for vdev
 interface vDevData {
 	name: string;
-	type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
+	// type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
+	type: string;
 	status: string;
 	guid: string;
 	stats: {

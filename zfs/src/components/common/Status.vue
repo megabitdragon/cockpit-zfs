@@ -115,17 +115,16 @@
                     <span v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" :class="[trimMessageClass(selectedDisk!), truncateText]" class="font-semibold text-sm">
                         Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
                     </span>
-                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) == 'none'" :class="[trimMessageClass(selectedDisk!), truncateText]" class="font-semibold text-sm">
+                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) == 'none'" :class="[trimMessageClass(selectedDisk!), truncateText]" class="mt-2">
                         No Trim Activity
                     </span>
-                    <div class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
+                    <div v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
                         <div :class="trimProgressBarClass(selectedDisk!)" class="h-3 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
                             <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                 {{ getTrimmedAmount(selectedDisk!) }}/{{ getTrimmedTotal(selectedDisk!) }}
                             </div>
                         </div>
                     </div>
-                 
                 </div>
                 <div v-if="selectedDisk!.stats.trim_notsup === 1" class="col-span-2 flex items-center justify-center mt-2">
                     <span class="text-muted" :class="truncateText">

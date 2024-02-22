@@ -12,11 +12,11 @@
 					<!-- if first VDev, always either DISK, MIRROR, RAIDZ1-3 -->
 					<!-- if NOT first VDev, always either CACHE, LOG, SPECIAL, SPARE, DEDUP, or TYPE OF FIRST VDEV -->
 					<select id="virtual-device" v-model="newVDev.type" name="virtual-device" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
-						<option value="disk">Disk</option>
-						<option value="mirror">Mirror</option>
-						<option value="raidz1">RaidZ1</option>
-						<option value="raidz2">RaidZ2</option>
-						<option value="raidz3">RaidZ3</option>
+                        <option v-if="props.pool.vdevs[0].type == 'data' && firstVDevType == 'disk'" value="disk">Disk</option>
+						<option v-if="props.pool.vdevs[0].type == 'data' && firstVDevType == 'mirror'" value="mirror">Mirror</option>
+						<option v-if="props.pool.vdevs[0].type == 'data' && firstVDevType == 'raidz1'" value="raidz1">RaidZ1</option>
+						<option v-if="props.pool.vdevs[0].type == 'data' && firstVDevType == 'raidz2'" value="raidz2">RaidZ2</option>
+						<option v-if="props.pool.vdevs[0].type == 'data' && firstVDevType == 'raidz3'" value="raidz3">RaidZ3</option>
 						<option value="cache">Cache</option>
 						<option value="log">Log</option> 
 						<option value="special">Special</option>
@@ -150,8 +150,25 @@ const props = defineProps<AddVDevModalProps>();
 
 const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
 
+const firstVDevType = ref('');
+const firstVDevIsDisk = ref(false);
+
+function getVDevType() {
+    const firstVDevName = props.pool.vdevs[0].name;
+    firstVDevIsDisk.value = (props.pool.vdevs[0].disks.length == 1) ? true : false;
+    if (!firstVDevIsDisk.value) {
+        const strippedType = firstVDevName.substring(0, firstVDevName.indexOf('-'));
+        firstVDevType.value = strippedType;
+    } else {
+        firstVDevType.value = 'disk';
+    }
+
+    console.log('firstVDevType:', firstVDevType.value);
+    newVDev.value.type = firstVDevType.value;
+}
+
 const newVDev = ref<newVDevData>({
-	type: 'mirror',
+	type: firstVDevType.value,
 	disks: [],
     isMirror: false,
     forceAdd: false,
@@ -357,6 +374,7 @@ const diskCheck = () => {
 }
 
 onMounted(() => {
+    getVDevType();
 	loadImportablePools(importablePools.value, allDisks, pools);
 });
 
