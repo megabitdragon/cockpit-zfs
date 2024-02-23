@@ -62,12 +62,12 @@
 											<a v-if="scanActivity!.isActive && scanOperation == 'SCRUB'" href="#" @click="stopScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
-											<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="trimThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
-											<a v-if="trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="resumeTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM (Pool)</a>
-											<a v-if="trimActivity!.isActive && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="pauseTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Pool)</a>
+											<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD' && getIsTrimmable()" href="#" @click="trimThisPool(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+											<a v-if="trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD' && getIsTrimmable()" href="#" @click="resumeTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM (Pool)</a>
+											<a v-if="trimActivity!.isActive && poolData[props.poolIdx].diskType != 'HDD' && getIsTrimmable()" href="#" @click="pauseTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Pool)</a>
 										</MenuItem>									
 										<MenuItem as="div" v-slot="{ active }">
-											<a v-if="trimActivity!.isActive || trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD'" href="#" @click="stopTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Pool)</a>
+											<a v-if="trimActivity!.isActive || trimActivity!.isPaused && poolData[props.poolIdx].diskType != 'HDD' && getIsTrimmable()" href="#" @click="stopTrim(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Pool)</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click="showAddVDev(poolData[props.poolIdx])" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
@@ -139,7 +139,7 @@
 
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, computed} from "vue";
+import { ref, inject, Ref, provide, watch, computed, onMounted} from "vue";
 import { EllipsisVerticalIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
@@ -166,6 +166,41 @@ const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const clearLabels = inject<Ref<boolean>>('clear-labels')!;
+
+function getIsTrimmable() {
+	selectedPool.value = props.pool;
+	//poolData[props.poolIdx].diskType != 'HDD'
+	if (selectedPool.value.diskType! != 'HDD') {
+		if (selectedPool.value.vdevs.some(vdev => vdev.type == 'log' || vdev.type == 'special' || vdev.type == 'dedup')) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
+	
+}
+
+// function getIsTrimmable(disk) {
+//    switch ((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) {
+//     case 'data':
+//         return true;
+//     case 'log':
+//         return true;
+//     case 'special':
+//         return true;
+//     case 'dedup':
+//         return true;
+//     default:
+//         return false;
+//    }
+// }
+
+onMounted(() => {
+	getIsTrimmable();
+	console.log('isTrimmable:', getIsTrimmable());
+});
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////

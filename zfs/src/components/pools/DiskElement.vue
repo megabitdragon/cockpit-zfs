@@ -10,7 +10,7 @@
             <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.temp">{{ props.disk.temp }}</div>
             <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.capacity">{{ props.disk.capacity }}</div>
             <div class="py-1 -mt-1 col-span-2">
-                <Status :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox" :isData="props.disk.vDevType! == 'data'"/>
+                <Status :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox" :isTrimmable="getIsTrimmable()"/>
             </div>
             <div class="col-span-1">
                 <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
@@ -41,16 +41,16 @@
                                         <a href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace Disk</a>
                                     </MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD' && props.disk.vDevType! == 'data'" href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
+										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isPaused && props.pool.diskType != 'HDD' && props.disk.vDevType! == 'data'" href="#" @click="resumeTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
+										<a v-if="trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="resumeTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isActive && props.pool.diskType != 'HDD' && props.disk.vDevType! == 'data'" href="#" @click="pauseTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Disk)</a>
+										<a v-if="trimActivity!.isActive && props.pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="pauseTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Disk)</a>
 									</MenuItem>						
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && props.pool.diskType != 'HDD' && props.disk.vDevType! == 'data'" href="#" @click="stopTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Disk)</a>
+										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="stopTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Disk)</a>
 									</MenuItem>
                                 </div>
                             </MenuItems>
@@ -98,7 +98,7 @@
 	
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, watch, computed, provide } from "vue";
+import { ref, inject, Ref, watch, computed, provide, onMounted } from "vue";
 import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { scrubPool, clearErrors } from "../../composables/pools";
@@ -128,6 +128,23 @@ const operationRunning = ref(false);
 const firstOptionToggle = ref(false);
 const secondOptionToggle = ref(false);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
+
+function getIsTrimmable() {
+	selectedPool.value = props.pool;
+	if (selectedPool.value.diskType! != 'HDD') {
+		if (props.disk.vDevType! == 'log' || props.disk.vDevType! == 'special' || props.disk.vDevType! == 'dedup') {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
+}
+
+onMounted(() => {
+	getIsTrimmable();
+});
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////

@@ -34,12 +34,12 @@
 										<a v-if="scanActivity!.isActive && scanOperation == 'SCRUB'" href="#" @click="stopScrub(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel Scrub</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && pool.diskType != 'HDD'" href="#" @click="trimThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
-										<a v-if="trimActivity!.isPaused && pool.diskType != 'HDD'" href="#" @click="resumeTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM (Pool)</a>
-										<a v-if="trimActivity!.isActive && pool.diskType != 'HDD'" href="#" @click="pauseTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Pool)</a>
+										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="trimThisPool(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Pool</a>
+										<a v-if="trimActivity!.isPaused && pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="resumeTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resume TRIM (Pool)</a>
+										<a v-if="trimActivity!.isActive && pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="pauseTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Pool)</a>
 									</MenuItem>									
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && pool.diskType != 'HDD'" href="#" @click="stopTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Pool)</a>
+										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="stopTrim(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Pool)</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click="showAddVDev(props.pool)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add Virtual Device</a>
@@ -91,7 +91,7 @@
 					<Status :pool="props.pool" :isTrim="false" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'scrub-status-box'" ref="scanStatus"/>
 				</div>
 				<div class="grid grid-cols-4 gap-1 min-h-full w-full h-max rounded-sm justify-center">
-					<Status :pool="props.pool" :isTrim="true" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'stats-status-box'" ref="trimStatus"/>
+					<Status :pool="props.pool" :isTrim="true" :isDisk="false" :isPoolList="false" :isPoolDetail="false" class="col-span-4" :idKey="'stats-status-box'" ref="trimStatus" />
 				</div>
 			</template>
 		</Card>
@@ -144,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, provide, watch} from "vue";
+import { ref, inject, Ref, computed, provide, watch, onMounted} from "vue";
 import { EllipsisVerticalIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
@@ -192,7 +192,18 @@ const poolConfig = ref<PoolData>({
 	comment: props.pool.comment,
 });
 
+function getIsTrimmable() {
+	selectedPool.value = props.pool;
+	if (selectedPool.value.vdevs.some(vdev => vdev.type == 'log' || vdev.type == 'special' || vdev.type == 'dedup')) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
+onMounted(() => {
+	getIsTrimmable();
+});
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
 const operationRunning = ref(false);
