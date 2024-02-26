@@ -104,6 +104,7 @@ interface AttachDiskModalProps {
 const props = defineProps<AttachDiskModalProps>();
 const showFlag = ref(props.showFlag);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
+const notifications = inject<Ref<any>>('notifications')!;
 
 const emit = defineEmits(['close']);
 
@@ -230,11 +231,19 @@ async function attachDiskBtn() {
             console.log('all data of disk being attached:', diskVDevPoolData.value);
                 
             adding.value = true;
-            await attachDisk(diskVDevPoolData.value);
+            try {
+                const output = await attachDisk(diskVDevPoolData.value);
+
+                if (output == null) {
+                    notifications.value.constructNotification('Error Attaching Disk', 'There was an error attaching this disk. Check console output.', 'error'); 
+                }
+            } catch (error) {
+                console.error(error);
+            }
+
             showAttachDiskModal.value = false;
             adding.value = false;
-            
-           await refreshAllData();
+            await refreshAllData();
         }
        
     }

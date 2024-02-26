@@ -147,7 +147,6 @@ interface AddVDevModalProps {
 }
 
 const props = defineProps<AddVDevModalProps>();
-const notifications = inject<Ref<any>>('notifications')!;
 
 const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
 
@@ -214,6 +213,8 @@ const diskCardClass = (diskName) => {
 
 const adding = ref(false);
 
+const notifications = inject<Ref<any>>('notifications')!;
+
 async function addVDevBtn() {
     if (replicationLevelCheck()) {
         if (diskSizeMatch()) {
@@ -231,8 +232,7 @@ async function addVDevBtn() {
                         const output = await addVDev(props.pool, newVDev.value);
                         
                         if (output == null) {
-                            notifications.value.constructNotification('Error Adding VDev', 'There was an error adding this virtual device. Check console output.', 'error');
-                            
+                            notifications.value.constructNotification('Error Adding VDev', 'There was an error adding this virtual device. Check console output.', 'error'); 
                         }
                     } catch (error) {
                         console.error(error);

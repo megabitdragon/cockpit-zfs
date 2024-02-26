@@ -4,7 +4,7 @@
             Replace Disk
         </template>
         <template v-slot:content>
-            <div v-for="(vDev, vDevIdx) in props.pool.vdevs" :key="vDevIdx">
+            <div>
                 <!-- Disk ID (Select) -->
 				<div>
 					<label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk Identifier</label>
@@ -206,8 +206,9 @@ function setDiskNamePath() {
     }
 }
 
+const notifications = inject<Ref<any>>('notifications')!;
+
 async function replaceDiskBtn() {
-    
     if (diskSizeMatch()) {
         if (!diskBelongsToImportablePool() || diskVDevPoolData.value.forceReplace) {
             setDiskNamePath();
@@ -216,10 +217,18 @@ async function replaceDiskBtn() {
             console.log('all data of disk being replaceed:', diskVDevPoolData.value);
                 
             adding.value = true;
-            await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
+            try {
+                const output =  await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
+
+                if (output == null) {
+                    notifications.value.constructNotification('Error Replacing Disk', 'There was an error replacing this disk. Check console output.', 'error'); 
+                }
+            } catch (error) {
+                console.error(error);
+            }
+           
             showReplaceDiskModal.value = false;
             adding.value = false;
-            // scanNow();
             await refreshAllData();
         }
     }
