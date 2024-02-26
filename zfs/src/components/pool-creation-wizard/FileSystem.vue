@@ -757,15 +757,26 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 							fillDatasetData();
 							saving.value = true;
 							console.log('create Dataset fired');
-							await createEncryptedDataset(newDataset.value, passphrase.value).then(async() => {
-								console.log('encryption check passed');
-								fileSystemsLoaded.value = false;
-								datasets.value = [];
-								await loadDatasets(datasets);
-								showFSWizard.value = false;
-								saving.value = false;
-								fileSystemsLoaded.value = true;
-							});
+
+							try {
+								const output = await createEncryptedDataset(newDataset.value, passphrase.value);
+								
+								if (output == null) {
+									saving.value = false;
+									notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating this dataset. Check console output.', 'error');
+								} else {
+									console.log('encryption check passed');
+									fileSystemsLoaded.value = false;
+									datasets.value = [];
+									await loadDatasets(datasets);
+									showFSWizard.value = false;
+									saving.value = false;
+									fileSystemsLoaded.value = true;
+								}
+
+							} catch (error) {
+								console.error(error);
+							}
 						} else {
 							console.log('quota check failed');
 						}
@@ -777,15 +788,26 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 						getInheritedProperties();
 						fillDatasetData();
 						saving.value = true;
-						await createDataset(newDataset.value).then(async() => {
-							console.log('create Dataset fired');
-							fileSystemsLoaded.value = false;
-							datasets.value = [];
-							await loadDatasets(datasets);
-							showFSWizard.value = false;
-							saving.value = false;
-							fileSystemsLoaded.value = true;
-						});
+
+						try {
+							const output = await createDataset(newDataset.value);
+							
+							if (output == null) {
+								saving.value = false;
+								notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating this dataset. Check console output.', 'error');
+							} else {
+								console.log('encryption check passed');
+								fileSystemsLoaded.value = false;
+								datasets.value = [];
+								await loadDatasets(datasets);
+								showFSWizard.value = false;
+								saving.value = false;
+								fileSystemsLoaded.value = true;
+							}
+
+						} catch (error) {
+							console.error(error);
+						}
 					} else {
 						console.log('quota check failed');
 					}
@@ -818,14 +840,27 @@ async function newFileSystemInPoolWizard() {
 							fillDatasetData();
 							saving.value = true;
 							console.log('create Dataset fired');
-							await createEncryptedDataset(newDataset.value, passphrase.value).then(async() => {
-								console.log('encryption check passed');
-								fileSystemsLoaded.value = false;
-								datasets.value = [];
-								await loadDatasets(datasets);
-								saving.value = false;
-								fileSystemsLoaded.value = true;
-							});
+
+							try {
+								const output = await createEncryptedDataset(newDataset.value, passphrase.value);
+								
+								if (output == null) {
+									saving.value = false;
+									notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating this dataset. Check console output.', 'error');
+								} else {
+									console.log('encryption check passed');
+									fileSystemsLoaded.value = false;
+									datasets.value = [];
+									await loadDatasets(datasets);
+									saving.value = false;
+									fileSystemsLoaded.value = true;
+								}
+
+							} catch (error) {
+								console.error(error);
+							}
+							
+
 						} else {
 							console.log('quota check failed');
 						}
@@ -838,18 +873,26 @@ async function newFileSystemInPoolWizard() {
 						getInheritedProperties();
 						fillDatasetData();
 						saving.value = true;
-						await createDataset(newDataset.value).then(async() => {
-							console.log('create Dataset fired');
-							fileSystemsLoaded.value = false;
-							datasets.value = [];
-							await loadDatasets(datasets);
-							saving.value = false;
-							fileSystemsLoaded.value = true;
-						});
-						// .catch(error => {
-						// 	console.error(error);
-						// 	notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating the dataset. Check console output.', 'error');
-						// });
+
+						try {
+							const output = await createDataset(newDataset.value);
+							
+							if (output == null) {
+								saving.value = false;
+								notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating this dataset. Check console output.', 'error');
+							} else {
+								console.log('encryption check passed');
+								fileSystemsLoaded.value = false;
+								datasets.value = [];
+								await loadDatasets(datasets);
+								saving.value = false;
+								fileSystemsLoaded.value = true;
+							}
+
+						} catch (error) {
+							console.error(error);
+						}
+
 					} else {
 						console.log('quota check failed');
 					}
