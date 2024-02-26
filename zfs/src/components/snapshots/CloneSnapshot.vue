@@ -82,6 +82,7 @@ interface CloneSnapshotProps {
     idKey: string;
     snapshot: Snapshot;
 }
+const notifications = inject<Ref<any>>('notifications')!;
 
 const props = defineProps<CloneSnapshotProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
@@ -127,7 +128,19 @@ async function cloneBtn() {
     if (nameCheck(newName.value, parentFS.value)) {
         cloning.value = true;
         confirmClone.value = true;
+
         await cloneSnapshot(props.snapshot.name, parentFS.value, newName.value, createNonExistParent.value);
+
+        // try {
+        //     const output = await cloneSnapshot(props.snapshot.name, parentFS.value, newName.value, createNonExistParent.value);
+            
+        //     if (output == null) {
+        //         notifications.value.constructNotification('Error Cloning Snapshot', 'There was an error cloning this snapshot. Check console output.', 'error'); 
+        //     }
+        // } catch (error) {
+        //     console.error(error);
+        // }
+        
         fileSystemsLoaded.value = false;
         datasets.value = [];
         await loadDatasets(datasets);

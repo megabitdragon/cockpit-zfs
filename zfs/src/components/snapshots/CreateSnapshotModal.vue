@@ -93,7 +93,8 @@ interface CreateSnapshotModalProps {
     item: 'pool' | 'filesystem';
     poolName?: string;
 }
-
+const notifications = inject<Ref<any>>('notifications')!;
+    
 const props = defineProps<CreateSnapshotModalProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -218,7 +219,19 @@ function createSnapButton(newSnapshot) {
 async function create(newSnapshot) {
     creating.value = true;
     confirmCreate.value = true;
+
     await createSnapshot(newSnapshot);
+    
+    // try {
+    //     const output = await createSnapshot(newSnapshot);
+        
+    //     if (output == null) {
+    //         notifications.value.constructNotification('Error Creating Snapshot', 'There was an error creating this snapshot. Check console output.', 'error'); 
+    //     }
+    // } catch (error) {
+    //     console.error(error);
+    // }
+
     snapshotsLoaded.value = false;
     refreshSnapshots();
     snapshotsLoaded.value = true;

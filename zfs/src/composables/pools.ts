@@ -444,8 +444,10 @@ export async function addVDev(pool, vdev) {
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+
+		console.log(output);
 		return output.stdout;
+
 	} catch (state) {
 		console.error(errorString(state));
 		return null;

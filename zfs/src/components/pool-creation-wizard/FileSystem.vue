@@ -799,6 +799,8 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 	} 
 }
 
+const notifications = inject<Ref<any>>('notifications')!;
+	
 async function newFileSystemInPoolWizard() {
 	console.log('newFileSystemInPool method fired');
 	const fileSystem = ref(fileSystemConfig.value);
@@ -811,6 +813,7 @@ async function newFileSystemInPoolWizard() {
 				if (fileSystem.value.encrypted) {
 					if (encryptPasswordCheck(fileSystem.value)) {
 						if (checkQuota(fileSystem.value)) {
+							console.log('checkQuota passed');
 							getInheritedProperties();
 							fillDatasetData();
 							saving.value = true;
@@ -843,6 +846,10 @@ async function newFileSystemInPoolWizard() {
 							saving.value = false;
 							fileSystemsLoaded.value = true;
 						});
+						// .catch(error => {
+						// 	console.error(error);
+						// 	notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating the dataset. Check console output.', 'error');
+						// });
 					} else {
 						console.log('quota check failed');
 					}

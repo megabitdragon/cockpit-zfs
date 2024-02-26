@@ -211,6 +211,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 }
+const notifications = inject<Ref<any>>('notifications')!;
 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
@@ -229,24 +230,58 @@ async function finishBtn(newPoolData) {
 	console.log('newPoolData received:', newPoolData);
 	//console.log('newPoolName received:', newPoolName.value);
 
-	newPool(newPoolData).then(async() => {
-		await refreshAllData();
-		const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
-		creatingPool.value = false;
-		poolCreated.value = true;
-		if (newPoolFound) {
-			console.log('newPoolFound:', newPoolFound);
-			setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
+	// newPool(newPoolData).then(async() => {
+	// 	await refreshAllData();
+	// 	const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
+	// 	creatingPool.value = false;
+	// 	poolCreated.value = true;
+	// 	if (newPoolFound) {
+	// 		console.log('newPoolFound:', newPoolFound);
+	// 		setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
+	// 	} else {
+	// 		console.log("Pool not found, refreservation unsuccessful");
+	// 	}
+	// 	await newFS();
+	// 	await refreshAllData();
+	// 	showWizard.value = false;
+	// 	poolCreated.value = false;
+	// 	filesystemCreated.value = false;
+	// 	finishPressed.value = false;
+	// });
+	
+	try {
+		const output = await newPool(newPoolData);
+
+		if (output == null) {
+			notifications.value.constructNotification('Error Creating Pool', 'There was an error creating this pool. Check console output.', 'error');	
 		} else {
-			console.log("Pool not found, refreservation unsuccessful");
+			await refreshAllData();
+			const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
+			creatingPool.value = false;
+			poolCreated.value = true;
+			if (newPoolFound) {
+				console.log('newPoolFound:', newPoolFound);
+				setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
+			} else {
+				console.log("Pool not found, refreservation unsuccessful");
+			}
+			await newFS();
+			await refreshAllData();
+			showWizard.value = false;
+			poolCreated.value = false;
+			filesystemCreated.value = false;
+			finishPressed.value = false;
 		}
-		await newFS();	
-		await refreshAllData();
-		showWizard.value = false;
-		poolCreated.value = false;
-		filesystemCreated.value = false;
-		finishPressed.value = false;
-	});
+
+	} catch (error) {
+		console.error(error);
+	}
+
+	// .catch(error => {
+	// 	console.error(error);
+	// 	notifications.value.constructNotification('Error Creating Pool', 'There was an error creating the pool. Check console output.', 'error');
+	// });
+
 }
 
 async function newFS() {

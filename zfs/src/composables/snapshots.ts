@@ -40,6 +40,7 @@ export async function createSnapshot(newSnap : NewSnapshot) {
         return output.stdout;
     } catch (state) {
         console.error(errorString(state));
+        return null;
     }
 }
 
@@ -65,6 +66,7 @@ export async function destroySnapshot(snapshot, destroyChildrenSameName, destroy
         return output.stdout;
     } catch (state) {
         console.error(errorString(state));
+        return null;
     }
 }
 
@@ -90,6 +92,7 @@ export async function rollbackSnapshot(snapshot, destroyNewerSnaps, destroyAllNe
         return output.stdout;
     } catch (state) {
         console.error(errorString(state));
+        return null;
     }
 }
 
@@ -112,6 +115,7 @@ export async function renameSnapshot(snapshotName, newName, renameChildren?) {
         return output.stdout;
     } catch (state) {
         console.error(errorString(state));
+        return null;
     }
 }
 
@@ -134,6 +138,7 @@ export async function cloneSnapshot(snapName, newParentFS, cloneName, createPare
         return output.stdout;
     } catch (state) {
         console.error(errorString(state));
+        return null;
     }
 }
 
