@@ -147,6 +147,7 @@ interface AddVDevModalProps {
 }
 
 const props = defineProps<AddVDevModalProps>();
+const notifications = inject<Ref<any>>('notifications')!;
 
 const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
 
@@ -226,7 +227,17 @@ async function addVDevBtn() {
                         console.log('newVdev.disks:', newVDev.value.disks);
                     });
                     adding.value = true;
-                    await addVDev(props.pool, newVDev.value);
+                    try {
+                        const output = await addVDev(props.pool, newVDev.value);
+                        
+                        if (output == null) {
+                            notifications.value.constructNotification('Error Adding VDev', 'There was an error adding this virtual device. Check console output.', 'error');
+                            
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+
                     showAddVDevModal.value = false;
                     adding.value = false;
                     await refreshAllData();

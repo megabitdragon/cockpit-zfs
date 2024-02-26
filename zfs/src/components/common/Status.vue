@@ -71,8 +71,8 @@
                             </div>
 
                             <div v-if="disk.stats.trim_notsup === 0 && !getIsTrimmable(disk)" class="col-span-4">
-                                <span class="col-span-4 font- text-muted" :class="truncateText" :title="disk!.name!">
-                                    Trim not suppported {{ disk!.name }} ({{ upperCaseWord((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) }})
+                                <span class="col-span-4 font-base text-default" :class="truncateText" :title="disk!.name!">
+                                    Trim not suppported on {{ disk!.name }} ({{ upperCaseWord((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) }})
                                 </span>
                             </div>
 
