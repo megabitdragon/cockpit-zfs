@@ -386,7 +386,6 @@ watch(confirmResilver, async (newValue, oldValue) => {
 		} catch (error) { 
 			console.error(error);
 		}
-		
 	}
 });
 
@@ -645,10 +644,22 @@ async function pauseTrim(pool) {
 
 async function resumeTrim(pool) {
 	resumingTrim.value = true;
-	// checkingDiskStats.value = true;
-	await trimPool(pool);
-	getTrimStatus();
-	// pollTrim();
+	try {
+		const output = await trimPool(pool)
+
+		if (output == null) {
+			notifications.value.constructNotification('Trim Resume Failed', "Trim failed to resume. Check console output for details.", 'error');
+			// operationRunning.value = false;
+		} else {
+			getTrimStatus();
+			confirmTrim.value = false;
+			notifications.value.constructNotification('Trim Resumed', 'Trim on ' + selectedPool.value!.name + " resumed.", 'success');
+			// operationRunning.value = false;
+			showTrimModal.value = false;
+		}
+	} catch (error) {
+		console.error(error)
+	}
 	resumingTrim.value = false
 }
 
@@ -778,7 +789,7 @@ watch(confirmExport, async (newVal, oldVal) => {
 		} catch (error) {
 			console.error(error);
 		}
-		
+
 		exporting.value = false;
 		operationRunning.value = false;
 	}
