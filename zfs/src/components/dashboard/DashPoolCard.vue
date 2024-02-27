@@ -194,7 +194,7 @@ const poolConfig = ref<PoolData>({
 
 function getIsTrimmable() {
 	selectedPool.value = props.pool;
-	if (selectedPool.value.vdevs.some(vdev => vdev.type == 'log' || vdev.type == 'special' || vdev.type == 'dedup')) {
+	if (selectedPool.value.vdevs.some(vdev => vdev.type == 'data' || vdev.type == 'log' || vdev.type == 'special' || vdev.type == 'dedup')) {
 		return true;
 	} else {
 		return false;
@@ -204,6 +204,7 @@ function getIsTrimmable() {
 onMounted(() => {
 	getIsTrimmable();
 });
+
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
 const operationRunning = ref(false);
@@ -300,23 +301,33 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		console.log('now deleting:', selectedPool.value);
 
-		if (secondOptionToggle.value == true) {
-			await destroyPool(selectedPool.value!, firstOptionToggle.value);
-			selectedPool.value!.vdevs.forEach(vDev => {
-				vDev.disks.forEach(async disk => {
-					selectedDisk.value = disk;
-					await labelClear(selectedDisk.value!);
-				});
-			});
-		} else {
-			await destroyPool(selectedPool.value!);
-		}
+		try {
+			const output = await destroyPool(selectedPool.value!, firstOptionToggle.value);
 
-		await refreshAllData();
-		confirmDelete.value = false;
-		showDeletePoolConfirm.value = false;
-		operationRunning.value = false;
-		notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
+			if (output == null) {
+				operationRunning.value = false;
+				notifications.value.constructNotification('Destroy Pool Failed', selectedPool.value!.name + "was not destroyed. Check console output for details.", 'error');
+				// showDeletePoolConfirm.value = false;
+			} else {
+				if (secondOptionToggle.value == true) {
+					selectedPool.value!.vdevs.forEach(vDev => {
+						vDev.disks.forEach(async disk => {
+							selectedDisk.value = disk;
+							await labelClear(selectedDisk.value!);
+						});
+					});
+				}
+
+				await refreshAllData();
+				confirmDelete.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
+				showDeletePoolConfirm.value = false;
+			}
+
+		} catch (error) {
+			console.error(error);
+		}
 	}
 });
 
@@ -349,11 +360,6 @@ const updateShowResilverPool = (newVal) => {
 	showResilverModal.value = newVal;
 }
 
-async function resilverAndScan() {
-	await resilverPool(selectedPool.value!);
-	getScanStatus();
-}
-
 watch(confirmResilver, async (newValue, oldValue) => {
 	if (confirmResilver.value == true) {
 		resilvered.value = false;
@@ -361,15 +367,26 @@ watch(confirmResilver, async (newValue, oldValue) => {
 		operationRunning.value = resilvering.value;
 		
 		console.log('now resilvering:', selectedPool.value);
-		showResilverModal.value = false;
-		resilverAndScan();
+		try {
+			const output = await resilverPool(selectedPool.value!);
+			if (output == null) {
+				notifications.value.constructNotification('Resilver Failed', "Resilver failed to start. Check console output for details.", 'error');
+				// showResilverModal.value = false;
+				operationRunning.value = false;
+			} else {
+				getScanStatus();
 
-		confirmResilver.value = false;
-		resilvered.value = true;
-		resilvering.value = false;
-		operationRunning.value = false;
-
-		notifications.value.constructNotification('Resilver Started', 'Resilver on ' + selectedPool.value!.name + " started.", 'success');
+				confirmResilver.value = false;
+				resilvered.value = true;
+				resilvering.value = false;
+				operationRunning.value = false;
+				showResilverModal.value = false;
+				notifications.value.constructNotification('Resilver Started', 'Resilver on ' + selectedPool.value!.name + " started.", 'success');
+			}
+		} catch (error) { 
+			console.error(error);
+		}
+		
 	}
 });
 
@@ -416,25 +433,27 @@ const updateShowScrubPool = (newVal) => {
 	showScrubModal.value = newVal;
 }
 
-async function scrubAndScan() {
-	starting.value = true;
-	await scrubPool(selectedPool.value!);
-	getScanStatus();
-	starting.value = false;
-}
-
 watch(confirmScrub, async (newVal, oldVal) => {
 	if (confirmScrub.value == true) {
 		operationRunning.value = true;
 		console.log('now scrubbing:', selectedPool.value);
-		showScrubModal.value = false;
+		starting.value = true;
+		try {
+			const output = await scrubPool(selectedPool.value!);
 
-		await scrubAndScan();
-	
-		confirmScrub.value = false;
-		operationRunning.value = false;
-
-		notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
+			if (output == null) {
+				notifications.value.constructNotification('Scrub Failed', "Scrub failed to start. Check console output for details.", 'error');
+				operationRunning.value = false;
+			} else {
+				getScanStatus();
+				confirmScrub.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
+				showScrubModal.value = false;
+			}
+		} catch (error) {
+			console.error(error)
+		}
 	}
 });
 
@@ -445,17 +464,25 @@ async function pauseScrub(pool) {
 	console.log('scrub to pause:', selectedPool.value);
 }
 
-async function pauseScrubAndScan() {
-	pausing.value = true;
-	await scrubPool(selectedPool.value, 'pause');
-	getScanStatus();
-	pausing.value = false;
-}
-
 async function resumeScrub(pool) {
 	resuming.value = true;
-	await scrubPool(pool);
-	getScanStatus();
+	// operationRunning.value = true;
+	try {
+		const output = await scrubPool(selectedPool.value!);
+
+		if (output == null) {
+			notifications.value.constructNotification('Scrub Resume Failed', "Scrub failed to resume. Check console output for details.", 'error');
+			// operationRunning.value = false;
+		} else {
+			getScanStatus();
+			confirmScrub.value = false;
+			notifications.value.constructNotification('Scrub Resumed', 'Scrub on ' + selectedPool.value!.name + " resumed.", 'success');
+			// operationRunning.value = false;
+			showScrubModal.value = false;
+		}
+	} catch (error) {
+		console.error(error)
+	}
 	resuming.value = false
 }
 
@@ -464,13 +491,6 @@ async function stopScrub(pool) {
 	await loadScrubStopConfirmComponent();
 	showStopScrubConfirm.value = true;
 	console.log('scrub to stop:', selectedPool.value);
-}
-
-async function stopScrubAndScan() {
-	stopping.value = true;
-	await scrubPool(selectedPool.value, 'stop');
-	getScanStatus();
-	stopping.value = false;
 }
 
 const showPauseScrubConfirm = ref(false);
@@ -487,10 +507,25 @@ const updateShowPauseScrub = (newVal) => {
 watch(confirmPauseScrub, async (newVal, oldVal) => {
 	if (confirmPauseScrub.value == true) {
 		console.log('now pausing scrub:', selectedPool.value);
-		showPauseScrubConfirm.value = false;
-		await pauseScrubAndScan();
-		confirmPauseScrub.value = false;
-		notifications.value.constructNotification('Scrub Paused', 'Scrub on ' + selectedPool.value!.name + " paused.", 'success');
+		pausing.value = true;
+		try {
+			const output = await scrubPool(selectedPool.value, 'pause');
+
+			if (output == null) {
+				notifications.value.constructNotification('Scrub Pause Failed', "Scrub failed to pause. Check console output for details.", 'error');
+				// operationRunning.value = false;
+			} else {
+				getScanStatus();
+				confirmPauseScrub.value = false;
+				notifications.value.constructNotification('Scrub Paused', 'Scrub on ' + selectedPool.value!.name + " paused.", 'success');
+				showPauseScrubConfirm.value = false;
+				// operationRunning.value = false;
+			}
+		} catch (error) {
+			console.error(error)
+		}
+		pausing.value = false
+	
 	}
 });
 
@@ -508,10 +543,26 @@ const updateShowStopScrub = (newVal) => {
 watch(confirmStopScrub, async (newVal, oldVal) => {
 	if (confirmStopScrub.value == true) {
 		console.log('now stopping scrub:', selectedPool.value);
-		showStopScrubConfirm.value = false;
-		await stopScrubAndScan();
-		confirmStopScrub.value = false;
-		notifications.value.constructNotification('Scrub Stopped', 'Scrub on ' + selectedPool.value!.name + " stopped.", 'success');
+		stopping.value = true;
+
+		try {
+			const output = await scrubPool(selectedPool.value, 'stop');
+
+			if (output == null) {
+				notifications.value.constructNotification('Scrub Stop Failed', "Scrub failed to stop. Check console output for details.", 'error');
+				// operationRunning.value = false;
+			} else {
+				getScanStatus();
+				confirmStopScrub.value = false;
+				notifications.value.constructNotification('Scrub Stopped', 'Scrub on ' + selectedPool.value!.name + " stopped.", 'success');
+				// operationRunning.value = false;
+				showStopScrubConfirm.value = false;
+			}
+		} catch (error) {
+			console.error(error)
+		}
+	
+		stopping.value = false;
 	}
 });
 
@@ -561,35 +612,27 @@ const updateShowTrimPool = (newVal) => {
 	showTrimModal.value = newVal;
 }
 
-async function trimAndScan() {
-	startingTrim.value = true;
-	if (firstOptionToggle.value) {
-		await trimPool(selectedPool.value!, firstOptionToggle.value);
-		getTrimStatus();
-	} else {
-		await trimPool(selectedPool.value!);
-		getTrimStatus();
-	}
-	startingTrim.value = false;
-}
-
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
-		operationRunning.value = true;
+		startingTrim.value = true;
+		// operationRunning.value = true;
 		console.log('now trimming:', selectedPool.value);
-
-		if (firstOptionToggle.value) {
-			confirmTrim.value = false;	
-			showTrimModal.value = false;
-			await trimAndScan();
-		} else {
-			confirmTrim.value = false;
-			showTrimModal.value = false;
-			await trimAndScan();
+		try {
+			const output = await trimPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
+			if (output == null) {
+				notifications.value.constructNotification('Trim Failed', "Trim failed to start. Check console output for details.", 'error');
+				// operationRunning.value = false;
+			} else {
+				getTrimStatus();
+				confirmTrim.value = false
+				notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
+				showTrimModal.value = false;
+				// operationRunning.value = false;
+			}
+		} catch (error) {
+			console.error(error);
 		}
-		operationRunning.value = false;
-
-		notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
+		startingTrim.value = false;
 	}
 });
 
@@ -598,13 +641,6 @@ async function pauseTrim(pool) {
 	await loadTrimPauseConfirmComponent();
 	showPauseTrimConfirm.value = true;
 	console.log('trim to pause:', selectedPool.value);
-}
-
-async function pauseTrimAndScan() {
-	pausingTrim.value = true;
-	await trimPool(selectedPool.value!, false, 'pause');
-	getTrimStatus();
-	pausingTrim.value = false;
 }
 
 async function resumeTrim(pool) {
@@ -623,13 +659,6 @@ async function stopTrim(pool) {
 	console.log('trim to stop:', selectedPool.value);
 }
 
-async function stopTrimAndScan() {
-	stoppingTrim.value = true;
-	await trimPool(selectedPool.value!, false, 'stop');
-	getTrimStatus();
-	stoppingTrim.value = false;
-}
-
 const showPauseTrimConfirm = ref(false);
 const confirmPauseTrim = ref(false);
 
@@ -644,10 +673,25 @@ const updateShowPauseTrim = (newVal) => {
 watch(confirmPauseTrim, async (newVal, oldVal) => {
 	if (confirmPauseTrim.value == true) {
 		console.log('now pausing trim:', selectedPool.value);
-		showPauseTrimConfirm.value = false;
-		await pauseTrimAndScan();
-		confirmPauseTrim.value = false;
-		notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
+		pausingTrim.value = true;
+		try {
+			const output = 	await trimPool(selectedPool.value!, false, 'pause');
+			if (output == null) {
+				notifications.value.constructNotification('Trim Pause Failed', "Trim failed to pause. Check console output for details.", 'error');
+				// operationRunning.value = false;
+			} else {
+				getTrimStatus();
+				confirmPauseTrim.value = false;
+				notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
+				// operationRunning.value = false;
+				showPauseTrimConfirm.value = false;
+			}
+			
+		} catch (error) {
+			console.error(error);
+		}
+		
+		pausingTrim.value = false;
 	}
 });
 
@@ -665,10 +709,23 @@ const updateShowStopTrim = (newVal) => {
 watch(confirmStopTrim, async (newVal, oldVal) => {
 	if (confirmStopTrim.value == true) {
 		console.log('now stopping trim:', selectedPool.value);
-		showStopTrimConfirm.value = false;
-		await stopTrimAndScan();
-		confirmStopTrim.value = false;
-		notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success');
+		stoppingTrim.value = true;
+		try {
+			const output = await trimPool(selectedPool.value!, false, 'stop');
+			if (output == null) {
+				notifications.value.constructNotification('Trim Stop Failed', "Trim failed to stop. Check console output for details.", 'error');
+				// operationRunning.value = false;
+			} else {
+				getTrimStatus();
+				confirmStopTrim.value = false;
+				notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success');
+				showStopTrimConfirm.value = false;
+			}
+		} catch (error) {
+			console.error(error);
+		}
+
+		stoppingTrim.value = false;
 	}
 });
 
@@ -707,15 +764,21 @@ watch(confirmExport, async (newVal, oldVal) => {
 		exporting.value = true;
 		operationRunning.value = true;
 		console.log('now exporting:', selectedPool.value);
-		if (firstOptionToggle.value) {
-			exportPool(selectedPool.value!, firstOptionToggle.value);
-		} else {
-			exportPool(selectedPool.value!);
+
+		try {
+			const output = await exportPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
+			if (output == null) {
+				notifications.value.constructNotification('Export Failed', "Pool failed to export. Check console output for details.", 'error');
+			} else {
+				notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
+				await refreshAllData();
+				confirmExport.value = false;
+				showExportModal.value = false;
+			}
+		} catch (error) {
+			console.error(error);
 		}
-		notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
-		await refreshAllData();
-		confirmExport.value = false;
-		showExportModal.value = false;
+		
 		exporting.value = false;
 		operationRunning.value = false;
 	}
@@ -792,7 +855,6 @@ const scanActivity = computed(() => {
 const trimActivity = computed(() => {
 	return trimActivities.value.get(poolID.value);
 });
-
 
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 

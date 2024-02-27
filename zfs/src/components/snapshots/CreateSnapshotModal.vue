@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showSnapshotModal" :marginTop="'mt-48'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
+    <Modal :isOpen="showSnapshotModal" :marginTop="'mt-48'" :width="'w-3/5'" :minWidth="'min-w-3/5'" class="z-20">
         <template v-slot:title>
             <legend class="flex justify-center">Create Snapshot</legend>
         </template>
@@ -217,30 +217,41 @@ function createSnapButton(newSnapshot) {
 }
 
 async function create(newSnapshot) {
+    // creating.value = true;
+    // confirmCreate.value = true;
+
+    // await createSnapshot(newSnapshot);
+
+    // snapshotsLoaded.value = false;
+    // refreshSnapshots();
+    // snapshotsLoaded.value = true;
+    // creating.value = false;
+    // newSnapshot.isCustomName = false;
+    // newSnapshot.snapChildren = false;
+    // showSnapshotModal.value = false;
+
     creating.value = true;
-    confirmCreate.value = true;
-
-    await createSnapshot(newSnapshot);
-    
-    // try {
-    //     const output = await createSnapshot(newSnapshot);
+    try {
+        const output = await createSnapshot(newSnapshot);
         
-    //     if (output == null) {
-    //         notifications.value.constructNotification('Error Creating Snapshot', 'There was an error creating this snapshot. Check console output.', 'error'); 
-    //     }
-    // } catch (error) {
-    //     console.error(error);
-    // }
-
-    snapshotsLoaded.value = false;
-    refreshSnapshots();
-    snapshotsLoaded.value = true;
+        if (output == null) {
+            notifications.value.constructNotification('Create Snapshot Failed', 'There was an error creating this snapshot. Check console output.', 'error'); 
+            confirmCreate.value = false;
+        } else {
+            confirmCreate.value = true;
+            snapshotsLoaded.value = false;
+            refreshSnapshots();
+            snapshotsLoaded.value = true;
+            newSnapshot.isCustomName = false;
+            newSnapshot.snapChildren = false;
+            notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+            showSnapshotModal.value = false;
+        }
+    } catch (error) {
+        console.error(error);
+    }
     creating.value = false;
-    newSnapshot.isCustomName = false;
-    newSnapshot.snapChildren = false;
-    showSnapshotModal.value = false;
 }
-
 
 const getIdKey = (name: string) => `${name}`;
 </script>

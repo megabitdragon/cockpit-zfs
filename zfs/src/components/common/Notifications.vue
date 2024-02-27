@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 <template>
 	<div aria-live="assertive"
-		class="fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start z-20 h-screen overflow-y-auto">
+		class="fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start z-50 h-screen overflow-y-auto">
 		<transition-group tag="div" class="w-full flex flex-col-reverse items-center sm:items-end sm:flex-col space-y-content"
 			enter-active-class="transition-all transform ease-out duration-300"
 			enter-from-class="translate-y-8 opacity-0 scale-95 sm:translate-y-0 sm:translate-x-8"

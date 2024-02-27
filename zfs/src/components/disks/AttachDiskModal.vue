@@ -235,15 +235,19 @@ async function attachDiskBtn() {
                 const output = await attachDisk(diskVDevPoolData.value);
 
                 if (output == null) {
-                    notifications.value.constructNotification('Error Attaching Disk', 'There was an error attaching this disk. Check console output.', 'error'); 
+                    adding.value = false;
+                    notifications.value.constructNotification('Disk Attach Failed', 'There was an error attaching this disk. Check console output.', 'error'); 
+                } else {
+                    showAttachDiskModal.value = false;
+                    adding.value = false;
+                    await refreshAllData();
+                    notifications.value.constructNotification('Disk Attached', `Attached disk to virtual device successfully.`, 'success');
                 }
             } catch (error) {
                 console.error(error);
             }
 
-            showAttachDiskModal.value = false;
-            adding.value = false;
-            await refreshAllData();
+          
         }
        
     }

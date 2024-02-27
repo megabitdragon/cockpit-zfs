@@ -304,7 +304,6 @@ watch(confirmCreate, async (newVal, oldVal) => {
 		await refreshDatasetSnaps(selectedDataset.value);
 		confirmCreate.value = false;
 		operationRunning.value = false;
-		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
 	}
 });
 

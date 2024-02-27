@@ -229,36 +229,26 @@ async function finishBtn(newPoolData) {
 	creatingPool.value = true;
 	console.log('newPoolData received:', newPoolData);
 	//console.log('newPoolName received:', newPoolName.value);
-
-	// newPool(newPoolData).then(async() => {
-	// 	await refreshAllData();
-	// 	const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
-	// 	creatingPool.value = false;
-	// 	poolCreated.value = true;
-	// 	if (newPoolFound) {
-	// 		console.log('newPoolFound:', newPoolFound);
-	// 		setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
-	// 	} else {
-	// 		console.log("Pool not found, refreservation unsuccessful");
-	// 	}
-	// 	await newFS();
-	// 	await refreshAllData();
-	// 	showWizard.value = false;
-	// 	poolCreated.value = false;
-	// 	filesystemCreated.value = false;
-	// 	finishPressed.value = false;
-	// });
 	
 	try {
 		const output = await newPool(newPoolData);
 
 		if (output == null) {
-			notifications.value.constructNotification('Error Creating Pool', 'There was an error creating this pool. Check console output.', 'error');	
+			finishPressed.value = false;
+		
+			notifications.value.constructNotification('Pool Creation Failed', 'There was an error creating this pool. Check console output.', 'error');	
+			await newFS();
+			await refreshAllData();
+			showWizard.value = false;
+			poolCreated.value = false;
+			filesystemCreated.value = false;
+			finishPressed.value = false;
 		} else {
 			await refreshAllData();
 			const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
 			creatingPool.value = false;
 			poolCreated.value = true;
+			notifications.value.constructNotification('Pool Created!', `Created new pool.`, 'success');
 			if (newPoolFound) {
 				console.log('newPoolFound:', newPoolFound);
 				setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
@@ -276,11 +266,6 @@ async function finishBtn(newPoolData) {
 	} catch (error) {
 		console.error(error);
 	}
-
-	// .catch(error => {
-	// 	console.error(error);
-	// 	notifications.value.constructNotification('Error Creating Pool', 'There was an error creating the pool. Check console output.', 'error');
-	// });
 
 }
 

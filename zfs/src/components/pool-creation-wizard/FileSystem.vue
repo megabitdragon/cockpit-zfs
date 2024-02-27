@@ -772,6 +772,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 									showFSWizard.value = false;
 									saving.value = false;
 									fileSystemsLoaded.value = true;
+									notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
 								}
 
 							} catch (error) {
@@ -803,6 +804,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 								showFSWizard.value = false;
 								saving.value = false;
 								fileSystemsLoaded.value = true;
+								notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
 							}
 
 						} catch (error) {
@@ -854,6 +856,7 @@ async function newFileSystemInPoolWizard() {
 									await loadDatasets(datasets);
 									saving.value = false;
 									fileSystemsLoaded.value = true;
+									notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
 								}
 
 							} catch (error) {
@@ -887,6 +890,7 @@ async function newFileSystemInPoolWizard() {
 								await loadDatasets(datasets);
 								saving.value = false;
 								fileSystemsLoaded.value = true;
+								notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
 							}
 
 						} catch (error) {

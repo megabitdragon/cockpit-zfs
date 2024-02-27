@@ -1,5 +1,5 @@
 <template>
-	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'">
+	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'" class="z-10">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
@@ -257,8 +257,6 @@ import Navigation from '../common/Navigation.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
-const notifications = inject<Ref<any>>('notifications')!;
-
 interface PoolDetailsProps {
 	pool: PoolData;
 }
@@ -398,11 +396,36 @@ watch(confirmCreate, async (newVal, oldVal) => {
 		operationRunning.value = true;
 		creating.value = operationRunning.value;
 		// await refreshSnaps();
-		confirmCreate.value = false;
 		operationRunning.value = false;
 		creating.value = operationRunning.value;
-		notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+		confirmCreate.value = false;
+		// notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
 	}
+
+
+	/*
+    creating.value = true;
+    confirmCreate.value = true;
+	try {
+        const output = await createSnapshot(newSnapshot);
+        
+        if (output == null) {
+            creating.value = false;
+            notifications.value.constructNotification('Create Snapshot Failed', 'There was an error creating this snapshot. Check console output.', 'error'); 
+        } else {
+            snapshotsLoaded.value = false;
+            refreshSnapshots();
+            snapshotsLoaded.value = true;
+            creating.value = false;
+            newSnapshot.isCustomName = false;
+            newSnapshot.snapChildren = false;
+            showSnapshotModal.value = false;
+            notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+        }
+    } catch (error) {
+        console.error(error);
+    } 
+	*/
 });
 
 /////////////////// Pool Changes ////////////////////
@@ -472,20 +495,34 @@ const commentLengthCheck = (poolData) => {
 	return result;
 }
 
+const notifications = inject<Ref<any>>('notifications')!;
+	
 async function poolConfigureBtn() {	
 	if (commentLengthCheck(poolConfig.value)) {
 		console.log('pool:', poolConfig.value);
 		await checkForChanges(poolConfig.value);
 		console.log('newChanges:', newChangesToPool.value);
 		saving.value = true;
-		await configurePool(newChangesToPool.value);
-		pools.value = [];
-		disks.value = [];
-		await loadDisksThenPools(disks, pools);
-		disksLoaded.value = true;
-		poolsLoaded.value = true;
-		saving.value = false;
-		showPoolDetails.value = false;
+
+		try {
+			const output = await configurePool(newChangesToPool.value);
+			if (output == false) {
+				saving.value = false;
+				notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output.', 'error');
+			} else {
+				notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
+				pools.value = [];
+				disks.value = [];
+				await loadDisksThenPools(disks, pools);
+				disksLoaded.value = true;
+				poolsLoaded.value = true;
+				saving.value = false;
+				showPoolDetails.value = false;
+			
+			}
+		} catch (error) {
+			console.error(error);
+		} 
 	}
 }
 

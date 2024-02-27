@@ -126,27 +126,38 @@ const datasetsInSamePool = computed<FileSystemData[]>(() => {
 
 async function cloneBtn() {
     if (nameCheck(newName.value, parentFS.value)) {
-        cloning.value = true;
-        confirmClone.value = true;
 
-        await cloneSnapshot(props.snapshot.name, parentFS.value, newName.value, createNonExistParent.value);
+        // cloning.value = true;
+        // confirmClone.value = true;
 
-        // try {
-        //     const output = await cloneSnapshot(props.snapshot.name, parentFS.value, newName.value, createNonExistParent.value);
-            
-        //     if (output == null) {
-        //         notifications.value.constructNotification('Error Cloning Snapshot', 'There was an error cloning this snapshot. Check console output.', 'error'); 
-        //     }
-        // } catch (error) {
-        //     console.error(error);
-        // }
+        // await cloneSnapshot(props.snapshot.name, parentFS.value, newName.value, createNonExistParent.value);
         
-        fileSystemsLoaded.value = false;
-        datasets.value = [];
-        await loadDatasets(datasets);
-        showCloneSnapModal.value = false;
+        // fileSystemsLoaded.value = false;
+        // datasets.value = [];
+        // await loadDatasets(datasets);
+        // showCloneSnapModal.value = false;
+        // cloning.value = false;
+        // fileSystemsLoaded.value = true;
+
+        cloning.value = true;
+        try {
+            const output = await cloneSnapshot(props.snapshot.name, parentFS.value, newName.value, createNonExistParent.value);
+            
+            if (output == null) {
+                notifications.value.constructNotification('Snapshot Clone Failed', 'There was an error cloning this snapshot. Check console output.', 'error'); 
+            } else {
+                confirmClone.value = true;
+                fileSystemsLoaded.value = false;
+                datasets.value = [];
+                await loadDatasets(datasets);
+                fileSystemsLoaded.value = true;
+                notifications.value.constructNotification('Snapshot Cloned', `Cloned snapshot successfully.`, 'success');
+                showCloneSnapModal.value = false;
+            }
+        } catch (error) {
+            console.error(error);
+        }
         cloning.value = false;
-        fileSystemsLoaded.value = true;
     }
 
 }

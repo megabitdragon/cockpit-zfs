@@ -232,15 +232,19 @@ async function addVDevBtn() {
                         const output = await addVDev(props.pool, newVDev.value);
                         
                         if (output == null) {
-                            notifications.value.constructNotification('Error Adding VDev', 'There was an error adding this virtual device. Check console output.', 'error'); 
+                            adding.value = false;
+                            notifications.value.constructNotification('Add VDev Failed', 'There was an error adding this virtual device. Check console output.', 'error'); 
+                        } else {
+                            showAddVDevModal.value = false;
+                            adding.value = false;
+                            await refreshAllData();
+                            notifications.value.constructNotification('Added VDev', `Virtual device added successfully.`, 'success');
                         }
                     } catch (error) {
                         console.error(error);
                     }
 
-                    showAddVDevModal.value = false;
-                    adding.value = false;
-                    await refreshAllData();
+                  
                 }
             }
         }

@@ -221,15 +221,19 @@ async function replaceDiskBtn() {
                 const output =  await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
 
                 if (output == null) {
-                    notifications.value.constructNotification('Error Replacing Disk', 'There was an error replacing this disk. Check console output.', 'error'); 
+                    adding.value = false;
+                    notifications.value.constructNotification('Replace Disk Failed', 'There was an error replacing this disk. Check console output.', 'error'); 
+                } else {
+           
+                    showReplaceDiskModal.value = false;
+                    adding.value = false;
+                    await refreshAllData();
+                    notifications.value.constructNotification('Disk Replaced', `Replaced disk successfully.`, 'success');
                 }
             } catch (error) {
                 console.error(error);
             }
-           
-            showReplaceDiskModal.value = false;
-            adding.value = false;
-            await refreshAllData();
+
         }
     }
 }
