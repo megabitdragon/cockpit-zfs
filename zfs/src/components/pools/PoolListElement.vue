@@ -182,21 +182,6 @@ function getIsTrimmable() {
 	
 }
 
-// function getIsTrimmable(disk) {
-//    switch ((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) {
-//     case 'data':
-//         return true;
-//     case 'log':
-//         return true;
-//     case 'special':
-//         return true;
-//     case 'dedup':
-//         return true;
-//     default:
-//         return false;
-//    }
-// }
-
 onMounted(() => {
 	getIsTrimmable();
 	console.log('isTrimmable:', getIsTrimmable());
@@ -777,16 +762,21 @@ watch(confirmExport, async (newVal, oldVal) => {
 		exporting.value = true;
 		operationRunning.value = true;
 		console.log('now exporting:', selectedPool.value);
-		if (firstOptionToggle.value) {
-			exportPool(selectedPool.value!, firstOptionToggle.value);
-		} else {
-			exportPool(selectedPool.value!);
+
+		try {
+			const output = await exportPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
+			if (output == null) {
+				notifications.value.constructNotification('Export Failed', "Pool failed to export. Check console output for details.", 'error');
+			} else {
+				notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
+				await refreshAllData();
+				confirmExport.value = false;
+				showExportModal.value = false;
+			}
+		} catch (error) {
+			console.error(error);
 		}
 
-		notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
-		await refreshAllData();
-		confirmExport.value = false;
-		showExportModal.value = false;
 		exporting.value = false;
 		operationRunning.value = false;
 	}
@@ -805,7 +795,6 @@ async function clearPoolErrors(poolName) {
 ///////////////////// Add VDev //////////////////////
 /////////////////////////////////////////////////////
 const showAddVDevModal = ref(false);
-
 const showAddVDevComponent = ref();
 const loadShowAddVDevComponent = async () => {
 	const module = await import('../pools/AddVDevModal.vue');
@@ -858,7 +847,6 @@ async function getTrimStatus() {
 	// await vDevElement.value[0].getDiskStatus();
 }
 
-
 /////////////////////////////////////////////////////
 
 const poolID = ref(props.pool.name);
@@ -895,5 +883,7 @@ provide('modal-option-one-toggle', firstOptionToggle);
 provide('modal-option-two-toggle', secondOptionToggle);
 provide('modal-option-three-toggle', thirdOptionToggle);
 provide('modal-option-four-toggle', fourthOptionToggle);
+
+provide('scan-status-box', scanStatusBox);
 
 </script>

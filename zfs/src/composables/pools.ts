@@ -272,15 +272,7 @@ export async function scrubPool(pool, action?) {
 		if(action === 'stop') {
 			cmdString.push('-s');
 		}
-				// await configurePool(newChangesToPool.value);
-		// pools.value = [];
-		// disks.value = [];
-		// await loadDisksThenPools(disks, pools);
-		// disksLoaded.value = true;
-		// poolsLoaded.value = true;
-		// saving.value = false;
-		// showPoolDetails.value = false;
-		// cmdString.push('-w');
+
 		cmdString.push(pool.name);
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		

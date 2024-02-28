@@ -29,7 +29,7 @@
 										<!-- <MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click.stop="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 										</MenuItem> -->
-										<MenuItem v-if="pool.vdevs.length !== 1 && vDevIdx != 0" as="div" v-slot="{ active }">
+										<MenuItem v-if="pool.vdevs.length !== 1" as="div" v-slot="{ active }">
 											<a href="#" @click="removeVDev(props.pool, props.pool.vdevs[vDevIdx])" :class="[active ? 'bg-danger text-white' : 'text-white', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
@@ -196,14 +196,23 @@ watch(confirmRemove, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
 
-		await removeVDevFromPool(selectedVDev.value, selectedPool.value);
+		try {
+			const output = await removeVDevFromPool(selectedVDev.value, selectedPool.value);
+			if (output == null) {
+				notifications.value.constructNotification('Remove Failed', "Failed to remove Virtual Device. Check console output for details.", 'error');
+			} else {
+				notifications.value.constructNotification('Remove Completed', `Removed VDev ${selectedVDev.value!.name} from Pool ${selectedPool.value!.name}`, 'success');
+				await refreshAllData();
+				confirmRemove.value = false;
+				showRemoveVDevConfirm.value = false;
+			}
+		} catch (error) {
+			console.error(error);
+		}
 
 		await refreshAllData();
-		confirmRemove.value = false;
-		showRemoveVDevConfirm.value = false;
+	
 		operationRunning.value = false;
-
-		notifications.value.constructNotification('Remove Completed', 'Removal of VDev '+ selectedVDev.value!.name + " from " + selectedPool.value!.name + " completed.", 'success');
 	}
 });
 
@@ -254,4 +263,9 @@ defineExpose({
 });
 
 provide('show-attach-modal', showAttachDiskModal);
+provide('modal-confirm-running', operationRunning);
+// provide('modal-option-one-toggle', firstOptionToggle);
+// provide('modal-option-two-toggle', secondOptionToggle);
+// provide('modal-option-three-toggle', thirdOptionToggle);
+// provide('modal-option-four-toggle', fourthOptionToggle);
 </script>

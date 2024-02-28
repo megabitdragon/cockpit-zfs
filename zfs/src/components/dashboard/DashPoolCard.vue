@@ -306,7 +306,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 
 			if (output == null) {
 				operationRunning.value = false;
-				notifications.value.constructNotification('Destroy Pool Failed', selectedPool.value!.name + "was not destroyed. Check console output for details.", 'error');
+				notifications.value.constructNotification('Destroy Pool Failed', selectedPool.value!.name + " was not destroyed. Check console output for details.", 'error');
 				// showDeletePoolConfirm.value = false;
 			} else {
 				if (secondOptionToggle.value == true) {
@@ -450,6 +450,7 @@ watch(confirmScrub, async (newVal, oldVal) => {
 				notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
 				showScrubModal.value = false;
 			}
+			starting.value = true;
 		} catch (error) {
 			console.error(error)
 		}

@@ -180,11 +180,11 @@ async function refreshAllData() {
 
 const starting = ref(false);
 
-const scanStatusBox = ref();
+// const scanStatusBox = ref();
+const scanStatusBox = inject<Ref<any>>('scan-status-box')!;
 
 async function getScanStatus() {
-	// console.log('scanStatusBox', scanStatusBox.value);
-
+	console.log('scanStatusBox', scanStatusBox.value);
 	await scanStatusBox.value.pollScanStatus();
 }
 
@@ -234,20 +234,28 @@ watch(confirmDetach, async (newValue, oldValue) => {
 		operationRunning.value = true;
 		console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 
-		if (secondOptionToggle.value == true) {
-			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
-			await labelClear(selectedDisk.value!);
-		} else {
-			await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
-		}
-		await refreshAllData();
-		
-		confirmDetach.value = false;
-		showDetachDiskModal.value = false;
-		detaching.value = false;
-		operationRunning.value = false;
+		try {
+			const output = await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
 
-		notifications.value.constructNotification('Detach Completed', selectedDisk.value!.name + " was detached from " + selectedPool.value!.name + ".", 'success');
+			if (output == null) {
+				operationRunning.value = false;
+				notifications.value.constructNotification('Detach Disk Failed', selectedDisk.value!.name + " was not detached. Check console output for details.", 'error');
+			} else {
+				if (secondOptionToggle.value == true) {
+					await labelClear(selectedDisk.value!);
+				}
+
+				await refreshAllData();
+				confirmDetach.value = false;
+				detaching.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('Detach Completed', selectedDisk.value!.name + " was detached from " + selectedPool.value!.name + ".", 'success');
+				showDetachDiskModal.value = false;
+			}
+
+		} catch (error) {
+			console.error(error);
+		}
 	}
 });
 
@@ -284,14 +292,25 @@ watch(confirmOffline, async (newVal, oldVal) => {
 		offlining.value = true;
 		operationRunning.value = true;
 		console.log('now offlining:', selectedDisk.value);
-		await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
 
-		notifications.value.constructNotification('Offline Completed', 'Offlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
-		await refreshAllData();
-		confirmOffline.value = false;
-		showOfflineDiskModal.value = false;
-		offlining.value = false;
-		operationRunning.value = false;
+		try {
+			const output = await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
+			
+			if (output == null) {
+				operationRunning.value = false;
+				notifications.value.constructNotification('Offline Failed', 'Offlining of disk ' + selectedDisk.value!.name + " failed. Check console output for details.", 'error');
+			} else {
+				await refreshAllData();
+				confirmOffline.value = false;
+				offlining.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('Offline Completed', 'Offlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
+				showOfflineDiskModal.value = false;
+			}
+
+		} catch (error) {
+			console.error(error);
+		}
 	}
 });
 
@@ -329,24 +348,49 @@ watch(confirmOnline, async (newVal, oldVal) => {
 		operationRunning.value = true;
 		console.log('now onlining:', selectedDisk.value);
 
-		if (secondOptionToggle.value == true) {
-			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
-			starting.value = true;
-			await scrubPool(selectedPool.value!);
-			getScanStatus();
-			starting.value = false;
-			notifications.value.constructNotification('Scrub Completed', 'Scrub on ' + selectedPool.value!.name + " completed.", 'success');
-		} else {
-			await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+		try {
+			const output = await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+
+			if (output == null) {
+				operationRunning.value = false;
+				notifications.value.constructNotification('Online Failed', 'Onlining of disk ' + selectedDisk.value!.name + " failed. Check console output for details.", 'error');
+			} else {
+				if (secondOptionToggle.value == true) {
+					starting.value = true;
+					// console.log('scrubbing pool');
+					try {
+						const output2 = await scrubPool(selectedPool.value!);
+
+						if (output2 == null) {
+							notifications.value.constructNotification('Scrub Failed', 'Scrub on ' + selectedPool.value!.name + " failed. Check console output for details.", 'error');
+						} else {
+							await getScanStatus();
+							notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
+						}
+					} catch (error) {
+						console.error(error);
+					}
+
+					// await scrubPool(selectedPool.value!);
+					// await getScanStatus();
+					// notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
+					
+					starting.value = false;
+				}
+
+				onlining.value = false;
+				confirmOnline.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
+				showOnlineDiskModal.value = false;
+			}
+
+			await refreshAllData();
+
+		} catch (error) {
+			console.error(error);
 		}
-		await refreshAllData();
 
-		confirmOnline.value = false;
-		showOnlineDiskModal.value = false;
-		onlining.value = false;
-		operationRunning.value = false;
-
-		notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
 	}
 });
 
@@ -580,6 +624,6 @@ defineExpose({
 
 provide('modal-confirm-running', operationRunning);
 provide('show-replace-modal', showReplaceDiskModal);
-// provide('', );
-// provide('', );
+provide('modal-option-one-toggle', firstOptionToggle);
+provide('modal-option-two-toggle', secondOptionToggle);
 </script>
