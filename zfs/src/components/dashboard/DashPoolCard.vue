@@ -98,7 +98,7 @@
 	</button>
 
 	<div v-if="showPoolDetails">	
-		<component :is="poolDetailsComponent" :pool="selectedPool!" @close="showPoolDetails = false"/>
+		<component :is="poolDetailsComponent" :showFlag="showPoolDetails" @close="updateShowPoolDetails" :confirm="confirmSavePoolDetails" :idKey="getIdKey(`show-pool-modal`)" :pool="selectedPool!"/>
 	</div>
 
 	<div v-if="showAddVDevModal">	
@@ -216,6 +216,7 @@ const fourthOptionToggle = ref(false);
 ////////////// Show Pool/Disk Details ///////////////
 /////////////////////////////////////////////////////
 const showPoolDetails = ref(false);
+const confirmSavePool = ref(false);
 
 const poolDetailsComponent = ref();
 const loadShowPoolComponent = async () => {
@@ -225,10 +226,29 @@ const loadShowPoolComponent = async () => {
 
 async function showDetails(pool) {
 	selectedPool.value = pool;
-	console.log('loading:', selectedPool);
+	console.log('loading:', selectedPool.value);
 	await loadShowPoolComponent();
 	showPoolDetails.value = true;
 }
+
+const confirmSavePoolDetails : ConfirmationCallback = () => {
+	confirmSavePool.value = true;
+}
+
+const updateShowPoolDetails = (newVal) => {
+	showPoolDetails.value = newVal;
+}
+
+watch(confirmSavePool, async (newVal, oldVal) => {
+	if (confirmSavePool.value == true) {
+		notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
+		await refreshAllData();
+		// showPoolDetails.value = false;
+		
+	} else {
+		notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output.', 'error');
+	}
+});
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
@@ -262,7 +282,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	console.log('DashPoolCard trimActivities', trimActivities.value);
+	// console.log('DashPoolCard trimActivities', trimActivities.value);
 }
 
 ////////////////// Destroy Pool /////////////////////
@@ -374,7 +394,7 @@ watch(confirmResilver, async (newValue, oldValue) => {
 				// showResilverModal.value = false;
 				operationRunning.value = false;
 			} else {
-				getScanStatus();
+				await getScanStatus();
 
 				confirmResilver.value = false;
 				resilvered.value = true;
@@ -465,6 +485,7 @@ async function pauseScrub(pool) {
 }
 
 async function resumeScrub(pool) {
+	selectedPool.value = pool;
 	resuming.value = true;
 	// operationRunning.value = true;
 	try {
@@ -817,7 +838,7 @@ const loadShowAddVDevComponent = async () => {
 
 async function showAddVDev(pool) {
 	selectedPool.value = pool;
-	console.log(selectedPool);
+	console.log('add vdev to:', selectedPool.value);
 	await loadShowAddVDevComponent();
 	showAddVDevModal.value = true;
 }
@@ -871,6 +892,7 @@ const trimActivity = computed(() => {
 const getIdKey = (name: string) => `${selectedPool.value}-${name}`;
 
 provide('show-pool-deets', showPoolDetails);
+provide('confirm-save-pool', confirmSavePool);
 provide('current-pool-config', poolConfig);
 provide("show-vdev-modal", showAddVDevModal);
 

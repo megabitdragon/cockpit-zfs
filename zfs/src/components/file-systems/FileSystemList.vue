@@ -71,42 +71,42 @@
 															</div>
 
 															<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-																<MenuItems class="absolute right-0 z-10 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+																<MenuItems @click.stop class="absolute right-0 z-10 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																	<div class="py-1">
 																		<MenuItem as="div" v-slot="{ active }">
-																			<a href="#" @click.stop="loadFileSystemConfig(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
+																			<a href="#" @click="loadFileSystemConfig(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
 																		</MenuItem>
 																		<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
-																			<a href="#" @click.stop="renameThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
+																			<a href="#" @click="renameThisDataset(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
 																		</MenuItem>
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'yes'" v-slot="{ active }">
-																			<a href="#" @click.stop="unmountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
+																			<a href="#" @click="unmountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
 																		</MenuItem>														
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && !fileSystems[fsIdx].encrypted" v-slot="{ active }">
-																			<a href="#" @click.stop="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+																			<a href="#" @click="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
 																		</MenuItem>
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
-																			<a href="#" @click.stop="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+																			<a href="#" @click="mountThisFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
 																		</MenuItem>
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && !fileSystems[fsIdx].key_loaded" v-slot="{ active }">
-																			<a href="#" @click.stop="handleFileSystemEncryption(fileSystems[fsIdx], 'unlock')" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unlock File System</a>
+																			<a href="#" @click="handleFileSystemEncryption(fileSystems[fsIdx], 'unlock')" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unlock File System</a>
 																		</MenuItem>
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
-																			<a href="#" @click.stop="handleFileSystemEncryption(fileSystems[fsIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
+																			<a href="#" @click="handleFileSystemEncryption(fileSystems[fsIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
 																		</MenuItem>					
 
 																		<!-- <MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
-																			<a href="#" @click.stop="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
+																			<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
 																		</MenuItem> -->
 																		
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
-																			<a href="#" @click.stop="changeThisPassphrase(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
+																			<a href="#" @click="changeThisPassphrase(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 																		</MenuItem>
 																		<MenuItem as="div" v-slot="{ active }">
-																			<a href="#" @click.stop="createSnapshotBtn(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
+																			<a href="#" @click="createSnapshotBtn(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
 																		</MenuItem>					
 																		<MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
-																			<a href="#" @click.stop="deleteFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+																			<a href="#" @click="deleteFileSystem(fileSystems[fsIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 																		</MenuItem>											
 																	</div>
 																</MenuItems>
@@ -350,21 +350,31 @@ const updateShowDestroyFileSystem = (newVal) => {
 
 watch(confirmDelete, async (newValue, oldValue) => {
 	if (confirmDelete.value == true) {
-		
-		console.log('now deleting:', newValue);
 		operationRunning.value = true;
-		await destroyDataset(selectedDataset.value!, firstOptionToggle.value, thirdOptionToggle.value, fourthOptionToggle.value);
-		operationRunning.value = false;
-		await refreshData();
-		await refreshDatasetSnaps(selectedDataset.value);
-		showDeleteFileSystemConfirm.value = false;
-		confirmDelete.value = false;
-		// hasChildren.value = false;
-		console.log('deleted:', selectedDataset.value!);
-		firstOptionToggle.value = false;
-		thirdOptionToggle.value = false;
-		fourthOptionToggle.value = false;
-		notifications.value.constructNotification('File System Destroyed', selectedDataset.value!.name + " destroyed.", 'success');
+		console.log('now deleting:', newValue);
+
+		try {
+			const output = await destroyDataset(selectedDataset.value!, firstOptionToggle.value, thirdOptionToggle.value, fourthOptionToggle.value);
+			
+			if (output == null) {
+				operationRunning.value = false;
+				notifications.value.constructNotification('Destroy Dataset Failed', selectedDataset.value!.name + " was not destroyed. Check console output for details.", 'error');
+			} else {
+				operationRunning.value = false;
+				await refreshData();
+				await refreshDatasetSnaps(selectedDataset.value);
+				console.log('deleted:', selectedDataset.value!);
+				firstOptionToggle.value = false;
+				thirdOptionToggle.value = false;
+				fourthOptionToggle.value = false;
+				confirmDelete.value = false;
+				notifications.value.constructNotification('File System Destroyed', selectedDataset.value!.name + " destroyed.", 'success');
+				showDeleteFileSystemConfirm.value = false;
+			}
+
+		} catch (error) {
+			console.error(error);
+		}
 	}
 });
 
@@ -403,20 +413,33 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 	if (confirmUnmount.value == true) {
 		unmounting.value = true;
 		operationRunning.value = true;
-		await unmountFileSystem(selectedDataset.value!, forceUnmount.value);
-		console.log('unmounted:', selectedDataset.value!);
-		if (selectedDataset.value?.encrypted && lockThisFileSystem.value == true) {
-			lockFileSystem(selectedDataset.value!);
+
+		try {
+			const output = await unmountFileSystem(selectedDataset.value!, forceUnmount.value);
+
+			if (output == null) {
+				operationRunning.value = false;
+				unmounting.value = false;
+				notifications.value.constructNotification('Unmount Dataset Failed', selectedDataset.value!.name + " was not unmounted. Check console output for details.", 'error');
+			} else {
+				console.log('unmounted:', selectedDataset.value!);
+				if (selectedDataset.value?.encrypted && lockThisFileSystem.value == true) {
+					await lockFileSystem(selectedDataset.value!);
+				}
+				confirmUnmount.value = false;
+				forceUnmount.value = false;
+				await refreshData();
+				await refreshDatasetSnaps(selectedDataset.value);
+				unmounting.value = false;
+				operationRunning.value = false;
+				lockThisFileSystem.value = false;
+				notifications.value.constructNotification('File System Unmounted', selectedDataset.value!.name + " unmounted.", 'success');
+				showUnmountFileSystemConfirm.value = false;
+			}
+
+		} catch (error) {
+			console.error(error);
 		}
-		showUnmountFileSystemConfirm.value = false;
-		confirmUnmount.value = false;
-		forceUnmount.value = false;
-		await refreshData();
-		await refreshDatasetSnaps(selectedDataset.value);
-		unmounting.value = false;
-		operationRunning.value = false;
-		lockThisFileSystem.value = false;
-		notifications.value.constructNotification('File System Unmounted', selectedDataset.value!.name + " unmounted.", 'success');
 	}
 });
 
@@ -454,16 +477,29 @@ watch(confirmMount, async (newValue, oldValue) => {
 	if (confirmMount.value == true) {
 		mounting.value = true;
 		operationRunning.value = true;
-		await mountFileSystem(selectedDataset.value!, forceMount.value);
-		console.log('mounted:', selectedDataset.value!);
-		showMountFileSystemConfirm.value = false;
-		confirmMount.value = false;
-		forceMount.value = false;
-		await refreshData();
-		await refreshDatasetSnaps(selectedDataset.value);
-		mounting.value = false;
-		operationRunning.value = false;
-		notifications.value.constructNotification('File System Mounted', selectedDataset.value!.name + " mounted.", 'success');
+
+		try {
+			const output = await mountFileSystem(selectedDataset.value!, forceMount.value);
+		
+			if (output == null) {
+				operationRunning.value = false;
+				mounting.value = false;
+				notifications.value.constructNotification('Mount Dataset Failed', selectedDataset.value!.name + " was not mounted. Check console output for details.", 'error');
+			} else {
+				console.log('mounted:', selectedDataset.value!);
+				confirmMount.value = false;
+				forceMount.value = false;
+				await refreshData();
+				await refreshDatasetSnaps(selectedDataset.value);
+				mounting.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('File System Mounted', selectedDataset.value!.name + " mounted.", 'success');
+				showMountFileSystemConfirm.value = false;
+			}
+		} catch (error) {
+			console.error(error);
+		}
+
 	}
 });
 
@@ -492,7 +528,6 @@ watch(confirmRename, async (newVal, oldVal) => {
 		await refreshData();
 		confirmRename.value = false;
 		operationRunning.value = false;
-		notifications.value.constructNotification('File System Renamed', `Renamed file system ${selectedDataset.value!.name} .`, 'success');
 	}
 });
 
@@ -522,7 +557,6 @@ watch(confirmChange, async (newVal, oldVal) => {
 		await refreshData();
 		confirmRename.value = false;
 		operationRunning.value = false;
-		notifications.value.constructNotification('Encryption passphrase changed', `Changed passphrase for ${selectedDataset.value!.name} .`, 'success');
 	}
 });
 

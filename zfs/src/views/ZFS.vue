@@ -79,8 +79,8 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	console.log('ZFS.vue scanActivities', scanActivities.value);
-	console.log('ZFS.vue trimActivities', trimActivities.value);
+	// console.log('ZFS.vue scanActivities', scanActivities.value);
+	// console.log('ZFS.vue trimActivities', trimActivities.value);
 }
 
 initialLoad(disks, pools, datasets, snapshots);

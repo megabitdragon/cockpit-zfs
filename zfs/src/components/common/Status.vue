@@ -284,7 +284,7 @@ async function pollScanStatus() {
 	// console.log('scan set:', scanning.value);
     // console.log(`scan for ${props.pool.name} set: ${scanning.value}`)
 	// displayScanBools();
-    console.log('polling scanStats...', scanning.value);
+    // console.log('polling scanStats...', scanning.value);
 }
 
 function startScanInterval() {
@@ -667,7 +667,7 @@ function trimProgressBarClass(disk) {
 onMounted(() => {
 	pollScanStatus();
 	pollTrimStatus();
-    console.log('isTrimmableDisk:', props.isTrimmableDisk!);
+    // console.log('isTrimmableDisk:', props.isTrimmableDisk!);
 });
 
 defineExpose({

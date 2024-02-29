@@ -49,6 +49,7 @@ interface ChangePassphraseProps {
     filesystem: FileSystemData;
 }
 
+const notifications = inject<Ref<any>>('notifications')!;
 const props = defineProps<ChangePassphraseProps>();
 const showChangePassphrase = inject<Ref<boolean>>('show-change-passphrase')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -63,14 +64,24 @@ const passFeedback = ref('');
 async function changeBtn() {
     if (encryptPasswordCheck(fileSystem.value)) {
         changing.value = true;
-        confirmChange.value = true;
-        await changePassphrase(fileSystem.value.name, passphrase.value);
-        fileSystemsLoaded.value = false;
-        datasets.value = [];
-        await loadDatasets(datasets);
-        showChangePassphrase.value = false;
-        changing.value = false;
-        fileSystemsLoaded.value = true;
+
+        try {
+            const output = await changePassphrase(fileSystem.value.name, passphrase.value);
+
+            if (output == null) {
+                changing.value = false;
+                notifications.value.constructNotification('Passphrase Change Failed', 'There was an error changing this passphrase. Check console output for details.', 'error')
+            } else {
+                confirmChange.value = true;
+
+                notifications.value.constructNotification('Encryption Passphrase Changed', `Changed passphrase for ${fileSystem.value!.name}.`, 'success');
+                changing.value = false;
+                showChangePassphrase.value = false;
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
     }
 }
 

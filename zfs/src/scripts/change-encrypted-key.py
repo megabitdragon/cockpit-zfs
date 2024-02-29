@@ -25,7 +25,8 @@ def change_key(fileSystemName, passphrase):
                 stdout, stderr = process.communicate(input=f.read())
 
             if process.returncode != 0:
-                print(f"Error: {stderr}")
+                 raise Exception(f"Error: {stderr.decode('utf-8')}")
+                
             else:
                 print(stdout)
 
@@ -35,6 +36,7 @@ def change_key(fileSystemName, passphrase):
 
     except Exception as e:
         print(f"An error occurred: {e}")
+        raise e
 
 def main():
     # Parse command-line arguments

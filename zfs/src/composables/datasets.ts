@@ -91,6 +91,7 @@ export async function changePassphrase(fileSystemName : string, newPassphrase : 
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', change_passphrase_script, fileSystemName, newPassphrase], { superuser: 'try', stderr: 'out'});
 		const output = await state.promise();
 		console.log(output);
+
 		return output.stdout;
 	} catch (state) {
 		console.error(errorString(state));

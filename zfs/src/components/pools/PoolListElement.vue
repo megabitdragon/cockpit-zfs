@@ -93,8 +93,8 @@
 		</div>
 	</div>
 
-	<div v-if="showPoolDetails">
-		<component :is="showPoolDetailsComponent" :pool="selectedPool!" @close="showPoolDetails = false"/>
+	<div v-if="showPoolDetails">	
+		<component :is="showPoolDetailsComponent" :showFlag="showPoolDetails" @close="updateShowPoolDetails" :confirm="confirmSavePoolDetails" :pool="selectedPool!"/>
 	</div>
 
 	<div v-if="showDeletePoolConfirm">
@@ -184,7 +184,7 @@ function getIsTrimmable() {
 
 onMounted(() => {
 	getIsTrimmable();
-	console.log('isTrimmable:', getIsTrimmable());
+	// console.log('isTrimmable:', getIsTrimmable());
 });
 
 ///////// Values for Confirmation Modals ////////////
@@ -198,6 +198,7 @@ const fourthOptionToggle = ref(false);
 ///////////////// Show Pool Details /////////////////
 /////////////////////////////////////////////////////
 const showPoolDetails = ref(false);
+const confirmSavePool = ref(false);
 
 const showPoolDetailsComponent = ref();
 const loadShowPoolDetailsComponent = async () => {
@@ -207,10 +208,30 @@ const loadShowPoolDetailsComponent = async () => {
 
 async function showPoolModal(pool) {
 	selectedPool.value = pool;
-	console.log(selectedPool);
+	console.log('loading:', selectedPool.value);
 	await loadShowPoolDetailsComponent();
 	showPoolDetails.value = true;
 }
+
+const confirmSavePoolDetails : ConfirmationCallback = () => {
+	confirmSavePool.value = true;
+}
+
+const updateShowPoolDetails = (newVal) => {
+	showPoolDetails.value = newVal;
+}
+
+watch(confirmSavePool, async (newVal, oldVal) => {
+	if (confirmSavePool.value == true) {
+		notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
+		await refreshAllData();
+		// showPoolDetails.value = false;
+		
+	} else {
+		notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output.', 'error');
+	}
+});
+
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
@@ -859,6 +880,7 @@ const trimActivity = computed(() => {
 
 
 provide('show-pool-deets', showPoolDetails);
+provide('confirm-save-pool', confirmSavePool);
 
 provide('show-delete-pool-confirm', showDeletePoolConfirm);
 provide('confirm-delete-pool', confirmDelete);

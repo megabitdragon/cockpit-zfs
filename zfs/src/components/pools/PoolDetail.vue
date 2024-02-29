@@ -1,5 +1,5 @@
 <template>
-	<Modal @close="showPoolDetails = false" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'" class="z-10">
+	<Modal @close="closeModal" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'" class="z-10">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 		</template>
@@ -220,7 +220,7 @@
 					</div>
 					<div v-if="navTag == 'settings'" >
 						<div class="button-group-row mt-2">
-							<button v-if="!saving" @click="poolConfigureBtn" :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
+							<button v-if="!saving" @click="poolConfigureBtn(); props.confirmation;" :id="getIdKey('settings-save-btn')" name="settings-save-btn" class="mt-1 btn btn-primary">Save Changes</button>
 							<button disabled v-if="saving" id="finish" type="button" class="btn btn-primary object-right justify-end">
 								<svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
 									<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -249,8 +249,8 @@
 import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { configurePool } from '../../composables/pools';
-import { getTimestampString, upperCaseWord, isBoolOnOff } from '../../composables/helpers';
-import { loadDisksThenPools } from '../../composables/loadData';
+import { getTimestampString, upperCaseWord, isBoolOnOff, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import Modal from '../common/Modal.vue';
 import PoolCapacity from '../common/PoolCapacity.vue';
 import Navigation from '../common/Navigation.vue';
@@ -259,6 +259,14 @@ import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 interface PoolDetailsProps {
 	pool: PoolData;
+	confirmation: ConfirmationCallback;
+	showFlag: boolean;
+}
+
+const emit = defineEmits(['close']);
+
+const closeModal = () => {
+	emit('close');
 }
 
 const props = defineProps<PoolDetailsProps>();
@@ -296,9 +304,14 @@ const poolConfig = ref<PoolData>({
 ////////////////// Loading Data /////////////////////
 /////////////////////////////////////////////////////
 const pools = inject<Ref<PoolData[]>>('pools')!;
-const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
+const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
+const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
+const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
+
+const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
+const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 // const snapshotsLoaded = ref(true);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
@@ -391,43 +404,6 @@ const updateShowNewSnapshot = (newVal) => {
 	showSnapshotModal.value = newVal;
 }
 
-watch(confirmCreate, async (newVal, oldVal) => {
-	if (confirmCreate.value == true) {
-		operationRunning.value = true;
-		creating.value = operationRunning.value;
-		// await refreshSnaps();
-		operationRunning.value = false;
-		creating.value = operationRunning.value;
-		confirmCreate.value = false;
-		// notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
-	}
-
-
-	/*
-    creating.value = true;
-    confirmCreate.value = true;
-	try {
-        const output = await createSnapshot(newSnapshot);
-        
-        if (output == null) {
-            creating.value = false;
-            notifications.value.constructNotification('Create Snapshot Failed', 'There was an error creating this snapshot. Check console output.', 'error'); 
-        } else {
-            snapshotsLoaded.value = false;
-            refreshSnapshots();
-            snapshotsLoaded.value = true;
-            creating.value = false;
-            newSnapshot.isCustomName = false;
-            newSnapshot.snapChildren = false;
-            showSnapshotModal.value = false;
-            notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
-        }
-    } catch (error) {
-        console.error(error);
-    } 
-	*/
-});
-
 /////////////////// Pool Changes ////////////////////
 /////////////////////////////////////////////////////
 const saving = ref(false);
@@ -495,36 +471,123 @@ const commentLengthCheck = (poolData) => {
 	return result;
 }
 
+async function refreshAllData() {
+    disksLoaded.value = false;
+    poolsLoaded.value = false;
+    disks.value = [];
+    pools.value = [];
+    await loadDisksThenPools(disks, pools);
+    await loadScanObjectGroup(scanObjectGroup);
+    await loadScanActivities(pools, scanActivities);
+    await loadDiskStats(poolDiskStats);
+    await loadTrimActivities(pools, trimActivities);
+    disksLoaded.value = true;
+    poolsLoaded.value = true;
+}
+
+const confirmSavePool = inject<Ref<boolean>>('confirm-save-pool')!;
+// const confirmSavePool = ref(false);
 const notifications = inject<Ref<any>>('notifications')!;
 	
-async function poolConfigureBtn() {	
+async function poolConfigureBtn() {
 	if (commentLengthCheck(poolConfig.value)) {
-		console.log('pool:', poolConfig.value);
 		await checkForChanges(poolConfig.value);
-		console.log('newChanges:', newChangesToPool.value);
 		saving.value = true;
+		try {
+			const success = await configurePool(newChangesToPool.value);
 
+			if (!success) {
+				console.log('configurePool failed');
+				
+				notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output for details.', 'error')
+				confirmSavePool.value = false;
+			} else {
+				console.log('configurePool succeeded');
+				
+				notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
+				confirmSavePool.value = true;
+				showPoolDetails.value = false;
+			}
+
+			saving.value = false;
+			// await refreshAllData();
+			// close();
+
+		} catch (error) {
+			console.error(error);
+		}
+
+	}
+}	
+// async function poolConfigureBtn() {	
+// 	console.log('poolConfigureBtn called');
+// 	if (commentLengthCheck(poolConfig.value)) {
+// 		console.log('Comment length check passed');
+// 		console.log('pool:', poolConfig.value);
+// 		await checkForChanges(poolConfig.value);
+// 		console.log('newChanges:', newChangesToPool.value);
+// 		saving.value = true;
+		
+// 		try {
+// 			const output = await configurePool(newChangesToPool.value);
+
+// 			if (output == false) {
+// 				console.log('configurePool failed');
+// 				saving.value = false;
+// 				confirmSavePool.value = false;
+// 				notifications.value.constructNotification('Save Pool Config Failed 1', 'There was an error saving this pool. Check console output.', 'error');
+// 			} else {
+// 				console.log('configurePool succeeded');
+// 				confirmSavePool.value = true;
+// 				notifications.value.constructNotification('Pool Config Saved 1', "Successfully saved this pool's configuration.", 'success');
+				
+// 				// await refreshAllData();
+// 				// showPoolDetails.value = false;
+// 				saving.value = false;
+// 			}
+
+// 		} catch (error) {
+// 			console.error('Error in poolConfigureBtn:', error);
+// 		} 
+// 	}
+// }
+
+// watch(confirmSavePool, async (newVal, oldVal) => {
+// 	if (confirmSavePool.value == true) {
+// 		console.log('configurePool succeeded');
+// 		notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
+// 		await refreshAllData();
+		
+// 	} 
+// 	else {
+// 		console.log('configurePool failed');
+// 		confirmSavePool.value = false;
+// 		notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output.', 'error');
+// 	}
+// 	showPoolDetails.value = false;
+// 	saving.value = false;
+// });
+
+/* watch(saving, async (newVal, oldVal) => {
+	if (saving.value == true) {
 		try {
 			const output = await configurePool(newChangesToPool.value);
+
 			if (output == false) {
 				saving.value = false;
 				notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output.', 'error');
 			} else {
 				notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
-				pools.value = [];
-				disks.value = [];
-				await loadDisksThenPools(disks, pools);
-				disksLoaded.value = true;
-				poolsLoaded.value = true;
+				await refreshAllData();
 				saving.value = false;
 				showPoolDetails.value = false;
-			
 			}
+
 		} catch (error) {
 			console.error(error);
 		} 
 	}
-}
+}); */
 
 /////////////////// Navigation //////////////////////
 /////////////////////////////////////////////////////

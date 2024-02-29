@@ -100,6 +100,8 @@ interface RenameFileSystemProps {
     filesystem: FileSystemData;
 }
 
+const notifications = inject<Ref<any>>('notifications')!;
+
 const props = defineProps<RenameFileSystemProps>();
 const showRenameModal = inject<Ref<boolean>>('show-rename-modal')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -143,13 +145,24 @@ const datasetsInSamePool = computed<FileSystemData[]>(() => {
 async function renameBtn() {
     if (nameCheck(newName.value, parentFS.value)) {
         renaming.value = true;
-        confirmRename.value = true;
-        await renameFileSystem(props.filesystem.name, (parentFS.value + '/' + newName.value), forceUnmount.value, createNonExistParent.value);
+        
+        try {
+			const output = await renameFileSystem(props.filesystem.name, (parentFS.value + '/' + newName.value), forceUnmount.value, createNonExistParent.value);
  
-        showRenameModal.value = false;
-        renaming.value = false;
-    }
+			if (output == null) {
+				renaming.value = false;
+				notifications.value.constructNotification('Rename Dataset Failed', props.filesystem.name + " was not renamed. Check console output for details.", 'error');
+			} else {
+                confirmRename.value = true;
 
+				notifications.value.constructNotification('File System Renamed', `${props.filesystem.name} renamed to ${newName.value}.`, 'success');
+                renaming.value = false;
+                showRenameModal.value = false;
+			}
+		} catch (error) {
+			console.error(error);
+		}
+    }
 }
 
 const nameCheck = (fileSystemName, fileSystemParent) => {

@@ -168,14 +168,16 @@ const properties = [
 ]
 
 export async function configurePool(pool : PoolEditConfig) {
+	// console.log('configurePool called with:', pool);
 	try {
 		//let cmdString = ['zpool', 'set'];
 		const hasProperties = hasChanges(pool);
+		// console.log('hasProperties:', hasProperties);
 
 		if (hasProperties) {
-
 			for (const property of properties) {
 				if (property in pool) {
+					// console.log('Setting property:', property);
 					let cmdString = ['zpool', 'set'];
 					cmdString.push(`${property}=${pool[property]}`);
 					cmdString.push(pool.name);
@@ -198,8 +200,10 @@ export async function configurePool(pool : PoolEditConfig) {
 	} catch (state) {
 		console.error(errorString(state));
 		return false;
+		// return null;
 	}
 }
+
 
 function hasChanges(pool) {
 	
