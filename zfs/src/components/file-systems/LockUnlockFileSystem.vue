@@ -9,9 +9,11 @@
                     <div class="col-span-2 flex flex-row">
                         <label :for="getIdKey('filesystem-name')" :class="truncateText" :title="props.filesystem.name" class="mt-1 block text-sm font-medium leading-6 text-default">Name: <span :class="truncateText" :title="props.filesystem.name" class="font-normal">{{ props.filesystem.name }}</span></label>
                     </div>
-                    <div class="col-span-2 flex flex-row justify-between">
+                    <div class="col-span-2 flex flex-row justify-between text-center items-center">
                         <label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Enter Passphrase</label>
                         <input :id="getIdKey('passphrase')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" />
+                    </div>
+                    <div class="col-span-2 flex flex-row">
                         <p class="text-danger mt-1">{{ passFeedback }}</p>
                     </div>
                     <div class="grid grid-rows-2 col-span-2">
@@ -100,6 +102,7 @@ const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const showFlag = ref(props.showFlag);
 const doingThing = inject<Ref<boolean>>('locking-or-unlocking')!;
 const showLockUnlockModal = inject<Ref<boolean>>('show-lock-unlock-modal')!;
+const confirmLockOrUnlock = inject<Ref<boolean>>('confirm-lock-or-unlock')!;
 
 const updateShowFlag = () => {
     if (props.showFlag !== showFlag.value) {
@@ -111,6 +114,7 @@ const closeModal = () => {
     emit('close');
 }
 
+const notifications = inject<Ref<any>>('notifications')!;
 const passphrase = ref('');
 const passFeedback = ref('');
 const passValid = ref(false);
@@ -124,36 +128,62 @@ const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 async function confirmBtn() {
     if (props.mode == 'lock') {
         doingThing.value = true;
-        await lockFileSystem(props.filesystem);
-        doingThing.value = false;
-        await refreshDatasets();
-        showLockUnlockModal.value = false;
+        try {
+            const lockOutput = await lockFileSystem(props.filesystem);
+
+            if (lockOutput == null) {
+                doingThing.value = false;
+                notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${props.filesystem.name}. Check console output for details.`, 'error');
+            } else {
+                notifications.value.constructNotification('Dataset Locked', `Successfully locked ${props.filesystem.name}.`, 'success');
+                doingThing.value = false;
+                confirmLockOrUnlock.value = true;
+                showLockUnlockModal.value = false;
+            }
+        } catch (error) {
+            console.error(error);
+        }
         
     } else if (props.mode == 'unlock') {
         passValid.value = await isPassphraseValid(props.filesystem.name, passphrase.value);
    
         if (passValid.value) {
             doingThing.value = true;
-            await unlockFileSystem(props.filesystem, passphrase.value);
-            if (mountFS.value) {
-                await mountFileSystem(props.filesystem, forceMountFS.value);
+
+            try {
+                const unlockOutput =  await unlockFileSystem(props.filesystem, passphrase.value);
+
+                if (unlockOutput == null) {
+                    doingThing.value = false;
+                    notifications.value.constructNotification('Unlock Dataset Failed', `Failed to unlock ${props.filesystem.name}. Check console output for details.`, 'error');
+                } else {
+                    if (mountFS.value) {
+                        try {
+                            const mountOutput = await mountFileSystem(props.filesystem, forceMountFS.value);
+                        
+                            if (mountOutput == null) {
+                                notifications.value.constructNotification('Mount Dataset Failed', props.filesystem.name + " was not mounted. Check console output for details.", 'error');
+                            } else {
+                                notifications.value.constructNotification('File System Mounted', props.filesystem.name + " mounted.", 'success');
+                            }
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
+
+                    notifications.value.constructNotification('Dataset Unlocked', `Successfully unlocked ${props.filesystem.name}.`, 'success');
+                    doingThing.value = false;
+                    confirmLockOrUnlock.value = true;
+                    showLockUnlockModal.value = false;
+                }
+            } catch (error) {
+                console.error(error);
             }
-            doingThing.value = false;
-            await refreshDatasets();
-            showLockUnlockModal.value = false;         
+          
         } else {
             passFeedback.value = 'Passphrase is invalid.';
         }
     } 
-}
-
-async function refreshDatasets() {
-	fileSystemsLoaded.value = false;
-	fileSystems.value = [];
-	snapshots.value = [];
-	await loadDatasets(fileSystems);
-	await loadSnapshots(snapshots);
-	fileSystemsLoaded.value = true;
 }
 
 const getIdKey = (name: string) => `${name}`;

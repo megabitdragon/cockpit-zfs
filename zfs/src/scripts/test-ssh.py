@@ -15,7 +15,7 @@ def test_passwordless_ssh(target):
         stdout, stderr = process_test.communicate()
 
         if process_test.returncode != 0:
-            print(f"Error: {stderr}")
+            raise Exception(f"Error: {stderr.decode('utf-8')}")
             return False
         else:
             print(stdout)

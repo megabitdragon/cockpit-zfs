@@ -237,6 +237,7 @@ async function create(newSnapshot) {
         if (output == null) {
             notifications.value.constructNotification('Create Snapshot Failed', 'There was an error creating this snapshot. Check console output.', 'error'); 
             confirmCreate.value = false;
+            confirmCreate.value = true;
         } else {
             confirmCreate.value = true;
             snapshotsLoaded.value = false;

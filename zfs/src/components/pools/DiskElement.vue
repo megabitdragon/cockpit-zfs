@@ -239,6 +239,7 @@ watch(confirmDetach, async (newValue, oldValue) => {
 
 			if (output == null) {
 				operationRunning.value = false;
+				confirmDetach.value = false;
 				notifications.value.constructNotification('Detach Disk Failed', selectedDisk.value!.name + " was not detached. Check console output for details.", 'error');
 			} else {
 				if (secondOptionToggle.value == true) {
@@ -298,6 +299,7 @@ watch(confirmOffline, async (newVal, oldVal) => {
 			
 			if (output == null) {
 				operationRunning.value = false;
+				confirmOffline.value = false;
 				notifications.value.constructNotification('Offline Failed', 'Offlining of disk ' + selectedDisk.value!.name + " failed. Check console output for details.", 'error');
 			} else {
 				await refreshAllData();
@@ -353,6 +355,7 @@ watch(confirmOnline, async (newVal, oldVal) => {
 
 			if (output == null) {
 				operationRunning.value = false;
+				confirmOnline.value = false;
 				notifications.value.constructNotification('Online Failed', 'Onlining of disk ' + selectedDisk.value!.name + " failed. Check console output for details.", 'error');
 			} else {
 				if (secondOptionToggle.value == true) {
@@ -444,6 +447,7 @@ watch(confirmTrimDisk, async (newValue, oldValue) => {
 		try {
 			const output = await trimDisk(selectedPool.value!.name,  selectedDisk.value!.name, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null) {
+				confirmTrimDisk.value = false
 				notifications.value.constructNotification('Trim Failed', "Trim failed to start. Check console output for details.", 'error');
 			} else {
 				getDiskTrimStatus();
@@ -514,6 +518,7 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 		try {
 			const output = await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, false, 'pause');
 			if (output == null) {
+				confirmPauseTrim.value = false;
 				notifications.value.constructNotification('Trim Pause Failed', "Trim failed to pause. Check console output for details.", 'error');
 				// operationRunning.value = false;
 			} else {
@@ -550,6 +555,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 		try {
 			const output = await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, false, 'stop');
 			if (output == null) {
+				confirmStopTrim.value = false;
 				notifications.value.constructNotification('Trim Stop Failed', "Trim failed to stop. Check console output for details.", 'error');
 				// operationRunning.value = false;
 			} else {

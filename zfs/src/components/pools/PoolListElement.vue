@@ -307,8 +307,8 @@ watch(confirmDelete, async (newValue, oldValue) => {
 
 			if (output == null) {
 				operationRunning.value = false;
-				notifications.value.constructNotification('Destroy Pool Failed', selectedPool.value!.name + "was not destroyed. Check console output for details.", 'error');
-				// showDeletePoolConfirm.value = false;
+				confirmDelete.value = false;
+				notifications.value.constructNotification('Destroy Pool Failed', selectedPool.value!.name + " was not destroyed. Check console output for details.", 'error');
 			} else {
 				if (secondOptionToggle.value == true) {
 					selectedPool.value!.vdevs.forEach(vDev => {
@@ -369,6 +369,7 @@ watch(confirmResilver, async (newValue, oldValue) => {
 		try {
 			const output = await resilverPool(selectedPool.value!);
 			if (output == null) {
+				confirmResilver.value = false;
 				notifications.value.constructNotification('Resilver Failed', "Resilver failed to start. Check console output for details.", 'error');
 				// showResilverModal.value = false;
 				operationRunning.value = false;
@@ -442,6 +443,7 @@ watch(confirmScrub, async (newVal, oldVal) => {
 			if (output == null) {
 				notifications.value.constructNotification('Scrub Failed', "Scrub failed to start. Check console output for details.", 'error');
 				operationRunning.value = false;
+				confirmScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmScrub.value = false;
@@ -471,6 +473,7 @@ async function resumeScrub(pool) {
 		if (output == null) {
 			notifications.value.constructNotification('Scrub Resume Failed', "Scrub failed to resume. Check console output for details.", 'error');
 			// operationRunning.value = false;
+			confirmScrub.value = false;
 		} else {
 			getScanStatus();
 			confirmScrub.value = false;
@@ -512,6 +515,7 @@ watch(confirmPauseScrub, async (newVal, oldVal) => {
 			if (output == null) {
 				notifications.value.constructNotification('Scrub Pause Failed', "Scrub failed to pause. Check console output for details.", 'error');
 				// operationRunning.value = false;
+				confirmPauseScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmPauseScrub.value = false;
@@ -549,6 +553,7 @@ watch(confirmStopScrub, async (newVal, oldVal) => {
 			if (output == null) {
 				notifications.value.constructNotification('Scrub Stop Failed', "Scrub failed to stop. Check console output for details.", 'error');
 				// operationRunning.value = false;
+				confirmStopScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmStopScrub.value = false;
@@ -619,6 +624,7 @@ watch(confirmTrim, async (newValue, oldValue) => {
 			if (output == null) {
 				notifications.value.constructNotification('Trim Failed', "Trim failed to start. Check console output for details.", 'error');
 				// operationRunning.value = false;
+				confirmTrim.value = false
 			} else {
 				getTrimStatus();
 				confirmTrim.value = false
@@ -658,6 +664,7 @@ async function resumeTrim(pool) {
 		if (output == null) {
 			notifications.value.constructNotification('Trim Resume Failed', "Trim failed to resume. Check console output for details.", 'error');
 			// operationRunning.value = false;
+			confirmTrim.value = false;
 		} else {
 			getTrimStatus();
 			confirmTrim.value = false;
@@ -698,6 +705,7 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 			if (output == null) {
 				notifications.value.constructNotification('Trim Pause Failed', "Trim failed to pause. Check console output for details.", 'error');
 				// operationRunning.value = false;
+				confirmPauseTrim.value = false;
 			} else {
 				getTrimStatus();
 				confirmPauseTrim.value = false;
@@ -734,6 +742,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 			if (output == null) {
 				notifications.value.constructNotification('Trim Stop Failed', "Trim failed to stop. Check console output for details.", 'error');
 				// operationRunning.value = false;
+				confirmStopTrim.value = false;
 			} else {
 				getTrimStatus();
 				confirmStopTrim.value = false;
@@ -788,6 +797,7 @@ watch(confirmExport, async (newVal, oldVal) => {
 			const output = await exportPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null) {
 				notifications.value.constructNotification('Export Failed', "Pool failed to export. Check console output for details.", 'error');
+				confirmExport.value = false;
 			} else {
 				notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
 				await refreshAllData();

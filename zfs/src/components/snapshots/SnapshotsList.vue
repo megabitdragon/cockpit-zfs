@@ -57,7 +57,7 @@
 								</div>
 
 								<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-									<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+									<MenuItems @click.stop class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 										<div class="py-1">
 											<MenuItem as="div" v-slot="{ active }">
 												<a href="#" @click.stop="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
@@ -141,19 +141,19 @@
 									<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 										<div class="py-1">
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+												<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+												<a href="#" @click="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+												<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+												<a href="#" @click="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+												<a href="#" @click="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
 											</MenuItem>
 										</div>
 									</MenuItems>
@@ -220,7 +220,6 @@ const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const snapshotsInFilesystem = ref<Snapshot[]>([]);
 const selectedSnapshot = ref<Snapshot>();
 
-// loadTheseSnapshots();
 onMounted(() => {
 	refreshSnaps();
 });
@@ -237,13 +236,6 @@ async function refreshData() {
 	datasetsLoaded.value = true;
 	snapshotsLoaded.value = true;
 }
-
-// async function refreshDatasets() {
-// 	datasetsLoaded.value = false;
-// 	datasets.value = [];
-// 	await loadDatasets(datasets);
-// 	datasetsLoaded.value = true;
-// }
 
 async function refreshSnaps() {
 	snapshotsLoaded.value = false;
@@ -302,20 +294,32 @@ const updateShowDestroySnapshot = (newVal) => {
 
 watch (confirmDestroy, async (newVal, oldVal) => {
 	if (confirmDestroy.value == true) {
-
-		console.log('now destroying:', newVal);
 		operationRunning.value = true;
-		await destroySnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
-		operationRunning.value = false;
-		await refreshSnaps();
-		showDestroySnapshotModal.value = false;
-		
-		confirmDestroy.value = false;
-		hasChildren.value = false;
-		console.log('destroyed:', selectedSnapshot.value);
-		firstOptionToggle.value = false;
-		secondOptionToggle.value = false;
-		notifications.value.constructNotification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success');
+		console.log('now destroying:', newVal);
+
+		try {
+			const output = await destroySnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
+
+			if (output == null) {
+				operationRunning.value = false;
+				confirmDestroy.value = false;
+				notifications.value.constructNotification('Destroy Snapshot Failed', selectedSnapshot.value!.name + " was not destroyed. Check console output for details.", 'error');
+				// showDeletePoolConfirm.value = false;
+			} else {
+				await refreshSnaps();
+				confirmDestroy.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success');
+				hasChildren.value = false;
+				console.log('destroyed:', selectedSnapshot.value);
+				firstOptionToggle.value = false;
+				secondOptionToggle.value = false;
+				showDestroySnapshotModal.value = false;
+			}
+
+		} catch (error) {
+			console.error(error);
+		}
 	}
 });
 
@@ -348,7 +352,7 @@ watch(confirmClone, async (newVal, oldVal) => {
 		await refreshSnaps();
 		confirmClone.value = false;
 		operationRunning.value = false;
-		notifications.value.constructNotification('Snapshot Cloned', `Cloned snapshot ${selectedSnapshot.value!.name} .`, 'success');
+		// notifications.value.constructNotification('Snapshot Cloned', `Cloned snapshot ${selectedSnapshot.value!.name} .`, 'success');
 	}
 });
 
@@ -381,14 +385,26 @@ const updateShowRollbackSnapshot = (newVal) => {
 watch(confirmRollback, async (newVal, oldVal) => {
 	if (confirmRollback.value == true) {
 		operationRunning.value = true;
-		await rollbackSnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
-		console.log('rolled back:', selectedSnapshot.value);
-		showRollbackSnapshotModal.value = false;
 
-		confirmRollback.value = false;
-		await refreshSnaps();
-		operationRunning.value = false;
-		notifications.value.constructNotification('Snapshot Rolled Back', `Rolled back to snapshot ${selectedSnapshot.value!.name} .`, 'success');
+		try {
+			const output = await rollbackSnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
+
+			if (output == null) {
+				operationRunning.value = false;
+				confirmRollback.value = false;
+				notifications.value.constructNotification('Rollback Snapshot Failed', selectedSnapshot.value!.name + " was not rolled back. Check console output for details.", 'error');
+			} else {
+				console.log('rolled back:', selectedSnapshot.value);
+				await refreshSnaps();
+				confirmRollback.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('Snapshot Rolled Back', `Rolled back to snapshot ${selectedSnapshot.value!.name} .`, 'success');
+				showRollbackSnapshotModal.value = false;
+			}
+
+		} catch (error) {
+			console.error(error);
+		}
 	}
 });
 
@@ -421,10 +437,8 @@ watch(confirmRename, async (newVal, oldVal) => {
 		await refreshSnaps();
 		confirmRename.value = false;
 		operationRunning.value = false;
-		notifications.value.constructNotification('Snapshot Renamed', `Renamed snapshot ${selectedSnapshot.value!.name} .`, 'success');
 	}
 });
-
 
 /////////////////// Send Snapshot ///////////////////
 /////////////////////////////////////////////////////
@@ -454,7 +468,6 @@ watch(confirmSendSnap, async (newVal, oldVal) => {
 	if (confirmSendSnap.value == true) {
 		await refreshData();
 		await refreshSnaps();
-		notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${selectedSnapshot.value!.name}.`, 'success');
 	}
 });
 

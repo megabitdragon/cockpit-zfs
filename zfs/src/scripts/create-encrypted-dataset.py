@@ -38,7 +38,7 @@ def create_encrypted_dataset(atime, case, compress, dedup, dnode, xattr, record,
                 stdout, stderr = process.communicate(input=f.read())
 
             if process.returncode != 0:
-                print(f"Error: {stderr}")
+                raise Exception(f"Error: {stderr.decode('utf-8')}")
             else:
                 print(stdout)
 

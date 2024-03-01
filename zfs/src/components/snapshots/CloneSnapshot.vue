@@ -145,6 +145,7 @@ async function cloneBtn() {
             
             if (output == null) {
                 notifications.value.constructNotification('Snapshot Clone Failed', 'There was an error cloning this snapshot. Check console output.', 'error'); 
+                confirmClone.value = true;
             } else {
                 confirmClone.value = true;
                 fileSystemsLoaded.value = false;

@@ -174,22 +174,13 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 			if (fileSystemData.canmount) {
 				cmdString.push('canmount=' + fileSystemData.canmount);
 			}
-	
+
 			cmdString.push(fileSystemData.name);
 	
 			console.log("configure cmdString:" , cmdString);
 			
 			const state = useSpawn(cmdString);
 			const output = await state.promise();
-			
-			if (fileSystemData.mountpoint) {
-				let newCmdString = 'zfs mount ' + fileSystemData.name;
-				console.log("mounting newCmdString:" , newCmdString);
-				const newState = useSpawn(newCmdString);
-				const newOutput = await newState.promise();
-				console.log(newOutput)
-				return newOutput.stdout;
-			}
 
 			console.log(output)
 			return output.stdout;
@@ -330,23 +321,24 @@ export async function renameFileSystem(oldPath, newPath, forceUnmount?, createPa
 	}
 }
 
+const properties = [
+	'readonly',
+	'mountpoint',
+	'canmount',
+	'atime',
+	'quota',
+	'record',
+	'refreservation',
+	'aclinherit',
+	'acltype',
+	'dedup',
+	'compression',
+	'checksum',
+	'dnodesize',
+	'xattr',
+]
+
 function hasChanges(fileSystemData) {
-	const properties = [
-		'readonly',
-        'mountpoint',
-        'canmount',
-        'atime',
-        'quota',
-        'record',
-        'refreservation',
-        'aclinherit',
-        'acltype',
-        'dedup',
-        'compression',
-        'checksum',
-        'dnodesize',
-        'xattr',
-	]
 
 	for (const property of properties) {
 		if (property in fileSystemData) {

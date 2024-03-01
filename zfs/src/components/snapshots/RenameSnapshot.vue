@@ -98,6 +98,8 @@ interface RenameSnapshotProps {
     snapshot: Snapshot;
 }
 
+const notifications = inject<Ref<any>>('notifications')!;
+
 const props = defineProps<RenameSnapshotProps>();
 const showRenameSnapModal = inject<Ref<boolean>>('show-rename-modal')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -119,10 +121,23 @@ async function renameBtn() {
 
     if (nameCheck(newName.value, parentFS.value)) {   
         renaming.value = true;
-        confirmRename.value = true;
-        await renameSnapshot(props.snapshot.name, newName.value);
-        showRenameSnapModal.value = false;
-        renaming.value = false;
+
+        try {
+			const output = await renameSnapshot(props.snapshot.name, newName.value);
+ 
+			if (output == null) {
+				renaming.value = false;
+				notifications.value.constructNotification('Rename Dataset Failed', props.snapshot.name + " was not renamed. Check console output for details.", 'error');
+			} else {
+                confirmRename.value = true;
+
+				notifications.value.constructNotification('Snapshot Renamed', `Renamed snapshot ${props.snapshot.name} to ${newName.value}.`, 'success');
+                renaming.value = false;
+                showRenameSnapModal.value = false;
+			}
+		} catch (error) {
+			console.error(error);
+		}
     }
 }
 

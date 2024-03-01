@@ -518,76 +518,7 @@ async function poolConfigureBtn() {
 		}
 
 	}
-}	
-// async function poolConfigureBtn() {	
-// 	console.log('poolConfigureBtn called');
-// 	if (commentLengthCheck(poolConfig.value)) {
-// 		console.log('Comment length check passed');
-// 		console.log('pool:', poolConfig.value);
-// 		await checkForChanges(poolConfig.value);
-// 		console.log('newChanges:', newChangesToPool.value);
-// 		saving.value = true;
-		
-// 		try {
-// 			const output = await configurePool(newChangesToPool.value);
-
-// 			if (output == false) {
-// 				console.log('configurePool failed');
-// 				saving.value = false;
-// 				confirmSavePool.value = false;
-// 				notifications.value.constructNotification('Save Pool Config Failed 1', 'There was an error saving this pool. Check console output.', 'error');
-// 			} else {
-// 				console.log('configurePool succeeded');
-// 				confirmSavePool.value = true;
-// 				notifications.value.constructNotification('Pool Config Saved 1', "Successfully saved this pool's configuration.", 'success');
-				
-// 				// await refreshAllData();
-// 				// showPoolDetails.value = false;
-// 				saving.value = false;
-// 			}
-
-// 		} catch (error) {
-// 			console.error('Error in poolConfigureBtn:', error);
-// 		} 
-// 	}
-// }
-
-// watch(confirmSavePool, async (newVal, oldVal) => {
-// 	if (confirmSavePool.value == true) {
-// 		console.log('configurePool succeeded');
-// 		notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
-// 		await refreshAllData();
-		
-// 	} 
-// 	else {
-// 		console.log('configurePool failed');
-// 		confirmSavePool.value = false;
-// 		notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output.', 'error');
-// 	}
-// 	showPoolDetails.value = false;
-// 	saving.value = false;
-// });
-
-/* watch(saving, async (newVal, oldVal) => {
-	if (saving.value == true) {
-		try {
-			const output = await configurePool(newChangesToPool.value);
-
-			if (output == false) {
-				saving.value = false;
-				notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output.', 'error');
-			} else {
-				notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
-				await refreshAllData();
-				saving.value = false;
-				showPoolDetails.value = false;
-			}
-
-		} catch (error) {
-			console.error(error);
-		} 
-	}
-}); */
+}
 
 /////////////////// Navigation //////////////////////
 /////////////////////////////////////////////////////

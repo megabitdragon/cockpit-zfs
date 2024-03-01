@@ -19,7 +19,7 @@ def destroy_for_overwrite_local(recvName):
     stdout, stderr = process_destroy.communicate()
 
     if process_destroy.returncode != 0:
-        print(f"Error: {stderr}")
+        raise Exception(f"Error: {stderr.decode('utf-8')}")
     else:
         print(stdout)
 
@@ -44,7 +44,7 @@ def destroy_for_overwrite_remote(recvName, recvHostUser, recvHost, recvPort=22):
     stdout, stderr = process_destroy.communicate()
 
     if process_destroy.returncode != 0:
-        print(f"Error: {stderr}")
+        raise Exception(f"Error: {stderr.decode('utf-8')}")
     else:
         print(stdout)
 
@@ -60,7 +60,7 @@ def remove_remote_file(hostname, username, port=22):
     stdout, stderr = process_remove.communicate()
 
     if process_remove.returncode != 0:
-        print(f"Error: {stderr}")
+        raise Exception(f"Error: {stderr.decode('utf-8')}")
     else:
         print(stdout)
 
@@ -199,7 +199,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             stdout, stderr = process_recv.communicate()
 
             if process_recv.returncode != 0:
-                print(f"Error: {stderr}")
+                raise Exception(f"Error: {stderr.decode('utf-8')}")
             else:
                 print(stdout)
 
@@ -323,7 +323,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             stdout, stderr = process_ssh_recv.communicate()
 
             if process_ssh_recv.returncode != 0:
-                print(f"Error: {stderr}")
+                raise Exception(f"Error: {stderr.decode('utf-8')}")
             else:
                 print(stdout)
 

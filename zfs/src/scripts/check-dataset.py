@@ -22,7 +22,7 @@ def check_if_recv_dataset_exists(recvName, recvHost, recvPort, recvHostUser):
 
     # Check the return code
     if process_check_dataset.returncode != 0:
-        print(f"Error: {stderr}")
+        raise Exception(f"Error: {stderr.decode('utf-8')}")
         return False
     else:
         # Check if the output matches the recvName

@@ -44,13 +44,13 @@
 										<div class="border border-default">
 											<Disclosure v-slot="{ open }">
 												<!-- <DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full justify-center text-center"> -->
-												<DisclosureButton class="bg-default grid grid-cols-11 grid-flow-cols w-full justify-center text-center">
+												<DisclosureButton class="bg-default grid grid-cols-11 grid-flow-cols w-full justify-center ">
 													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="fileSystem.name">
 														<ChevronUpIcon
 															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 														/>
 													</div>
-													<div class="py-1 mt-1 col-span-2 justify-start" :class="truncateText" :title="fileSystem.name">{{ fileSystem.name }}</div>
+													<div class="py-1 mt-1 col-span-2 text-left" :class="truncateText" :title="fileSystem.name">{{ fileSystem.name }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="convertBytesToSize(fileSystem.properties.available)">{{ convertBytesToSize(fileSystem.properties.available) }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="fileSystem.properties.usedByDataset">{{ fileSystem.properties.usedByDataset }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="fileSystem.properties.usedbyRefreservation">{{ fileSystem.properties.usedbyRefreservation }}</div>
@@ -359,6 +359,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 			if (output == null) {
 				operationRunning.value = false;
 				notifications.value.constructNotification('Destroy Dataset Failed', selectedDataset.value!.name + " was not destroyed. Check console output for details.", 'error');
+				confirmDelete.value = false;
 			} else {
 				operationRunning.value = false;
 				await refreshData();
@@ -382,7 +383,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showUnmountFileSystemConfirm = ref(false);
 const forceUnmount = ref(false);
-const lockThisFileSystem = ref(false);
+// const lockThisFileSystem = ref(secondOptionToggle.value);
 const unmounting = ref(false);
 const confirmUnmount = ref(false);
 
@@ -420,11 +421,24 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 			if (output == null) {
 				operationRunning.value = false;
 				unmounting.value = false;
+				confirmUnmount.value = false;
 				notifications.value.constructNotification('Unmount Dataset Failed', selectedDataset.value!.name + " was not unmounted. Check console output for details.", 'error');
 			} else {
 				console.log('unmounted:', selectedDataset.value!);
-				if (selectedDataset.value?.encrypted && lockThisFileSystem.value == true) {
-					await lockFileSystem(selectedDataset.value!);
+				if (selectedDataset.value?.encrypted && secondOptionToggle.value) {
+					try {
+						const lockOutput = await lockFileSystem(selectedDataset.value!);
+
+						if (lockOutput == null) {
+							notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${selectedDataset.value!.name}. Check console output for details.`, 'error');
+						} else {
+							notifications.value.constructNotification('Dataset Locked', `Successfully locked ${selectedDataset.value!.name}.`, 'success');
+							// showLockUnlockModal.value = false;
+						}
+
+					} catch (error) {
+						console.error(error);
+					}
 				}
 				confirmUnmount.value = false;
 				forceUnmount.value = false;
@@ -432,7 +446,7 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 				await refreshDatasetSnaps(selectedDataset.value);
 				unmounting.value = false;
 				operationRunning.value = false;
-				lockThisFileSystem.value = false;
+				// lockThisFileSystem.value = false;
 				notifications.value.constructNotification('File System Unmounted', selectedDataset.value!.name + " unmounted.", 'success');
 				showUnmountFileSystemConfirm.value = false;
 			}
@@ -485,6 +499,7 @@ watch(confirmMount, async (newValue, oldValue) => {
 				operationRunning.value = false;
 				mounting.value = false;
 				notifications.value.constructNotification('Mount Dataset Failed', selectedDataset.value!.name + " was not mounted. Check console output for details.", 'error');
+				confirmMount.value = false;
 			} else {
 				console.log('mounted:', selectedDataset.value!);
 				confirmMount.value = false;
@@ -585,9 +600,8 @@ watch(confirmLockOrUnlock, async (newVal, oldVal) => {
 	if (confirmLockOrUnlock.value == true) {
 		operationRunning.value = true;
 		await refreshData();
-		confirmRename.value = false;
+		confirmLockOrUnlock.value = false;
 		operationRunning.value = false;
-		notifications.value.constructNotification('File system locked', `Locked file system ${selectedDataset.value!.name} .`, 'success');
 	}
 });
 

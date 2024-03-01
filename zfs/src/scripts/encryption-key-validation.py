@@ -22,10 +22,16 @@ def check_key(fileSystemName, passphrase):
 
             # Provide the passphrase file as input to the process
             with open(temp_passphrase_file_path, 'rb') as f:
-                process.communicate(input=f.read())
+                # process.communicate(input=f.read())
+                stdout, stderr = process.communicate(input=f.read())
 
-            return process.returncode == 0
-            
+            # return process.returncode == 0
+            if process.returncode != 0:
+                raise Exception(f"Error: {stderr.decode('utf-8')}")
+            else:
+                # print(stdout)
+                return process.returncode
+
         finally:
             # Delete the temporary passphrase file after using it
             os.remove(temp_passphrase_file_path)

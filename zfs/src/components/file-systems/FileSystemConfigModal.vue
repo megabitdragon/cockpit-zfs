@@ -386,18 +386,31 @@ async function checkForChanges(fileSystemCheck) {
 }
 
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
-   
+const notifications = inject<Ref<any>>('notifications')!;
+
 async function fsConfigureBtn() {
     if (checkSizes()) {
         console.log('filesystem:', fileSystemConfig.value);
         await checkForChanges(fileSystemConfig.value);
         console.log('newChanges:', newChangesToFileSystem.value);
-        await configureDataset(newChangesToFileSystem.value);
-        datasets.value = [];
-        fileSystemsLoaded.value = false;
-        await loadDatasets(datasets);
-        showFSConfig.value = false;
-        fileSystemsLoaded.value = true;
+        try {
+            const output =  await configureDataset(newChangesToFileSystem.value);
+
+			if (output == null) {
+				console.log('configureFS failed');
+				notifications.value.constructNotification('Save File System Config Failed', 'There was an error saving this file system. Check console output for details.', 'error')
+			} else {
+				console.log('configureFS succeeded');
+				notifications.value.constructNotification('File System Config Saved', "Successfully saved this file system's configuration.", 'success');
+                datasets.value = [];
+                fileSystemsLoaded.value = false;
+                await loadDatasets(datasets);
+                fileSystemsLoaded.value = true;
+                showFSConfig.value = false;
+			}
+        } catch (error) {
+            console.error(error);
+        }
     }
 }
 

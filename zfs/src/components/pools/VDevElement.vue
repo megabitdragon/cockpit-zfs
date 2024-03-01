@@ -200,6 +200,7 @@ watch(confirmRemove, async (newValue, oldValue) => {
 			const output = await removeVDevFromPool(selectedVDev.value, selectedPool.value);
 			if (output == null) {
 				notifications.value.constructNotification('Remove Failed', "Failed to remove Virtual Device. Check console output for details.", 'error');
+				confirmRemove.value = false;
 			} else {
 				notifications.value.constructNotification('Remove Completed', `Removed VDev ${selectedVDev.value!.name} from Pool ${selectedPool.value!.name}`, 'success');
 				await refreshAllData();
