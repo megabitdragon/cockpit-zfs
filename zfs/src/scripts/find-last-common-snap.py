@@ -18,7 +18,7 @@ def get_snapshots_info(recvName, recvHost, recvPort, recvHostUser):
     stdout, stderr = process.communicate()
 
     if process.returncode != 0:
-        raise Exception(f"Error: {stderr.decode('utf-8')}")
+        # raise Exception(f"Error:{stderr}")
         return []
 
     # Parse the output and structure the data

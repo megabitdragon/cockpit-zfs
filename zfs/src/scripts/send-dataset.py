@@ -199,7 +199,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             stdout, stderr = process_recv.communicate()
 
             if process_recv.returncode != 0:
-                raise Exception(f"Error: {stderr.decode('utf-8')}")
+                raise Exception(f"Error:{stderr}")
             else:
                 print(stdout)
 
@@ -323,7 +323,7 @@ def send_dataset(sendName, recvName, sendName2="", forceOverwrite=False, compres
             stdout, stderr = process_ssh_recv.communicate()
 
             if process_ssh_recv.returncode != 0:
-                raise Exception(f"Error: {stderr.decode('utf-8')}")
+                raise Exception(f"Error: {stderr}")
             else:
                 print(stdout)
 

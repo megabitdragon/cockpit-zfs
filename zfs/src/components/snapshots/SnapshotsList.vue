@@ -50,7 +50,7 @@
 						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 							<Menu as="div" class="relative inline-block text-right">
 								<div>
-									<MenuButton class="flex items-center rounded-full bg-default p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+									<MenuButton class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 										<span class="sr-only">Open options</span>
 										<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 									</MenuButton>
@@ -468,6 +468,9 @@ watch(confirmSendSnap, async (newVal, oldVal) => {
 	if (confirmSendSnap.value == true) {
 		await refreshData();
 		await refreshSnaps();
+		// notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${selectedSnapshot.value!.name}.`, 'success');
+	} else {
+		// notifications.value.constructNotification('Failed Snapshot Send', `Failed to send snapshot ${selectedSnapshot.value!.name}.`, 'error');
 	}
 });
 

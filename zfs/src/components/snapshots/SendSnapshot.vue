@@ -18,6 +18,7 @@
                     <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
                     <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="destinationName" placeholder="Destination Name Here"/>
                     <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ invalidConfigMsg }}</p>
+                    <p v-if="invalidDest" class="mt-1 text-sm text-danger">{{ invalidDestMsg }}</p>
                     <p v-if="invalidConfig" class="mt-1 text-sm text-muted"><i>{{ mostRecentDestSnapMsg }}</i></p>
                     <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ useForceOverwriteMsg }}</p>
                 </div>
@@ -118,7 +119,10 @@ interface SendSnapshotProps {
     name: string;
 }
 
+const notifications = inject<Ref<any>>('notifications')!;
+
 const props = defineProps<SendSnapshotProps>();
+const pools = inject<Ref<PoolData[]>>('pools')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
@@ -149,6 +153,8 @@ const sendProgressData = ref<SendProgress[]>([]);
 const mBufferSize = ref(1);
 const mBufferUnit = ref('G');
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
+const invalidDest = ref(false);
+const invalidDestMsg = ref('');
 
 const showTestSSH = ref(false);
 
@@ -204,11 +210,26 @@ const isSendLocal = computed(() => {
     }
 });
 
-function doesRecvDatasetExist() {
+/* function doesRecvDatasetExist() {
     try {
         return datasets.value.some(dataset => dataset.name === sendingData.value.recvName);
     } catch (error) {
         console.error('Error checking dataset', error);
+    }
+} */
+function doesRecvDatasetExist() {
+    // Check if datasets and recvName are defined and not null
+    // if (!datasets.value || !sendingData.value || !sendingData.value.recvName) {
+    //     console.error('Datasets or recvName is undefined or null');
+    //     return false;
+    // }
+
+    try {
+        // Use Array.prototype.some to check if dataset with recvName exists
+        return datasets.value.some(dataset => dataset.name === sendingData.value.recvName);
+    } catch (error) {
+        console.error('Error checking dataset:', error);
+        return false; // Return false if an error occurs during the check
     }
 }
 
@@ -217,6 +238,15 @@ async function doesRemoteDatasetExist() {
         return await doesDatasetExist(sendingData.value);
     } catch (error) {
         console.error('Error checking dataset', error);
+    }
+}
+
+function doesPoolExist() {
+    try {
+        const poolName = sendingData.value.recvName.split("/", 1).shift();
+        return pools.value.some(pool => pool.name === poolName);
+    } catch (error) {
+        console.error('Error checking pool', error);
     }
 }
 
@@ -274,8 +304,14 @@ async function setSendData() {
                     mostRecentDestSnapMsg.value = `Most recent snapshot: ${mostRecentLocalDestSnap.value!.name}`;
                 }
             } else {
-                sendIncremental.value = false;
-                sendingData.value.sendIncName! = "";
+                if (doesPoolExist()) {
+                    sendIncremental.value = false;
+                    sendingData.value.sendIncName! = "";
+                } else {
+                    console.error('Pool does not exist');
+                    invalidDest.value = true;
+                    invalidDestMsg.value = "Destination pool does not exist.";
+                }
             }
         } else {
             datasetCheckResult.value = await doesRemoteDatasetExist();
@@ -395,27 +431,48 @@ async function compareRemoteTimestamp(snapSnips : SnapSnippet[], sourceDatasetSn
 }
 
 async function sendBtn() {
-    await setSendData();
-    console.log('Sending data:', sendingData.value);
-    
-    if (!invalidConfig.value && !invalidFlags.value) {
-        sending.value = true;
-        await sendAndReadProgress(sendingData.value, sendProgressData.value);
-        sending.value = false;
-        showSendDataset.value = false;
-        confirmSend.value = true;
-        tracking.value = false;
-    } else if (invalidConfig.value) {
-        if (forceOverwrite.value) {
+    try {
+        await setSendData();
+        console.log('Sending data:', sendingData.value);
+        
+        if (!invalidConfig.value && !invalidFlags.value && !invalidDest.value) {
             sending.value = true;
-            invalidConfig.value = false;
+    
             await sendAndReadProgress(sendingData.value, sendProgressData.value);
             sending.value = false;
-            showSendDataset.value = false;
             confirmSend.value = true;
             tracking.value = false;
+            
+            // Show success notification
+            notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${props.snapshot!.name}.`, 'success');
+
+            showSendDataset.value = false;
+        } else if (invalidConfig.value) {
+            if (forceOverwrite.value) {
+                sending.value = true;
+                invalidConfig.value = false;
+                await sendAndReadProgress(sendingData.value, sendProgressData.value);
+                sending.value = false;
+                confirmSend.value = true;
+                tracking.value = false;
+
+                // Show success notification
+                notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${props.snapshot!.name}.`, 'success');
+
+                showSendDataset.value = false;
+            } else {
+                confirmSend.value = false;
+            }
+        } else {
+            confirmSend.value = false;
         }
-    } 
+    } catch (error) {
+        console.error(error);
+
+        // Show error notification
+        notifications.value.constructNotification('Failed Snapshot Send', `Failed to send snapshot ${props.snapshot!.name}.`, 'error');
+    }
+   
 }
 
 const totalSendSize = ref(0);
@@ -459,23 +516,14 @@ async function readSendProgress(sendProgressData : SendProgress[], fileReader : 
                     sendProgressAmount.value = getSendProgress(content.sent);
                     console.log(`content.totalSize: ${content.totalSize}, content.sent: ${content.sent}`);
                     console.log(`totalSendSize: ${totalSendSize.value}, sendProgAmount: ${sendProgressAmount.value}`);
-                }
-               
+                }    
             }
         }
 
-        // const file = fileReader.watch((content) => {
-        //     fillProgressArray(content, sendProgressData)
-        //     console.log(content)
-        // });
-        
         fileReader.watch((content) => {
-            fillProgressArray(content, sendProgressData)
-            console.log(content)
+            fillProgressArray(content, sendProgressData);
+            console.log('fileReaderContent:', content);
         });
-
-        // file.remove();
-        // fileReader.close();
 
     } catch (error) {
         console.error("An error occurred loading send progress:", error);
@@ -498,9 +546,13 @@ async function sendAndReadProgress(sendingData : SendingDataset, sendProgress : 
 
         fileReader.close();
         // return snapshotResult;
+
+        // return true;
     } catch (error) {
         console.error("An error occurred in sendAndReadProgress:", error);
         // return null;
+        
+        // return false;
     }
 }
 

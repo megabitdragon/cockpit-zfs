@@ -154,6 +154,7 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 	} catch (state) {
 		console.error(errorString(state));
 		return null;
+        // throw new Error('Snapshot send failed'); // Throw an error if the operation fails
 	}
 }
 
