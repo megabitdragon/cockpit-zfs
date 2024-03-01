@@ -21,13 +21,13 @@
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="py-2 font-semibold text-default col-span-2" :class="truncateText" title="Dataset">Dataset</th>
+								<th class="py-2 font-semibold text-left text-default col-span-2" :class="truncateText" title="Dataset">Dataset</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Available">Available</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used">Used</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Refreservation">Refreservation</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Compression">Compression</th>
 								<!-- <th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Deduplication">Deduplication</th> -->
-								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Encryption">Encryption</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Encrypted">Encrypted</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Mounted">Mounted</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Read Only">Read Only</th>
 								<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
@@ -57,7 +57,16 @@
 													<div v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.compression)">{{ upperCaseWord(fileSystem.properties.compression) }}</div>
 													<div v-else class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.compression).toUpperCase()">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
 													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.deduplication)">{{ upperCaseWord(fileSystem.properties.deduplication) }}</div> -->
-													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(isBoolOnOff(fileSystem.encrypted))">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div>
+													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(isBoolOnOff(fileSystem.encrypted))">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div> -->
+													<div v-if="fileSystem.encrypted && fileSystem.key_loaded" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Unlocked">
+														<LockOpenIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="fileSystem.encrypted && !fileSystem.key_loaded" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Locked">
+														<LockClosedIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="!fileSystem.encrypted" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Not Encrypted">
+														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.mounted)">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.readOnly)">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
 
@@ -182,7 +191,7 @@
 
 <script setup lang="ts">
 import { ref, inject, Ref, provide, watch, onMounted } from "vue";
-import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
 import { isBoolOnOff, convertBytesToSize, upperCaseWord,   } from '../../composables/helpers';
