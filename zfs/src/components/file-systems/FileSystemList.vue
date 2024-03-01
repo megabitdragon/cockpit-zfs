@@ -67,8 +67,20 @@
 													<div v-if="!fileSystem.encrypted" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Not Encrypted">
 														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
-													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.mounted)">{{ upperCaseWord(fileSystem.properties.mounted) }}</div>
-													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.readOnly)">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div>
+													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.mounted)">{{ upperCaseWord(fileSystem.properties.mounted) }}</div> -->
+													<div v-if="yesNoToBool(fileSystem.properties.mounted)" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">
+														<CheckIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="!yesNoToBool(fileSystem.properties.mounted)" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">
+														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.readOnly)">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div> -->
+													<div v-if="fileSystem.properties.isReadOnly!" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">
+														<CheckIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="!fileSystem.properties.isReadOnly!" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">
+														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
 
 													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 														<Menu as="div" class="relative inline-block text-right -mt-1">
@@ -191,10 +203,10 @@
 
 <script setup lang="ts">
 import { ref, inject, Ref, provide, watch, onMounted } from "vue";
-import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon } from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon, CheckIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
-import { isBoolOnOff, convertBytesToSize, upperCaseWord,   } from '../../composables/helpers';
+import { isBoolOnOff, convertBytesToSize, upperCaseWord, yesNoToBool } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";

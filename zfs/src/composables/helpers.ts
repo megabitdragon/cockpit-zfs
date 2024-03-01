@@ -17,6 +17,11 @@ export function onOffToBool(state : string) {
     if (state == 'on') { return true } else if (state == 'off') { return false }
 }
 
+//change 'yes' to true and 'no' to false
+export function yesNoToBool(state: string) {
+	if (state == 'yes') { return true } else if (state == 'no') { return false }
+}
+
 //change the first letter of a word to upper case
 export const upperCaseWord = (word => {
 	let lowerCaseWord = word.toLowerCase();
