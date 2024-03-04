@@ -520,11 +520,43 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 
 export async function loadSnapshots(snapshots) {
 	try {
-		getSnapshots().then(rawJSON => {
-			const parsedJSON = (JSON.parse(rawJSON));
-			// console.log('Snapshots JSON (all):', parsedJSON);
-			for (const dataset in parsedJSON) {
-				parsedJSON[dataset].forEach(snapshot => {
+		const rawJSON = await getSnapshots();
+        const parsedJSON = JSON.parse(rawJSON);
+        console.log('Snapshots JSON (all):', parsedJSON);
+
+        for (const dataset in parsedJSON) {
+            parsedJSON[dataset].forEach(snapshot => {
+				
+				const snap = {
+					name: snapshot.name,
+					id: snapshot.id,
+					snapName: snapshot.snapshot_name,
+					dataset: snapshot.dataset,
+					pool: snapshot.pool,
+					mountpoint: snapshot.mountpoint,
+					type: snapshot.type,
+					guid: snapshot.properties.guid.value,
+					creationTimestamp: snapshot.properties.creation.rawvalue,
+					properties: snapshot.properties,
+					holds: snapshot.holds
+				};
+				snapshots.value.push(snap);
+            });
+        }
+	} catch(error) {
+		console.error("An error occurred getting snapshots:", error);
+	}
+}
+
+export async function loadSnapshotsInPool(snapshots, poolName) {
+    try {
+        const rawJSON = await getSnapshots();
+        const parsedJSON = JSON.parse(rawJSON);
+        // console.log('Snapshots JSON (loadByPool):', parsedJSON);
+
+        for (const dataset in parsedJSON) {
+            parsedJSON[dataset].forEach(snapshot => {
+				if (snapshot.pool === poolName) {
 					const snap = {
 						name: snapshot.name,
 						id: snapshot.id,
@@ -535,84 +567,20 @@ export async function loadSnapshots(snapshots) {
 						type: snapshot.type,
 						guid: snapshot.properties.guid.value,
 						creationTimestamp: snapshot.properties.creation.rawvalue,
-						properties: {
-							clones: snapshot.properties.clones.parsed,
-							creation: {
-								rawTimestamp: snapshot.properties.creation.rawvalue,
-								parsed: convertTimestampToLocal(snapshot.properties.creation.parsed),
-								value: snapshot.properties.creation.value,
-							},
-							referenced: {
-								value: snapshot.properties.referenced.value,
-								rawNum: snapshot.properties.referenced.parsed,
-							},
-							used: {
-								value: snapshot.properties.used.value,
-								rawNum: snapshot.properties.used.parsed,
-							},
-						},
+						properties: snapshot.properties,
 						holds: snapshot.holds
-					}
-	
+					};
+				
 					snapshots.value.push(snap);
-				});
-			}
-			
-		});
-
-		console.log('loaded snapshots:', snapshots);
-	} catch(error) {
-		console.error("An error occurred getting snapshots:", error);
-	}
-}
-
-export async function loadSnapshotsInPool(snapshots, poolName) {
-	try {
-		getSnapshots().then(rawJSON => {
-			const parsedJSON = (JSON.parse(rawJSON));
-			// console.log('Snapshots JSON (loadByPool):', parsedJSON);
-			for (const dataset in parsedJSON) {
-				parsedJSON[dataset].forEach(snapshot => {
-					if (snapshot.pool == poolName) {
-						const snap = {
-							name: snapshot.name,
-							id: snapshot.id,
-							snapName: snapshot.snapshot_name,
-							dataset: snapshot.dataset,
-							pool: snapshot.pool,
-							mountpoint: snapshot.mountpoint,
-							type: snapshot.type,
-							guid: snapshot.properties.guid.value,
-							creationTimestamp: snapshot.properties.creation.rawvalue,
-							properties: {
-								clones: snapshot.properties.clones.parsed,
-								creation: {
-									rawTimestamp: snapshot.properties.creation.rawvalue,
-									parsed: convertTimestampToLocal(snapshot.properties.creation.parsed),
-									value: snapshot.properties.creation.value,
-								},
-								referenced: {
-									value: snapshot.properties.referenced.value,
-									rawNum: snapshot.properties.referenced.parsed,
-								},
-								used: {
-									value: snapshot.properties.used.value,
-									rawNum: snapshot.properties.used.parsed,
-								},
-							},
-							holds: snapshot.holds
-						}
-		
-						snapshots.value.push(snap);
-					}
-				});
-			}
-		});
+                }
+            });
+        }
 		console.log('loaded snapshots in:', poolName, '\n', snapshots);
-	} catch(error) {
-		console.error("An error occurred getting snapshots:", error);
-	}
+    } catch (error) {
+        console.error("An error occurred getting snapshots:", error);
+    }
 }
+
 
 export async function loadSnapshotsInDataset(snapshots, datasetName) {
 	try {

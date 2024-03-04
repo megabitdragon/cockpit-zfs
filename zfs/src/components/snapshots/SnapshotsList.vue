@@ -60,19 +60,19 @@
 									<MenuItems @click.stop class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 										<div class="py-1">
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+												<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+												<a href="#" @click="renameThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+												<a href="#" @click="rollbackThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+												<a href="#" @click="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
 											</MenuItem>
 											<MenuItem as="div" v-slot="{ active }">
-												<a href="#" @click.stop="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+												<a href="#" @click="destroyThisSnapshot(snapshot)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
 											</MenuItem>
 										</div>
 									</MenuItems>
@@ -164,6 +164,84 @@
 				</tbody>
 			</table>
 		</div>
+
+		<!-- Single Snap -->
+		<div v-if="props.item == 'singleSnap'" class="inline-block min-w-full max-h-max align-middle border-collapse">
+			<table class="table-auto min-w-full min-h-full divide-y divide-default">
+				<thead class="bg-secondary border-collapse">
+					<tr v-if="snapshotsLoaded" class="rounded-md grid grid-cols-7 font-semibold text-white">
+						<!-- <th class="relative py-2 rounded-tl-md col-span-1">
+							<span class="sr-only"></span>
+						</th> -->
+						<th class="py-2 col-span-2 text-center" :class="truncateText" title="Snapshot">Snapshot</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Created On">Created On</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Used">Used</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Referenced">Referenced</th>
+						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Clones">Clones</th>
+						<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
+							<span class="sr-only"></span>
+						</th>
+					</tr>
+					<tr v-if="!snapshotsLoaded && snapshotsLoading" class="rounded-md flex bg-well justify-center">
+						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-default bg-accent border-collapse">
+					<tr v-if="snapshotsLoaded" class="text-default grid grid-cols-7 justify-center items-center">
+						<!-- <td class="relative py-2 col-span-1">
+							<span class="sr-only"></span>
+						</td> -->
+						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2" :class="truncateText" :title="props.singleSnap!.name"> 
+							{{ props.singleSnap!.name }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="props.singleSnap!.properties.creation.parsed">
+							{{ props.singleSnap!.properties.creation.parsed }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="props.singleSnap!.properties.used.value">
+							{{ props.singleSnap!.properties.used.value }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="props.singleSnap!.properties.referenced.value">
+							{{ props.singleSnap!.properties.referenced.value }}
+						</td>
+						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="props.singleSnap!.properties.clones">
+							{{ props.singleSnap!.properties.clones.length > 0 ? props.singleSnap!.properties.clones : '-' }}
+						</td>
+						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
+							<Menu as="div" class="relative inline-block text-right">
+								<div>
+									<MenuButton class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+										<span class="sr-only">Open options</span>
+										<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+									</MenuButton>
+								</div>
+
+								<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+									<MenuItems class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+										<div class="py-1">
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click="cloneThisSnapshot(props.singleSnap!)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click="renameThisSnapshot(props.singleSnap!)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click="rollbackThisSnapshot(props.singleSnap!)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll Back Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click="sendThisDataset(props.singleSnap!)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
+											</MenuItem>
+											<MenuItem as="div" v-slot="{ active }">
+												<a href="#" @click="destroyThisSnapshot(props.singleSnap!)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Snapshot</a>
+											</MenuItem>
+										</div>
+									</MenuItems>
+								</transition>
+							</Menu>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	
 		<div v-if="showDestroySnapshotModal">
 			<component :is="destroySnapshotComponent" :showFlag="showDestroySnapshotModal" @close="updateShowDestroySnapshot" :idKey="'confirm-destroy-snapshot'" :item="'snapshot'" :operation="'destroy'" :snapshot="selectedSnapshot!" :confirmOperation="confirmThisDestroy" :firstOption="'Destroy child snapshots with same name'" :secondOption="'Force Destroy ALL child datasets'" :hasChildren="hasChildren"/>
@@ -201,7 +279,8 @@ const notifications = inject<Ref<any>>('notifications')!;
 interface SnapshotsListProps {
 	pool?: PoolData;
 	filesystem?: FileSystemData;
-	item: 'pool' | 'filesystem';
+	singleSnap?: Snapshot;
+	item: 'pool' | 'filesystem' | 'singleSnap';
 }
 
 const props = defineProps<SnapshotsListProps>();
@@ -246,6 +325,8 @@ async function refreshSnaps() {
 	} else if (props.item == 'filesystem') {
 		snapshotsInFilesystem.value = [];
 		await loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name);
+	} else if (props.item == 'singleSnap') {
+		selectedSnapshot.value = snapshots.value.find(snapshot => snapshot.name == props.singleSnap!.name);
 	}
 	snapshotsLoaded.value = true;
 	snapshotsLoading.value = false;

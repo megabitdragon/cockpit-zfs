@@ -281,22 +281,7 @@ interface Snapshot {
 	type: string;
 	guid: string;
 	creationTimestamp: string;
-	properties: {
-		clones: string;
-		creation: {
-			rawTimestamp: string;
-			parsed: string;
-			value: string;
-		}
-		referenced: {
-			value: string;
-			rawNum: number;
-		}
-		used: {
-			value: string;
-			rawNum: number;
-		},
-	}
+	properties: {}
 	holds: {}
 }
 

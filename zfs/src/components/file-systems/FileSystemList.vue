@@ -1,3 +1,5 @@
+
+
 <template>
 	<div class="inline-block min-w-full min-h-full py-4 align-middle sm:px-4 lg:px-6 overflow-visible sm:rounded-lg bg-accent rounded-md border border-default">	
 		<div class="flex bg-well justify-between rounded-md p-2 shadow text-default rounded-b-md ring-1 ring-black ring-opacity-5">
@@ -16,17 +18,17 @@
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
-							<!-- <tr class="bg-well rounded-t-md grid grid-cols-12"> -->
-								<tr class="bg-well rounded-t-md grid grid-cols-11">
+							<tr class="bg-well rounded-t-md grid grid-cols-12">
+								<!-- <tr class="bg-well rounded-t-md grid grid-cols-11"> -->
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
 								<th class="py-2 font-semibold text-left text-default col-span-2" :class="truncateText" title="Dataset">Dataset</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Available">Available</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used">Used</th>
-								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Refreservation">Refreservation</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Refreservation">Refres.</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Compression">Compression</th>
-								<!-- <th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Deduplication">Deduplication</th> -->
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Deduplication">Dedup.</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Encrypted">Encrypted</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Mounted">Mounted</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Read Only">Read Only</th>
@@ -39,12 +41,11 @@
 
 						<tbody class="">
 							<tr class="">
-								<div v-if="fileSystems.length > 0 && fileSystemsLoaded == true">
-									<div v-for="fileSystem, fsIdx in fileSystems">
+								<div v-if="allDatasets.length > 0 && allDatasetsLoaded == true">
+									<!-- <div v-for="fileSystem, fsIdx in fileSystems">
 										<div class="border border-default">
 											<Disclosure v-slot="{ open }">
-												<!-- <DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full justify-center text-center"> -->
-												<DisclosureButton class="bg-default grid grid-cols-11 grid-flow-cols w-full justify-center ">
+												<DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
 													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="fileSystem.name">
 														<ChevronUpIcon
 															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
@@ -56,8 +57,8 @@
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="fileSystem.properties.usedbyRefreservation">{{ fileSystem.properties.usedbyRefreservation }}</div>
 													<div v-if="fileSystem.properties.compression == 'off' || fileSystem.properties.compression == 'on'" class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.compression)">{{ upperCaseWord(fileSystem.properties.compression) }}</div>
 													<div v-else class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.compression).toUpperCase()">{{ (fileSystem.properties.compression).toUpperCase() }}</div>
-													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.deduplication)">{{ upperCaseWord(fileSystem.properties.deduplication) }}</div> -->
-													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(isBoolOnOff(fileSystem.encrypted))">{{ upperCaseWord(isBoolOnOff(fileSystem.encrypted)) }}</div> -->
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="getValue('dedup', fileSystem.properties.deduplication)">{{ getValue('dedup', fileSystem.properties.deduplication) }}</div>
+												
 													<div v-if="fileSystem.encrypted && fileSystem.key_loaded" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Unlocked">
 														<LockOpenIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
@@ -67,18 +68,18 @@
 													<div v-if="!fileSystem.encrypted" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Not Encrypted">
 														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
-													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.mounted)">{{ upperCaseWord(fileSystem.properties.mounted) }}</div> -->
-													<div v-if="yesNoToBool(fileSystem.properties.mounted)" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">
+
+													<div v-if="yesNoToBool(fileSystem.properties.mounted)" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Mounted">
 														<CheckIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
-													<div v-if="!yesNoToBool(fileSystem.properties.mounted)" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">
+													<div v-if="!yesNoToBool(fileSystem.properties.mounted)" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Not Mounted">
 														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
-													<!-- <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(fileSystem.properties.readOnly)">{{ upperCaseWord(fileSystem.properties.readOnly) }}</div> -->
-													<div v-if="fileSystem.properties.isReadOnly!" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">
+
+													<div v-if="fileSystem.properties.isReadOnly!" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Read Only ON">
 														<CheckIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
-													<div v-if="!fileSystem.properties.isReadOnly!" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">
+													<div v-if="!fileSystem.properties.isReadOnly!" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Read Only OFF">
 														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
 
@@ -114,12 +115,7 @@
 																		</MenuItem>
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].properties.mounted == 'no' && fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
 																			<a href="#" @click="handleFileSystemEncryption(fileSystems[fsIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
-																		</MenuItem>					
-
-																		<!-- <MenuItem as="div" v-if="!findPoolDataset(fileSystems[fsIdx])" v-slot="{ active }">
-																			<a href="#" @click="" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure Replication Task</a>
-																		</MenuItem> -->
-																		
+																		</MenuItem>			
 																		<MenuItem as="div" v-if="fileSystems[fsIdx].encrypted && fileSystems[fsIdx].key_loaded" v-slot="{ active }">
 																			<a href="#" @click="changeThisPassphrase(fileSystems[fsIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
 																		</MenuItem>
@@ -142,8 +138,190 @@
 												</DisclosurePanel>
 											</Disclosure>
 										</div>
+									</div> -->
+
+									<div v-for="dataset, datasetIdx in allDatasets" :key="dataset.name">
+										<div v-if="dataset.type == 'FILESYSTEM'" class="border border-default">
+											<Disclosure v-slot="{ open }">
+												<DisclosureButton class="bg-default grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
+													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="dataset.name">
+														<ChevronUpIcon
+															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+														/> 
+													</div>
+													<div class="py-1 mt-1 col-span-2 text-left" :class="truncateText" :title="dataset.name">{{ dataset.name }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="convertBytesToSize(dataset.properties.available) ? convertBytesToSize(dataset.properties.available) : 'N/A'">{{ convertBytesToSize(dataset.properties.available) ? convertBytesToSize(dataset.properties.available) : 'N/A' }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="dataset.properties.usedByDataset">{{ dataset.properties.usedByDataset }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="dataset.properties.usedbyRefreservation ? dataset.properties.usedbyRefreservation : 'N/A'">{{ dataset.properties.usedbyRefreservation ? dataset.properties.usedbyRefreservation : 'N/A' }}</div>
+													<div v-if="dataset.properties.compression == 'off' || dataset.properties.compression == 'on'" class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(dataset.properties.compression) ? upperCaseWord(dataset.properties.compression) : 'N/A'">{{ upperCaseWord(dataset.properties.compression) ? upperCaseWord(dataset.properties.compression) : 'N/A' }}</div>
+													<div v-else class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(dataset.properties.compression).toUpperCase() ? upperCaseWord(dataset.properties.compression).toUpperCase() : 'N/A'">{{ dataset.properties.compression.toUpperCase() ? dataset.properties.compression.toUpperCase() : 'N/A' }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="getValue('dedup', dataset.properties.deduplication) ? getValue('dedup', dataset.properties.deduplication) : 'N/A'">{{ getValue('dedup', dataset.properties.deduplication) ? getValue('dedup', dataset.properties.deduplication) : 'N/A' }}</div>
+												
+													<div v-if="dataset.encrypted && dataset.key_loaded" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Unlocked">
+														<LockOpenIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="dataset.encrypted && !dataset.key_loaded" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Locked">
+														<LockClosedIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="!dataset.encrypted" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Not Encrypted">
+														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+
+													<div v-if="yesNoToBool(dataset.properties.mounted)" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Mounted">
+														<CheckIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="!yesNoToBool(dataset.properties.mounted)" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Not Mounted">
+														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+
+													<div v-if="dataset.properties.isReadOnly!" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Read Only ON">
+														<CheckIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="!dataset.properties.isReadOnly!" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Read Only OFF">
+														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+
+													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
+														<Menu as="div" class="relative inline-block text-right -mt-1">
+															<div>		
+																<MenuButton class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+																	<span class="sr-only">Open options</span>
+																	<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+																</MenuButton>
+															</div>
+
+															<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+																<MenuItems @click.stop class="absolute right-0 z-10 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+																	<div class="py-1">
+																		<MenuItem as="div" v-slot="{ active }">
+																			<a href="#" @click="loadFileSystemConfig(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="!findPoolDataset(allDatasets[datasetIdx])" v-slot="{ active }">
+																			<a href="#" @click="renameThisDataset(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'yes'" v-slot="{ active }">
+																			<a href="#" @click="unmountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
+																		</MenuItem>														
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && !allDatasets[datasetIdx].encrypted" v-slot="{ active }">
+																			<a href="#" @click="mountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
+																			<a href="#" @click="mountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && !allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
+																			<a href="#" @click="handleFileSystemEncryption(allDatasets[datasetIdx], 'unlock')" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unlock File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
+																			<a href="#" @click="handleFileSystemEncryption(allDatasets[datasetIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
+																		</MenuItem>	
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
+																			<a href="#" @click="changeThisPassphrase(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-slot="{ active }">
+																			<a href="#" @click="createSnapshotBtn(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
+																		</MenuItem>					
+																		<MenuItem as="div" v-if="!findPoolDataset(allDatasets[datasetIdx])" v-slot="{ active }">
+																			<a href="#" @click="deleteFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+																		</MenuItem>											
+																	</div>
+																</MenuItems>
+															</transition>
+														</Menu>
+													</div>
+												</DisclosureButton>
+												<DisclosurePanel>
+													<div>
+														<SnapshotsList :filesystem="fileSystems[datasetIdx]" :item="'filesystem'"/>
+													</div>
+												</DisclosurePanel>
+											</Disclosure>
+										</div>
+										<div v-if="dataset.type == 'SNAPSHOT'" class="border border-default">
+											<Disclosure v-slot="{ open }">
+												<DisclosureButton class="bg-secondary grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
+													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="dataset.name">
+														<ChevronUpIcon
+															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+														/> 
+													</div>
+													<div class="py-1 mt-1 col-span-2 text-left" :class="truncateText" :title="dataset.name">{{ dataset.name }}</div>
+													<div class="py-1 mt-1 col-span-1">N/A</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="convertBytesToSize(dataset.properties.used.parsed)">{{ convertBytesToSize(dataset.properties.used.parsed) }}</div>
+													<div class="py-1 mt-1 col-span-1">N/A</div>
+													<div class="py-1 mt-1 col-span-1">N/A</div>
+													<div class="py-1 mt-1 col-span-1">N/A</div>
+													<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'available'" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Unlocked">
+														<LockOpenIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'unavailable'" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Locked">
+														<LockClosedIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div v-if="dataset.properties.encryption.value === 'off' && dataset.properties.keystatus.value == ''" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Not Encrypted">
+														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
+													</div>
+													<div class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">N/A</div>
+													<div class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">N/A</div>
+
+													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
+														<!-- <Menu as="div" class="relative inline-block text-right -mt-1">
+															<div>		
+																<MenuButton class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+																	<span class="sr-only">Open options</span>
+																	<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+																</MenuButton>
+															</div>
+
+															<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+																<MenuItems @click.stop class="absolute right-0 z-10 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+																	<div class="py-1">
+																		<MenuItem as="div" v-slot="{ active }">
+																			<a href="#" @click="loadFileSystemConfig(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="!findPoolDataset(allDatasets[datasetIdx])" v-slot="{ active }">
+																			<a href="#" @click="renameThisDataset(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'yes'" v-slot="{ active }">
+																			<a href="#" @click="unmountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
+																		</MenuItem>														
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && !allDatasets[datasetIdx].encrypted" v-slot="{ active }">
+																			<a href="#" @click="mountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
+																			<a href="#" @click="mountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && !allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
+																			<a href="#" @click="handleFileSystemEncryption(allDatasets[datasetIdx], 'unlock')" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unlock File System</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
+																			<a href="#" @click="handleFileSystemEncryption(allDatasets[datasetIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
+																		</MenuItem>	
+																		<MenuItem as="div" v-if="allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
+																			<a href="#" @click="changeThisPassphrase(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-slot="{ active }">
+																			<a href="#" @click="createSnapshotBtn(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
+																		</MenuItem>					
+																		<MenuItem as="div" v-if="!findPoolDataset(allDatasets[datasetIdx])" v-slot="{ active }">
+																			<a href="#" @click="deleteFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
+																		</MenuItem>											
+																	</div>
+																</MenuItems>
+															</transition>
+														</Menu> -->
+													</div>
+												</DisclosureButton>
+												<DisclosurePanel>
+													<!-- <div class="flex flex-row w-full justify-center text-center items-center">
+														Dataset is Snapshot
+													</div> -->
+													<div>
+														<SnapshotsList :item="'singleSnap'" :singleSnap="dataset"/>
+													</div>
+												</DisclosurePanel>
+											</Disclosure>
+										</div>
 									</div>
-								</div>
+								</div> 
 							</tr>
 						</tbody>
 					</table>
@@ -206,7 +384,7 @@ import { ref, inject, Ref, provide, watch, onMounted } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon, CheckIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
-import { isBoolOnOff, convertBytesToSize, upperCaseWord, yesNoToBool } from '../../composables/helpers';
+import { getValue, convertBytesToSize, upperCaseWord, yesNoToBool } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
@@ -234,17 +412,72 @@ const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const selectedDataset = ref<FileSystemData>();
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+const allDatasets = ref<any>([]);
+const allDatasetsLoaded = ref(false);
 
 async function refreshData() {
 	fileSystemsLoaded.value = false;
 	snapshotsLoaded.value = false;
+	allDatasetsLoaded.value = false;
+
 	fileSystems.value = [];
 	snapshots.value = [];
+	allDatasets.value = [];
+
 	await loadDatasets(fileSystems);
 	await loadSnapshots(snapshots);
+	await populateDatasetList();
+
 	fileSystemsLoaded.value = true;
 	snapshotsLoaded.value = true;
+	allDatasetsLoaded.value = true;
+
 }
+///////////////////////////////////////////////////////////
+async function populateDatasetList() {
+    try {
+		// console.log('fileSystems:', fileSystems.value);
+		// console.log('snapshots:', snapshots.value);
+
+		for (const pool of pools.value) {
+			// console.log('Pool Name:', pool.name);
+
+            const poolFileSystems = fileSystems.value.filter(filesystem => filesystem.pool === pool.name);
+			// console.log('Filtered File Systems:', poolFileSystems);
+
+			const poolSnapshots = snapshots.value.filter(snapshot => snapshot.pool === pool.name);
+			// console.log('Filtered Snapshots:', poolSnapshots);
+
+            if (pool.properties.listSnapshots) {
+                allDatasets.value.push(...poolFileSystems, ...poolSnapshots);
+				console.log(`Added datasets & snaps from ${pool.name}`);
+            } else {
+				allDatasets.value.push(...poolFileSystems);
+				console.log(`Added only datasets from ${pool.name}`);
+			}
+        }
+
+		allDatasets.value.sort((a, b) => {
+			// Convert names to lowercase for case-insensitive sorting
+			const nameA = a.name.toLowerCase();
+			const nameB = b.name.toLowerCase();
+
+			if (nameA < nameB) {
+				return -1; // Name A comes before name B
+			}
+			if (nameA > nameB) {
+				return 1; // Name B comes before name A
+			}
+			return 0; // Names are equal
+		});
+
+		console.log('Final allDatasets:', allDatasets.value);
+
+    } catch (error) {
+        console.error('Error in populateDatasetList:', error);
+    }
+}
+
 
 onMounted(async () => {
 	await refreshData();
