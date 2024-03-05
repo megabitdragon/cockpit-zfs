@@ -139,11 +139,12 @@
 											</Disclosure>
 										</div>
 										<div v-if="dataset.type == 'SNAPSHOT'" class="border border-default">
-											<Disclosure v-slot="{ open }">
-												<DisclosureButton class="bg-primary grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
+											<!-- <Disclosure v-slot="{ open }">
+												<DisclosureButton class="bg-primary grid grid-cols-12 grid-flow-cols w-full justify-center text-center"> -->
+												<div class="bg-primary grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
 													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="dataset.name">
-														<ChevronUpIcon
-															class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+														<CameraIcon
+															class="-mt-1 mx-2 h-8 w-8 text-muted"
 														/> 
 													</div>
 													<div class="py-1 mt-1 col-span-2 text-left text-white" :class="[truncateText, `ml-${getNestingLevel(dataset)}`]" :title="dataset.name">{{ dataset.name }}</div>
@@ -163,64 +164,18 @@
 													</div>
 													<div class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center">N/A</div>
 													<div class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center">N/A</div>
-
-													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
-														<!-- <Menu as="div" class="relative inline-block text-right -mt-1">
-															<div>		
-																<MenuButton class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-																	<span class="sr-only">Open options</span>
-																	<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
-																</MenuButton>
-															</div>
-
-															<transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-																<MenuItems @click.stop class="absolute right-0 z-10 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-																	<div class="py-1">
-																		<MenuItem as="div" v-slot="{ active }">
-																			<a href="#" @click="loadFileSystemConfig(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure File System</a>
-																		</MenuItem>
-																		<MenuItem as="div" v-if="!findPoolDataset(allDatasets[datasetIdx])" v-slot="{ active }">
-																			<a href="#" @click="renameThisDataset(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename File System</a>
-																		</MenuItem>
-																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'yes'" v-slot="{ active }">
-																			<a href="#" @click="unmountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unmount File System</a>
-																		</MenuItem>														
-																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && !allDatasets[datasetIdx].encrypted" v-slot="{ active }">
-																			<a href="#" @click="mountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
-																		</MenuItem>
-																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
-																			<a href="#" @click="mountThisFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Mount File System</a>
-																		</MenuItem>
-																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && !allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
-																			<a href="#" @click="handleFileSystemEncryption(allDatasets[datasetIdx], 'unlock')" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Unlock File System</a>
-																		</MenuItem>
-																		<MenuItem as="div" v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
-																			<a href="#" @click="handleFileSystemEncryption(allDatasets[datasetIdx], 'lock')" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Lock File System</a>
-																		</MenuItem>	
-																		<MenuItem as="div" v-if="allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded" v-slot="{ active }">
-																			<a href="#" @click="changeThisPassphrase(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change Passphrase</a>
-																		</MenuItem>
-																		<MenuItem as="div" v-slot="{ active }">
-																			<a href="#" @click="createSnapshotBtn(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create Snapshot</a>
-																		</MenuItem>					
-																		<MenuItem as="div" v-if="!findPoolDataset(allDatasets[datasetIdx])" v-slot="{ active }">
-																			<a href="#" @click="deleteFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
-																		</MenuItem>											
-																	</div>
-																</MenuItems>
-															</transition>
-														</Menu> -->
-													</div>
-												</DisclosureButton>
+													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8"></div>
+												</div>
+												<!-- <div>
+													<SnapshotsList :item="'singleSnap'" :singleSnap="dataset"/>
+												</div> -->
+												<!-- </DisclosureButton>
 												<DisclosurePanel>
-													<!-- <div class="flex flex-row w-full justify-center text-center items-center">
-														Dataset is Snapshot
-													</div> -->
 													<div>
 														<SnapshotsList :item="'singleSnap'" :singleSnap="dataset"/>
 													</div>
 												</DisclosurePanel>
-											</Disclosure>
+											</Disclosure> -->
 										</div>
 									</div>
 								</div> 
@@ -281,7 +236,8 @@
 
 <script setup lang="ts">
 import { ref, inject, Ref, provide, watch, onMounted } from "vue";
-import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon, CheckIcon } from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon, CheckIcon, } from '@heroicons/vue/24/outline';
+import { CameraIcon } from '@heroicons/vue/24/solid'
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
 import { getValue, convertBytesToSize, upperCaseWord, yesNoToBool } from '../../composables/helpers';

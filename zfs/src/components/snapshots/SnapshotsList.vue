@@ -168,11 +168,8 @@
 		<!-- Single Snap -->
 		<div v-if="props.item == 'singleSnap'" class="inline-block min-w-full max-h-max align-middle border-collapse">
 			<table class="table-auto min-w-full min-h-full divide-y divide-default">
-				<thead class="bg-secondary border-collapse">
+				<!-- <thead class="bg-secondary border-collapse">
 					<tr v-if="snapshotsLoaded" class="rounded-md grid grid-cols-7 font-semibold text-white">
-						<!-- <th class="relative py-2 rounded-tl-md col-span-1">
-							<span class="sr-only"></span>
-						</th> -->
 						<th class="py-2 col-span-2 text-center" :class="truncateText" title="This Snapshot">This Snapshot</th>
 						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Created On">Created On</th>
 						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Used">Used</th>
@@ -182,29 +179,26 @@
 							<span class="sr-only"></span>
 						</th>
 					</tr>
+				</thead> -->
+				<tbody class="divide-y divide-default bg-accent border-collapse">
 					<tr v-if="!snapshotsLoaded && snapshotsLoading" class="rounded-md flex bg-well justify-center">
 						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 					</tr>
-				</thead>
-				<tbody class="divide-y divide-default bg-accent border-collapse">
-					<tr v-if="snapshotsLoaded" class="text-default grid grid-cols-7 justify-center items-center">
-						<!-- <td class="relative py-2 col-span-1">
-							<span class="sr-only"></span>
-						</td> -->
-						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2" :class="truncateText" :title="props.singleSnap!.name"> 
+					<tr v-if="snapshotsLoaded" class="text-default grid grid-cols-6 justify-center items-center">
+						<!-- <td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2" :class="truncateText" :title="props.singleSnap!.name"> 
 							{{ props.singleSnap!.name }}
-						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="props.singleSnap!.properties.creation.parsed">
-							{{ props.singleSnap!.properties.creation.parsed }}
+						</td> -->
+						<td class="py-1 px-3 text-sm text-default text-center col-span-2" :class="truncateText" :title="props.singleSnap!.properties.creation.parsed">
+							Created On {{ props.singleSnap!.properties.creation.parsed }}
 						</td>
 						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="props.singleSnap!.properties.used.value">
-							{{ props.singleSnap!.properties.used.value }}
+							Used - {{ props.singleSnap!.properties.used.value }}
 						</td>
 						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="props.singleSnap!.properties.referenced.value">
-							{{ props.singleSnap!.properties.referenced.value }}
+							Referenced - {{ props.singleSnap!.properties.referenced.value }}
 						</td>
 						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="props.singleSnap!.properties.clones">
-							{{ props.singleSnap!.properties.clones.length > 0 ? props.singleSnap!.properties.clones : '-' }}
+							Clones - {{ props.singleSnap!.properties.clones.length > 0 ? props.singleSnap!.properties.clones : '0' }}
 						</td>
 						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 							<Menu as="div" class="relative inline-block text-right">
