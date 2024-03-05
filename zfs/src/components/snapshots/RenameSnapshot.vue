@@ -101,7 +101,7 @@ interface RenameSnapshotProps {
 const notifications = inject<Ref<any>>('notifications')!;
 
 const props = defineProps<RenameSnapshotProps>();
-const showRenameSnapModal = inject<Ref<boolean>>('show-rename-modal')!;
+const showRenameSnapModal = inject<Ref<boolean>>('show-rename-snap-modal')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 

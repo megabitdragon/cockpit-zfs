@@ -490,6 +490,7 @@ const destroyChildren = ref(false);
 const destroyAllDependents = ref(false);
 const showDeleteFileSystemConfirm = ref(false);
 const confirmDelete = ref(false);
+const confirmDestroySnap = ref(false);
 
 const deleteFileSystemComponent = ref();
 const loadDeleteFileSystemComponent = async () => {
@@ -780,6 +781,12 @@ watch(confirmLockOrUnlock, async (newVal, oldVal) => {
 	}
 });
 
+watch(confirmDestroySnap, async (newVal, oldVal) => {
+	if (confirmDestroySnap.value == true) {
+		await refreshData();
+	}
+});
+
 provide('all-datasets', allDatasets);
 provide('all-datasets-loaded', allDatasetsLoaded);
 provide('show-fs-wizard', showNewFSWizard);
@@ -789,7 +796,7 @@ provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
 provide('confirm-delete-filesystem', confirmDelete);
 provide('destroy-children', destroyChildren);
 provide('destroy-dependents', destroyAllDependents);
-
+provide('confirm-destroy-snap', confirmDestroySnap);
 provide('has-children', hasChildren);
 provide('selected-dataset', selectedDataset);
 

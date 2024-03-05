@@ -333,7 +333,8 @@ const fourthOptionToggle = ref(false);
 /////////////////////////////////////////////////////
 const showDestroySnapshotModal = ref(false);
 const hasChildren = ref(false);
-const confirmDestroy = ref(false);
+// const confirmDestroy = ref(false);
+const confirmDestroy = inject<Ref<boolean>>('confirm-destroy-snap')!;
 
 const destroySnapshotComponent = ref();
 const loadDestroySnapshotComponent = async () => {
@@ -376,10 +377,10 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 				notifications.value.constructNotification('Destroy Snapshot Failed', selectedSnapshot.value!.name + " was not destroyed. Check console output for details.", 'error');
 				// showDeletePoolConfirm.value = false;
 			} else {
+				notifications.value.constructNotification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success');
 				await refreshSnaps();
 				confirmDestroy.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success');
 				hasChildren.value = false;
 				console.log('destroyed:', selectedSnapshot.value);
 				firstOptionToggle.value = false;
@@ -550,7 +551,7 @@ provide('confirm-clone', confirmClone);
 provide('show-clone-modal', showCloneSnapshotModal);
 provide('renaming', renaming);
 provide('confirm-rename', confirmRename);
-provide('show-rename-modal', showRenameSnapshotModal);
+provide('show-rename-snap-modal', showRenameSnapshotModal);
 
 provide('show-send-dataset', showSendSnapshot);
 provide('sending', sendingSnap);
