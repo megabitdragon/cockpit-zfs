@@ -173,7 +173,7 @@
 						<!-- <th class="relative py-2 rounded-tl-md col-span-1">
 							<span class="sr-only"></span>
 						</th> -->
-						<th class="py-2 col-span-2 text-center" :class="truncateText" title="Snapshot">Snapshot</th>
+						<th class="py-2 col-span-2 text-center" :class="truncateText" title="This Snapshot">This Snapshot</th>
 						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Created On">Created On</th>
 						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Used">Used</th>
 						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Referenced">Referenced</th>

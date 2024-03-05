@@ -522,7 +522,7 @@ export async function loadSnapshots(snapshots) {
 	try {
 		const rawJSON = await getSnapshots();
         const parsedJSON = JSON.parse(rawJSON);
-        console.log('Snapshots JSON (all):', parsedJSON);
+        // console.log('Snapshots JSON (all):', parsedJSON);
 
         for (const dataset in parsedJSON) {
             parsedJSON[dataset].forEach(snapshot => {
