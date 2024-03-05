@@ -290,31 +290,20 @@ const truncateText = inject<Ref<string>>('style-truncate-text')!;
 /////////////////////////////////////////////////////
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const datasetsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
-
+const pools = inject<Ref<PoolData[]>>('pools')!;
 // const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 const snapshotsLoaded = ref(false);
 const snapshotsLoading = ref(false);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const snapshotsInFilesystem = ref<Snapshot[]>([]);
 const selectedSnapshot = ref<Snapshot>();
+const allDatasets = ref<any>([]);
+const allDatasetsLoaded = ref(false);
 
 onMounted(() => {
 	refreshSnaps();
 });
-
-async function refreshData() {
-	datasetsLoaded.value = false;
-	snapshotsLoaded.value = false;
-	datasets.value = [];
-	snapshots.value = [];
-	snapshotsLoading.value = true;
-	await loadDatasets(datasets);
-	await loadSnapshots(snapshots);
-	snapshotsLoading.value = false;
-	datasetsLoaded.value = true;
-	snapshotsLoaded.value = true;
-}
 
 async function refreshSnaps() {
 	snapshotsLoaded.value = false;
@@ -547,7 +536,7 @@ const updateShowSendSnapshot = (newVal) => {
 
 watch(confirmSendSnap, async (newVal, oldVal) => {
 	if (confirmSendSnap.value == true) {
-		await refreshData();
+		// await refreshData();
 		await refreshSnaps();
 		// notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${selectedSnapshot.value!.name}.`, 'success');
 	} else {

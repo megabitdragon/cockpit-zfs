@@ -87,7 +87,7 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { getSnapshotTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
-import { loadSnapshotsInDataset, loadSnapshotsInPool } from '../../composables/loadData';
+import { loadSnapshotsInDataset, loadSnapshotsInPool, loadDatasets, loadSnapshots } from '../../composables/loadData';
 
 interface CreateSnapshotModalProps {
     item: 'pool' | 'filesystem';
@@ -109,6 +109,10 @@ const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const showSnapshotModal = inject<Ref<boolean>>('create-snap-modal')!;
 const creating = inject<Ref<boolean>>('creating')!;
 const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
+const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+const allDatasetsLoaded = inject<Ref<boolean>>('all-datasets-loaded')!;
+const allDatasets = inject<Ref<any>>('all-datasets')!;
+const pools = inject<Ref<PoolData[]>>('pools')!;
 
 initialize();
 
@@ -217,19 +221,6 @@ function createSnapButton(newSnapshot) {
 }
 
 async function create(newSnapshot) {
-    // creating.value = true;
-    // confirmCreate.value = true;
-
-    // await createSnapshot(newSnapshot);
-
-    // snapshotsLoaded.value = false;
-    // refreshSnapshots();
-    // snapshotsLoaded.value = true;
-    // creating.value = false;
-    // newSnapshot.isCustomName = false;
-    // newSnapshot.snapChildren = false;
-    // showSnapshotModal.value = false;
-
     creating.value = true;
     try {
         const output = await createSnapshot(newSnapshot);
@@ -240,9 +231,10 @@ async function create(newSnapshot) {
             confirmCreate.value = true;
         } else {
             confirmCreate.value = true;
-            snapshotsLoaded.value = false;
-            refreshSnapshots();
-            snapshotsLoaded.value = true;
+            // snapshotsLoaded.value = false;
+            // refreshSnapshots();
+            // await refreshData();
+            // snapshotsLoaded.value = true;
             newSnapshot.isCustomName = false;
             newSnapshot.snapChildren = false;
             notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');

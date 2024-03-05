@@ -14,8 +14,8 @@
         "deb": "all"
     },
     "description": {
-        "long": "ZFS Pool and Disk Manager for Cockpit",
-        "short": "ZFS Pool and Disk Manager for Cockpit"
+        "long": "ZFS Pool Manager for Cockpit",
+        "short": "ZFS Pool Manager for Cockpit"
     },
     "defaults": {
         "urgency": "medium"

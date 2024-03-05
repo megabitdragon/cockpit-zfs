@@ -5,7 +5,6 @@
 		<div class="flex bg-well justify-between rounded-md p-2 shadow text-default rounded-b-md ring-1 ring-black ring-opacity-5">
 			<div class="button-group-row justify-start">
 				<button id="createFS" class="btn btn-primary object-left justify-start" @click="newFileSystemWizard()">Create File System</button>
-
 			</div>
 			<div class="button-group-row justify-end">
 				<button id="refreshFS" class="btn btn-secondary object-right justify-self-end" @click="refreshData()"><ArrowPathIcon class="w-5 h-5 m-1"/></button>
@@ -141,29 +140,29 @@
 										</div>
 										<div v-if="dataset.type == 'SNAPSHOT'" class="border border-default">
 											<Disclosure v-slot="{ open }">
-												<DisclosureButton class="bg-secondary grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
+												<DisclosureButton class="bg-primary grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
 													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="dataset.name">
 														<ChevronUpIcon
-															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
+															class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 														/> 
 													</div>
-													<div class="py-1 mt-1 col-span-2 text-left" :class="truncateText" :title="dataset.name">{{ dataset.name }}</div>
-													<div class="py-1 mt-1 col-span-1">N/A</div>
-													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="convertBytesToSize(dataset.properties.used.parsed)">{{ convertBytesToSize(dataset.properties.used.parsed) }}</div>
-													<div class="py-1 mt-1 col-span-1">N/A</div>
-													<div class="py-1 mt-1 col-span-1">N/A</div>
-													<div class="py-1 mt-1 col-span-1">N/A</div>
-													<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'available'" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Unlocked">
+													<div class="py-1 mt-1 col-span-2 text-left text-white" :class="[truncateText, `ml-${getNestingLevel(dataset)}`]" :title="dataset.name">{{ dataset.name }}</div>
+													<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
+													<div class="py-1 mt-1 col-span-1 text-white" :class="truncateText" :title="convertBytesToSize(dataset.properties.used.parsed)">{{ convertBytesToSize(dataset.properties.used.parsed) }}</div>
+													<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
+													<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
+													<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
+													<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'available'" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Encrypted & Unlocked">
 														<LockOpenIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
-													<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'unavailable'" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Encrypted & Locked">
+													<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'unavailable'" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Encrypted & Locked">
 														<LockClosedIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
-													<div v-if="dataset.properties.encryption.value === 'off' && dataset.properties.keystatus.value == ''" class="py-1 mt-1 col-span-1 justify-self-center items-center text-center" title="Not Encrypted">
+													<div v-if="dataset.properties.encryption.value === 'off' && dataset.properties.keystatus.value == ''" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Not Encrypted">
 														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
 													</div>
-													<div class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">N/A</div>
-													<div class="py-1 mt-1 col-span-1 justify-self-center items-center text-center">N/A</div>
+													<div class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center">N/A</div>
+													<div class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center">N/A</div>
 
 													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 														<!-- <Menu as="div" class="relative inline-block text-right -mt-1">
@@ -228,8 +227,6 @@
 							</tr>
 						</tbody>
 					</table>
-
-					
 
 					<div v-if="fileSystemsLoaded == false" class="p-2 flex justify-center bg-default">
 						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'" class="font-semibold text-lg my-0.5"/>
@@ -336,43 +333,34 @@ async function refreshData() {
 	allDatasetsLoaded.value = true;
 
 }
+
 ///////////////////////////////////////////////////////////
 async function populateDatasetList() {
     try {
 		// console.log('fileSystems:', fileSystems.value);
 		// console.log('snapshots:', snapshots.value);
+		const combinedData = ref<any>([]);
 
 		for (const pool of pools.value) {
 			// console.log('Pool Name:', pool.name);
-
             const poolFileSystems = fileSystems.value.filter(filesystem => filesystem.pool === pool.name);
 			// console.log('Filtered File Systems:', poolFileSystems);
-
 			const poolSnapshots = snapshots.value.filter(snapshot => snapshot.pool === pool.name);
 			// console.log('Filtered Snapshots:', poolSnapshots);
-
             if (pool.properties.listSnapshots) {
-                allDatasets.value.push(...poolFileSystems, ...poolSnapshots);
+                combinedData.value.push(...poolFileSystems, ...poolSnapshots);
 				console.log(`Added datasets & snaps from ${pool.name}`);
             } else {
-				allDatasets.value.push(...poolFileSystems);
+				combinedData.value.push(...poolFileSystems);
 				console.log(`Added only datasets from ${pool.name}`);
 			}
         }
 	
-		// sort list alphabetically
-		allDatasets.value.sort((a, b) => {
-			// Convert names to lowercase for case-insensitive sorting
-			const nameA = a.name.toLowerCase();
-			const nameB = b.name.toLowerCase();
+		// Sort the combined array alphabetically by name
+		combinedData.value.sort((a, b) => a.name.localeCompare(b.name));
 
-			if (nameA < nameB) {
-				return -1; // Name A comes before name B
-			}
-			if (nameA > nameB) {
-				return 1; // Name B comes before name A
-			}
-			return 0; // Names are equal
+		combinedData.value.forEach(data => {
+			allDatasets.value.push(data);
 		});
 
 		console.log('Final allDatasets:', allDatasets.value);
@@ -384,12 +372,25 @@ async function populateDatasetList() {
 
 function getNestingLevel(dataset) {
     let level = 0;
-    let currentDataset = dataset;
 
-	// Traverse up the hierarchy until reaching the root node
-	while (currentDataset.parentFS !== "") {
-        level += 4; // Increase the indentation level
-        currentDataset = findDatasetByName(currentDataset.parentFS); // Move to the parent
+    if (dataset.type === 'SNAPSHOT') {
+        // Extract the dataset name from the snapshot's name using regex
+        const datasetNameRegex = /^(.+?)(?:\/.+)?@[\w.-]+$/;
+        const match = dataset.name.match(datasetNameRegex);
+        if (match && match[1]) {
+            const datasetName = match[1]; // Extracted dataset name
+            // Split the dataset name into parts to calculate the nesting level
+            const parts = datasetName.split('/');
+            // Each level of hierarchy increases indentation by 4
+            level = parts.length * 4;
+        }
+    } else {
+        let currentDataset = dataset;
+        // Traverse up the hierarchy until reaching the root node
+        while (currentDataset && currentDataset.parentFS !== "") {
+            level += 4; // Increase the indentation level by 4 for each level of hierarchy
+            currentDataset = findDatasetByName(currentDataset.parentFS); // Move to the parent
+        }
     }
 
     return level;
@@ -475,7 +476,7 @@ watch(confirmCreate, async (newVal, oldVal) => {
 	if (confirmCreate.value == true) {
 		operationRunning.value = true;
 		await refreshData();
-		await refreshDatasetSnaps(selectedDataset.value);
+		// await refreshDatasetSnaps(selectedDataset.value);
 		confirmCreate.value = false;
 		operationRunning.value = false;
 	}
@@ -779,6 +780,8 @@ watch(confirmLockOrUnlock, async (newVal, oldVal) => {
 	}
 });
 
+provide('all-datasets', allDatasets);
+provide('all-datasets-loaded', allDatasetsLoaded);
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 
