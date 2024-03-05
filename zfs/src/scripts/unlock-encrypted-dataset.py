@@ -26,7 +26,8 @@ def unlock_locked_dataset(name, passphrase_file):
                 stdout, stderr = process.communicate(input=f.read())
 
             if process.returncode != 0:
-                raise Exception(f"Error: {stderr.decode('utf-8')}")
+                # raise Exception(f"Error: {stderr.decode('utf-8')}")
+                print(f"Error: {stderr}")
             else:
                 print(stdout)
 

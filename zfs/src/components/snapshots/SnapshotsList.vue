@@ -32,7 +32,7 @@
 						<!-- <td class="relative py-2 col-span-1">
 							<span class="sr-only"></span>
 						</td> -->
-						<td class="py-1 px-3 text-sm font-medium text-default text-center col-span-2" :class="truncateText" :title="snapshot.name"> 
+						<td class="py-1 px-3 text-sm font-medium text-default text-left col-span-2" :class="truncateText" :title="snapshot.name"> 
 							{{ snapshot.name }}
 						</td>
 						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.creation.parsed">

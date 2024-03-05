@@ -556,7 +556,7 @@ provide('create-snap-modal', showSnapshotModal);
 // provide('snapshots-loaded', snapshotsLoaded);
 provide("snapshots", snapshots);
 // provide("snapshots-in-pool", snapshotsInPool);
-provide('confirm-create', confirmCreate);
+provide('confirm-create-snap', confirmCreate);
 provide('creating', creating);
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);

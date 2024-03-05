@@ -39,14 +39,36 @@
 
 			<div v-if="fileSystemConfig.encrypted">
 				<!-- Passphrase (Text) -->
-				<div>
-					<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
-					<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" placeholder="Passphrase" />
+				<div class="grid grid-cols-3 justify-between items-center">
+					<div class="col-span-2">
+						<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
+						<input v-if="showPassword == false" :id="getIdKey('passphrase-hidden')" type="password" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" placeholder="Passphrase" />
+						<input v-if="showPassword == true" :id="getIdKey('passphrase-shown')" type="text" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" placeholder="Passphrase" />
+					</div>
+					<div class="col-span-1 button-group-row justify-center items-center">
+						<button v-if="showPassword == true" class="btn btn-secondary max-h-min" @click="showPassword = false">
+							<EyeSlashIcon class="h-5"/>
+						</button>
+						<button v-if="showPassword == false" class="btn btn-secondary max-h-min" @click="showPassword = true">
+							<EyeIcon class="h-5"/>
+						</button>
+					</div>
 				</div>
 				<!-- Confirm Passphrase (Text) -->
-				<div>
-					<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
-					<input :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+				<div class="grid grid-cols-3 justify-between items-center">
+					<div class="col-span-2">
+						<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
+						<input v-if="showPasswordConfirm == false" :id="getIdKey('passphrase-confirm-hidden')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+						<input v-if="showPasswordConfirm == true" :id="getIdKey('passphrase-confirm-shown')" type="text" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+					</div>
+					<div class="col-span-1 button-group-row justify-center items-center">
+						<button v-if="showPasswordConfirm == true" class="btn btn-secondary max-h-min" @click="showPasswordConfirm = false">
+							<EyeSlashIcon class="h-5"/>
+						</button>
+						<button v-if="showPasswordConfirm == false" class="btn btn-secondary max-h-min" @click="showPasswordConfirm = true">
+							<EyeIcon class="h-5"/>
+						</button>
+					</div>
 				</div>
 				<!-- Cipher (Select) -->
 				<div>
@@ -260,14 +282,36 @@
 
 				<div v-if="newFileSystemConfig.encrypted">
 					<!-- Passphrase (Text) -->
-					<div>
-						<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
-						<input :id="getIdKey('passphrase')" type="password" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" placeholder="Passphrase" />
+					<div class="grid grid-cols-3 justify-between">
+						<div class="col-span-2">
+							<label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
+							<input v-if="showPassword == false" :id="getIdKey('passphrase-hidden')" type="password" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" placeholder="Passphrase" />
+							<input v-if="showPassword == true" :id="getIdKey('passphrase-shown')" type="text" v-model="passphrase" name="passphrase" class="mt-1 block w-full input-textlike bg-default" placeholder="Passphrase" />
+						</div>
+						<div class="col-span-1 button-group-row justify-center items-center">
+							<button v-if="showPassword == true" class="btn btn-secondary max-h-min" @click="showPassword = false">
+								<EyeSlashIcon class="h-5"/>
+							</button>
+							<button v-if="showPassword == false" class="btn btn-secondary max-h-min" @click="showPassword = true">
+								<EyeIcon class="h-5"/>
+							</button>
+						</div>
 					</div>
 					<!-- Confirm Passphrase (Text) -->
-					<div>
-						<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
-						<input  @keydown.enter="fsCreateBtn(newFileSystemConfig)" :id="getIdKey('passphrase-confirm')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+					<div class="grid grid-cols-3 justify-between items-center">
+						<div class="col-span-2">
+							<label :for="getIdKey('passphrase-confirm')" class="mt-1 block text-sm font-medium leading-6 text-default">Confirm Passphrase</label>
+							<input v-if="showPasswordConfirm == false" :id="getIdKey('passphrase-confirm-hidden')" type="password" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+							<input v-if="showPasswordConfirm == true" :id="getIdKey('passphrase-confirm-shown')" type="text" v-model="passphraseConfirm" name="passphrase-confirm" class="mt-1 block w-full input-textlike bg-default" placeholder="Confirm Passphrase" />
+						</div>
+						<div class="col-span-1 button-group-row justify-center items-center">
+							<button v-if="showPasswordConfirm == true" class="btn btn-secondary max-h-min" @click="showPasswordConfirm = false">
+								<EyeSlashIcon class="h-5"/>
+							</button>
+							<button v-if="showPasswordConfirm == false" class="btn btn-secondary max-h-min" @click="showPasswordConfirm = true">
+								<EyeIcon class="h-5"/>
+							</button>
+						</div>
 					</div>
 					<!-- Cipher (Select) -->
 					<div>
@@ -464,6 +508,7 @@
 </template>
 
 <script setup lang="ts">
+import { EyeSlashIcon, EyeIcon } from '@heroicons/vue/24/outline';
 import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, isBoolOnOff, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
@@ -499,6 +544,8 @@ const nameFeedback = ref('');
 const passphrase = ref('');
 const passphraseConfirm = ref('');
 const passFeedback = ref('');
+const showPassword = ref(false);
+const showPasswordConfirm = ref(false);
 
 const quotaFeedback = ref('');
 
@@ -743,6 +790,8 @@ function fillDatasetData() {
 	console.log("newDataSetData sent:", newDataset);
 }
 
+const confirmCreateFS = inject<Ref<boolean>>('confirm-create-filesystem')!;
+
 async function fsCreateBtn(fileSystem : FileSystemData) {
 	console.log('fsCreateBtn fired');
 	if (props.isStandalone) {
@@ -757,7 +806,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 							fillDatasetData();
 							saving.value = true;
 							console.log('create Dataset fired');
-
+							confirmCreateFS.value = false;
 							try {
 								const output = await createEncryptedDataset(newDataset.value, passphrase.value);
 								
@@ -773,6 +822,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 									saving.value = false;
 									fileSystemsLoaded.value = true;
 									notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+									confirmCreateFS.value = true;
 								}
 
 							} catch (error) {
@@ -789,7 +839,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 						getInheritedProperties();
 						fillDatasetData();
 						saving.value = true;
-
+						confirmCreateFS.value = false;
 						try {
 							const output = await createDataset(newDataset.value);
 							
@@ -805,6 +855,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 								saving.value = false;
 								fileSystemsLoaded.value = true;
 								notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+								confirmCreateFS.value = true;
 							}
 
 						} catch (error) {
@@ -842,7 +893,7 @@ async function newFileSystemInPoolWizard() {
 							fillDatasetData();
 							saving.value = true;
 							console.log('create Dataset fired');
-
+							confirmCreateFS.value = false;
 							try {
 								const output = await createEncryptedDataset(newDataset.value, passphrase.value);
 								
@@ -857,6 +908,7 @@ async function newFileSystemInPoolWizard() {
 									saving.value = false;
 									fileSystemsLoaded.value = true;
 									notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+									confirmCreateFS.value = true;
 								}
 
 							} catch (error) {

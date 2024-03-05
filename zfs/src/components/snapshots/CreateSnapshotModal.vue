@@ -152,7 +152,7 @@ const newSnapshot = ref<NewSnapshot>({
 
 const nameFeedback = ref('');
 const filesystemFeedback = ref('');
-const confirmCreate = inject<Ref<boolean>>('confirm-create')!;
+const confirmCreate = inject<Ref<boolean>>('confirm-create-snap')!;
 
 const filesystemCheck = (newSnapshot : NewSnapshot) => {
 	let result = true;

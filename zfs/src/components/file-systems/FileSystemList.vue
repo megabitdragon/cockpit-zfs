@@ -383,6 +383,7 @@ async function refreshDatasetSnaps(filesystem) {
 
 ///////////////// New File System ///////////////////
 /////////////////////////////////////////////////////
+const confirmCreateFS = ref(false);
 const newFileSystemComponent = ref();
 const loadNewFileSystemComponent = async () => {
 	const module = await import('../pool-creation-wizard/FileSystem.vue');
@@ -413,7 +414,7 @@ async function loadFileSystemConfig(fileSystem) {
 /////////////////////////////////////////////////////
 const showSnapshotModal = ref(false);
 const creating = ref(false);
-const confirmCreate = ref(false);
+const confirmCreateSnap = ref(false);
 
 const createSnapshotComponent = ref();
 const loadCreateSnapshotComponent = async () => {
@@ -428,12 +429,12 @@ async function createSnapshotBtn(filesystem) {
 	console.log('create snapshot modal triggered');
 }
 
-watch(confirmCreate, async (newVal, oldVal) => {
-	if (confirmCreate.value == true) {
+watch(confirmCreateSnap, async (newVal, oldVal) => {
+	if (confirmCreateSnap.value == true) {
 		operationRunning.value = true;
 		await refreshData();
 		// await refreshDatasetSnaps(selectedDataset.value);
-		confirmCreate.value = false;
+		confirmCreateSnap.value = false;
 		operationRunning.value = false;
 	}
 });
@@ -743,11 +744,17 @@ watch(confirmDestroySnap, async (newVal, oldVal) => {
 	}
 });
 
+watch(confirmCreateFS, async (newVal, oldVal) => {
+	if (confirmCreateFS.value == true) {
+		await refreshData();
+	}
+});
+
 provide('all-datasets', allDatasets);
 provide('all-datasets-loaded', allDatasetsLoaded);
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
-
+provide('confirm-create-filesystem', confirmCreateFS);
 provide('show-delete-filesystem-confirm', showDeleteFileSystemConfirm);
 provide('confirm-delete-filesystem', confirmDelete);
 provide('destroy-children', destroyChildren);
@@ -772,7 +779,7 @@ provide('confirm-rename', confirmRename);
 
 provide('create-snap-modal', showSnapshotModal);
 provide('creating', creating);
-provide('confirm-create', confirmCreate);
+provide('confirm-create-snap', confirmCreateSnap);
 
 provide('show-change-passphrase', showChangePassphrase);
 provide('changing', changing);

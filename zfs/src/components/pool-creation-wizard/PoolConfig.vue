@@ -22,7 +22,7 @@
 						<option v-if="vDevIdx === 0" value="raidz1">RaidZ1</option>
 						<option v-if="vDevIdx === 0" value="raidz2">RaidZ2</option>
 						<option v-if="vDevIdx === 0" value="raidz3">RaidZ3</option>
-						<option v-if="vDevIdx !== 0" :value="poolConfig.vdevs[0].type">{{upperCaseWord(poolConfig.vdevs[vDevIdx].type)}}</option>
+						<option v-if="vDevIdx !== 0" :value="additionalVDevType">{{upperCaseWord(additionalVDevType)}}</option>
 						<option v-if="vDevIdx !== 0" value="cache">Cache</option>
 						<option v-if="vDevIdx !== 0" value="log">Log</option> 
 						<option v-if="vDevIdx !== 0" value="special">Special</option>
@@ -349,6 +349,10 @@ watchEffect(() => {
 	if (props.tag === 'review') {
 		loadReviewTabComponent();
 	}
+});
+
+const additionalVDevType = computed(() => {
+	return poolConfig.value.vdevs[0].type;
 });
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection

@@ -22,13 +22,15 @@ def change_key(fileSystemName, passphrase):
 
             # Provide the passphrase file as input to the process
             with open(temp_passphrase_file_path, 'rb') as f:
-                stdout, stderr = process.communicate(input=f.read())
-
-            if process.returncode != 0:
-                 raise Exception(f"Error: {stderr.decode('utf-8')}")
+                # stdout, stderr = process.communicate(input=f.read())
+            # if process.returncode != 0:
+            #      raise Exception(f"Error: {stderr.decode('utf-8')}")
                 
-            else:
-                print(stdout)
+            # else:
+            #     print(stdout)
+                process.communicate(input=f.read())
+
+            return process.returncode == 0
 
         finally:
             # Delete the temporary passphrase file after using it

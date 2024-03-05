@@ -1,5 +1,5 @@
 <template>
-   <Modal :isOpen="showChangePassphrase" @close="showChangePassphrase = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
+   <Modal :isOpen="showChangePassphrase" @close="showChangePassphrase = false" :marginTop="'mt-28'" :width="'w-96'" :minWidth="'min-w-min'">
         <template v-slot:title>
             <legend class="flex justify-center">Change Passphrase</legend>
         </template>

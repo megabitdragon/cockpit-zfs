@@ -9,10 +9,22 @@
                     <div class="col-span-2 flex flex-row">
                         <label :for="getIdKey('filesystem-name')" :class="truncateText" :title="props.filesystem.name" class="mt-1 block text-sm font-medium leading-6 text-default">Name: <span :class="truncateText" :title="props.filesystem.name" class="font-normal">{{ props.filesystem.name }}</span></label>
                     </div>
-                    <div class="col-span-2 flex flex-row justify-between text-center items-center">
-                        <label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Enter Passphrase</label>
-                        <input :id="getIdKey('passphrase')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" />
+                    <div class="col-span-2 grid grid-cols-3 justify-between text-center items-center">
+                        <div class="col-span-2 justify-between text-center items-center">
+                            <label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Enter Passphrase</label>
+                            <input v-if="showPassword == false" :id="getIdKey('passphrase-hidden')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" placeholder="Passphrase" /> 
+                            <input v-if="showPassword == true" :id="getIdKey('passphrase-shown')" type="text" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" placeholder="Passphrase" />
+                        </div>
+                        <div class="col-span-1 button-group-row">
+                            <button v-if="showPassword == true" class="btn btn-secondary max-h-min" @click="showPassword = false">
+                                <EyeSlashIcon class="h-5"/>
+                            </button>
+                            <button v-if="showPassword == false" class="btn btn-secondary max-h-min" @click="showPassword = true">
+                                <EyeIcon class="h-5"/>
+                            </button>
+                        </div>
                     </div>
+
                     <div class="col-span-2 flex flex-row">
                         <p class="text-danger mt-1">{{ passFeedback }}</p>
                     </div>
@@ -82,6 +94,7 @@
 <script setup lang="ts">
 import { Ref, inject, ref } from 'vue';
 import { Switch } from '@headlessui/vue';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
 import { upperCaseWord } from '../../composables/helpers';
 import { lockFileSystem, mountFileSystem, unlockFileSystem, isPassphraseValid } from "../../composables/datasets";
 import { loadDatasets, loadSnapshots } from "../../composables/loadData";
@@ -100,6 +113,7 @@ const emit = defineEmits(['close']);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const showFlag = ref(props.showFlag);
+const showPassword = ref(false);
 const doingThing = inject<Ref<boolean>>('locking-or-unlocking')!;
 const showLockUnlockModal = inject<Ref<boolean>>('show-lock-unlock-modal')!;
 const confirmLockOrUnlock = inject<Ref<boolean>>('confirm-lock-or-unlock')!;
@@ -149,7 +163,11 @@ async function confirmBtn() {
    
         if (passValid.value) {
             doingThing.value = true;
-
+            
+            /* await unlockFileSystem(props.filesystem, passphrase.value);
+            if (mountFS.value) {
+                await mountFileSystem(props.filesystem, forceMountFS.value);
+            } */
             try {
                 const unlockOutput =  await unlockFileSystem(props.filesystem, passphrase.value);
 
@@ -172,6 +190,7 @@ async function confirmBtn() {
                     }
 
                     notifications.value.constructNotification('Dataset Unlocked', `Successfully unlocked ${props.filesystem.name}.`, 'success');
+
                     doingThing.value = false;
                     confirmLockOrUnlock.value = true;
                     showLockUnlockModal.value = false;
