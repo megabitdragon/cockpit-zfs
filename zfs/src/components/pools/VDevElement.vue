@@ -8,7 +8,7 @@
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.name">{{ props.vDev.name }}</div>
+					<div class="p-1 mt-1 col-span-1 text-base text-left" :class="truncateText" :title="props.vDev.name">{{ props.vDev.name }}</div>
 					<div class="p-1 mt-1 col-span-1 font-semibold text-base" :class="[formatStatus(props.vDev.status), truncateText]" :title="props.vDev.status">{{ props.vDev.status }}</div>
 					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="upperCaseWord(props.vDev.type) + ' Device'">{{ upperCaseWord(props.vDev.type) }} Device</div>
 					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.read_errors + ' Read Errors'">{{ props.vDev.stats.read_errors }} Read Errors</div>
