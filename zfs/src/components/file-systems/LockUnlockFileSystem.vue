@@ -5,17 +5,17 @@
         </template>
         <template v-slot:content>
             <div class="grid grid-flow-row mt-3 text-center">
-                <div v-if="props.mode == 'unlock'" class="w-full grid grid-cols-2">
-                    <div class="col-span-2 flex flex-row">
+                <div v-if="props.mode == 'unlock'" class="w-full grid grid-cols-3">
+                    <div class="col-span-3 flex flex-row">
                         <label :for="getIdKey('filesystem-name')" :class="truncateText" :title="props.filesystem.name" class="mt-1 block text-sm font-medium leading-6 text-default">Name: <span :class="truncateText" :title="props.filesystem.name" class="font-normal">{{ props.filesystem.name }}</span></label>
                     </div>
-                    <div class="col-span-2 grid grid-cols-3 justify-between text-center items-center">
-                        <div class="col-span-2 justify-between text-center items-center">
-                            <label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Enter Passphrase</label>
-                            <input v-if="showPassword == false" :id="getIdKey('passphrase-hidden')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" placeholder="Passphrase" /> 
-                            <input v-if="showPassword == true" :id="getIdKey('passphrase-shown')" type="text" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" placeholder="Passphrase" />
+                    <div class="col-span-3 justify-between text-center items-center grid grid-cols-3">
+                        <div class="col-span-2 flex flex-row gap-1 text-center items-center">
+                            <label :for="getIdKey('passphrase')" class="mt-1 block text-sm font-medium leading-6 text-default">Passphrase</label>
+                            <input v-if="showPassword == false" :id="getIdKey('passphrase-hidden')" type="password" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" placeholder="Enter here" /> 
+                            <input v-if="showPassword == true" :id="getIdKey('passphrase-shown')" type="text" @keydown.enter="confirmBtn()" v-model="passphrase" name="passphrase" class="mt-1 block w-fit input-textlike bg-default" placeholder="Enter here" />
                         </div>
-                        <div class="col-span-1 button-group-row">
+                        <div class="col-span-1 button-group-row justify-end">
                             <button v-if="showPassword == true" class="btn btn-secondary max-h-min" @click="showPassword = false">
                                 <EyeSlashIcon class="h-5"/>
                             </button>
@@ -25,10 +25,10 @@
                         </div>
                     </div>
 
-                    <div class="col-span-2 flex flex-row">
+                    <div class="col-span-3 flex flex-row">
                         <p class="text-danger mt-1">{{ passFeedback }}</p>
                     </div>
-                    <div class="grid grid-rows-2 col-span-2">
+                    <div class="grid grid-rows-2 col-span-3">
                         <div class="flex flex-row justify-between">
                             <label :for="getIdKey('mount-switch')" class="mt-3 mr-2 block text-sm font-medium text-default whitespace-nowrap">Mount File System</label>
                             <Switch v-model="mountFS" :id="getIdKey('mount-file-system')" :class="[mountFS ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">

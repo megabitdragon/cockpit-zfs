@@ -8,7 +8,7 @@
 							class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="py-1 mt-1 col-span-1 justify-start" :class="truncateText" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name}}</div>
+					<div class="py-1 mt-1 col-span-1 justify-start text-left" :class="truncateText" :title="poolData[props.poolIdx].name">{{ poolData[props.poolIdx].name}}</div>
 					<div class="py-1 mt-1 col-span-1 font-semibold" :class="[formatStatus(poolData[props.poolIdx].status), truncateText]"  :title="poolData[props.poolIdx].status">{{ poolData[props.poolIdx].status }}</div>
 					<div class="py-1 mt-1 col-span-1">
 						<div class="w-full bg-well rounded-full text-center" :title="poolData[props.poolIdx].properties.capacity + '%'">
