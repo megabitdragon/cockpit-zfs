@@ -127,7 +127,7 @@ const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
 const sending = inject<Ref<boolean>>('sending')!;
-const confirmSend = inject<Ref<boolean>>('confirm-send')!;
+const confirmSend = inject<Ref<boolean>>('confirm-send-snap')!;
 const sendName = ref(props.name);
 const secondNameIncremental = ref('');
 const destinationName = ref('');
@@ -210,20 +210,7 @@ const isSendLocal = computed(() => {
     }
 });
 
-/* function doesRecvDatasetExist() {
-    try {
-        return datasets.value.some(dataset => dataset.name === sendingData.value.recvName);
-    } catch (error) {
-        console.error('Error checking dataset', error);
-    }
-} */
 function doesRecvDatasetExist() {
-    // Check if datasets and recvName are defined and not null
-    // if (!datasets.value || !sendingData.value || !sendingData.value.recvName) {
-    //     console.error('Datasets or recvName is undefined or null');
-    //     return false;
-    // }
-
     try {
         // Use Array.prototype.some to check if dataset with recvName exists
         return datasets.value.some(dataset => dataset.name === sendingData.value.recvName);
@@ -444,8 +431,8 @@ async function sendBtn() {
             tracking.value = false;
             
             // Show success notification
-            notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${props.snapshot!.name}.`, 'success');
-
+            notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`, 'success');
+         
             showSendDataset.value = false;
         } else if (invalidConfig.value) {
             if (forceOverwrite.value) {
@@ -457,20 +444,21 @@ async function sendBtn() {
                 tracking.value = false;
 
                 // Show success notification
-                notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${props.snapshot!.name}.`, 'success');
-
+                notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`, 'success');
+            
                 showSendDataset.value = false;
             } else {
                 confirmSend.value = false;
             }
         } else {
+
             confirmSend.value = false;
         }
     } catch (error) {
         console.error(error);
 
         // Show error notification
-        notifications.value.constructNotification('Failed Snapshot Send', `Failed to send snapshot ${props.snapshot!.name}.`, 'error');
+        notifications.value.constructNotification('Failed Snapshot Send', `Failed to send snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`, 'error');
     }
    
 }

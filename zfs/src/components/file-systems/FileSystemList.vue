@@ -750,6 +750,15 @@ watch(confirmCreateFS, async (newVal, oldVal) => {
 	}
 });
 
+const confirmSendSnap = ref(false);
+watch(confirmSendSnap, async (newVal, oldVal) => {
+	if (confirmSendSnap.value == true) {
+		await refreshData();
+	}
+});
+
+
+provide('confirm-send-snap', confirmSendSnap);
 provide('all-datasets', allDatasets);
 provide('all-datasets-loaded', allDatasetsLoaded);
 provide('show-fs-wizard', showNewFSWizard);

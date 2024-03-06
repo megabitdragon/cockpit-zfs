@@ -509,7 +509,8 @@ watch(confirmRename, async (newVal, oldVal) => {
 /////////////////////////////////////////////////////
 const showSendSnapshot = ref(false);
 const sendingSnap = ref(false);
-const confirmSendSnap = ref(false);
+// const confirmSendSnap = ref(false);
+const confirmSendSnap = inject<Ref<boolean>>('confirm-send-snap')!;
 
 const sendSnapshotComponent = ref();
 const loadSendSnapshotComponent = async () => {
@@ -549,7 +550,7 @@ provide('show-rename-snap-modal', showRenameSnapshotModal);
 
 provide('show-send-dataset', showSendSnapshot);
 provide('sending', sendingSnap);
-provide('confirm-send', confirmSendSnap);
+// provide('confirm-send', confirmSendSnap);
 
 provide('modal-confirm-running', operationRunning);
 provide('modal-option-one-toggle', firstOptionToggle);
