@@ -20,7 +20,7 @@
 			</div>
 
 			<!-- pools summary loading spinner -->
-			<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-flow-col grid-cols-3 bg-well gap-2 justify-items-center rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5 ">
+			<div v-if="poolsLoaded == false" class="grid grid-flow-col grid-cols-3 bg-well gap-2 justify-items-center rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5 ">
 				<LoadingSpinner :width="'w-11'" :height="'h-11'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'" class="col-span-4 my-2"/>
 			</div>
 
@@ -44,7 +44,7 @@
 			</div>
 
 			<!-- pools card loading skeleton -->
-			<div v-if="pools.length < 1 && poolsLoaded == false" class="grid grid-cols-3 justify-items-center">
+			<div v-if="poolsLoaded == false" class="grid grid-cols-3 justify-items-center">
 				<DashboardLoadingSkeleton color="bg-plugin-header" class="col-span-4"/>
 			</div>
 		</div>
