@@ -133,7 +133,7 @@
 												</DisclosureButton>
 												<DisclosurePanel>
 													<div>
-														<SnapshotsList :filesystem="fileSystems[datasetIdx]" :item="'filesystem'"/>
+														<SnapshotsList :filesystem="allDatasets[datasetIdx]" :item="'filesystem'"/>
 													</div>
 												</DisclosurePanel>
 											</Disclosure>
