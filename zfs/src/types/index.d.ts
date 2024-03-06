@@ -22,7 +22,7 @@ interface PoolData {
 		forceCreate?: boolean;
 		delegation?: boolean;
 		listSnapshots?: boolean;
-		multiHost?: boolean;
+		// multiHost?: boolean;
 		health?: string;
 		altroot?: string;
 	}
@@ -155,7 +155,7 @@ interface PoolEditConfig {
 	autoexpand?: string;
 	autoreplace?: string;
 	autotrim?: string;
-	multihost?: string;
+	// multihost?: string;
 	delegation?: string;
 	listsnapshots?: string;
 }
@@ -281,7 +281,7 @@ interface Snapshot {
 	type: string;
 	guid: string;
 	creationTimestamp: string;
-	properties: {}
+	properties: any,
 	holds: {}
 }
 

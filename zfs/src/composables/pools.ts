@@ -162,7 +162,7 @@ const properties = [
 	"autoexpand",
 	"autoreplace",
 	"autotrim",
-	"multihost",
+	// "multihost",
 	"delegation",
 	"listsnapshots",
 ]

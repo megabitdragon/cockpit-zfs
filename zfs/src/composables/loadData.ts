@@ -100,14 +100,14 @@ export async function loadDisksThenPools(disks, pools) {
 						sector: parsedJSON[i].properties.ashift.rawvalue,
 						record: parsedJSON[i].root_dataset.properties.recordsize.value,
 						compression: parsedJSON[i].root_dataset.properties.compression.parsed,
-						deduplication: isBoolOnOff(parsedJSON[i].root_dataset.properties.dedup.parsed),
+						deduplication: onOffToBool(parsedJSON[i].root_dataset.properties.dedup.parsed),
 						refreservationRawSize: parsedJSON[i].root_dataset.properties.refreservation.parsed,
 						autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 						autoReplace: parsedJSON[i].properties.autoreplace.parsed,
-						autoTrim: isBoolOnOff(parsedJSON[i].properties.autotrim.parsed),
+						autoTrim: onOffToBool(parsedJSON[i].properties.autotrim.parsed),
 						delegation: parsedJSON[i].properties.delegation.parsed,
 						listSnapshots: parsedJSON[i].properties.listsnapshots.parsed,
-						multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
+						// multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
 						health: parsedJSON[i].properties.health.parsed,
 						altroot: parsedJSON[i].properties.altroot.value,
 					},
@@ -141,9 +141,9 @@ export async function loadDisksThenPools(disks, pools) {
 			}
 
 			const poolDiskTypes = pools.value.map(pool => {
-				console.log('mapping pool disk types for pool:', pool.name);
+				// console.log('mapping pool disk types for pool:', pool.name);
 				const vDevDiskTypes = pool.vdevs.map(vDev => {
-					console.log('mapping pool disk types for vdev:', vDev.name);
+					// console.log('mapping pool disk types for vdev:', vDev.name);
 					// Map over the disks within each VDev and extract their types
 					const diskTypes = vDev.disks.map(disk => disk.type);
 					
@@ -164,7 +164,7 @@ export async function loadDisksThenPools(disks, pools) {
 			
 			pools.value.forEach((pool, index) => {
 				pool.diskType = poolDiskTypes[index];
-				console.log(`pool: ${pool.name} type: ${poolDiskTypes[index]}`);
+				// console.log(`pool: ${pool.name} type: ${poolDiskTypes[index]}`);
 			});
 			  
 			console.log("loaded Pools:", pools);
@@ -255,7 +255,7 @@ export async function loadDisks(disks) {
 	try {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Disks JSON:', parsedJSON);
+		// console.log('Disks JSON:', parsedJSON);
 		
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
@@ -281,10 +281,10 @@ export async function loadDisks(disks) {
 			disks.value.push(disk);
 			// console.log("Disk:", disk);
 		}
-		console.log("loaded Disks:", disks);
+		// console.log("loaded Disks:", disks);
 
 	} catch (error) {
-		// Handle any errors that may occur during the asynchronous operation	console.log('selectedDisk', selectedDisk);
+		// Handle any errors that may occur during the asynchronous operation
 		console.error("An error occurred getting disks:", error);
 	}
 }
@@ -311,7 +311,7 @@ export async function loadDisksExtraData(disks, pools) {
 						if (index !== -1) {
 							// Replace the original disk with the updated selectedDisk
 							disks[index] = { ...selectedDisk }; // Use spread operator to create a new object
-							console.log('Updated disks array:', disks);
+							// console.log('Updated disks array:', disks);
 						} else {
 							console.error('Original disk not found in the disks array');
 						}
@@ -405,7 +405,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		}
 		vDevData.type = vDevType;
 		vDevData.disks.push(notAChildDisk);
-		console.log("Not A ChildDisk:", notAChildDisk);
+		// console.log("Not A ChildDisk:", notAChildDisk);
 		console.log("vDevData (disk device):", vDevData);
 		
 		vDevs.value.push(vDevData);
@@ -462,7 +462,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 					vDevType: vDevType,
 				}; 
 
-				console.log("ChildDisk:", childDisk);
+				// console.log("ChildDisk:", childDisk);
 				vDevData.disks.push(childDisk);
 		
 			} else if (child.type === 'replacing') {			
@@ -503,7 +503,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 						vDevType: vDevType,
 					}
 
-					console.log("ChildDisk:", childDisk);
+					// console.log("ChildDisk:", childDisk);
 					vDevData.disks.push(childDisk);
 
 			} else {
