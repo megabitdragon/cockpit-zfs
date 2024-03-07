@@ -690,6 +690,15 @@ const parentCheck = (fileSystem : FileSystemData) => {
 	if (fileSystem.parentFS == '') {
 		result = false;
 		parentFeedback.value = 'Please select a Parent File System.';
+	} else {
+		const parentDataset = datasets.value.find(dataset => {
+			return dataset.id === fileSystem.parentFS;
+		});
+
+		if (parentDataset && parentDataset!.encrypted && !parentDataset!.key_loaded) {
+			result = false;
+			parentFeedback.value = 'Parent File System is encrypted and locked. Please unlock and try again.';
+		}
 	}
 
 	return result;
