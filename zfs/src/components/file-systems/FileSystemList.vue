@@ -139,43 +139,31 @@
 											</Disclosure>
 										</div>
 										<div v-if="dataset.type == 'SNAPSHOT'" class="border border-default">
-											<!-- <Disclosure v-slot="{ open }">
-												<DisclosureButton class="bg-primary grid grid-cols-12 grid-flow-cols w-full justify-center text-center"> -->
-												<div class="bg-primary grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
-													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="dataset.name">
-														<CameraIcon
-															class="-mt-1 mx-2 h-8 w-8 text-muted"
-														/> 
-													</div>
-													<div class="py-1 mt-1 col-span-2 text-left text-white" :class="[truncateText, `ml-${getNestingLevel(dataset)}`]" :title="dataset.name">{{ dataset.name }}</div>
-													<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
-													<div class="py-1 mt-1 col-span-1 text-white" :class="truncateText" :title="convertBytesToSize(dataset.properties.used.parsed)">{{ convertBytesToSize(dataset.properties.used.parsed) }}</div>
-													<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
-													<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
-													<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
-													<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'available'" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Encrypted & Unlocked">
-														<LockOpenIcon class="w-5 mt-0.5" aria-hidden="true"/>
-													</div>
-													<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'unavailable'" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Encrypted & Locked">
-														<LockClosedIcon class="w-5 mt-0.5" aria-hidden="true"/>
-													</div>
-													<div v-if="dataset.properties.encryption.value === 'off' && dataset.properties.keystatus.value == ''" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Not Encrypted">
-														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
-													</div>
-													<div class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center">N/A</div>
-													<div class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center">N/A</div>
-													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8"></div>
+											<div class="bg-primary grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
+												<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="dataset.name">
+													<CameraIcon
+														class="-mt-1 mx-2 h-8 w-8 text-muted"
+													/>
 												</div>
-												<!-- <div>
-													<SnapshotsList :item="'singleSnap'" :singleSnap="dataset"/>
-												</div> -->
-												<!-- </DisclosureButton>
-												<DisclosurePanel>
-													<div>
-														<SnapshotsList :item="'singleSnap'" :singleSnap="dataset"/>
-													</div>
-												</DisclosurePanel>
-											</Disclosure> -->
+												<div class="py-1 mt-1 col-span-2 text-left text-white" :class="[truncateText, `ml-${getNestingLevel(dataset)}`]" :title="dataset.name">{{ dataset.name }}</div>
+												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
+												<div class="py-1 mt-1 col-span-1 text-white" :class="truncateText" :title="convertBytesToSize(dataset.properties.used.parsed)">{{ convertBytesToSize(dataset.properties.used.parsed) }}</div>
+												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
+												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
+												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
+												<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'available'" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Encrypted & Unlocked">
+													<LockOpenIcon class="w-5 mt-0.5" aria-hidden="true"/>
+												</div>
+												<div v-if="dataset.properties.encryption.value !== 'off' && dataset.properties.keystatus.value == 'unavailable'" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Encrypted & Locked">
+													<LockClosedIcon class="w-5 mt-0.5" aria-hidden="true"/>
+												</div>
+												<div v-if="dataset.properties.encryption.value === 'off' && dataset.properties.keystatus.value == ''" class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center" title="Not Encrypted">
+													<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true"/>
+												</div>
+												<div class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center">N/A</div>
+												<div class="py-1 mt-1 col-span-1 text-white justify-self-center items-center text-center">N/A</div>
+												<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8"></div>
+											</div>
 										</div>
 									</div>
 								</div> 
@@ -192,6 +180,26 @@
 					
 				</div>
 			</div>
+
+			<!-- div for dynamic style rendering -->
+			<div id="debug" class="hidden">
+				<div id="dummy" class="hidden">
+					<div class="ml-0"></div>
+					<div class="ml-4"></div>
+					<div class="ml-8"></div>
+					<div class="ml-12"></div>
+					<div class="ml-16"></div>
+					<div class="ml-20"></div>
+					<div class="ml-24"></div>
+					<div class="ml-28"></div>
+					<div class="ml-32"></div>
+					<div class="ml-36"></div>
+				</div>
+				<!-- <div v-for="dataset in debugNestingLevel" :key="dataset.name" :class="`ml-${dataset.nestingLevel}`">
+					{{ dataset.name }} ({{ dataset.type }}) - Nesting Level: {{ dataset.nestingLevel }}
+				</div> -->
+			</div>
+		
 		</div>
 	</div>
 
@@ -235,7 +243,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, onMounted } from "vue";
+import { ref, inject, Ref, provide, watch, onMounted, computed } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon, CheckIcon, } from '@heroicons/vue/24/outline';
 import { CameraIcon } from '@heroicons/vue/24/solid'
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
@@ -287,7 +295,6 @@ async function refreshData() {
 	fileSystemsLoaded.value = true;
 	snapshotsLoaded.value = true;
 	allDatasetsLoaded.value = true;
-
 }
 
 ///////////////////////////////////////////////////////////
@@ -331,7 +338,7 @@ function getNestingLevel(dataset) {
 
     if (dataset.type === 'SNAPSHOT') {
         // Extract the dataset name from the snapshot's name using regex
-        const datasetNameRegex = /^(.+?)(?:\/.+)?@[\w.-]+$/;
+        const datasetNameRegex = /^(.+?)@[\w.-]+$/;
         const match = dataset.name.match(datasetNameRegex);
         if (match && match[1]) {
             const datasetName = match[1]; // Extracted dataset name
@@ -355,6 +362,14 @@ function getNestingLevel(dataset) {
 function findDatasetByName(name) {
 	return allDatasets.value.find(dataset => dataset.name === name);
 }
+
+const debugNestingLevel = computed(() => {
+	return allDatasets.value.map(dataset => ({
+		name: dataset.name,
+		nestingLevel: getNestingLevel(dataset),
+		type: dataset.type
+	}));
+});
 
 onMounted(async () => {
 	await refreshData();
