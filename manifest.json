@@ -1,38 +1,67 @@
 {
-    "__version": "45D-R1",
+    "__version": "45D-R2",
     "name": "cockpit-zfs",
-    "title": "Cockpit ZFS Module",
-    "prerelease": false,
-    "version": "0.0.0",
-    "buildVersion": "0",
+    "title": "cockpit zfs",
+    "prerelease": true,
+    "version": "0.1.0",
+    "buildVersion": "1",
     "author": "Jordan Keough <jkeough@45drives.com>",
-    "url": "",
+    "url": "https://github.com/45Drives/cockpit-zfs",
     "category": "utils",
     "priority": "optional",
     "licence": "GPL-3.0+",
     "architecture": {
-        "deb": "all"
+        "deb": "all",
+        "el": "noarch"
     },
     "description": {
-        "long": "ZFS Pool Manager for Cockpit",
-        "short": "ZFS Pool Manager for Cockpit"
+        "long": "zfs manager for cockpit",
+        "short": "zfs manager for cockpit"
     },
     "defaults": {
         "urgency": "medium"
     },
     "dependencies": {
-        "deb": [
-            "cockpit",
-            "attr",
-            "coreutils",
-            "libc-bin",
-            "nfs-kernel-server",
-            "samba",
-            "samba-common-bin",
-            "systemd",
-            "winbind",
-            "gawk",
-            "mbuffer"
-        ]
+        "deb": {
+            "bionic": [
+                "cockpit",
+                "python3"
+            ],
+            "focal": [
+                "cockpit",
+                "python3"
+            ]
+        },
+        "el": {
+            "el7": [
+                "cockpit",
+                "python3"
+            ],
+            "el8": [
+                "cockpit",
+                "python3"
+            ]
+        }
+    },
+    "releases": [
+        {
+            "image": "ubuntu-focal-builder",
+            "codeName": "focal",
+            "type": "deb"
+        },
+        {
+            "image": "rocky-el8-builder",
+            "codeName": "el8",
+            "type": "el"
+        }
+    ],
+    "changelog": {
+        "urgency": "medium",
+        "version": "0.1.0",
+        "buildVersion": "1",
+        "ignore": [],
+        "date": null,
+        "packager": "Jordan Keough <jkeough@45drives.com>",
+        "changes": []
     }
 }
