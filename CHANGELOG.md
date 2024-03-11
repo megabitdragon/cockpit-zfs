@@ -1,3 +1,3 @@
-## cockpit zfs 0.1.0-1
+## cockpit zfs 0.1.0-7
 
-* initial release
+* wip bug fixing for root_dataset property
