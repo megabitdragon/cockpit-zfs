@@ -3,7 +3,7 @@ import { convertTimestampToLocal, convertTimestampFormat } from '../composables/
 // @ts-ignore
 import get_snapshots_script from "../scripts/get-snapshots.py?raw";
 // @ts-ignore
-import send_dataset_script from "../scripts/send-dataset.py?raw";
+import send_dataset_script from "../scripts/send-snapshot.py?raw";
 // @ts-ignore
 import check_dataset_script from"../scripts/check-dataset.py?raw";
 // @ts-ignore
@@ -60,7 +60,7 @@ export async function destroySnapshot(snapshot, destroyChildrenSameName, destroy
 
         cmdString.push(snapshot.name)
 
-        console.log("****create cmdString: *****\n" , cmdString);
+        console.log("****destroy cmdString: *****\n" , cmdString);
 			
         const state = useSpawn(cmdString);
         const output = await state.promise();
@@ -86,7 +86,7 @@ export async function rollbackSnapshot(snapshot, destroyNewerSnaps, destroyAllNe
 
         cmdString.push(snapshot.name)
 
-        console.log("****create cmdString: *****\n" , cmdString);
+        console.log("****rollback cmdString: *****\n" , cmdString);
 			
         const state = useSpawn(cmdString);
         const output = await state.promise();
@@ -109,7 +109,7 @@ export async function renameSnapshot(snapshotName, newName, renameChildren?) {
         cmdString.push(snapshotName);
         cmdString.push(newName);
 
-        console.log("****create cmdString: *****\n" , cmdString);
+        console.log("****rename cmdString: *****\n" , cmdString);
 			
         const state = useSpawn(cmdString);
         const output = await state.promise();
@@ -132,7 +132,7 @@ export async function cloneSnapshot(snapName, newParentFS, cloneName, createPare
         cmdString.push(`${snapName}`);
         cmdString.push(`${newParentFS}/${cloneName}`);
 
-        console.log("****create cmdString: *****\n" , cmdString);
+        console.log("****clone cmdString: *****\n" , cmdString);
 			
         const state = useSpawn(cmdString);
         const output = await state.promise();
