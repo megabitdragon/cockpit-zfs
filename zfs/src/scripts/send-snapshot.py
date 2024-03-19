@@ -363,10 +363,10 @@ def main() :
     mBufferSize = args.mBufferSize
     mBufferUnit = args.mBufferUnit
 
-    # if sendName2 != "":
-    #     print(f"Sending incrementally to {recvName} from {sendName2} to {sendName}")
-    # else:
-    #     print(f"Executing command: zfs send {sendName} | {recvName}")
+    if sendName2 != "":
+        print(f"Sending incrementally to {recvName} from {sendName2} to {sendName}")
+    else:
+        print(f"Executing command: zfs send {sendName} | {recvName}")
 
     send_dataset(sendName, recvName, sendName2, forceOverwrite, compressed, raw, recvHost, recvPort, recvHostUser, mBufferSize, mBufferUnit)
 

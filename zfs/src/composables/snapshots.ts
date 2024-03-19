@@ -162,7 +162,7 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 
 export async function doesDatasetExist(sendingData : SendingDataset) {
     try {
-        console.log('sendingData (snapshots.ts - checkDataset):', sendingData);
+        console.log('sendingData (snapshots.ts - checkDataset - doesDatasetExist):', sendingData);
 
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', check_dataset_script, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
 
@@ -182,7 +182,7 @@ export async function doesDatasetExist(sendingData : SendingDataset) {
 
 export async function doesDatasetHaveSnaps(sendingData : SendingDataset) {
     try {
-        console.log('sendingData (snapshots.ts - checkDataset):', sendingData);
+        console.log('sendingData (snapshots.ts - checkDataset - doesDatasetHaveSnaps):', sendingData);
 
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', check_remote_snaps_script, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
 

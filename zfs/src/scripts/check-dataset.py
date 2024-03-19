@@ -1,4 +1,4 @@
-# Python script for sending snapshots
+# Python script for checking dataset
 import subprocess
 import argparse
 
@@ -30,7 +30,7 @@ def check_if_recv_dataset_exists(recvName, recvHost, recvPort, recvHostUser):
         return bool(stdout.strip())
 
 def main() :
-    parser = argparse.ArgumentParser(description='Send ZFS Dataset')
+    parser = argparse.ArgumentParser(description='Check ZFS Dataset')
     parser.add_argument('recvName', type=str, help='receiving dataset name')
     parser.add_argument('recvHost', type=str, help='receiving dataset host')
     parser.add_argument('recvPort', type=str, default='22', help='receiving dataset port')

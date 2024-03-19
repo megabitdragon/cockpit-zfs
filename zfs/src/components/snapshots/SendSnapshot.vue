@@ -335,6 +335,7 @@ async function setSendData() {
             datasetCheckResult.value = await doesRemoteDatasetExist();
             if (datasetCheckResult.value) {
                 const doesRecvHaveSnaps = await doesRemoteDatasetHaveSnaps();
+                console.log('doesRecvHaveSnaps:', doesRecvHaveSnaps);
                 if (doesRecvHaveSnaps) {
                     lastCommonSnap.value = await checkForLastCommonSnap();
                     console.log('remote lastCommonSnap:', lastCommonSnap.value);
@@ -377,24 +378,28 @@ async function checkForLastCommonSnap() {
                 return b.creationTimestamp.localeCompare(a.creationTimestamp);
             });
         });
-
+        console.log('sortedSnapshots:', sortedSnapshots.value);
         const sourceDataset = computed(() => {
             return sendName.value.split("@").shift();
         });
 
+        console.log('sourceDataset:', sourceDataset.value);
         const sourceDatasetSnaps = computed(() => {
             return sortedSnapshots.value.filter(snapshot => snapshot.dataset == sourceDataset.value);
         });
 
+        console.log('sourceDatasetSnaps:', sourceDatasetSnaps.value);
         const sourceSnap = computed(() => {
             return sourceDatasetSnaps.value.find(snap => snap.name == sendName.value);
         });
 
+        console.log('sourceSnap:', sourceSnap.value);
         if (isSendLocal.value) {
             const destinationDatasetSnaps = computed(() => {
                 return sortedSnapshots.value.filter(snapshot => snapshot.dataset == destinationName.value);
             });
 
+            console.log('destinationDatasetSnaps:', destinationDatasetSnaps.value);
             // Check if destinationDatasetSnaps is empty
             if (destinationDatasetSnaps.value.length === 0) {
                 // Handle the case where no destinationDatasetSnaps exist
@@ -465,6 +470,7 @@ async function compareRemoteTimestamp(snapSnips : SnapSnippet[], sourceDatasetSn
             console.log('sendSnap is the same as mostRecentDestSnap');
             return null;
         } else {
+            console.log('comparing snap timestamps:', Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation)) < Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp)))));
             if (Number(getRawTimestampFromString(mostRecentRemoteDestSnap.value.creation)) < Number(getRawTimestampFromString(convertTimestampToLocal(convertRawTimestampToString(sourceSendSnap.creationTimestamp))))) {
                 const sourceSnapMatch = computed(() => {
                     const source = sourceDatasetSnaps.find(snap => snap.guid == mostRecentRemoteDestSnap.value!.guid);
@@ -472,7 +478,13 @@ async function compareRemoteTimestamp(snapSnips : SnapSnippet[], sourceDatasetSn
                     return source; 
                 });
                 console.log('remote sourceSnapMatch:', sourceSnapMatch.value);
-                return sourceSnapMatch.value;
+                
+                if (sourceSnapMatch.value == undefined) {
+                    return null;
+                } else {
+                    return sourceSnapMatch.value;
+                }
+
             } else {
                 console.log('invalid remote lastCommonSnap match');
                 return null;
@@ -482,7 +494,6 @@ async function compareRemoteTimestamp(snapSnips : SnapSnippet[], sourceDatasetSn
         console.log('No snap snips to compare');
         return null;
     }
-    
 }
 
 async function sendBtn() {
