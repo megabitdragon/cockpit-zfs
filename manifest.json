@@ -4,7 +4,7 @@
     "title": "cockpit zfs",
     "prerelease": true,
     "version": "0.1.0",
-    "buildVersion": "7",
+    "buildVersion": "8",
     "author": "Jordan Keough <jkeough@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-zfs",
     "category": "utils",
@@ -25,7 +25,8 @@
         "el": {
             "el8": [
                 "cockpit",
-                "python3"
+                "python3",
+                "python3-libzfs"
             ]
         }
     },
@@ -39,7 +40,7 @@
     "changelog": {
         "urgency": "medium",
         "version": "0.1.0",
-        "buildVersion": "7",
+        "buildVersion": "8",
         "ignore": [],
         "date": null,
         "packager": "Jordan Keough <jkeough@45drives.com>",

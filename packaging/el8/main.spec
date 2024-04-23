@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Tue Apr 23 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-8
+- adds py-libzfs to dependencies
 * Mon Mar 11 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-7
 - wip bug fixing for root_dataset property
 * Mon Mar 11 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-6

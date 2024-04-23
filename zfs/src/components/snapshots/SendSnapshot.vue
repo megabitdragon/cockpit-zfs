@@ -196,9 +196,9 @@ const sendingData = ref<SendingDataset>({
 function handleCheckboxChange(checkbox) {
     // Ensure only one checkbox is selected at a time
     if (checkbox === 'sendCompressed' && sendCompressed.value) {
-    sendRaw.value = false;
+        sendRaw.value = false;
     } else if (checkbox === 'sendRaw' && sendRaw.value) {
-    sendCompressed.value = false;
+        sendCompressed.value = false;
     }
 }
 
