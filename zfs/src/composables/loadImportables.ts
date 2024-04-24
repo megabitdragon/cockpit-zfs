@@ -24,7 +24,7 @@ export function parseImportVDevData(vDev, poolName, vDevType) {
 
     } catch (error) {
         // Handle any errors that may occur during the asynchronous operation
-        console.error("An error occurred getting Importable pools:", error);
+        console.error("An error occurred getting vdevs for Importable pools:", error);
     }
 }
 
@@ -100,7 +100,7 @@ export async function loadImportableDestroyedPools(importablePools, allDisks, ex
             vDevs.value = [];
 		}
             
-        console.log("loaded Importable Pools:", importablePools);
+        console.log("loaded Importable/Destroyed Pools:", importablePools);
 
         await loadDisksExtraData(allDisks.value, existingPools.value);
 
@@ -108,7 +108,7 @@ export async function loadImportableDestroyedPools(importablePools, allDisks, ex
 
     } catch (error) {
         // Handle any errors that may occur during the asynchronous operation
-        console.error("An error occurred getting Importable pools:", error);
+        console.error("An error occurred getting destroyed Importable pools:", error);
     }
 }
 
@@ -201,26 +201,37 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			const newChildren = ref<ChildDiskData[]>([]);
 
 			if (child.type === 'disk') {
-				if (child.path!.match(phyPathRegex)) {
-					fullDiskData.value = disks.value.find(disk => disk.phy_path + '-part1' === child.path)!;
+			/* 	if (child.path!.match(phyPathRegex)) {
+					fullDiskData.value = disks.value.find(disk => disk.phy_path + '-part1' === child.path || disk.phy_path === child.path)!;
 					//console.log('phyPath match');
 					diskPath.value = fullDiskData.value.phy_path;
 					diskName.value = fullDiskData.value.phy_path.replace(phyPathPrefix, '');
 					// console.log('disk:', diskName.value);
 				} else if (child.path!.match(sdPathRegex)) {
-					fullDiskData.value = disks.value.find(disk => disk.sd_path + '1' === child.path)!;
+					fullDiskData.value = disks.value.find(disk => disk.sd_path + '1' === child.path || disk.sd_path === child.path)!;
 					//console.log('sdPath match');
 					diskPath.value = fullDiskData.value.sd_path;
 					diskName.value = fullDiskData.value.sd_path.replace(sdPathPrefix, '');
 					// console.log('disk:', diskName.value);
 				} else if (child.path!.match(vDevPathRegex)) {
-					fullDiskData.value = disks.value.find(disk => disk.vdev_path  + '-part1' === child.path)!;
+					fullDiskData.value = disks.value.find(disk => disk.vdev_path + '-part1' === child.path || disk.vdev_path === child.path)!;
 					//console.log('vDevPath match');
 					diskPath.value = fullDiskData.value.vdev_path;
 					diskName.value = fullDiskData.value!.name;
 					// console.log('disk:', diskName.value);
+				} */
+				let normalizedPath = child.path.replace('-part1', ''); // Normalize the path by removing '-part1'
+				fullDiskData.value = disks.value.find(disk =>
+					disk.vdev_path === normalizedPath ||
+					disk.phy_path === normalizedPath ||
+					disk.sd_path + '1' === child.path // Adding '1' to match `/dev/sdx1` style paths
+				);
+
+				if (!fullDiskData.value) {
+					console.error('No matching disk found for path:', child.path);
+					return; // Optionally return or handle the error
 				}
-				
+								
 				const childDisk : DiskData = {
 					name: diskName.value,
 					path: diskPath.value,

@@ -1,3 +1,3 @@
-## cockpit zfs 0.1.0-8
+## cockpit zfs 0.1.0-9
 
-* adds py-libzfs to dependencies
+* fixes a bug with finding importable pools
