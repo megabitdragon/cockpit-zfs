@@ -1,7 +1,7 @@
 <template>
 	<div class="">
 		<div class="">
-			<Disclosure v-slot="{ open }" :defaultOpen="true">
+			<Disclosure v-slot="{ open }" :defaultOpen="false">
 				<DisclosureButton class="bg-default grid grid-cols-10 grid-flow-cols w-full justify-center text-center" >
 					<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start" :title="poolData[props.poolIdx].name">
 						<ChevronUpIcon

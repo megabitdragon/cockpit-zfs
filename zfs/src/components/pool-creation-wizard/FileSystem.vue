@@ -13,7 +13,7 @@
 			<!-- Name of File System (Text) -->
 			<div>
 				<label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Name</label>
-				<input @keydown.enter="fsCreateBtn(fileSystemConfig)" :id="getIdKey('filesystem-name')" type="text" name="file-system-name" v-model="fileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default" placeholder="File System Name" />
+				<input @keydown.enter="fsCreateBtn(fileSystemConfig)" :id="getIdKey('filesystem-name')" type="text" name="file-system-name" v-model="fileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default text-default" placeholder="File System Name" />
 				<p class="text-danger" v-if="nameFeedback">{{ nameFeedback }}</p>
 			</div>
 
