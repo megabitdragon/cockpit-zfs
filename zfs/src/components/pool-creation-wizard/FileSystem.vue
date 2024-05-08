@@ -252,7 +252,7 @@
 				<!-- Name of Parent File System (Text) -->
 				<div>
                     <label :for="getIdKey('parent-filesystem')" class="block text-sm font-medium leading-6 text-default">Parent File System</label>
-                    <select :id="getIdKey('parent-filesystem')" name="parent-filesystem" v-model="newFileSystemConfig.parentFS" class="mt-1 block w-full input-textlike bg-default">
+                    <select :id="getIdKey('parent-filesystem')" name="parent-filesystem" v-model="newFileSystemConfig.parentFS" class="mt-1 block w-full input-textlike bg-default text-default">
                         <option v-for="dataset, datasetIdx in datasets" :key="datasetIdx" :value="dataset.name">{{ dataset.name }}</option>
                     </select>
                 </div>
@@ -260,7 +260,7 @@
 				<!-- Name of File System (Text) -->
 				<div>
 					<label :for="getIdKey('filesystem-name')" class="mt-1 block text-sm font-medium text-default">Name</label>
-					<input :id="getIdKey('filesystem-name')" @keydown.enter="fsCreateBtn(newFileSystemConfig)" type="text" name="file-system-name" v-model="newFileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default" placeholder="File System Name" />
+					<input :id="getIdKey('filesystem-name')" @keydown.enter="fsCreateBtn(newFileSystemConfig)" type="text" name="file-system-name" v-model="newFileSystemConfig.name" class="mt-1 block w-full input-textlike bg-default text-default" placeholder="File System Name" />
 				</div>
 
 				<!-- Encryption (Toggle) -> Reveals extra fields-->
