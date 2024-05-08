@@ -54,7 +54,7 @@
 						</div>
 					</div>
 					<div class="button-group-row mt-2">
-						<button id="back" class="btn btn-secondary object-left justify-start h-fit" @click="prev">Back</button>
+						<button v-if="!end" id="back" class="btn btn-secondary object-left justify-start h-fit" @click="prev">Back</button>
 						<button v-if="!end" id="next" class="btn btn-primary object-right justify-end h-fit" @click="next">Next</button>
 						<!-- only show finish button if currently on the final tab -->
 						<button v-if="end && !finishPressed" id="finish" class="btn btn-primary object-right justify-end h-fit" @click="finishBtn(newPoolData)">Finish</button>
@@ -344,6 +344,11 @@ const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) =
 		}
 	}  else if (currentTag === 'review') {
 			navTag.value = item.tag;
+
+			if (finishPressed.value) {
+				
+
+			}
 	} 
 }
 

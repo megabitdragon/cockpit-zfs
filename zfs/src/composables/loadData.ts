@@ -577,10 +577,10 @@ export async function loadSnapshots(snapshots) {
 		const rawJSON = await getSnapshots();
         const parsedJSON = JSON.parse(rawJSON);
         // console.log('Snapshots JSON (all):', parsedJSON);
+		const allSnapshots: Snapshot[] = [];
 
         for (const dataset in parsedJSON) {
             parsedJSON[dataset].forEach(snapshot => {
-				
 				const snap = {
 					name: snapshot.name,
 					id: snapshot.id,
@@ -594,9 +594,16 @@ export async function loadSnapshots(snapshots) {
 					properties: snapshot.properties,
 					holds: snapshot.holds
 				};
-				snapshots.value.push(snap);
+				allSnapshots.push(snap);
             });
         }
+
+		// Sort the snapshots by creationTimestamp
+        allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
+
+        // Push sorted snapshots into the reactive data
+        allSnapshots.forEach(snap => snapshots.value.push(snap));
+
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
@@ -607,6 +614,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
         const rawJSON = await getSnapshots();
         const parsedJSON = JSON.parse(rawJSON);
         // console.log('Snapshots JSON (loadByPool):', parsedJSON);
+		const allSnapshots: Snapshot[] = [];
 
         for (const dataset in parsedJSON) {
             parsedJSON[dataset].forEach(snapshot => {
@@ -625,10 +633,17 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 						holds: snapshot.holds
 					};
 				
-					snapshots.value.push(snap);
+					allSnapshots.push(snap);
                 }
             });
         }
+
+		// Sort the snapshots by creationTimestamp
+        allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
+
+        // Push sorted snapshots into the reactive data
+        allSnapshots.forEach(snap => snapshots.value.push(snap));
+
 		console.log('loaded snapshots in:', poolName, '\n', snapshots);
     } catch (error) {
         console.error("An error occurred getting snapshots:", error);
@@ -641,6 +656,8 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 		getSnapshots().then(rawJSON => {
 			const parsedJSON = (JSON.parse(rawJSON));
 			// console.log('Snapshots JSON (loadByDataset):', parsedJSON);
+			const allSnapshots: Snapshot[] = [];
+
 			for (const dataset in parsedJSON) {
 				parsedJSON[dataset].forEach(snapshot => {
 					if (dataset == datasetName) {
@@ -661,22 +678,23 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 									parsed: convertTimestampToLocal(snapshot.properties.creation.parsed),
 									value: snapshot.properties.creation.value,
 								},
-								referenced: {
-									value: snapshot.properties.referenced.value,
-									rawNum: snapshot.properties.referenced.parsed,
-								},
-								used: {
-									value: snapshot.properties.used.value,
-									rawNum: snapshot.properties.used.parsed,
-								},
+								referenced: snapshot.properties.referenced,
+								used: snapshot.properties.used,
 							},
 							holds: snapshot.holds
 						}
 		
-						snapshots.value.push(snap);
+						allSnapshots.push(snap);
 					}
 				});
 			}
+
+			// Sort the snapshots by creationTimestamp
+			allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
+
+			// Push sorted snapshots into the reactive data
+			allSnapshots.forEach(snap => snapshots.value.push(snap));
+
 		});
 
 		console.log('loaded snapshots in:', datasetName, '\n', snapshots);
