@@ -1,3 +1,3 @@
-## cockpit zfs 0.1.0-9
+## cockpit zfs 0.1.0-10
 
-* fixes a bug with finding importable pools
+* fixed bug with missing disks breaking pools

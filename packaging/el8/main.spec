@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Fri May 10 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-10
+- fixed bug with missing disks breaking pools
 * Wed Apr 24 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-9
 - fixes a bug with finding importable pools
 * Tue Apr 23 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-8
