@@ -1,3 +1,3 @@
-## cockpit zfs 0.1.0-11
+## cockpit zfs 0.1.1-1
 
-* fixed bug with missing disks breaking pools
+* Updates to data display + loading spinners for snapshots

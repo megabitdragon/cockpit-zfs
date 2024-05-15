@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Wed May 15 2024 Jordan Keough <jkeough@45drives.com> 0.1.1-1
+- Updates to data display + loading spinners for snapshots
 * Fri May 10 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-11
 - fixed bug with missing disks breaking pools
 * Fri May 10 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-10
