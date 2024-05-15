@@ -50,7 +50,6 @@ const snapshots = ref<Snapshot[]>([]);
 const disksLoaded = ref(false);
 const poolsLoaded = ref(false);
 const fileSystemsLoaded = ref(false);
-const snapshotsLoaded = ref(true);
 
 const clearLabels = ref(false);
 
@@ -72,6 +71,7 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 
 	await loadDatasets(datasets);
 	await loadSnapshots(snapshots);
+	
 	await scanNow();
 	await loadScanActivities(pools, scanActivities);
 	await checkDiskStats();
@@ -84,6 +84,7 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 }
 
 initialLoad(disks, pools, datasets, snapshots);
+
 
 /////////////////////////////////////////////////////
 async function scanNow() {
@@ -137,7 +138,6 @@ provide("datasets", datasets);
 provide('disks-loaded', disksLoaded);
 provide('datasets-loaded', fileSystemsLoaded);
 provide('pools-loaded', poolsLoaded);
-provide('snapshots-loaded', snapshotsLoaded);
 provide('clear-labels', clearLabels);
 provide("snapshots", snapshots);
 provide('scan-object-group', scanObjectGroup);

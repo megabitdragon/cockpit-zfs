@@ -273,14 +273,11 @@ const pools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
 const selectedDataset = ref<FileSystemData>();
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-// const snapshotsInDataset = ref<Snapshot[]>([]);
-const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
 const allDatasets = ref<any>([]);
 const allDatasetsLoaded = ref(false);
 
 async function refreshData() {
 	fileSystemsLoaded.value = false;
-	snapshotsLoaded.value = false;
 	allDatasetsLoaded.value = false;
 
 	fileSystems.value = [];
@@ -292,7 +289,6 @@ async function refreshData() {
 	await populateDatasetList();
 
 	fileSystemsLoaded.value = true;
-	snapshotsLoaded.value = true;
 	allDatasetsLoaded.value = true;
 }
 

@@ -108,11 +108,6 @@ const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 
 const showSnapshotModal = inject<Ref<boolean>>('create-snap-modal')!;
 const creating = inject<Ref<boolean>>('creating')!;
-const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
-const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
-const allDatasetsLoaded = inject<Ref<boolean>>('all-datasets-loaded')!;
-const allDatasets = inject<Ref<any>>('all-datasets')!;
-const pools = inject<Ref<PoolData[]>>('pools')!;
 
 initialize();
 
@@ -231,10 +226,6 @@ async function create(newSnapshot) {
             confirmCreate.value = true;
         } else {
             confirmCreate.value = true;
-            // snapshotsLoaded.value = false;
-            // refreshSnapshots();
-            // await refreshData();
-            // snapshotsLoaded.value = true;
             newSnapshot.isCustomName = false;
             newSnapshot.snapChildren = false;
             notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');

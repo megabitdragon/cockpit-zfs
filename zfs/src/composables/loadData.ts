@@ -370,7 +370,7 @@ export async function loadDisksExtraData(disks, pools) {
 							console.error('Original disk not found in the disks array');
 						}
 					} else {
-						console.error('Selected disk not found');
+						console.log('Selected disk not found');
 					}
                 });
             });

@@ -41,12 +41,9 @@
 				</div>
 			</div>
 			
-			<div v-if="navTag == 'snapshots' && snapshotsLoaded" class="w-full text-center min-w-fit" >
+			<div v-if="navTag == 'snapshots'" class="w-full text-center min-w-fit" >
 				<!-- <SnapshotsList :pool="props.pool" :item="'pool'"/> -->
 				<component :is="snapshotListComponent" :pool="props.pool" :item="'pool'"/>
-			</div>
-			<div v-if="navTag == 'snapshots' && !snapshotsLoaded" class="rounded-md flex bg-well justify-center">
-				<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'"/>
 			</div>
 
 			<div v-if="navTag == 'settings'">
@@ -309,21 +306,14 @@ const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
-
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
-
-// const snapshotsLoaded = ref(true);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-const snapshotsLoaded = inject<Ref<boolean>>('snapshots-loaded')!;
-// const snapshotsInPool = ref<Snapshot[]>([]);
 
-// loadSnapshotsInPool(snapshots, props.pool.name);
 const snapshotListComponent = ref();
 const loadSnapshotListComponent = async () => {
 	const module = await import('../snapshots/SnapshotsList.vue');
 	snapshotListComponent.value = module.default;
-	snapshotsLoaded.value = true;
 }
 
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
@@ -533,7 +523,6 @@ const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 
 watch(navTag, (newVal, oldVal) => {
 	if (navTag.value == 'snapshots') {
-		snapshotsLoaded.value = false;
 		loadSnapshotListComponent();
 	}
 }, {immediate: true});
@@ -553,9 +542,7 @@ provide('current-pool-config', poolConfig);
 provide('show-vdev-modal', showAddVDevModal);
 provide("saving", saving);
 provide('create-snap-modal', showSnapshotModal);
-// provide('snapshots-loaded', snapshotsLoaded);
 provide("snapshots", snapshots);
-// provide("snapshots-in-pool", snapshotsInPool);
 provide('confirm-create-snap', confirmCreate);
 provide('creating', creating);
 provide('modal-confirm-running', operationRunning);
