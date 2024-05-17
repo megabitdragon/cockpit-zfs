@@ -84,19 +84,21 @@
 			</table>
 			<table v-if="snapshotsInFilesystem.length > 0 && snapshotsInDatasetLoaded" class="table-auto min-w-full min-h-full divide-y divide-default">
 				<thead class="bg-secondary border-collapse">
-					<tr class="rounded-md grid grid-cols-7 font-semibold text-white">
+					<tr class="rounded-md grid grid-cols-8 font-semibold text-white">
 						<th class="py-2 col-span-2 text-center" :class="truncateText" title="Snapshot">Snapshot</th>
 						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Created On">Created On</th>
 						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Used">Used</th>
 						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Referenced">Referenced</th>
-						<th class="py-2 col-span-1 text-center" :class="truncateText" title="Clones">Clones</th>
+						<th v-if="!bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-2 text-center" :class="truncateText" title="Clones">Clones</th>
+						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center" :class="truncateText" title="Clones">Clones</th>
+						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center" :class="truncateText" title="Select">Select</th>
 						<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 							<span class="sr-only"></span>
 						</th>
 					</tr>
 				</thead>
 				<tbody class="divide-y divide-default bg-accent border-collapse">
-					<tr v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-7 justify-center items-center">
+					<tr v-for="snapshot, snapshotIdx in snapshotsInFilesystem" :key="snapshotIdx" class="text-default grid grid-cols-8 justify-center items-center">
 						<td class="py-1 px-3 text-sm font-medium text-default text-left col-span-2" :class="truncateText" :title="snapshot.name"> 
 							{{ snapshot.name }}
 						</td>
@@ -109,8 +111,14 @@
 						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.referenced.value">
 							{{ snapshot.properties.referenced.value }}
 						</td>
-						<td class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.clones">
+						<td v-if="!bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-1 px-3 text-sm text-default text-center col-span-2" :class="truncateText" :title="snapshot.properties.clones">
 							{{ snapshot.properties.clones.length > 0 ? snapshot.properties.clones : '-' }}
+						</td>
+						<td v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.clones">
+							{{ snapshot.properties.clones.length > 0 ? snapshot.properties.clones : '-' }}
+						</td>
+						<td v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-1 px-3 text-sm text-default text-center col-span-1">
+							<input v-model="selectedForDestroy" :value="snapshot.name" type="checkbox" class="ml-2 h-4 w-4 rounded "/>
 						</td>
 						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 							<Menu as="div" class="relative inline-block text-right">
@@ -147,6 +155,7 @@
 					</tr>
 				</tbody>
 			</table>
+			<button v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" @click="destroySelectedSnapshots()" name="destroy-multiple-snaps-btn" class="mt-1 btn btn-danger h-fit w-full">Destroy Selected Snapshots</button>
 			<div v-if="snapshotsInFilesystem.length === 0 && snapshotsInDatasetLoaded" class="text-center bg-well">
 				<p>No snapshots found.</p>
 			</div>
@@ -172,6 +181,9 @@
 			<component :is="sendSnapshotComponent" @close="updateShowSendSnapshot" idKey="'show-send-snapshot-modal'" :snapshot="selectedSnapshot!" :name="selectedSnapshot!.name" />
 		</div>
 
+		<div v-if="showDestroyBulkSnapshotModal">
+			<component :is="destroyBulkSnapshotComponent" :showFlag="showDestroyBulkSnapshotModal" @close="updateShowDestroyBulkSnapshot" :idKey="'confirm-destroy-bulk-snapshots'" :item="'snapshots'" :operation="'destroy'" :snapshots="selectedForDestroy!" :confirmOperation="confirmThisBulkDestroy" :hasChildren="false"/>
+		</div>
 	</div>
 
 </template>
@@ -190,6 +202,7 @@ interface SnapshotsListProps {
 	filesystem?: FileSystemData;
 	singleSnap?: Snapshot;
 	item: 'pool' | 'filesystem' | 'singleSnap';
+	bulkSnapDestroyMode?: boolean;
 }
 
 const props = defineProps<SnapshotsListProps>();
@@ -227,24 +240,6 @@ onMounted(async () => {
         snapshotsInDatasetLoaded.value = true;
     }
 }
-
-/* async function refreshSnaps() {
-	snapshotsInDatasetLoaded.value = false;
-	snapshotsInPoolLoading.value = true;
-	if (props.item == 'pool') {
-		snapshots.value = [];
-		await loadSnapshotsInPool(snapshots, props.pool!.name);
-	} else if (props.item == 'filesystem') {
-		snapshotsInFilesystem.value = [];
-		await loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name);
-	} else if (props.item == 'singleSnap') {
-		selectedSnapshot.value = snapshots.value.find(snapshot => snapshot.name == props.singleSnap!.name);
-	}
-	snapshotsInDatasetLoaded.value = true;
-	snapshotsInPoolLoading.value = false;
-} */
-
-
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
@@ -293,7 +288,7 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 		console.log('now destroying:', newVal);
 
 		try {
-			const output = await destroySnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
+			const output = await destroySnapshot(selectedSnapshot.value?.name, firstOptionToggle.value, secondOptionToggle.value);
 
 			if (output == null) {
 				operationRunning.value = false;
@@ -316,6 +311,69 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 		}
 	}
 });
+
+
+///////////// Destroy Snaps in Bulk /////////////////
+/////////////////////////////////////////////////////
+const bulkSnapDestroyMode = inject<Map<string, boolean>>('bulk-destroy-snaps')!;
+const selectedForDestroy = ref<string[]>([]);
+const showDestroyBulkSnapshotModal = ref(false);
+const confirmBulkDestroy = ref(false);
+const destroyBulkSnapshotComponent = ref();
+const loadDestroyBulkSnapshotsComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	destroyBulkSnapshotComponent.value = module.default;
+}
+
+async function destroySelectedSnapshots() {
+	operationRunning.value = false;
+	await loadDestroyBulkSnapshotsComponent();
+	showDestroyBulkSnapshotModal.value = true;
+	console.log('Selected snapshots to destroy:', selectedForDestroy.value);
+}
+
+const confirmThisBulkDestroy : ConfirmationCallback = () => {
+	confirmBulkDestroy.value = true;
+}
+
+const updateShowDestroyBulkSnapshot = (newVal) => {
+	showDestroyBulkSnapshotModal.value = newVal;
+}
+
+watch(confirmBulkDestroy, async (newVal, oldVal) => {
+	if (confirmBulkDestroy.value == true) {
+		operationRunning.value = true;
+		console.log('now destroying in bulk:', selectedForDestroy.value);
+
+		try {
+			selectedForDestroy.value.forEach(async snapshot => {
+				console.log('currently destroying:', snapshot);
+				const output = await destroySnapshot(snapshot, false, false);
+
+				if (output == null) {
+					operationRunning.value = false;
+					confirmBulkDestroy.value = false;
+					notifications.value.constructNotification('Destroy Snapshot Failed', snapshot + " was not destroyed. Check console output for details.", 'error');
+				} else {
+					notifications.value.constructNotification('Snapshot Destroyed', `${snapshot} destroyed.`, 'success');
+				}
+			});
+			await refreshSnaps();
+			confirmBulkDestroy.value = false;
+			operationRunning.value = false;
+			console.log('destroyed:', selectedForDestroy.value);
+			showDestroyBulkSnapshotModal.value = false;
+			exitBulkDestroyMode();
+		} catch (error) {
+			console.log(error);
+		}
+	}
+})
+
+function exitBulkDestroyMode() {
+	bulkSnapDestroyMode.set(props.filesystem!.name, false);
+}
+
 
 ////////////////// Clone Snapshot ///////////////////
 /////////////////////////////////////////////////////

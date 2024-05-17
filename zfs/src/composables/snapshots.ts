@@ -46,7 +46,7 @@ export async function createSnapshot(newSnap : NewSnapshot) {
     }
 }
 
-export async function destroySnapshot(snapshot, destroyChildrenSameName, destroyAllChildren) {
+export async function destroySnapshot(snapshotName, destroyChildrenSameName, destroyAllChildren) {
     try {
         let cmdString = ['zfs', 'destroy'];
 
@@ -58,7 +58,7 @@ export async function destroySnapshot(snapshot, destroyChildrenSameName, destroy
             cmdString.push('-R');
         }
 
-        cmdString.push(snapshot.name)
+        cmdString.push(snapshotName)
 
         console.log("****destroy cmdString: *****\n" , cmdString);
 			

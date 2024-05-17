@@ -84,7 +84,7 @@
 													<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 														<Menu as="div" class="relative inline-block text-right -mt-1">
 															<div>		
-																<MenuButton class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+																<MenuButton @click.stop class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 																	<span class="sr-only">Open options</span>
 																	<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 																</MenuButton>
@@ -122,18 +122,25 @@
 																		</MenuItem>					
 																		<MenuItem as="div" v-if="!findPoolDataset(allDatasets[datasetIdx])" v-slot="{ active }">
 																			<a href="#" @click="deleteFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
-																		</MenuItem>											
+																		</MenuItem>	
+
+																		<MenuItem as="div" v-slot="{ active }">
+																			<a href="#" @click="enterBulkSnapDestroyMode(allDatasets[datasetIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Multiple Snapshots</a>
+																		</MenuItem>		
+
 																	</div>
 																</MenuItems>
 															</transition>
 														</Menu>
 													</div>
 												</DisclosureButton>
+									
 												<DisclosurePanel>
 													<div>
-														<SnapshotsList :filesystem="allDatasets[datasetIdx]" :item="'filesystem'"/>
+														<SnapshotsList :filesystem="allDatasets[datasetIdx]" :item="'filesystem'" :bulkSnapDestroyMode="bulkSnapDestroyMode.get(allDatasets[datasetIdx].name)"/>
 													</div>
 												</DisclosurePanel>
+
 											</Disclosure>
 										</div>
 										<div v-if="dataset.type == 'SNAPSHOT'" class="border border-default">
@@ -241,7 +248,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, onMounted, computed } from "vue";
+import { ref, inject, Ref, provide, watch, onMounted, computed, reactive } from "vue";
 import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon, CheckIcon, } from '@heroicons/vue/24/outline';
 import { CameraIcon } from '@heroicons/vue/24/solid'
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
@@ -807,6 +814,16 @@ watch(confirmCloneSnap, async (newVal, oldVal) => {
 	}
 });
 
+///////////// Destroy Snaps in Bulk /////////////////
+/////////////////////////////////////////////////////
+const bulkSnapDestroyMode = reactive(new Map<string, boolean>());
+
+function enterBulkSnapDestroyMode(dataset) {
+  bulkSnapDestroyMode.set(dataset.name, true);
+  console.log('Bulk Snap Destroy Mode Enabled for:', dataset.name);
+}
+
+provide('bulk-destroy-snaps', bulkSnapDestroyMode);
 provide('confirm-clone-snap', confirmCloneSnap);
 provide('confirm-send-snap', confirmSendSnap);
 provide('all-datasets', allDatasets);
