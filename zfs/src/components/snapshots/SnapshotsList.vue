@@ -117,15 +117,20 @@
 						<td v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-1 px-3 text-sm text-default text-center col-span-1" :class="truncateText" :title="snapshot.properties.clones">
 							{{ snapshot.properties.clones.length > 0 ? snapshot.properties.clones : '-' }}
 						</td>
-						<td v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="text-sm text-default text-center col-span-1">
+						<!-- <td v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="text-sm text-default text-center col-span-1">
 							<button class="flex justify-center min-w-full w-full h-full border border-default rounded-lg p-2">
 								<label class="flex justify-center w-full text-sm h-full">
 									<input v-model="selectedForDestroy" type="checkbox" :value="snapshot.name"
 									class="w-4 h-4 text-success border-default rounded focus:ring-green-500 dark:focus:ring-green-600 focus:ring-2"/>	
 								</label>
 							</button>
+						</td> -->
+						<td v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="text-sm text-default text-center col-span-1 p-0" >
+							<label class="flex justify-center items-center w-full h-full py-2 rounded-lg border border-default bg-well" :class="checkboxSelectedClass(snapshot.name)">
+								<input v-model="selectedForDestroy" type="checkbox" :value="snapshot.name"
+								class="w-4 h-4 text-success border-default rounded focus:ring-green-500 dark:focus:ring-green-600 focus:ring-2"/>
+							</label>
 						</td>
-
 						<td class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end"> 
 							<Menu as="div" class="relative inline-block text-right">
 								<div>
@@ -354,28 +359,34 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 		console.log('now destroying in bulk:', selectedForDestroy.value);
 
 		try {
-			selectedForDestroy.value.forEach(async snapshot => {
-				console.log('currently destroying:', snapshot);
-				const output = await destroySnapshot(snapshot, false, false);
+			// selectedForDestroy.value.forEach(async snapshot => {
+			// 	console.log('currently destroying:', snapshot);
+			// 	const output = await destroySnapshot(snapshot, false, false);
 
-				if (output == null) {
-					operationRunning.value = false;
-					confirmBulkDestroy.value = false;
-					failedToDestroySnaps.push(snapshot);
-				} else {
-					destroyedSnaps.push(snapshot);
-				}
-			});
+			// 	if (output == null) {
+			// 		operationRunning.value = false;
+			// 		confirmBulkDestroy.value = false;
+			// 		failedToDestroySnaps.push(snapshot);
+			// 	} else {
+			// 		destroyedSnaps.push(snapshot);
+			// 	}
+			// });
+			for (const snapshot of selectedForDestroy.value) {
+                console.log('currently destroying:', snapshot);
+                const output = await destroySnapshot(snapshot, false, false);
 
-		} catch (error) {
-			console.log(error);
-		} finally {
+                if (output == null) {
+                    failedToDestroySnaps.push(snapshot);
+                } else {
+                    destroyedSnaps.push(snapshot);
+                }
+            }
+
+			console.log('destroyed:', selectedForDestroy.value);
 			await exitBulkDestroyMode();
 			await refreshSnaps();
 			confirmBulkDestroy.value = false;
 			operationRunning.value = false;
-			console.log('destroyed:', selectedForDestroy.value);
-			showDestroyBulkSnapshotModal.value = false;
 
 			if (failedToDestroySnaps.length !== 0) {
 				notifications.value.constructNotification('Destroy Snapshots Failed', `The folllowing snapshots were not destroyed: \n${failedToDestroySnaps.join(', ')} Check console output for details.`, 'error');
@@ -383,14 +394,24 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 			if (destroyedSnaps.length !== 0) {
 				notifications.value.constructNotification('Snapshot Destroyed', `The folllowing snapshots were destroyed: \n${destroyedSnaps.join(', ')}`, 'success');
 			}
+			showDestroyBulkSnapshotModal.value = false;
+
+		} catch (error) {
+			console.log(error);
+			operationRunning.value = false;
+            confirmBulkDestroy.value = false;
 		}
 	}
-})
+});
 
 async function exitBulkDestroyMode() {
 	bulkSnapDestroyMode.set(props.filesystem!.name, false);
 }
 
+const checkboxSelectedClass = (snapshotName) => {
+  const isSelected = selectedForDestroy.value.includes(snapshotName);
+  return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
+};
 
 ////////////////// Clone Snapshot ///////////////////
 /////////////////////////////////////////////////////
