@@ -124,8 +124,11 @@
 																			<a href="#" @click="deleteFileSystem(allDatasets[datasetIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy File System</a>
 																		</MenuItem>	
 
-																		<MenuItem as="div" v-slot="{ active }">
-																			<a href="#" @click="enterBulkSnapDestroyMode(allDatasets[datasetIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy Multiple Snapshots</a>
+																		<MenuItem as="div" v-if="!bulkSnapDestroyMode.get(dataset.name)" v-slot="{ active }">
+																			<a href="#" @click="enterBulkSnapDestroyMode(allDatasets[datasetIdx])" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Bulk Destroy Snapshot Mode</a>
+																		</MenuItem>
+																		<MenuItem as="div" v-if="bulkSnapDestroyMode.get(dataset.name)" v-slot="{ active }">
+																			<a href="#" @click="exitBulkSnapDestroyMode(allDatasets[datasetIdx])" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Leave Bulk Destroy Mode</a>
 																		</MenuItem>		
 
 																	</div>
@@ -822,6 +825,11 @@ function enterBulkSnapDestroyMode(dataset) {
   bulkSnapDestroyMode.set(dataset.name, true);
   console.log('Bulk Snap Destroy Mode Enabled for:', dataset.name);
 }
+
+function exitBulkSnapDestroyMode(dataset) {
+	bulkSnapDestroyMode.set(dataset.name, false);
+}
+
 
 provide('bulk-destroy-snaps', bulkSnapDestroyMode);
 provide('confirm-clone-snap', confirmCloneSnap);
