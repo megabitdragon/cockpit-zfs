@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Fri May 17 2024 Jordan Keough <jkeough@45drives.com> 1.0.1-2
+- Feature Addition: Bulk destroy snapshots
 * Wed May 15 2024 Jordan Keough <jkeough@45drives.com> 0.1.1-1
 - Updates to data display + loading spinners for snapshots
 * Fri May 10 2024 Jordan Keough <jkeough@45drives.com> 0.1.0-11

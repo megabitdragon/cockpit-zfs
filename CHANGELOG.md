@@ -1,3 +1,3 @@
-## cockpit zfs 0.1.1-1
+## cockpit zfs 1.0.1-2
 
-* Updates to data display + loading spinners for snapshots
+* Feature Addition: Bulk destroy snapshots
