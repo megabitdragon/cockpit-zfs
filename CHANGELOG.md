@@ -1,3 +1,3 @@
-## cockpit zfs 1.0.1-2
+## cockpit zfs 1.0.1-1-3
 
-* Feature Addition: Bulk destroy snapshots
+* Updated build package to newest version
