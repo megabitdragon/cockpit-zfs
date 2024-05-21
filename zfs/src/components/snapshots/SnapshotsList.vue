@@ -359,18 +359,6 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 		console.log('now destroying in bulk:', selectedForDestroy.value);
 
 		try {
-			// selectedForDestroy.value.forEach(async snapshot => {
-			// 	console.log('currently destroying:', snapshot);
-			// 	const output = await destroySnapshot(snapshot, false, false);
-
-			// 	if (output == null) {
-			// 		operationRunning.value = false;
-			// 		confirmBulkDestroy.value = false;
-			// 		failedToDestroySnaps.push(snapshot);
-			// 	} else {
-			// 		destroyedSnaps.push(snapshot);
-			// 	}
-			// });
 			for (const snapshot of selectedForDestroy.value) {
                 console.log('currently destroying:', snapshot);
                 const output = await destroySnapshot(snapshot, false, false);
@@ -384,7 +372,7 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 
 			console.log('destroyed:', selectedForDestroy.value);
 			await exitBulkDestroyMode();
-			await refreshSnaps();
+			
 			confirmBulkDestroy.value = false;
 			operationRunning.value = false;
 
@@ -395,7 +383,8 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 				notifications.value.constructNotification('Snapshot Destroyed', `The folllowing snapshots were destroyed: \n${destroyedSnaps.join(', ')}`, 'success');
 			}
 			showDestroyBulkSnapshotModal.value = false;
-
+			await refreshSnaps();
+			
 		} catch (error) {
 			console.log(error);
 			operationRunning.value = false;
