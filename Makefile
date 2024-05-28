@@ -17,11 +17,7 @@
 PLUGIN_SRCS=
 
 # For installing to a remote machine for testing with `make install-remote`
-# REMOTE_TEST_HOST=192.168.210.75
-# Service Testing Server ^
-
 REMOTE_TEST_HOST=192.168.13.40
-# Dev Server ^ 
 REMOTE_TEST_USER=root
 
 # Restarts cockpit after install

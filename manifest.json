@@ -1,10 +1,10 @@
 {
     "__version": "45D-R2",
     "name": "cockpit-zfs",
-    "title": "cockpit zfs",
+    "title": "zfs module",
     "prerelease": true,
-    "version": "1.0.1-1",
-    "buildVersion": "3",
+    "version": "1.0.2",
+    "buildVersion": "2",
     "author": "Jordan Keough <jkeough@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-zfs-45d",
     "category": "utils",
@@ -22,6 +22,13 @@
         "urgency": "medium"
     },
     "dependencies": {
+        "deb": {
+            "focal": [
+                "cockpit",
+                "python3",
+                "python3-libzfs"
+            ]
+        },
         "el": {
             "el8": [
                 "cockpit",
@@ -32,6 +39,11 @@
     },
     "releases": [
         {
+            "image": "node-ubuntu-focal-builder",
+            "codeName": "focal",
+            "type": "deb"
+        },
+        {
             "image": "node-rocky-el8-builder",
             "codeName": "el8",
             "type": "el"
@@ -39,8 +51,8 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "1.0.1-1",
-        "buildVersion": "3",
+        "version": "1.0.2",
+        "buildVersion": "2",
         "ignore": [],
         "date": null,
         "packager": "Jordan Keough <jkeough@45drives.com>",

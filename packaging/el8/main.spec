@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Tue May 28 2024 Jordan Keough <jkeough@45drives.com> 1.0.2-2
+- Building for focal
 * Fri May 17 2024 Jordan Keough <jkeough@45drives.com> 1.0.1-1-3
 - Updated build package to newest version
 * Fri May 17 2024 Jordan Keough <jkeough@45drives.com> 1.0.1-2

@@ -1,7 +1,7 @@
 {
   "name": "cockpit-zfs",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Redesigned ZFS Manager for Cockpit",
   "types": "./src/index.d.ts",
   "repository": {

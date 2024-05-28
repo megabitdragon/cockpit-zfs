@@ -1,3 +1,3 @@
-## cockpit zfs 1.0.1-1-3
+## zfs module 1.0.2-2
 
-* Updated build package to newest version
+* Building for focal
