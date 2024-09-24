@@ -104,7 +104,7 @@
                             {{ miniStateMsg }}
                         </span>
                         <div class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
-                            <div :class="progressBarClass()" class="h-3 min-h-min max-h-max" :style="{ width: `${ parseFloat(scanPercentage.toFixed(2)) }%` }">
+                            <div :class="progressBarClass()" class="h-3" :style="{ width: `${ parseFloat(scanPercentage.toFixed(2)) }%` }">
                                 <!-- <div :class="progressBarClass()" class="h-3 min-h-min max-h-max" :style="{ width: `${scanObjectGroup[props.pool.name].state === 'FINISHED' &&  parseFloat(scanPercentage.toFixed(2)) < 1 ? 100 : parseFloat(scanPercentage.toFixed(2))} %` }"> -->
                                 <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                     {{ amountProcessed }}/{{ amountTotal }} 
@@ -132,7 +132,7 @@
                         No Trim Activity
                     </span>
                     <div v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
-                        <div :class="trimProgressBarClass(selectedDisk!)" class="h-3 min-h-min max-h-max" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
+                        <div :class="trimProgressBarClass(selectedDisk!)" class="h-3" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
                             <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                 {{ getTrimmedAmount(selectedDisk!) }}/{{ getTrimmedTotal(selectedDisk!) }}
                             </div>
@@ -194,6 +194,7 @@ function getIsTrimmable(disk) {
         return false;
    }
 }
+
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
@@ -207,6 +208,7 @@ function getScanStateBool(state) : ComputedRef<boolean> {
     return computed(() => {
         // return scanObjectGroup.value[props.pool.name].state === state;
         const poolState = scanObjectGroup.value[props.pool.name].state;
+        // console.log('poolState:', poolState);
         return poolState !== 'null' && poolState === state;
     });
 }
@@ -327,7 +329,7 @@ const scanFunction = computed(() => {
 
 const stateMessage = computed(() => {
     if (scanObjectGroup.value[props.pool.name].state === null) {
-        return `No scan data found.`;
+        return `No scrub/resilver data found.`;
     } else {
         if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause !== 'None') {
            return `${scanFunction.value} paused at  ${scanObjectGroup.value[props.pool.name].pause}`;
@@ -354,7 +356,7 @@ const stateMessage = computed(() => {
 
 const miniStateMsg = computed(() => {
     if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].state === null) {
-        return `No scan data found.`;
+        return `No scrub/resilver data found.`;
     } else {
         if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause !== 'None') {
             return `${scanFunction.value} Paused (${ parseFloat(scanPercentage.value.toFixed(1)) }%)`;
