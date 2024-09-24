@@ -1,3 +1,9 @@
+cockpit-zfs (1.0.2-3focal) focal; urgency=medium
+
+  * Fixes rendering issue with status bar in Pools list
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 24 Sep 2024 06:03:50 -0300
+
 cockpit-zfs (1.0.2-2focal) focal; urgency=medium
 
   * Building for focal

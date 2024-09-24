@@ -1,3 +1,3 @@
-## zfs module 1.0.2-2
+## zfs module 1.0.2-3
 
-* Building for focal
+* Fixes rendering issue with status bar in Pools list
