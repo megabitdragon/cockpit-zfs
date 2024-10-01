@@ -4,6 +4,7 @@ import { loadDisksExtraData } from './loadData';
 
 // const vDevs = ref<ImportablePoolvDevData[]>([]);
 const vDevs = ref<vDevData[]>([]);
+const errors: string[] = [];
 
 export function parseImportVDevData(vDev, poolName, vDevType) {
     try {
@@ -53,6 +54,7 @@ export async function loadImportablePools(importablePools, allDisks, existingPoo
                 scan: parsedJSON[i].scan,
                 vdevs: vDevs.value,
                 isDestroyed: false,
+				errors: errors,
             }
            // console.log("ImportablePoolData", i , ": ", poolData);
             importablePools.push(poolData);
@@ -94,6 +96,7 @@ export async function loadImportableDestroyedPools(importablePools, allDisks, ex
                 scan: parsedJSON[i].scan,
                 vdevs: vDevs.value,
                 isDestroyed: true,
+				errors: errors,
             }
            // console.log("DestroyedImportablePoolData", i , ": ", poolData);
             importablePools.push(poolData);
@@ -115,9 +118,7 @@ export async function loadImportableDestroyedPools(importablePools, allDisks, ex
 
 //method for parsing through VDevs to add to array (VDev array is added to Pool)
 export function parseVDevData(vDev, poolName, disks, vDevType) {
-	// vDevs.value = [];
-	
-	const vDevData : vDevData = {
+	const vDevData: vDevData = {
 		name: vDev.name,
 		type: vDevType,
 		status: vDev.status,
@@ -129,47 +130,86 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		path: vDev.path,
 		diskType: determineDiskType(vDev, disks),
 	};
-	
+
+	// Regex for various disk path types
 	const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
-	const sdPathRegex = `\/dev\/sd[a-z][0-9]+$`;
-	const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9\-]+(?:-part[0-9]+)?$`;
+	const sdPathRegex = `\/dev\/sd[a-z0-9]+[0-9]*$`;
+	const vDevPathRegex = `\/dev\/disk\/by-vdev\/[0-9a-zA-Z\-]+(?:-part[0-9]+)?$`;
+	const idPathRegex = `\/dev\/disk\/by-id\/[0-9a-zA-Z:\-]+(?:-part[0-9]+)?$`;
+	const labelPathRegex = `\/dev\/disk\/by-label\/[0-9a-zA-Z\-]+(?:-part[0-9]+)?$`;
+	const partLabelPathRegex = `\/dev\/disk\/by-partlabel\/[0-9a-zA-Z\-]+(?:-part[0-9]+)?$`;
+	const partUUIDRegex = `\/dev\/disk\/by-partuuid\/[0-9a-zA-Z\-]+$`;
+	const uuidRegex = `\/dev\/disk\/by-uuid\/[0-9a-zA-Z\-]+$`;
+
+	// Prefixes for constructing paths
 	const phyPathPrefix = '/dev/disk/by-path/';
 	const sdPathPrefix = '/dev/';
+	const idPathPrefix = '/dev/disk/by-id/';
+	const labelPathPrefix = '/dev/disk/by-label/';
+	const partLabelPathPrefix = '/dev/disk/by-partlabel/';
+	const partUUIDPrefix = '/dev/disk/by-partuuid/';
+	const uuidPrefix = '/dev/disk/by-uuid/';
 
-	//checks if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
+	// Function to find the correct disk based on the matching path
+	function findDiskByPath(vDevData, disks) {
+		return disks.value.find(disk => {
+			const partitionSuffix = vDevData.path.includes('-part') ? '' : '-part1'; // Check if path has partition already
+			return (
+				disk.phy_path + partitionSuffix === vDevData.path ||
+				disk.sd_path + (partitionSuffix ? '1' : '') === vDevData.path || // Handle sd_path with or without partitions
+				disk.vdev_path + partitionSuffix === vDevData.path ||
+				disk.id_path + partitionSuffix === vDevData.path ||
+				disk.label_path + partitionSuffix === vDevData.path ||
+				disk.part_label_path + partitionSuffix === vDevData.path ||
+				disk.part_uuid === vDevData.path || // Part UUID paths don't need to append partition
+				disk.uuid === vDevData.path // UUID paths also don't need partition
+			);
+		});
+	}
+
 	if (vDev.children.length < 1) {
-
 		const diskVDev = ref();
 		const diskName = ref('');
 		const diskPath = ref('');
 
-		if (vDevData.path!.match(phyPathRegex)) {
-			diskVDev.value = disks.value.find(disk => disk.phy_path + '-part1' === vDevData.path)!;
-			//console.log('phyPath match');
-			diskPath.value = diskVDev.value.phy_path;
-			diskName.value = diskVDev.value.phy_path.replace(phyPathPrefix, '');
-			// console.log('disk:', diskName.value);
-		} else if (vDevData.path!.match(sdPathRegex)) {
-			diskVDev.value = disks.value.find(disk => disk.sd_path + '1' === vDevData.path)!;
-			//console.log('sdPath match');
-			diskPath.value = diskVDev.value.sd_path;
-			diskName.value = diskVDev.value.sd_path.replace(sdPathPrefix, '');
-			// console.log('disk:', diskName.value);
-		} else if (vDevData.path!.match(vDevPathRegex)) {
-			diskVDev.value = disks.value.find(disk => disk.vdev_path  + '-part1' === vDevData.path)!;
-			//console.log('vDevPath match');
-			diskPath.value = diskVDev.value.vdev_path;
-			diskName.value = diskVDev.value!.name;
+		diskVDev.value = findDiskByPath(vDevData, disks,);
+
+		if (!diskVDev.value) {
+			console.error(`Disk not found for path: ${vDevData.path}.`);
+			diskVDev.value = createMissingDisk(vDev.path, vDev.name, vDevType, poolName);
 		}
 
-		// console.log('vDev', vDev);
-		console.log('diskVDev:', diskVDev);
+		if (vDevData.path!.match(phyPathRegex)) {
+			diskPath.value = diskVDev.value.phy_path;
+			diskName.value = diskVDev.value.phy_path.replace(phyPathPrefix, '');
+		} else if (vDevData.path!.match(sdPathRegex)) {
+			diskPath.value = diskVDev.value.sd_path;
+			diskName.value = diskVDev.value.sd_path.replace(sdPathPrefix, '');
+		} else if (vDevData.path!.match(vDevPathRegex)) {
+			diskPath.value = diskVDev.value.vdev_path;
+			diskName.value = diskVDev.value.name;
+		} else if (vDevData.path!.match(idPathRegex)) {
+			diskPath.value = diskVDev.value.id_path;
+			diskName.value = diskVDev.value.id_path.replace(idPathPrefix, '');
+		} else if (vDevData.path!.match(labelPathRegex)) {
+			diskPath.value = diskVDev.value.label_path;
+			diskName.value = diskVDev.value.label_path.replace(labelPathPrefix, '');
+		} else if (vDevData.path!.match(partLabelPathRegex)) {
+			diskPath.value = diskVDev.value.part_label_path;
+			diskName.value = diskVDev.value.part_label_path.replace(partLabelPathPrefix, '');
+		} else if (vDevData.path!.match(partUUIDRegex)) {
+			diskPath.value = diskVDev.value.part_uuid;
+			diskName.value = diskVDev.value.name;
+		} else if (vDevData.path!.match(uuidRegex)) {
+			diskPath.value = diskVDev.value.uuid;
+			diskName.value = diskVDev.value.name;
+		}
 
-		const notAChildDisk : DiskData = {
+		const notAChildDisk: DiskData = {
 			name: diskName!.value,
 			path: diskPath.value,
 			guid: vDev.guid,
-			type: diskVDev.value!.type,
+			type: diskVDev.value!.type ,
 			health: diskVDev.value!.status,
 			stats: diskVDev.value!.stats,
 			capacity: diskVDev.value!.capacity,
@@ -178,136 +218,99 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			sd_path: diskVDev.value!.sd_path,
 			vdev_path: diskVDev.value!.vdev_path,
 			serial: diskVDev.value!.serial,
-			// usable: false,
 			powerOnHours: diskVDev.value!.powerOnHours,
 			powerOnCount: diskVDev.value!.powerOnCount,
 			temp: diskVDev.value!.temp,
 			rotationRate: diskVDev.value!.rotationRate,
 			vDevName: vDev.name,
 			poolName: poolName,
+			errors: errors
+		};
+
+		if (!vDevData.disks.some(disk => disk.guid === notAChildDisk.guid)) {
+			vDevData.disks.push(notAChildDisk);
 		}
-		vDevData.type = vDevType;
-		vDevData.disks.push(notAChildDisk);
-		console.log("Not A ChildDisk:", notAChildDisk);
-		console.log("vDevData (disk device):", vDevData);
-		
+
 		vDevs.value.push(vDevData);
 	} else {
-		//if VDev does have child disks, add those disks to the VDev data object + array
 		vDev.children.forEach(child => {
-			const fullDiskData = ref();
-			const diskName = ref('');
-			const diskPath = ref('');
-			const newChildren = ref<ChildDiskData[]>([]);
-
-			if (child.type === 'disk') {
-			/* 	if (child.path!.match(phyPathRegex)) {
-					fullDiskData.value = disks.value.find(disk => disk.phy_path + '-part1' === child.path || disk.phy_path === child.path)!;
-					//console.log('phyPath match');
-					diskPath.value = fullDiskData.value.phy_path;
-					diskName.value = fullDiskData.value.phy_path.replace(phyPathPrefix, '');
-					// console.log('disk:', diskName.value);
-				} else if (child.path!.match(sdPathRegex)) {
-					fullDiskData.value = disks.value.find(disk => disk.sd_path + '1' === child.path || disk.sd_path === child.path)!;
-					//console.log('sdPath match');
-					diskPath.value = fullDiskData.value.sd_path;
-					diskName.value = fullDiskData.value.sd_path.replace(sdPathPrefix, '');
-					// console.log('disk:', diskName.value);
-				} else if (child.path!.match(vDevPathRegex)) {
-					fullDiskData.value = disks.value.find(disk => disk.vdev_path + '-part1' === child.path || disk.vdev_path === child.path)!;
-					//console.log('vDevPath match');
-					diskPath.value = fullDiskData.value.vdev_path;
-					diskName.value = fullDiskData.value!.name;
-					// console.log('disk:', diskName.value);
-				} */
-				let normalizedPath = child.path.replace('-part1', ''); // Normalize the path by removing '-part1'
-				fullDiskData.value = disks.value.find(disk =>
-					disk.vdev_path === normalizedPath ||
-					disk.phy_path === normalizedPath ||
-					disk.sd_path + '1' === child.path // Adding '1' to match `/dev/sdx1` style paths
-				);
-
-				if (!fullDiskData.value) {
-					console.error('No matching disk found for path:', child.path);
-					return; // Optionally return or handle the error
-				}
-								
-				const childDisk : DiskData = {
-					name: diskName.value,
-					path: diskPath.value,
-					guid: child.guid,
-					type: fullDiskData.value.type,
-					health: fullDiskData.value.status,
-					stats: child.stats,
-					capacity: fullDiskData.value.capacity,
-					model: fullDiskData.value.model,
-					phy_path: fullDiskData.value.phy_path,
-					sd_path: fullDiskData.value.sd_path,
-					vdev_path: fullDiskData.value.vdev_path,
-					serial: fullDiskData.value.serial,
-					// usable: false,
-					powerOnHours: fullDiskData.value.powerOnHours,
-					powerOnCount: fullDiskData.value.powerOnCount,
-					temp: fullDiskData.value.temp,
-					rotationRate: fullDiskData.value.rotationRate,
-					vDevName: vDev.name,
-					poolName: poolName,
-					// children: newChildren.value,
-				}; 
-
-				console.log("ChildDisk:", childDisk);
-				vDevData.disks.push(childDisk);
-		
-			} else if (child.type === 'replacing') {			
-					child.children.forEach(childchild => {
-						const newChild : ChildDiskData = {
-							name: childchild.name,
-							guid: childchild.guid,
-							path: childchild.path,
-							stats: childchild.stats,
-							status: childchild.status,
-							type: childchild.type,
-							children: childchild.children,
-						}
-						newChildren.value.push(newChild);
-					});
-
-					const childDisk : DiskData = {
-						name: child.name,
-						path: child.path,
-						guid: child.guid,
-						type: child.type,
-						health: child.status,
-						stats: child.stats,
-						capacity: '',
-						model: '',
-						phy_path: '',
-						sd_path: '',
-						vdev_path: '',
-						serial: '',
-						// usable: false,
-						powerOnHours: 0,
-						powerOnCount: '',
-						temp: '',
-						rotationRate: 0,
-						vDevName: vDev.name,
-						poolName: poolName,
-						children: newChildren.value,
-					}
-
-					console.log("ChildDisk:", childDisk);
-					vDevData.disks.push(childDisk);
-
-			} else {
-				console.error('error getting disk information');
-			}
-	
+			handleDiskChild(child, vDevData, disks, vDev.name, poolName, vDevType);
 		});
-	
-		console.log("loaded vDevData:", vDevData);
+
 		vDevs.value.push(vDevData);
 	}
+}
 
+
+function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
+	let fullDiskData = disks.value.find(disk => {
+		return disk.phy_path + '-part1' === child.path ||
+			disk.sd_path + '1' === child.path ||
+			disk.vdev_path + '-part1' === child.path;
+	});
+
+	if (!fullDiskData) {
+		const errorMessage = `Disk not found for path: ${child.path}. Pool might be degraded.`;
+		console.error(errorMessage);
+
+		// Create missing disk and add error
+		fullDiskData = createMissingDisk(child.path, child.name, vDevType, poolName);
+		fullDiskData.errors!.push(errorMessage); // Add the error to disk object
+	}
+
+	const childDisk = {
+		name: child.name || 'Unknown',
+		path: child.path,
+		guid: child.guid,
+		type: fullDiskData.type,
+		health: fullDiskData.status,
+		stats: child.stats || {},
+		capacity: fullDiskData.capacity || 'Unknown',
+		model: fullDiskData.model || 'Unknown',
+		phy_path: fullDiskData.phy_path,
+		sd_path: fullDiskData.sd_path,
+		vdev_path: fullDiskData.vdev_path,
+		serial: fullDiskData.serial || 'Unknown',
+		powerOnHours: fullDiskData.powerOnHours || 0,
+		powerOnCount: fullDiskData.powerOnCount || 0,
+		temp: fullDiskData.temp || 0,
+		rotationRate: fullDiskData.rotationRate || 0,
+		vDevName: vDevName,
+		poolName: poolName,
+		vDevType: vDevType,
+		errors: errors // Propagate errors
+	};
+
+	// Add the disk only if it's not already in the vDevData.disks array
+	if (!vDevData.disks.some(disk => disk.guid === childDisk.guid)) {
+		vDevData.disks.push(childDisk);
+	}
+}
+
+function createMissingDisk(path, vDevName, vDevType, poolName) {
+	console.log(`Creating placeholder for missing disk at path: ${path}`);
+	return {
+		name: 'Missing Disk',
+		path: path,
+		guid: 'N/A',
+		type: vDevType,
+		health: 'MISSING',
+		stats: {},
+		capacity: 'N/A',
+		model: 'N/A',
+		phy_path: path,
+		sd_path: '',
+		vdev_path: '',
+		serial: 'N/A',
+		powerOnHours: 0,
+		powerOnCount: 0,
+		temp: 0,
+		rotationRate: 0,
+		vDevName: vDevName,
+		poolName: poolName,
+		vDevType: vDevType,
+		errors: errors
+	};
 }
 
 function determineDiskType(vDev, disks) {

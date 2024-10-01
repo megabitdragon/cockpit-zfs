@@ -1,6 +1,5 @@
 <template>
     <Modal @close="showAddVDevModal = false" :isOpen="showAddVDevModal" :marginTop="props.marginTop" :width="'w-3/5'" :minWidth="'min-w-3/5'">
-        
         <template v-slot:title>
             Add Virtual Device
         </template>

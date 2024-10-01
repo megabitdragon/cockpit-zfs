@@ -83,6 +83,8 @@ interface DiskData {
 	identifier?: DiskIdentifier;
 	children?: ChildDiskData[];
 	vDevType?: 'data' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
+	errors?: string[];
+	hasPartitions?: boolean;
 }
 
 interface ChildDiskData {
@@ -98,6 +100,7 @@ interface ChildDiskData {
 
 //object for importing pools
 interface ImportedPool {
+	name: string;
 	poolGUID: string;
 	altRoot: string;
 	renamePool: boolean;
@@ -109,6 +112,7 @@ interface ImportedPool {
 	mountFileSystems: boolean;
 	readOnly: boolean;
 	isDestroyed: boolean;
+	errors?: string[];
 }
 
 //object for importablePoolsData
@@ -121,6 +125,7 @@ interface ImportablePoolData {
 	vdevs: vDevData[];
 	scan: {}
 	isDestroyed?: boolean;
+	errors?: string[];
 }
 
 //object for vdev

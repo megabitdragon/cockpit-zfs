@@ -14,6 +14,8 @@ def main():
                 continue
 
             device_path = disk['dev']
+            
+            partitions = int(disk['partitions'])
 
             disks.append({
                 'vdev_path': f'/dev/disk/by-vdev/{disk["bay-id"]}',
@@ -30,6 +32,7 @@ def main():
                 'rotation_rate': disk['rotation-rate'],
                 'power_on_count': disk['power-cycle-count'],
                 'power_on_time': disk['power-on-time'],
+                'has_partitions': False if partitions == 0 else True
             })
 
     print(json.dumps(disks, indent=4))
