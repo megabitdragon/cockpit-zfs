@@ -151,7 +151,7 @@ export async function loadDisksThenPools(disks, pools) {
 							rawsize: parsedJSON[i].properties.size.parsed,
 							size: convertBytesToSize(parsedJSON[i].properties.size.parsed),
 							allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
-							capacity: parsedJSON[i].properties.capacity.rawvalue,
+							capacity: Number(parsedJSON[i].properties.capacity.rawvalue),
 							free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
 							readOnly: parsedJSON[i].properties.readonly.parsed,
 							sector: parsedJSON[i].properties.ashift.rawvalue,
@@ -352,18 +352,19 @@ export async function loadDisksExtraData(disks, pools) {
         pools.forEach((pool) => {
             pool.vdevs.forEach((vDev) => {
                 vDev.disks.forEach((usedDisk) => {
+					// console.log('usedDisk:', usedDisk)
                     const selectedDisk = findDiskByPath(disks, usedDisk.path);
-
+					// console.log('selectedDisk:', selectedDisk)
 					 // Check if the selectedDisk is found
 					if (selectedDisk) {
 						
 						selectedDisk!.guid = usedDisk.guid;
 						selectedDisk!.path = usedDisk.path;
 						selectedDisk!.stats = usedDisk.stats;
-						console.log('selectedDisk loading data', selectedDisk);
+						// console.log('selectedDisk loading data', selectedDisk);
 
 						// Find the index of the original disk in the disks array
-						const index = disks.findIndex(disk => [disk.sd_path, disk.phy_path, disk.vdev_path].includes(usedDisk.path));
+						const index = disks.findIndex(disk => [disk.sd_path, disk.phy_path, disk.vdev_path].includes(usedDisk.path.replace(/(-part[0-9]+|[0-9]+$)/, '')));
 
 						// Check if the original disk is found in the disks array
 						if (index !== -1) {
@@ -385,6 +386,8 @@ export async function loadDisksExtraData(disks, pools) {
         console.error("An error occurred getting extra disk data:", error);
     }
 }
+
+
 
 
 //method for parsing through VDevs to add to array (VDev array is added to Pool)

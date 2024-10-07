@@ -78,9 +78,9 @@
 										<ExclamationTriangleIcon class="h-6 text-danger" />
 									</div>
 								</span>
-								<p class="truncate text-sm font-medium text-default"
+								<h3 class="truncate text-sm font-medium text-default"
 									:title="getDiskIDName(disks, vDev.diskIdentifier!, disk.name)">{{
-									truncateName(getDiskIDName(disks, vDev.diskIdentifier!, disk.name), 8) }}</p>
+									truncateName(getDiskIDName(disks, vDev.diskIdentifier!, disk.name), 8) }}</h3>
 								<p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
 								<p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
 							</label>

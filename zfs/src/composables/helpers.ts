@@ -513,15 +513,22 @@ export function formatStatus(status) {
 	}
 }
 
-export function getDiskIDName(disks : DiskData[], diskIdentifier : string, selectedDiskName : string) {
-	// console.log('disks:', disks, 'diskID:', diskIdentifier, 'selectedDiskName:', selectedDiskName);
+export function getDiskIDName(disks: DiskData[], diskIdentifier: string, selectedDiskName: string) {
 	const phyPathPrefix = '/dev/disk/by-path/';
 	const sdPathPrefix = '/dev/';
+	const idPathPrefix = '/dev/disk/by-id/';
+	const labelPathPrefix = '/dev/disk/by-label/';
+	const partLabelPathPrefix = '/dev/disk/by-partlabel/';
+	const partUUIDPrefix = '/dev/disk/by-partuuid/';
+	const uuidPrefix = '/dev/disk/by-uuid/';
+
 	const newDisk = ref();
 	const diskName = ref('');
 	const diskPath = ref('');
 
+	// Find the selected disk
 	newDisk.value = disks.find(disk => disk.name === selectedDiskName);
+
 	switch (diskIdentifier) {
 		case 'vdev_path':
 			diskPath.value = newDisk.value!.vdev_path;
@@ -534,18 +541,55 @@ export function getDiskIDName(disks : DiskData[], diskIdentifier : string, selec
 		case 'sd_path':
 			diskPath.value = newDisk.value!.sd_path;
 			diskName.value = diskPath.value.replace(sdPathPrefix, '');
-			break;	
+			break;
+		case 'id_path':
+			diskPath.value = newDisk.value!.id_path;
+			diskName.value = diskPath.value.replace(idPathPrefix, '');
+			break;
+		case 'label_path':
+			diskPath.value = newDisk.value!.label_path;
+			diskName.value = diskPath.value.replace(labelPathPrefix, '');
+			break;
+		case 'part_label_path':
+			diskPath.value = newDisk.value!.part_label_path;
+			diskName.value = diskPath.value.replace(partLabelPathPrefix, '');
+			break;
+		case 'part_uuid':
+			diskPath.value = newDisk.value!.part_uuid;
+			diskName.value = diskPath.value.replace(partUUIDPrefix, '');
+			break;
+		case 'uuid':
+			diskPath.value = newDisk.value!.uuid;
+			diskName.value = diskPath.value.replace(uuidPrefix, '');
+			break;
 		default:
-			console.log('error with selectedDiskNames/diskIdentifier'); 
+			console.log('Error with selectedDiskNames/diskIdentifier');
 			break;
 	}
 
 	return diskName.value;
 }
 
+/* 
 export function findDiskByPath(disks : DiskData[], path : string) {
 	return disks.find((disk) => [disk.sd_path, disk.phy_path, disk.vdev_path].includes(path));
+} */
+export function findDiskByPath(disks: DiskData[], path: string) {
+	// Regex to check if the path ends with a partition (e.g., -partX or single digit suffixes like sda1)
+	const partitionSuffixRegex = /(-part[0-9]+|[0-9]+$)/;
+
+	// Only strip the partition if it's a proper partition (and not part of something like `1-17`)
+	const basePath = path.match(partitionSuffixRegex) ? path.replace(partitionSuffixRegex, '') : path;
+
+	// console.log('Checking path:', path, 'Base path:', basePath);
+
+	return disks.find((disk) => {
+		// console.log('Comparing with disk:', disk);
+		return [disk.sd_path, disk.phy_path, disk.vdev_path]
+			.some((diskPath) => diskPath === path || diskPath === basePath);
+	});
 }
+
 
 export function truncateName(name : string, threshold : number) {
     return (name.length > threshold ? name.slice(0, threshold) + '...' : name)

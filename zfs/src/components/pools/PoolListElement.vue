@@ -17,8 +17,22 @@
 									{{ poolData[props.poolIdx].properties.capacity }}%
 								</div>
 							</div>
-							<div v-if="poolData[props.poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-4 mt-1 min-h-min max-h-max overflow-hidden">
-								<div class="bg-green-600 h-4 min-h-min max-h-max" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
+							<div v-if="poolData[props.poolIdx].properties.capacity >= 1" class="w-full bg-well rounded-full relative flex h-4 mt-1 overflow-hidden">
+								<div class="bg-green-600 h-4" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
+									<div class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default text-center p-0.5 leading-none">
+										{{ poolData[props.poolIdx].properties.capacity }}%
+									</div>
+								</div>
+							</div>
+							<div v-if="poolData[props.poolIdx].properties.capacity! >= 80 && poolData[props.poolIdx].properties.capacity! <= 95" class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex">
+								<div class="bg-orange-600 h-4" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
+									<div class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default text-center p-0.5 leading-none">
+										{{ poolData[props.poolIdx].properties.capacity }}%
+									</div>
+								</div>
+							</div>
+							<div v-if="poolData[props.poolIdx].properties.capacity >= 96" class="w-full bg-well rounded-full relative flex h-4 mt-1 overflow-hidden">
+								<div class="bg-red-600 h-4" :style="{ width: `${poolData[props.poolIdx].properties.capacity}%` }">
 									<div class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default text-center p-0.5 leading-none">
 										{{ poolData[props.poolIdx].properties.capacity }}%
 									</div>
@@ -29,7 +43,7 @@
 					<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="poolData[props.poolIdx].properties.allocated">{{ poolData[props.poolIdx].properties.allocated }}</div>
 					<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="poolData[props.poolIdx].properties.free">{{ poolData[props.poolIdx].properties.free }}</div>
 					<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="poolData[props.poolIdx].properties.size">{{ poolData[props.poolIdx].properties.size }}</div>
-					<div class="py-1 -mt-1 col-span-2">
+					<div class="py-1 -mt-1.5 col-span-2">
 						<Status :pool="poolData[props.poolIdx]" :isDisk="false" :isTrim="false" :isPoolList="true" :isPoolDetail="false" :idKey="'scan-status-box'" ref="scanStatusBox"/>
 					</div>
 					<div class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
