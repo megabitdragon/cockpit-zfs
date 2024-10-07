@@ -163,14 +163,6 @@
 							:title="snapshot.properties.clones">
 							{{ snapshot.properties.clones.length > 0 ? snapshot.properties.clones : '-' }}
 						</td>
-						<!-- <td v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="text-sm text-default text-center col-span-1">
-							<button class="flex justify-center min-w-full w-full h-full border border-default rounded-lg p-2">
-								<label class="flex justify-center w-full text-sm h-full">
-									<input v-model="selectedForDestroy" type="checkbox" :value="snapshot.name"
-									class="w-4 h-4 text-success border-default rounded focus:ring-green-500 dark:focus:ring-green-600 focus:ring-2"/>	
-								</label>
-							</button>
-						</td> -->
 						<td v-if="bulkSnapDestroyMode.get(props.filesystem!.name)"
 							class="text-sm text-default text-center col-span-1 p-0">
 							<label
