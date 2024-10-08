@@ -179,10 +179,10 @@
 						</tbody>
 					</table>
 
-					<div v-if="fileSystemsLoaded == false" class="p-2 flex justify-center bg-default">
+					<div v-if="allDatasetsLoaded == false" class="p-2 flex justify-center bg-default">
 						<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'" :fillColor="'fill-slate-500'" class="font-semibold text-lg my-0.5"/>
 					</div>
-					<div v-if="fileSystems.length < 1 && fileSystemsLoaded == true" class="p-2 flex bg-default justify-center">
+					<div v-if="fileSystems.length < 1 && allDatasetsLoaded == true" class="p-2 flex bg-default justify-center">
 						<span class="font-semibold text-lg my-2">No File Systems Found</span>
 					</div>
 					
@@ -274,7 +274,7 @@ const fourthOptionToggle = ref(false);
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
-const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
+// const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const fileSystemConfiguration = ref();
 const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
@@ -287,7 +287,7 @@ const allDatasets = ref<any>([]);
 const allDatasetsLoaded = ref(false);
 
 async function refreshData() {
-	fileSystemsLoaded.value = false;
+	// fileSystemsLoaded.value = false;
 	allDatasetsLoaded.value = false;
 
 	fileSystems.value = [];
@@ -296,11 +296,18 @@ async function refreshData() {
 
 	await loadDatasets(fileSystems);
 	await loadSnapshots(snapshots);
+
 	await populateDatasetList();
 
-	fileSystemsLoaded.value = true;
+	// fileSystemsLoaded.value = true;
 	allDatasetsLoaded.value = true;
 }
+
+watch(showFSConfig, async (newVal, oldVal) => {
+	if (showFSConfig.value == false) {
+		await refreshData();
+	}
+});
 
 ///////////////////////////////////////////////////////////
 async function populateDatasetList() {
@@ -835,7 +842,7 @@ provide('bulk-destroy-snaps', bulkSnapDestroyMode);
 provide('confirm-clone-snap', confirmCloneSnap);
 provide('confirm-send-snap', confirmSendSnap);
 provide('all-datasets', allDatasets);
-provide('all-datasets-loaded', allDatasetsLoaded);
+provide('datasets-loaded', allDatasetsLoaded);
 provide('show-fs-wizard', showNewFSWizard);
 provide('show-fs-config', showFSConfig);
 provide('confirm-create-filesystem', confirmCreateFS);
