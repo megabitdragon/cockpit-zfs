@@ -41,8 +41,9 @@ export async function createSnapshot(newSnap : NewSnapshot) {
         console.log(output)
         return output.stdout;
     } catch (state) {
-        console.error(errorString(state));
-        return null;
+        const errorMessage = errorString(state);
+        console.error(errorMessage);
+        return { error: errorMessage };
     }
 }
 
@@ -67,8 +68,9 @@ export async function destroySnapshot(snapshotName, destroyChildrenSameName, des
         console.log(output)
         return output.stdout;
     } catch (state) {
-        console.error(errorString(state));
-        return null;
+        const errorMessage = errorString(state);
+        console.error(errorMessage);
+        return { error: errorMessage };
     }
 }
 
@@ -93,8 +95,9 @@ export async function rollbackSnapshot(snapshot, destroyNewerSnaps, destroyAllNe
         console.log(output)
         return output.stdout;
     } catch (state) {
-        console.error(errorString(state));
-        return null;
+        const errorMessage = errorString(state);
+        console.error(errorMessage);
+        return { error: errorMessage };
     }
 }
 
@@ -116,8 +119,9 @@ export async function renameSnapshot(snapshotName, newName, renameChildren?) {
         console.log(output)
         return output.stdout;
     } catch (state) {
-        console.error(errorString(state));
-        return null;
+        const errorMessage = errorString(state);
+        console.error(errorMessage);
+        return { error: errorMessage };
     }
 }
 
@@ -139,8 +143,9 @@ export async function cloneSnapshot(snapName, newParentFS, cloneName, createPare
         console.log(output)
         return output.stdout;
     } catch (state) {
-        console.error(errorString(state));
-        return null;
+        const errorMessage = errorString(state);
+        console.error(errorMessage);
+        return { error: errorMessage };
     }
 }
 
@@ -154,8 +159,9 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 		console.log('sendSnapshot completed');
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
         // throw new Error('Snapshot send failed'); // Throw an error if the operation fails
 	}
 }
@@ -175,8 +181,9 @@ export async function doesDatasetExist(sendingData : SendingDataset) {
 			return false;
 		}
     } catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -195,8 +202,9 @@ export async function doesDatasetHaveSnaps(sendingData : SendingDataset) {
 			return false;
 		}
     } catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -211,8 +219,9 @@ export async function getRecentSnaps(sendingData : SendingDataset) {
 		return output.stdout;
 
     } catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -243,5 +252,8 @@ export async function formatRecentSnaps(sendingData : SendingDataset, snapSnips 
         console.log('formatted snapSnips:', snapSnips);
 	} catch(error) {
 		console.error("An error occurred getting snapSnips:", error);
+        // const errorMessage = errorString(error);
+        // console.error(errorMessage);
+        // return { error: errorMessage };
 	}
 }

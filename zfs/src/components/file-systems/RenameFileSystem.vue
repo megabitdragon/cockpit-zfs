@@ -149,9 +149,10 @@ async function renameBtn() {
         try {
 			const output = await renameFileSystem(props.filesystem.name, (parentFS.value + '/' + newName.value), forceUnmount.value, createNonExistParent.value);
  
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				renaming.value = false;
-				notifications.value.constructNotification('Rename Dataset Failed', props.filesystem.name + " was not renamed. Check console output for details.", 'error');
+				notifications.value.constructNotification('Rename Dataset Failed', `${props.filesystem.name} was not renamed: ${errorMessage}.`, 'error');
 			} else {
                 confirmRename.value = true;
 

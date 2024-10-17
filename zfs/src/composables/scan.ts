@@ -14,6 +14,9 @@ export async function getScanGroup() {
 		const scans = (await state.promise()).stdout;
 		return scans;
 	} catch (state) {
+		// const errorMessage = errorString(state);
+		// console.error(errorMessage);
+		// return { error: errorMessage };
 		console.error(errorString(state));
 		return null;
 	}
@@ -26,6 +29,9 @@ export async function getDiskStats() {
 		const diskStats = (await state.promise()).stdout;
 		return diskStats;
 	} catch (state) {
+		// const errorMessage = errorString(state);
+		// console.error(errorMessage);
+		// return { error: errorMessage };
 		console.error(errorString(state));
 		return null;
 	}

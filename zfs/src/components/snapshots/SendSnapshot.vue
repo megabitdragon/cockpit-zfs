@@ -500,46 +500,67 @@ async function sendBtn() {
     try {
         await setSendData();
         console.log('Sending data:', sendingData.value);
-        
-        if (!invalidConfig.value && !invalidFlags.value && !invalidDest.value) {
-            sending.value = true;
-    
-            await sendAndReadProgress(sendingData.value, sendProgressData.value);
-            sending.value = false;
-            confirmSend.value = true;
-            tracking.value = false;
-            
-            // Show success notification
-            notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`, 'success');
-         
-            showSendDataset.value = false;
-        } else if (invalidConfig.value) {
-            if (forceOverwrite.value) {
-                sending.value = true;
-                invalidConfig.value = false;
-                await sendAndReadProgress(sendingData.value, sendProgressData.value);
-                sending.value = false;
-                confirmSend.value = true;
-                tracking.value = false;
 
-                // Show success notification
-                notifications.value.constructNotification('Snapshot Sent', `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`, 'success');
-            
-                showSendDataset.value = false;
+        // Check for invalid configurations
+        if (invalidConfig.value || invalidFlags.value || invalidDest.value) {
+            if (invalidConfig.value && forceOverwrite.value) {
+                // Force overwrite case
+                await handleSendWithOverwrite();
             } else {
                 confirmSend.value = false;
+                return;
             }
         } else {
-
-            confirmSend.value = false;
+            // Valid configuration, send snapshot
+            await handleSend();
         }
-    } catch (error) {
-        console.error(error);
 
-        // Show error notification
-        notifications.value.constructNotification('Failed Snapshot Send', `Failed to send snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`, 'error');
+    } catch (error: any) {
+        console.error("Error occurred during snapshot send:", error);
+        notifications.value.constructNotification(
+            'Failed Snapshot Send',
+            `Failed to send snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}: ${error.message}`,
+            'error'
+        );
     }
-   
+}
+
+
+// Helper function to handle normal send
+async function handleSend() {
+    sending.value = true;
+    try {
+        await sendAndReadProgress(sendingData.value, sendProgressData.value);
+        notifications.value.constructNotification(
+            'Snapshot Sent',
+            `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`,
+            'success'
+        );
+        confirmSend.value = true;
+        showSendDataset.value = false;
+    } finally {
+        sending.value = false;
+        tracking.value = false;
+    }
+}
+
+// Helper function to handle send with overwrite
+async function handleSendWithOverwrite() {
+    sending.value = true;
+    try {
+        invalidConfig.value = false;
+        await sendAndReadProgress(sendingData.value, sendProgressData.value);
+        notifications.value.constructNotification(
+            'Snapshot Sent',
+            `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName} with overwrite.`,
+            'success'
+        );
+        confirmSend.value = true;
+        showSendDataset.value = false;
+    } finally {
+        sending.value = false;
+        tracking.value = false;
+    }
 }
 
 const totalSendSize = ref(0);

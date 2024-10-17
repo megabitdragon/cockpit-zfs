@@ -145,9 +145,10 @@ async function confirmBtn() {
         try {
             const lockOutput = await lockFileSystem(props.filesystem);
 
-            if (lockOutput == null) {
+            if (lockOutput == null || lockOutput.error) {
+                const errorMessage = lockOutput?.error || 'Unknown error';
                 doingThing.value = false;
-                notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${props.filesystem.name}. Check console output for details.`, 'error');
+                notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${props.filesystem.name}: ${errorMessage}`, 'error');
             } else {
                 notifications.value.constructNotification('Dataset Locked', `Successfully locked ${props.filesystem.name}.`, 'success');
                 doingThing.value = false;
@@ -171,16 +172,18 @@ async function confirmBtn() {
             try {
                 const unlockOutput =  await unlockFileSystem(props.filesystem, passphrase.value);
 
-                if (unlockOutput == null) {
+                if (unlockOutput == null || unlockOutput.error) {
+                    const errorMessage = unlockOutput?.error || 'Unknown error';
                     doingThing.value = false;
-                    notifications.value.constructNotification('Unlock Dataset Failed', `Failed to unlock ${props.filesystem.name}. Check console output for details.`, 'error');
+                    notifications.value.constructNotification('Unlock Dataset Failed', `Failed to unlock ${props.filesystem.name}: ${errorMessage}`, 'error');
                 } else {
                     if (mountFS.value) {
                         try {
                             const mountOutput = await mountFileSystem(props.filesystem, forceMountFS.value);
                         
-                            if (mountOutput == null) {
-                                notifications.value.constructNotification('Mount Dataset Failed', props.filesystem.name + " was not mounted. Check console output for details.", 'error');
+                            if (mountOutput == null || mountOutput.error) {
+                                const errorMessage = mountOutput?.error || 'Unknown error';
+                                notifications.value.constructNotification('Mount Dataset Failed', `${props.filesystem.name} was not mounted: ${errorMessage}.`, 'error');
                             } else {
                                 notifications.value.constructNotification('File System Mounted', props.filesystem.name + " mounted.", 'success');
                             }

@@ -383,10 +383,11 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 		try {
 			const output = await destroySnapshot(selectedSnapshot.value?.name, firstOptionToggle.value, secondOptionToggle.value);
 
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmDestroy.value = false;
-				notifications.value.constructNotification('Destroy Snapshot Failed', selectedSnapshot.value!.name + " was not destroyed. Check console output for details.", 'error');
+				notifications.value.constructNotification('Destroy Snapshot Failed', `${selectedSnapshot.value!.name} was not destroyed: ${errorMessage}.`, 'error');
 			} else {
 				notifications.value.constructNotification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success');
 				await refreshSnaps();
@@ -441,11 +442,14 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 		console.log('now destroying in bulk:', selectedForDestroy.value);
 
 		try {
+			let errorMessage;
+
 			for (const snapshot of selectedForDestroy.value) {
                 console.log('currently destroying:', snapshot);
                 const output = await destroySnapshot(snapshot, false, false);
-
-                if (output == null) {
+				
+                if (output == null || output.error) {
+					errorMessage = output?.error || 'Unknown error';;
                     failedToDestroySnaps.push(snapshot);
                 } else {
                     destroyedSnaps.push(snapshot);
@@ -459,7 +463,7 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 			operationRunning.value = false;
 
 			if (failedToDestroySnaps.length !== 0) {
-				notifications.value.constructNotification('Destroy Snapshots Failed', `The folllowing snapshots were not destroyed: \n${failedToDestroySnaps.join(', ')} Check console output for details.`, 'error');
+				notifications.value.constructNotification('Destroy Snapshots Failed', `The folllowing snapshots were not destroyed: \n${failedToDestroySnaps.join(', ')}: ${errorMessage}`, 'error');
 			}
 			if (destroyedSnaps.length !== 0) {
 				notifications.value.constructNotification('Snapshot Destroyed', `The folllowing snapshots were destroyed: \n${destroyedSnaps.join(', ')}`, 'success');
@@ -571,10 +575,11 @@ watch(confirmRollback, async (newVal, oldVal) => {
 		try {
 			const output = await rollbackSnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
 
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmRollback.value = false;
-				notifications.value.constructNotification('Rollback Snapshot Failed', selectedSnapshot.value!.name + " was not rolled back. Check console output for details.", 'error');
+				notifications.value.constructNotification('Rollback Snapshot Failed', `${selectedSnapshot.value!.name} was not rolled back: ${errorMessage}.`, 'error');
 			} else {
 				console.log('rolled back:', selectedSnapshot.value);
 				await refreshSnaps();

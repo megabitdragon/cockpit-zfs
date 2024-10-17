@@ -259,10 +259,11 @@ async function finishBtn(newPoolData) {
 	try {
 		const output = await newPool(newPoolData);
 
-		if (output == null) {
+		if (output == null || output.error) {
+			const errorMessage = output?.error || 'Unknown error';
 			finishPressed.value = false;
 		
-			notifications.value.constructNotification('Pool Creation Failed', 'There was an error creating this pool. Check console output.', 'error');	
+			notifications.value.constructNotification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}.`, 'error');	
 			await newFS();
 			await refreshAllData();
 			showWizard.value = false;

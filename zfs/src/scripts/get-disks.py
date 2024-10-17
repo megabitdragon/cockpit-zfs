@@ -46,10 +46,8 @@ def get_nvme_disks():
         if 'nvme' not in name:
             continue
 
-
         # Get additional data using smartctl
         smartctl_data = get_smartctl_data(name)
-        
         
         # Use udevadm to get more details about the NVMe device
         udevadm_result = subprocess.run(['udevadm', 'info', '--query=all', f'--name=/dev/{name}'], stdout=subprocess.PIPE)
@@ -63,7 +61,7 @@ def get_nvme_disks():
 
         nvme_disks.append({
             'vdev_path': 'N/A',
-            'phy_path': f'/dev/disk/by-path/{udev_info.get('E: ID_PATH')}',  # Physical path from ID_PATH or DEVLINKS
+            'phy_path': f'/dev/disk/by-path/{udev_info.get("E: ID_PATH")}',  # Physical path from ID_PATH
             'sd_path': f'/dev/{name}',  # Device path
             'name': name,  # Device name, e.g., nvme0n1
             'model': udev_info.get('E: ID_MODEL', 'Unknown'),  # Model name

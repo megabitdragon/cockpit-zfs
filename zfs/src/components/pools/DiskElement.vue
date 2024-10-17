@@ -237,10 +237,11 @@ watch(confirmDetach, async (newValue, oldValue) => {
 		try {
 			const output = await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
 
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmDetach.value = false;
-				notifications.value.constructNotification('Detach Disk Failed', selectedDisk.value!.name + " was not detached. Check console output for details.", 'error');
+				notifications.value.constructNotification('Detach Disk Failed', `${selectedDisk.value!.name} was not detached: ${errorMessage}.`, 'error');
 			} else {
 				if (secondOptionToggle.value == true) {
 					await labelClear(selectedDisk.value!);
@@ -250,7 +251,7 @@ watch(confirmDetach, async (newValue, oldValue) => {
 				confirmDetach.value = false;
 				detaching.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Detach Completed', selectedDisk.value!.name + " was detached from " + selectedPool.value!.name + ".", 'success');
+				notifications.value.constructNotification('Detach Completed', `${selectedDisk.value!.name} was detached from ${selectedPool.value!.name}`, 'success');
 				showDetachDiskModal.value = false;
 			}
 
@@ -297,10 +298,11 @@ watch(confirmOffline, async (newVal, oldVal) => {
 		try {
 			const output = await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
 			
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmOffline.value = false;
-				notifications.value.constructNotification('Offline Failed', 'Offlining of disk ' + selectedDisk.value!.name + " failed. Check console output for details.", 'error');
+				notifications.value.constructNotification('Offline Failed', `Offlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}.`, 'error');
 			} else {
 				await refreshAllData();
 				confirmOffline.value = false;
@@ -353,10 +355,11 @@ watch(confirmOnline, async (newVal, oldVal) => {
 		try {
 			const output = await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
 
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmOnline.value = false;
-				notifications.value.constructNotification('Online Failed', 'Onlining of disk ' + selectedDisk.value!.name + " failed. Check console output for details.", 'error');
+				notifications.value.constructNotification('Online Failed', `Onlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}.`, 'error');
 			} else {
 				if (secondOptionToggle.value == true) {
 					starting.value = true;
@@ -364,8 +367,9 @@ watch(confirmOnline, async (newVal, oldVal) => {
 					try {
 						const output2 = await scrubPool(selectedPool.value!);
 
-						if (output2 == null) {
-							notifications.value.constructNotification('Scrub Failed', 'Scrub on ' + selectedPool.value!.name + " failed. Check console output for details.", 'error');
+						if (output2 == null || output2.error) {
+							const errorMessage2 = output2?.error || 'Unknown error';
+							notifications.value.constructNotification('Scrub Failed', `Scrub on ${selectedDisk.value!.name} failed: ${errorMessage2}.`, 'error');
 						} else {
 							await getScanStatus();
 							notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
@@ -446,9 +450,10 @@ watch(confirmTrimDisk, async (newValue, oldValue) => {
 		console.log('now trimming:', selectedPool.value);
 		try {
 			const output = await trimDisk(selectedPool.value!.name,  selectedDisk.value!.name, (firstOptionToggle.value ? firstOptionToggle.value : false));
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				confirmTrimDisk.value = false
-				notifications.value.constructNotification('Trim Failed', "Trim failed to start. Check console output for details.", 'error');
+				notifications.value.constructNotification('Trim Failed', `Trim failed to start: ${errorMessage}.`, 'error');
 			} else {
 				getDiskTrimStatus();
 				confirmTrimDisk.value = false
@@ -477,8 +482,9 @@ async function resumeTrim(pool, disk) {
 	try {
 		const output = await trimDisk(selectedPool.value!.name, selectedDisk.value!.name);
 
-		if (output == null) {
-			notifications.value.constructNotification('Trim Resume Failed', "Trim failed to resume. Check console output for details.", 'error');
+		if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
+			notifications.value.constructNotification('Trim Resume Failed', "Trim failed to resume:${errorMessage}.", 'error');
 			// operationRunning.value = false;
 		} else {
 			getDiskTrimStatus();
@@ -517,9 +523,10 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 		pausingDiskTrim.value = true;
 		try {
 			const output = await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, false, 'pause');
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				confirmPauseTrim.value = false;
-				notifications.value.constructNotification('Trim Pause Failed', "Trim failed to pause. Check console output for details.", 'error');
+				notifications.value.constructNotification('Trim Pause Failed', `Trim failed to pause: ${errorMessage}.`, 'error');
 				// operationRunning.value = false;
 			} else {
 				getDiskTrimStatus();
@@ -554,9 +561,10 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 		stoppingDiskTrim.value = true;
 		try {
 			const output = await trimDisk(selectedPool.value!.name, selectedDisk.value!.name, false, 'stop');
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				confirmStopTrim.value = false;
-				notifications.value.constructNotification('Trim Stop Failed', "Trim failed to stop. Check console output for details.", 'error');
+				notifications.value.constructNotification('Trim Stop Failed', `Trim failed to stop: ${errorMessage}.`, 'error');
 				// operationRunning.value = false;
 			} else {
 				getDiskTrimStatus();

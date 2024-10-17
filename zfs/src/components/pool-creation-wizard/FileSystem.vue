@@ -1028,9 +1028,10 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 							try {
 								const output = await createEncryptedDataset(newDataset.value, passphrase.value);
 								
-								if (output == null) {
+								if (output == null || output.error) {
+									const errorMessage = output?.error || 'Unknown error';
 									saving.value = false;
-									notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating this dataset. Check console output.', 'error');
+									notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}`, 'error');
 								} else {
 									console.log('encryption check passed');
 									fileSystemsLoaded.value = false;
@@ -1061,9 +1062,10 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 						try {
 							const output = await createDataset(newDataset.value);
 							
-							if (output == null) {
+							if (output == null || output.error) {
+								const errorMessage = output?.error || 'Unknown error';
 								saving.value = false;
-								notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating this dataset. Check console output.', 'error');
+								notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error');
 							} else {
 								console.log('encryption check passed');
 								fileSystemsLoaded.value = false;
@@ -1115,9 +1117,10 @@ async function newFileSystemInPoolWizard() {
 							try {
 								const output = await createEncryptedDataset(newDataset.value, passphrase.value);
 								
-								if (output == null) {
+								if (output == null || output.error) {
+									const errorMessage = output?.error || 'Unknown error';
 									saving.value = false;
-									notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating this dataset. Check console output.', 'error');
+									notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error');
 								} else {
 									console.log('encryption check passed');
 									fileSystemsLoaded.value = false;
@@ -1150,9 +1153,10 @@ async function newFileSystemInPoolWizard() {
 						try {
 							const output = await createDataset(newDataset.value);
 							
-							if (output == null) {
+							if (output == null || output.error) {
+								const errorMessage = output?.error || 'Unknown error';
 								saving.value = false;
-								notifications.value.constructNotification('Error Creating Dataset', 'There was an error creating this dataset. Check console output.', 'error');
+								notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}.`, 'error');
 							} else {
 								console.log('encryption check passed');
 								fileSystemsLoaded.value = false;

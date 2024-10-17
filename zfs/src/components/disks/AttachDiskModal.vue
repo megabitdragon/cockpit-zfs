@@ -275,9 +275,10 @@ async function attachDiskBtn() {
             try {
                 const output = await attachDisk(diskVDevPoolData.value);
 
-                if (output == null) {
+                if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    notifications.value.constructNotification('Disk Attach Failed', 'There was an error attaching this disk. Check console output.', 'error'); 
+                    notifications.value.constructNotification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error'); 
                 } else {
                     showAttachDiskModal.value = false;
                     adding.value = false;

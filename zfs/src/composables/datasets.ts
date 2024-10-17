@@ -81,8 +81,9 @@ export async function createEncryptedDataset(fileSystemData : NewDataset, passph
 		return output.stdout;
 		
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -94,8 +95,9 @@ export async function changePassphrase(fileSystemName : string, newPassphrase : 
 
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -190,8 +192,9 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 		}
 
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -220,8 +223,9 @@ export async function destroyDataset(fileSystemData : FileSystemData, forceDestr
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -241,8 +245,9 @@ export async function unmountFileSystem(fileSystemData: FileSystemData, forceUnm
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -262,8 +267,9 @@ export async function mountFileSystem(fileSystemData: FileSystemData, forceMount
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -278,8 +284,9 @@ export async function lockFileSystem(fileSystemData: FileSystemData) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -290,8 +297,9 @@ export async function unlockFileSystem(fileSystemData: FileSystemData, passphras
 		console.log(output);
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -316,8 +324,9 @@ export async function renameFileSystem(oldPath, newPath, forceUnmount?, createPa
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 

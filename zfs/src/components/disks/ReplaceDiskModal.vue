@@ -261,9 +261,10 @@ async function replaceDiskBtn() {
             try {
                 const output =  await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
 
-                if (output == null) {
+                if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    notifications.value.constructNotification('Replace Disk Failed', 'There was an error replacing this disk. Check console output.', 'error'); 
+                    notifications.value.constructNotification('Replace Disk Failed', `There was an error replacing this disk: ${errorMessage}.`, 'error'); 
                 } else {
            
                     showReplaceDiskModal.value = false;

@@ -125,9 +125,10 @@ async function renameBtn() {
         try {
 			const output = await renameSnapshot(props.snapshot.name, newName.value);
  
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				renaming.value = false;
-				notifications.value.constructNotification('Rename Dataset Failed', props.snapshot.name + " was not renamed. Check console output for details.", 'error');
+				notifications.value.constructNotification('Rename Dataset Failed', `${props.snapshot.name} was not renamed: ${errorMessage}.`, 'error');
 			} else {
                 confirmRename.value = true;
 

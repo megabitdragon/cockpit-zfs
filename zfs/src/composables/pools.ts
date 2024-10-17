@@ -16,8 +16,9 @@ export async function getPools() {
 		const pools = (await state.promise()).stdout;
 		return pools;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -111,8 +112,9 @@ export async function newPool(pool: newPoolData) {
 		return output.stdout;
 	
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -153,8 +155,9 @@ export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -170,10 +173,8 @@ const properties = [
 	"listsnapshots",
 ]
 
-export async function configurePool(pool : PoolEditConfig) {
-	// console.log('configurePool called with:', pool);
+export async function configurePool(pool: PoolEditConfig) {
 	try {
-		//let cmdString = ['zpool', 'set'];
 		const hasProperties = hasChanges(pool);
 		// console.log('hasProperties:', hasProperties);
 
@@ -185,31 +186,29 @@ export async function configurePool(pool : PoolEditConfig) {
 					cmdString.push(`${property}=${pool[property]}`);
 					cmdString.push(pool.name);
 					console.log('****\ncmdstring:\n', ...cmdString, "\n****");
-					
+
 					const state = useSpawn(cmdString);
 					const output = await state.promise();
 					console.log(output);
-					
+
 					await new Promise(resolve => setTimeout(resolve, 250));
 				}
 			}
-			
 		} else {
 			console.log("There are no selected properties to change.");
 		}
 
-		return true;
-	
+		return { success: true };
+
 	} catch (state) {
-		console.error(errorString(state));
-		return false;
-		// return null;
+		const errorMessage = errorString(state);  // Assuming errorString formats the error
+		console.error(errorMessage);
+		return { success: false, error: errorMessage };  // Return error message
 	}
 }
 
 
 function hasChanges(pool) {
-	
 	for (const property of properties) {
 		if (property in pool) {
 			return true;
@@ -233,8 +232,9 @@ export async function clearErrors(poolName, deviceName?) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -263,8 +263,9 @@ export async function trimPool(pool : PoolData, isSecure? : boolean, action? : s
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -288,8 +289,9 @@ export async function scrubPool(pool, action?) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -300,8 +302,9 @@ export async function resilverPool(pool) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -321,8 +324,9 @@ export async function exportPool(pool, force?) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -332,8 +336,9 @@ export async function getImportablePools() {
 		const pools = (await state.promise()).stdout;
 		return pools;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -343,8 +348,9 @@ export async function getImportableDestroyedPools() {
 		const pools = (await state.promise()).stdout;
 		return pools;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -424,8 +430,9 @@ export async function importPool(pool) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 

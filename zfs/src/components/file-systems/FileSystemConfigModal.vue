@@ -396,9 +396,10 @@ async function fsConfigureBtn() {
         try {
             const output =  await configureDataset(newChangesToFileSystem.value);
 
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				console.log('configureFS failed');
-				notifications.value.constructNotification('Save File System Config Failed', 'There was an error saving this file system. Check console output for details.', 'error')
+				notifications.value.constructNotification('Save File System Config Failed', `There was an error saving this file system: ${errorMessage}.`, 'error')
 			} else {
 				console.log('configureFS succeeded');
 				notifications.value.constructNotification('File System Config Saved', "Successfully saved this file system's configuration.", 'success');

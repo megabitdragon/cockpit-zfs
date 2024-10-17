@@ -290,15 +290,17 @@ async function addVDevBtn() {
                     try {
                         const output = await addVDev(props.pool, newVDev.value);
                         
-                        if (output == null) {
-                            notifications.value.constructNotification('Add VDev Failed', 'There was an error adding this virtual device. Check console output.', 'error'); 
+                        if (output == null || output.error) {
+                            const errorMessage = output?.error || 'Unknown error';
+                            notifications.value.constructNotification('Add VDev Failed', `There was an error adding this virtual device: ${errorMessage}`, 'error'); 
                         } else {
                             notifications.value.constructNotification('Added VDev', `Virtual device added successfully.`, 'success');
 
                             if (props.pool.properties.refreservationRawSize!) {
                                 const output = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
-                                if (output == null) {
-                                    notifications.value.constructNotification('Refreservation Update Failed', 'There was an error updating pools refreservation value. Check console output.', 'error');
+                                if (output == null || output.error) {
+                                    const errorMessage = output?.error || 'Unknown error';
+                                    notifications.value.constructNotification('Refreservation Update Failed', `There was an error updating pools refreservation value: ${errorMessage}`, 'error');
                                 } else {
                                     notifications.value.constructNotification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success');
                                     showAddVDevModal.value = false;

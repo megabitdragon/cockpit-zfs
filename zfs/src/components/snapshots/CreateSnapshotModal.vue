@@ -220,10 +220,10 @@ async function create(newSnapshot) {
     try {
         const output = await createSnapshot(newSnapshot);
         
-        if (output == null) {
-            notifications.value.constructNotification('Create Snapshot Failed', 'There was an error creating this snapshot. Check console output.', 'error'); 
+        if (output == null || output.error) {
+            const errorMessage = output?.error || 'Unknown error';
+            notifications.value.constructNotification('Create Snapshot Failed', `There was an error creating this snapshot: ${errorMessage}`, 'error'); 
             confirmCreate.value = false;
-            confirmCreate.value = true;
         } else {
             confirmCreate.value = true;
             newSnapshot.isCustomName = false;

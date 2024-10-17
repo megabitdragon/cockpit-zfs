@@ -104,9 +104,10 @@ async function changeBtn() {
         try {
             const output = await changePassphrase(fileSystem.value.name, passphrase.value);
 
-            if (output == null) {
+            if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
                 changing.value = false;
-                notifications.value.constructNotification('Passphrase Change Failed', 'There was an error changing this passphrase. Check console output for details.', 'error')
+                notifications.value.constructNotification('Passphrase Change Failed', `There was an error changing this passphrase: ${errorMessage}`, 'error')
             } else {
                 confirmChange.value = true;
 

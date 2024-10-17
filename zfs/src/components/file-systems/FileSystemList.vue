@@ -544,9 +544,10 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		try {
 			const output = await destroyDataset(selectedDataset.value!, firstOptionToggle.value, thirdOptionToggle.value, fourthOptionToggle.value);
 			
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
-				notifications.value.constructNotification('Destroy Dataset Failed', selectedDataset.value!.name + " was not destroyed. Check console output for details.", 'error');
+				notifications.value.constructNotification('Destroy Dataset Failed', `${selectedDataset.value!.name} was not destroyed: ${errorMessage}.`, 'error');
 				confirmDelete.value = false;
 			} else {
 				operationRunning.value = false;
@@ -611,19 +612,21 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 		try {
 			const output = await unmountFileSystem(selectedDataset.value!, forceUnmount.value);
 
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				unmounting.value = false;
 				confirmUnmount.value = false;
-				notifications.value.constructNotification('Unmount Dataset Failed', selectedDataset.value!.name + " was not unmounted. Check console output for details.", 'error');
+				notifications.value.constructNotification('Unmount Dataset Failed', `${selectedDataset.value!.name} was not unmounted: ${errorMessage}.`, 'error');
 			} else {
 				console.log('unmounted:', selectedDataset.value!);
 				if (selectedDataset.value?.encrypted && secondOptionToggle.value) {
 					try {
 						const lockOutput = await lockFileSystem(selectedDataset.value!);
 
-						if (lockOutput == null) {
-							notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${selectedDataset.value!.name}. Check console output for details.`, 'error');
+						if (lockOutput == null || lockOutput.error) {
+							const lockErrorMsg = lockOutput?.error || 'Unknown error';
+							notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${selectedDataset.value!.name}: ${lockErrorMsg}`, 'error');
 						} else {
 							notifications.value.constructNotification('Dataset Locked', `Successfully locked ${selectedDataset.value!.name}.`, 'success');
 							// showLockUnlockModal.value = false;
@@ -688,10 +691,11 @@ watch(confirmMount, async (newValue, oldValue) => {
 		try {
 			const output = await mountFileSystem(selectedDataset.value!, forceMount.value);
 		
-			if (output == null) {
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				mounting.value = false;
-				notifications.value.constructNotification('Mount Dataset Failed', selectedDataset.value!.name + " was not mounted. Check console output for details.", 'error');
+				notifications.value.constructNotification('Mount Dataset Failed', `${selectedDataset.value!.name} was not mounted: ${errorMessage}.`, 'error');
 				confirmMount.value = false;
 			} else {
 				console.log('mounted:', selectedDataset.value!);

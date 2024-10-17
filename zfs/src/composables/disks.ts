@@ -10,8 +10,9 @@ export async function getDisks() {
         const disks = (await state.promise()).stdout;
         return disks;
     } catch (state) {
-        console.error(errorString(state));
-        return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
     }
 }
 
@@ -22,8 +23,9 @@ export async function clearPartitions(disk) {
         console.log(output)
         return output.stdout;
       } catch (state) {
-        console.error(errorString(state));
-        return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
       }
 }
 
@@ -39,8 +41,9 @@ export async function labelClear(disk) {
         console.log(output)
         return output.stdout;
       } catch (state) {
-        console.error(errorString(state));
-        return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
       }
 }
 
@@ -63,8 +66,9 @@ export async function attachDisk(diskVDevPoolData) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -82,8 +86,9 @@ export async function detachDisk(poolName, diskName) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -110,8 +115,9 @@ export async function offlineDisk(poolName, diskName, forceFault, temporary) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -134,8 +140,9 @@ export async function onlineDisk(poolName, diskName, expand) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -160,8 +167,9 @@ export async function replaceDisk(poolName, diskName, newDiskName, forceReplace?
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -193,7 +201,8 @@ export async function trimDisk(poolName : string, diskName : string, isSecure? :
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }

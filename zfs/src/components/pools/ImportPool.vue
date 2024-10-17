@@ -539,14 +539,20 @@ async function importPoolBtn() {
         
         try {
             importing.value = true;
-            await importPool(importedPool.value);
-            importing.value = false;
-            notifications.value.constructNotification('Import Completed', `Imported Pool ${importedPool.value!.name!} from Pool ${importedPool.value!.name!}`, 'success');
-            showImportModal.value = false;
+
+            const output = await importPool(importedPool.value);
+
+            if (output == null || output.error) {
+                const errorMessage = output?.error || 'Unknown error';
+                notifications.value.constructNotification('Import Failed', `Failed to Import Pool: ${errorMessage}.`, 'error');
+            } else {
+                notifications.value.constructNotification('Import Completed', `Imported Pool ${importedPool.value!.name!} from Pool ${importedPool.value!.name!}`, 'success');
+                showImportModal.value = false;
+            }
             importing.value = false;
             await refreshAllData();
         } catch (error) {
-            notifications.value.constructNotification('Import Failed', "Failed to Import Virtual Device. Check console output for details.", 'error');
+            notifications.value.constructNotification('Import Failed', `Failed to Import Pool: ${error}.`, 'error');
             importing.value = false;
         }
     }

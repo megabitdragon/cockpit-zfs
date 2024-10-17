@@ -129,8 +129,9 @@ async function cloneBtn() {
         try {
             const output = await cloneSnapshot(props.snapshot.name, parentFS.value, newName.value, createNonExistParent.value);
             
-            if (output == null) {
-                notifications.value.constructNotification('Snapshot Clone Failed', 'There was an error cloning this snapshot. Check console output.', 'error'); 
+            if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
+                notifications.value.constructNotification('Snapshot Clone Failed', `There was an error cloning this snapshot: ${errorMessage}.`, 'error'); 
                 confirmCloneSnap.value = true;
             } else {
                 confirmCloneSnap.value = true;

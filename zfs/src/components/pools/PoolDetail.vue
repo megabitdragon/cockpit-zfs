@@ -484,27 +484,35 @@ async function poolConfigureBtn() {
 		await checkForChanges(poolConfig.value);
 		saving.value = true;
 		try {
-			const success = await configurePool(newChangesToPool.value);
+			const result = await configurePool(newChangesToPool.value);
 
-			if (!success) {
+			if (!result.success) {
+				const errorMessage = result.error || 'Unknown error occurred';
 				console.log('configurePool failed');
-				
-				notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool. Check console output for details.', 'error')
+
+				notifications.value.constructNotification(
+					'Save Pool Config Failed',
+					`There was an error saving this pool: ${errorMessage}.`,
+					'error'
+				);
 				confirmSavePool.value = false;
 			} else {
 				console.log('configurePool succeeded');
-				
-				notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
+
+				notifications.value.constructNotification(
+					'Pool Config Saved',
+					"Successfully saved this pool's configuration.",
+					'success'
+				);
 				confirmSavePool.value = true;
 				showPoolDetails.value = false;
 			}
 
 			saving.value = false;
-			// await refreshAllData();
-			// close();
 
-		} catch (error) {
+		} catch (error: any) {
 			console.error(error);
+			notifications.value.constructNotification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error');
 		}
 
 	}
