@@ -29,6 +29,7 @@
 									</DisclosureButton>
 									<DisclosurePanel>
 										<div class="p-2 rounded-lg bg-default">
+											<p>Refreservation: <b>{{ poolConfig.properties.refreservationPercent! }}%</b></p>
 											<p>Deduplication: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }}</b></p>
 											<p>Auto-Expand: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoExpand)) }}</b></p>
 											<p>Auto-Replace: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoReplace)) }}</b></p>

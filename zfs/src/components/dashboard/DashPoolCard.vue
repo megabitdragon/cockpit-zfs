@@ -105,43 +105,78 @@
 					</div>
 				</div>
 
-				<div v-if="Number(props.pool.properties.capacity) >= 1"
-					class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-					<div class="bg-green-600 h-6"
-						:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+				<div v-if="props.pool.properties.refreservationPercent!">
+					<div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < (100 - props.pool.properties.refreservationPercent) - 20"
+						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+						<div class="bg-green-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+							<div
+								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								{{ Number(props.pool.properties.capacity) }}% Full
+							</div>
+						</div>
+					</div>
+
+					<div v-else-if="Number(props.pool.properties.capacity) >= ((100 - props.pool.properties.refreservationPercent) - 19) && Number(props.pool.properties.capacity) <= ((100 - props.pool.properties.refreservationPercent) - 10)"
+						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+						<div class="bg-orange-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+							<div
+								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								{{ Number(props.pool.properties.capacity) }}% Full
+							</div>
+						</div>
+					</div>
+
+					<div v-else-if="Number(props.pool.properties.capacity) > ((100 - props.pool.properties.refreservationPercent) - 9) && Number(props.pool.properties.capacity) <= (100 - props.pool.properties.refreservationPercent)"
+						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+						<div class="bg-red-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+							<div
+								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								{{ Number(props.pool.properties.capacity) }}% Full
+							</div>
+						</div>
+					</div>
+					<div v-else class="w-full bg-well rounded-full h-6 text-center mt-2 relative flex">
 						<div
-							class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-							{{ Number(props.pool.properties.capacity) }}% Full
+							class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
+							Empty
 						</div>
 					</div>
 				</div>
-
-				<div v-else-if="Number(props.pool.properties.capacity) >= 80 && Number(props.pool.properties.capacity) <= 95"
-					class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-					<div class="bg-orange-600 h-6"
-						:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-						<div
-							class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-							{{ Number(props.pool.properties.capacity) }}% Full
+				<div v-else>
+					<div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < 80"
+						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+						<div class="bg-green-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+							<div
+								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								{{ Number(props.pool.properties.capacity) }}% Full
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div v-else-if="Number(props.pool.properties.capacity) >= 96 && Number(props.pool.properties.capacity) <= 100"
-					class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-					<div class="bg-red-600 h-6"
-						:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-						<div
-							class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-							{{ Number(props.pool.properties.capacity) }}% Full
+					<div v-else-if="Number(props.pool.properties.capacity) >= 80 && Number(props.pool.properties.capacity) <= 90"
+						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+						<div class="bg-orange-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+							<div
+								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								{{ Number(props.pool.properties.capacity) }}% Full
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div v-else class="w-full bg-well rounded-full h-6 text-center mt-2 relative flex">
-					<div
-						class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
-						Empty
+					<div v-else-if="Number(props.pool.properties.capacity) > 90 && Number(props.pool.properties.capacity) <= 100"
+						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+						<div class="bg-red-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+							<div
+								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								{{ Number(props.pool.properties.capacity) }}% Full
+							</div>
+						</div>
+					</div>
+					<div v-else class="w-full bg-well rounded-full h-6 text-center mt-2 relative flex">
+						<div
+							class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
+							Empty
+						</div>
 					</div>
 				</div>
 

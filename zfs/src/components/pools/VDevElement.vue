@@ -81,7 +81,7 @@
 import { ref, inject, Ref, watch, provide, onMounted } from "vue";
 import { EllipsisVerticalIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { clearErrors, removeVDevFromPool } from "../../composables/pools";
+import { clearErrors, removeVDevFromPool, setRefreservation } from "../../composables/pools";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { formatStatus, loadScanActivities, loadTrimActivities, upperCaseWord,  } from '../../composables/helpers';
 import DiskElement from '../pools/DiskElement.vue';
@@ -198,15 +198,33 @@ watch(confirmRemove, async (newValue, oldValue) => {
 
 		try {
 			const output = await removeVDevFromPool(selectedVDev.value, selectedPool.value);
-			if (output == null) {
-				notifications.value.constructNotification('Remove Failed', "Failed to remove Virtual Device. Check console output for details.", 'error');
-				confirmRemove.value = false;
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
+				notifications.value.constructNotification('Remove Failed', `Failed to remove Virtual Device: ${errorMessage}.`, 'error');
+
 			} else {
 				notifications.value.constructNotification('Remove Completed', `Removed VDev ${selectedVDev.value!.name} from Pool ${selectedPool.value!.name}`, 'success');
-				await refreshAllData();
+
+				if (props.pool.properties.refreservationRawSize!) {
+					const output = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
+					if (output == null || output.error) {
+						const errorMessage = output?.error || 'Unknown error';
+						notifications.value.constructNotification('Refreservation Update Failed', `Error updating refreservation: ${errorMessage}.`, 'error');
+					} else {
+						notifications.value.constructNotification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success');
+						showRemoveVDevConfirm.value = false;
+					}
+				} else {
+					showRemoveVDevConfirm.value = false;
+				}
+				
 				confirmRemove.value = false;
 				showRemoveVDevConfirm.value = false;
 			}
+
+			confirmRemove.value = false;
+			await refreshAllData();
+
 		} catch (error) {
 			console.error(error);
 		}

@@ -194,7 +194,7 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
-import { addVDev } from '../../composables/pools';
+import { addVDev, setRefreservation } from '../../composables/pools';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
@@ -294,7 +294,18 @@ async function addVDevBtn() {
                             notifications.value.constructNotification('Add VDev Failed', 'There was an error adding this virtual device. Check console output.', 'error'); 
                         } else {
                             notifications.value.constructNotification('Added VDev', `Virtual device added successfully.`, 'success');
-                            showAddVDevModal.value = false;
+
+                            if (props.pool.properties.refreservationRawSize!) {
+                                const output = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
+                                if (output == null) {
+                                    notifications.value.constructNotification('Refreservation Update Failed', 'There was an error updating pools refreservation value. Check console output.', 'error');
+                                } else {
+                                    notifications.value.constructNotification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success');
+                                    showAddVDevModal.value = false;
+                                }
+                            } else {
+                                showAddVDevModal.value = false;
+                            }
                         }
                         
                         adding.value = false;

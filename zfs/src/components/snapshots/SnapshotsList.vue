@@ -125,9 +125,16 @@
 						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center"
 							:class="truncateText" title="Select">Select</th>
 						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center">
-							<input type="checkbox" v-model="isSelectAllChecked" @change="toggleSelectAll"
+							<!-- <input type="checkbox" v-model="isSelectAllChecked" @change="toggleSelectAll"
 								class="w-4 h-4 text-success border-default rounded focus:ring-green-500 dark:focus:ring-green-600 focus:ring-2" />
-							Select All
+							Select All -->
+							<label
+								class="flex flex-row items-center w-full h-full rounded-lg"
+								:class="checkboxSelectedAllClass">
+								<input type="checkbox" v-model="isSelectAllChecked" @change="toggleSelectAll"
+									class="w-4 h-4 mr-2 text-success border-default rounded focus:ring-green-500 dark:focus:ring-green-600 focus:ring-2" />
+								Select All
+							</label>
 						</th>
 						<th v-else class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">
 							<span class="sr-only"></span>
@@ -493,6 +500,10 @@ watch(selectedForDestroy, (newValue) => {
 	// Update select all checkbox if all snapshots are selected or not
 	isSelectAllChecked.value = newValue.length === snapshotsInFilesystem.value.length;
 });
+
+const checkboxSelectedAllClass = () => {
+	return isSelectAllChecked ? 'bg-green-300 dark:bg-green-700' : '';
+};
 
 
 ////////////////// Clone Snapshot ///////////////////

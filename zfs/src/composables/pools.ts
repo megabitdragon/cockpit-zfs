@@ -118,11 +118,11 @@ export async function newPool(pool: newPoolData) {
 
 export async function setRefreservation(pool: PoolData, refreservationPercent: number) {
 	try {
-		const size = convertSizeToBytes(pool.properties.size);
+		const sizeInBytes = convertSizeToBytes(pool.properties.size);
 	
-		const refreservation = (size / 100) * refreservationPercent;
+		const refreservationBytes = (sizeInBytes / 100) * refreservationPercent;
 
-		const cmdString = ['zfs', 'set', 'refreservation='+ refreservation, pool.name];
+		const cmdString = ['zfs', 'set', 'refreservation=' + refreservationBytes, pool.name];
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
@@ -131,8 +131,11 @@ export async function setRefreservation(pool: PoolData, refreservationPercent: n
 		return output.stdout;
 	
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		// console.error(errorString(state));
+		// return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -454,8 +457,11 @@ export async function addVDev(pool, vdev) {
 		return output.stdout;
 
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		// console.error(errorString(state));
+		// return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }
 
@@ -473,7 +479,10 @@ export async function removeVDevFromPool(vdev, pool) {
 		console.log(output)
 		return output.stdout;
 	} catch (state) {
-		console.error(errorString(state));
-		return null;
+		// console.error(errorString(state));
+		// return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
 	}
 }

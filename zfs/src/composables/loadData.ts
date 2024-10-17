@@ -106,6 +106,7 @@ export async function loadDisksThenPools(disks, pools) {
 							compression: parsedJSON[i].root_dataset.properties.compression.parsed,
 							deduplication: onOffToBool(parsedJSON[i].root_dataset.properties.dedup.parsed),
 							refreservationRawSize: parsedJSON[i].root_dataset.properties.refreservation.parsed,
+							refreservationPercent: Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)),
 							autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 							autoReplace: parsedJSON[i].properties.autoreplace.parsed,
 							autoTrim: onOffToBool(parsedJSON[i].properties.autotrim.parsed),
@@ -159,6 +160,7 @@ export async function loadDisksThenPools(disks, pools) {
 							compression: false,
 							deduplication: false,
 							refreservationRawSize: 0,
+							refreservationPercent: Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)),
 							autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 							autoReplace: parsedJSON[i].properties.autoreplace.parsed,
 							autoTrim: onOffToBool(parsedJSON[i].properties.autotrim.parsed),
@@ -347,24 +349,35 @@ export async function loadDisks(disks) {
 	}
 }
 
+// Helper function to clean disk paths by removing partition numbers but leaving the rest intact
+function cleanDiskPath(path) {
+	return path.replace(/-part[0-9]+$/, ''); // Only remove partition suffix like '-part1'
+}
+
 export async function loadDisksExtraData(disks, pools) {
-    try {
-        pools.forEach((pool) => {
-            pool.vdevs.forEach((vDev) => {
-                vDev.disks.forEach((usedDisk) => {
-					// console.log('usedDisk:', usedDisk)
-                    const selectedDisk = findDiskByPath(disks, usedDisk.path);
-					// console.log('selectedDisk:', selectedDisk)
-					 // Check if the selectedDisk is found
+	try {
+		pools.forEach((pool) => {
+			pool.vdevs.forEach((vDev) => {
+				vDev.disks.forEach((usedDisk) => {
+					// console.log('usedDisk:', usedDisk);
+					const selectedDisk = findDiskByPath(disks, usedDisk.path);
+					// console.log('selectedDisk:', selectedDisk);
+
+					// Check if the selectedDisk is found
 					if (selectedDisk) {
-						
-						selectedDisk!.guid = usedDisk.guid;
-						selectedDisk!.path = usedDisk.path;
-						selectedDisk!.stats = usedDisk.stats;
+						selectedDisk.guid = usedDisk.guid;
+						selectedDisk.path = usedDisk.path;
+						selectedDisk.stats = usedDisk.stats;
 						// console.log('selectedDisk loading data', selectedDisk);
 
+						// Clean the usedDisk.path and compare it with sd_path, phy_path, and vdev_path
+						const cleanedUsedDiskPath = cleanDiskPath(usedDisk.path);
+						// console.log('cleanedUsedDiskPath:', cleanedUsedDiskPath);
+
 						// Find the index of the original disk in the disks array
-						const index = disks.findIndex(disk => [disk.sd_path, disk.phy_path, disk.vdev_path].includes(usedDisk.path.replace(/(-part[0-9]+|[0-9]+$)/, '')));
+						const index = disks.findIndex(disk =>
+							[disk.sd_path, disk.phy_path, disk.vdev_path].includes(cleanedUsedDiskPath)
+						);
 
 						// Check if the original disk is found in the disks array
 						if (index !== -1) {
@@ -377,14 +390,14 @@ export async function loadDisksExtraData(disks, pools) {
 					} else {
 						console.log('Selected disk not found');
 					}
-                });
-            });
-        });
+				});
+			});
+		});
 
-    } catch (error) {
-        // Handle any errors that may occur during the asynchronous operation
-        console.error("An error occurred getting extra disk data:", error);
-    }
+	} catch (error) {
+		// Handle any errors that may occur during the asynchronous operation
+		console.error("An error occurred getting extra disk data:", error);
+	}
 }
 
 
@@ -426,13 +439,38 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	const partUUIDPrefix = '/dev/disk/by-partuuid/';
 	const uuidPrefix = '/dev/disk/by-uuid/';
 
-	// Function to find the correct disk based on the matching path
+	// // Function to find the correct disk based on the matching path
+	// function findDiskByPath(vDevData, disks) {
+	// 	console.log('vDevData:', vDevData);
+	// 	console.log('disks:', disks);
+	// 	return disks.value.find(disk => {
+	// 		const partitionSuffix = vDevData.path.includes('-part') ? '' : '-part1'; // Check if path has partition already
+	// 		return (
+	// 			disk.phy_path + partitionSuffix === vDevData.path ||
+	// 			disk.sd_path + (partitionSuffix ? '1' : '') === vDevData.path || // Handle sd_path with or without partitions
+	// 			disk.vdev_path + partitionSuffix === vDevData.path ||
+	// 			disk.id_path + partitionSuffix === vDevData.path ||
+	// 			disk.label_path + partitionSuffix === vDevData.path ||
+	// 			disk.part_label_path + partitionSuffix === vDevData.path ||
+	// 			disk.part_uuid === vDevData.path || // Part UUID paths don't need to append partition
+	// 			disk.uuid === vDevData.path // UUID paths also don't need partition
+	// 		);
+	// 	});
+	// }
+	// Adjusted function to find the correct disk based on matching path
 	function findDiskByPath(vDevData, disks) {
+		console.log('vDevData:', vDevData);
+		console.log('disks:', disks);
+
 		return disks.value.find(disk => {
-			const partitionSuffix = vDevData.path.includes('-part') ? '' : '-part1'; // Check if path has partition already
+			// Extract partition number if present (e.g., -part1)
+			const partitionSuffixMatch = vDevData.path.match(/-part(\d+)/);
+			const partitionSuffix = partitionSuffixMatch ? `-part${partitionSuffixMatch[1]}` : '';
+
+			// Check if the disk paths match considering partition suffix
 			return (
 				disk.phy_path + partitionSuffix === vDevData.path ||
-				disk.sd_path + (partitionSuffix ? '1' : '') === vDevData.path || // Handle sd_path with or without partitions
+				disk.sd_path + (partitionSuffix ? partitionSuffix : '') === vDevData.path || // Handle sd_path with or without partitions
 				disk.vdev_path + partitionSuffix === vDevData.path ||
 				disk.id_path + partitionSuffix === vDevData.path ||
 				disk.label_path + partitionSuffix === vDevData.path ||
@@ -442,6 +480,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			);
 		});
 	}
+
 
 	//checks if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
 	if (vDev.children.length < 1) {
