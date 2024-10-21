@@ -1,3 +1,3 @@
-## zfs module 1.0.2-3
+## zfs module 1.0.3-1
 
-* Fixes rendering issue with status bar in Pools list
+* Bug fixes and some minor updates
