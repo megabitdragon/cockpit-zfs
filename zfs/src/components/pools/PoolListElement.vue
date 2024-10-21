@@ -1017,7 +1017,7 @@ const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 // }
 
 async function getTrimStatus() {
-    console.log('vDevElement', vDevElement.value);
+    // console.log('vDevElement', vDevElement.value);
 	console.log('trimActivity:', trimActivity.value);
     // Check if vDevElement is defined and is an array
     if (vDevElement.value && Array.isArray(vDevElement.value) && vDevElement.value.length > 0) {

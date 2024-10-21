@@ -262,7 +262,7 @@ async function showAttachDisk(pool: PoolData, vdev: vDevData) {
 const diskElement = ref();
 
 async function getDiskStatus() {
-	console.log('diskElement', diskElement.value);
+	// console.log('diskElement', diskElement.value);
 
 	// Needed to specify index to work properly (treating as an array due to multiple pools error)
 	await diskElement.value[0].getDiskTrimStatus();

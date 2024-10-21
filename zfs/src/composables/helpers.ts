@@ -67,18 +67,6 @@ export const convertSizeToBytes = (size) => {
     return bytes;
 };
 
-/* export const convertSizeToBytesDecimal = (size) => {
-    const sizesWithoutByte = ['B', 'K', 'M', 'G', 'TB', 'P', 'E', 'Z', 'Y'];
-	const sizesWithByte = sizesWithoutByte.map(unit => unit + 'B');
-
-	const combinedSizes = [...sizesWithoutByte, ...sizesWithByte];
-    const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
-
-    const index = combinedSizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
-    const bytes = parseFloat(value) * Math.pow(1000, index); // Use 1000 for decimal prefixes
-
-    return bytes;
-}; */
 
 export const convertSizeToBytesDecimal = (size) => {
     if (size === null || size === undefined) {
@@ -167,11 +155,6 @@ export function getSnapshotTimestamp() {
 	return timestamp;
 }
 
-/* export function getRawTimestampFromString(timestampString) {
-	const rawTimestamp = new Date(timestampString).getTime() / 1000;
-	return rawTimestamp;
-}
- */
 export function getRawTimestampFromString(timestampString) {
 	// Check if timestampString is undefined or null
 	if (timestampString === undefined || timestampString === null) {
@@ -570,24 +553,34 @@ export function getDiskIDName(disks: DiskData[], diskIdentifier: string, selecte
 	return diskName.value;
 }
 
-/* 
-export function findDiskByPath(disks : DiskData[], path : string) {
-	return disks.find((disk) => [disk.sd_path, disk.phy_path, disk.vdev_path].includes(path));
-} */
-export function findDiskByPath(disks: DiskData[], path: string) {
-	// Regex to check if the path ends with a partition (e.g., -partX or single digit suffixes like sda1)
-	const partitionSuffixRegex = /(-part[0-9]+|[0-9]+$)/;
 
-	// Only strip the partition if it's a proper partition (and not part of something like `1-17`)
+export function findDiskByPath(disks, path) {
+	// Regex to match partition suffixes like '-part1'
+	const partitionSuffixRegex = /-part[0-9]+$/;
+
+	// Only strip the partition if it's a partition (and not something like 'nvme0n1')
 	const basePath = path.match(partitionSuffixRegex) ? path.replace(partitionSuffixRegex, '') : path;
 
 	// console.log('Checking path:', path, 'Base path:', basePath);
 
 	return disks.find((disk) => {
-		// console.log('Comparing with disk:', disk);
-		return [disk.sd_path, disk.phy_path, disk.vdev_path]
+		// Clean paths for each disk property
+		const sdPath = disk.sd_path ? cleanDiskPath(disk.sd_path) : null;
+		const phyPath = disk.phy_path ? cleanDiskPath(disk.phy_path) : null;
+		const vdevPath = disk.vdev_path ? cleanDiskPath(disk.vdev_path) : null;
+
+		// Log paths being compared
+		// console.log(`Comparing with disk paths: sd_path: ${sdPath}, phy_path: ${phyPath}, vdev_path: ${vdevPath}`);
+
+		// Check if any cleaned path matches
+		return [sdPath, phyPath, vdevPath]
 			.some((diskPath) => diskPath === path || diskPath === basePath);
 	});
+}
+
+// Helper function to clean disk paths by removing partition numbers but leaving the rest intact
+function cleanDiskPath(path) {
+	return path.replace(/-part[0-9]+$/, ''); // Only remove partition suffix like '-part1'
 }
 
 

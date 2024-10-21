@@ -59,7 +59,7 @@
                 </div>
             </div>
         </div>
-		<div v-if="diskState == 'REPLACING'" class="border border-collapse border-default ">
+		<div v-if="diskState == 'REPLACING' || diskState == 'MISSING'" class="border border-collapse border-default ">
 			<div v-for="disk in props.disk.children" class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
 				<div class="py-1 mt-1 col-span-3" :class="truncateText" :title="disk.name">{{ props.disk.name }}</div>
 				<div class="py-1 mt-1 col-span-3"></div>
@@ -195,7 +195,7 @@ const diskState = computed(() => {
 	if (diskState) {
 		return diskState.status;
 	} else {
-		return 'REPLACING';
+		return 'MISSING';
 	}
 
 });
@@ -619,7 +619,6 @@ const trimStatusBox = ref();
 
 async function getDiskTrimStatus() {
 	// console.log('trimStatusBox', trimStatusBox.value);
-
 	await trimStatusBox.value.pollTrimStatus();
 }
 

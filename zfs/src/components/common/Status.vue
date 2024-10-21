@@ -151,11 +151,10 @@
                         Trim not suppported ({{ upperCaseWord((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == selectedDisk!.name)))!.type) }}).
                     </span>
                 </div>
-
             </div>
             <div v-if="!selectedDisk" class="col-span-2 flex items-center justify-center mt-2">
                 <span class="text-muted" :class="truncateText">
-                    Disk replacing in progress...
+                    Disk is missing or being replaced.
                 </span>
             </div>
         </div>
@@ -631,6 +630,24 @@ function getTrimState(state_num) {
             break;
     }
 }
+
+// function getTrimState(state_num) {
+//     if (state_num === null || state_num === undefined) {
+//         return 'none';
+//     }
+//     switch (state_num) {
+//         case 1:
+//             return 'active';
+//         case 2:
+//             return 'canceled';
+//         case 3:
+//             return 'suspended';
+//         case 4:
+//             return 'finished';
+//         default:
+//             return 'none';
+//     }
+// }
 
 function trimMessageClass(disk) {
     switch (getTrimState(disk.stats.trim_state)) {
