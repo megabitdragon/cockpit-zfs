@@ -574,7 +574,13 @@ function getTrimTimestamp(disk) {
 }
 
 function getTrimPercentage(disk) {
-    return (disk.stats.trim_bytes_done / disk.stats.trim_bytes_est) * 100;
+    console.log('disk stats (for trim percentage):', disk.stats);
+
+    if (disk.stats.trim_state == 4) {
+        return 100;
+    } else {
+        return (disk.stats.trim_bytes_done / disk.stats.trim_bytes_est) * 100;
+    }
 }
 
 function handleTrimPercentage(percentage : number) {

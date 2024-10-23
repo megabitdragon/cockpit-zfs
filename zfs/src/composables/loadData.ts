@@ -354,70 +354,31 @@ function cleanDiskPath(path) {
 	return path.replace(/-part[0-9]+$/, ''); // Only remove partition suffix like '-part1'
 }
 
-// export async function loadDisksExtraData(disks, pools) {
-// 	try {
-// 		pools.forEach((pool) => {
-// 			pool.vdevs.forEach((vDev) => {
-// 				vDev.disks.forEach((usedDisk) => {
-// 					console.log('usedDisk:', usedDisk);
-// 					const selectedDisk = findDiskByPath(disks, usedDisk.path);
-// 					console.log('selectedDisk:', selectedDisk);
-
-// 					// Check if the selectedDisk is found
-// 					if (selectedDisk) {
-// 						selectedDisk.guid = usedDisk.guid;
-// 						selectedDisk.path = usedDisk.path;
-// 						selectedDisk.stats = usedDisk.stats;
-// 						console.log('selectedDisk loading data', selectedDisk);
-
-// 						// Clean the usedDisk.path and compare it with sd_path, phy_path, and vdev_path
-// 						const cleanedUsedDiskPath = cleanDiskPath(usedDisk.path);
-// 						console.log('cleanedUsedDiskPath:', cleanedUsedDiskPath);
-
-// 						// Find the index of the original disk in the disks array
-// 						const index = disks.findIndex(disk =>
-// 							[disk.sd_path, disk.phy_path, disk.vdev_path].includes(cleanedUsedDiskPath)
-// 						);
-
-// 						// Check if the original disk is found in the disks array
-// 						if (index !== -1) {
-// 							// Replace the original disk with the updated selectedDisk
-// 							disks[index] = { ...selectedDisk }; // Use spread operator to create a new object
-// 							// console.log('Updated disks array:', disks);
-// 						} else {
-// 							console.error('Original disk not found in the disks array');
-// 						}
-// 					} else {
-// 						console.log('Selected disk not found');
-// 					}
-// 				});
-// 			});
-// 		});
-
-// 	} catch (error) {
-// 		// Handle any errors that may occur during the asynchronous operation
-// 		console.error("An error occurred getting extra disk data:", error);
-// 	}
-// }
 export async function loadDisksExtraData(disks, pools) {
 	try {
 		pools.forEach((pool) => {
 			pool.vdevs.forEach((vDev) => {
 				vDev.disks.forEach((usedDisk) => {
-					console.log('disk from vdev:', usedDisk);
+					// console.log('disk from vdev:', usedDisk);
 					const selectedDisk = findDiskByPath(disks, usedDisk.path);
-					console.log('matching disk from disks:', selectedDisk);
+					let statsObject;
+
+					if (selectedDisk.type == 'NVMe' || !usedDisk.stats) {
+						statsObject = vDev.stats
+					} else {
+						statsObject = usedDisk.stats
+					}
 
 					// Check if the selectedDisk is found
 					if (selectedDisk) {
 						selectedDisk.guid = usedDisk.guid;
 						selectedDisk.path = usedDisk.path;
-						selectedDisk.stats = usedDisk.stats;
-						console.log('selectedDisk loading data', selectedDisk);
+						selectedDisk.stats = statsObject;
+						// console.log('selectedDisk loading data', selectedDisk);
 
 						// Clean the usedDisk.path and compare it with sd_path, phy_path, and vdev_path
 						const cleanedUsedDiskPath = cleanDiskPath(usedDisk.path);
-						console.log('cleanedUsedDiskPath:', cleanedUsedDiskPath);
+						// console.log('cleanedUsedDiskPath:', cleanedUsedDiskPath);
 
 						// Find the index of the original disk in the disks array
 						const index = disks.findIndex(disk =>
@@ -428,7 +389,7 @@ export async function loadDisksExtraData(disks, pools) {
 						if (index !== -1) {
 							// Replace the original disk with the updated selectedDisk
 							disks[index] = { ...selectedDisk }; // Use spread operator to create a new object
-							console.log('Updated disks array:', disks);
+							// console.log('Updated disks array:', disks);
 						} else {
 							console.error('Original disk not found in the disks array');
 						}
