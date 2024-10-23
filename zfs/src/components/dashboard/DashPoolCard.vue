@@ -3,9 +3,17 @@
 		<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true"
 			class="mt-2 mb-4 min-w-96 w-full min-h-96 h-full overflow-visible bg-plugin-header rounded-md border border-default">
 			<template v-slot:title>
-				<div class="flex flex-row justify-between">
-					<div class="text-default" :class="truncateText">
-						{{ props.pool.name }}
+				<div class="flex flex-row justify-between items-center">
+					<div class="flex flex-row flex-grow">
+						<div class="text-default" :class="truncateText">
+							{{ props.pool.name }}
+						</div>
+						<div v-if="upgradeablePool"
+							title="Pool was made with a legacy version of ZFS. Upgrade available."
+							class="flex flex-row justify-between w-fit bg-default rounded-full text-xs items-center">
+							<ExclamationCircleIcon class="ml-2 w-5 text-orange-700" />
+							<span class="text-orange-700 ml-1">Upgrade Available</span>
+						</div>
 					</div>
 					<Menu as="div" class="relative inline-block text-right">
 						<div>
@@ -31,6 +39,11 @@
 									<!-- <MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click="clearPoolErrors(props.pool.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
 									</MenuItem> -->
+									<MenuItem as="div" v-slot="{ active }">
+									<a v-if="upgradeablePool" href="#" @click="upgradeThisPool(props.pool)!"
+										:class="[active ? 'bg-orange-700 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Upgrade
+										Pool</a>
+									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
 									<a v-if="!scanActivity!.isActive" href="#" @click="resilverThisPool(props.pool)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver
@@ -266,16 +279,22 @@
 			:confirmOperation="confirmThisExport" :firstOption="'force unmount'" :hasChildren="false" />
 	</div>
 
+	<div v-if="showUpgradeModal">
+		<component :is="upgradeConfirmComponent" :showFlag="showUpgradeModal" @close="updateShowUpgradePool"
+			:idKey="'confirm-upgrade-pool'" :item="'pool'" :operation="'upgrade'" :pool="selectedPool!"
+			:confirmOperation="confirmThisUpgrade" :hasChildren="false" />
+	</div>
+
 </template>
 
 <script setup lang="ts">
 import { ref, inject, Ref, computed, provide, watch, onMounted} from "vue";
-import { EllipsisVerticalIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool } from "../../composables/pools";
+import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, upgradePool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
-import { loadScanActivities, loadTrimActivities, formatStatus } from '../../composables/helpers'
+import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable } from '../../composables/helpers'
 import Card from '../common/Card.vue';
 import Status from '../common/Status.vue';
 
@@ -328,6 +347,7 @@ function getIsTrimmable() {
 
 onMounted(() => {
 	getIsTrimmable();
+	canUpgradePool(props.pool.name);
 });
 
 ///////// Values for Confirmation Modals ////////////
@@ -534,6 +554,67 @@ watch(confirmResilver, async (newValue, oldValue) => {
 			}
 		} catch (error) { 
 			console.error(error);
+		}
+	}
+});
+
+
+////////////////// Upgrade Pool /////////////////////
+/////////////////////////////////////////////////////
+const upgradeablePool = ref(false);
+const showUpgradeModal = ref(false);
+const confirmUpgrade = ref(false);
+const upgrading = ref(false);
+
+async function canUpgradePool(poolName) {
+	return upgradeablePool.value = await isPoolUpgradable(props.pool.name);
+}
+
+const upgradeConfirmComponent = ref();
+const loadUpgradeConfirmComponent = async () => {
+	const module = await import('../common/UniversalConfirmation.vue');
+	upgradeConfirmComponent.value = module.default;
+}
+
+async function upgradeThisPool(pool) {
+	selectedPool.value = pool;
+	await loadUpgradeConfirmComponent();
+	showUpgradeModal.value = true;
+	console.log('preparing to upgrade:', selectedPool.value);
+}
+
+const confirmThisUpgrade: ConfirmationCallback = () => {
+	confirmUpgrade.value = true;
+}
+
+const updateShowUpgradePool = (newVal) => {
+	showUpgradeModal.value = newVal;
+}
+
+watch(confirmUpgrade, async (newVal, oldVal) => {
+	if (confirmUpgrade.value == true) {
+		operationRunning.value = true;
+		console.log('now upgrading:', selectedPool.value);
+		upgrading.value = true;
+		try {
+			const output = await upgradePool(selectedPool.value!);
+
+			if (output == null || output.error) {
+				const errorMessage = output?.error || 'Unknown error';
+				notifications.value.constructNotification('Upgrade Failed', `Upgrade failed: ${errorMessage}.`, 'error');
+				operationRunning.value = false;
+				confirmUpgrade.value = false;
+			} else {
+				getScanStatus();
+				confirmUpgrade.value = false;
+				operationRunning.value = false;
+				notifications.value.constructNotification('Upgrade Successful', 'Upgrade on ' + selectedPool.value!.name + " succeeded.", 'success');
+				showUpgradeModal.value = false;
+				canUpgradePool(selectedPool.value!.name);
+			}
+			upgrading.value = true;
+		} catch (error) {
+			console.error(error)
 		}
 	}
 });

@@ -308,6 +308,7 @@ export async function resilverPool(pool) {
 	}
 }
 
+
 export async function exportPool(pool, force?) {
 	try {
 		let cmdString = ['zpool', 'export'];
@@ -488,6 +489,19 @@ export async function removeVDevFromPool(vdev, pool) {
 	} catch (state) {
 		// console.error(errorString(state));
 		// return null;
+		const errorMessage = errorString(state);
+		console.error(errorMessage);
+		return { error: errorMessage };
+	}
+}
+
+export async function upgradePool(pool) {
+	try {
+		const state = useSpawn(['zpool', 'upgrade', pool.name]);
+		const output = await state.promise();
+		console.log(output)
+		return output.stdout;
+	} catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
 		return { error: errorMessage };

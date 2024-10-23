@@ -587,3 +587,45 @@ function cleanDiskPath(path) {
 export function truncateName(name : string, threshold : number) {
     return (name.length > threshold ? name.slice(0, threshold) + '...' : name)
 }
+
+
+export async function isPoolUpgradable(poolName: string) {
+	try {
+		const state = useSpawn(['zpool', 'status', poolName], { superuser: 'try', stderr: 'out' });
+
+		const output = await state.promise();
+		// console.log('zpool status output:', output.stdout);
+
+		// Split the output into lines
+		const lines = output.stdout.split('\n');
+
+		// Define the patterns to match
+		const statusPattern = /The pool is formatted using a legacy on-disk format/;
+		const actionPattern = /Upgrade the pool using 'zpool upgrade'/;
+
+		// Variables to track if patterns are found
+		let statusFound = false;
+		let actionFound = false;
+
+		// Iterate through each line and check for patterns
+		for (const line of lines) {
+			if (statusPattern.test(line)) {
+				statusFound = true;
+			}
+			if (actionPattern.test(line)) {
+				actionFound = true;
+			}
+
+			// If both patterns are found, return true early
+			if (statusFound && actionFound) {
+				return true;
+			}
+		}
+
+		// If the patterns aren't matched, the pool is not upgradable
+		return false;	
+	} catch (error) {
+		console.error(errorString(error));
+		return false;
+	}
+}
