@@ -1,3 +1,3 @@
-## zfs module 1.0.4-1
+## zfs module 1.0.4-2
 
-* Adds upgrade pool feature for pools made in legacy zfs version
+* Rebuilding
