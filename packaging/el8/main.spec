@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Wed Oct 23 2024 Jordan Keough <jkeough@45drives.com> 1.0.4-1
+- Adds upgrade pool feature for pools made in legacy zfs version
 * Mon Oct 21 2024 Jordan Keough <jkeough@45drives.com> 1.0.3-1
 - Bug fixes and some minor updates
 * Tue Sep 24 2024 Jordan Keough <jkeough@45drives.com> 1.0.2-3
