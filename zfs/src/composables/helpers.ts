@@ -483,6 +483,8 @@ export function formatStatus(status) {
 			return 'text-orange-600';
 		case 'FAULTED':
 			return 'text-red-600';
+		case 'SUSPENDED':
+			return 'text-red-600';
 		case 'OFFLINE':
 			return 'text-red-600';
 		case 'REMOVED':

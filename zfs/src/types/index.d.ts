@@ -32,6 +32,8 @@ interface PoolData {
 	fileSystem?: FileSystemData;
 	datasets?: Dataset[];
 	errors?: string[];
+	statusCode: string | null;
+	statusDetail: string | null;
 	comment?: string;
 	failMode?: 'wait' | 'continue' | 'panic';
 	diskType?: 'SSD' | 'HDD' | 'Hybrid';
@@ -56,8 +58,9 @@ interface vDevData {
 	forceAdd?: boolean;
 	poolName?: string;
 	isMirror?: boolean;
-	diskType?: 'SSD' | 'HDD' | 'Hybrid';
+	diskType?: 'SSD' | 'HDD' | 'NVMe' | 'Hybrid' | unknown;
 	diskIdentifier?: DiskIdentifier;
+	errors?: string[];
 	path?: string;
 }
 
@@ -69,7 +72,7 @@ interface DiskData {
 	guid: string;
 	type: string;
 	health: string;
-	stats: {};
+	stats: Record<string, any>;
 	path: string;
 	phy_path: string;
 	sd_path: string;
@@ -92,7 +95,7 @@ interface ChildDiskData {
 	name: string;
 	guid: string;
 	path: string;
-	stats: {};
+	stats: Record<string, any>;
 	status: string;
 	type: string;
 	children?:[];
@@ -121,10 +124,10 @@ interface ImportablePoolData {
 	name: string;
 	status: string;
 	guid: string;
-	properties: {}
+	properties: Record<string, any>
 	// vdevs: ImportablePoolvDevData[];
 	vdevs: vDevData[];
-	scan: {}
+	scan: Record<string, any>
 	isDestroyed?: boolean;
 	errors?: string[];
 }
@@ -135,8 +138,8 @@ interface ImportablePoolvDevData {
 	type: 'disk' | 'mirror' | 'raidz1' | 'raidz2' | 'raidz3' | 'cache' | 'log' | 'dedup' | 'special' | 'spare';
 	status: string;
 	guid: string;
-	stats: {};
-	disks: [{}];
+	stats: Record<string, any>;
+	disks: [Record<string, any>];
 	poolName?: string;
 }
 
@@ -278,7 +281,7 @@ interface Snapshot {
 	guid: string;
 	creationTimestamp: string;
 	properties: any,
-	holds: {}
+	holds: Record<string, any>
 }
 
 interface NewSnapshot {

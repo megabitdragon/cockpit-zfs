@@ -334,6 +334,8 @@ const poolConfig = ref<PoolData>({
 	vdevs: props.pool.vdevs,
 	failMode: props.pool.failMode,
 	comment: props.pool.comment,
+	statusCode: props.pool.statusCode,
+	statusDetail: props.pool.statusDetail,
 });
 
 function getIsTrimmable() {

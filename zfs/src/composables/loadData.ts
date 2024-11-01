@@ -92,7 +92,7 @@ export async function loadDisksThenPools(disks, pools) {
 				if (parsedJSON[i].root_dataset != null) {
 					const poolData = {
 						name: parsedJSON[i].name,
-						status: parsedJSON[i].status,
+						status: parsedJSON[i].status_code == 'OK' ? parsedJSON[i].status : parsedJSON[i].properties.health.parsed,
 						guid: parsedJSON[i].guid,
 						properties: {
 							rawsize: parsedJSON[i].properties.size.parsed,
@@ -133,7 +133,9 @@ export async function loadDisksThenPools(disks, pools) {
 							bytes_to_process: parsedJSON[i].scan.bytes_to_process,
 						},
 						errors: errors,
-						
+						statusCode: parsedJSON[i].status_code,
+						statusDetail: parsedJSON[i].status_detail,
+
 						//adds VDev array to Pool data object
 						vdevs: vDevs.value,
 	
@@ -146,7 +148,7 @@ export async function loadDisksThenPools(disks, pools) {
 				} else {
 					const poolData = {
 						name: parsedJSON[i].name,
-						status: parsedJSON[i].status,
+						status: parsedJSON[i].status_code == 'OK' ? parsedJSON[i].status : parsedJSON[i].properties.health.parsed,
 						guid: parsedJSON[i].guid,
 						properties: {
 							rawsize: parsedJSON[i].properties.size.parsed,
@@ -160,7 +162,7 @@ export async function loadDisksThenPools(disks, pools) {
 							compression: false,
 							deduplication: false,
 							refreservationRawSize: 0,
-							refreservationPercent: Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)),
+							refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)) : 0,
 							autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 							autoReplace: parsedJSON[i].properties.autoreplace.parsed,
 							autoTrim: onOffToBool(parsedJSON[i].properties.autotrim.parsed),
@@ -187,6 +189,8 @@ export async function loadDisksThenPools(disks, pools) {
 							bytes_to_process: parsedJSON[i].scan.bytes_to_process,
 						},
 						errors: errors,
+						statusCode: parsedJSON[i].status_code,
+						statusDetail: parsedJSON[i].status_detail,
 						
 						//adds VDev array to Pool data object
 						vdevs: vDevs.value,
@@ -232,6 +236,49 @@ export async function loadDisksThenPools(disks, pools) {
 			await loadDisksExtraData(disks.value, pools.value);
 
 			console.log("loaded Disks:", disks);
+
+			// // After loading pools, check for pools with missing or degraded disks
+			// pools.value.forEach(pool => {
+			// 	let allDisksMissing = true;
+			// 	let anyDiskMissing = false;
+
+			// 	// Check if all disks in each vDev are marked as "MISSING" or if at least one is missing
+			// 	pool.vdevs.forEach(vDev => {
+			// 		let vDevAllDisksMissing = true;
+			// 		let vDevAnyDiskMissing = false;
+
+			// 		vDev.disks.forEach(disk => {
+			// 			if (disk.health !== "MISSING") {
+			// 				vDevAllDisksMissing = false;
+			// 				allDisksMissing = false;
+			// 			} else {
+			// 				vDevAnyDiskMissing = true;
+			// 				anyDiskMissing = true;
+			// 			}
+			// 		});
+
+			// 		// If at least one disk is missing in this vDev, mark it as degraded
+			// 		if (vDevAnyDiskMissing && !vDevAllDisksMissing) {
+			// 			vDev.status = "DEGRADED";
+			// 			vDev.errors = vDev.errors || [];
+			// 			vDev.errors.push("One or more disks in this vDev are missing, marking it as degraded.");
+			// 		}
+			// 	});
+
+			// 	// If all disks are missing in the pool, mark the pool as suspended
+			// 	if (allDisksMissing) {
+			// 		pool.status = "SUSPENDED";
+			// 		pool.properties.health = "SUSPENDED";
+			// 		pool.errors.push("Pool is suspended due to all disks being unavailable.");
+			// 	} else if (anyDiskMissing) {
+			// 		// If only some disks are missing, mark the pool as degraded
+			// 		pool.status = "DEGRADED";
+			// 		pool.properties.health = "DEGRADED";
+			// 		pool.errors.push("Pool is degraded due to one or more missing disks.");
+			// 	}
+			// });
+
+			// console.log("Loaded Pools with missing and degraded disk handling:", pools);
 
 		} catch (error) {
 			// Handle any errors that may occur during the asynchronous operation
@@ -363,7 +410,7 @@ export async function loadDisksExtraData(disks, pools) {
 					const selectedDisk = findDiskByPath(disks, usedDisk.path);
 					let statsObject;
 
-					if (selectedDisk.type == 'NVMe' || !usedDisk.stats) {
+					if (selectedDisk && selectedDisk.type == 'NVMe' || !usedDisk.stats) {
 						statsObject = vDev.stats
 					} else {
 						statsObject = usedDisk.stats
@@ -419,7 +466,11 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		poolName: poolName,
 		path: vDev.path,
 		diskType: determineDiskType(vDev, disks),
+		errors: [],
 	};
+
+	// let allDisksMissing = true;
+	// let anyDiskMissing = false;
 
 	// Regex for various disk path types
 	const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
@@ -473,8 +524,6 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		});
 	}
 
-
-
 	// Check if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
 	if (vDev.children.length < 1) {
 		const diskVDev = ref();
@@ -486,6 +535,10 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		if (!diskVDev.value) {
 			console.error(`Disk not found for path: ${vDevData.path}.`);
 			diskVDev.value = createMissingDisk(vDev.path, vDev.name, vDevType, poolName);
+			// vDevData.status = "DEGRADED";
+			// vDevData.errors!.push("VDev is degraded due to missing disk.");
+		// } else {
+		// 	allDisksMissing = false;
 		}
 
 		if (vDevData.path!.match(phyPathRegex)) {
@@ -544,18 +597,34 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			vDevData.disks.push(notAChildDisk);
 		}
 
-		vDevs.value.push(vDevData);
 	} else {
 		vDev.children.forEach(child => {
 			handleDiskChild(child, vDevData, disks, vDev.name, poolName, vDevType);
+			// const childDisk = handleDiskChild(child, vDevData, disks, vDev.name, poolName, vDevType);
+			// if (childDisk.health === "MISSING") {
+			// 	anyDiskMissing = true;
+			// } else {
+			// 	allDisksMissing = false;
+			// }
 		});
-
-		vDevs.value.push(vDevData);
 	}
+
+	// if (allDisksMissing) {
+	// 	vDevData.status = "SUSPENDED";
+	// 	vDevData.errors!.push("All disks in this vDev are missing.");
+	// } else if (anyDiskMissing) {
+	// 	vDevData.status = "DEGRADED";
+	// 	vDevData.errors!.push("One or more disks in this vDev are missing, marking it as degraded.");
+	// } else {
+	// 	vDevData.status = "ONLINE";
+	// }
+
+	vDevs.value.push(vDevData);
 }
 
+
 function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
-    let fullDiskData = disks.value.find(disk => {
+    let fullDiskData: DiskData = disks.value.find(disk => {
         return disk.phy_path + '-part1' === child.path ||
                disk.sd_path + '1' === child.path ||
                disk.vdev_path + '-part1' === child.path;
@@ -575,7 +644,7 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
         path: child.path,
         guid: child.guid,
         type: fullDiskData.type,
-        health: fullDiskData.status,
+		health: fullDiskData.health,
         stats: child.stats || {},
         capacity: fullDiskData.capacity || 'Unknown',
         model: fullDiskData.model || 'Unknown',
@@ -584,7 +653,7 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
         vdev_path: fullDiskData.vdev_path,
         serial: fullDiskData.serial || 'Unknown',
         powerOnHours: fullDiskData.powerOnHours || 0,
-        powerOnCount: fullDiskData.powerOnCount || 0,
+        powerOnCount: fullDiskData.powerOnCount || '0',
         temp: fullDiskData.temp || 0,
         rotationRate: fullDiskData.rotationRate || 0,
         vDevName: vDevName,
@@ -597,6 +666,8 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 	if (!vDevData.disks.some(disk => disk.guid === childDisk.guid)) {
 		vDevData.disks.push(childDisk);
 	}
+
+	return childDisk;
 }
 
 
@@ -606,7 +677,7 @@ function createMissingDisk(path, vDevName, vDevType, poolName) {
         name: 'Missing Disk',
         path: path,
         guid: 'N/A',
-        type: vDevType,
+        type: 'N/A',
         health: 'MISSING',
         stats: {},
         capacity: 'N/A',
@@ -616,12 +687,13 @@ function createMissingDisk(path, vDevName, vDevType, poolName) {
         vdev_path: '',
         serial: 'N/A',
         powerOnHours: 0,
-        powerOnCount: 0,
-        temp: 0,
+        powerOnCount: '0',
+        temp: '0',
         rotationRate: 0,
         vDevName: vDevName,
         poolName: poolName,
         vDevType: vDevType,
+		errors: [`Disk missing from pool: ${poolName}, vDev: ${vDevName}`],
     };
 }
 
@@ -757,7 +829,7 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 	}
 }
 
-function determineDiskType(vDev, disks) {
+/* function determineDiskType(vDev, disks) {
     const childDisks = vDev.children.map(child => child.name);
 
     const diskTypes = childDisks.map(diskName => {
@@ -773,4 +845,27 @@ function determineDiskType(vDev, disks) {
     } else {
         return 'Hybrid'; // Mixed SSD and HDD
     }
+} */
+
+// Function to determine the type of disks in a VDev
+function determineDiskType(vDev, disks) {
+	const childDisks = vDev.children.map(child => child.name);
+
+	const diskTypes = childDisks.map(diskName => {
+		const disk = disks.value.find(disk => disk.name === diskName);
+		return disk ? disk.type : 'MISSING'; // Mark as 'MISSING' if disk not found
+	});
+
+	// Determine the disk type based on the types of child disks in the VDev
+	const uniqueDiskTypes = new Set(diskTypes);
+
+	if (uniqueDiskTypes.has('MISSING')) {
+		return 'MISSING';
+	} else if (uniqueDiskTypes.size === 1) {
+		return Array.from(uniqueDiskTypes)[0]; // Return the single type if all disks are the same
+	} else if (uniqueDiskTypes.has('SSD') || uniqueDiskTypes.has('HDD') || uniqueDiskTypes.has('NVMe')) {
+		return 'Hybrid'; // Mixed SSD, HDD, or NVMe
+	} else {
+		return 'Unknown';
+	}
 }

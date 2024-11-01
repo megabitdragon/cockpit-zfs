@@ -161,6 +161,8 @@ const poolConfig = ref<PoolData>({
 	},
 	vdevs: [],
 	createFileSystem: true,
+	statusCode: '',
+	statusDetail: null,
 	// fileSystem: fileSystemConfig.value,
 });
 

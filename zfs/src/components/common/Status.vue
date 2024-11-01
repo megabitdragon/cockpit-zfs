@@ -6,7 +6,8 @@
                 <div v-if="!isTrim">
                     <div class="grid grid-cols-4 gap-1 justify-items-center w-full">
                         <span class="col-span-4 mt-0.5 font-semibold" :class="stateMessageClass()">
-                            {{ stateMessage }}
+                            <!-- {{ stateMessage }} -->
+                              {{ displayStateMessage }}
                         </span>
 
                         <div class="col-span-4">
@@ -100,8 +101,9 @@
                 <div class="grid grid-cols-2 gap-1 justify-center items-center">
 
                     <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-2">
-                        <span :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm" :title="miniStateMsg">
-                            {{ miniStateMsg }}
+                        <span :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm" :title="displayMiniStateMsg">
+                            <!-- {{ miniStateMsg }} -->
+                              {{ displayMiniStateMsg }}
                         </span>
                         <div class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
                             <div :class="progressBarClass()" class="h-3" :style="{ width: `${ parseFloat(scanPercentage.toFixed(2)) }%` }">
@@ -115,7 +117,8 @@
 
                     <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-2" :class="truncateText">
                         <span :class="stateMessageClass()">
-                            {{ miniStateMsg }}
+                            <!-- {{ miniStateMsg }} -->
+                              {{ displayMiniStateMsg }}
                         </span>
                     </div>
                 </div>
@@ -376,6 +379,38 @@ const miniStateMsg = computed(() => {
     }
 });
 
+// Computed property to determine the state message based on pool health
+const displayStateMessage = computed(() => {
+    // if (props.pool.status === "SUSPENDED") {
+    //     return "Pool is suspended due to all disks being unavailable.";
+    // } else if (props.pool.status === "DEGRADED") {
+    //     return "Pool is degraded due to one or more missing disks.";
+    // } else {
+    //     return stateMessage.value;  // Default to existing stateMessage if not degraded or suspended
+    // }
+    if (props.pool.statusCode !== 'OK') {
+        return `${props.pool.statusDetail}`;
+    } else {
+        return stateMessage.value;
+    }
+});
+
+// Computed property for a shorter message in pool list view
+const displayMiniStateMsg = computed(() => {
+    // if (props.pool.status === "SUSPENDED") {
+    //     return "All disks are missing";
+    // } else if (props.pool.status === "DEGRADED") {
+    //     return "One or more disks missing.";
+    // } else {
+    //     return miniStateMsg.value;  // Default to existing miniStateMsg if not degraded or suspended
+    // }
+    if (props.pool.statusCode !== 'OK') {
+        return `${props.pool.statusDetail}`;
+    } else {
+        return miniStateMsg.value;
+    }
+});
+
 const scanPercentage = computed(() => {
     return scanObjectGroup.value[props.pool.name].percentage;
 });
@@ -393,7 +428,7 @@ const timeRemaining = computed(() => {
 });
 
 function stateMessageClass() {
-     if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause === 'None') {
+    if (scanObjectGroup.value[props.pool.name] && scanObjectGroup.value[props.pool.name].pause === 'None') {
         switch (scanObjectGroup.value[props.pool.name].state) {
             case 'SCANNING':
                 return 'text-default';
@@ -636,24 +671,6 @@ function getTrimState(state_num) {
             break;
     }
 }
-
-// function getTrimState(state_num) {
-//     if (state_num === null || state_num === undefined) {
-//         return 'none';
-//     }
-//     switch (state_num) {
-//         case 1:
-//             return 'active';
-//         case 2:
-//             return 'canceled';
-//         case 3:
-//             return 'suspended';
-//         case 4:
-//             return 'finished';
-//         default:
-//             return 'none';
-//     }
-// }
 
 function trimMessageClass(disk) {
     switch (getTrimState(disk.stats.trim_state)) {
