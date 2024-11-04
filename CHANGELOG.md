@@ -1,3 +1,3 @@
-## zfs module 1.0.4-3
+## zfs module 1.1.0-1
 
-* Rebuilding
+* Stable Release
