@@ -44,13 +44,5 @@ const offset = computed(() => {
     return circumference.value - (circumference.value * percentage) / 100;
 });
 
-// const filledAmount = computed(() => {
-// 	//return (props.capacity / 100) * (2 * Math.PI * props.radius);
-//     const capacity = props.percentage;
-//     const circumference = 2 * Math.PI * props.radius;
-//     const filledCircumference = (capacity / 100) * circumference;
-//     return circumference - filledCircumference;
-// });
-
 const getIdKey = (name: string) => `${name}`;
 </script>

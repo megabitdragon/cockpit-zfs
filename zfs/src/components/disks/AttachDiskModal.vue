@@ -29,8 +29,9 @@
                             <label :for="getIdKey(`disk-${diskIdx}`)"
                                 class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <span class="flex flex-row flex-grow w-full justify-between">
-                                    <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisk" type="checkbox"
-                                        :value="`${disk.name}`" :name="`disk-${disk.name}`"
+                                    <input :id="getIdKey(`disk-${diskIdx}`)" type="checkbox" :value="disk.name"
+                                        :name="`disk-${disk.name}`" :checked="selectedDisk === disk.name"
+                                        @change="selectSingleDisk(disk.name)"
                                         class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
                                     <div v-if="disk.hasPartitions!"
                                         title="Disk already has partitions. Procees with caution."
@@ -130,7 +131,7 @@ import { ref, inject, Ref, computed, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
-import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, loadScanActivities } from '../../composables/helpers';
+import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, loadScanActivities, convertSizeToBytesDecimal } from '../../composables/helpers';
 import { attachDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets, loadDiskStats, loadScanObjectGroup } from '../../composables/loadData';
 import { loadImportablePools } from '../../composables/loadImportables';
@@ -168,7 +169,12 @@ function debuggingInfo() {
 
 const showAttachDiskModal = inject<Ref<boolean>>('show-attach-modal')!;
 
-const selectedDisk = ref('');
+const selectedDisk = ref(''); // Holds the name of the selected disk
+
+function selectSingleDisk(diskName) {
+    // If the same disk is clicked again, deselect it; otherwise, select the new disk
+    selectedDisk.value = selectedDisk.value === diskName ? '' : diskName;
+}
 
 const pools = inject<Ref<PoolData[]>>('pools')!;
 const allDisks = inject<Ref<DiskData[]>>('disks')!;
@@ -214,9 +220,7 @@ const availableDisks = computed<DiskData[]>(() => {
 
 //change color of disk when selected
 const diskCardClass = (diskName) => {
-    const isSelected = selectedDisk.value === diskName;
-    // console.log('DISK SELECTED:', selectedDisk.value);
-    return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
+    return selectedDisk.value === diskName ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
 function setDiskNamePath() {
@@ -308,14 +312,14 @@ const diskSizeMatch = () => {
     const newDiskData = allDisks.value.find(fullDisk => fullDisk.name === selectedDisk.value);
 
     if (newDiskData) {
-        const newCapacity = convertSizeToBytes(newDiskData!.capacity);
+        const newCapacity = convertSizeToBytesDecimal(newDiskData!.capacity);
         console.log('newCapacity:', newCapacity);
 
         const oldDisks = props.vDev.disks;
         console.log('oldDisks:', oldDisks);
 
         for (const oldDisk of oldDisks) {
-            const currentCapacity = convertSizeToBytes(oldDisk.capacity);
+            const currentCapacity = convertSizeToBytesDecimal(oldDisk.capacity);
             console.log('currentCapacity:', currentCapacity);
 
             if (newCapacity < currentCapacity) {

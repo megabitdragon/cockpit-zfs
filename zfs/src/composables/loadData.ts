@@ -106,7 +106,8 @@ export async function loadDisksThenPools(disks, pools) {
 							compression: parsedJSON[i].root_dataset.properties.compression.parsed,
 							deduplication: onOffToBool(parsedJSON[i].root_dataset.properties.dedup.parsed),
 							refreservationRawSize: parsedJSON[i].root_dataset.properties.refreservation.parsed,
-							refreservationPercent: Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)),
+							// refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)) : 0,
+							refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].properties.size.parsed) * 100).toFixed(2)) : 0,
 							autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 							autoReplace: parsedJSON[i].properties.autoreplace.parsed,
 							autoTrim: onOffToBool(parsedJSON[i].properties.autotrim.parsed),
@@ -135,6 +136,7 @@ export async function loadDisksThenPools(disks, pools) {
 						errors: errors,
 						statusCode: parsedJSON[i].status_code,
 						statusDetail: parsedJSON[i].status_detail,
+						errorCount: parsedJSON[i].error_count,
 
 						//adds VDev array to Pool data object
 						vdevs: vDevs.value,
@@ -143,7 +145,7 @@ export async function loadDisksThenPools(disks, pools) {
 					}
 					pools.value.push(poolData);
 
-					console.log("poolData after JSON load:", poolData);
+					console.log("poolData after JSON load (with root):", poolData);
 					vDevs.value = [];
 				} else {
 					const poolData = {
@@ -162,7 +164,8 @@ export async function loadDisksThenPools(disks, pools) {
 							compression: false,
 							deduplication: false,
 							refreservationRawSize: 0,
-							refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)) : 0,
+							// refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)) : 0,
+							refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].properties.size.parsed) * 100).toFixed(2)) : 0,
 							autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 							autoReplace: parsedJSON[i].properties.autoreplace.parsed,
 							autoTrim: onOffToBool(parsedJSON[i].properties.autotrim.parsed),
@@ -191,6 +194,7 @@ export async function loadDisksThenPools(disks, pools) {
 						errors: errors,
 						statusCode: parsedJSON[i].status_code,
 						statusDetail: parsedJSON[i].status_detail,
+						errorCount: parsedJSON[i].error_count,
 						
 						//adds VDev array to Pool data object
 						vdevs: vDevs.value,
@@ -199,7 +203,7 @@ export async function loadDisksThenPools(disks, pools) {
 					}
 					pools.value.push(poolData);
 
-					console.log("poolData after JSON load:", poolData);
+					console.log("poolData after JSON load (no root):", poolData);
 					vDevs.value = [];
 				}
 			}
@@ -237,48 +241,6 @@ export async function loadDisksThenPools(disks, pools) {
 
 			console.log("loaded Disks:", disks);
 
-			// // After loading pools, check for pools with missing or degraded disks
-			// pools.value.forEach(pool => {
-			// 	let allDisksMissing = true;
-			// 	let anyDiskMissing = false;
-
-			// 	// Check if all disks in each vDev are marked as "MISSING" or if at least one is missing
-			// 	pool.vdevs.forEach(vDev => {
-			// 		let vDevAllDisksMissing = true;
-			// 		let vDevAnyDiskMissing = false;
-
-			// 		vDev.disks.forEach(disk => {
-			// 			if (disk.health !== "MISSING") {
-			// 				vDevAllDisksMissing = false;
-			// 				allDisksMissing = false;
-			// 			} else {
-			// 				vDevAnyDiskMissing = true;
-			// 				anyDiskMissing = true;
-			// 			}
-			// 		});
-
-			// 		// If at least one disk is missing in this vDev, mark it as degraded
-			// 		if (vDevAnyDiskMissing && !vDevAllDisksMissing) {
-			// 			vDev.status = "DEGRADED";
-			// 			vDev.errors = vDev.errors || [];
-			// 			vDev.errors.push("One or more disks in this vDev are missing, marking it as degraded.");
-			// 		}
-			// 	});
-
-			// 	// If all disks are missing in the pool, mark the pool as suspended
-			// 	if (allDisksMissing) {
-			// 		pool.status = "SUSPENDED";
-			// 		pool.properties.health = "SUSPENDED";
-			// 		pool.errors.push("Pool is suspended due to all disks being unavailable.");
-			// 	} else if (anyDiskMissing) {
-			// 		// If only some disks are missing, mark the pool as degraded
-			// 		pool.status = "DEGRADED";
-			// 		pool.properties.health = "DEGRADED";
-			// 		pool.errors.push("Pool is degraded due to one or more missing disks.");
-			// 	}
-			// });
-
-			// console.log("Loaded Pools with missing and degraded disk handling:", pools);
 
 		} catch (error) {
 			// Handle any errors that may occur during the asynchronous operation
@@ -600,24 +562,9 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	} else {
 		vDev.children.forEach(child => {
 			handleDiskChild(child, vDevData, disks, vDev.name, poolName, vDevType);
-			// const childDisk = handleDiskChild(child, vDevData, disks, vDev.name, poolName, vDevType);
-			// if (childDisk.health === "MISSING") {
-			// 	anyDiskMissing = true;
-			// } else {
-			// 	allDisksMissing = false;
-			// }
 		});
 	}
 
-	// if (allDisksMissing) {
-	// 	vDevData.status = "SUSPENDED";
-	// 	vDevData.errors!.push("All disks in this vDev are missing.");
-	// } else if (anyDiskMissing) {
-	// 	vDevData.status = "DEGRADED";
-	// 	vDevData.errors!.push("One or more disks in this vDev are missing, marking it as degraded.");
-	// } else {
-	// 	vDevData.status = "ONLINE";
-	// }
 
 	vDevs.value.push(vDevData);
 }
@@ -829,23 +776,6 @@ export async function loadSnapshotsInDataset(snapshots, datasetName) {
 	}
 }
 
-/* function determineDiskType(vDev, disks) {
-    const childDisks = vDev.children.map(child => child.name);
-
-    const diskTypes = childDisks.map(diskName => {
-        const disk = disks.value.find(disk => disk.name === diskName);
-        return disk ? disk.type : 'unknown'; // Default to 'unknown' if disk not found
-    });
-
-    // Determine the disk type based on the types of child disks in the VDev
-    if (diskTypes.every(type => type === 'SSD')) {
-        return 'SSD';
-    } else if (diskTypes.every(type => type === 'HDD')) {
-        return 'HDD';
-    } else {
-        return 'Hybrid'; // Mixed SSD and HDD
-    }
-} */
 
 // Function to determine the type of disks in a VDev
 function determineDiskType(vDev, disks) {

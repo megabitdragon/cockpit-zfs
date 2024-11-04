@@ -36,9 +36,11 @@
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool
 										Details</a>
 									</MenuItem>
-									<!-- <MenuItem as="div" v-slot="{ active }">
-										<a href="#" @click="clearPoolErrors(props.pool.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
-									</MenuItem> -->
+									<MenuItem as="div" v-slot="{ active }">
+									<a href="#" @click="clearPoolErrors(props.pool.name)"
+										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear
+										Pool Errors</a>
+									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
 									<a v-if="upgradeablePool" href="#" @click="upgradeThisPool(props.pool)!"
 										:class="[active ? 'bg-orange-700 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Upgrade
@@ -119,29 +121,10 @@
 				</div>
 
 				<div v-if="props.pool.properties.refreservationPercent!">
-					<div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < (100 - props.pool.properties.refreservationPercent) - 20"
+					<div v-if="Number(props.pool.properties.capacity) >= 1"
 						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-						<div class="bg-green-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-							<div
-								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-								{{ Number(props.pool.properties.capacity) }}% Full
-							</div>
-						</div>
-					</div>
-
-					<div v-else-if="Number(props.pool.properties.capacity) >= ((100 - props.pool.properties.refreservationPercent) - 19) && Number(props.pool.properties.capacity) <= ((100 - props.pool.properties.refreservationPercent) - 10)"
-						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-						<div class="bg-orange-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-							<div
-								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-								{{ Number(props.pool.properties.capacity) }}% Full
-							</div>
-						</div>
-					</div>
-
-					<div v-else-if="Number(props.pool.properties.capacity) > ((100 - props.pool.properties.refreservationPercent) - 9) && Number(props.pool.properties.capacity) <= (100 - props.pool.properties.refreservationPercent)"
-						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-						<div class="bg-red-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+						<div :class="capacityColor" class="h-6"
+							:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
 							<div
 								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
 								{{ Number(props.pool.properties.capacity) }}% Full
@@ -156,29 +139,10 @@
 					</div>
 				</div>
 				<div v-else>
-					<div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < 80"
+					<div v-if="Number(props.pool.properties.capacity) >= 1"
 						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-						<div class="bg-green-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-							<div
-								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-								{{ Number(props.pool.properties.capacity) }}% Full
-							</div>
-						</div>
-					</div>
-
-					<div v-else-if="Number(props.pool.properties.capacity) >= 80 && Number(props.pool.properties.capacity) <= 90"
-						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-						<div class="bg-orange-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-							<div
-								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
-								{{ Number(props.pool.properties.capacity) }}% Full
-							</div>
-						</div>
-					</div>
-
-					<div v-else-if="Number(props.pool.properties.capacity) > 90 && Number(props.pool.properties.capacity) <= 100"
-						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
-						<div class="bg-red-600 h-6" :style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+						<div :class="capacityColor" class="h-6"
+							:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
 							<div
 								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
 								{{ Number(props.pool.properties.capacity) }}% Full
@@ -195,13 +159,20 @@
 
 			</template>
 			<template v-slot:content>
-				<div class="grid grid-rows-3">
+				<div class="grid grid-rows-4">
 					<p class="row-start-1">Used {{ props.pool.properties.allocated }}</p>
 					<p class="row-start-2">Free {{ props.pool.properties.free }}</p>
-					<p class="row-start-3"><b>Total {{ props.pool.properties.size }}</b></p>
+					<p class="row-start-3">
+						<!-- {{ convertBytesToSizeDecimal(props.pool.properties.refreservationRawSize!) }} -->
+						{{ props.pool.properties.refreservationPercent }}% Reserved
+					</p>
+					<p class="row-start-4"><b>Total {{ props.pool.properties.size }}</b></p>
 				</div>
 			</template>
 			<template v-slot:footer>
+				<div class="flex flex-row items-center text-center justify-center">
+					Errors: {{ props.pool.errorCount }}
+				</div>
 				<div class="grid grid-cols-4 gap-1 min-h-full w-full h-max rounded-sm justify-center">
 					<Status :pool="props.pool" :isTrim="false" :isDisk="false" :isPoolList="false" :isPoolDetail="false"
 						class="col-span-4" :idKey="'scrub-status-box'" ref="scanStatus" />
@@ -294,7 +265,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, upgradePool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
-import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable } from '../../composables/helpers'
+import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable, getCapacityColor, convertBytesToSizeDecimal } from '../../composables/helpers'
 import Card from '../common/Card.vue';
 import Status from '../common/Status.vue';
 
@@ -336,7 +307,13 @@ const poolConfig = ref<PoolData>({
 	comment: props.pool.comment,
 	statusCode: props.pool.statusCode,
 	statusDetail: props.pool.statusDetail,
+	errorCount: props.pool.errorCount
 });
+
+const capacityColor = computed(() =>
+	getCapacityColor('bg', props.pool.properties.capacity, props.pool.properties.refreservationPercent!)
+	// getCapacityColor('text', props.pool.properties.capacity, props.pool.properties.refreservationPercent!)
+);
 
 function getIsTrimmable() {
 	selectedPool.value = props.pool;
@@ -463,7 +440,7 @@ const updateShowDestroyPool = (newVal) => {
 }
 
 watch(confirmDelete, async (newValue, oldValue) => {
-	
+	const poolName = selectedPool.value!.name;
 	if (confirmDelete.value == true) {	
 		operationRunning.value = true;
 		console.log('now deleting:', selectedPool.value);
@@ -490,7 +467,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 				await refreshAllData();
 				confirmDelete.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Pool Destroyed', `${selectedPool.value!.name} destroyed.`, 'success');
+				notifications.value.constructNotification('Pool Destroyed', `${poolName} destroyed.`, 'success');
 				showDeletePoolConfirm.value = false;
 			}
 

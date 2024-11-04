@@ -39,6 +39,7 @@ interface PoolData {
 	diskType?: 'SSD' | 'HDD' | 'Hybrid';
 	scan?: PoolScanObject;
 	diskIdentifier?: DiskIdentifier;
+	errorCount: number;
 }
 
 //object for vdev

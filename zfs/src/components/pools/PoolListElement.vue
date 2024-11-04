@@ -35,7 +35,7 @@
 						<div class="w-full bg-well rounded-full text-center"
 							:title="poolData[props.poolIdx].properties.capacity + '%'">
 							<div v-if="props.pool.properties.refreservationPercent!">
-								<div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < (100 - props.pool.properties.refreservationPercent) - 20"
+								<!-- <div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < (100 - props.pool.properties.refreservationPercent) - 20"
 									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
 									<div class="bg-green-600 h-4"
 										:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
@@ -66,6 +66,16 @@
 											{{ Number(props.pool.properties.capacity) }}%
 										</div>
 									</div>
+								</div> -->
+								<div v-if="Number(props.pool.properties.capacity) >= 1"
+									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
+									<div :class="capacityColor" class="h-4"
+										:style="{ width: `${props.pool.properties.capacity}%` }">
+										<div
+											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
+											{{ props.pool.properties.capacity }}%
+										</div>
+									</div>
 								</div>
 								<div v-else
 									class="w-full bg-well rounded-full h-4 text-center mt-1 relative flex overflow-hidden">
@@ -76,7 +86,7 @@
 								</div>
 							</div>
 							<div v-else>
-								<div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < 80"
+								<!-- <div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < 80"
 									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
 									<div class="bg-green-600 h-4"
 										:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
@@ -105,6 +115,16 @@
 										<div
 											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
 											{{ Number(props.pool.properties.capacity) }}%
+										</div>
+									</div>
+								</div> -->
+								<div v-if="Number(props.pool.properties.capacity) >= 1"
+									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
+									<div :class="capacityColor" class="h-4"
+										:style="{ width: `${props.pool.properties.capacity}%` }">
+										<div
+											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
+											{{ props.pool.properties.capacity }}%
 										</div>
 									</div>
 								</div>
@@ -154,9 +174,9 @@
 											:class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool
 											Details</a>
 										</MenuItem>
-										<!-- <MenuItem as="div" v-slot="{ active }">
+										<MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click="clearPoolErrors(poolData[props.poolIdx].name)" :class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Pool Errors</a>
-										</MenuItem> -->
+										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">
 										<a v-if="upgradeablePool" href="#" @click="upgradeThisPool(props.pool)!"
 											:class="[active ? 'bg-orange-700 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Upgrade
@@ -316,7 +336,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, Di
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, upgradePool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable  } from '../../composables/helpers';
+import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable, getCapacityColor  } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import Status from "../common/Status.vue";
 
@@ -356,6 +376,10 @@ onMounted(() => {
 	getIsTrimmable();
 	canUpgradePool(props.pool.name);
 });
+
+const capacityColor = computed(() =>
+	getCapacityColor("bg", props.pool.properties.capacity, props.pool.properties.refreservationPercent!)
+);
 
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
@@ -467,6 +491,7 @@ const updateShowDestroyPool = (newVal) => {
 }
 
 watch(confirmDelete, async (newValue, oldValue) => {
+	const destroyedPoolName = selectedPool.value!.name;
 	if (confirmDelete.value == true) {	
 		operationRunning.value = true;
 		console.log('now deleting:', selectedPool.value);
@@ -478,7 +503,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmDelete.value = false;
-				notifications.value.constructNotification('Destroy Pool Failed', selectedPool.value!.name + " was not destroyed:${errorMessage}.", 'error');
+				notifications.value.constructNotification('Destroy Pool Failed', selectedPool.value!.name + ` was not destroyed: ${errorMessage}.`, 'error');
 			} else {
 				if (secondOptionToggle.value == true) {
 					selectedPool.value!.vdevs.forEach(vDev => {
@@ -492,7 +517,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 				await refreshAllData();
 				confirmDelete.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Pool Destroyed', selectedPool.value!.name + " destroyed.", 'success');
+				notifications.value.constructNotification('Pool Destroyed', destroyedPoolName + " destroyed.", 'success');
 				showDeletePoolConfirm.value = false;
 			}
 

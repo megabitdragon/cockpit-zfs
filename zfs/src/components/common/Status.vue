@@ -7,91 +7,116 @@
                     <div class="grid grid-cols-4 gap-1 justify-items-center w-full">
                         <span class="col-span-4 mt-0.5 font-semibold" :class="stateMessageClass()">
                             <!-- {{ stateMessage }} -->
-                              {{ displayStateMessage }}
+                            {{ displayStateMessage }}
                         </span>
 
                         <div class="col-span-4">
 
-                            <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-4 grid grid-cols-4 justify-items-center w-full">
-                                <div class="col-span-4 w-full bg-well rounded-full relative flex h-6 min-h-min overflow-hidden">
-                                    <div :class="progressBarClass()" class="h-6 min-h-min w-full" :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
-                                        <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-1.5 leading-none">
+                            <div v-if="scanObjectGroup[props.pool.name].state !== null"
+                                class="col-span-4 grid grid-cols-4 justify-items-center w-full">
+                                <div
+                                    class="col-span-4 w-full bg-well rounded-full relative flex h-6 min-h-min overflow-hidden">
+                                    <div :class="progressBarClass()" class="h-6 min-h-min w-full"
+                                        :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                                        <div
+                                            class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-1.5 leading-none">
                                             {{ parseFloat(scanPercentage.toFixed(2)) }}%
                                         </div>
                                     </div>
                                 </div>
 
                                 <span class="text-muted col-span-4">
-                                    {{ amountProcessed }} of {{ amountTotal }} processed. <br/>
+                                    {{ amountProcessed }} of {{ amountTotal }} processed. <br />
                                 </span>
 
                                 <span v-if="isScanning && !isPaused && !isCanceled && !isFinished" class="col-span-4">
-                                    Completes in {{ timeRemaining }}.                    
+                                    Completes in {{ timeRemaining }}.
                                 </span>
                                 <span v-if="isScanning && isPaused && !isCanceled && !isFinished" class="col-span-4">
-                                    Resume to continue or cancel to stop.                    
+                                    Resume to continue or cancel to stop.
                                 </span>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
                 <div v-if="isTrim">
                     <div class="grid grid-cols-4 gap-1 justify-items-center w-full">
                         <div v-for="disk, idx in poolDiskStats[props.pool.name]" :key="idx" class="col-span-4">
 
-                            <div v-if="disk.stats.trim_notsup === 0 && getIsTrimmable(disk)" class="col-span-4">                           
-                                <div v-if="isTrimActive || isTrimSuspended || isTrimFinished || isTrimCanceled" class="col-span-4">
-
-                                    <div class="grid grid-cols-4 justify-items-center w-full whitespace-nowrap text-ellipsis">
-                                        <span class="col-span-4 font-semibold" :class="[trimMessageClass(disk), truncateText]">
+                            <div v-if="disk.stats.trim_notsup === 0 && getIsTrimmable(disk)" class="col-span-4">
+                                <div v-if="isTrimActive || isTrimSuspended || isTrimFinished || isTrimCanceled"
+                                    class="col-span-4">
+                                    <div
+                                        class="grid grid-cols-4 justify-items-center w-full whitespace-nowrap text-ellipsis">
+                                        <span class="col-span-4 font-semibold"
+                                            :class="[trimMessageClass(disk), truncateText]">
                                             {{ trimMessage(disk) }}
                                         </span>
                                         <span class="col-span-4" :class="trimMessageClass(disk)" :title="disk.name">
-                                            Disk: {{ disk.name }} ({{ upperCaseWord((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) }})
+                                            Disk: {{ disk.name }} ({{ upperCaseWord((props.pool.vdevs.find(vdev =>
+                                            vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) }})
                                         </span>
                                     </div>
-                                    
+
                                     <div class="col-span-4">
                                         <div class="col-span-4 grid grid-cols-4 justify-items-center w-full">
-                                            <div class="col-span-4 w-full bg-well rounded-full relative flex h-6 min-h-min overflow-hidden">
-                                                <div :class="trimProgressBarClass(disk)" class="h-6 min-h-min w-full" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))}%` }">
-                                                    <div class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-1.5 leading-none">
-                                                        {{ handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2))) }}%
+                                            <div
+                                                class="col-span-4 w-full bg-well rounded-full relative flex h-6 min-h-min overflow-hidden">
+                                                <div :class="trimProgressBarClass(disk)" class="h-6 min-h-min w-full"
+                                                    :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))}%` }">
+                                                    <div
+                                                        class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-1.5 leading-none">
+                                                        {{
+                                                        handleTrimPercentage(parseFloat(getTrimPercentage(disk).toFixed(2)))
+                                                        }}%
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <span class="text-muted col-span-4">
-                                            {{ getTrimmedAmount(disk) }} of {{ getTrimmedTotal(disk) }} processed. <br/>
+                                            {{ getTrimmedAmount(disk) }} of {{ getTrimmedTotal(disk) }} processed.
+                                            <br />
                                         </span>
-                                        
+
                                     </div>
                                 </div>
+                                <!-- <div v-else class="col-span-4">
+                                    <span class="col-span-4 font-base text-default">
+                                        No trim data found.
+                                    </span>
+                                </div> -->
                             </div>
 
                             <div v-if="disk.stats.trim_notsup === 0 && !getIsTrimmable(disk)" class="col-span-4">
-                                <span class="col-span-4 font-base text-default" :class="truncateText" :title="disk!.name!">
-                                    Trim not suppported on {{ disk!.name }} ({{ upperCaseWord((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) }})
+                                <span class="col-span-4 font-base text-default" :class="truncateText"
+                                    :title="disk!.name!">
+                                    Trim not suppported on {{ disk!.name }} ({{
+                                    upperCaseWord((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk =>
+                                    vDevDisk.name == disk.name)))!.type) }})
                                 </span>
                             </div>
 
                         </div>
 
-                        <div v-if="poolDiskStats[props.pool.name].some(disk => disk.stats.trim_notsup == 1)" class="col-span-4">
+                        <div v-if="poolDiskStats[props.pool.name].some(disk => disk.stats.trim_notsup == 1)"
+                            class="col-span-4">
                             <div class="">
                                 <span class="text-default col-span-4">
-                                    Trim not supported on HDDs: <br/>
-                                    <div :class="(poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1)).length < 5 ? `grid-cols-${poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1).length}` : 'grid-cols-4'" class="grid col-span-4 gap-1 mt-1 justify-center">
-                                        <span v-for="disk, idx in (poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1))" :title="disk.name" :class="truncateText" class="">{{ disk.name }} </span>
+                                    Trim not supported on HDDs: <br />
+                                    <div :class="(poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1)).length < 5 ? `grid-cols-${poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1).length}` : 'grid-cols-4'"
+                                        class="grid col-span-4 gap-1 mt-1 justify-center">
+                                        <span
+                                            v-for="disk, idx in (poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1))"
+                                            :title="disk.name" :class="truncateText" class="">{{ disk.name }} </span>
                                     </div>
                                 </span>
                             </div>
                         </div>
 
                         <div v-if="isTrimSuspended" class="col-span-4">
-                            Resume to continue or cancel to stop.     
+                            Resume to continue or cancel to stop.
                         </div>
                     </div>
                 </div>
@@ -101,24 +126,29 @@
                 <div class="grid grid-cols-2 gap-1 justify-center items-center">
 
                     <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-2">
-                        <span :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm" :title="displayMiniStateMsg">
+                        <span :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm"
+                            :title="displayMiniStateMsg">
                             <!-- {{ miniStateMsg }} -->
-                              {{ displayMiniStateMsg }}
+                            {{ displayMiniStateMsg }}
                         </span>
-                        <div class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
-                            <div :class="progressBarClass()" class="h-3" :style="{ width: `${ parseFloat(scanPercentage.toFixed(2)) }%` }">
+                        <div
+                            class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
+                            <div :class="progressBarClass()" class="h-3"
+                                :style="{ width: `${ parseFloat(scanPercentage.toFixed(2)) }%` }">
                                 <!-- <div :class="progressBarClass()" class="h-3 min-h-min max-h-max" :style="{ width: `${scanObjectGroup[props.pool.name].state === 'FINISHED' &&  parseFloat(scanPercentage.toFixed(2)) < 1 ? 100 : parseFloat(scanPercentage.toFixed(2))} %` }"> -->
-                                <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
-                                    {{ amountProcessed }}/{{ amountTotal }} 
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
+                                    {{ amountProcessed }}/{{ amountTotal }}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-2" :class="truncateText">
+                    <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-2"
+                        :class="truncateText" :title="displayMiniStateMsg">
                         <span :class="stateMessageClass()">
                             <!-- {{ miniStateMsg }} -->
-                              {{ displayMiniStateMsg }}
+                            {{ displayMiniStateMsg }}
                         </span>
                     </div>
                 </div>
@@ -127,31 +157,41 @@
         <div v-if="isDisk">
             <div v-if="selectedDisk!" class="grid grid-cols-2 gap-1 justify-center items-center">
 
-                <div v-if="selectedDisk!.stats.trim_notsup === 0 && getIsTrimmable(disk)!" class="col-span-2 flex flex-col items-center justify-center">
-                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" :class="[trimMessageClass(selectedDisk!), truncateText]" class="font-semibold text-sm">
-                        Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{ handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
+                <div v-if="selectedDisk!.stats.trim_notsup === 0 && getIsTrimmable(disk)!"
+                    class="col-span-2 flex flex-col items-center justify-center">
+                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'"
+                        :class="[trimMessageClass(selectedDisk!), truncateText]" class="font-semibold text-sm">
+                        Trim {{ upperCaseWord(getTrimState(selectedDisk!.stats.trim_state)) }} ({{
+                        handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2))) }}%)
                     </span>
-                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) == 'none'" :class="[trimMessageClass(selectedDisk!), truncateText]" class="mt-2">
+                    <span v-if="getTrimState(selectedDisk!.stats.trim_state) == 'none'"
+                        :class="[trimMessageClass(selectedDisk!), truncateText]" class="mt-2">
                         No Trim Activity
                     </span>
-                    <div v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'" class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
-                        <div :class="trimProgressBarClass(selectedDisk!)" class="h-3" :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
-                            <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
+                    <div v-if="getTrimState(selectedDisk!.stats.trim_state) !== 'none'"
+                        class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
+                        <div :class="trimProgressBarClass(selectedDisk!)" class="h-3"
+                            :style="{ width: `${handleTrimPercentage(parseFloat(getTrimPercentage(selectedDisk!).toFixed(2)))}%` }">
+                            <div
+                                class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                 {{ getTrimmedAmount(selectedDisk!) }}/{{ getTrimmedTotal(selectedDisk!) }}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="selectedDisk!.stats.trim_notsup === 1" class="col-span-2 flex items-center justify-center mt-2">
+                <div v-if="selectedDisk!.stats.trim_notsup === 1"
+                    class="col-span-2 flex items-center justify-center mt-2">
                     <span class="text-muted" :class="truncateText">
                         Trim not suppported ({{ props.disk!.type }}).
                     </span>
-                </div> 
+                </div>
 
-                <div v-if="selectedDisk!.stats.trim_notsup === 0 && !getIsTrimmable(disk)" class="col-span-2 flex items-center justify-center mt-2">
+                <div v-if="selectedDisk!.stats.trim_notsup === 0 && !getIsTrimmable(disk)"
+                    class="col-span-2 flex items-center justify-center mt-2">
                     <span class="text-muted" :class="truncateText">
-                        Trim not suppported ({{ upperCaseWord((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == selectedDisk!.name)))!.type) }}).
+                        Trim not suppported ({{ upperCaseWord((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk =>
+                        vDevDisk.name == selectedDisk!.name)))!.type) }}).
                     </span>
                 </div>
             </div>
@@ -183,18 +223,20 @@ const poolID = ref(props.pool.name);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 function getIsTrimmable(disk) {
-   switch ((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) {
-    case 'data':
-        return true;
-    case 'log':
-        return true;
-    case 'special':
-        return true;
-    case 'dedup':
-        return true;
-    default:
-        return false;
-   }
+    if (props.pool.vdevs && disk) {
+        switch ((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) {
+            case 'data':
+                return true;
+            case 'log':
+                return true;
+            case 'special':
+                return true;
+            case 'dedup':
+                return true;
+            default:
+                return false;
+        }
+    }
 }
 
 ///////////////////// Scanning //////////////////////

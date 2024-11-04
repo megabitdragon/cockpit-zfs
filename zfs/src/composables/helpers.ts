@@ -55,45 +55,53 @@ export const convertBytesToSizeDecimal = (bytes) => {
   
     return `${convertedSize} ${sizes[i]}`;
 };
-  
-//convert readable data size to raw bytes
+
+// Convert readable data size to raw bytes
 export const convertSizeToBytes = (size) => {
     const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
-    const [value, unit] = size.match(/(\d+\.?\d*)\s?(\w+)/i).slice(1);
+    const match = size.match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
 
+    if (!match) {
+        console.warn(`Invalid size format: "${size}"`);
+        return NaN;  // Or return 0, depending on your requirements
+    }
+
+    const [value, unit] = match.slice(1);
     const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
-    const bytes = parseFloat(value) * Math.pow(1024, index);
-    
-    return bytes;
-};
 
-
-export const convertSizeToBytesDecimal = (size) => {
-    if (size === null || size === undefined) {
-        // Return null or handle the case according to your requirement
-        return null;
-    }
-    const sizesWithoutByte = ['B', 'K', 'M', 'G', 'TB', 'P', 'E', 'Z', 'Y'];
-    const sizesWithByte = sizesWithoutByte.map(unit => unit + 'B');
-    const combinedSizes = [...sizesWithoutByte, ...sizesWithByte];
-    const matchResult = size.match(/(\d+\.?\d*)\s?(\w+)/i);
-    if (!matchResult) {
-        // Handle invalid size format
-        // Return null or throw an error according to your requirement
-        return null;
-    }
-    const [value, unit] = matchResult.slice(1);
-    const index = combinedSizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
     if (index === -1) {
-        // Handle unknown unit
-        // Return null or throw an error according to your requirement
-        return null;
+        console.warn(`Unrecognized unit: "${unit}"`);
+        return NaN;  // Or return 0, depending on your requirements
     }
-    const bytes = parseFloat(value) * Math.pow(1000, index); // Use 1000 for decimal prefixes
 
+    const bytes = parseFloat(value) * Math.pow(1024, index);
     return bytes;
 };
 
+
+// Convert readable decimal data size to raw bytes
+export const convertSizeToBytesDecimal = (size) => {
+	const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
+
+	if (!match) {
+		console.warn(`Invalid size format: "${size}"`);
+		return NaN;  // Or return 0, depending on your requirements
+	}
+
+	const [value, unit] = match.slice(1);
+	const normalizedUnit = unit.toUpperCase();
+	const index = sizes.findIndex((sizeUnit) => sizeUnit === normalizedUnit);
+
+	if (index === -1) {
+		console.warn(`Unrecognized unit: "${unit}"`);
+		return NaN;  // Or return 0, depending on your requirements
+	}
+
+	// console.log(`Parsed value: ${value}, Parsed unit: ${normalizedUnit}, Unit index: ${index}`);
+	const bytes = parseFloat(value) * Math.pow(1000, index);
+	return bytes;
+};
 
 
 //get size number from data size string
@@ -496,6 +504,27 @@ export function formatStatus(status) {
 		default:
 			break;
 	}
+}
+
+export function getCapacityColor(type: 'text' | 'bg', capacity: number, refreservationPercent?: number): string {
+	// Calculate the available space as 100% minus the refreservation percent
+	const availableSpace = refreservationPercent !== undefined ? 100 - refreservationPercent : 100;
+	const capacityPercentOfAvailable = (capacity / availableSpace) * 100; // Calculate capacity as a percentage of available space
+
+	// console.log('Available Space:', availableSpace, 'Capacity Percentage of Available:', capacityPercentOfAvailable);
+
+	let colorString;
+	if (capacityPercentOfAvailable <= 70) {
+		colorString = `${type}-green-600`;
+	} else if (capacityPercentOfAvailable > 70 && capacityPercentOfAvailable <= 85) {
+		colorString = `${type}-orange-600`;
+	} else if (capacityPercentOfAvailable > 85 && capacityPercentOfAvailable <= 100) {
+		colorString = `${type}-red-600`;
+	} else {
+		colorString = `${type}-blue-600`; // Fallback color, if needed
+	}
+
+	return colorString;
 }
 
 export function getDiskIDName(disks: DiskData[], diskIdentifier: string, selectedDiskName: string) {

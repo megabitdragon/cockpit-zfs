@@ -125,9 +125,6 @@
 						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center"
 							:class="truncateText" title="Select">Select</th>
 						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center">
-							<!-- <input type="checkbox" v-model="isSelectAllChecked" @change="toggleSelectAll"
-								class="w-4 h-4 text-success border-default rounded focus:ring-green-500 dark:focus:ring-green-600 focus:ring-2" />
-							Select All -->
 							<label
 								class="flex flex-row items-center w-full h-full rounded-lg"
 								:class="checkboxSelectedAllClass">

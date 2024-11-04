@@ -358,14 +358,6 @@ export async function getImportableDestroyedPools() {
 export async function importPool(pool) {
 	try {
 		let cmdString = ['zpool', 'import'];
-		//import specific pool
-		//zpool import [-Dflmt] [-F [-nTX]] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s] pool|id [newpool]
-
-		//import all pools in dir
-		//zpool import -a [-DflmN] [-F [-nTX]] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s]
-
-		//show all available importable pools
-		//zpool import [-D] [-d dir|device]…
 
 		if(pool.isDestroyed) {
 			cmdString.push('-Df');
@@ -401,10 +393,6 @@ export async function importPool(pool) {
 			case 'sd_path':
 				cmdString.push('/dev');
 				break;
-
-			// case 'disk':
-			// 	cmdString.push('/dev/disk/by-id');
-			// 	break;
 			
 			default:
 				break;

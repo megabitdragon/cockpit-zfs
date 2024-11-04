@@ -6,14 +6,15 @@
 		<template v-slot:content>
 			<div v-if="navTag == 'stats'">
 				<div class="mt-6 grid grid-cols-3 grid-rows-2 text-default">
-					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="'text-success'" 
+					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="capacityColor" 
 					:name="props.pool.name" :totalSize="props.pool.properties.size" :percentage="props.pool.properties.capacity" 
 					:radius="50" :coordX="60" :coordY="60" :strokeWidth="10" :percentFontSize="'text-2xl'" class="w-full col-span-3"/>
 					<div class="mt-2 px-8 col-span-3 row-start-2 grid grid-cols-3 justify-items-center min-w-fit max-w-fit">
 						<div class="m-2 col-span-1">
-							<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span class="text-success">{{ props.pool.status }}</span></p>
-							<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: {{ props.pool.scan && props.pool.scan.errors ? props.pool.scan.errors : '0' }} <br/>@ {{ getTimestampString() }}</p>
-							</div>
+							<p :id="getIdKey('pool-health')" name="pool-health" class="text-lg">Health: <span :class="formatStatus(props.pool.status)" class="">{{ props.pool.status }}</span></p>
+							<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: <span :class="formatStatus(props.pool.status)" class="">{{ props.pool.errorCount }}</span> <br/>as of {{ getTimestampString() }}</p>
+							<p :id="getIdKey('pool-refreservation')" name="pool-refreservation" class="text-sm">Refreservation: {{ convertBytesToSizeDecimal(props.pool.properties.refreservationRawSize!) }} ({{ props.pool.properties.refreservationPercent }}%)</p>
+						</div>
 						<div class="m-2 col-span-1">
 							<p :id="getIdKey('pool-altroot')" name="pool-altroot" class="text-base" :title="props.pool.properties.altroot == '' || props.pool.properties.altroot == '-' ? 'None' : props.pool.properties.altroot" :class="truncateText">Alt Root: {{ props.pool.properties.altroot == '' || props.pool.properties.altroot == '-' ? 'None' : props.pool.properties.altroot }}</p>
 							<p :id="getIdKey('pool-devices')" name="pool-devices" class="text-base">Devices: {{ getNumDevices }}</p>
@@ -246,7 +247,7 @@
 import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { configurePool } from '../../composables/pools';
-import { getTimestampString, upperCaseWord, isBoolOnOff, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { getTimestampString, upperCaseWord, isBoolOnOff, loadScanActivities, loadTrimActivities, formatStatus, getCapacityColor, convertBytesToSizeDecimal } from '../../composables/helpers';
 import { loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import Modal from '../common/Modal.vue';
 import PoolCapacity from '../common/PoolCapacity.vue';
@@ -296,7 +297,15 @@ const poolConfig = ref<PoolData>({
 	vdevs: props.pool.vdevs,
 	failMode: props.pool.failMode,
 	comment: props.pool.comment!,
+	statusCode: props.pool.statusCode,
+	statusDetail: props.pool.statusDetail,
+	errorCount: props.pool.errorCount
 });
+
+const capacityColor = computed(() =>
+	getCapacityColor('text', props.pool.properties.capacity, props.pool.properties.refreservationPercent!)
+);
+
 
 ////////////////// Loading Data /////////////////////
 /////////////////////////////////////////////////////

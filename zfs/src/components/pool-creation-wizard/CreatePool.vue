@@ -163,6 +163,7 @@ const poolConfig = ref<PoolData>({
 	createFileSystem: true,
 	statusCode: '',
 	statusDetail: null,
+	errorCount: 0,
 	// fileSystem: fileSystemConfig.value,
 });
 
