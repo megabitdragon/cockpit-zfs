@@ -1,3 +1,10 @@
+cockpit-zfs (1.1.1-1focal) focal; urgency=medium
+
+  * Updates disk data retrieval using lsdev with a fallback to lsblk data if lsdev
+    is not available (on VMs or non-aliased third party hardware)
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 06 Nov 2024 09:17:48 -0400
+
 cockpit-zfs (1.1.0-1focal) focal; urgency=medium
 
   * Stable Release

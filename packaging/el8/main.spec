@@ -27,6 +27,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Wed Nov 06 2024 Jordan Keough <jkeough@45drives.com> 1.1.1-1
+- Updates disk data retrieval using lsdev with a fallback to lsblk data if lsdev
+  is not available (on VMs or non-aliased third party hardware)
 * Mon Nov 04 2024 Jordan Keough <jkeough@45drives.com> 1.1.0-1
 - Stable Release
 * Wed Oct 23 2024 Jordan Keough <jkeough@45drives.com> 1.0.4-3
