@@ -2,7 +2,7 @@ import { ref, Ref } from 'vue';
 import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
-import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal } from "./helpers";
+import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal, convertCapacityString, isCapacityPatternInvalid } from "./helpers";
 import { getSnapshots } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
 
@@ -39,6 +39,7 @@ export async function loadDisksThenPools(disks, pools) {
 	//executes a python script to retrieve all disk data and outputs a JSON
 	try {
 		const rawJSON = await getDisks();
+		// console.log('Raw JSON:', rawJSON);
 		const parsedJSON = JSON.parse(rawJSON);
 		console.log('Disks JSON:', parsedJSON);
 
@@ -46,24 +47,24 @@ export async function loadDisksThenPools(disks, pools) {
 		for (let i = 0; i < parsedJSON.length; i++) {
 			const disk = {
 				name: parsedJSON[i].name,
-				capacity: parsedJSON[i].capacity,
+				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? convertCapacityString(parsedJSON[i].capacity).gb : parsedJSON[i].capacity,
 				model: parsedJSON[i].model,
-				type: parsedJSON[i].type,
-				phy_path: parsedJSON[i].phy_path,
-				sd_path: parsedJSON[i].sd_path,
-				vdev_path: parsedJSON[i].vdev_path,
-				serial: parsedJSON[i].serial,
-				usable: parsedJSON[i].usable,
+				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
+				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
+				sd_path: parsedJSON[i].sd_path || 'N/A',
+				vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
+				serial: parsedJSON[i].serial || 'N/A',
+				usable: parsedJSON[i].usable || false,
 				path: '',
 				guid: '',
-				status: parsedJSON[i].health,
-				powerOnHours: parsedJSON[i].power_on_time,
-				powerOnCount: parsedJSON[i].power_on_count,
-				temp: parsedJSON[i].temp,
-				rotationRate: parsedJSON[i].rotation_rate,
+				status: parsedJSON[i].health || 'Unknown',
+				powerOnHours: parsedJSON[i].power_on_time || 0,
+				powerOnCount: parsedJSON[i].power_on_count || 0,
+				temp: parsedJSON[i].temp || 'N/A',
+				rotationRate: parsedJSON[i].rotation_rate || 0,
 				stats: {},
 				errors: errors,
-				hasPartitions: parsedJSON[i].has_partitions,
+				hasPartitions: parsedJSON[i].has_partitions || false,
 			};
 
 			disks.value.push(disk);
@@ -329,23 +330,25 @@ export async function loadDisks(disks) {
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
 			const disk = {
-                name: parsedJSON[i].name,
-                capacity: parsedJSON[i].capacity,
-                model: parsedJSON[i].model,
-                type: parsedJSON[i].type,
-                phy_path: parsedJSON[i].phy_path,
-                sd_path: parsedJSON[i].sd_path,
-                vdev_path: parsedJSON[i].vdev_path,
-                serial: parsedJSON[i].serial,
-                path: '',
-                guid: '',
-                status: parsedJSON[i].health,
-                powerOnHours: parsedJSON[i].power_on_time,
-                powerOnCount: parsedJSON[i].power_on_count,
-                temp: parsedJSON[i].temp,
-                rotationRate: parsedJSON[i].rotation_rate,
-                stats: {},
-				hasPartitions: parsedJSON[i].has_partitions,
+				name: parsedJSON[i].name,
+				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? convertCapacityString(parsedJSON[i].capacity).gb : parsedJSON[i].capacity,
+				model: parsedJSON[i].model,
+				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
+				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
+				sd_path: parsedJSON[i].sd_path || 'N/A',
+				vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
+				serial: parsedJSON[i].serial || 'N/A',
+				usable: parsedJSON[i].usable || false,
+				path: '',
+				guid: '',
+				status: parsedJSON[i].health || 'Unknown',
+				powerOnHours: parsedJSON[i].power_on_time || 0,
+				powerOnCount: parsedJSON[i].power_on_count || 0,
+				temp: parsedJSON[i].temp || 'N/A',
+				rotationRate: parsedJSON[i].rotation_rate || 0,
+				stats: {},
+				errors: errors,
+				hasPartitions: parsedJSON[i].has_partitions || false,
 			}
 			disks.value.push(disk);
 			// console.log("Disk:", disk);
@@ -358,9 +361,14 @@ export async function loadDisks(disks) {
 	}
 }
 
-// Helper function to clean disk paths by removing partition numbers but leaving the rest intact
+// // Helper function to clean disk paths by removing partition numbers but leaving the rest intact
 function cleanDiskPath(path) {
-	return path.replace(/-part[0-9]+$/, ''); // Only remove partition suffix like '-part1'
+	// Only strip suffixes for paths that are known to contain partitions (e.g., /dev/sdX, /dev/nvmeXnY)
+	if (/\/dev\/sd[a-z][0-9]*$/.test(path) || /\/dev\/nvme\d+n\d+p[0-9]+$/.test(path) || /-part\d+$/.test(path)) {
+		return path.replace(/[-p]?\d+$/, ''); // Removes -partN or pN at the end
+	}
+	// If path doesn't match those patterns, return as is
+	return path;
 }
 
 export async function loadDisksExtraData(disks, pools) {
@@ -369,10 +377,11 @@ export async function loadDisksExtraData(disks, pools) {
 			pool.vdevs.forEach((vDev) => {
 				vDev.disks.forEach((usedDisk) => {
 					// console.log('disk from vdev:', usedDisk);
-					const selectedDisk = findDiskByPath(disks, usedDisk.path);
+					const cleanedUsedDiskPath = cleanDiskPath(usedDisk.path);
+					const selectedDisk = findDiskByPath(disks, cleanedUsedDiskPath);
 					let statsObject;
 
-					if (selectedDisk && selectedDisk.type == 'NVMe' || !usedDisk.stats) {
+					if (selectedDisk && selectedDisk.type == 'NVMe' || selectedDisk && selectedDisk.type == 'Disk' || !usedDisk.stats) {
 						statsObject = vDev.stats
 					} else {
 						statsObject = usedDisk.stats
@@ -386,7 +395,7 @@ export async function loadDisksExtraData(disks, pools) {
 						// console.log('selectedDisk loading data', selectedDisk);
 
 						// Clean the usedDisk.path and compare it with sd_path, phy_path, and vdev_path
-						const cleanedUsedDiskPath = cleanDiskPath(usedDisk.path);
+						
 						// console.log('cleanedUsedDiskPath:', cleanedUsedDiskPath);
 
 						// Find the index of the original disk in the disks array
@@ -431,8 +440,9 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		errors: [],
 	};
 
-	// let allDisksMissing = true;
-	// let anyDiskMissing = false;
+	if (vDevData.type === 'Disk') {
+		vDevData.path = 'N/A';  // Default path for VM Disk
+	}
 
 	// Regex for various disk path types
 	const phyPathRegex = `\/dev\/disk\/by-path\/[0-9a-zA-Z:.\-]+(?:-part[0-9]+)?$`;
@@ -459,7 +469,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		console.log('disks:', disks);
 
 		// Extract the partition suffix for NVMe (e.g., p1) and standard paths (e.g., -part1)
-		const partitionSuffixMatch = vDevData.path.match(/(?:-part|p)(\d+)/);
+		const partitionSuffixMatch = vDevData.path.match(/(?:-part|p)?(\d+)$/);
 		const partitionSuffix = partitionSuffixMatch ? partitionSuffixMatch[0] : '';
 
 		// Remove any partition suffix from the vDev path for comparison
@@ -486,6 +496,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		});
 	}
 
+
 	// Check if VDev has child disks and if not, stores the disk information as the VDev itself (vdev-level disks) then adds to VDev array
 	if (vDev.children.length < 1) {
 		const diskVDev = ref();
@@ -497,10 +508,6 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		if (!diskVDev.value) {
 			console.error(`Disk not found for path: ${vDevData.path}.`);
 			diskVDev.value = createMissingDisk(vDev.path, vDev.name, vDevType, poolName);
-			// vDevData.status = "DEGRADED";
-			// vDevData.errors!.push("VDev is degraded due to missing disk.");
-		// } else {
-		// 	allDisksMissing = false;
 		}
 
 		if (vDevData.path!.match(phyPathRegex)) {
@@ -584,6 +591,9 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 		// Create missing disk and add error
 		fullDiskData = createMissingDisk(child.path, child.name, vDevType, poolName);
 		fullDiskData.errors!.push(errorMessage); // Add the error to disk object
+	} else if (fullDiskData.type === 'Disk') {
+		fullDiskData.vdev_path = fullDiskData.vdev_path || 'N/A';
+		fullDiskData.phy_path = fullDiskData.phy_path || 'N/A';
 	}
 
     const childDisk = {
@@ -793,6 +803,8 @@ function determineDiskType(vDev, disks) {
 		return 'MISSING';
 	} else if (uniqueDiskTypes.size === 1) {
 		return Array.from(uniqueDiskTypes)[0]; // Return the single type if all disks are the same
+	} else if (uniqueDiskTypes.has('Disk')) {
+		return 'Disk'; // All disks in VDev are Disks
 	} else if (uniqueDiskTypes.has('SSD') || uniqueDiskTypes.has('HDD') || uniqueDiskTypes.has('NVMe')) {
 		return 'Hybrid'; // Mixed SSD, HDD, or NVMe
 	} else {

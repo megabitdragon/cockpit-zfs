@@ -410,7 +410,7 @@
 import { inject, ref, Ref, computed, watchEffect, onMounted, watch } from 'vue';
 import { ChevronUpIcon, ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, findDiskByPath, truncateName, convertSizeToBytesDecimal } from '../../composables/helpers';
+import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, truncateName, convertSizeToBytesDecimal } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
 
 interface PoolConfigProps {
@@ -421,14 +421,11 @@ interface PoolConfigProps {
 }
 
 const props = defineProps<PoolConfigProps>();
-const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const allPools = inject<Ref<PoolData[]>>('pools')!;
 const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
-
-const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
 const nameFeedback = inject<Ref<string>>('feedback-name')!;
 const vDevFeedback = inject<Ref<string>>('feedback-vdev')!;
@@ -480,6 +477,8 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 		const claimed = poolConfig.value.vdevs
 		.filter((_, idx) => idx !== vdevIdx)
 		.flatMap(vdev => vdev.selectedDisks);
+		// console.log('claimed:', claimed);
+		// console.log('disks filtered:', disks.value.filter(disk => disk.guid === "" && !claimed.includes(disk.name)));
 		return disks.value.filter(disk => disk.guid === "" && !claimed.includes(disk.name));
 	});
 });
@@ -500,7 +499,7 @@ const createFileSystemCardClass = (createFileSystem : boolean) => {
 function initialVDev() {
 	const vDevConfig: vDevData = {
 		name: '',
-		type: 'mirror',
+		type: 'raidz2',
 		status: '',
 		guid: '',
 		stats: {

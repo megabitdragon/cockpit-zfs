@@ -660,3 +660,44 @@ export async function isPoolUpgradable(poolName: string) {
 		return false;
 	}
 }
+
+export function isCapacityPatternInvalid(capacityStr) {
+	// Check if the capacity string matches the pattern like "32G" (case-insensitive)
+	return /^(\d+)([KMGTPE]?)$/i.test(capacityStr);
+}
+
+export function convertCapacityString(capacityStr) {
+	// Define a case-insensitive regex to match the pattern (e.g., "32G", "500M")
+	const match = capacityStr.match(/^(\d+)([KMGTPE]?)$/i);
+	if (!match) {
+		throw new Error("Invalid capacity string format. Expected format like '32G', '500M'.");
+	}
+
+	// Extract the numeric value and unit
+	const value = parseInt(match[1], 10);
+	const unit = match[2].toUpperCase() || "G"; // Default to G if no unit is specified
+
+	// Define a map for capacity units in bytes
+	const unitMap = {
+		"K": 1e3,
+		"M": 1e6,
+		"G": 1e9,
+		"T": 1e12,
+		"P": 1e15
+	};
+
+	// Convert to base 10 (e.g., GB)
+	const valueInBytes = value * (unitMap[unit] || 1);
+	const valueInGB = valueInBytes / 1e9;
+	const gbString = `${valueInGB} GB`;
+
+	// Convert to base 2 (e.g., GiB)
+	const valueInGiB = valueInBytes / (1024 ** 3);
+	const gibString = `${valueInGiB.toFixed(2)} GiB`;
+
+	return {
+		original: capacityStr,
+		gb: gbString,
+		gib: gibString
+	};
+}

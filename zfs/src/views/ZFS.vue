@@ -3,17 +3,14 @@
 		<div class="w-full h-dvh min-h-dvh overflow-visible bg-default text-default">
 
 			<div v-if="props.tag === 'dashboard'" class="p-2">
-			   <!-- <Dashboard /> -->
 			   	<component :is="dashboardComponent"/> 
 			</div>
 
 			<div v-if="props.tag === 'pools'" class="p-2">
-			  	<!-- <PoolsList/> -->
 				<component :is="poolListComponent"/>
 			</div>
 
 			<div v-if="props.tag === 'filesystems'" class="p-2">
-			  	<!-- <FileSystemList/> -->
 				<component :is="fileSystemListComponent"/>
 			</div>
 
@@ -27,9 +24,6 @@ import "@45drives/cockpit-css/src/index.css";
 import "@45drives/cockpit-vue-components/dist/style.css";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
-import PoolsList from "../components/pools/PoolsList.vue";
-import Dashboard from '../components/dashboard/Dashboard.vue';
-import FileSystemList from '../components/file-systems/FileSystemList.vue';
 
 interface ZFSProps {
   	tag: string;
@@ -41,7 +35,6 @@ const truncateText = ref('overflow-hidden whitespace-nowrap text-ellipsis');
 
 const pools = ref<PoolData[]>([]);
 const disks = ref<DiskData[]>([]);
-// const diskStatus = ref<PoolDiskStatus[]>([]);
 const datasets = ref<FileSystemData[]>([]);
 const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
@@ -66,9 +59,6 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 	poolsLoaded.value = false;
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
-
-	// await assignGUIDsToDisks(disks, pools, diskStatus);
-
 	await loadDatasets(datasets);
 	await loadSnapshots(snapshots);
 	

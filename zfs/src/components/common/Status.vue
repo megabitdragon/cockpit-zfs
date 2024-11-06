@@ -6,7 +6,6 @@
                 <div v-if="!isTrim">
                     <div class="grid grid-cols-4 gap-1 justify-items-center w-full">
                         <span class="col-span-4 mt-0.5 font-semibold" :class="stateMessageClass()">
-                            <!-- {{ stateMessage }} -->
                             {{ displayStateMessage }}
                         </span>
 
@@ -82,11 +81,6 @@
 
                                     </div>
                                 </div>
-                                <!-- <div v-else class="col-span-4">
-                                    <span class="col-span-4 font-base text-default">
-                                        No trim data found.
-                                    </span>
-                                </div> -->
                             </div>
 
                             <div v-if="disk.stats.trim_notsup === 0 && !getIsTrimmable(disk)" class="col-span-4">
@@ -128,14 +122,12 @@
                     <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-2">
                         <span :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm"
                             :title="displayMiniStateMsg">
-                            <!-- {{ miniStateMsg }} -->
                             {{ displayMiniStateMsg }}
                         </span>
                         <div
                             class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
                             <div :class="progressBarClass()" class="h-3"
                                 :style="{ width: `${ parseFloat(scanPercentage.toFixed(2)) }%` }">
-                                <!-- <div :class="progressBarClass()" class="h-3 min-h-min max-h-max" :style="{ width: `${scanObjectGroup[props.pool.name].state === 'FINISHED' &&  parseFloat(scanPercentage.toFixed(2)) < 1 ? 100 : parseFloat(scanPercentage.toFixed(2))} %` }"> -->
                                 <div
                                     class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
                                     {{ amountProcessed }}/{{ amountTotal }}
@@ -147,7 +139,6 @@
                     <div v-if="scanObjectGroup[props.pool.name].state === null" class="col-span-2 mt-2"
                         :class="truncateText" :title="displayMiniStateMsg">
                         <span :class="stateMessageClass()">
-                            <!-- {{ miniStateMsg }} -->
                             {{ displayMiniStateMsg }}
                         </span>
                     </div>
@@ -423,13 +414,6 @@ const miniStateMsg = computed(() => {
 
 // Computed property to determine the state message based on pool health
 const displayStateMessage = computed(() => {
-    // if (props.pool.status === "SUSPENDED") {
-    //     return "Pool is suspended due to all disks being unavailable.";
-    // } else if (props.pool.status === "DEGRADED") {
-    //     return "Pool is degraded due to one or more missing disks.";
-    // } else {
-    //     return stateMessage.value;  // Default to existing stateMessage if not degraded or suspended
-    // }
     if (props.pool.statusCode !== 'OK') {
         return `${props.pool.statusDetail}`;
     } else {
@@ -439,13 +423,6 @@ const displayStateMessage = computed(() => {
 
 // Computed property for a shorter message in pool list view
 const displayMiniStateMsg = computed(() => {
-    // if (props.pool.status === "SUSPENDED") {
-    //     return "All disks are missing";
-    // } else if (props.pool.status === "DEGRADED") {
-    //     return "One or more disks missing.";
-    // } else {
-    //     return miniStateMsg.value;  // Default to existing miniStateMsg if not degraded or suspended
-    // }
     if (props.pool.statusCode !== 'OK') {
         return `${props.pool.statusDetail}`;
     } else {
@@ -505,14 +482,11 @@ function progressBarClass() {
     } else {
         return 'bg-orange-600';
     }
-
-    // ${scanObjectGroup[props.pool.name].state === 'FINISHED' &&  parseFloat(scanPercentage.toFixed(2)) < 1 ? parseFloat(scanPercentage.toFixed(2)) : 100}
 }
 
 //////////// Checking Disk Stats (Trim) /////////////
 /////////////////////////////////////////////////////
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
-// const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 const trimActivity = computed(() => {
@@ -545,15 +519,11 @@ const isTrimFinished = computed(() => {
 
 
 async function setTrimActivity(activity: Activity) {
-    // const trimActivity = trimActivities.value.get(props.disk!.name) || trimActivities.value.get(poolID.value);
-
     if (activity) {
         activity.isActive = isTrimActive.value;
         activity.isPaused = isTrimSuspended.value;
         activity.isFinished = isTrimFinished.value;
         activity.isCanceled = isTrimCanceled.value;
-
-        // trimActivities.value.set(props.disk!.name, activity);
     }
 
     // console.log('setTrimActivity fired');
@@ -751,7 +721,6 @@ function trimProgressBarClass(disk) {
 onMounted(() => {
 	pollScanStatus();
 	pollTrimStatus();
-    // console.log('isTrimmableDisk:', props.isTrimmableDisk!);
 });
 
 defineExpose({

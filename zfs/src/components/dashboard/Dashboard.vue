@@ -54,8 +54,8 @@
 
 <script setup lang="ts">
 import {computed, Ref, inject} from 'vue';
-import { loadDisks, loadDisksThenPools, loadScanObjectGroup, loadDiskStats  } from '../../composables/loadData';
-import { convertBytesToSize, convertSizeToBytesDecimal, convertBytesToSizeDecimal, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { loadDisksThenPools, loadScanObjectGroup, loadDiskStats  } from '../../composables/loadData';
+import { convertBytesToSize, loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashboardLoadingSkeleton from './DashboardLoadingSkeleton.vue';
