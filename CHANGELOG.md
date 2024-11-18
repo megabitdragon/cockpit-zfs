@@ -1,3 +1,3 @@
-## zfs module 1.1.1-1
+## zfs module 1.1.2-1
 
-* Updates disk data retrieval using lsdev with a fallback to lsblk data if lsdev is not available (on VMs or non-aliased third party hardware)
+* Reworked bytes conversion function to fix mismatched disk size bug

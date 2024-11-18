@@ -32,76 +32,125 @@ export const upperCaseWord = (word => {
 });
 
 //convert raw bytes to readable data size
-export const convertBytesToSize = (bytes) => {
-	if (bytes === 0) {
-        return `0 B`;
-    }
+// export const convertBytesToSize = (bytes) => {
+// 	if (bytes === 0) {
+//         return `0 B`;
+//     }
 
-    const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
+//     const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+//     const i = Math.floor(Math.log(bytes) / Math.log(1024));
+//     const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
   
-    return `${convertedSize} ${sizes[i]}`;
+//     return `${convertedSize} ${sizes[i]}`;
+// };
+
+// export const convertBytesToSizeDecimal = (bytes) => {
+// 	if (bytes === 0) {
+//         return `0 B`;
+//     }
+
+// 	const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+//     const i = Math.floor(Math.log(bytes) / Math.log(1024));
+//     const convertedSize = (bytes / Math.pow(1000, i)).toFixed(2);
+  
+//     return `${convertedSize} ${sizes[i]}`;
+// };
+
+export const convertBytesToSize = (bytes: number, useBinary: boolean = false): string => {
+	if (bytes === 0) {
+		return `0 B`;
+	}
+
+	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+	const decimalSizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+	const sizes = useBinary ? binarySizes : decimalSizes;
+	const base = useBinary ? 1024 : 1000;
+
+	const i = Math.floor(Math.log(bytes) / Math.log(base));
+	const convertedSize = (bytes / Math.pow(base, i)).toFixed(2);
+
+	return `${convertedSize} ${sizes[i]}`;
 };
 
-export const convertBytesToSizeDecimal = (bytes) => {
-	if (bytes === 0) {
-        return `0 B`;
-    }
 
-	const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    const convertedSize = (bytes / Math.pow(1000, i)).toFixed(2);
-  
-    return `${convertedSize} ${sizes[i]}`;
-};
+// // Convert readable data size to raw bytes
+// export const convertSizeToBytes = (size) => {
+//     const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+//     const match = size.match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
 
-// Convert readable data size to raw bytes
-export const convertSizeToBytes = (size) => {
-    const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
-    const match = size.match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
+//     if (!match) {
+//         console.warn(`Invalid size format: "${size}"`);
+//         return NaN;  // Or return 0, depending on your requirements
+//     }
+
+//     const [value, unit] = match.slice(1);
+//     const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
+
+//     if (index === -1) {
+//         console.warn(`Unrecognized unit: "${unit}"`);
+//         return NaN;  // Or return 0, depending on your requirements
+//     }
+
+//     const bytes = parseFloat(value) * Math.pow(1024, index);
+//     return bytes;
+// };
+
+
+// // Convert readable decimal data size to raw bytes
+// export const convertSizeToBytesDecimal = (size) => {
+// 	const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+// 	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
+
+// 	if (!match) {
+// 		console.warn(`Invalid size format: "${size}"`);
+// 		return NaN;  // Or return 0, depending on your requirements
+// 	}
+
+// 	const [value, unit] = match.slice(1);
+// 	const normalizedUnit = unit.toUpperCase();
+// 	const index = sizes.findIndex((sizeUnit) => sizeUnit === normalizedUnit);
+
+// 	if (index === -1) {
+// 		console.warn(`Unrecognized unit: "${unit}"`);
+// 		return NaN;  // Or return 0, depending on your requirements
+// 	}
+
+// 	// console.log(`Parsed value: ${value}, Parsed unit: ${normalizedUnit}, Unit index: ${index}`);
+// 	const bytes = parseFloat(value) * Math.pow(1000, index);
+// 	return bytes;
+// };
+
+export const convertSizeToBytes = (size: string, useBinary: boolean = false): number => {
+    const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+    const decimalSizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+    const sizes = useBinary ? binarySizes : decimalSizes;
+    const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
 
     if (!match) {
         console.warn(`Invalid size format: "${size}"`);
-        return NaN;  // Or return 0, depending on your requirements
+        return NaN; // Or return 0, depending on your requirements
     }
 
     const [value, unit] = match.slice(1);
-    const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
+    const normalizedUnit = useBinary ? unit.toLowerCase() : unit.toUpperCase();
+    const index = sizes.findIndex((sizeUnit) =>
+        useBinary
+            ? sizeUnit.toLowerCase() === normalizedUnit
+            : sizeUnit === normalizedUnit
+    );
 
     if (index === -1) {
         console.warn(`Unrecognized unit: "${unit}"`);
-        return NaN;  // Or return 0, depending on your requirements
+        return NaN; // Or return 0, depending on your requirements
     }
 
-    const bytes = parseFloat(value) * Math.pow(1024, index);
+    const base = useBinary ? 1024 : 1000;
+    const bytes = parseFloat(value) * Math.pow(base, index);
     return bytes;
 };
 
-
-// Convert readable decimal data size to raw bytes
-export const convertSizeToBytesDecimal = (size) => {
-	const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
-
-	if (!match) {
-		console.warn(`Invalid size format: "${size}"`);
-		return NaN;  // Or return 0, depending on your requirements
-	}
-
-	const [value, unit] = match.slice(1);
-	const normalizedUnit = unit.toUpperCase();
-	const index = sizes.findIndex((sizeUnit) => sizeUnit === normalizedUnit);
-
-	if (index === -1) {
-		console.warn(`Unrecognized unit: "${unit}"`);
-		return NaN;  // Or return 0, depending on your requirements
-	}
-
-	// console.log(`Parsed value: ${value}, Parsed unit: ${normalizedUnit}, Unit index: ${index}`);
-	const bytes = parseFloat(value) * Math.pow(1000, index);
-	return bytes;
-};
 
 
 //get size number from data size string

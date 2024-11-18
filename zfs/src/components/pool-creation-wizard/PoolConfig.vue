@@ -410,7 +410,7 @@
 import { inject, ref, Ref, computed, watchEffect, onMounted, watch } from 'vue';
 import { ChevronUpIcon, ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, truncateName, convertSizeToBytesDecimal } from '../../composables/helpers';
+import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
 
 interface PoolConfigProps {
@@ -615,7 +615,7 @@ const diskSizeMatch = () => {
 			const disk = disks.value.find(fullDisk => fullDisk.name == selDisk);
 			
 			if (disk) {
-				const currentCapacity = convertSizeToBytesDecimal(disk.capacity);
+				const currentCapacity = convertSizeToBytes(disk.capacity, true);
 
 				if (previousCapacity != 0 && currentCapacity != previousCapacity) {
 					result = false;

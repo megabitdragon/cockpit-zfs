@@ -163,7 +163,7 @@
 					<p class="row-start-1">Used {{ props.pool.properties.allocated }}</p>
 					<p class="row-start-2">Free {{ props.pool.properties.free }}</p>
 					<p class="row-start-3">
-						<!-- {{ convertBytesToSizeDecimal(props.pool.properties.refreservationRawSize!) }} -->
+						<!-- {{ convertBytesToSize(props.pool.properties.refreservationRawSize!, true) }} -->
 						{{ props.pool.properties.refreservationPercent }}% Reserved
 					</p>
 					<p class="row-start-4"><b>Total {{ props.pool.properties.size }}</b></p>
@@ -265,7 +265,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { destroyPool, trimPool, scrubPool, resilverPool, clearErrors, exportPool, upgradePool } from "../../composables/pools";
 import { labelClear } from "../../composables/disks";
-import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable, getCapacityColor, convertBytesToSizeDecimal } from '../../composables/helpers'
+import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable, getCapacityColor } from '../../composables/helpers'
 import Card from '../common/Card.vue';
 import Status from '../common/Status.vue';
 

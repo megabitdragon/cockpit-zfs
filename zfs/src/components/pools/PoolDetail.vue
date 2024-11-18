@@ -22,7 +22,7 @@
 								<br />as of {{ getTimestampString() }}</p>
 							<p :id="getIdKey('pool-refreservation')" name="pool-refreservation" class="text-sm">
 								Refreservation: {{
-								convertBytesToSizeDecimal(props.pool.properties.refreservationRawSize!) }} ({{
+								convertBytesToSize(props.pool.properties.refreservationRawSize!, true) }} ({{
 								props.pool.properties.refreservationPercent }}%)</p>
 						</div>
 						<div class="m-2 col-span-1">
@@ -341,7 +341,7 @@
 import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { configurePool } from '../../composables/pools';
-import { getTimestampString, upperCaseWord, isBoolOnOff, loadScanActivities, loadTrimActivities, formatStatus, getCapacityColor, convertBytesToSizeDecimal } from '../../composables/helpers';
+import { getTimestampString, upperCaseWord, isBoolOnOff, loadScanActivities, loadTrimActivities, formatStatus, getCapacityColor, convertBytesToSize } from '../../composables/helpers';
 import { loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import Modal from '../common/Modal.vue';
 import PoolCapacity from '../common/PoolCapacity.vue';

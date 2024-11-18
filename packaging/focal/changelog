@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.2-1focal) focal; urgency=medium
+
+  * Reworked bytes conversion function to fix mismatched disk size bug
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 18 Nov 2024 04:01:54 -0400
+
 cockpit-zfs (1.1.1-1focal) focal; urgency=medium
 
   * Updates disk data retrieval using lsdev with a fallback to lsblk data if lsdev

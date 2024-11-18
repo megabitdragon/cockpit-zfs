@@ -111,7 +111,7 @@ import Modal from '../common/Modal.vue';
 import { BetterCockpitFile } from '@45drives/cockpit-helpers';
 import { ref, Ref, inject, computed } from 'vue';
 import { sendSnapshot, doesDatasetExist, formatRecentSnaps, doesDatasetHaveSnaps } from '../../composables/snapshots';
-import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, convertSizeToBytesDecimal } from '../../composables/helpers';
+import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, convertSizeToBytes } from '../../composables/helpers';
 
 interface SendSnapshotProps {
     idKey: string;
@@ -568,11 +568,11 @@ const sendProgressAmount = ref(0);
 const tracking = ref(false);
 
 function getTotalSendSize(contentTotal) {
-    return (convertSizeToBytesDecimal(contentTotal));
+    return (convertSizeToBytes(contentTotal, true));
 }
 
 function getSendProgress(contentProgress) {
-    return (convertSizeToBytesDecimal(contentProgress));
+    return (convertSizeToBytes(contentProgress, true));
 }
 
 const sendPercentage = computed(() => {

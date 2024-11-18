@@ -1,17 +1,18 @@
 <template>
-	<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true" class="mt-2 mb-4 overflow-visible card bg-default">
+	<Card :bgColor="'bg-default'" :titleSection="true" :contentSection="true" :footerSection="true"
+		class="mt-2 mb-4 overflow-visible card bg-default" :title="props.disk.name">
 		<template v-slot:title>
 			<div class="flex flex-row justify-between gap-1">
 				<div class="pr-2 text-default text-medium" :class="truncateText" :title="props.disk.name">
 					{{ props.disk.name }}
 				</div>
 				<div class="px-1">
-					<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400"/>
+					<CheckCircleIcon class="aspect-square w-5 h-5 text-green-400" />
 				</div>
 			</div>
 
 		</template>
-					<!-- alias, name, model/serial, temp, status -->	
+		<!-- alias, name, model/serial, temp, status -->
 		<template v-slot:content>
 			<div>
 				<p>({{ props.disk.type }})</p>

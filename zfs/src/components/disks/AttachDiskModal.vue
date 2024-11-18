@@ -131,7 +131,7 @@ import { ref, inject, Ref, computed, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
-import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, loadScanActivities, convertSizeToBytesDecimal } from '../../composables/helpers';
+import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, loadScanActivities } from '../../composables/helpers';
 import { attachDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets, loadDiskStats, loadScanObjectGroup } from '../../composables/loadData';
 import { loadImportablePools } from '../../composables/loadImportables';
@@ -312,14 +312,14 @@ const diskSizeMatch = () => {
     const newDiskData = allDisks.value.find(fullDisk => fullDisk.name === selectedDisk.value);
 
     if (newDiskData) {
-        const newCapacity = convertSizeToBytesDecimal(newDiskData!.capacity);
+        const newCapacity = convertSizeToBytes(newDiskData!.capacity, true);
         console.log('newCapacity:', newCapacity);
 
         const oldDisks = props.vDev.disks;
         console.log('oldDisks:', oldDisks);
 
         for (const oldDisk of oldDisks) {
-            const currentCapacity = convertSizeToBytesDecimal(oldDisk.capacity);
+            const currentCapacity = convertSizeToBytes(oldDisk.capacity, true);
             console.log('currentCapacity:', currentCapacity);
 
             if (newCapacity < currentCapacity) {
