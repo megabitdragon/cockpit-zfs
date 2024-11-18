@@ -32,31 +32,7 @@ export const upperCaseWord = (word => {
 });
 
 //convert raw bytes to readable data size
-// export const convertBytesToSize = (bytes) => {
-// 	if (bytes === 0) {
-//         return `0 B`;
-//     }
-
-//     const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
-//     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-//     const convertedSize = (bytes / Math.pow(1024, i)).toFixed(2);
-  
-//     return `${convertedSize} ${sizes[i]}`;
-// };
-
-// export const convertBytesToSizeDecimal = (bytes) => {
-// 	if (bytes === 0) {
-//         return `0 B`;
-//     }
-
-// 	const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-//     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-//     const convertedSize = (bytes / Math.pow(1000, i)).toFixed(2);
-  
-//     return `${convertedSize} ${sizes[i]}`;
-// };
-
-export const convertBytesToSize = (bytes: number, useBinary: boolean = false): string => {
+export const convertBytesToSize = (bytes: number, useDecimal: boolean = false): string => {
 	if (bytes === 0) {
 		return `0 B`;
 	}
@@ -64,8 +40,8 @@ export const convertBytesToSize = (bytes: number, useBinary: boolean = false): s
 	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
 	const decimalSizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-	const sizes = useBinary ? binarySizes : decimalSizes;
-	const base = useBinary ? 1024 : 1000;
+	const sizes = useDecimal ? decimalSizes : binarySizes;
+	const base = useDecimal ? 1000 : 1024;
 
 	const i = Math.floor(Math.log(bytes) / Math.log(base));
 	const convertedSize = (bytes / Math.pow(base, i)).toFixed(2);
@@ -74,81 +50,35 @@ export const convertBytesToSize = (bytes: number, useBinary: boolean = false): s
 };
 
 
-// // Convert readable data size to raw bytes
-// export const convertSizeToBytes = (size) => {
-//     const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
-//     const match = size.match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
+// Convert readable data size to raw bytes
+export const convertSizeToBytes = (size: string, useDecimal: boolean = false): number => {
+	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+	const decimalSizes = ['B', 'KB', 'MB', 'GB', 'TB'];
 
-//     if (!match) {
-//         console.warn(`Invalid size format: "${size}"`);
-//         return NaN;  // Or return 0, depending on your requirements
-//     }
+	const sizes = useDecimal ? decimalSizes : binarySizes;
+	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
 
-//     const [value, unit] = match.slice(1);
-//     const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === unit.toLowerCase());
+	if (!match) {
+		console.warn(`Invalid size format: "${size}"`);
+		return NaN; // Or return 0, depending on your requirements
+	}
 
-//     if (index === -1) {
-//         console.warn(`Unrecognized unit: "${unit}"`);
-//         return NaN;  // Or return 0, depending on your requirements
-//     }
+	const [value, unit] = match.slice(1);
+	const normalizedUnit = useDecimal ? unit.toUpperCase() : unit.toLowerCase();
+	const index = sizes.findIndex((sizeUnit) =>
+		useDecimal
+			? sizeUnit === normalizedUnit
+			: sizeUnit.toLowerCase() === normalizedUnit
+	);
 
-//     const bytes = parseFloat(value) * Math.pow(1024, index);
-//     return bytes;
-// };
+	if (index === -1) {
+		console.warn(`Unrecognized unit: "${unit}"`);
+		return NaN; // Or return 0, depending on your requirements
+	}
 
-
-// // Convert readable decimal data size to raw bytes
-// export const convertSizeToBytesDecimal = (size) => {
-// 	const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-// 	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
-
-// 	if (!match) {
-// 		console.warn(`Invalid size format: "${size}"`);
-// 		return NaN;  // Or return 0, depending on your requirements
-// 	}
-
-// 	const [value, unit] = match.slice(1);
-// 	const normalizedUnit = unit.toUpperCase();
-// 	const index = sizes.findIndex((sizeUnit) => sizeUnit === normalizedUnit);
-
-// 	if (index === -1) {
-// 		console.warn(`Unrecognized unit: "${unit}"`);
-// 		return NaN;  // Or return 0, depending on your requirements
-// 	}
-
-// 	// console.log(`Parsed value: ${value}, Parsed unit: ${normalizedUnit}, Unit index: ${index}`);
-// 	const bytes = parseFloat(value) * Math.pow(1000, index);
-// 	return bytes;
-// };
-
-export const convertSizeToBytes = (size: string, useBinary: boolean = false): number => {
-    const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
-    const decimalSizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-
-    const sizes = useBinary ? binarySizes : decimalSizes;
-    const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
-
-    if (!match) {
-        console.warn(`Invalid size format: "${size}"`);
-        return NaN; // Or return 0, depending on your requirements
-    }
-
-    const [value, unit] = match.slice(1);
-    const normalizedUnit = useBinary ? unit.toLowerCase() : unit.toUpperCase();
-    const index = sizes.findIndex((sizeUnit) =>
-        useBinary
-            ? sizeUnit.toLowerCase() === normalizedUnit
-            : sizeUnit === normalizedUnit
-    );
-
-    if (index === -1) {
-        console.warn(`Unrecognized unit: "${unit}"`);
-        return NaN; // Or return 0, depending on your requirements
-    }
-
-    const base = useBinary ? 1024 : 1000;
-    const bytes = parseFloat(value) * Math.pow(base, index);
-    return bytes;
+	const base = useDecimal ? 1000 : 1024;
+	const bytes = parseFloat(value) * Math.pow(base, index);
+	return bytes;
 };
 
 
