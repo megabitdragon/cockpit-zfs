@@ -1,3 +1,3 @@
-## zfs module 1.2.3-1
+## zfs module 1.1.3-1
 
-* Adds log files for getDisks and getPools script execution for better debugging
+* FIXED VERSION NUMBER - Adds log files for getDisks and getPools scripts
