@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Thu Nov 21 2024 Jordan Keough <jkeough@45drives.com> 1.2.3-1
+- Adds log files for getDisks and getPools script execution for better debugging
 * Mon Nov 18 2024 Jordan Keough <jkeough@45drives.com> 1.1.2-1
 - Reworked bytes conversion function to fix mismatched disk size bug
 * Wed Nov 06 2024 Jordan Keough <jkeough@45drives.com> 1.1.1-1

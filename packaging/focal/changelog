@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.3-1focal) focal; urgency=medium
+
+  * Adds log files for getDisks and getPools script execution for better debugging
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 21 Nov 2024 06:26:56 -0400
+
 cockpit-zfs (1.1.2-1focal) focal; urgency=medium
 
   * Reworked bytes conversion function to fix mismatched disk size bug

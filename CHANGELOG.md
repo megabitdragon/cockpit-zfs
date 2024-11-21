@@ -1,3 +1,3 @@
-## zfs module 1.1.2-1
+## zfs module 1.2.3-1
 
-* Reworked bytes conversion function to fix mismatched disk size bug
+* Adds log files for getDisks and getPools script execution for better debugging
