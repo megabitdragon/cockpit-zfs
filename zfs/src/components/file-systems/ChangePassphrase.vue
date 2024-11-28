@@ -76,7 +76,6 @@
 <script setup lang="ts">
 import { ref, Ref, inject } from 'vue';
 import Modal from '../common/Modal.vue';
-import { loadDatasets } from '../../composables/loadData';
 import { changePassphrase } from '../../composables/datasets';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
 

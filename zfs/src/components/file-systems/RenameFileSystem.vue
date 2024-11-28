@@ -105,7 +105,6 @@ const notifications = inject<Ref<any>>('notifications')!;
 const props = defineProps<RenameFileSystemProps>();
 const showRenameModal = inject<Ref<boolean>>('show-rename-modal')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
-const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const renaming = inject<Ref<boolean>>('renaming')!;
 const confirmRename = inject<Ref<boolean>>('confirm-rename')!;
@@ -130,7 +129,6 @@ function getChildDatasetIds(dataset, allDatasets): string[] {
 }
 
 const datasetsInSamePool = computed<FileSystemData[]>(() => {
-   // return datasets.value.filter(dataset => dataset.pool === props.filesystem.pool && dataset.id !== props.filesystem.id);
     const currentDataset = props.filesystem;
 
     const childDatasetIds = getChildDatasetIds(currentDataset, datasets.value);

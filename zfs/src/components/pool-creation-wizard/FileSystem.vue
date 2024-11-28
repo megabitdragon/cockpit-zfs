@@ -643,9 +643,6 @@
 								<option value="tib">TiB</option>
 							</select>
 						</div>
-						<!-- <div class="mt-2 justify-self-start">
-                            <p class="text-muted">Used Space: {{ convertBytesToSize(newFileSystemConfig.properties.used) }}</p>
-                        </div> -->
 					</div>
 
 					<!-- Read Only (Toggle) -->

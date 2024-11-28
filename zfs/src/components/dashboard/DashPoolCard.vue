@@ -163,7 +163,6 @@
 					<p class="row-start-1">Used {{ props.pool.properties.allocated }}</p>
 					<p class="row-start-2">Free {{ props.pool.properties.free }}</p>
 					<p class="row-start-3">
-						<!-- {{ convertBytesToSize(props.pool.properties.refreservationRawSize!, true) }} -->
 						{{ props.pool.properties.refreservationPercent }}% Reserved
 					</p>
 					<p class="row-start-4"><b>Total {{ props.pool.properties.size }}</b></p>
@@ -312,7 +311,6 @@ const poolConfig = ref<PoolData>({
 
 const capacityColor = computed(() =>
 	getCapacityColor('bg', props.pool.properties.capacity, props.pool.properties.refreservationPercent!)
-	// getCapacityColor('text', props.pool.properties.capacity, props.pool.properties.refreservationPercent!)
 );
 
 function getIsTrimmable() {
@@ -367,7 +365,6 @@ watch(confirmSavePool, async (newVal, oldVal) => {
 	if (confirmSavePool.value == true) {
 		notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
 		await refreshAllData();
-		// showPoolDetails.value = false;
 		
 	} else {
 		notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool.', 'error');
@@ -626,7 +623,7 @@ const loadScrubStopConfirmComponent = async () => {
 }
 
 async function scrubThisPool(pool) {
-	// cleared.value = false;
+
 	selectedPool.value = pool;
 	await loadScrubConfirmComponent();
 	showScrubModal.value = true;
@@ -685,13 +682,13 @@ async function resumeScrub(pool) {
 		if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 			notifications.value.constructNotification('Scrub Resume Failed', `Scrub failed to resume: ${errorMessage}.`, 'error');
-			// operationRunning.value = false;
+
 			confirmScrub.value = false;
 		} else {
 			getScanStatus();
 			confirmScrub.value = false;
 			notifications.value.constructNotification('Scrub Resumed', 'Scrub on ' + selectedPool.value!.name + " resumed.", 'success');
-			// operationRunning.value = false;
+
 			showScrubModal.value = false;
 		}
 	} catch (error) {
@@ -728,14 +725,14 @@ watch(confirmPauseScrub, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				notifications.value.constructNotification('Scrub Pause Failed', `Scrub failed to pause: ${errorMessage}.`, 'error');
-				// operationRunning.value = false;
+
 				confirmPauseScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmPauseScrub.value = false;
 				notifications.value.constructNotification('Scrub Paused', 'Scrub on ' + selectedPool.value!.name + " paused.", 'success');
 				showPauseScrubConfirm.value = false;
-				// operationRunning.value = false;
+
 			}
 		} catch (error) {
 			console.error(error)
@@ -767,13 +764,13 @@ watch(confirmStopScrub, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				notifications.value.constructNotification('Scrub Stop Failed', `Scrub failed to stop: ${errorMessage}.`, 'error');
-				// operationRunning.value = false;
+
 				confirmStopScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmStopScrub.value = false;
 				notifications.value.constructNotification('Scrub Stopped', 'Scrub on ' + selectedPool.value!.name + " stopped.", 'success');
-				// operationRunning.value = false;
+
 				showStopScrubConfirm.value = false;
 			}
 		} catch (error) {
@@ -814,7 +811,7 @@ const loadTrimStopConfirmComponent = async () => {
 }
 
 async function trimThisPool(pool) {
-	// cleared.value = false;
+
 	selectedPool.value = pool;
 	await loadTrimConfirmComponent();
 	showTrimModal.value = true;
@@ -833,21 +830,21 @@ const updateShowTrimPool = (newVal) => {
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
 		startingTrim.value = true;
-		// operationRunning.value = true;
+
 		console.log('now trimming:', selectedPool.value);
 		try {
 			const output = await trimPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				notifications.value.constructNotification('Trim Failed', `Trim failed to start: ${errorMessage}.`, 'error');
-				// operationRunning.value = false;
+
 				confirmTrim.value = false
 			} else {
 				getTrimStatus();
 				confirmTrim.value = false
 				notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
 				showTrimModal.value = false;
-				// operationRunning.value = false;
+
 			}
 		} catch (error) {
 			console.error(error);
@@ -871,13 +868,13 @@ async function resumeTrim(pool) {
 		if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 			notifications.value.constructNotification('Trim Resume Failed', `Trim failed to resume: ${errorMessage}.`, 'error');
-			// operationRunning.value = false;
+
 			confirmTrim.value = false;
 		} else {
 			getTrimStatus();
 			confirmTrim.value = false;
 			notifications.value.constructNotification('Trim Resumed', 'Trim on ' + selectedPool.value!.name + " resumed.", 'success');
-			// operationRunning.value = false;
+
 			showTrimModal.value = false;
 		}
 	} catch (error) {
@@ -913,13 +910,13 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				notifications.value.constructNotification('Trim Pause Failed', `Trim failed to pause: ${errorMessage}.`, 'error');
-				// operationRunning.value = false;
+
 				confirmPauseTrim.value = false;
 			} else {
 				getTrimStatus();
 				confirmPauseTrim.value = false;
 				notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
-				// operationRunning.value = false;
+
 				showPauseTrimConfirm.value = false;
 			}
 			
@@ -951,7 +948,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				notifications.value.constructNotification('Trim Stop Failed', `Trim failed to stop: ${errorMessage}.`, 'error');
-				// operationRunning.value = false;
+
 				confirmStopTrim.value = false;
 			} else {
 				getTrimStatus();
@@ -981,7 +978,7 @@ const loadExportConfirmComponent = async () => {
 }
 
 async function exportThisPool(pool) {
-	// cleared.value = false;
+
 	selectedPool.value = pool;
 	await loadExportConfirmComponent();
 	showExportModal.value = true;
@@ -1026,12 +1023,8 @@ watch(confirmExport, async (newVal, oldVal) => {
 
 /////////////////// Clear Errors ////////////////////
 /////////////////////////////////////////////////////
-// const cleared = ref(false);
-
 async function clearPoolErrors(poolName) {
-	// cleared.value = false;
 	await clearErrors(poolName);
-	// cleared.value = true;
 }
 
 ///////////////////// Add VDev //////////////////////
@@ -1083,8 +1076,6 @@ async function getTrimStatus() {
 }
 
 /////////////////////////////////////////////////////
-// const scanActivities = ref<Map<string, Activity>>(new Map());
-// const trimActivities = ref<Map<string, Activity>>(new Map());
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 

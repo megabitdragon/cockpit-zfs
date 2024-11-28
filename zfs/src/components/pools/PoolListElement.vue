@@ -17,17 +17,6 @@
 							<ExclamationCircleIcon class="ml-2 w-5 text-orange-700" />
 						</div>
 					</div>
-					<!-- 	<div class="py-1 mt-1 col-span-1 justify-between text-left flex flex-row"
-						:title="poolData[props.poolIdx].name">
-						<span class="justify-self-start text-left" :class="truncateText">
-							{{ poolData[props.poolIdx].name }}
-						</span>
-						<div v-if="upgradeablePool"
-							title="Pool was made with a legacy version of ZFS. Upgrade available."
-							class="flex flex-row justify-between w-fit bg-default rounded-full items-center">
-							<ExclamationCircleIcon class="ml-2 w-5 text-orange-700" />
-						</div>
-					</div> -->
 					<div class="py-1 mt-1 col-span-1 font-semibold"
 						:class="[formatStatus(poolData[props.poolIdx].status), truncateText]"
 						:title="poolData[props.poolIdx].status">{{ poolData[props.poolIdx].status }}</div>
@@ -35,38 +24,6 @@
 						<div class="w-full bg-well rounded-full text-center"
 							:title="poolData[props.poolIdx].properties.capacity + '%'">
 							<div v-if="props.pool.properties.refreservationPercent!">
-								<!-- <div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < (100 - props.pool.properties.refreservationPercent) - 20"
-									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
-									<div class="bg-green-600 h-4"
-										:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-										<div
-											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
-											{{ Number(props.pool.properties.capacity) }}%
-										</div>
-									</div>
-								</div>
-
-								<div v-else-if="Number(props.pool.properties.capacity) >= ((100 - props.pool.properties.refreservationPercent) - 19) && Number(props.pool.properties.capacity) <= ((100 - props.pool.properties.refreservationPercent) - 10)"
-									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
-									<div class="bg-orange-600 h-4"
-										:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-										<div
-											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
-											{{ Number(props.pool.properties.capacity) }}%
-										</div>
-									</div>
-								</div>
-
-								<div v-else-if="Number(props.pool.properties.capacity) > ((100 - props.pool.properties.refreservationPercent) - 9) && Number(props.pool.properties.capacity) <= (100 - props.pool.properties.refreservationPercent)"
-									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
-									<div class="bg-red-600 h-4"
-										:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-										<div
-											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
-											{{ Number(props.pool.properties.capacity) }}%
-										</div>
-									</div>
-								</div> -->
 								<div v-if="Number(props.pool.properties.capacity) >= 1"
 									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
 									<div :class="capacityColor" class="h-4"
@@ -86,38 +43,6 @@
 								</div>
 							</div>
 							<div v-else>
-								<!-- <div v-if="Number(props.pool.properties.capacity) >= 1 && Number(props.pool.properties.capacity) < 80"
-									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
-									<div class="bg-green-600 h-4"
-										:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-										<div
-											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
-											{{ Number(props.pool.properties.capacity) }}%
-										</div>
-									</div>
-								</div>
-
-								<div v-else-if="Number(props.pool.properties.capacity) >= 80 && Number(props.pool.properties.capacity) <= 90"
-									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
-									<div class="bg-orange-600 h-4"
-										:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-										<div
-											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
-											{{ Number(props.pool.properties.capacity) }}%
-										</div>
-									</div>
-								</div>
-
-								<div v-else-if="Number(props.pool.properties.capacity) > 90 && Number(props.pool.properties.capacity) <= 100"
-									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
-									<div class="bg-red-600 h-4"
-										:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
-										<div
-											class="absolute inset-0 flex items-center justify-center text-sm font-medium text-default p-0.5 leading-none">
-											{{ Number(props.pool.properties.capacity) }}%
-										</div>
-									</div>
-								</div> -->
 								<div v-if="Number(props.pool.properties.capacity) >= 1"
 									class="w-full bg-well rounded-full h-4 mt-1 text-center relative flex overflow-hidden">
 									<div :class="capacityColor" class="h-4"
@@ -360,7 +285,6 @@ const clearLabels = inject<Ref<boolean>>('clear-labels')!;
 
 function getIsTrimmable() {
 	selectedPool.value = props.pool;
-	//poolData[props.poolIdx].diskType != 'HDD'
 	if (selectedPool.value.diskType! != 'HDD') {
 		if (selectedPool.value.vdevs.some(vdev => vdev.type == 'data' || vdev.type == 'log' || vdev.type == 'special' || vdev.type == 'dedup')) {
 			return true;
@@ -419,7 +343,6 @@ watch(confirmSavePool, async (newVal, oldVal) => {
 	if (confirmSavePool.value == true) {
 		notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
 		await refreshAllData();
-		// showPoolDetails.value = false;
 	} else {
 		notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool.', 'error');
 	}
@@ -566,8 +489,7 @@ watch(confirmResilver, async (newValue, oldValue) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmResilver.value = false;
-				notifications.value.constructNotification('Resilver Failed', "Resilver failed to start:${errorMessage}.", 'error');
-				// showResilverModal.value = false;
+				notifications.value.constructNotification('Resilver Failed', `Resilver failed to start:${errorMessage}.`, 'error');
 				operationRunning.value = false;
 			} else {
 				getScanStatus();
@@ -673,7 +595,6 @@ const loadScrubStopConfirmComponent = async () => {
 }
 
 async function scrubThisPool(pool) {
-	// cleared.value = false;
 	selectedPool.value = pool;
 	await loadScrubConfirmComponent();
 	showScrubModal.value = true;
@@ -699,7 +620,7 @@ watch(confirmScrub, async (newVal, oldVal) => {
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Scrub Failed', "Scrub failed to start:${errorMessage}.", 'error');
+				notifications.value.constructNotification('Scrub Failed', `Scrub failed to start:${errorMessage}.`, 'error');
 				operationRunning.value = false;
 				confirmScrub.value = false;
 			} else {
@@ -724,20 +645,17 @@ async function pauseScrub(pool) {
 
 async function resumeScrub(pool) {
 	resuming.value = true;
-	// operationRunning.value = true;
 	try {
 		const output = await scrubPool(selectedPool.value!);
 
 		if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-			notifications.value.constructNotification('Scrub Resume Failed', "Scrub failed to resume:${errorMessage}.", 'error');
-			// operationRunning.value = false;
+			notifications.value.constructNotification('Scrub Resume Failed', `Scrub failed to resume:${errorMessage}.`, 'error');
 			confirmScrub.value = false;
 		} else {
 			getScanStatus();
 			confirmScrub.value = false;
 			notifications.value.constructNotification('Scrub Resumed', 'Scrub on ' + selectedPool.value!.name + " resumed.", 'success');
-			// operationRunning.value = false;
 			showScrubModal.value = false;
 		}
 	} catch (error) {
@@ -773,15 +691,13 @@ watch(confirmPauseScrub, async (newVal, oldVal) => {
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Scrub Pause Failed', "Scrub failed to pause:${errorMessage}.", 'error');
-				// operationRunning.value = false;
+				notifications.value.constructNotification('Scrub Pause Failed', `Scrub failed to pause:${errorMessage}.`, 'error');
 				confirmPauseScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmPauseScrub.value = false;
 				notifications.value.constructNotification('Scrub Paused', 'Scrub on ' + selectedPool.value!.name + " paused.", 'success');
 				showPauseScrubConfirm.value = false;
-				// operationRunning.value = false;
 			}
 		} catch (error) {
 			console.error(error)
@@ -812,14 +728,12 @@ watch(confirmStopScrub, async (newVal, oldVal) => {
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Scrub Stop Failed', "Scrub failed to stop:${errorMessage}.", 'error');
-				// operationRunning.value = false;
+				notifications.value.constructNotification('Scrub Stop Failed', `Scrub failed to stop:${errorMessage}.`, 'error');
 				confirmStopScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmStopScrub.value = false;
 				notifications.value.constructNotification('Scrub Stopped', 'Scrub on ' + selectedPool.value!.name + " stopped.", 'success');
-				// operationRunning.value = false;
 				showStopScrubConfirm.value = false;
 			}
 		} catch (error) {
@@ -859,7 +773,6 @@ const loadTrimStopConfirmComponent = async () => {
 }
 
 async function trimThisPool(pool) {
-	// cleared.value = false;
 	selectedPool.value = pool;
 	await loadTrimConfirmComponent();
 	showTrimModal.value = true;
@@ -878,21 +791,18 @@ const updateShowTrimPool = (newVal) => {
 watch(confirmTrim, async (newValue, oldValue) => {
 	if (confirmTrim.value == true) {
 		startingTrim.value = true;
-		// operationRunning.value = true;
 		console.log('now trimming:', selectedPool.value);
 		try {
 			const output = await trimPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Trim Failed', "Trim failed to start:${errorMessage}.", 'error');
-				// operationRunning.value = false;
+				notifications.value.constructNotification('Trim Failed', `Trim failed to start:${errorMessage}.`, 'error');
 				confirmTrim.value = false
 			} else {
 				getTrimStatus();
 				confirmTrim.value = false
 				notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
 				showTrimModal.value = false;
-				// operationRunning.value = false;
 			}
 		} catch (error) {
 			console.error(error);
@@ -908,15 +818,6 @@ async function pauseTrim(pool) {
 	console.log('trim to pause:', selectedPool.value);
 }
 
-// async function resumeTrim(pool) {
-// 	resumingTrim.value = true;
-// 	// checkingDiskStats.value = true;
-// 	await trimPool(pool);
-// 	getTrimStatus();
-// 	// pollTrim();
-// 	resumingTrim.value = false
-// 	await refreshAllData();
-// }
 
 async function resumeTrim(pool) {
 	resumingTrim.value = true;
@@ -924,15 +825,13 @@ async function resumeTrim(pool) {
 		const output = await trimPool(pool)
 
 		if (output == null || output.error) {
-				const errorMessage = output?.error || 'Unknown error';
-			notifications.value.constructNotification('Trim Resume Failed', "Trim failed to resume:${errorMessage}.", 'error');
-			// operationRunning.value = false;
+			const errorMessage = output?.error || 'Unknown error';
+			notifications.value.constructNotification('Trim Resume Failed', `Trim failed to resume:${errorMessage}.`, 'error');
 			confirmTrim.value = false;
 		} else {
 			getTrimStatus();
 			confirmTrim.value = false;
 			notifications.value.constructNotification('Trim Resumed', 'Trim on ' + selectedPool.value!.name + " resumed.", 'success');
-			// operationRunning.value = false;
 		}
 	} catch (error) {
 		console.error(error)
@@ -967,14 +866,12 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 			const output = 	await trimPool(selectedPool.value!, false, 'pause');
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Trim Pause Failed', "Trim failed to pause:${errorMessage}.", 'error');
-				// operationRunning.value = false;
+				notifications.value.constructNotification('Trim Pause Failed', `Trim failed to pause:${errorMessage}.`, 'error');
 				confirmPauseTrim.value = false;
 			} else {
 				getTrimStatus();
 				confirmPauseTrim.value = false;
 				notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
-				// operationRunning.value = false;
 				showPauseTrimConfirm.value = false;
 			}
 			
@@ -1005,8 +902,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 			const output = await trimPool(selectedPool.value!, false, 'stop');
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Trim Stop Failed', "Trim failed to stop:${errorMessage}.", 'error');
-				// operationRunning.value = false;
+				notifications.value.constructNotification('Trim Stop Failed', `Trim failed to stop:${errorMessage}.`, 'error');
 				confirmStopTrim.value = false;
 			} else {
 				getTrimStatus();
@@ -1036,7 +932,6 @@ const loadExportConfirmComponent = async () => {
 }
 
 async function exportThisPool(pool) {
-	// cleared.value = false;
 	selectedPool.value = pool;
 	await loadExportConfirmComponent();
 	showExportModal.value = true;
@@ -1062,7 +957,7 @@ watch(confirmExport, async (newVal, oldVal) => {
 			const output = await exportPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Export Failed', "Pool failed to export:${errorMessage}.", 'error');
+				notifications.value.constructNotification('Export Failed', `Pool failed to export:${errorMessage}.`, 'error');
 				confirmExport.value = false;
 			} else {
 				notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
@@ -1081,12 +976,8 @@ watch(confirmExport, async (newVal, oldVal) => {
 
 /////////////////// Clear Errors ////////////////////
 /////////////////////////////////////////////////////
-// const cleared = ref(false);
-
 async function clearPoolErrors(poolName) {
-	// cleared.value = false;
 	await clearErrors(poolName);
-	// cleared.value = true;
 }
 
 ///////////////////// Add VDev //////////////////////
@@ -1107,9 +998,7 @@ async function showAddVDev(pool) {
 
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
-// const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const scanStatusBox = ref();
-// const scanActivity = inject<Ref<Activity>>('scan-activity')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 	
 async function getScanStatus() {
@@ -1120,16 +1009,8 @@ async function getScanStatus() {
 
 //////////// Checking Disk Stats (Trim) /////////////
 /////////////////////////////////////////////////////
-// const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const vDevElement = ref();
-// const trimActivity = inject<Ref<Activity>>('trim-activity')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
-	
-// async function getTrimStatus() {
-// 	console.log('vDevElement', vDevElement.value);
-
-// 	await vDevElement.value[0].getDiskStatus();
-// }
 
 async function getTrimStatus() {
     // console.log('vDevElement', vDevElement.value);
@@ -1140,8 +1021,6 @@ async function getTrimStatus() {
     } else {
         console.error('vDevElement is not defined or does not contain an array with elements.');
     }
-
-	// await vDevElement.value[0].getDiskStatus();
 }
 
 /////////////////////////////////////////////////////
@@ -1183,5 +1062,4 @@ provide('modal-option-three-toggle', thirdOptionToggle);
 provide('modal-option-four-toggle', fourthOptionToggle);
 
 provide('scan-status-box', scanStatusBox);
-
 </script>

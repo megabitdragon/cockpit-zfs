@@ -129,7 +129,6 @@
                             class="mt-1 block w-full input-textlike bg-default">
                             <option value="vdev_path">Device Alias</option>
                             <option value="sd_path">Block Device</option>
-                            <!-- <option value="disk">Disk/WWN</option> -->
                             <option value="phy_path">Hardware Path</option>
                         </select>
                     </div>
@@ -375,7 +374,6 @@ interface ImportPoolProps {
     idKey: string;
 }
 
-const props = defineProps<ImportPoolProps>();
 const showDeletedPools = ref(false);
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 const notifications = inject<Ref<any>>('notifications')!;

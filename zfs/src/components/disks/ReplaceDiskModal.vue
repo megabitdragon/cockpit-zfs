@@ -207,9 +207,6 @@ const diskCardClass = (diskName) => {
 };
 
 function setDiskNamePath() {
-    // const oldDisks = props.vDev.disks;
-    // console.log('setting oldDisks:', oldDisks);
-    // oldDisk.value = oldDisks.pop();
     oldDisk.value = props.disk;
     console.log('setting oldDisk.value:', oldDisk.value);
     console.log('getting selectedDisk.value:', selectedDisk.value);
@@ -227,20 +224,16 @@ function setDiskNamePath() {
             break;
         case 'phy_path':
             diskNewPath.value = newDisk.value!.phy_path;
-            //diskNewName.value = diskNewPath.value;
              diskNewName.value = diskNewPath.value.replace(phyPathPrefix, '');
             diskExistPath.value = oldDisk.value!.path;
-            //diskExistName.value = diskExistPath.value;
              diskExistName.value = diskExistPath.value.replace(phyPathPrefix, '');
             console.log('diskNewPath:', diskNewPath.value, 'diskNewName:', diskNewName.value);
             console.log('diskExistPath:', diskExistPath.value, 'diskExistName:', diskExistName.value);
             break;
         case 'sd_path':
             diskNewPath.value = newDisk.value!.sd_path;
-            //diskNewName.value = diskNewPath.value;
              diskNewName.value = diskNewPath.value.replace(sdPathPrefix, '');
             diskExistPath.value = oldDisk.value!.path;
-            //diskExistName.value = diskExistPath.value;
              diskExistName.value = diskExistPath.value.replace(sdPathPrefix, '');
             console.log('diskNewPath:', diskNewPath.value, 'diskNewName:', diskNewName.value);
             console.log('diskExistPath:', diskExistPath.value, 'diskExistName:', diskExistName.value);

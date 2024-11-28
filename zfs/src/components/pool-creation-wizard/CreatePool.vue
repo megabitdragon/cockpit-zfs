@@ -164,10 +164,8 @@ const poolConfig = ref<PoolData>({
 	statusCode: '',
 	statusDetail: null,
 	errorCount: 0,
-	// fileSystem: fileSystemConfig.value,
 });
 
-// const fileSystemConfig = ref<FileSystemData>();
 
 //setting default values for file system object
 const fileSystemConfig = ref<FileSystemData>({
@@ -244,7 +242,6 @@ const notifications = inject<Ref<any>>('notifications')!;
 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
-//const newPoolName = ref('');
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 
@@ -257,7 +254,6 @@ async function finishBtn(newPoolData) {
 	poolConfiguration.value.fillNewPoolData();
 	creatingPool.value = true;
 	console.log('newPoolData received:', newPoolData);
-	//console.log('newPoolName received:', newPoolName.value);
 	
 	try {
 		const output = await newPool(newPoolData);
@@ -365,7 +361,6 @@ const navigationCallback: StepNavigationCallback = (item: StepsNavigationItem) =
 			}
 			
 		} else if (item.tag === 'review') {
-			// } else if (item.tag === 'review' && poolConfiguration.value.validateAndProceed(currentTag)) {
 			navTag.value = item.tag;
 			tabError.value = false;
 		} else {
@@ -414,12 +409,8 @@ const next = () => {
 			console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
 		}
 	} else if (currentItem!.tag === 'pool-settings') {
-		// if (poolConfiguration.value.validateAndProceed('pool-settings')) {
 		navTag.value = nextItem.tag;
 		tabError.value = false;
-		// } else {
-		//   console.log(`Validation failed for ${navTag.value} tab. Cannot proceed to the ${nextItem.tag} tab.`);
-		// }
 	} else if (currentItem!.tag === 'file-system') {
 		if (poolConfig.value.createFileSystem!) {
 			if (poolConfiguration.value.validateAndProceed('file-system')) {

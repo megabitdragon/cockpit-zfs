@@ -63,7 +63,6 @@
 
 
 			<div v-if="navTag == 'snapshots'" class="w-full text-center min-w-fit">
-				<!-- <SnapshotsList :pool="props.pool" :item="'pool'"/> -->
 				<component :is="snapshotListComponent" :pool="props.pool" :item="'pool'" />
 			</div>
 
@@ -88,15 +87,6 @@
 					<div class="mt-2 col-span-1 col-start-4 row-start-1">
 						<label :for="getIdKey('settings-pool-sector-size')"
 							class="bg-default block text-base leading-6 text-default">Sector Size</label>
-						<!-- <select :id="getIdKey('settings-pool-sector-size')" v-model="poolConfig.properties.sector" name="pool-sector-size" class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-default bg-default ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-slate-600 sm:text-sm sm:leading-6">
-							<option value="auto">Auto Detect</option>
-							<option value="9">512 B</option>
-							<option value="12">4 KiB</option>
-							<option value="13">8 KiB</option>
-							<option value="14">16 KiB</option>
-							<option value="15">32 KiB</option>
-							<option value="16">64 KiB</option>
-						</select> -->
 						<p :id="getIdKey('settings-pool-sector-size')" name="settings-pool-sector-size"
 							class="mt-1 py-1.5">{{ calculateSectorSize(Number(poolConfig.properties.sector)) }}</p>
 					</div>
@@ -347,7 +337,6 @@ import Modal from '../common/Modal.vue';
 import PoolCapacity from '../common/PoolCapacity.vue';
 import Navigation from '../common/Navigation.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
-import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 interface PoolDetailsProps {
 	pool: PoolData;
@@ -363,7 +352,6 @@ const closeModal = () => {
 
 const props = defineProps<PoolDetailsProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
-// const comment = ref(props.pool.comment!);
 
 const poolConfig = ref<PoolData>({
 	name: props.pool.name,
@@ -579,7 +567,6 @@ async function refreshAllData() {
 }
 
 const confirmSavePool = inject<Ref<boolean>>('confirm-save-pool')!;
-// const confirmSavePool = ref(false);
 const notifications = inject<Ref<any>>('notifications')!;
 	
 async function poolConfigureBtn() {
@@ -617,7 +604,6 @@ async function poolConfigureBtn() {
 			console.error(error);
 			notifications.value.constructNotification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error');
 		}
-
 	}
 }
 

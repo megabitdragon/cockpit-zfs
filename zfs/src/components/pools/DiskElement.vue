@@ -180,7 +180,6 @@ async function refreshAllData() {
 
 const starting = ref(false);
 
-// const scanStatusBox = ref();
 const scanStatusBox = inject<Ref<any>>('scan-status-box')!;
 
 async function getScanStatus() {
@@ -199,49 +198,6 @@ const diskState = computed(() => {
 	}
 
 });
-
-// const diskState = computed(() => {
-// 	// Get the array of disks for the specified pool
-// 	const diskArray = poolDiskStats.value[props.pool.name];
-
-// 	// Find the disk status in poolDiskStats by name
-// 	const diskStatus = diskArray ? diskArray.find(disk => disk.name === props.disk.name) : null;
-
-// 	if (diskStatus) {
-// 		// Return the status from poolDiskStats if available
-// 		if (diskStatus.status !== 'ONLINE') {
-// 			return diskStatus.status;
-// 		}
-// 	}
-
-// 	// If not in poolDiskStats or if ONLINE, fall back to vdevs data for additional status details
-// 	const vdevDisk = props.pool.vdevs
-// 		.flatMap(vdev => vdev.disks)
-// 		.find(disk => disk.name === props.disk.name);
-
-// 	if (vdevDisk) {
-// 		// Check if the disk in vdev has reported errors, even if marked ONLINE
-// 		if (vdevDisk.health === 'MISSING' || (vdevDisk.errors && vdevDisk.errors.length > 0)) {
-// 			return vdevDisk.health;
-// 		}
-
-// 		// Use vdev status if errors are present in stats
-// 		const hasErrors = vdevDisk.stats &&
-// 			(vdevDisk.stats.read_errors > 0 ||
-// 				vdevDisk.stats.write_errors > 0 ||
-// 				vdevDisk.stats.checksum_errors > 0);
-
-// 		if (hasErrors) {
-// 			return 'DEGRADED';
-// 		}
-
-// 		// Otherwise, return the vdevDisk's health status
-// 		return vdevDisk.health;
-// 	}
-
-// 	// Default to MISSING if the disk is not found in either poolDiskStats or vdevs data
-// 	return 'MISSING';
-// });
 
 
 /////////////////// Detach Disk /////////////////////
@@ -407,7 +363,6 @@ watch(confirmOnline, async (newVal, oldVal) => {
 			} else {
 				if (secondOptionToggle.value == true) {
 					starting.value = true;
-					// console.log('scrubbing pool');
 					try {
 						const output2 = await scrubPool(selectedPool.value!);
 
@@ -422,9 +377,6 @@ watch(confirmOnline, async (newVal, oldVal) => {
 						console.error(error);
 					}
 
-					// await scrubPool(selectedPool.value!);
-					// await getScanStatus();
-					// notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
 					
 					starting.value = false;
 				}

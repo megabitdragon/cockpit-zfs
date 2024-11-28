@@ -97,7 +97,6 @@ import { Switch } from '@headlessui/vue';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
 import { upperCaseWord } from '../../composables/helpers';
 import { lockFileSystem, mountFileSystem, unlockFileSystem, isPassphraseValid } from "../../composables/datasets";
-import { loadDatasets, loadSnapshots } from "../../composables/loadData";
 import Modal from '../common/Modal.vue';
 
 interface LockUnlockFileSystemProps {
@@ -135,10 +134,6 @@ const passValid = ref(false);
 const mountFS = ref(true);
 const forceMountFS = ref(false);
 
-const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
-const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
-const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
-
 async function confirmBtn() {
     if (props.mode == 'lock') {
         doingThing.value = true;
@@ -165,10 +160,6 @@ async function confirmBtn() {
         if (passValid.value) {
             doingThing.value = true;
             
-            /* await unlockFileSystem(props.filesystem, passphrase.value);
-            if (mountFS.value) {
-                await mountFileSystem(props.filesystem, forceMountFS.value);
-            } */
             try {
                 const unlockOutput =  await unlockFileSystem(props.filesystem, passphrase.value);
 

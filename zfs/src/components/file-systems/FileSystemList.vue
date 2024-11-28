@@ -16,7 +16,6 @@
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
 							<tr class="bg-well rounded-t-md grid grid-cols-12">
-								<!-- <tr class="bg-well rounded-t-md grid grid-cols-11"> -->
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
@@ -189,7 +188,7 @@
 				</div>
 			</div>
 
-			<!-- div for dynamic style rendering -->
+			<!-- hidden div for dynamic style rendering -->
 			<div id="debug" class="hidden">
 				<div id="dummy" class="hidden">
 					<div class="ml-0"></div>
@@ -203,9 +202,6 @@
 					<div class="ml-32"></div>
 					<div class="ml-36"></div>
 				</div>
-				<!-- <div v-for="dataset in debugNestingLevel" :key="dataset.name" :class="`ml-${dataset.nestingLevel}`">
-					{{ dataset.name }} ({{ dataset.type }}) - Nesting Level: {{ dataset.nestingLevel }}
-				</div> -->
 			</div>
 		
 		</div>
@@ -255,7 +251,7 @@ import { ref, inject, Ref, provide, watch, onMounted, computed, reactive } from 
 import { EllipsisVerticalIcon, ArrowPathIcon, ChevronUpIcon, LockClosedIcon, LockOpenIcon, NoSymbolIcon, CheckIcon, } from '@heroicons/vue/24/outline';
 import { CameraIcon } from '@heroicons/vue/24/solid'
 import { Menu, MenuButton, MenuItem, MenuItems, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { loadDatasets, loadSnapshots, loadSnapshotsInDataset } from "../../composables/loadData";
+import { loadDatasets, loadSnapshots } from "../../composables/loadData";
 import { getValue, convertBytesToSize, upperCaseWord, yesNoToBool } from '../../composables/helpers';
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
@@ -287,7 +283,6 @@ const allDatasets = ref<any>([]);
 const allDatasetsLoaded = ref(false);
 
 async function refreshData() {
-	// fileSystemsLoaded.value = false;
 	allDatasetsLoaded.value = false;
 
 	fileSystems.value = [];
@@ -299,7 +294,6 @@ async function refreshData() {
 
 	await populateDatasetList();
 
-	// fileSystemsLoaded.value = true;
 	allDatasetsLoaded.value = true;
 }
 
@@ -412,11 +406,6 @@ function findSnapDataset(fileSystem) {
     }
 }
 
-// async function refreshDatasetSnaps(filesystem) {
-// 	snapshots.value = [];
-// 	await loadSnapshotsInDataset(snapshots, filesystem);
-// }
-
 ///////////////// New File System ///////////////////
 /////////////////////////////////////////////////////
 const confirmCreateFS = ref(false);
@@ -469,7 +458,6 @@ watch(confirmCreateSnap, async (newVal, oldVal) => {
 	if (confirmCreateSnap.value == true) {
 		operationRunning.value = true;
 		await refreshData();
-		// await refreshDatasetSnaps(selectedDataset.value);
 		confirmCreateSnap.value = false;
 		operationRunning.value = false;
 	}
@@ -479,7 +467,6 @@ watch(confirmCreateSnap, async (newVal, oldVal) => {
 /////////////////////////////////////////////////////
 const hasChildren = ref(false);
 
-// const forceDestroy = ref(false);
 const destroyChildren = ref(false);
 const destroyAllDependents = ref(false);
 const showDeleteFileSystemConfirm = ref(false);
@@ -513,16 +500,8 @@ async function deleteFileSystem(fileSystem) {
 	});
 	console.log(`dataset ${selectedDataset.value?.name} HasChildren: ${datasetHasChildren.value}`);
 	hasChildren.value = datasetHasChildren.value!;
-	// await refreshDatasetSnaps(selectedDataset.value);
-	// console.log('snapshots', snapshots.value);
 	console.log('hasChildren', hasChildren.value);
-	// if (selectedDataset.value) { 
-	// 	if ((!findPoolDataset(selectedDataset.value) && selectedDataset.value!.children!.length > 0) || findSnapDataset(selectedDataset.value)) {
-	// 		hasChildren.value = true;
-	// 	} else {
-	// 		hasChildren.value = false;
-	// 	}
-	// }
+
 	await loadDeleteFileSystemComponent();
 	showDeleteFileSystemConfirm.value = true;
 	console.log('selected for deletion:', selectedDataset.value);
@@ -558,12 +537,10 @@ watch(confirmDelete, async (newValue, oldValue) => {
 				fourthOptionToggle.value = false;
 				confirmDelete.value = false;
 
-				// await refreshDatasetSnaps(selectedDataset.value);
 				await refreshData();
-				
+			
 				notifications.value.constructNotification('File System Destroyed', selectedDataset.value!.name + " destroyed.", 'success');
 				await refreshData();
-				// await refreshDatasetSnaps(selectedDataset.value);
 				showDeleteFileSystemConfirm.value = false;
 			}
 
@@ -577,7 +554,6 @@ watch(confirmDelete, async (newValue, oldValue) => {
 /////////////////////////////////////////////////////
 const showUnmountFileSystemConfirm = ref(false);
 const forceUnmount = ref(false);
-// const lockThisFileSystem = ref(secondOptionToggle.value);
 const unmounting = ref(false);
 const confirmUnmount = ref(false);
 
@@ -629,7 +605,6 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 							notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${selectedDataset.value!.name}: ${lockErrorMsg}`, 'error');
 						} else {
 							notifications.value.constructNotification('Dataset Locked', `Successfully locked ${selectedDataset.value!.name}.`, 'success');
-							// showLockUnlockModal.value = false;
 						}
 
 					} catch (error) {
@@ -639,10 +614,9 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 				confirmUnmount.value = false;
 				forceUnmount.value = false;
 				await refreshData();
-				// await refreshDatasetSnaps(selectedDataset.value);
+
 				unmounting.value = false;
 				operationRunning.value = false;
-				// lockThisFileSystem.value = false;
 				notifications.value.constructNotification('File System Unmounted', selectedDataset.value!.name + " unmounted.", 'success');
 				showUnmountFileSystemConfirm.value = false;
 			}
@@ -702,7 +676,7 @@ watch(confirmMount, async (newValue, oldValue) => {
 				confirmMount.value = false;
 				forceMount.value = false;
 				await refreshData();
-				// await refreshDatasetSnaps(selectedDataset.value);
+
 				mounting.value = false;
 				operationRunning.value = false;
 				notifications.value.constructNotification('File System Mounted', selectedDataset.value!.name + " mounted.", 'success');

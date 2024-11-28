@@ -242,21 +242,17 @@ function setDiskNamePath() {
             break;
         case 'phy_path':
             diskNewPath.value = newDisk.value!.phy_path;
-            //diskNewName.value = diskNewPath.value;
-             diskNewName.value = diskNewPath.value.replace(phyPathPrefix, '');
+            diskNewName.value = diskNewPath.value.replace(phyPathPrefix, '');
             diskExistPath.value = oldDisk.value!.path;
-            //diskExistName.value = diskExistPath.value;
-             diskExistName.value = diskExistPath.value.replace(phyPathPrefix, '');
+            diskExistName.value = diskExistPath.value.replace(phyPathPrefix, '');
             console.log('diskNewPath:', diskNewPath.value, 'diskNewName:', diskNewName.value);
             console.log('diskExistPath:', diskExistPath.value, 'diskExistName:', diskExistName.value);
             break;
         case 'sd_path':
             diskNewPath.value = newDisk.value!.sd_path;
-            //diskNewName.value = diskNewPath.value;
-             diskNewName.value = diskNewPath.value.replace(sdPathPrefix, '');
+            diskNewName.value = diskNewPath.value.replace(sdPathPrefix, '');
             diskExistPath.value = oldDisk.value!.path;
-            //diskExistName.value = diskExistPath.value;
-             diskExistName.value = diskExistPath.value.replace(sdPathPrefix, '');
+            diskExistName.value = diskExistPath.value.replace(sdPathPrefix, '');
             console.log('diskNewPath:', diskNewPath.value, 'diskNewName:', diskNewName.value);
             console.log('diskExistPath:', diskExistPath.value, 'diskExistName:', diskExistName.value);
             break;
@@ -271,7 +267,6 @@ async function attachDiskBtn() {
         if (!diskBelongsToImportablePool() || diskVDevPoolData.value.forceAttach) {
             setDiskNamePath();
             diskVDevPoolData.value.newDiskName = diskNewName.value;
-            // diskVDevPoolData.value.newDiskName = getDiskIDName(allDisks.value, diskIdentifier.value, diskNewName.value);
             diskVDevPoolData.value.existingDiskName = diskExistName.value;
             console.log('all data of disk being attached:', diskVDevPoolData.value);
                 

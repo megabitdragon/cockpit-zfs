@@ -68,7 +68,6 @@
 		</div>
     </div>
 	<div v-if="showAttachDiskModal">
-		<!-- <AttachDiskModal :showFlag="showAttachDiskModal" @close="updateShowAttachDisk" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/> -->
 		<component :is="showAttachDiskComponent" :showFlag="showAttachDiskModal" @close="updateShowAttachDisk" :idKey="'show-attach-disk-modal'" :pool="selectedPool!" :vDev="selectedVDev!"/>
 	</div>
 
@@ -102,22 +101,6 @@ const selectedPool = ref<PoolData>();
 const selectedVDev = ref<vDevData>();
 
 const operationRunning = ref(false);
-
-// const isDataDevice = ref(true);
-
-// function checkVDevType() {
-// 	if (props.vDev.type == 'data') {
-// 		isDataDevice.value = true;
-// 	} else {
-// 		isDataDevice.value = false;
-// 	}
-// }
-
-
-// onMounted(() => {
-// 	checkVDevType();
-// });
-
 
 
 /////////////// Loading/Refreshing //////////////////
@@ -269,22 +252,10 @@ async function getDiskStatus() {
 }
 
 /////////////////////////////////////////////////////
-// const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
-
-// const poolID = ref(props.pool.name);
-// const trimActivity = computed(() => {
-// 	return trimActivities.value.get(poolID.value);
-// });
-
-
 defineExpose({
     getDiskStatus,
 });
 
 provide('show-attach-modal', showAttachDiskModal);
 provide('modal-confirm-running', operationRunning);
-// provide('modal-option-one-toggle', firstOptionToggle);
-// provide('modal-option-two-toggle', secondOptionToggle);
-// provide('modal-option-three-toggle', thirdOptionToggle);
-// provide('modal-option-four-toggle', fourthOptionToggle);
 </script>
