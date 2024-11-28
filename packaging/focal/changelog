@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.4-1focal) focal; urgency=medium
+
+  * Fixes some notification bugs (errorString formatting issues)
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 28 Nov 2024 13:05:54 -0400
+
 cockpit-zfs (1.1.3-1focal) focal; urgency=medium
 
   * FIXED VERSION NUMBER - Adds log files for getDisks and getPools scripts

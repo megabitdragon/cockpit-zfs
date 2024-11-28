@@ -1,3 +1,3 @@
-## zfs module 1.1.3-1
+## zfs module 1.1.4-1
 
-* FIXED VERSION NUMBER - Adds log files for getDisks and getPools scripts
+* Fixes some notification bugs (errorString formatting issues)
