@@ -19,6 +19,7 @@ interface PoolData {
 		autoExpand: boolean;
 		autoReplace: boolean;
 		autoTrim: boolean;
+		available: number;
 		forceCreate?: boolean;
 		delegation?: boolean;
 		listSnapshots?: boolean;
@@ -26,6 +27,7 @@ interface PoolData {
 		health?: string;
 		altroot?: string;
 		upgradable?: boolean;
+
 	}
 	vdevs: vDevData[];
 	createFileSystem?: boolean;

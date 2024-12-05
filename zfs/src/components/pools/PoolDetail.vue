@@ -38,8 +38,10 @@
 						<div class="m-2 col-span-1">
 							<p :id="getIdKey('pool-allocated')" name="pool-allocated" class="text-base">Used: {{
 								props.pool.properties.allocated }}</p>
-							<p :id="getIdKey('pool-free')" name="pool-free" class="text-base">Free: {{
+							<p :id="getIdKey('pool-free')" name="pool-free" class="text-base">RAW Space Available: {{
 								props.pool.properties.free }}</p>
+							<p :id="getIdKey('pool-free')" name="pool-free" class="text-base">Actual Space Available: {{
+								props.pool.properties.available }}</p>
 							<p :id="getIdKey('pool-size')" name="pool-size" class="text-base">Total: {{
 								props.pool.properties.size }}</p>
 						</div>

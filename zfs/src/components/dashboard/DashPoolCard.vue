@@ -159,13 +159,14 @@
 
 			</template>
 			<template v-slot:content>
-				<div class="grid grid-rows-4">
+				<div class="grid grid-rows-5">
 					<p class="row-start-1">Used {{ props.pool.properties.allocated }}</p>
-					<p class="row-start-2">Free {{ props.pool.properties.free }}</p>
-					<p class="row-start-3">
+					<p class="row-start-2">RAW Space Available {{ props.pool.properties.free }}</p>
+					<p class="row-start-3">Actual Available Space {{ props.pool.properties.available }}</p>
+					<p class="row-start-4">
 						{{ props.pool.properties.refreservationPercent }}% Reserved
 					</p>
-					<p class="row-start-4"><b>Total {{ props.pool.properties.size }}</b></p>
+					<p class="row-start-5"><b>Total {{ props.pool.properties.size }}</b></p>
 				</div>
 			</template>
 			<template v-slot:footer>

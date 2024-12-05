@@ -77,8 +77,7 @@ export async function loadDisksThenPools(disks, pools) {
 		try {
 			const rawJSON = await getPools();
 			const parsedJSON = JSON.parse(rawJSON);
-			console.log('Pools JSON:', parsedJSON);
-
+			console.log('rwa json ',rawJSON)
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
 				//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
@@ -117,6 +116,8 @@ export async function loadDisksThenPools(disks, pools) {
 							// multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
 							health: parsedJSON[i].properties.health.parsed,
 							altroot: parsedJSON[i].properties.altroot.value,
+							available: convertBytesToSize(parsedJSON[i]?.root_dataset?.properties?.available.parsed),
+						
 						},
 						failMode: parsedJSON[i].properties.failmode.parsed,
 						comment: parsedJSON[i].properties.comment.value !== '-' ? parsedJSON[i].properties.comment.value : '',
@@ -258,7 +259,7 @@ export async function loadDatasets(datasets) {
 	try {
 		const rawJSON = await getDatasets();
 		const parsedJSON = JSON.parse(rawJSON);
-		// console.log('Datasets JSON:', parsedJSON);
+		console.log('Datasets JSON:', parsedJSON);
 
 		//loops through JSON data and adds data to a Dataset object
 		for (let i = 0; i < parsedJSON.length; i++) {
