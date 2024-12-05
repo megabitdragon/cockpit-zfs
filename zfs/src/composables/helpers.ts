@@ -642,41 +642,39 @@ export async function isPoolUpgradable(poolName: string) {
 
 export function isCapacityPatternInvalid(capacityStr) {
 	// Check if the capacity string matches the pattern like "32G" (case-insensitive)
-	return /^(\d+)([KMGTPE]?)$/i.test(capacityStr);
+	return /^(\d+(\.\d+)?)(\s*[KMGTP]{1,2})?$/i.test(capacityStr);
 }
 
 export function convertCapacityString(capacityStr) {
-	// Define a case-insensitive regex to match the pattern (e.g., "32G", "500M")
-	const match = capacityStr.match(/^(\d+)([KMGTPE]?)$/i);
-	if (!match) {
-		throw new Error("Invalid capacity string format. Expected format like '32G', '500M'.");
-	}
+    // Log the input capacity string
+    console.log("Processing capacity: " + capacityStr);
 
-	// Extract the numeric value and unit
-	const value = parseInt(match[1], 10);
-	const unit = match[2].toUpperCase() || "G"; // Default to G if no unit is specified
+    // Define a case-insensitive regex to match the pattern (e.g., "32G", "500M", "9.01 TiB", "1 PB", etc.)
+    const match = capacityStr.match(/^(\d+(\.\d+)?)(\s*[KMGTP])?$/i);
+    if (!match) {
+        throw new Error("Invalid capacity string format. Expected format like '32G', '500M', '9.01 TiB', '1 PB'.");
+    }
 
-	// Define a map for capacity units in bytes
-	const unitMap = {
-		"K": 1e3,
-		"M": 1e6,
-		"G": 1e9,
-		"T": 1e12,
-		"P": 1e15
-	};
-
-	// Convert to base 10 (e.g., GB)
-	const valueInBytes = value * (unitMap[unit] || 1);
-	const valueInGB = valueInBytes / 1e9;
-	const gbString = `${valueInGB} GB`;
-
-	// Convert to base 2 (e.g., GiB)
-	const valueInGiB = valueInBytes / (1024 ** 3);
-	const gibString = `${valueInGiB.toFixed(2)} GiB`;
-
-	return {
-		original: capacityStr,
-		gb: gbString,
-		gib: gibString
-	};
+    // Extract the numeric value and unit
+    const value = parseFloat(match[1]); // Use parseFloat to handle decimal values
+    const unit = match[3] ? match[3].trim().toUpperCase() : "G"; // Default to G if no unit is specified
+	
+    // Prepare and return the single converted value
+    if (unit[0] === "G") {
+        // Convert GB to GiB
+        return `${(value *0.931323).toFixed(2)} GiB`;
+    } else if (unit[0] === "T") {
+        // Convert TB to TiB
+        return `${(value * 0.90949470177293).toFixed(2)} TiB`;
+    } else if (unit[0] === "M") {
+        // Convert MB to MiB
+        return `${(value * 0.953674).toFixed(2)} MiB`;
+    } else if (unit[0] === "P") {
+        // Convert PB to PiB
+        return `${(value * 0.888178).toFixed(2)} PiB`;
+    } else {
+        // For K, return KB
+        return `${(value * 0.976562).toFixed(2)} KB`; // Return KB directly if it's K
+    }
 }
+

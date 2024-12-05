@@ -47,7 +47,7 @@ export async function loadDisksThenPools(disks, pools) {
 		for (let i = 0; i < parsedJSON.length; i++) {
 			const disk = {
 				name: parsedJSON[i].name,
-				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? convertCapacityString(parsedJSON[i].capacity).gb : parsedJSON[i].capacity,
+				capacity:convertCapacityString((parsedJSON[i].capacity).replace(/\s/g, "").slice(0, -1)) ,
 				model: parsedJSON[i].model,
 				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
 				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
