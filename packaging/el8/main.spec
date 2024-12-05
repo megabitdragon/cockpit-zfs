@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Thu Dec 05 2024 Rachit Hans <rhans@45drives.com> 1.1.5-1
+- Updated Datatypes
 * Thu Nov 28 2024 Jordan Keough <jkeough@45drives.com> 1.1.4-1
 - Fixes some notification bugs (errorString formatting issues)
 * Thu Nov 21 2024 Jordan Keough <jkeough@45drives.com> 1.1.3-1
