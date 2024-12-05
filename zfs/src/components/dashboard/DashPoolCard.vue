@@ -301,6 +301,8 @@ const poolConfig = ref<PoolData>({
 		delegation: props.pool.properties.delegation,
 		listSnapshots: props.pool.properties.listSnapshots,
 		readOnly: props.pool.properties.readOnly,
+		available:props.pool.properties.available
+
 	},
 	vdevs: props.pool.vdevs,
 	failMode: props.pool.failMode,
