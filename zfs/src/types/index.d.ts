@@ -27,7 +27,6 @@ interface PoolData {
 		health?: string;
 		altroot?: string;
 		upgradable?: boolean;
-
 	}
 	vdevs: vDevData[];
 	createFileSystem?: boolean;
