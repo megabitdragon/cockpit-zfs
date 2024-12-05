@@ -120,10 +120,10 @@
                 <div class="grid grid-cols-2 gap-1 justify-center items-center">
 
                     <div v-if="scanObjectGroup[props.pool.name].state !== null" class="col-span-2">
-                        <span :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm"
+                        <div :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm"
                             :title="displayMiniStateMsg">
                             {{ displayMiniStateMsg }}
-                        </span>
+                    </div>
                         <div
                             class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
                             <div :class="progressBarClass()" class="h-3"
