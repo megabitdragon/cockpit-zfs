@@ -1,3 +1,10 @@
+cockpit-zfs (1.1.6-1focal) focal; urgency=medium
+
+  * Fixes issue with convertSizeToBytes function, which would give errors when creating
+    vdevs with same size disks (incorrectly flagging as different sizes)
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 06 Dec 2024 10:30:15 -0400
+
 cockpit-zfs (1.1.5-1focal) focal; urgency=medium
 
   * Updated Datatypes

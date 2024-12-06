@@ -27,6 +27,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Fri Dec 06 2024 Jordan Keough <jkeough@45drives.com> 1.1.6-1
+- Fixes issue with convertSizeToBytes function, which would give errors when creating
+  vdevs with same size disks (incorrectly flagging as different sizes)
 * Thu Dec 05 2024 Rachit Hans <rhans@45drives.com> 1.1.5-1
 - Updated Datatypes
 * Thu Nov 28 2024 Jordan Keough <jkeough@45drives.com> 1.1.4-1
