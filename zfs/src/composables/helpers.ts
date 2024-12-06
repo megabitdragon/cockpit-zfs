@@ -51,11 +51,8 @@ export const convertBytesToSize = (bytes: number, useDecimal: boolean = false): 
 
 
 // Convert readable data size to raw bytes
-export const convertSizeToBytes = (size: string, useDecimal: boolean = false): number => {
-	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
-	const decimalSizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-
-	const sizes = useDecimal ? decimalSizes : binarySizes;
+export const convertSizeToBytes = (size: string): number => {
+	const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
 	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
 
 	if (!match) {
@@ -64,19 +61,15 @@ export const convertSizeToBytes = (size: string, useDecimal: boolean = false): n
 	}
 
 	const [value, unit] = match.slice(1);
-	const normalizedUnit = useDecimal ? unit.toUpperCase() : unit.toLowerCase();
-	const index = sizes.findIndex((sizeUnit) =>
-		useDecimal
-			? sizeUnit === normalizedUnit
-			: sizeUnit.toLowerCase() === normalizedUnit
-	);
+	const normalizedUnit = unit.toLowerCase();
+	const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
 
 	if (index === -1) {
 		console.warn(`Unrecognized unit: "${unit}"`);
 		return NaN; // Or return 0, depending on your requirements
 	}
 
-	const base = useDecimal ? 1000 : 1024;
+	const base = 1024;
 	const bytes = parseFloat(value) * Math.pow(base, index);
 	return bytes;
 };

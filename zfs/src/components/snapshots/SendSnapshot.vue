@@ -568,11 +568,11 @@ const sendProgressAmount = ref(0);
 const tracking = ref(false);
 
 function getTotalSendSize(contentTotal) {
-    return (convertSizeToBytes(contentTotal, true));
+    return (convertSizeToBytes(contentTotal));
 }
 
 function getSendProgress(contentProgress) {
-    return (convertSizeToBytes(contentProgress, true));
+    return (convertSizeToBytes(contentProgress));
 }
 
 const sendPercentage = computed(() => {

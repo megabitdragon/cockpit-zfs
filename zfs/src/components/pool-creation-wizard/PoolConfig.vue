@@ -615,7 +615,7 @@ const diskSizeMatch = () => {
 			const disk = disks.value.find(fullDisk => fullDisk.name == selDisk);
 			
 			if (disk) {
-				const currentCapacity = convertSizeToBytes(disk.capacity, true);
+				const currentCapacity = convertSizeToBytes(disk.capacity);
 
 				if (previousCapacity != 0 && currentCapacity != previousCapacity) {
 					result = false;

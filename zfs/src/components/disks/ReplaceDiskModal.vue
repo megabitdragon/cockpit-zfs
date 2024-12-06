@@ -291,7 +291,7 @@ const diskSizeMatch = () => {
 
     if (newDiskData) {
         console.log('newDiskCapacity before conversion:', newDiskData!.capacity);
-        const newCapacity = convertSizeToBytes(newDiskData!.capacity, true);
+        const newCapacity = convertSizeToBytes(newDiskData!.capacity);
         console.log('newCapacity:', newCapacity);
 
         const oldDisks = props.vDev.disks;
@@ -299,7 +299,7 @@ const diskSizeMatch = () => {
 
         for (const oldDisk of oldDisks) {
 
-            console.log('currentCapacity before conversion:', oldDisk!.capacity, true);
+            console.log('currentCapacity before conversion:', oldDisk!.capacity, false);
             const currentCapacity = convertSizeToBytes(oldDisk.capacity);
             console.log('currentCapacity:', currentCapacity);
 
