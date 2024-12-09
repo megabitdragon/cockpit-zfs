@@ -1,3 +1,3 @@
-## zfs module 1.1.6-1
+## zfs module 1.1.7-1
 
-* Fixes issue with convertSizeToBytes function, which would give errors when creating vdevs with same size disks (incorrectly flagging as different sizes)
+* Adjusts disk capacity strings and removes accidental double conversion of binary size values where applicable
