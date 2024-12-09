@@ -1,3 +1,3 @@
-## zfs module 1.1.7-1
+## zfs module 1.1.7-2
 
-* Adjusts disk capacity strings and removes accidental double conversion of binary size values where applicable
+* Testing capacity bugfix for non-aliased disks
