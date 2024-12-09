@@ -47,26 +47,75 @@ export const convertBytesToSize = (bytes: number, precision: number = 2): string
 };
 
 // Convert readable binary data size to raw bytes
+// export const convertSizeToBytes = (size: string): number => {
+// 	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+// 	const base = 1024;
+// 	console.log('size:', size)
+// 	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
+
+// 	if (!match) {
+// 		throw new Error(`Invalid size format: "${size}"`);
+// 	}
+
+// 	const [value, unit] = match.slice(1);
+// 	const normalizedUnit = unit.toLowerCase();
+
+// 	console.log('normalizedUnit:', normalizedUnit)
+
+// 	const decimalSizes = ['b', 'kb', 'mb', 'gb', 'tb', 'pb', 'eb', 'zb', 'yb'];
+
+// 	const index = binarySizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
+// 	if (index === -1) {
+// 		const decimalIndex = decimalSizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
+// 		if (decimalIndex === -1) {
+// 			throw new Error(`Unrecognized unit: "${unit}"`);
+// 		} else {
+
+// 		}
+// 	}
+
+// 	const bytes = parseFloat(value) * Math.pow(base, index);
+// 	return bytes;
+// };
+
+// Convert readable binary data size to raw bytes
 export const convertSizeToBytes = (size: string): number => {
 	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
 	const base = 1024;
+	const decimalBase = 1000; // Base for decimal sizes
+	// console.log('size:', size);
 
 	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
-
 	if (!match) {
 		throw new Error(`Invalid size format: "${size}"`);
 	}
 
 	const [value, unit] = match.slice(1);
 	const normalizedUnit = unit.toLowerCase();
+	// console.log('normalizedUnit:', normalizedUnit);
 
+	const decimalSizes = ['b', 'kb', 'mb', 'gb', 'tb', 'pb', 'eb', 'zb', 'yb'];
+
+	// Check for binary unit
 	const index = binarySizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
-	if (index === -1) {
-		throw new Error(`Unrecognized unit: "${unit}"`);
+	if (index !== -1) {
+		// console.log('binary bytes:', (parseFloat(value) * Math.pow(base, index)));
+		return parseFloat(value) * Math.pow(base, index);
 	}
 
-	const bytes = parseFloat(value) * Math.pow(base, index);
-	return bytes;
+	// Check for decimal unit
+	const decimalIndex = decimalSizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
+	if (decimalIndex !== -1) {
+		// Convert decimal value to binary equivalent
+		const decimalBytes = parseFloat(value) * Math.pow(decimalBase, decimalIndex);
+		// Adjust to binary base
+		const binaryBytes = decimalBytes * Math.pow(decimalBase / base, decimalIndex);
+		// console.log('decimal converted binary bytes:', binaryBytes);
+		return binaryBytes;
+	}
+
+	// If neither binary nor decimal unit is found
+	throw new Error(`Unrecognized unit: "${unit}"`);
 };
 
 
@@ -635,7 +684,7 @@ export function isCapacityPatternInvalid(capacityStr) {
 
 export function formatCapacityString(capacityStr) {
 	// Log the input capacity string
-	console.log("Formatting capacity: " + capacityStr);
+	// console.log("Formatting capacity: " + capacityStr);
 
 	// Define a case-insensitive regex to match the pattern (e.g., "32G", "9.01T", "500M", etc.)
 	const match = capacityStr.match(/^(\d+(\.\d+)?)(\s*[KMGTP])?$/i);
@@ -652,7 +701,7 @@ export function formatCapacityString(capacityStr) {
 
 	// Standardize the unit to decimal (KB, MB, GB, TB, PB)
 	const decimalUnit = `${unit}B`;
-
+	// console.log(`formatted capacity: ${value} ${decimalUnit}`)
 	// Return the formatted string
 	return `${value} ${decimalUnit}`;
 }
