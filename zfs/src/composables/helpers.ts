@@ -31,45 +31,40 @@ export const upperCaseWord = (word => {
 	return firstLetterCap + remainingLetters;
 });
 
-//convert raw bytes to readable data size
-export const convertBytesToSize = (bytes: number, useDecimal: boolean = false): string => {
+// Convert raw bytes to readable binary data size
+export const convertBytesToSize = (bytes: number, precision: number = 2): string => {
 	if (bytes === 0) {
 		return `0 B`;
 	}
 
 	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-	const decimalSizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+	const base = 1024;
 
-	const sizes = useDecimal ? decimalSizes : binarySizes;
-	const base = useDecimal ? 1000 : 1024;
+	const i = Math.min(Math.floor(Math.log(bytes) / Math.log(base)), binarySizes.length - 1);
+	const convertedSize = (bytes / Math.pow(base, i)).toFixed(precision);
 
-	const i = Math.floor(Math.log(bytes) / Math.log(base));
-	const convertedSize = (bytes / Math.pow(base, i)).toFixed(2);
-
-	return `${convertedSize} ${sizes[i]}`;
+	return `${convertedSize} ${binarySizes[i]}`;
 };
 
-
-// Convert readable data size to raw bytes
+// Convert readable binary data size to raw bytes
 export const convertSizeToBytes = (size: string): number => {
-	const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+	const base = 1024;
+
 	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
 
 	if (!match) {
-		console.warn(`Invalid size format: "${size}"`);
-		return NaN; // Or return 0, depending on your requirements
+		throw new Error(`Invalid size format: "${size}"`);
 	}
 
 	const [value, unit] = match.slice(1);
 	const normalizedUnit = unit.toLowerCase();
-	const index = sizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
 
+	const index = binarySizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
 	if (index === -1) {
-		console.warn(`Unrecognized unit: "${unit}"`);
-		return NaN; // Or return 0, depending on your requirements
+		throw new Error(`Unrecognized unit: "${unit}"`);
 	}
 
-	const base = 1024;
 	const bytes = parseFloat(value) * Math.pow(base, index);
 	return bytes;
 };
@@ -634,40 +629,49 @@ export async function isPoolUpgradable(poolName: string) {
 }
 
 export function isCapacityPatternInvalid(capacityStr) {
-	// Check if the capacity string matches the pattern like "32G" (case-insensitive)
-	return /^(\d+(\.\d+)?)(\s*[KMGTP]{1,2})?$/i.test(capacityStr);
+	// Check if the capacity string matches a valid pattern like "32G", "9.01T", "500M", etc.
+	return /^(\d+(\.\d+)?)(\s*[KMGTP]{1})$/i.test(capacityStr); // Ensure only single-letter units
 }
 
-export function convertCapacityString(capacityStr) {
-    // Log the input capacity string
-    console.log("Processing capacity: " + capacityStr);
+export function formatCapacityString(capacityStr) {
+	// Log the input capacity string
+	console.log("Formatting capacity: " + capacityStr);
 
-    // Define a case-insensitive regex to match the pattern (e.g., "32G", "500M", "9.01 TiB", "1 PB", etc.)
-    const match = capacityStr.match(/^(\d+(\.\d+)?)(\s*[KMGTP])?$/i);
-    if (!match) {
-        throw new Error("Invalid capacity string format. Expected format like '32G', '500M', '9.01 TiB', '1 PB'.");
-    }
+	// Define a case-insensitive regex to match the pattern (e.g., "32G", "9.01T", "500M", etc.)
+	const match = capacityStr.match(/^(\d+(\.\d+)?)(\s*[KMGTP])?$/i);
+	if (!match) {
+		throw new Error("Invalid capacity string format. Expected format like '32G', '500M', '9.01T', '1P'.");
+	}
 
-    // Extract the numeric value and unit
-    const value = parseFloat(match[1]); // Use parseFloat to handle decimal values
-    const unit = match[3] ? match[3].trim().toUpperCase() : "G"; // Default to G if no unit is specified
-	
-    // Prepare and return the single converted value
-    if (unit[0] === "G") {
-        // Convert GB to GiB
-        return `${(value *0.931323).toFixed(2)} GiB`;
-    } else if (unit[0] === "T") {
-        // Convert TB to TiB
-        return `${(value * 0.90949470177293).toFixed(2)} TiB`;
-    } else if (unit[0] === "M") {
-        // Convert MB to MiB
-        return `${(value * 0.953674).toFixed(2)} MiB`;
-    } else if (unit[0] === "P") {
-        // Convert PB to PiB
-        return `${(value * 0.888178).toFixed(2)} PiB`;
-    } else {
-        // For K, return KB
-        return `${(value * 0.976562).toFixed(2)} KB`; // Return KB directly if it's K
-    }
+	// Extract the numeric value and unit
+	const value = parseFloat(match[1]); // Numeric part
+	const unit = match[3] ? match[3].trim().toUpperCase() : "G"; // Default to G if no unit is specified
+
+	// // Standardize the unit to binary (KiB, MiB, GiB, TiB, PiB)
+	// const binaryUnit = `${unit}iB`; // Append "iB" to the unit for binary consistency
+
+	// Standardize the unit to decimal (KB, MB, GB, TB, PB)
+	const decimalUnit = `${unit}B`;
+
+	// Return the formatted string
+	return `${value} ${decimalUnit}`;
+}
+
+export function changeUnitToBinary(capacityStr) {
+	// Define a regex to match capacity strings like "9.1 TB"
+	const match = capacityStr.match(/^(\d+(\.\d+)?)(\s*[KMGTP]{1}B)$/i);
+	if (!match) {
+		throw new Error("Invalid capacity string format. Expected format like '9.1 TB', '500 GB', etc.");
+	}
+
+	// Extract the numeric value and unit
+	const value = match[1]; // Numeric part
+	const unit = match[3].trim().toUpperCase(); // Unit part (e.g., "KB", "MB", "GB", "TB", "PB")
+
+	// Append "i" to the unit to make it binary (e.g., "TB" -> "TiB")
+	const binaryUnit = unit.replace(/B$/, "iB");
+
+	// Return the updated capacity string
+	return `${value} ${binaryUnit}`;
 }
 

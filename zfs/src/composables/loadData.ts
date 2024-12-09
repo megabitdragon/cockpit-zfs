@@ -2,7 +2,7 @@ import { ref, Ref } from 'vue';
 import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
-import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal, convertCapacityString, isCapacityPatternInvalid } from "./helpers";
+import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal, formatCapacityString, isCapacityPatternInvalid, changeUnitToBinary } from "./helpers";
 import { getSnapshots } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
 
@@ -47,7 +47,7 @@ export async function loadDisksThenPools(disks, pools) {
 		for (let i = 0; i < parsedJSON.length; i++) {
 			const disk = {
 				name: parsedJSON[i].name,
-				capacity:convertCapacityString((parsedJSON[i].capacity).replace(/\s/g, "").slice(0, -1)) ,
+				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : changeUnitToBinary(parsedJSON[i].capacity),
 				model: parsedJSON[i].model,
 				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
 				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
@@ -175,6 +175,7 @@ export async function loadDisksThenPools(disks, pools) {
 							// multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
 							health: parsedJSON[i].properties.health.parsed,
 							altroot: parsedJSON[i].properties.altroot.value,
+							available: convertBytesToSize(parsedJSON[i]?.root_dataset?.properties?.available.parsed),
 						},
 						failMode: parsedJSON[i].properties.failmode.parsed,
 						comment: parsedJSON[i].properties.comment.value !== '-' ? parsedJSON[i].properties.comment.value : '',
@@ -331,7 +332,7 @@ export async function loadDisks(disks) {
 		for (let i = 0; i < parsedJSON.length; i++) {
 			const disk = {
 				name: parsedJSON[i].name,
-				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? convertCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
+				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : changeUnitToBinary(parsedJSON[i].capacity),
 				model: parsedJSON[i].model,
 				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
 				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
