@@ -1,3 +1,3 @@
-## zfs module 1.1.7-2
+## zfs module 1.1.8-1
 
-* Testing capacity bugfix for non-aliased disks
+* Updates readme and fixes get-importable-pools functionality.

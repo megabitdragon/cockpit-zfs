@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.8-1focal) focal; urgency=medium
+
+  * Updates readme and fixes get-importable-pools functionality.
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 16 Dec 2024 06:11:33 -0400
+
 cockpit-zfs (1.1.7-2focal) focal; urgency=medium
 
   * Testing capacity bugfix for non-aliased disks
