@@ -169,7 +169,7 @@ def get_smartctl_data(device):
 def main():
     try:
         logger.info("=" * 80)  # Separator line
-        logger.info("Starting a new run of get_disks script")
+        logger.info("Starting a new run of get-disks script")
         
         lsdev_disks = get_lsdev_disks()
         if lsdev_disks is not None:

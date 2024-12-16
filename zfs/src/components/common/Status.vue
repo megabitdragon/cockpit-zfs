@@ -18,7 +18,7 @@
                                     <div :class="progressBarClass()" class="h-6 min-h-min w-full"
                                         :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
                                         <div
-                                            class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-1.5 leading-none">
+                                            class="absolute inset-0 flex items-center justify-center text-s font-medium text-white text-center p-1.5 leading-none">
                                             {{ parseFloat(scanPercentage.toFixed(2)) }}%
                                         </div>
                                     </div>
@@ -123,13 +123,13 @@
                         <div :class="[stateMessageClass(), truncateText]" class="font-semibold text-sm"
                             :title="displayMiniStateMsg">
                             {{ displayMiniStateMsg }}
-                    </div>
+                        </div>
                         <div
                             class="min-w-max w-full bg-well rounded-full relative flex h-3 min-h-min max-h-max overflow-hidden">
                             <div :class="progressBarClass()" class="h-3"
                                 :style="{ width: `${ parseFloat(scanPercentage.toFixed(2)) }%` }">
                                 <div
-                                    class="absolute inset-0 flex items-center justify-center text-xs font-medium text-default text-center p-0.5 leading-none">
+                                    class="absolute inset-0 flex items-center justify-center text-xs font-medium text-white text-center p-0.5 leading-none">
                                     {{ amountProcessed }}/{{ amountTotal }}
                                 </div>
                             </div>

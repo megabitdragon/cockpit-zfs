@@ -414,7 +414,7 @@ const updateShowDestroyPool = (newVal) => {
 }
 
 watch(confirmDelete, async (newValue, oldValue) => {
-	const destroyedPoolName = selectedPool.value!.name;
+	const poolName = selectedPool.value!.name;
 	if (confirmDelete.value == true) {	
 		operationRunning.value = true;
 		console.log('now deleting:', selectedPool.value);
@@ -440,7 +440,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 				await refreshAllData();
 				confirmDelete.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Pool Destroyed', destroyedPoolName + " destroyed.", 'success');
+				notifications.value.constructNotification('Pool Destroyed', `${poolName} destroyed.`, 'success');
 				showDeletePoolConfirm.value = false;
 			}
 

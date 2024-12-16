@@ -8,7 +8,7 @@ const errors: string[] = [];
 
 export function parseImportVDevData(vDev, poolName, vDevType) {
     try {
-        console.log('vDevData Importing:', vDev);
+        // console.log('vDevData Importing:', vDev);
         const vDevData : vDevData = {
             name: vDev.name,
             type: vDevType,
@@ -33,17 +33,23 @@ export async function loadImportablePools(importablePools, allDisks, existingPoo
     try {
         const rawJSON = await getImportablePools();
         const parsedJSON = JSON.parse(rawJSON);
-        console.log('Importable Pools JSON:', parsedJSON);
+        // console.log('Importable Pools JSON:', parsedJSON);
 
         //loops through pool JSON
         for (let i = 0; i < parsedJSON.length; i++) {
             //calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
-            parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'data'));
-            parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'cache'));
-            parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'dedup'));
-            parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'log'));
-            parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'spare'));
-            parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'special'));
+            // parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'data'));
+            // parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'cache'));
+            // parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'dedup'));
+            // parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'log'));
+            // parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'spare'));
+            // parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'special'));
+			parsedJSON[i].groups.data.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'data'));
+			parsedJSON[i].groups.cache.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'cache'));
+			parsedJSON[i].groups.dedup.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'dedup'));
+			parsedJSON[i].groups.log.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'log'));
+			parsedJSON[i].groups.spare.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'spare'));
+			parsedJSON[i].groups.special.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'special'));
             
             //adds pool data from JSON into pool data object, pushes into array 
             const poolData : ImportablePoolData = {
@@ -63,9 +69,9 @@ export async function loadImportablePools(importablePools, allDisks, existingPoo
             
         console.log("loaded Importable Pools:", importablePools);
 
-        await loadDisksExtraData(allDisks.value, existingPools.value);
+        // await loadDisksExtraData(allDisks.value, existingPools.value);
 
-        console.log("loaded Disks:", allDisks);
+        // console.log("loaded Disks:", allDisks);
 
     } catch (error) {
         // Handle any errors that may occur during the asynchronous operation
@@ -77,16 +83,22 @@ export async function loadImportableDestroyedPools(importablePools, allDisks, ex
     try {
 		const rawJSON = await getImportableDestroyedPools();
 		const parsedJSON = JSON.parse(rawJSON);
-		console.log('Destroyed Pools JSON:', parsedJSON);
+		// console.log('Destroyed Pools JSON:', parsedJSON);
 		
 		for (let i = 0; i < parsedJSON.length; i++) {
 			//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
-            parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'data'));
-            parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'cache'));
-            parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'dedup'));
-            parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'log'));
-            parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'spare'));
-            parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'special'));
+            // parsedJSON[i].groups.data.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'data'));
+            // parsedJSON[i].groups.cache.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'cache'));
+            // parsedJSON[i].groups.dedup.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'dedup'));
+            // parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'log'));
+            // parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'spare'));
+            // parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, allDisks, 'special'));
+			parsedJSON[i].groups.data.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'data'));
+			parsedJSON[i].groups.cache.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'cache'));
+			parsedJSON[i].groups.dedup.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'dedup'));
+			parsedJSON[i].groups.log.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'log'));
+			parsedJSON[i].groups.spare.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'spare'));
+			parsedJSON[i].groups.special.forEach(vDev => parseImportVDevData(vDev, parsedJSON[i].name, 'special'));
             
             const poolData : ImportablePoolData = {
                 name: parsedJSON[i].name,
@@ -103,21 +115,20 @@ export async function loadImportableDestroyedPools(importablePools, allDisks, ex
             vDevs.value = [];
 		}
             
-        console.log("loaded Importable/Destroyed Pools:", importablePools);
+        console.log("loaded Importable Destroyed Pools:", importablePools);
 
-        await loadDisksExtraData(allDisks.value, existingPools.value);
+        // await loadDisksExtraData(allDisks.value, existingPools.value);
 
-        console.log("loaded Disks:", allDisks);
+        // console.log("loaded Disks:", allDisks);
 
     } catch (error) {
         // Handle any errors that may occur during the asynchronous operation
-        console.error("An error occurred getting destroyed Importable pools:", error);
+        console.error("An error occurred getting destroyed importable pools:", error);
     }
 }
 
 
-//method for parsing through VDevs to add to array (VDev array is added to Pool)
-
+/* //method for parsing through VDevs to add to array (VDev array is added to Pool)
 export function parseVDevData(vDev, poolName, disks, vDevType) {
 	const vDevData: vDevData = {
 		name: vDev.name,
@@ -157,6 +168,11 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	const uuidPrefix = '/dev/disk/by-uuid/';
 
 	function findDiskByPath(vDevData, disks) {
+		if (!vDevData.path) {
+			console.error(`vDevData.path is null or undefined for vDev: ${vDevData.name}`);
+			return null; // Exit early if the path is invalid
+		}
+
 		console.log('vDevData:', vDevData);
 		console.log('disks:', disks);
 
@@ -271,7 +287,6 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	vDevs.value.push(vDevData);
 }
 
-
 function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 	let fullDiskData: DiskData = disks.value.find(disk => {
 		return disk.phy_path + '-part1' === child.path ||
@@ -319,19 +334,43 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 	return childDisk;
 }
 
-
+// function createMissingDisk(path, vDevName, vDevType, poolName) {
+// 	console.log(`Creating placeholder for missing disk at path: ${path}`);
+// 	return {
+// 		name: 'Missing Disk',
+// 		path: path,
+// 		guid: 'N/A',
+// 		type: 'N/A',
+// 		health: 'MISSING',
+// 		stats: {},
+// 		capacity: 'N/A',
+// 		model: 'N/A',
+// 		phy_path: path,
+// 		sd_path: '',
+// 		vdev_path: '',
+// 		serial: 'N/A',
+// 		powerOnHours: 0,
+// 		powerOnCount: '0',
+// 		temp: '0',
+// 		rotationRate: 0,
+// 		vDevName: vDevName,
+// 		poolName: poolName,
+// 		vDevType: vDevType,
+// 		errors: [`Disk missing from pool: ${poolName}, vDev: ${vDevName}`],
+// 	};
+// }
 function createMissingDisk(path, vDevName, vDevType, poolName) {
-	console.log(`Creating placeholder for missing disk at path: ${path}`);
+	console.warn(`Creating placeholder for missing disk at path: ${path || 'Unknown Path'}`);
 	return {
 		name: 'Missing Disk',
-		path: path,
+		path: path || 'Unknown Path',
 		guid: 'N/A',
 		type: 'N/A',
 		health: 'MISSING',
 		stats: {},
 		capacity: 'N/A',
 		model: 'N/A',
-		phy_path: path,
+		phy_path: path || 'Unknown Path',
 		sd_path: '',
 		vdev_path: '',
 		serial: 'N/A',
@@ -345,7 +384,6 @@ function createMissingDisk(path, vDevName, vDevType, poolName) {
 		errors: [`Disk missing from pool: ${poolName}, vDev: ${vDevName}`],
 	};
 }
-
 
 // Function to determine the type of disks in a VDev
 function determineDiskType(vDev, disks) {
@@ -368,4 +406,4 @@ function determineDiskType(vDev, disks) {
 	} else {
 		return 'Unknown';
 	}
-}
+} */

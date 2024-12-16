@@ -31,7 +31,7 @@ def basic_typed_children(children):
 def main():
     try:
         logger.info("=" * 80)  # Separator line
-        logger.info("Starting a new run of get_pools script")
+        logger.info("Starting a new run of get-pools script")
         
         with libzfs.ZFS() as zfs:
             z_pools = []
@@ -62,6 +62,7 @@ def main():
 
             logger.info(f"Pools discovered: {len(z_pools)}")
             print(json.dumps(z_pools, indent=4))
+            
     except Exception as e:
         logger.error(f"Exception in main: {str(e)}")
 
