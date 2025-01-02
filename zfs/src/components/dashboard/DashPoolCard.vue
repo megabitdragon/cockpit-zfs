@@ -121,7 +121,7 @@
 				</div>
 
 				<div v-if="props.pool.properties.refreservationPercent!">
-					<div v-if="Number(props.pool.properties.capacity) >= 1"
+					<!-- <div v-if="Number(props.pool.properties.capacity) >= 1"
 						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
 						<div :class="capacityColor" class="h-6"
 							:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
@@ -135,11 +135,20 @@
 						<div
 							class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
 							Empty
+						</div>
+					</div> -->
+					<div class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+						<div :class="capacityColor" class="h-6"
+							:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+							<div
+								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								{{ Number(props.pool.properties.capacity) }}% Full
+							</div>
 						</div>
 					</div>
 				</div>
 				<div v-else>
-					<div v-if="Number(props.pool.properties.capacity) >= 1"
+					<!-- <div v-if="Number(props.pool.properties.capacity) >= 1"
 						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
 						<div :class="capacityColor" class="h-6"
 							:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
@@ -153,6 +162,16 @@
 						<div
 							class="absolute inset-0 flex items-center justify-center text-s font-medium text-default p-0.5 leading-none">
 							Empty
+						</div>
+					</div> -->
+					<div
+						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+						<div :class="capacityColor" class="h-6"
+							:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
+							<div
+								class="absolute inset-0 flex items-center justify-center text-s font-medium text-default text-center p-0.5 leading-none">
+								{{ Number(props.pool.properties.capacity) }}% Full
+							</div>
 						</div>
 					</div>
 				</div>

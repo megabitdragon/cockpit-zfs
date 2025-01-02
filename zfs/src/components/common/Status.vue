@@ -16,10 +16,10 @@
                                 <div
                                     class="col-span-4 w-full bg-well rounded-full relative flex h-6 min-h-min overflow-hidden">
                                     <div :class="progressBarClass()" class="h-6 min-h-min w-full"
-                                        :style="{ width: `${parseFloat(scanPercentage.toFixed(2))}%` }">
+                                        :style="{ width: `${adjustedScanPercentage}%` }">
                                         <div
                                             class="absolute inset-0 flex items-center justify-center text-s font-medium text-white text-center p-1.5 leading-none">
-                                            {{ parseFloat(scanPercentage.toFixed(2)) }}%
+                                            {{ adjustedScanPercentage }}%
                                         </div>
                                     </div>
                                 </div>
@@ -229,6 +229,13 @@ function getIsTrimmable(disk) {
         }
     }
 }
+
+const adjustedScanPercentage = computed(() => {
+    if (isFinished.value && parseFloat(scanPercentage.value.toFixed(2)) > 90) {
+        return 100;
+    }
+    return parseFloat(scanPercentage.value.toFixed(2));
+});
 
 ///////////////////// Scanning //////////////////////
 /////////////////////////////////////////////////////
