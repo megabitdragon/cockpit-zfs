@@ -1,3 +1,10 @@
+cockpit-zfs (1.1.9-1focal) focal; urgency=medium
+
+  * Adds block device name to disk name for better UX, fixes available disk selection
+    issue where in-use disks shown as available
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 07 Jan 2025 06:52:20 -0400
+
 cockpit-zfs (1.1.8-1focal) focal; urgency=medium
 
   * Updates readme and fixes get-importable-pools functionality.
