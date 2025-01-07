@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.10-1focal) focal; urgency=medium
+
+  * Fixes package number
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 07 Jan 2025 07:15:40 -0400
+
 cockpit-zfs (1.1.20-1focal) focal; urgency=medium
 
   * Fixes binary size bug
