@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Tue Jan 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.20-1
+- Fixes binary size bug
 * Tue Jan 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.9-1
 - Adds block device name to disk name for better UX, fixes available disk selection
   issue where in-use disks shown as available
