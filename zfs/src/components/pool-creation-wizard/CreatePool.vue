@@ -158,6 +158,7 @@ const poolConfig = ref<PoolData>({
 		autoTrim: false,
 		forceCreate: false,
 		readOnly: false,
+		available: 0,
 	},
 	vdevs: [],
 	createFileSystem: true,

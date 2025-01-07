@@ -4,7 +4,7 @@
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
-            <div class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">{{ props.disk.name }}</div>
+            <div class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">{{ props.disk.name }} {{ diskSdName }}</div>
             <div class="py-1 mt-1 col-span-1 font-semibold" :class="[formatStatus(diskState), truncateText]" :title="diskState">{{ diskState }}</div>
             <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.type">{{ props.disk.type }}</div>
             <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.temp">{{ props.disk.temp }}</div>
@@ -141,6 +141,12 @@ function getIsTrimmable() {
 		return false;
 	}
 }
+
+const diskSdName = computed(() => {
+	if (!props.disk.sd_path.includes(props.disk.name)) {
+		return `(${props.disk.sd_path.replace(/^\/dev\//, '')})`;
+	}
+});
 
 onMounted(() => {
 	getIsTrimmable();

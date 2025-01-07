@@ -362,15 +362,50 @@ export async function loadDisks(disks) {
 	}
 }
 
-// // Helper function to clean disk paths by removing partition numbers but leaving the rest intact
+// Helper function to clean disk paths by removing partition numbers but leaving the rest intact
+// function cleanDiskPath(path) {
+// 	// Only strip suffixes for paths that are known to contain partitions (e.g., /dev/sdX, /dev/nvmeXnY)
+// 	if (/\/dev\/sd[a-z][0-9]*$/.test(path) || /\/dev\/nvme\d+n\d+p[0-9]+$/.test(path) || /-part\d+$/.test(path)) {
+// 		return path.replace(/[-p]?\d+$/, ''); // Removes -partN or pN at the end
+// 	}
+// 	// If path doesn't match those patterns, return as is
+// 	return path;
+// }
 function cleanDiskPath(path) {
-	// Only strip suffixes for paths that are known to contain partitions (e.g., /dev/sdX, /dev/nvmeXnY)
-	if (/\/dev\/sd[a-z][0-9]*$/.test(path) || /\/dev\/nvme\d+n\d+p[0-9]+$/.test(path) || /-part\d+$/.test(path)) {
-		return path.replace(/[-p]?\d+$/, ''); // Removes -partN or pN at the end
+	if (!path) return ''; // Handle null/undefined paths gracefully
+
+	// Handle known patterns for paths with partitions
+	if (/\/dev\/sd[a-z][0-9]*$/.test(path)) {
+		return path.replace(/\d+$/, ''); // Remove numeric suffix (e.g., /dev/sda1 → /dev/sda)
 	}
-	// If path doesn't match those patterns, return as is
+	if (/\/dev\/nvme\d+n\d+p[0-9]+$/.test(path)) {
+		return path.replace(/p\d+$/, ''); // Remove 'pN' suffix (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
+	}
+	if (/-part\d+$/.test(path)) {
+		return path.replace(/-part\d+$/, ''); // Remove '-partN' suffix (e.g., /dev/disk/by-vdev/1-1-part1 → /dev/disk/by-vdev/1-1)
+	}
+
+	// Return unmodified for unknown patterns
 	return path;
 }
+// function cleanDiskPath(path) {
+// 	if (!path) return ''; // Handle null/undefined paths gracefully
+
+// 	// Handle known patterns for paths with partitions
+// 	if (/\/dev\/sd[a-z]\d*$/.test(path)) {
+// 		return path.replace(/\d+$/, ''); // Remove numeric suffix (e.g., /dev/sda1 → /dev/sda)
+// 	}
+// 	if (/\/dev\/nvme\d+n\d+p\d+$/.test(path)) {
+// 		return path.replace(/p\d+$/, ''); // Remove 'pN' suffix (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
+// 	}
+// 	if (/-part\d+$/.test(path)) {
+// 		return path.replace(/-part\d+$/, ''); // Remove '-partN' suffix (e.g., /dev/disk/by-vdev/1-1-part1 → /dev/disk/by-vdev/1-1)
+// 	}
+
+// 	// Return unmodified for unknown patterns
+// 	return path;
+// }
+
 
 export async function loadDisksExtraData(disks, pools) {
 	try {
@@ -396,9 +431,6 @@ export async function loadDisksExtraData(disks, pools) {
 						// console.log('selectedDisk loading data', selectedDisk);
 
 						// Clean the usedDisk.path and compare it with sd_path, phy_path, and vdev_path
-						
-						// console.log('cleanedUsedDiskPath:', cleanedUsedDiskPath);
-
 						// Find the index of the original disk in the disks array
 						const index = disks.findIndex(disk =>
 							[cleanDiskPath(disk.sd_path), cleanDiskPath(disk.phy_path), cleanDiskPath(disk.vdev_path)].includes(cleanedUsedDiskPath)
@@ -413,7 +445,7 @@ export async function loadDisksExtraData(disks, pools) {
 							console.error('Original disk not found in the disks array');
 						}
 					} else {
-						console.log('Selected disk not found');
+						console.log('Selected disk not found', usedDisk);
 					}
 				});
 			});
