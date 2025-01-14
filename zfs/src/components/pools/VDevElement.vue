@@ -3,18 +3,18 @@
 		<div class="">
 			<Disclosure v-slot="{ open }" :defaultOpen="true">
 				<DisclosureButton class="grid grid-cols-8 grid-flow-cols w-full text-center bg-primary text-sm text-white">
-					<div class="p-1 mt-1 col-span-1 flex flex-row justify-center text-center">
+					<div name="vdev-chevron" class="p-1 mt-1 col-span-1 flex flex-row justify-center text-center">
 						<ChevronUpIcon
 							class="-mt-2 h-10 w-10 text-white transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 						/>
 					</div>
-					<div class="p-1 mt-1 col-span-1 text-base text-left" :class="truncateText" :title="props.vDev.name">{{ props.vDev.name }}</div>
-					<div class="p-1 mt-1 col-span-1 font-semibold text-base" :class="[formatStatus(props.vDev.status), truncateText]" :title="props.vDev.status">{{ props.vDev.status }}</div>
-					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="upperCaseWord(props.vDev.type) + ' Device'">{{ upperCaseWord(props.vDev.type) }} Device</div>
-					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.read_errors + ' Read Errors'">{{ props.vDev.stats.read_errors }} Read Errors</div>
-					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.write_errors + ' Write Errors'">{{ props.vDev.stats.write_errors }} Write Errors</div>
-					<div class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.checksum_errors + ' Checksum Errors'">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
-					<div class="col-span-1 relative p-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
+					<div name="vdev-name" class="p-1 mt-1 col-span-1 text-base text-left" :class="truncateText" :title="props.vDev.name">{{ props.vDev.name }}</div>
+					<div name="vdev-status" class="p-1 mt-1 col-span-1 font-semibold text-base" :class="[formatStatus(props.vDev.status), truncateText]" :title="props.vDev.status">{{ props.vDev.status }}</div>
+					<div name="vdev-type" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="upperCaseWord(props.vDev.type) + ' Device'">{{ upperCaseWord(props.vDev.type) }} Device</div>
+					<div name="vdev-read-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.read_errors + ' Read Errors'">{{ props.vDev.stats.read_errors }} Read Errors</div>
+					<div name="vdev-write-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.write_errors + ' Write Errors'">{{ props.vDev.stats.write_errors }} Write Errors</div>
+					<div name="vdev-checksum-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.checksum_errors + ' Checksum Errors'">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
+					<div name="vdev-menu" class="col-span-1 relative p-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
 								<MenuButton @click.stop class="flex items-center rounded-full bg-primary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">

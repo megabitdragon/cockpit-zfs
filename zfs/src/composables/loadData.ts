@@ -498,8 +498,8 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	const uuidPrefix = '/dev/disk/by-uuid/';
 
 	function findDiskByPath(vDevData, disks) {
-		console.log('vDevData:', vDevData);
-		console.log('disks:', disks);
+		// console.log('vDevData:', vDevData);
+		// console.log('disks:', disks);
 
 		// Extract the partition suffix for NVMe (e.g., p1) and standard paths (e.g., -part1)
 		const partitionSuffixMatch = vDevData.path.match(/(?:-part|p)?(\d+)$/);
@@ -515,9 +515,12 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 				return disk.sd_path + (partitionSuffix ? partitionSuffix : '') === vDevData.path;
 			} else {
 				// Check for other disk types with standard paths
+				const standardDiskPath = disk.sd_path + (partitionSuffix ? partitionSuffix.replace(/^p/, '') : '');
+
+				console.log('Comparing:', standardDiskPath, 'with', vDevData.path);
 				return (
 					disk.phy_path === cleanedVDevPath ||
-					disk.sd_path + (partitionSuffix ? partitionSuffix : '') === vDevData.path ||
+					standardDiskPath === vDevData.path ||
 					disk.vdev_path === cleanedVDevPath ||
 					disk.id_path === cleanedVDevPath ||
 					disk.label_path === cleanedVDevPath ||

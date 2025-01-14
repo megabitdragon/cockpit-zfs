@@ -725,6 +725,7 @@ export function formatCapacityString(capacityStr) {
 // }
 
 export function changeUnitToBinary(capacityStr) {
+	console.log('capacityStr:', capacityStr);
 	// Check if the input is already in binary format (e.g., ends with "KiB", "MiB", "GiB", "TiB", "PiB")
 	if (/^\d+(\.\d+)?\s*[KMGTPE]{1}iB$/i.test(capacityStr)) {
 		return capacityStr; // Return as is if already in binary format

@@ -4,15 +4,15 @@
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
-            <div class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">{{ props.disk.name }} {{ diskSdName }}</div>
-            <div class="py-1 mt-1 col-span-1 font-semibold" :class="[formatStatus(diskState), truncateText]" :title="diskState">{{ diskState }}</div>
-            <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.type">{{ props.disk.type }}</div>
-            <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.temp">{{ props.disk.temp }}</div>
-            <div class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.capacity">{{ props.disk.capacity }}</div>
-            <div class="py-1 -mt-1 col-span-2">
+            <div name="disk-name" class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">{{ props.disk.name }} {{ diskSdName }}</div>
+            <div name="disk-state" class="py-1 mt-1 col-span-1 font-semibold" :class="[formatStatus(diskState), truncateText]" :title="diskState">{{ diskState }}</div>
+            <div name="disk-type" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.type">{{ props.disk.type }}</div>
+            <div name="disk-temp" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.temp">{{ props.disk.temp }}</div>
+            <div name="disk-capacity" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.capacity">{{ props.disk.capacity }}</div>
+            <div name="disk-message" class="py-1 -mt-1 col-span-2">
                 <Status :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox" :isTrimmable="getIsTrimmable()"/>
             </div>
-            <div class="col-span-1">
+            <div name="disk-" class="col-span-1">
                 <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
                     <Menu as="div" class="relative inline-block text-right">
                         <div>
