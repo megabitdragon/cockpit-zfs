@@ -706,26 +706,9 @@ export function formatCapacityString(capacityStr) {
 	return `${value} ${decimalUnit}`;
 }
 
-// export function changeUnitToBinary(capacityStr) {
-// 	// Define a regex to match capacity strings like "9.1 TB"
-// 	const match = capacityStr.match(/^(\d+(\.\d+)?)(\s*[KMGTP]{1}B)$/i);
-// 	if (!match) {
-// 		throw new Error("Invalid capacity string format. Expected format like '9.1 TB', '500 GB', etc.");
-// 	}
-
-// 	// Extract the numeric value and unit
-// 	const value = match[1]; // Numeric part
-// 	const unit = match[3].trim().toUpperCase(); // Unit part (e.g., "KB", "MB", "GB", "TB", "PB")
-
-// 	// Append "i" to the unit to make it binary (e.g., "TB" -> "TiB")
-// 	const binaryUnit = unit.replace(/B$/, "iB");
-
-// 	// Return the updated capacity string
-// 	return `${value} ${binaryUnit}`;
-// }
 
 export function changeUnitToBinary(capacityStr) {
-	console.log('capacityStr:', capacityStr);
+	// console.log('capacityStr:', capacityStr);
 	// Check if the input is already in binary format (e.g., ends with "KiB", "MiB", "GiB", "TiB", "PiB")
 	if (/^\d+(\.\d+)?\s*[KMGTPE]{1}iB$/i.test(capacityStr)) {
 		return capacityStr; // Return as is if already in binary format
