@@ -772,7 +772,6 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 
 
 export async function loadSnapshotsInDataset(snapshots, datasetName,snapshotNotFound,snapshotFound ){
-    console.time('Load All Snapshots');
 		try {
 
         const rawJSON = await getSnapshotsOfDataset(datasetName);
@@ -823,7 +822,6 @@ export async function loadSnapshotsInDataset(snapshots, datasetName,snapshotNotF
 					snapshotFound.value = true;
 				}
 			}
-		console.timeEnd('Load All Snapshots');
 		console.log('loaded snapshots in:', datasetName, '\n', snapshots);
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
