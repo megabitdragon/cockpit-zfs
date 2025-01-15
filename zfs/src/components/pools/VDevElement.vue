@@ -29,7 +29,7 @@
 										<!-- <MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click.stop="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 										</MenuItem> -->
-										<MenuItem v-if="pool.vdevs.length !== 1 && vDev !== pool.vdevs[0]" as="div" v-slot="{ active }">
+										<MenuItem v-if="pool.vdevs.length !== 1 && vDev !== pool.vdevs[0] && !vDev.type.includes('raid')" as="div" v-slot="{ active }">
 											<a href="#" @click="removeVDev(props.pool, props.pool.vdevs[vDevIdx])" :class="[active ? 'bg-danger text-white' : 'text-white', 'block px-4 py-2 text-sm']">Remove Virtual Device</a>
 										</MenuItem>
 										<MenuItem as="div" v-slot="{ active }">

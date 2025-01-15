@@ -339,7 +339,7 @@ export async function getImportablePools() {
 	} catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
-		return { error: errorMessage };
+		return JSON.stringify({ error: errorMessage });
 	}
 }
 
@@ -351,7 +351,7 @@ export async function getImportableDestroyedPools() {
 	} catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
-		return { error: errorMessage };
+		return JSON.stringify({ error: errorMessage });
 	}
 }
 
