@@ -530,6 +530,7 @@ function addVDev() {
 		disks: [],
 		selectedDisks: [],
 		diskIdentifier: 'vdev_path',
+		isMirror: false,
 	}
 
   	poolConfig.value.vdevs.push(vDevConfig);

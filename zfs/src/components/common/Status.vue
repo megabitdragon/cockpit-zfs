@@ -98,7 +98,7 @@
                             class="col-span-4">
                             <div class="">
                                 <span class="text-default col-span-4">
-                                    Trim not supported on HDDs: <br />
+                                    Trim not supported on disks: <br />
                                     <div :class="(poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1)).length < 5 ? `grid-cols-${poolDiskStats[props.pool.name].filter(disk => disk.stats.trim_notsup === 1).length}` : 'grid-cols-4'"
                                         class="grid col-span-4 gap-1 mt-1 justify-center">
                                         <span
@@ -628,7 +628,7 @@ function getTrimTimestamp(disk) {
 }
 
 function getTrimPercentage(disk) {
-    console.log('disk stats (for trim percentage):', disk.stats);
+    // console.log('disk stats (for trim percentage):', disk.stats);
 
     if (disk.stats.trim_state == 4) {
         return 100;

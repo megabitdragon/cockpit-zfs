@@ -24,7 +24,7 @@
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Status">Status</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used (%)">Used (%)</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used">Used</th>
-								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Free">Free</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Available">Available</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Total">Total</th>
 								<th class="py-2 font-semibold text-default col-span-2" :class="truncateText" title="Message">Message</th>
 								<th class="relative py-2 sm:pr-6 lg:pr-8 rounded-tr-md col-span-1">

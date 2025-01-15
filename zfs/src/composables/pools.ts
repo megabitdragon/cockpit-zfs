@@ -437,6 +437,10 @@ export async function addVDev(pool, vdev) {
 		if (vdev.type != 'disk') {
 			cmdString.push(vdev.type);
 		}
+
+		if (vdev.isMirror) {
+			cmdString.push('mirror');
+		}
 		
 		//console.log('vdev.disks', vdev.disks);
 		vdev.disks.forEach(disk => {
