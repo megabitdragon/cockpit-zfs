@@ -1,9 +1,9 @@
 <template>
-	<div>
+	<div class="TableDIv">
 		<!-- POOLS -->
 		<div v-if="props.item == 'pool'"
-			class="inline-block min-w-full max-h-max align-middle border border-default border-collapse">
-			<table class="table-auto min-w-full min-h-full divide-y divide-default">
+			class="inline-block min-w-full max-h-96 align-middle border border-default border-collapse overflow-y-auto">
+			<table class="table-auto min-w-full min-h-full divide-y divide-default ">
 				<thead class="bg-well border-collapse">
 					<tr v-if="snapshots.length > 0 && !snapshotsInPoolLoading"
 						class="rounded-md grid grid-cols-7 font-semibold text-white">
@@ -103,8 +103,8 @@
 		</div>
 
 		<!-- FILESYSTEMS -->
-		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-max align-middle border-collapse">
-			<table v-if="!snapshotsInDatasetLoaded" class="table-auto min-w-full min-h-full divide-y divide-default">
+		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-96 overflow-y-auto align-middle border-collapse">
+			<table v-if="!snapshotsInDatasetLoaded && !snapshotNotFound" class="table-auto min-w-full min-h-full divide-y divide-default">
 				<tr class="rounded-md flex bg-well justify-center">
 					<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'"
 						:fillColor="'fill-slate-500'" />
@@ -232,7 +232,7 @@
 			<button v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" @click="destroySelectedSnapshots()"
 				name="destroy-multiple-snaps-btn" class="mt-1 btn btn-danger h-fit w-full">Destroy Selected
 				Snapshots</button>
-			<div v-if="snapshotsInFilesystem.length === 0 && snapshotsInDatasetLoaded" class="text-center bg-well">
+			<div v-if="snapshotsInFilesystem.length === 0 && snapshotNotFound" class="text-center bg-well">
 				<p>No snapshots found.</p>
 			</div>
 		</div>
@@ -305,6 +305,8 @@ const snapshotsInDatasetLoaded = ref(false);
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const snapshotsInFilesystem = ref<Snapshot[]>([]);
 const selectedSnapshot = ref<Snapshot>();
+const snapshotNotFound = ref(false);
+
 
 onMounted(async () => {
 	await refreshSnaps();
@@ -318,7 +320,8 @@ onMounted(async () => {
             await loadSnapshotsInPool(snapshots, props.pool!.name);
         } else if (props.item === 'filesystem') {
 			snapshotsInFilesystem.value = [];
-            await loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name);
+            await loadSnapshotsInDataset(snapshotsInFilesystem, props.filesystem!.name,snapshotNotFound,snapshotsInDatasetLoaded);
+			
         } else if (props.item == 'singleSnap') {
 		selectedSnapshot.value = snapshots.value.find(snapshot => snapshot.name == props.singleSnap!.name);
 	}
@@ -326,8 +329,8 @@ onMounted(async () => {
         console.error("Failed to load snapshots:", error);
     } finally {
 		await new Promise(resolve => setTimeout(resolve, 1000));
+		console.log(snapshotNotFound.value)
         snapshotsInPoolLoading.value = false;
-        snapshotsInDatasetLoaded.value = true;
     }
 }
 

@@ -16,7 +16,7 @@
                 <p v-if="operation2 && props.item !== 'snapshots'" class="text-default row-start-1" :class="truncateText" :title="props[props.item].name">Are you sure you wish to {{props.operation}} {{props.operation2!}} on <b :class="truncateText" :title="props[props.item].name">{{ props[props.item].name }}</b>?</p>
                 
                 <p v-if="props.item == 'snapshots'" class="text-default row-start-1">Are you sure you wish to destroy these snapshots?</p>
-                <div v-if="props.item == 'snapshots'" class="text-default text-left items-center divide-y divide-default row-start-2 p-2 bg-accent">
+                <div v-if="props.item == 'snapshots'" class="text-default text-left items-center divide-y divide-default row-start-2 p-2 bg-accent overflow-y-auto max-h-96">
                     <p v-for="snapshot, idx in props.snapshots" :key="idx">{{ snapshot }}</p>
                 </div>
                 <div v-if="props.operation == 'destroy' && props.hasChildren!">
