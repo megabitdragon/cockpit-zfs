@@ -738,7 +738,6 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 
         for (const dataset in rawJSON) {
             rawJSON[dataset].forEach(snapshot => {
-				if (snapshot.pool === poolName) {
 					const snap = {
 						name: snapshot.name,
 						id: snapshot.id,
@@ -754,7 +753,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 					};
 				
 					allSnapshots.push(snap);
-                }
+                
             });
         }
 
