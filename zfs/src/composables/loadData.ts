@@ -718,11 +718,13 @@ export async function loadSnapshots(snapshots) {
             });
         }
 
-		// Sort the snapshots by creationTimestamp
-        allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
+		// // Sort the snapshots by creationTimestamp
+        // allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
 
-        // Push sorted snapshots into the reactive data
-        allSnapshots.forEach(snap => snapshots.value.push(snap));
+        // // Push sorted snapshots into the reactive data
+        // allSnapshots.forEach(snap => snapshots.value.push(snap));
+		snapshots.value = allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
+
 
 	} catch(error) {
 		console.error("An error occurred getting snapshots:", error);
@@ -758,10 +760,8 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
         }
 
 		// Sort the snapshots by creationTimestamp
-        allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
+		snapshots.value = allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
 
-        // Push sorted snapshots into the reactive data
-        allSnapshots.forEach(snap => snapshots.value.push(snap));
 
 		console.log('loaded snapshots in:', poolName, '\n', snapshots);
     } catch (error) {
@@ -771,7 +771,7 @@ export async function loadSnapshotsInPool(snapshots, poolName) {
 
 
 export async function loadSnapshotsInDataset(snapshots, datasetName,snapshotNotFound,snapshotFound ){
-		try {
+    try {
 
         const rawJSON = await getSnapshotsOfDataset(datasetName);
 			const allSnapshots: Snapshot[] = [];
@@ -807,11 +807,7 @@ export async function loadSnapshotsInDataset(snapshots, datasetName,snapshotNotF
 			}
 
 			// Sort the snapshots by creationTimestamp
-			allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
-
-			// Push sorted snapshots into the reactive data
-			allSnapshots.forEach(snap => snapshots.value.push(snap));
-		
+			snapshots.value = allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
 			if (snapshots.value.length === 0) {
 				if (snapshotNotFound) {
 					snapshotNotFound.value = true;
