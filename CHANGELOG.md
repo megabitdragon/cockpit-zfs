@@ -1,3 +1,3 @@
-## zfs module 1.1.10-1
+## zfs module 1.1.11-1
 
-* Fixes package number
+* making package
