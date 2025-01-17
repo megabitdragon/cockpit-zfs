@@ -15,11 +15,45 @@ import check_remote_snaps_script from"../scripts/check-remote-snapshots.py?raw";
 
 export async function getSnapshots() {
     try {
-        const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_snapshots_script], { superuser: 'try' });
+        // Use the script without any dataset name to get all snapshots
+        const argument = `all`;
+
+        const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_snapshots_script, argument], { superuser: 'try' });
         const snapshots = (await state.promise()).stdout;
-        return snapshots;
-    } catch (state) {
-        console.error(errorString(state));
+        return JSON.parse(snapshots); 
+    } catch (error) {
+        console.error("Error fetching all snapshots:", error);
+        return null;
+    }
+}
+
+
+export async function getSnapshotsOfDataset(datasetName) {
+    try {
+        // Use the script with datasetName to get snapshots for that specific dataset
+        const argument = `dataset:${datasetName}`;
+        const command = ['/usr/bin/env', 'python3','-c', get_snapshots_script, argument]; // Pass the script and argument separately
+        const state = useSpawn(command, { superuser: 'try' });
+        const snapshots = (await state.promise()).stdout;
+        return JSON.parse(snapshots); // Assuming the snapshots are in JSON format
+    } catch (error) {
+        console.error(`Error fetching snapshots for dataset "${datasetName}":`, error);
+        return null;
+    }
+}
+
+
+
+export async function getSnapshotsOfPool(poolName) {
+    try {
+        const argument = `pool:${poolName}`;
+        // Use the script with datasetName to get snapshots for that specific dataset
+        const command = ['/usr/bin/env', 'python3','-c', get_snapshots_script, argument];
+        const state = useSpawn(command, { superuser: 'try' });
+        const snapshots = (await state.promise()).stdout;
+        return JSON.parse(snapshots); // Assuming the snapshots are in JSON format
+    } catch (error) {
+        console.error(`Error fetching snapshots for dataset "${poolName}":`, error);
         return null;
     }
 }

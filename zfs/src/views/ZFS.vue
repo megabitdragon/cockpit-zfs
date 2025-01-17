@@ -60,7 +60,7 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 	fileSystemsLoaded.value = false;
 	await loadDisksThenPools(disks, pools);
 	await loadDatasets(datasets);
-	// await loadSnapshots(snapshots);
+	//await loadSnapshots(snapshots);
 	
 	await scanNow();
 	await loadScanActivities(pools, scanActivities);

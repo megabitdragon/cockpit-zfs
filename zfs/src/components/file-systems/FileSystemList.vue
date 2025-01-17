@@ -290,10 +290,16 @@ async function refreshData() {
 	allDatasets.value = [];
 
 	await loadDatasets(fileSystems);
-	await loadSnapshots(snapshots);
+	for (const pool of pools.value) {
+		if (pool.properties.listSnapshots) {
+			await loadSnapshots(snapshots);
+			break;
+		}
+		
+	}
+	
 
 	await populateDatasetList();
-
 	allDatasetsLoaded.value = true;
 }
 

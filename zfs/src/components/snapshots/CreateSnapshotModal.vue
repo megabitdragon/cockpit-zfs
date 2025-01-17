@@ -124,7 +124,7 @@ function loadTheseSnapshots() {
     if (props.item == 'pool') {
         loadSnapshotsInPool(snapshots, props.poolName);
     } else if (props.item == 'filesystem') {
-        loadSnapshotsInDataset(snapshots, selectedDataset.value.name);
+        loadSnapshotsInDataset(snapshots, selectedDataset.value.name,null,null);
     }
 }
 
