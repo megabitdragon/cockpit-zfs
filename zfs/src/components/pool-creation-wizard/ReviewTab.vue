@@ -177,6 +177,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { CheckCircleIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
+import { PoolData, DiskData, FileSystemData } from '@45drives/houston-common-lib';
 
 const poolConfig = inject<PoolData>("pool-config-data")!;
 const disks = inject<Ref<DiskData[]>>('disks')!;

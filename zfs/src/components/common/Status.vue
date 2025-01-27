@@ -198,6 +198,7 @@
 import { ref, inject, Ref, computed, ComputedRef, onMounted, watch, defineExpose } from "vue";
 import { convertBytesToSize, convertSecondsToString, convertRawTimestampToString, upperCaseWord, convertTimestampToLocal } from "../../composables/helpers";
 import { loadScanObjectGroup, loadDiskStats } from "../../composables/loadData";
+import { PoolData, DiskData} from "@45drives/houston-common-lib";
 
 interface StatusProps {
     pool: PoolData;

@@ -435,6 +435,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 
 		try {
 			const output = await destroyPool(selectedPool.value!, firstOptionToggle.value);
+			console.log("error dashpoolcard",output)
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';

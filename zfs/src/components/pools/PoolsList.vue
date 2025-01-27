@@ -73,6 +73,8 @@ import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } 
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import PoolListElement from './PoolListElement.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
+import { DiskData } from "@45drives/houston-common-lib/dist/lib/managers/zfs/types";
+import { FileSystemData, PoolData } from "@45drives/houston-common-lib/lib/managers/zfs/types";
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////

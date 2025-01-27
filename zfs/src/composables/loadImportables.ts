@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { getImportablePools, getImportableDestroyedPools } from "./pools";
-import { loadDisksExtraData } from './loadData';
+import { vDevData } from '@45drives/houston-common-lib';
 
 // const vDevs = ref<ImportablePoolvDevData[]>([]);
 const vDevs = ref<vDevData[]>([]);

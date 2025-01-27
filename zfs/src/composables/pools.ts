@@ -1,4 +1,4 @@
-import { legacy } from '@45drives/houston-common-lib';
+import { legacy, PoolData } from '@45drives/houston-common-lib';
 import { convertSizeToBytes } from './helpers';
 import { ref } from 'vue';
 // @ts-ignore
@@ -22,13 +22,7 @@ export async function getPools() {
 	}
 }
 
-const newPoolDisks = ref<string[]>([]);
-const newVDevs = ref<newVDevData[]>([]);
-const newVDevData = ref<newVDevData>({
-	type: '',
-	disks: [],
-	isMirror: false,
- });
+
   
 // export async function newPool(pool: newPoolData) {
 // 	try {
@@ -151,8 +145,10 @@ export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
 		cmdString.push(pool.name);
 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		const state = useSpawn(cmdString);
+		console.log("before destroy state: ", state) 
+
 		const output = await state.promise();
-		console.log(output)
+		console.log("destroy output: ",output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);

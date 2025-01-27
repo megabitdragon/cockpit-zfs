@@ -474,6 +474,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		errors: [],
 	};
 
+	console.log("parsedVdevdata: ",vDev, poolName, disks, vDevType )
 	if (vDevData.type === 'Disk') {
 		vDevData.path = 'N/A';  // Default path for VM Disk
 	}

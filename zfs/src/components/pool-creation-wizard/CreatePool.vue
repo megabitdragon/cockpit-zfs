@@ -105,11 +105,10 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
-import { newPool } from "../../composables/zfsCommonLib";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { setRefreservation } from '../../composables/pools';
-import { PoolData ,DiskData,FileSystemData,newPoolData} from '@45drives/houston-common-lib';
+import { PoolData ,DiskData,FileSystemData,newPoolData, newPool} from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 const show = ref(true);
