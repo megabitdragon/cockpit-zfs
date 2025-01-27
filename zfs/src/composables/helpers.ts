@@ -1,8 +1,9 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { legacy } from '@45drives/houston-common-lib';
 import { ref, Ref } from 'vue';
 // @ts-ignore
 import test_ssh_script from"../scripts/test-ssh.py?raw";
-
+import {DiskData, PoolData} from "@45drives/houston-common-lib"
+const { errorString, useSpawn } = legacy;
 //change true to 'on' and false to 'off'
 export function isBoolOnOff(bool : boolean) {
 	if (bool) {return 'on'} else {return 'off'}

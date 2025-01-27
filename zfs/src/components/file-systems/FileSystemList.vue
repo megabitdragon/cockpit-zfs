@@ -256,8 +256,9 @@ import { getValue, convertBytesToSize, upperCaseWord, yesNoToBool } from '../../
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
+import { PoolData, FileSystemData } from "@45drives/houston-common-lib";
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
-const notifications = inject<Ref<any>>('notifications')!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 ///////// Values for Confirmation Modals ////////////
@@ -532,7 +533,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
-				notifications.value.constructNotification('Destroy Dataset Failed', `${selectedDataset.value!.name} was not destroyed: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Destroy Dataset Failed', `${selectedDataset.value!.name} was not destroyed: ${errorMessage}.`, 'error', 8000));
 				confirmDelete.value = false;
 			} else {
 				operationRunning.value = false;
@@ -544,8 +545,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 				confirmDelete.value = false;
 
 				await refreshData();
-			
-				notifications.value.constructNotification('File System Destroyed', selectedDataset.value!.name + " destroyed.", 'success');
+				pushNotification(new Notification('File System Destroyed', selectedDataset.value!.name + " destroyed.", 'success', 8000));
 				await refreshData();
 				showDeleteFileSystemConfirm.value = false;
 			}
@@ -599,7 +599,8 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 				operationRunning.value = false;
 				unmounting.value = false;
 				confirmUnmount.value = false;
-				notifications.value.constructNotification('Unmount Dataset Failed', `${selectedDataset.value!.name} was not unmounted: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Unmount Dataset Failed', `${selectedDataset.value!.name} was not unmounted: ${errorMessage}.`, 'error', 8000));
+
 			} else {
 				console.log('unmounted:', selectedDataset.value!);
 				if (selectedDataset.value?.encrypted && secondOptionToggle.value) {
@@ -608,9 +609,11 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 
 						if (lockOutput == null || lockOutput.error) {
 							const lockErrorMsg = lockOutput?.error || 'Unknown error';
-							notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${selectedDataset.value!.name}: ${lockErrorMsg}`, 'error');
+							pushNotification(new Notification('Lock Dataset Failed', `Failed to lock ${selectedDataset.value!.name}: ${lockErrorMsg}`, 'error', 8000));
+
 						} else {
-							notifications.value.constructNotification('Dataset Locked', `Successfully locked ${selectedDataset.value!.name}.`, 'success');
+							pushNotification(new Notification('Dataset Locked', `Successfully locked ${selectedDataset.value!.name}.`, 'success', 8000));
+
 						}
 
 					} catch (error) {
@@ -623,7 +626,8 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 
 				unmounting.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('File System Unmounted', selectedDataset.value!.name + " unmounted.", 'success');
+				pushNotification(new Notification('File System Unmounted', selectedDataset.value!.name + " unmounted.", 'success', 8000));
+
 				showUnmountFileSystemConfirm.value = false;
 			}
 
@@ -675,7 +679,8 @@ watch(confirmMount, async (newValue, oldValue) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				mounting.value = false;
-				notifications.value.constructNotification('Mount Dataset Failed', `${selectedDataset.value!.name} was not mounted: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Mount Dataset Failed', `${selectedDataset.value!.name} was not mounted: ${errorMessage}.`, 'error', 8000));
+
 				confirmMount.value = false;
 			} else {
 				console.log('mounted:', selectedDataset.value!);
@@ -685,7 +690,8 @@ watch(confirmMount, async (newValue, oldValue) => {
 
 				mounting.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('File System Mounted', selectedDataset.value!.name + " mounted.", 'success');
+				pushNotification(new Notification('File System Mounted', selectedDataset.value!.name + " mounted.", 'success', 8000));
+
 				showMountFileSystemConfirm.value = false;
 			}
 		} catch (error) {

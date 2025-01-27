@@ -194,10 +194,12 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
-import { addVDev, setRefreservation } from '../../composables/pools';
+import {setRefreservation } from '../../composables/pools';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
+import {addVDev, PoolData,FileSystemData, newVDevData, DiskIdentifier, DiskData} from "@45drives/houston-common-lib"
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface AddVDevModalProps {
 	idKey: string;
@@ -272,8 +274,6 @@ const diskCardClass = (diskName) => {
 
 const adding = ref(false);
 
-const notifications = inject<Ref<any>>('notifications')!;
-
 async function addVDevBtn() {
     if (replicationLevelCheck()) {
         if (diskSizeMatch()) {
@@ -292,17 +292,18 @@ async function addVDevBtn() {
                         
                         if (output == null || output.error) {
                             const errorMessage = output?.error || 'Unknown error';
-                            notifications.value.constructNotification('Add VDev Failed', `There was an error adding this virtual device: ${errorMessage}`, 'error'); 
+                            pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${errorMessage}`, 'error', 8000));
+
                         } else {
-                            notifications.value.constructNotification('Added VDev', `Virtual device added successfully.`, 'success');
+                            pushNotification(new Notification('Added VDev', `Virtual device added successfully.`, 'success', 8000));
 
                             if (props.pool.properties.refreservationRawSize!) {
                                 const output = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
                                 if (output == null || output.error) {
                                     const errorMessage = output?.error || 'Unknown error';
-                                    notifications.value.constructNotification('Refreservation Update Failed', `There was an error updating pools refreservation value: ${errorMessage}`, 'error');
+                                    pushNotification(new Notification('Refreservation Update Failed', `There was an error updating pools refreservation value: ${errorMessage}`, 'error', 8000));
                                 } else {
-                                    notifications.value.constructNotification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success');
+                                    pushNotification(new Notification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success', 8000));
                                     showAddVDevModal.value = false;
                                 }
                             } else {

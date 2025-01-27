@@ -88,12 +88,14 @@ import Modal from '../common/Modal.vue';
 import { getSnapshotTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
 import { loadSnapshotsInDataset, loadSnapshotsInPool, loadDatasets, loadSnapshots } from '../../composables/loadData';
+import { FileSystemData } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+
 
 interface CreateSnapshotModalProps {
     item: 'pool' | 'filesystem';
     poolName?: string;
 }
-const notifications = inject<Ref<any>>('notifications')!;
     
 const props = defineProps<CreateSnapshotModalProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
@@ -222,13 +224,14 @@ async function create(newSnapshot) {
         
         if (output == null || output.error) {
             const errorMessage = output?.error || 'Unknown error';
-            notifications.value.constructNotification('Create Snapshot Failed', `There was an error creating this snapshot: ${errorMessage}`, 'error'); 
+            pushNotification(new Notification('Create Snapshot Failed', `There was an error creating this snapshot: ${errorMessage}`, 'error', 8000));
             confirmCreate.value = false;
         } else {
             confirmCreate.value = true;
             newSnapshot.isCustomName = false;
             newSnapshot.snapChildren = false;
-            notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+            pushNotification(new Notification('Snapshot Created', `Created new snapshot.`, 'success', 8000));
+
             showSnapshotModal.value = false;
         }
     } catch (error) {

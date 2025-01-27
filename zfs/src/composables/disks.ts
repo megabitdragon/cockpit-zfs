@@ -1,20 +1,33 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { legacy } from '@45drives/houston-common-lib';
 // @ts-ignore
 import script_py from "../scripts/get-disks.py?raw";
 
+
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
+const {errorString, useSpawn } = legacy;
 
 export async function getDisks() {
-    try {
-        const state = useSpawn(['/usr/bin/env', 'python3', '-c', script_py], { superuser: 'try' });
-        const disks = (await state.promise()).stdout;
-        return disks;
-    } catch (state) {
-		const errorMessage = errorString(state);
-		console.error(errorMessage);
-		return { error: errorMessage };
+  try {
+    // Ensure useSpawn is properly defined and invoked
+	
+    const spawnState = useSpawn(['/usr/bin/env', 'python3', '-c', script_py], { superuser: 'try' });
+	console.debug('Spawn state:', spawnState);
+	
+    // Check if spawnState is valid
+    if (!spawnState || !spawnState.promise) {
+      throw new Error('Failed to initialize spawnState or promise is undefined');
     }
+
+    // Await the promise and retrieve disks
+    const result = await spawnState.promise();
+	console.log(result.stdout)
+    return result.stdout;
+  } catch (error) {
+    console.error('Error in getDisks:', error.message);
+    throw new Error(error.message); // Propagate the error to the caller
+  }
 }
+
 
 export async function clearPartitions(disk) {
     try {

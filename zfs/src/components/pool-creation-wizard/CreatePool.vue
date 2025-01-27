@@ -105,10 +105,12 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
-import { newPool } from "../../composables/pools";
+import { newPool } from "../../composables/zfsCommonLib";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { setRefreservation } from '../../composables/pools';
+import { PoolData ,DiskData,FileSystemData,newPoolData} from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 const show = ref(true);
 const navTag = ref('name-entry');
@@ -239,7 +241,6 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 }
-const notifications = inject<Ref<any>>('notifications')!;
 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
@@ -262,8 +263,7 @@ async function finishBtn(newPoolData) {
 		if (output == null || output.error) {
 			const errorMessage = output?.error || 'Unknown error';
 			finishPressed.value = false;
-		
-			notifications.value.constructNotification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}.`, 'error');	
+			pushNotification(new Notification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}.`, 'error', 8000));
 			await newFS();
 			await refreshAllData();
 			showWizard.value = false;
@@ -275,7 +275,7 @@ async function finishBtn(newPoolData) {
 			const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
 			creatingPool.value = false;
 			poolCreated.value = true;
-			notifications.value.constructNotification('Pool Created!', `Created new pool.`, 'success');
+			pushNotification(new Notification('Pool Created!', `Created new pool.`, 'success', 8000));
 			if (newPoolFound) {
 				console.log('newPoolFound:', newPoolFound);
 				setRefreservation(newPoolFound!, newPoolData.refreservationPercent);

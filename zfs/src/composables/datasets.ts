@@ -1,5 +1,4 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
-// @ts-ignore
+import { legacy } from '@45drives/houston-common-lib';// @ts-ignore
 import get_datasets_script from "../scripts/get-datasets.py?raw";
 // @ts-ignore
 import create_encrypted_dataset_script from "../scripts/create-encrypted-dataset.py?raw";
@@ -9,9 +8,11 @@ import change_passphrase_script from "../scripts/change-encrypted-key.py?raw";
 import unlock_dataset_script from "../scripts/unlock-encrypted-dataset.py?raw";
 // @ts-ignore
 import validate_passphrase_script from "../scripts/encryption-key-validation.py?raw";
+import {FileSystemData, NewDataset} from "@45drives/houston-common-lib"
+
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
-
+const { errorString, useSpawn } = legacy;
 export async function getDatasets() {
     try {
         const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_datasets_script], { superuser: 'try' });
@@ -23,31 +24,7 @@ export async function getDatasets() {
     }
 }
 
-export async function createDataset(fileSystemData : NewDataset) {
-    try {
-        let cmdString = ['zfs', 'create', '-o', 'atime=' + fileSystemData.atime, '-o', 'casesensitivity=' + fileSystemData.casesensitivity, '-o', 'compression=' + fileSystemData.compression, '-o', 'dedup=' + fileSystemData.dedup, '-o', 'dnodesize=' + fileSystemData.dnodesize, '-o', 'xattr=' + fileSystemData.xattr, '-o', 'recordsize=' + fileSystemData.recordsize, '-o', 'readonly=' + fileSystemData.readonly]
-		
-		
-		if (Number(fileSystemData.quota) == 0) {
-			cmdString.push('-o', 'quota=none');
-		} else {
-			cmdString.push('-o', 'quota=' + fileSystemData.quota);
-		}
 
-		cmdString.push(fileSystemData.parent + '/' + fileSystemData.name);
-
-		console.log("create cmdString:" , cmdString);
-		
-		const state = useSpawn(cmdString);
-		const output = await state.promise();
-		console.log(output)
-		return output.stdout;
-		
-	} catch (state) {
-        console.error(errorString(state));
-        return null;
-    }
-}
 
 export async function createEncryptedDataset(fileSystemData : NewDataset, passphrase? : string) {
 	try {

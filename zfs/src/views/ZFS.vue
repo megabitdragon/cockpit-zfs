@@ -20,10 +20,11 @@
 
 <script setup lang="ts">
 import { ref, Ref, provide, watchEffect } from 'vue';
-import "@45drives/cockpit-css/src/index.css";
-import "@45drives/cockpit-vue-components/dist/style.css";
+//import "@45drives/cockpit-css/src/index.css";
+//import "@45drives/cockpit-vue-components/dist/style.css";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
+import { PoolData, DiskData, FileSystemData } from '@45drives/houston-common-lib';
 
 interface ZFSProps {
   	tag: string;

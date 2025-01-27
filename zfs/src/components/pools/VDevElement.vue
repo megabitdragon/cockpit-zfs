@@ -84,6 +84,9 @@ import { clearErrors, removeVDevFromPool, setRefreservation } from "../../compos
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { formatStatus, loadScanActivities, loadTrimActivities, upperCaseWord,  } from '../../composables/helpers';
 import DiskElement from '../pools/DiskElement.vue';
+import { PoolData, vDevData, DiskData, FileSystemData } from "@45drives/houston-common-lib";
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+
 
 interface VDevElementProps {
 	pool: PoolData;
@@ -95,7 +98,6 @@ interface VDevElementProps {
 const props = defineProps<VDevElementProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-const notifications = inject<Ref<any>>('notifications')!;
 
 const selectedPool = ref<PoolData>();
 const selectedVDev = ref<vDevData>();
@@ -183,18 +185,22 @@ watch(confirmRemove, async (newValue, oldValue) => {
 			const output = await removeVDevFromPool(selectedVDev.value, selectedPool.value);
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Remove Failed', `Failed to remove Virtual Device: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Remove Failed', `Failed to remove Virtual Device: ${errorMessage}.`, 'error', 8000));
+
 
 			} else {
-				notifications.value.constructNotification('Remove Completed', `Removed VDev ${selectedVDev.value!.name} from Pool ${selectedPool.value!.name}`, 'success');
+				pushNotification(new Notification('Remove Completed', `Removed VDev ${selectedVDev.value!.name} from Pool ${selectedPool.value!.name}`, 'success', 8000));
+
 
 				if (props.pool.properties.refreservationRawSize!) {
 					const output = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
 					if (output == null || output.error) {
 						const errorMessage = output?.error || 'Unknown error';
-						notifications.value.constructNotification('Refreservation Update Failed', `Error updating refreservation: ${errorMessage}.`, 'error');
+						pushNotification(new Notification('Refreservation Update Failed', `Error updating refreservation: ${errorMessage}.`, 'error', 8000));
+
 					} else {
-						notifications.value.constructNotification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success');
+						pushNotification(new Notification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success', 8000));
+
 						showRemoveVDevConfirm.value = false;
 					}
 				} else {

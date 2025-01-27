@@ -412,6 +412,7 @@ import { ChevronUpIcon, ExclamationCircleIcon, ExclamationTriangleIcon } from '@
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
+import { PoolData ,DiskData,FileSystemData,newPoolData,vDevData,newVDevData} from '@45drives/houston-common-lib';
 
 interface PoolConfigProps {
 	tag: string;

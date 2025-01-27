@@ -717,10 +717,12 @@ import { EyeSlashIcon, EyeIcon } from '@heroicons/vue/24/outline';
 import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, isBoolOnOff, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
-import { createDataset, createEncryptedDataset } from '../../composables/datasets';
+import {  createEncryptedDataset } from '../../composables/datasets';
+import { createDataset, FileSystemData, NewDataset, PoolData ,} from '@45drives/houston-common-lib';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface FileSystemProps {
 	idKey: string;
@@ -1028,7 +1030,8 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 								if (output == null || output.error) {
 									const errorMessage = output?.error || 'Unknown error';
 									saving.value = false;
-									notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}`, 'error');
+									pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}`, 'error', 8000));
+
 								} else {
 									console.log('encryption check passed');
 									fileSystemsLoaded.value = false;
@@ -1037,7 +1040,8 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 									showFSWizard.value = false;
 									saving.value = false;
 									fileSystemsLoaded.value = true;
-									notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+									pushNotification(new Notification('File System Created!', `Created new dataset.`, 'success', 8000));
+
 									confirmCreateFS.value = true;
 								}
 
@@ -1062,7 +1066,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 							if (output == null || output.error) {
 								const errorMessage = output?.error || 'Unknown error';
 								saving.value = false;
-								notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error');
+								pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error', 8000));
 							} else {
 								console.log('encryption check passed');
 								fileSystemsLoaded.value = false;
@@ -1071,7 +1075,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 								showFSWizard.value = false;
 								saving.value = false;
 								fileSystemsLoaded.value = true;
-								notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+								pushNotification(new Notification('File System Created!', `Created new dataset.`, 'success', 8000));
 								confirmCreateFS.value = true;
 							}
 
@@ -1091,7 +1095,6 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 	} 
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 	
 async function newFileSystemInPoolWizard() {
 	console.log('newFileSystemInPool method fired');
@@ -1117,7 +1120,7 @@ async function newFileSystemInPoolWizard() {
 								if (output == null || output.error) {
 									const errorMessage = output?.error || 'Unknown error';
 									saving.value = false;
-									notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error');
+									pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error', 8000));
 								} else {
 									console.log('encryption check passed');
 									fileSystemsLoaded.value = false;
@@ -1125,7 +1128,7 @@ async function newFileSystemInPoolWizard() {
 									await loadDatasets(datasets);
 									saving.value = false;
 									fileSystemsLoaded.value = true;
-									notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+									pushNotification(new Notification('File System Created!', `Created new dataset.`, 'success', 8000));
 									confirmCreateFS.value = true;
 								}
 
@@ -1153,7 +1156,7 @@ async function newFileSystemInPoolWizard() {
 							if (output == null || output.error) {
 								const errorMessage = output?.error || 'Unknown error';
 								saving.value = false;
-								notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}.`, 'error');
+								pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}.`, 'error', 8000));
 							} else {
 								console.log('encryption check passed');
 								fileSystemsLoaded.value = false;
@@ -1161,7 +1164,7 @@ async function newFileSystemInPoolWizard() {
 								await loadDatasets(datasets);
 								saving.value = false;
 								fileSystemsLoaded.value = true;
-								notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+								pushNotification(new Notification('File System Created!', `Created new dataset.`, 'success', 8000));
 							}
 
 						} catch (error) {

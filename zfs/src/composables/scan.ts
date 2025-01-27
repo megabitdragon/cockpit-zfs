@@ -1,11 +1,10 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
-// @ts-ignore
+import { legacy } from '@45drives/houston-common-lib';// @ts-ignore
 import get_scan_script from "../scripts/get-scan-stats.py?raw";
 // @ts-ignore
 import get_disk_stats_script from "../scripts/get-disk-stats.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
-
+const { BetterCockpitFile, errorString, useSpawn } = legacy;
 export async function getScanGroup() {
 	try {
 		const cmdString = ['/usr/bin/env', 'python3', '-c', get_scan_script];

@@ -1,32 +1,26 @@
 <template>
 	<div class="min-h-screen h-full w-full min-w-fit flex flex-col bg-default overflow-auto">
-		<HoustonHeader moduleName="ZFS" sourceURL=""
-			issuesURL="" :pluginVersion="Number(pluginVersion)"
-			:infoNudgeScrollbar="true" />
-		<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
-		<ZFS :tag="navTag"/>
+		<HoustonAppContainer moduleName="zfs" :appVersion="version">
+			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
+			<ZFS :tag="navTag"/>
+
+		</HoustonAppContainer>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, provide } from 'vue';
-import "@45drives/cockpit-css/src/index.css";
-import "@45drives/cockpit-vue-components/dist/style.css";
+import { reactive, ref, computed } from 'vue';
+import "@45drives/houston-common-ui/style.css";
+import '@45drives/houston-common-css/src/index.css';
 import { pluginVersion } from "./version";
-import { HoustonHeader } from "@45drives/cockpit-vue-components";
-import { FIFO } from '@45drives/cockpit-helpers';
+import { HoustonAppContainer } from "@45drives/houston-common-ui";
 import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';
 
-interface AppProps {
-	notificationFIFO: FIFO;
-}
-
-const props = defineProps<AppProps>();
-const notifications = ref<any>(null);
 
 const show = ref(true);
 const navTag = ref('dashboard');
+const version = __APP_VERSION__;
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
@@ -42,8 +36,7 @@ const navigation = reactive<NavigationItem[]>([
 	{ name: 'File Systems', tag: 'filesystems', current: computed(() => navTag.value == 'filesystems') as unknown as boolean, show: true, },
 ].filter(item => item.show));
 
-provide('notifications', notifications);
-provide('notification-fifo', props.notificationFIFO);
+
 </script>
 
 	

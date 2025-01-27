@@ -369,6 +369,9 @@ import { loadImportablePools, loadImportableDestroyedPools } from '../../composa
 import { importPool } from '../../composables/pools';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
+import { DiskData, PoolData, FileSystemData } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+
 
 interface ImportPoolProps {
     idKey: string;
@@ -376,7 +379,6 @@ interface ImportPoolProps {
 
 const showDeletedPools = ref(false);
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
-const notifications = inject<Ref<any>>('notifications')!;
 
 const disks = inject<Ref<DiskData[]>>('disks')!;
 const pools = inject<Ref<PoolData[]>>('pools')!;
@@ -542,15 +544,18 @@ async function importPoolBtn() {
 
             if (output == null || output.error) {
                 const errorMessage = output?.error || 'Unknown error';
-                notifications.value.constructNotification('Import Failed', `Failed to Import Pool: ${errorMessage}.`, 'error');
+                pushNotification(new Notification('Import Failed', `Failed to Import Pool: ${errorMessage}.`, 'error', 8000));
+
             } else {
-                notifications.value.constructNotification('Import Completed', `Imported Pool ${importedPool.value!.name!} from Pool ${importedPool.value!.name!}`, 'success');
+                pushNotification(new Notification('Import Completed', `Imported Pool ${importedPool.value!.name!} from Pool ${importedPool.value!.name!}`, 'success', 8000));
+
                 showImportModal.value = false;
             }
             importing.value = false;
             await refreshAllData();
         } catch (error) {
-            notifications.value.constructNotification('Import Failed', `Failed to Import Pool: ${error}.`, 'error');
+            pushNotification(new Notification('Import Failed', `Failed to Import Pool: ${error}.`, 'error', 8000));
+
             importing.value = false;
         }
     }

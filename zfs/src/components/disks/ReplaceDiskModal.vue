@@ -134,6 +134,9 @@ import { convertSizeToBytes, getDiskIDName, loadScanActivities, loadTrimActiviti
 import { replaceDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadImportablePools } from '../../composables/loadImportables';
+import { PoolData, vDevData, DiskData, FileSystemData, DiskIdentifier } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+
 
 interface ReplaceDiskModalProps {
     idKey: string;
@@ -244,7 +247,6 @@ function setDiskNamePath() {
     }
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 
 async function replaceDiskBtn() {
     if (diskSizeMatch()) {
@@ -261,13 +263,13 @@ async function replaceDiskBtn() {
                 if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    notifications.value.constructNotification('Replace Disk Failed', `There was an error replacing this disk: ${errorMessage}.`, 'error'); 
+                    pushNotification(new Notification('Replace Disk Failed', `There was an error replacing this disk: ${errorMessage}.`, 'error', 8000));
                 } else {
            
                     showReplaceDiskModal.value = false;
                     adding.value = false;
                     await refreshAllData();
-                    notifications.value.constructNotification('Disk Replaced', `Replaced disk successfully.`, 'success');
+                    pushNotification(new Notification('Disk Replaced', `Replaced disk successfully.`, 'success', 8000));
                 }
             } catch (error) {
                 console.error(error);

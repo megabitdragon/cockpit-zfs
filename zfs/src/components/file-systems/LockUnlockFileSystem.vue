@@ -98,6 +98,8 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
 import { upperCaseWord } from '../../composables/helpers';
 import { lockFileSystem, mountFileSystem, unlockFileSystem, isPassphraseValid } from "../../composables/datasets";
 import Modal from '../common/Modal.vue';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { FileSystemData } from '@45drives/houston-common-lib';
 
 interface LockUnlockFileSystemProps {
     idKey: string;
@@ -127,7 +129,6 @@ const closeModal = () => {
     emit('close');
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 const passphrase = ref('');
 const passFeedback = ref('');
 const passValid = ref(false);
@@ -143,9 +144,9 @@ async function confirmBtn() {
             if (lockOutput == null || lockOutput.error) {
                 const errorMessage = lockOutput?.error || 'Unknown error';
                 doingThing.value = false;
-                notifications.value.constructNotification('Lock Dataset Failed', `Failed to lock ${props.filesystem.name}: ${errorMessage}`, 'error');
+                pushNotification(new Notification('Lock Dataset Failed', `Failed to lock ${props.filesystem.name}: ${errorMessage}`, 'error', 8000));
             } else {
-                notifications.value.constructNotification('Dataset Locked', `Successfully locked ${props.filesystem.name}.`, 'success');
+                pushNotification(new Notification('Dataset Locked', `Successfully locked ${props.filesystem.name}.`, 'success', 8000));
                 doingThing.value = false;
                 confirmLockOrUnlock.value = true;
                 showLockUnlockModal.value = false;
@@ -166,7 +167,8 @@ async function confirmBtn() {
                 if (unlockOutput == null || unlockOutput.error) {
                     const errorMessage = unlockOutput?.error || 'Unknown error';
                     doingThing.value = false;
-                    notifications.value.constructNotification('Unlock Dataset Failed', `Failed to unlock ${props.filesystem.name}: ${errorMessage}`, 'error');
+                    pushNotification(new Notification('Unlock Dataset Failed', `Failed to unlock ${props.filesystem.name}: ${errorMessage}`, 'error', 8000));
+
                 } else {
                     if (mountFS.value) {
                         try {
@@ -174,16 +176,16 @@ async function confirmBtn() {
                         
                             if (mountOutput == null || mountOutput.error) {
                                 const errorMessage = mountOutput?.error || 'Unknown error';
-                                notifications.value.constructNotification('Mount Dataset Failed', `${props.filesystem.name} was not mounted: ${errorMessage}.`, 'error');
+                                pushNotification(new Notification('Mount Dataset Failed', `${props.filesystem.name} was not mounted: ${errorMessage}.`, 'error', 8000));
                             } else {
-                                notifications.value.constructNotification('File System Mounted', props.filesystem.name + " mounted.", 'success');
+                                pushNotification(new Notification('File System Mounted', props.filesystem.name + " mounted.", 'success', 8000));
                             }
                         } catch (error) {
                             console.error(error);
                         }
                     }
+                    pushNotification(new Notification('Dataset Unlocked', `Successfully unlocked ${props.filesystem.name}.`, 'success', 8000));
 
-                    notifications.value.constructNotification('Dataset Unlocked', `Successfully unlocked ${props.filesystem.name}.`, 'success');
 
                     doingThing.value = false;
                     confirmLockOrUnlock.value = true;

@@ -403,6 +403,8 @@ const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { PoolData, DiskData } from '@45drives/houston-common-lib';
 
 const snapshotListComponent = ref();
 const loadSnapshotListComponent = async () => {
@@ -570,7 +572,6 @@ async function refreshAllData() {
 }
 
 const confirmSavePool = inject<Ref<boolean>>('confirm-save-pool')!;
-const notifications = inject<Ref<any>>('notifications')!;
 	
 async function poolConfigureBtn() {
 	if (commentLengthCheck(poolConfig.value)) {
@@ -582,21 +583,14 @@ async function poolConfigureBtn() {
 			if (!result.success) {
 				const errorMessage = result.error || 'Unknown error occurred';
 				console.log('configurePool failed');
+				pushNotification(new Notification('Save Pool Config Failed',`There was an error saving this pool: ${errorMessage}.`,'error', 8000));
 
-				notifications.value.constructNotification(
-					'Save Pool Config Failed',
-					`There was an error saving this pool: ${errorMessage}.`,
-					'error'
-				);
 				confirmSavePool.value = false;
 			} else {
 				console.log('configurePool succeeded');
+				pushNotification(new Notification('Pool Config Saved',"Successfully saved this pool's configuration.",'success', 8000));
 
-				notifications.value.constructNotification(
-					'Pool Config Saved',
-					"Successfully saved this pool's configuration.",
-					'success'
-				);
+
 				confirmSavePool.value = true;
 				showPoolDetails.value = false;
 			}
@@ -605,7 +599,8 @@ async function poolConfigureBtn() {
 
 		} catch (error: any) {
 			console.error(error);
-			notifications.value.constructNotification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error');
+			pushNotification(new Notification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error', 8000));
+
 		}
 	}
 }

@@ -5,6 +5,7 @@ import { getDatasets } from "./datasets";
 import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal, formatCapacityString, isCapacityPatternInvalid, changeUnitToBinary } from "./helpers";
 import { getSnapshots, getSnapshotsOfDataset,getSnapshotsOfPool } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
+import {DiskData, FileSystemData, vDevData} from "@45drives/houston-common-lib"
 
 const vDevs = ref<vDevData[]>([]);
 const errors: string[] = [];

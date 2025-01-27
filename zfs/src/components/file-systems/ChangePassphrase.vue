@@ -78,13 +78,14 @@ import { ref, Ref, inject } from 'vue';
 import Modal from '../common/Modal.vue';
 import { changePassphrase } from '../../composables/datasets';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
+import { FileSystemData } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface ChangePassphraseProps {
     idKey: string;
     filesystem: FileSystemData;
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 const props = defineProps<ChangePassphraseProps>();
 const showChangePassphrase = inject<Ref<boolean>>('show-change-passphrase')!;
 const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
@@ -106,11 +107,12 @@ async function changeBtn() {
             if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                 changing.value = false;
-                notifications.value.constructNotification('Passphrase Change Failed', `There was an error changing this passphrase: ${errorMessage}`, 'error')
+                pushNotification(new Notification('Passphrase Change Failed', `There was an error changing this passphrase: ${errorMessage}`, 'error', 8000));
+
             } else {
                 confirmChange.value = true;
+                pushNotification(new Notification('Encryption Passphrase Changed', `Changed passphrase for ${fileSystem.value!.name}.`, 'success', 8000));
 
-                notifications.value.constructNotification('Encryption Passphrase Changed', `Changed passphrase for ${fileSystem.value!.name}.`, 'success');
                 changing.value = false;
                 showChangePassphrase.value = false;
             }

@@ -74,11 +74,11 @@ import { ref, watch, reactive, WatchStopHandle } from 'vue';
 import { InformationCircleIcon, ExclamationCircleIcon, MinusCircleIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 
-import { FIFO } from '@45drives/cockpit-helpers';
+// import { FIFO } from '@45drives/houston-common-lib';
 
-interface NotificationsProps {
-    notificationFIFO: FIFO,
-}
+// interface NotificationsProps {
+//     notificationFIFO: FIFO,
+// }
 
 interface Notification {
     id?: number;
@@ -101,7 +101,7 @@ interface Notification {
     addAction: (text: string, callback: () => void) => void;
 }
 
-const props = defineProps<NotificationsProps>();
+// const props = defineProps<NotificationsProps>();
 
 /** Notification passed to showNotification
  * 
@@ -201,18 +201,18 @@ const showNotificationObj = (notificationObj: Notification) => {
     notificationObj.setTimeouts();
 }
 
-watch(() => props.notificationFIFO.getLen(), (newLen, oldLen) => {
-    if (newLen > oldLen) {
-        try {
-            const notification = props.notificationFIFO.pop();
-            if (notification)
-                showNotificationObj(notification);
-        } catch (error) {
-            console.error(error);
-            constructNotification("System Error", "An error occured, check the system console (CTRL+SHIFT+J) for more information.", 'error');
-        }
-    }
-});
+// watch(() => props.notificationFIFO.getLen(), (newLen, oldLen) => {
+//     if (newLen > oldLen) {
+//         try {
+//             const notification = props.notificationFIFO.pop();
+//             if (notification)
+//                 showNotificationObj(notification);
+//         } catch (error) {
+//             console.error(error);
+//             constructNotification("System Error", "An error occured, check the system console (CTRL+SHIFT+J) for more information.", 'error');
+//         }
+//     }
+// });
 
 defineExpose({
     notificationList,

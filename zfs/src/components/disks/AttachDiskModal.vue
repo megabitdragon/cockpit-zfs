@@ -135,6 +135,8 @@ import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, lo
 import { attachDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets, loadDiskStats, loadScanObjectGroup } from '../../composables/loadData';
 import { loadImportablePools } from '../../composables/loadImportables';
+import { PoolData, vDevData, DiskData, FileSystemData, DiskIdentifier } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface AttachDiskModalProps {
 	idKey: string;
@@ -146,7 +148,6 @@ interface AttachDiskModalProps {
 const props = defineProps<AttachDiskModalProps>();
 const showFlag = ref(props.showFlag);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
-const notifications = inject<Ref<any>>('notifications')!;
 
 const emit = defineEmits(['close']);
 
@@ -277,12 +278,12 @@ async function attachDiskBtn() {
                 if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    notifications.value.constructNotification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error'); 
+                    pushNotification(new Notification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error', 8000));
                 } else {
                     showAttachDiskModal.value = false;
                     adding.value = false;
                     await refreshAllData();
-                    notifications.value.constructNotification('Disk Attached', `Attached disk to virtual device successfully.`, 'success');
+                    pushNotification(new Notification('Disk Attached', `Attached disk to virtual device successfully.`, 'success', 8000));
                 }
             } catch (error) {
                 console.error(error);

@@ -106,6 +106,8 @@ import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../..
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, formatStatus,  } from '../../composables/helpers'
 import Status from "../common/Status.vue";
+import { PoolData, vDevData, DiskData, FileSystemData } from "@45drives/houston-common-lib";
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface DiskListElementProps {
 	pool: PoolData;
@@ -118,7 +120,6 @@ interface DiskListElementProps {
 
 const props = defineProps<DiskListElementProps>();
 
-const notifications = inject<Ref<any>>('notifications')!;
 
 const selectedPool = ref<PoolData>();
 const selectedDisk = ref<DiskData>();
@@ -247,7 +248,8 @@ watch(confirmDetach, async (newValue, oldValue) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmDetach.value = false;
-				notifications.value.constructNotification('Detach Disk Failed', `${selectedDisk.value!.name} was not detached: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Detach Disk Failed', `${selectedDisk.value!.name} was not detached: ${errorMessage}.`, 'error', 8000));
+
 			} else {
 				if (secondOptionToggle.value == true) {
 					await labelClear(selectedDisk.value!);
@@ -257,7 +259,8 @@ watch(confirmDetach, async (newValue, oldValue) => {
 				confirmDetach.value = false;
 				detaching.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Detach Completed', `${selectedDisk.value!.name} was detached from ${selectedPool.value!.name}`, 'success');
+				pushNotification(new Notification('Detach Completed', `${selectedDisk.value!.name} was detached from ${selectedPool.value!.name}`, 'success', 8000));
+
 				showDetachDiskModal.value = false;
 			}
 
@@ -308,13 +311,15 @@ watch(confirmOffline, async (newVal, oldVal) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmOffline.value = false;
-				notifications.value.constructNotification('Offline Failed', `Offlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Offline Failed', `Offlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}.`, 'error', 8000));
+
 			} else {
 				await refreshAllData();
 				confirmOffline.value = false;
 				offlining.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Offline Completed', 'Offlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
+				pushNotification(new Notification('Offline Completed', 'Offlining of disk ' + selectedDisk.value!.name + " completed.", 'success', 8000));
+
 				showOfflineDiskModal.value = false;
 			}
 
@@ -365,7 +370,8 @@ watch(confirmOnline, async (newVal, oldVal) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmOnline.value = false;
-				notifications.value.constructNotification('Online Failed', `Onlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Online Failed', `Onlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}.`, 'error', 8000));
+
 			} else {
 				if (secondOptionToggle.value == true) {
 					starting.value = true;
@@ -374,10 +380,12 @@ watch(confirmOnline, async (newVal, oldVal) => {
 
 						if (output2 == null || output2.error) {
 							const errorMessage2 = output2?.error || 'Unknown error';
-							notifications.value.constructNotification('Scrub Failed', `Scrub on ${selectedDisk.value!.name} failed: ${errorMessage2}.`, 'error');
+							pushNotification(new Notification('Scrub Failed', `Scrub on ${selectedDisk.value!.name} failed: ${errorMessage2}.`, 'error', 8000));
+
 						} else {
 							await getScanStatus();
-							notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
+							pushNotification(new Notification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success', 8000));
+
 						}
 					} catch (error) {
 						console.error(error);
@@ -390,7 +398,8 @@ watch(confirmOnline, async (newVal, oldVal) => {
 				onlining.value = false;
 				confirmOnline.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success');
+				pushNotification(new Notification('Online Completed', 'Onlining of disk ' + selectedDisk.value!.name + " completed.", 'success', 8000));
+
 				showOnlineDiskModal.value = false;
 			}
 
@@ -455,11 +464,13 @@ watch(confirmTrimDisk, async (newValue, oldValue) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmTrimDisk.value = false
-				notifications.value.constructNotification('Trim Failed', `Trim failed to start: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Trim Failed', `Trim failed to start: ${errorMessage}.`, 'error', 8000));
+
 			} else {
 				getDiskTrimStatus();
 				confirmTrimDisk.value = false
-				notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedDisk.value!.name + " started.", 'success');
+				pushNotification(new Notification('Trim Started', 'Trim on ' + selectedDisk.value!.name + " started.", 'success', 8000));
+
 				showTrimDiskModal.value = false;
 			}
 		} catch (error) {
@@ -486,11 +497,13 @@ async function resumeTrim(pool, disk) {
 
 		if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-			notifications.value.constructNotification('Trim Resume Failed', "Trim failed to resume:${errorMessage}.", 'error');
+				pushNotification(new Notification('Trim Resume Failed', "Trim failed to resume:${errorMessage}.", 'error', 8000));
+
 			// operationRunning.value = false;
 		} else {
 			getDiskTrimStatus();
-			notifications.value.constructNotification('Trim Resumed', 'Trim on ' + selectedDisk.value!.name + " resumed.", 'success');
+			pushNotification(new Notification('Trim Resumed', 'Trim on ' + selectedDisk.value!.name + " resumed.", 'success', 8000));
+
 			// operationRunning.value = false;
 		}
 	} catch (error) {
@@ -528,12 +541,14 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmPauseTrim.value = false;
-				notifications.value.constructNotification('Trim Pause Failed', `Trim failed to pause: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Trim Pause Failed', `Trim failed to pause: ${errorMessage}.`, 'error', 8000));
+
 				// operationRunning.value = false;
 			} else {
 				getDiskTrimStatus();
 				confirmPauseTrim.value = false;
-				notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedDisk.value!.name + " paused.", 'success');
+				pushNotification(new Notification('Trim Paused', 'Trim on ' + selectedDisk.value!.name + " paused.", 'success', 8000));
+
 				// operationRunning.value = false;
 				showPauseTrimConfirm.value = false;
 			}
@@ -566,12 +581,14 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmStopTrim.value = false;
-				notifications.value.constructNotification('Trim Stop Failed', `Trim failed to stop: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Trim Stop Failed', `Trim failed to stop: ${errorMessage}.`, 'error', 8000));
+
 				// operationRunning.value = false;
 			} else {
 				getDiskTrimStatus();
 				confirmStopTrim.value = false;
-				notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedDisk.value!.name + " stopped.", 'success');
+				pushNotification(new Notification('Trim Stopped', 'Trim on ' + selectedDisk.value!.name + " stopped.", 'success', 8000));
+
 				showStopTrimConfirm.value = false;
 			}
 		} catch (error) {

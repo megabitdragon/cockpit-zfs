@@ -108,18 +108,20 @@
 </template>
 <script setup lang="ts">
 import Modal from '../common/Modal.vue';
-import { BetterCockpitFile } from '@45drives/cockpit-helpers';
+import { legacy } from '@45drives/houston-common-lib';
 import { ref, Ref, inject, computed } from 'vue';
 import { sendSnapshot, doesDatasetExist, formatRecentSnaps, doesDatasetHaveSnaps } from '../../composables/snapshots';
 import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, convertSizeToBytes } from '../../composables/helpers';
+import {PoolData,FileSystemData} from "@45drives/houston-common-lib"
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
+const { BetterCockpitFile } = legacy;
 interface SendSnapshotProps {
     idKey: string;
     snapshot: Snapshot;
     name: string;
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 
 const props = defineProps<SendSnapshotProps>();
 const pools = inject<Ref<PoolData[]>>('pools')!;
@@ -517,11 +519,9 @@ async function sendBtn() {
 
     } catch (error: any) {
         console.error("Error occurred during snapshot send:", error);
-        notifications.value.constructNotification(
-            'Failed Snapshot Send',
+        pushNotification(new Notification(            'Failed Snapshot Send',
             `Failed to send snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}: ${error.message}`,
-            'error'
-        );
+            'error', 8000));
     }
 }
 
@@ -531,11 +531,10 @@ async function handleSend() {
     sending.value = true;
     try {
         await sendAndReadProgress(sendingData.value, sendProgressData.value);
-        notifications.value.constructNotification(
-            'Snapshot Sent',
+        pushNotification(new Notification('Snapshot Sent',
             `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`,
-            'success'
-        );
+            'success', 8000));
+
         confirmSend.value = true;
         showSendDataset.value = false;
     } finally {
@@ -550,11 +549,10 @@ async function handleSendWithOverwrite() {
     try {
         invalidConfig.value = false;
         await sendAndReadProgress(sendingData.value, sendProgressData.value);
-        notifications.value.constructNotification(
-            'Snapshot Sent',
+        pushNotification(new Notification('Snapshot Sent',
             `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName} with overwrite.`,
-            'success'
-        );
+            'success', 8000));
+
         confirmSend.value = true;
         showSendDataset.value = false;
     } finally {

@@ -76,13 +76,14 @@ import { ref, Ref, inject, computed } from 'vue';
 import { cloneSnapshot } from '../../composables/snapshots';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { loadDatasets } from '../../composables/loadData';
+import {FileSystemData} from "@45drives/houston-common-lib"
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+
 
 interface CloneSnapshotProps {
     idKey: string;
     snapshot: Snapshot;
 }
-const notifications = inject<Ref<any>>('notifications')!;
 
 const props = defineProps<CloneSnapshotProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
@@ -131,7 +132,8 @@ async function cloneBtn() {
             
             if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-                notifications.value.constructNotification('Snapshot Clone Failed', `There was an error cloning this snapshot: ${errorMessage}.`, 'error'); 
+                pushNotification(new Notification('Snapshot Clone Failed', `There was an error cloning this snapshot: ${errorMessage}.`, 'error', 8000));
+
                 confirmCloneSnap.value = true;
             } else {
                 confirmCloneSnap.value = true;
@@ -139,7 +141,8 @@ async function cloneBtn() {
                 // datasets.value = [];
                 // await loadDatasets(datasets);
                 fileSystemsLoaded.value = true;
-                notifications.value.constructNotification('Snapshot Cloned', `Cloned snapshot ${props.snapshot.name} to ${newName.value} successfully.`, 'success');
+                pushNotification(new Notification('Snapshot Cloned', `Cloned snapshot ${props.snapshot.name} to ${newName.value} successfully.`, 'success', 8000));
+
                 showCloneSnapModal.value = false;
             }
         } catch (error) {
