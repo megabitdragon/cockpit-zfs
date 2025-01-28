@@ -520,7 +520,7 @@ watch(confirmResilver, async (newValue, oldValue) => {
 				resilvering.value = false;
 				operationRunning.value = false;
 				showResilverModal.value = false;
-				pushNotification(new Notification('Resilver Started', `Resilver on ' + selectedPool.value!.name + " started.`, 'success', 8000));
+				pushNotification(new Notification('Resilver Started', 'Resilver on ' + selectedPool.value!.name + " started.", 'success', 8000));
 			}
 		} catch (error) { 
 			console.error(error);
@@ -578,7 +578,7 @@ watch(confirmUpgrade, async (newVal, oldVal) => {
 				getScanStatus();
 				confirmUpgrade.value = false;
 				operationRunning.value = false;
-				pushNotification(new Notification('Upgrade Successful', `Upgrade on ' + selectedPool.value!.name + " succeeded.`, 'success', 8000));
+				pushNotification(new Notification('Upgrade Successful', 'Upgrade on ' + selectedPool.value!.name + " succeeded.", 'success', 8000));
 				showUpgradeModal.value = false;
 				canUpgradePool(selectedPool.value!.name);
 			}

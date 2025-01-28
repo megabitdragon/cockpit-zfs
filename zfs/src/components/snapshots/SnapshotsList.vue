@@ -369,6 +369,8 @@ async function destroyThisSnapshot(snapshot) {
 }
 
 const confirmThisDestroy : ConfirmationCallback = () => {
+	console.log("confirm Destroy watch line 372: ",confirmDestroy )
+
 	confirmDestroy.value = true;
 }
 
@@ -377,8 +379,11 @@ const updateShowDestroySnapshot = (newVal) => {
 }
 
 watch (confirmDestroy, async (newVal, oldVal) => {
+	console.log("confirm Destroy watch line 380: ",confirmDestroy )
 	if (confirmDestroy.value == true) {
 		operationRunning.value = true;
+		console.log("confirm Destroy watch line 383: ",confirmDestroy )
+
 		console.log('now destroying:', newVal);
 
 		try {
@@ -387,6 +392,8 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
+				console.log("confirm Destroy watch line 393: ",confirmDestroy )
+
 				confirmDestroy.value = false;
 				pushNotification(new Notification('Destroy Snapshot Failed', `${selectedSnapshot.value!.name} was not destroyed: ${errorMessage}.`, 'error', 8000));
 
@@ -394,6 +401,8 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 				pushNotification(new Notification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success', 8000));
 
 				await refreshSnaps();
+				console.log("confirm Destroy watch line 402: ",confirmDestroy )
+
 				confirmDestroy.value = false;
 				operationRunning.value = false;
 				hasChildren.value = false;
