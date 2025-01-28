@@ -649,7 +649,7 @@ watch(confirmScrub, async (newVal, oldVal) => {
 				getScanStatus();
 				confirmScrub.value = false;
 				operationRunning.value = false;
-				pushNotification(new Notification('Scrub Started', `Scrub on ' + selectedPool.value!.name + " started.`, 'success', 8000));
+				pushNotification(new Notification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success', 8000));
 				showScrubModal.value = false;
 			}
 			starting.value = true;

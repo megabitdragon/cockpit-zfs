@@ -9,8 +9,6 @@ import unlock_dataset_script from "../scripts/unlock-encrypted-dataset.py?raw";
 // @ts-ignore
 import validate_passphrase_script from "../scripts/encryption-key-validation.py?raw";
 import {FileSystemData, NewDataset} from "@45drives/houston-common-lib"
-
-
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 const { errorString, useSpawn } = legacy;
 export async function getDatasets() {
@@ -192,10 +190,9 @@ export async function destroyDataset(fileSystemData : FileSystemData, forceDestr
 		}
 
 		cmdString.push(fileSystemData.name)
-
 		console.log("destroy cmdString:" , cmdString);
-			
 		const state = useSpawn(cmdString);
+		console.log("state: ", state)
 		const output = await state.promise();
 		console.log(output)
 		return output.stdout;

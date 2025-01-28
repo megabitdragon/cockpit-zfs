@@ -137,26 +137,42 @@ export async function setRefreservation(pool: PoolData, refreservationPercent: n
 
 export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
 	try {
-		const cmdString = ['zpool', 'destroy'];
+		// Force unmount datasets before destruction
+		console.log(`Unmounting datasets in pool: ${pool.name}`);
+		await useSpawn(['zfs', 'unmount', '-f', pool.name]);
 
-		if(forceDestroy) {
+		// Destroy the pool
+		const cmdString = ['zpool', 'destroy'];
+		if (forceDestroy) {
 			cmdString.push('-f');
 		}
 		cmdString.push(pool.name);
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
-		const state = useSpawn(cmdString);
-		console.log("before destroy state: ", state) 
 
+		console.log('Executing command:', cmdString.join(' '));
+
+		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log("destroy output: ",output)
+
+		if (output.stderr) {
+			console.warn('Destroy command warnings:', output.stderr);
+		}
+
+		console.log('Destroy command output:', output.stdout);
 		return output.stdout;
-	} catch (state) {
-		const errorMessage = errorString(state);
-		console.error(errorMessage);
+	} catch (err) {
+		// If unmount error, retry
+		if (err.stderr && err.stderr.includes('cannot unmount')) {
+			console.warn(`Unmount failed for pool: ${pool.name}. Retrying...`);
+			await useSpawn(['zfs', 'unmount', '-f', pool.name]);
+			return destroyPool(pool, true); // Retry destruction
+		}
+
+		// Handle other errors
+		console.error('Error during destroyPool:', err);
+		const errorMessage = errorString(err);
 		return { error: errorMessage };
 	}
 }
-
 const properties = [
 	// "ashift",
 	"failmode",
