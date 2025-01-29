@@ -1,11 +1,11 @@
 <template>
-    <Modal @close="showAddVDevModal = false" :isOpen="showAddVDevModal" :marginTop="props.marginTop" :width="'w-3/5'"
-        :minWidth="'min-w-3/5'">
+    <Modal @close="closeModal" :isOpen="showAddVDevModal" :marginTop="props.marginTop" :width="'w-3/5'"
+        :minWidth="'min-w-3/5'" :close-on-background-click="false" style="z-index: 1100;">
         <template v-slot:title>
             Add Virtual Device
         </template>
-        <template v-slot:content>
-            <div>
+        <template v-slot:content >
+            <div> 
                 <!-- Virtual Device (Select) -->
                 <div>
                     <label :for="getIdKey('virtual-device')"
@@ -39,11 +39,11 @@
                     <label :for="getIdKey('mirror-enabled')"
                         class="mt-1 block text-sm font-medium leading-6 text-default">{{ upperCaseWord(newVDev.type) }}
                         (Mirror)</label>
-                    <Switch v-model="newVDev.isMirror"
+                    <Switch v-model="newVDev.isMirror" :sync=true
                         :class="[newVDev.isMirror ? 'bg-primary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                         <span class="sr-only">Use setting</span>
                         <span
-                            :class="[newVDev.isMirror ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                            :class="[newVDev.isMirror ? 'translate-x-5' : 'translate-x-0', ' relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
                             <span
                                 :class="[newVDev.isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']"
                                 aria-hidden="true">
@@ -83,7 +83,7 @@
                 <ul v-if="availableDisks.length > 0" :id="getIdKey('available-disk-list')" role="list"
                     class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
-                        <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
+                        <button  @click="addVDevBtn" class="flex min-w-fit w-full h-full border border-default rounded-lg"
                             :title="disk.hasPartitions! ? 'Disk already has partitions.Procees with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name)"
                             :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)"
@@ -138,11 +138,11 @@
                             <label :for="getIdKey('force-add-vdev')"
                                 class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully
                                 Add</label>
-                            <Switch v-model="newVDev.forceAdd" :id="getIdKey('force-add-vdev')"
+                            <Switch  @click="newVDev.forceAdd = !newVDev.forceAdd" :id="getIdKey('force-add-vdev')"
                                 :class="[newVDev.forceAdd! ? 'bg-primary' : 'bg-accent', 'mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                 <span class="sr-only">Use setting</span>
                                 <span
-                                    :class="[newVDev.forceAdd! ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                    :class="[newVDev.forceAdd! ? 'translate-x-5' : 'translate-x-0', ' relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
                                     <span
                                         :class="[newVDev.forceAdd! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']"
                                         aria-hidden="true">
@@ -161,6 +161,8 @@
                                     </span>
                                 </span>
                             </Switch>
+                            <input id ="hello" type="checkbox" @click="logSwitch">
+
                         </div>
                     </div>
                     <div class="button-group-row mt-2">
@@ -187,6 +189,11 @@
         </template>
     </Modal>
 </template>
+<style>
+.switch-class, input[type="checkbox"] {
+    pointer-events: auto !important;
+}
+</style>
 
 <script setup lang="ts">
 import { ref, inject, Ref, computed, watch, onMounted } from 'vue';
@@ -234,7 +241,9 @@ const newVDev = ref<newVDevData>({
     isMirror: false,
     forceAdd: false,
 });
-
+watch(() => newVDev.value.forceAdd, (newVal) => {
+  console.log("forceAdd changed:", newVal);
+});
 const selectedDisks = ref<string[]>([])!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
@@ -461,6 +470,14 @@ const diskCheck = () => {
 	return result;
 }
 
+const closeModal = () => {
+    showAddVDevModal.value = false;
+    emit('close');
+}
+const emit = defineEmits(['close']);
+function logSwitch() {
+    console.log("Switch toggled:");
+  }
 onMounted(() => {
     getVDevType();
 	loadImportablePools(importablePools.value, allDisks, pools);

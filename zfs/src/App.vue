@@ -12,7 +12,6 @@
 import { reactive, ref, computed } from 'vue';
 import "@45drives/houston-common-ui/style.css";
 import '@45drives/houston-common-css/src/index.css';
-import { pluginVersion } from "./version";
 import { HoustonAppContainer } from "@45drives/houston-common-ui";
 import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';

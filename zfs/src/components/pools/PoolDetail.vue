@@ -1,12 +1,12 @@
 <template>
-	<Modal @close="closeModal" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'"
-		class="z-10">
+	<Modal @close="closeModal" :close-on-background-click="false"  :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'"
+		class="z-10 inset-0">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem"
 				:navigationCallback="navigationCallback" :show="show" />
 		</template>
 		<template v-slot:content>
-			<div v-if="navTag == 'stats'">
+			<div v-if="navTag == 'stats'" @click.stop>
 				<div class="mt-6 grid grid-cols-3 grid-rows-2 text-default">
 					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="capacityColor"
 						:name="props.pool.name" :totalSize="props.pool.properties.size"
@@ -49,13 +49,13 @@
 				</div>
 			</div>
 
-			<div v-if="navTag == 'topology'" class="mt-2 grid" :class="`grid-cols-${props.pool.vdevs.length}`">
+			<div v-if="navTag == 'topology'"  class="mt-2 grid" :class="`grid-cols-${props.pool.vdevs.length}`" @click.stop>
 				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx"
 					class="p-2 m-2 rounded-md border border-default bg-accent">
 					<legend class="mb-1 text-base font-medium leading-6 text-default">{{ vDev.name }} ({{ vDev.type }})
 					</legend>
 
-					<div class="grid" :class="vDev.disks.length < 2 ? 'grid-cols-1' : 'grid-cols-2'">
+					<div class="grid" :class="vDev.disks.length < 2 ? 'grid-cols-1' : 'grid-cols-2'" @click.stop>
 						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1">
 							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]" />
 						</div>
@@ -328,7 +328,9 @@
 	</div>
 
 </template>
+<style >
 
+</style>
 <script setup lang="ts">
 import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
