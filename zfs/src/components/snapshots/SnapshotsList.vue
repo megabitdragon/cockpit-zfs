@@ -347,15 +347,18 @@ const fourthOptionToggle = ref(false);
 /////////////////////////////////////////////////////
 const showDestroySnapshotModal = ref(false);
 const hasChildren = ref(false);
-const confirmDestroy = inject<Ref<boolean>>('confirm-destroy-snap')!;
+const confirmDestroy = ref(false);
 
 const destroySnapshotComponent = ref();
 const loadDestroySnapshotComponent = async () => {
+	console.log("confirm Destroy watch line 355: ",confirmDestroy )
+
 	const module = await import('../common/UniversalConfirmation.vue');
 	destroySnapshotComponent.value = module.default;
 }
 
 async function destroyThisSnapshot(snapshot) {
+	console.log("snapshot: ", snapshot)
 	operationRunning.value = false;
 	selectedSnapshot.value = snapshot;
 	
@@ -369,9 +372,10 @@ async function destroyThisSnapshot(snapshot) {
 }
 
 const confirmThisDestroy : ConfirmationCallback = () => {
-	console.log("confirm Destroy watch line 372: ",confirmDestroy )
 
 	confirmDestroy.value = true;
+	console.log("confirm Destroy watch line 378: ",confirmDestroy )
+
 }
 
 const updateShowDestroySnapshot = (newVal) => {

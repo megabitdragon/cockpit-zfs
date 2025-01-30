@@ -1,12 +1,12 @@
 <template>
-	<Modal @close="closeModal" :close-on-background-click="false"  :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'"
-		class="z-10 inset-0">
+	<Modal @close="closeModal"  :class="{ 'inert': showAddVDevModal }" :close-on-background-click="false"  :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'"
+		    :inert="false">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem"
 				:navigationCallback="navigationCallback" :show="show" />
 		</template>
 		<template v-slot:content>
-			<div v-if="navTag == 'stats'" @click.stop>
+			<div v-if="navTag == 'stats'" >
 				<div class="mt-6 grid grid-cols-3 grid-rows-2 text-default">
 					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="capacityColor"
 						:name="props.pool.name" :totalSize="props.pool.properties.size"
@@ -49,13 +49,13 @@
 				</div>
 			</div>
 
-			<div v-if="navTag == 'topology'"  class="mt-2 grid" :class="`grid-cols-${props.pool.vdevs.length}`" @click.stop>
+			<div v-if="navTag == 'topology'"  class="mt-2 grid" :class="`grid-cols-${props.pool.vdevs.length}`" >
 				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx"
 					class="p-2 m-2 rounded-md border border-default bg-accent">
 					<legend class="mb-1 text-base font-medium leading-6 text-default">{{ vDev.name }} ({{ vDev.type }})
 					</legend>
 
-					<div class="grid" :class="vDev.disks.length < 2 ? 'grid-cols-1' : 'grid-cols-2'" @click.stop>
+					<div class="grid" :class="vDev.disks.length < 2 ? 'grid-cols-1' : 'grid-cols-2'" >
 						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1">
 							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]" />
 						</div>
@@ -117,7 +117,7 @@
 					<div class="col-span-1 col-start-1 row-start-3">
 						<label :for="getIdKey('settings-pool-auto-expand')"
 							class="mt-1 block text-sm leading-6 text-default">Auto-Expand Pool</label>
-						<Switch v-model="poolConfig.properties.autoExpand" :id="getIdKey('settings-pool-auto-expand')"
+						<Switch     :initialFocus="null" v-model="poolConfig.properties.autoExpand" :id="getIdKey('settings-pool-auto-expand')"
 							:class="[poolConfig.properties.autoExpand ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -146,7 +146,7 @@
 					<div class="col-span-1 col-start-2 row-start-3">
 						<label :for="getIdKey('settings-pool-auto-replace')"
 							class="mt-1 block text-sm leading-6 text-default">Auto-Replace Drives</label>
-						<Switch v-model="poolConfig.properties.autoReplace" :id="getIdKey('settings-pool-auto-replace')"
+						<Switch     :initialFocus="null" v-model="poolConfig.properties.autoReplace" :id="getIdKey('settings-pool-auto-replace')"
 							:class="[poolConfig.properties.autoReplace ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -175,7 +175,7 @@
 					<div class="col-span-2 col-start-3 row-start-3">
 						<label :for="getIdKey('settings-pool-display-snapshots')"
 							class="mt-1 block text-sm leading-6 text-default">List Snapshots With File Systems</label>
-						<Switch v-model="poolConfig.properties.listSnapshots"
+						<Switch     :initialFocus="null" v-model="poolConfig.properties.listSnapshots"
 							:id="getIdKey('settings-pool-display-snapshots')"
 							:class="[poolConfig.properties.listSnapshots ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
@@ -208,7 +208,7 @@
 								class="block text-sm text-default">Delegation</label>
 							<p class="text-xs text-muted mt-0.5">(Access based on dataset permissions)</p>
 						</div>
-						<Switch v-model="poolConfig.properties.delegation" :id="getIdKey('settings-pool-delegation')"
+						<Switch      :initialFocus="null" v-model="poolConfig.properties.delegation" :id="getIdKey('settings-pool-delegation')"
 							:class="[poolConfig.properties.delegation ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -238,7 +238,7 @@
 						class="col-span-1 col-start-3 row-start-4">
 						<label :for="getIdKey('settings-pool-auto-trim')"
 							class="mt-1 block text-sm leading-6 text-default">Auto-TRIM Pool</label>
-						<Switch v-model="poolConfig.properties.autoTrim" :id="getIdKey('settings-pool-auto-trim')"
+						<Switch     :initialFocus="null" v-model="poolConfig.properties.autoTrim" :id="getIdKey('settings-pool-auto-trim')"
 							:class="[poolConfig.properties.autoTrim ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -323,12 +323,16 @@
 			:item="'pool'" />
 	</div>
 	<div v-if="showAddVDevModal">
-		<component :is="addVDevComponent" @close="updateShowAddVDev" :idKey="getIdKey(`show-vdev-modal`)"
+		<component :is="addVDevComponent" @close="updateShowAddVDev"     :key="showAddVDevModal" :idKey="getIdKey(`show-vdev-modal`)"
 			:pool="poolConfig" :marginTop="'mt-48'" />
 	</div>
 
 </template>
 <style >
+.inert {
+    pointer-events: none !important;
+    opacity: 0.5;
+}
 
 </style>
 <script setup lang="ts">
