@@ -131,8 +131,8 @@ function loadTheseSnapshots() {
 }
 
 function initialize() {
-    clearSnapshots();
-    loadTheseSnapshots();
+    //clearSnapshots();
+  //  loadTheseSnapshots();
     if (props.item == 'pool') {
         defaultFileSystem.value = datasetsInSamePool.value[0];
     } else if (props.item == 'filesystem') {
@@ -231,7 +231,7 @@ async function create(newSnapshot) {
             newSnapshot.isCustomName = false;
             newSnapshot.snapChildren = false;
             pushNotification(new Notification('Snapshot Created', `Created new snapshot.`, 'success', 8000));
-
+            refreshSnapshots()
             showSnapshotModal.value = false;
         }
     } catch (error) {
