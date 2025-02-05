@@ -284,13 +284,13 @@ import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { loadSnapshotsInPool, loadSnapshotsInDataset } from '../../composables/loadData';
 import { destroySnapshot, rollbackSnapshot } from '../../composables/snapshots';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { PoolData,FileSystemData} from "@45drives/houston-common-lib"
+import { ZPool,ZFSFileSystemInfo} from "@45drives/houston-common-lib"
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 
 interface SnapshotsListProps {
-	pool?: PoolData;
-	filesystem?: FileSystemData;
+	pool?: ZPool;
+	filesystem?: ZFSFileSystemInfo;
 	singleSnap?: Snapshot;
 	item: 'pool' | 'filesystem' | 'singleSnap';
 	bulkSnapDestroyMode?: boolean;

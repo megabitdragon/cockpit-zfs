@@ -112,7 +112,7 @@ import { legacy } from '@45drives/houston-common-lib';
 import { ref, Ref, inject, computed } from 'vue';
 import { sendSnapshot, doesDatasetExist, formatRecentSnaps, doesDatasetHaveSnaps } from '../../composables/snapshots';
 import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, convertSizeToBytes } from '../../composables/helpers';
-import {PoolData,FileSystemData} from "@45drives/houston-common-lib"
+import {ZPool,ZFSFileSystemInfo} from "@45drives/houston-common-lib"
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 const { BetterCockpitFile } = legacy;
@@ -124,8 +124,8 @@ interface SendSnapshotProps {
 
 
 const props = defineProps<SendSnapshotProps>();
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const showSendDataset = inject<Ref<boolean>>('show-send-dataset')!;
 const sending = inject<Ref<boolean>>('sending')!;

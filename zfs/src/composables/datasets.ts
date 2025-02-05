@@ -8,7 +8,7 @@ import change_passphrase_script from "../scripts/change-encrypted-key.py?raw";
 import unlock_dataset_script from "../scripts/unlock-encrypted-dataset.py?raw";
 // @ts-ignore
 import validate_passphrase_script from "../scripts/encryption-key-validation.py?raw";
-import {FileSystemData, NewDataset} from "@45drives/houston-common-lib"
+import {ZFSFileSystemInfo, Dataset,DatasetCreateOptions} from "@45drives/houston-common-lib"
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 const { errorString, useSpawn } = legacy;
 export async function getDatasets() {
@@ -24,7 +24,7 @@ export async function getDatasets() {
 
 
 
-export async function createEncryptedDataset(fileSystemData : NewDataset, passphrase? : string) {
+export async function createEncryptedDataset(fileSystemData : Dataset&DatasetCreateOptions, passphrase? : string) {
 	try {
 		let quota = '';
 		if (Number(fileSystemData.quota) == 0) {
@@ -173,7 +173,7 @@ export async function configureDataset(fileSystemData : FileSystemEditConfig) {
 	}
 }
 
-export async function destroyDataset(fileSystemData : FileSystemData, forceDestroy? : boolean, destroyChildren?: boolean, destroyDependents?: boolean) {
+export async function destroyDataset(fileSystemData : ZFSFileSystemInfo, forceDestroy? : boolean, destroyChildren?: boolean, destroyDependents?: boolean) {
 	try {
 		let cmdString = ['zfs', 'destroy'];
 
@@ -203,7 +203,7 @@ export async function destroyDataset(fileSystemData : FileSystemData, forceDestr
 	}
 }
 
-export async function unmountFileSystem(fileSystemData: FileSystemData, forceUnmount?: boolean) {
+export async function unmountFileSystem(fileSystemData: ZFSFileSystemInfo, forceUnmount?: boolean) {
 	try {
 		let cmdString = ['zfs', 'unmount'];
 		
@@ -225,7 +225,7 @@ export async function unmountFileSystem(fileSystemData: FileSystemData, forceUnm
 	}
 }
 
-export async function mountFileSystem(fileSystemData: FileSystemData, forceMount?: boolean) {
+export async function mountFileSystem(fileSystemData: ZFSFileSystemInfo, forceMount?: boolean) {
 	try {
 		let cmdString = ['zfs', 'mount'];
 		
@@ -247,7 +247,7 @@ export async function mountFileSystem(fileSystemData: FileSystemData, forceMount
 	}
 }
 
-export async function lockFileSystem(fileSystemData: FileSystemData) {
+export async function lockFileSystem(fileSystemData: ZFSFileSystemInfo) {
 	try {
 		let cmdString = ['zfs', 'unload-key'];
 
@@ -264,7 +264,7 @@ export async function lockFileSystem(fileSystemData: FileSystemData) {
 	}
 }
 
-export async function unlockFileSystem(fileSystemData: FileSystemData, passphrase : string) {
+export async function unlockFileSystem(fileSystemData: ZFSFileSystemInfo, passphrase : string) {
 	try {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', unlock_dataset_script, fileSystemData.name, passphrase], { superuser: 'try', stderr: 'out'});
 		const output = await state.promise();

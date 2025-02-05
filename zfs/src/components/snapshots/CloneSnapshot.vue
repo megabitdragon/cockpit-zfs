@@ -76,7 +76,7 @@ import { ref, Ref, inject, computed } from 'vue';
 import { cloneSnapshot } from '../../composables/snapshots';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import {FileSystemData} from "@45drives/houston-common-lib"
+import {ZFSFileSystemInfo} from "@45drives/houston-common-lib"
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 
@@ -89,7 +89,7 @@ const props = defineProps<CloneSnapshotProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const showCloneSnapModal = inject<Ref<boolean>>('show-clone-modal')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
 const cloning = inject<Ref<boolean>>('cloning')!;
@@ -112,7 +112,7 @@ function getChildDatasetIds(dataset, allDatasets): string[] {
     return childIds;
 }
 
-const datasetsInSamePool = computed<FileSystemData[]>(() => {
+const datasetsInSamePool = computed<ZFSFileSystemInfo[]>(() => {
     const currentDataset = props.snapshot.dataset!;
 
     const childDatasetIds = getChildDatasetIds(currentDataset, datasets.value);
@@ -179,7 +179,7 @@ const nameCheck = (fileSystemName, fileSystemParent) => {
     return result;
 }
 
-function fileSystemNameExists(filesystemName, fileSystemParent, datasets : FileSystemData[]) {
+function fileSystemNameExists(filesystemName, fileSystemParent, datasets : ZFSFileSystemInfo[]) {
 	const newParentPath = fileSystemParent;
 	for (const dataset of datasets) {
 		const existingParentPath = dataset.parentFS;

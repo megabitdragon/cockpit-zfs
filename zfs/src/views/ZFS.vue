@@ -24,7 +24,7 @@ import { ref, Ref, provide, watchEffect } from 'vue';
 //import "@45drives/cockpit-vue-components/dist/style.css";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
-import { PoolData, DiskData, FileSystemData } from '@45drives/houston-common-lib';
+import { ZPool, VDevDisk, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 
 interface ZFSProps {
   	tag: string;
@@ -34,9 +34,9 @@ const props = defineProps<ZFSProps>();
 
 const truncateText = ref('overflow-hidden whitespace-nowrap text-ellipsis');
 
-const pools = ref<PoolData[]>([]);
-const disks = ref<DiskData[]>([]);
-const datasets = ref<FileSystemData[]>([]);
+const pools = ref<ZPool[]>([]);
+const disks = ref<VDevDisk[]>([]);
+const datasets = ref<ZFSFileSystemInfo[]>([]);
 const importablePools = ref<ImportablePoolData[]>([]);
 const importableDestroyedPools = ref<ImportablePoolData[]>([]);
 const snapshots = ref<Snapshot[]>([]);

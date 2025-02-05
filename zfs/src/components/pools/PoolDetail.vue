@@ -361,7 +361,7 @@ const closeModal = () => {
 const props = defineProps<PoolDetailsProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-const poolConfig = ref<PoolData>({
+const poolConfig = ref<ZPool>({
 	name: props.pool.name,
 	status: props.pool.status,
 	guid: props.pool.guid,
@@ -400,8 +400,8 @@ const capacityColor = computed(() =>
 
 ////////////////// Loading Data /////////////////////
 /////////////////////////////////////////////////////
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const disks = inject<Ref<DiskData[]>>('disks')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
@@ -410,7 +410,7 @@ const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
-import { PoolData, DiskData } from '@45drives/houston-common-lib';
+import { ZPool, VDevDisk } from '@45drives/houston-common-lib';
 
 const snapshotListComponent = ref();
 const loadSnapshotListComponent = async () => {

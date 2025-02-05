@@ -369,7 +369,7 @@ import { loadImportablePools, loadImportableDestroyedPools } from '../../composa
 import { importPool } from '../../composables/pools';
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
-import { DiskData, PoolData, FileSystemData } from '@45drives/houston-common-lib';
+import { VDevDisk, ZPool, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 
@@ -380,9 +380,9 @@ interface ImportPoolProps {
 const showDeletedPools = ref(false);
 const showImportModal = inject<Ref<boolean>>('show-import-modal')!;
 
-const disks = inject<Ref<DiskData[]>>('disks')!;
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 
 const importablePools = inject<Ref<ImportablePoolData[]>>('importable-pools')!;
 const allImportableDestroyedPools = inject<Ref<ImportablePoolData[]>>('importable-destroyed-pools')!;

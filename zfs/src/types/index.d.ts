@@ -24,7 +24,7 @@ interface ImportablePoolData {
 	guid: string;
 	properties: Record<string, any>
 	// vdevs: ImportablePoolvDevData[];
-	vdevs: vDevData[];
+	vdevs: VDev[];
 	scan: Record<string, any>
 	isDestroyed?: boolean;
 	errors?: string[];

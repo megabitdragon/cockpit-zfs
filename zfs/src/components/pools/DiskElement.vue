@@ -106,24 +106,24 @@ import { labelClear, detachDisk, offlineDisk, onlineDisk, trimDisk } from "../..
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, formatStatus,  } from '../../composables/helpers'
 import Status from "../common/Status.vue";
-import { PoolData, vDevData, DiskData, FileSystemData } from "@45drives/houston-common-lib";
+import { ZPool, VDev, VDevDisk, ZFSFileSystemInfo } from "@45drives/houston-common-lib";
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface DiskListElementProps {
-	pool: PoolData;
+	pool: ZPool;
 	poolIdx: number;
-	vDev: vDevData;
+	vDev: VDev;
 	vDevIdx: number;
-	disk: DiskData;
+	disk: VDevDisk;
     diskIdx: number;
 }
 
 const props = defineProps<DiskListElementProps>();
 
 
-const selectedPool = ref<PoolData>();
-const selectedDisk = ref<DiskData>();
-const selectedVDev = ref<vDevData>();
+const selectedPool = ref<ZPool>();
+const selectedDisk = ref<VDevDisk>();
+const selectedVDev = ref<VDev>();
 
 const operationRunning = ref(false);
 const firstOptionToggle = ref(false);
@@ -155,9 +155,9 @@ onMounted(() => {
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
-const poolData = inject<Ref<PoolData[]>>("pools")!;
-const diskData = inject<Ref<DiskData[]>>("disks")!;
-const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
+const poolData = inject<Ref<ZPool[]>>("pools")!;
+const diskData = inject<Ref<VDevDisk[]>>("disks")!;
+const filesystemData = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
@@ -219,7 +219,7 @@ const loadDetachDiskComponent = async () => {
 	detachDiskComponent.value = module.default;
 }
 
-async function detachThisDisk(pool : PoolData, disk: DiskData) {
+async function detachThisDisk(pool : ZPool, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	await loadDetachDiskComponent();
@@ -282,7 +282,7 @@ const loadOfflineDiskComponent = async () => {
 	offlineDiskComponent.value = module.default;
 }
 
-async function offlineThisDisk(pool: PoolData, disk: DiskData) {
+async function offlineThisDisk(pool: ZPool, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
@@ -341,7 +341,7 @@ const loadOnlineDiskComponent = async () => {
 	onlineDiskComponent.value = module.default;
 }
 
-async function onlineThisDisk(pool: PoolData, disk: DiskData) {
+async function onlineThisDisk(pool: ZPool, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
@@ -439,7 +439,7 @@ const loadTrimStopDiskComponent = async () => {
 	trimStopDiskComponent.value = module.default;
 }
 
-async function trimThisDisk(pool: PoolData, disk: DiskData) {
+async function trimThisDisk(pool: ZPool, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
@@ -613,7 +613,7 @@ const updateShowReplaceDisk = (newVal) => {
 	showReplaceDiskModal.value = newVal;
 }
 
-async function replaceThisDisk(pool: PoolData,  vdev: vDevData, disk: DiskData) {
+async function replaceThisDisk(pool: ZPool,  vdev: VDev, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	selectedVDev.value = vdev;

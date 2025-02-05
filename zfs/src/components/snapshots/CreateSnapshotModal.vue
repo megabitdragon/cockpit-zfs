@@ -88,7 +88,7 @@ import Modal from '../common/Modal.vue';
 import { getSnapshotTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
 import { loadSnapshotsInDataset, loadSnapshotsInPool, loadDatasets, loadSnapshots } from '../../composables/loadData';
-import { FileSystemData } from '@45drives/houston-common-lib';
+import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 
@@ -99,13 +99,13 @@ interface CreateSnapshotModalProps {
     
 const props = defineProps<CreateSnapshotModalProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
-const datasetsInSamePool = computed<FileSystemData[]>(() => {
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
+const datasetsInSamePool = computed<ZFSFileSystemInfo[]>(() => {
     return datasets.value.filter(dataset => dataset.pool === props.poolName);
 });
 
 const defaultFileSystem = ref();
-const selectedDataset= inject<Ref<FileSystemData>>('selected-dataset')!;
+const selectedDataset= inject<Ref<ZFSFileSystemInfo>>('selected-dataset')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 
 const showSnapshotModal = inject<Ref<boolean>>('create-snap-modal')!;

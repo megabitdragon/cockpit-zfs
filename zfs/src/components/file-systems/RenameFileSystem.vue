@@ -94,18 +94,18 @@ import { ref, Ref, inject, computed } from 'vue';
 import { renameFileSystem } from '../../composables/datasets';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import { FileSystemData } from '@45drives/houston-common-lib';
+import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface RenameFileSystemProps {
     idKey: string;
-    filesystem: FileSystemData;
+    filesystem: ZFSFileSystemInfo;
 }
 
 
 const props = defineProps<RenameFileSystemProps>();
 const showRenameModal = inject<Ref<boolean>>('show-rename-modal')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const renaming = inject<Ref<boolean>>('renaming')!;
 const confirmRename = inject<Ref<boolean>>('confirm-rename')!;
@@ -129,7 +129,7 @@ function getChildDatasetIds(dataset, allDatasets): string[] {
     return childIds;
 }
 
-const datasetsInSamePool = computed<FileSystemData[]>(() => {
+const datasetsInSamePool = computed<ZFSFileSystemInfo[]>(() => {
     const currentDataset = props.filesystem;
 
     const childDatasetIds = getChildDatasetIds(currentDataset, datasets.value);
@@ -192,7 +192,7 @@ const nameCheck = (fileSystemName, fileSystemParent) => {
     return result;
 }
 
-function fileSystemNameExists(filesystemName, fileSystemParent, datasets : FileSystemData[]) {
+function fileSystemNameExists(filesystemName, fileSystemParent, datasets : ZFSFileSystemInfo[]) {
 	const newParentPath = fileSystemParent;
 	for (const dataset of datasets) {
 		const existingParentPath = dataset.parentFS;

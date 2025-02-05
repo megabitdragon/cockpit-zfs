@@ -99,12 +99,12 @@ import { upperCaseWord } from '../../composables/helpers';
 import { lockFileSystem, mountFileSystem, unlockFileSystem, isPassphraseValid } from "../../composables/datasets";
 import Modal from '../common/Modal.vue';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
-import { FileSystemData } from '@45drives/houston-common-lib';
+import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 
 interface LockUnlockFileSystemProps {
     idKey: string;
     mode: string;
-    filesystem: FileSystemData;
+    filesystem: ZFSFileSystemInfo;
     showFlag: boolean;
 }
 

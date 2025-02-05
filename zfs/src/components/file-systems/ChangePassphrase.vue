@@ -78,17 +78,17 @@ import { ref, Ref, inject } from 'vue';
 import Modal from '../common/Modal.vue';
 import { changePassphrase } from '../../composables/datasets';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
-import { FileSystemData } from '@45drives/houston-common-lib';
+import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface ChangePassphraseProps {
     idKey: string;
-    filesystem: FileSystemData;
+    filesystem: ZFSFileSystemInfo;
 }
 
 const props = defineProps<ChangePassphraseProps>();
 const showChangePassphrase = inject<Ref<boolean>>('show-change-passphrase')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const fileSystem = ref(props.filesystem);
 const changing = inject<Ref<boolean>>('changing')!;
@@ -123,7 +123,7 @@ async function changeBtn() {
     }
 }
 
-const encryptPasswordCheck = (fileSystem : FileSystemData) => {
+const encryptPasswordCheck = (fileSystem : ZFSFileSystemInfo) => {
 	let result = true;
 	passFeedback.value = '';
 

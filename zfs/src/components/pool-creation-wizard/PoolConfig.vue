@@ -412,7 +412,7 @@ import { ChevronUpIcon, ExclamationCircleIcon, ExclamationTriangleIcon } from '@
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
-import { PoolData ,DiskData,FileSystemData,newPoolData,vDevData,newVDevData} from '@45drives/houston-common-lib';
+import { ZPool ,VDevDisk,ZFSFileSystemInfo,ZpoolCreateOptions , ZPoolBase,VDev,newVDevData} from '@45drives/houston-common-lib';
 
 interface PoolConfigProps {
 	tag: string;
@@ -423,10 +423,10 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
-const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
-const disks = inject<Ref<DiskData[]>>('disks')!;
-const allPools = inject<Ref<PoolData[]>>('pools')!;
-const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
+const poolConfig = inject<Ref<ZPool>>('pool-config-data')!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
+const allPools = inject<Ref<ZPool[]>>('pools')!;
+const fileSystemConfig = inject<Ref<ZFSFileSystemInfo>>('file-system-data')!;
 
 const nameFeedback = inject<Ref<string>>('feedback-name')!;
 const vDevFeedback = inject<Ref<string>>('feedback-vdev')!;
@@ -473,7 +473,7 @@ const additionalVDevType = computed(() => {
 });
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection
-const vDevAvailDisks = computed<DiskData[][]>(() => {
+const vDevAvailDisks = computed<VDevDisk[][]>(() => {
 	return poolConfig.value.vdevs.map((vdev, vdevIdx) => {
 		const claimed = poolConfig.value.vdevs
 		.filter((_, idx) => idx !== vdevIdx)
@@ -498,7 +498,7 @@ const createFileSystemCardClass = (createFileSystem : boolean) => {
 
 //method for adding initial vdev with default values 
 function initialVDev() {
-	const vDevConfig: vDevData = {
+	const vDevConfig: VDev = {
 		name: '',
 		type: 'raidz2',
 		status: '',
@@ -518,7 +518,7 @@ function initialVDev() {
 
 //method for adding additional vdev
 function addVDev() {
-	const vDevConfig: vDevData = {
+	const vDevConfig: VDev = {
 		name: '',
 		type: poolConfig.value.vdevs[0].type,
 		status: '',
@@ -786,7 +786,7 @@ function removeVDev(index: number) {
   	poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
+const newPoolData  = inject<Ref<ZpoolCreateOptions & ZPoolBase>>('new-pool-data')!;
 const newVDevs = ref<newVDevData[]>([]);
 const newVDevDisks = ref<string[]>([]);
 

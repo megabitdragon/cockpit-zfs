@@ -108,7 +108,7 @@ import PoolConfig from './PoolConfig.vue';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { setRefreservation } from '../../composables/pools';
-import { PoolData ,DiskData,FileSystemData,newPoolData, newPool} from '@45drives/houston-common-lib';
+import { ZPool ,VDevDisk,ZFSFileSystemInfo,ZpoolCreateOptions,ZPoolBase} from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 const show = ref(true);
@@ -134,12 +134,12 @@ const diskBelongsFeedback = ref('');
 const isProperReplicationFeedback = ref('');
 
 //injecting provided disk and pools rray
-const disks = inject<Ref<DiskData[]>>('disks')!;
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 
 //setting defaults for pool object
-const poolConfig = ref<PoolData>({
+const poolConfig = ref<ZPool>({
 	name: '',
 	status: '',
 	guid: '',
@@ -170,7 +170,7 @@ const poolConfig = ref<PoolData>({
 
 
 //setting default values for file system object
-const fileSystemConfig = ref<FileSystemData>({
+const fileSystemConfig = ref<ZFSFileSystemInfo>({
 	parentFS: poolConfig.value.name,
     name: '',
     id: '',
@@ -212,7 +212,7 @@ const fileSystemConfig = ref<FileSystemData>({
     children: [],
 });
 
-const newPoolData = ref<newPoolData>({
+const newPoolData = ref<ZpoolCreateOptions & ZPoolBase>({
 	name: '',
 	vdevs : [],
 	autoexpand: '',

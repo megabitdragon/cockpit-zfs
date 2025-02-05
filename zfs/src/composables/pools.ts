@@ -1,4 +1,4 @@
-import { legacy, PoolData } from '@45drives/houston-common-lib';
+import { legacy, ZPool } from '@45drives/houston-common-lib';
 import { convertSizeToBytes } from './helpers';
 import { ref } from 'vue';
 // @ts-ignore
@@ -112,7 +112,7 @@ export async function getPools() {
 // 	}
 // }
 
-export async function setRefreservation(pool: PoolData, refreservationPercent: number) {
+export async function setRefreservation(pool: ZPool, refreservationPercent: number) {
 	try {
 		const sizeInBytes = convertSizeToBytes(pool.properties.size);
 	
@@ -135,7 +135,7 @@ export async function setRefreservation(pool: PoolData, refreservationPercent: n
 	}
 }
 
-export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
+export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
 	try {
 		// Force unmount datasets before destruction
 		console.log(`Unmounting datasets in pool: ${pool.name}`);
@@ -250,7 +250,7 @@ export async function clearErrors(poolName, deviceName?) {
 	}
 }
 
-export async function trimPool(pool : PoolData, isSecure? : boolean, action? : string) {
+export async function trimPool(pool : ZPool, isSecure? : boolean, action? : string) {
 	try {
 		let cmdString = ['zpool', 'trim'];
 

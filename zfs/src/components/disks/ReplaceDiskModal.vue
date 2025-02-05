@@ -134,15 +134,15 @@ import { convertSizeToBytes, getDiskIDName, loadScanActivities, loadTrimActiviti
 import { replaceDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadImportablePools } from '../../composables/loadImportables';
-import { PoolData, vDevData, DiskData, FileSystemData, DiskIdentifier } from '@45drives/houston-common-lib';
+import { ZPool, VDev, VDevDisk, ZFSFileSystemInfo, DiskIdentifier } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 
 interface ReplaceDiskModalProps {
     idKey: string;
-    pool: PoolData;
-    vDev: vDevData;
-    disk: DiskData;
+    pool: ZPool;
+    vDev: VDev;
+    disk: VDevDisk;
     showFlag: boolean;
 }
 
@@ -165,9 +165,9 @@ function selectSingleDisk(diskName) {
     selectedDisk.value = selectedDisk.value === diskName ? '' : diskName;
 }
 
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const allDisks = inject<Ref<DiskData[]>>('disks')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const allDisks = inject<Ref<VDevDisk[]>>('disks')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 
 const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 const diskSizeFeedback = ref('')
@@ -192,7 +192,7 @@ const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
-const availableDisks = computed<DiskData[]>(() => {
+const availableDisks = computed<VDevDisk[]>(() => {
     return allDisks.value.filter(disk => disk.guid === "");
 });
 
@@ -316,7 +316,7 @@ const diskSizeMatch = () => {
     return result;
 };
 
-const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const importablePools = inject<Ref<ZPool[]>>('importable-pools')!;
 const diskBelongsToImportablePool = () => {
 	let result = false;
 	diskBelongsFeedback.value = '';

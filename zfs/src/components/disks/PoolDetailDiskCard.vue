@@ -35,10 +35,10 @@
 import { CheckCircleIcon } from '@heroicons/vue/24/outline';
 import {inject, Ref} from 'vue';
 import Card from '../common/Card.vue';
-import { DiskData } from '@45drives/houston-common-lib';
+import { VDevDisk } from '@45drives/houston-common-lib';
 
 interface PoolDetailDiskCardProps {
-	disk: DiskData;
+	disk: VDevDisk;
 }
 
 const truncateText = inject<Ref<string>>('style-truncate-text')!;

@@ -255,19 +255,19 @@ import { labelClear } from "../../composables/disks";
 import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable, getCapacityColor } from '../../composables/helpers'
 import Card from '../common/Card.vue';
 import Status from '../common/Status.vue';
-import { PoolData, DiskData, FileSystemData } from "@45drives/houston-common-lib";
+import { ZPool, VDevDisk, ZFSFileSystemInfo } from "@45drives/houston-common-lib";
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface DashPoolCardProps {
-	pool: PoolData;
+	pool: ZPool;
 }
 
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const props = defineProps<DashPoolCardProps>();
-const selectedPool = ref<PoolData>();
+const selectedPool = ref<ZPool>();
 
-const poolConfig = ref<PoolData>({
+const poolConfig = ref<ZPool>({
 	name: props.pool.name,
 	status: props.pool.status,
 	guid: props.pool.guid,
@@ -364,9 +364,9 @@ watch(confirmSavePool, async (newVal, oldVal) => {
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
-const poolData = inject<Ref<PoolData[]>>("pools")!;
-const diskData = inject<Ref<DiskData[]>>("disks")!;
-const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
+const poolData = inject<Ref<ZPool[]>>("pools")!;
+const diskData = inject<Ref<VDevDisk[]>>("disks")!;
+const filesystemData = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
@@ -386,7 +386,7 @@ async function refreshAllData() {
 	poolData.value = [];
 	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
-	await loadDatasets(filesystemData);
+	await loadDatasets(ZFSFileSystemInfo);
 	await loadScanObjectGroup(scanObjectGroup);
 	await loadScanActivities(poolData, scanActivities);
 	await loadDiskStats(poolDiskStats);
@@ -402,7 +402,7 @@ async function refreshAllData() {
 const confirmDelete = ref(false);
 const showDeletePoolConfirm = ref(false);
 const clearLabels = inject<Ref<boolean>>('clear-labels')!;
-const selectedDisk = ref<DiskData>();
+const selectedDisk = ref<VDevDisk>();
 
 const deleteConfirmComponent = ref();
 const loadDeleteConfirmComponent = async () => {

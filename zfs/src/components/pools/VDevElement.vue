@@ -84,14 +84,14 @@ import { clearErrors, removeVDevFromPool, setRefreservation } from "../../compos
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { formatStatus, loadScanActivities, loadTrimActivities, upperCaseWord,  } from '../../composables/helpers';
 import DiskElement from '../pools/DiskElement.vue';
-import { PoolData, vDevData, DiskData, FileSystemData } from "@45drives/houston-common-lib";
+import { PoolData, VDev, VDevDisk, ZFSFileSystemInfo } from "@45drives/houston-common-lib";
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 
 interface VDevElementProps {
 	pool: PoolData;
 	poolIdx: number;
-	vDev: vDevData;
+	vDev: VDev;
 	vDevIdx: number;
 }
 
@@ -100,7 +100,7 @@ const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 
 const selectedPool = ref<PoolData>();
-const selectedVDev = ref<vDevData>();
+const selectedVDev = ref<VDev>();
 
 const operationRunning = ref(false);
 
@@ -108,8 +108,8 @@ const operationRunning = ref(false);
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
 const poolData = inject<Ref<PoolData[]>>("pools")!;
-const diskData = inject<Ref<DiskData[]>>("disks")!;
-const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
+const diskData = inject<Ref<VDevDisk[]>>("disks")!;
+const filesystemData = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
@@ -159,7 +159,7 @@ const loadShowRemoveVDevComponent = async () => {
 	showRemoveVDevComponent.value = module.default;
 }
 
-async function removeVDev(pool : PoolData, vDev : vDevData) {
+async function removeVDev(pool : PoolData, vDev : VDev) {
 	selectedPool.value = pool;
 	selectedVDev.value = vDev;
 	await loadShowRemoveVDevComponent();
@@ -238,7 +238,7 @@ const updateShowAttachDisk = (newVal) => {
 	showAttachDiskModal.value = newVal;
 }
 
-async function showAttachDisk(pool: PoolData, vdev: vDevData) {
+async function showAttachDisk(pool: PoolData, vdev: VDev) {
 	selectedPool.value = pool;
 	selectedVDev.value = vdev;
 	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)

@@ -210,15 +210,16 @@ import { setRefreservation } from '../../composables/pools';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
-import { addVDev, PoolData, FileSystemData, newVDevData, DiskIdentifier, DiskData } from "@45drives/houston-common-lib"
+import {ZFSManager , ZPool, ZFSFileSystemInfo, ZPoolBase ,newVDevData, DiskIdentifier, VDevDisk, ZPoolAddVDevOptions } from "@45drives/houston-common-lib"
 import { pushNotification, Notification, Modal, CardContainer,CenteredCardColumn } from '@45drives/houston-common-ui';
 
 interface AddVDevModalProps {
     idKey: string;
-    pool: PoolData;
+    pool: ZPoolBase & ZPoolAddVDevOptions;
     marginTop: string;
 }
 
+const zfsManager = new ZFSManager();
 const props = defineProps<AddVDevModalProps>();
 
 const showAddVDevModal = inject<Ref<boolean>>('show-vdev-modal')!;
@@ -257,9 +258,9 @@ const diskSizeFeedback = ref('');
 const isProperReplicationFeedback = ref('');
 const diskBelongsFeedback = ref('');
 
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const allDisks = inject<Ref<DiskData[]>>('disks')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const allDisks = inject<Ref<VDevDisk[]>>('disks')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 
 const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 
@@ -272,7 +273,7 @@ const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
-const availableDisks = computed<DiskData[]>(() => {
+const availableDisks = computed<VDevDisk[]>(() => {
     return allDisks.value.filter(disk => disk.guid === "");
 });
 
@@ -301,8 +302,9 @@ async function addVDevBtn() {
                         console.log('newVdev.disks:', newVDev.value.disks);
                     });
                     adding.value = true;
+                    
                     try {
-                        const output = await addVDev(props.pool, newVDev.value);
+                        const output = await zfsManager.addVDevsToPool(props.pool, newVDev.value);
 
                         if (output == null || output.error) {
                             const errorMessage = output?.error || 'Unknown error';
@@ -403,7 +405,7 @@ const diskSizeMatch = () => {
     return result;
 }
 
-const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const importablePools = inject<Ref<ZPool[]>>('importable-pools')!;
 const diskBelongsToImportablePool = () => {
     let result = false;
     diskBelongsFeedback.value = '';

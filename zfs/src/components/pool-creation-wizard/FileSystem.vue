@@ -718,7 +718,7 @@ import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, isBoolOnOff, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
 import {  createEncryptedDataset } from '../../composables/datasets';
-import { createDataset, FileSystemData, NewDataset, PoolData ,} from '@45drives/houston-common-lib';
+import { ZFSFileSystemInfo, Dataset,DatasetCreateOptions, ZPool ,} from '@45drives/houston-common-lib';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
@@ -733,11 +733,11 @@ const props = defineProps<FileSystemProps>();
 
 const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
 
-const poolConfig = inject<Ref<PoolData>>("pool-config-data")!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const poolConfig = inject<Ref<ZPool>>("pool-config-data")!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
-const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
+const fileSystemConfig = inject<Ref<ZFSFileSystemInfo>>('file-system-data')!;
 
 const parentFileSystem = computed(() => {
 	return poolConfig.value.name;
@@ -759,7 +759,7 @@ const quotaFeedback = ref('');
 
 const saving = ref(false);
 
-const newFileSystemConfig = ref<FileSystemData>({
+const newFileSystemConfig = ref<ZFSFileSystemInfo>({
     parentFS: '',
     name: '',
     id: '',
@@ -862,7 +862,7 @@ function getInheritedProperties() {
 	}
 }
 
-const nameCheck = (fileSystem : FileSystemData) => {
+const nameCheck = (fileSystem : ZFSFileSystemInfo) => {
 	let result = true;
 	nameFeedback.value = '';
 	
@@ -889,7 +889,7 @@ const nameCheck = (fileSystem : FileSystemData) => {
     return result;
 }
 
-const parentCheck = (fileSystem : FileSystemData) => {
+const parentCheck = (fileSystem : ZFSFileSystemInfo) => {
 	let result = true;
 	parentFeedback.value = '';
 
@@ -910,7 +910,7 @@ const parentCheck = (fileSystem : FileSystemData) => {
 	return result;
 }
 
-function fileSystemNameExists(filesystem : FileSystemData, datasets : FileSystemData[]) {
+function fileSystemNameExists(filesystem : ZFSFileSystemInfo, datasets : ZFSFileSystemInfo[]) {
 	const newParentPath = filesystem.parentFS;
 	//console.log('newParentPath:', newParentPath);
 	for (const dataset of datasets) {
@@ -927,7 +927,7 @@ function fileSystemNameExists(filesystem : FileSystemData, datasets : FileSystem
 	return false;
 }
 
-const encryptPasswordCheck = (fileSystem : FileSystemData) => {
+const encryptPasswordCheck = (fileSystem : ZFSFileSystemInfo) => {
 	let result = true;
 	passFeedback.value = '';
 
@@ -947,7 +947,7 @@ const encryptPasswordCheck = (fileSystem : FileSystemData) => {
 	return result;
 }
 
-const checkQuota = (filesystem : FileSystemData) => {
+const checkQuota = (filesystem : ZFSFileSystemInfo) => {
     let result = true;
     quotaFeedback.value = '';
 
@@ -959,7 +959,7 @@ const checkQuota = (filesystem : FileSystemData) => {
     return result;
 }
 
-const newDataset = ref<NewDataset>({
+const newDataset = ref<Dataset & DatasetCreateOptions>({
 	name: '',
 	parent: '',
 	encrypted: false,
@@ -1009,7 +1009,7 @@ function fillDatasetData() {
 
 const confirmCreateFS = inject<Ref<boolean>>('confirm-create-filesystem')!;
 
-async function fsCreateBtn(fileSystem : FileSystemData) {
+async function fsCreateBtn(fileSystem : ZFSFileSystemInfo) {
 	console.log('fsCreateBtn fired');
 	if (props.isStandalone) {
 		if (parentCheck(fileSystem)) {

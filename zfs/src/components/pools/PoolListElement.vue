@@ -253,20 +253,20 @@ import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } 
 import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable, getCapacityColor  } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import Status from "../common/Status.vue";
-import { PoolData, DiskData, FileSystemData } from "@45drives/houston-common-lib";
+import { ZPool, VDevDisk, ZFSFileSystemInfo } from "@45drives/houston-common-lib";
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface PoolListElementProps {
     poolIdx: number;
-	pool: PoolData;
+	pool: ZPool;
 }
 
 const props = defineProps<PoolListElementProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 
-const selectedPool = ref<PoolData>();
-const selectedDisk = ref<DiskData>();
+const selectedPool = ref<ZPool>();
+const selectedDisk = ref<VDevDisk>();
 
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
@@ -343,9 +343,9 @@ watch(confirmSavePool, async (newVal, oldVal) => {
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
-const poolData = inject<Ref<PoolData[]>>("pools")!;
-const diskData = inject<Ref<DiskData[]>>("disks")!;
-const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
+const poolData = inject<Ref<ZPool[]>>("pools")!;
+const diskData = inject<Ref<VDevDisk[]>>("disks")!;
+const filesystemData = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;

@@ -256,7 +256,7 @@ import { getValue, convertBytesToSize, upperCaseWord, yesNoToBool } from '../../
 import { destroyDataset, unmountFileSystem, mountFileSystem, lockFileSystem } from "../../composables/datasets";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import SnapshotsList from "../snapshots/SnapshotsList.vue";
-import { PoolData, FileSystemData } from "@45drives/houston-common-lib";
+import { ZPool, ZFSFileSystemInfo } from "@45drives/houston-common-lib";
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
@@ -276,9 +276,9 @@ const fileSystemConfiguration = ref();
 const showNewFSWizard = ref(false);
 const showFSConfig = ref(false);
 
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const fileSystems = inject<Ref<FileSystemData[]>>('datasets')!;
-const selectedDataset = ref<FileSystemData>();
+const pools = inject<Ref<ZPool>>('pools')!;
+const fileSystems = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
+const selectedDataset = ref<ZFSFileSystemInfo>();
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 const allDatasets = ref<any>([]);
 const allDatasetsLoaded = ref(false);
@@ -771,7 +771,7 @@ const loadlockUnlockFileSystemComponent = async () => {
 	lockUnlockFileSystemComponent.value = module.default;
 }
 
-async function handleFileSystemEncryption(fileSystem : FileSystemData, mode : 'lock' | 'unlock') {
+async function handleFileSystemEncryption(fileSystem : ZFSFileSystemInfo, mode : 'lock' | 'unlock') {
 	selectedDataset.value = fileSystem;
 	modeSelected.value = mode;
 	console.log(`selected to be ${mode}ed: ${selectedDataset.value.name}`);

@@ -92,7 +92,7 @@ import { convertRawTimestampToString } from '../../composables/helpers';
 import { renameSnapshot } from '../../composables/snapshots';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
-import {FileSystemData} from "../../../../houston-common/houston-common-lib/lib/managers/index"
+import {ZFSFileSystemInfo} from "../../../../houston-common/houston-common-lib/lib/managers/index"
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 
@@ -104,7 +104,7 @@ interface RenameSnapshotProps {
 
 const props = defineProps<RenameSnapshotProps>();
 const showRenameSnapModal = inject<Ref<boolean>>('show-rename-snap-modal')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const renaming = inject<Ref<boolean>>('renaming')!;
@@ -178,7 +178,7 @@ const nameCheck = (snapshotName, fileSystemParent) => {
     return result;
 }
 
-function snapshotNameExists(snapshotName, fileSystemParent, datasets : FileSystemData[]) {
+function snapshotNameExists(snapshotName, fileSystemParent, datasets : ZFSFileSystemInfo[]) {
 	const newParentPath = fileSystemParent;
 	for (const dataset of datasets) {
 		const existingParentPath = dataset.parentFS;
