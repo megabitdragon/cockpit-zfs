@@ -556,9 +556,9 @@ export function getDiskIDName(disks: VDevDisk[], diskIdentifier: string, selecte
 	const newDisk = ref();
 	const diskName = ref('');
 	const diskPath = ref('');
-
+	console.log("getDiskIDNAme: disks: ", disks," diskIdentifier: ", diskIdentifier," selectDiskName: ",selectedDiskName )
 	// Find the selected disk
-	newDisk.value = disks.find(disk => disk.name === selectedDiskName);
+	newDisk.value = disks.find(disk => disk.name.trim() == selectedDiskName.trim());
 
 	switch (diskIdentifier) {
 		case 'vdev_path':

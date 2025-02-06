@@ -63,14 +63,11 @@
 								class="flex flex-col w-full py-4 px-2 text-sm gap-0.5">
 								<span class="flex flex-row flex-grow w-full justify-between">
 
-									<input
-										:id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)"
-										v-model="poolConfig.vdevs[vDevIdx].selectedDisks"
-										type="checkbox"
-										:value="{ path: disk.path }" 
-										:name="`disk-${disk.name}`"
-										class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"
-										/>									<div v-if="disk.hasPartitions!"
+									<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)"
+										v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox"
+										:value="`${disk.name}`" :name="`disk-${disk.name}`"
+										class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
+										<div v-if="disk.hasPartitions!"
 										title="Disk already has partitions. Procees with caution."
 										class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
 										<ExclamationCircleIcon class="h-6 text-orange-700" />
@@ -688,36 +685,37 @@ const diskBelongsToImportablePool = () => {
 const diskCheck = () => {
 	let result = true;
 	diskFeedback.value = '';
-	
 	poolConfig.value.vdevs.forEach(vdev => {
-		if (vdev.type == 'mirror' && vdev.selectedDisks.length < 2) {
+		console.log("diskCheck : " ,vdev.disks )
+
+		if (vdev.type == 'mirror' && vdev.disks.length < 2) {
 			result = false;
 			diskFeedback.value = 'Two or more Disks are required for Mirror.';
-		} else if (vdev.type == 'raidz1' && vdev.selectedDisks.length < 2) {
+		} else if (vdev.type == 'raidz1' && vdev.disks.length < 2) {
 			result = false;
 			diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
-		} else if (vdev.type == 'raidz2' && vdev.selectedDisks.length < 3) {
+		} else if (vdev.type == 'raidz2' && vdev.disks.length < 3) {
 			result = false;
 			diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
-		} else if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) {
+		} else if (vdev.type == 'raidz3' && vdev.disks.length < 4) {
 			result = false;
 			diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
-		} else if (vdev.type == 'disk' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'disk' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required.';
-		} else if (vdev.type == 'log' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'log' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Log.';
-		} else if (vdev.type == 'cache' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'cache' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Cache.';		
-		} else if (vdev.type == 'special' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'special' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Special.';
-		} else if (vdev.type == 'spare' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'spare' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Spare.';
-		} else if (vdev.type == 'dedup' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'dedup' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Dedup.';
 		} 
@@ -802,9 +800,12 @@ function fillNewPoolData() {
 		}
 		newVDev.type = vDev.type;
 		newVDev.isMirror = vDev.isMirror;
+		console.log("fillNewPoolData : ", vDev)
 
 		vDev.disks.forEach(selectedDisk => {
-			const diskNameFinal = getDiskIDName(disks.value, vDev.diskIdentifier!, selectedDisk.path);
+			const diskObject = typeof selectedDisk === "string" ? { path: selectedDisk } : selectedDisk;
+			console.log("diskObject: ", diskObject)
+			const diskNameFinal = getDiskIDName(disks.value, vDev.diskIdentifier!, diskObject.path.toString());
 			const fullDisk = disks.value.find(disk => disk.path === diskNameFinal);
 
 			if (fullDisk) {
