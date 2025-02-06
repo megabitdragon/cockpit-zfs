@@ -386,7 +386,7 @@ async function refreshAllData() {
 	poolData.value = [];
 	filesystemData.value = [];
 	await loadDisksThenPools(diskData, poolData);
-	await loadDatasets(ZFSFileSystemInfo);
+	await loadDatasets(filesystemData);
 	await loadScanObjectGroup(scanObjectGroup);
 	await loadScanActivities(poolData, scanActivities);
 	await loadDiskStats(poolDiskStats);

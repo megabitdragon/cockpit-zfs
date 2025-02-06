@@ -57,8 +57,17 @@ interface PoolEditConfig {
 	listsnapshots?: string;
 }
 
+interface newPoolData{
+	name: string;
+	vdevs: newVDevData[];
+}
 
-
+interface newVDevData {
+	type: string;
+	disks: string[];
+	isMirror?: boolean;
+	forceAdd?: boolean;
+}
 interface FileSystemEditConfig {
 	name: string;
 	guid: string;

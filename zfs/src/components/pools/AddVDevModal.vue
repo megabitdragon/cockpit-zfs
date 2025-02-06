@@ -304,7 +304,7 @@ async function addVDevBtn() {
                     adding.value = true;
                     
                     try {
-                        const output = await zfsManager.addVDevsToPool(props.pool, newVDev.value);
+                        const output = await zfsManager.addVDevsToPool(props.pool, [newVDev.value],newVDev.value.forceAdd!);
 
                         if (output == null || output.error) {
                             const errorMessage = output?.error || 'Unknown error';

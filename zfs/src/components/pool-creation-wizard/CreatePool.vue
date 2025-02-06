@@ -108,9 +108,10 @@ import PoolConfig from './PoolConfig.vue';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { setRefreservation } from '../../composables/pools';
-import { ZPool ,VDevDisk,ZFSFileSystemInfo,ZpoolCreateOptions,ZPoolBase} from '@45drives/houston-common-lib';
+import {ZFSManager, ZPool ,VDevDisk,ZFSFileSystemInfo,ZpoolCreateOptions,ZPoolBase} from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
+const zfsManager = new ZFSManager();
 const show = ref(true);
 const navTag = ref('name-entry');
 const tabError = ref(false);
@@ -255,9 +256,13 @@ async function finishBtn(newPoolData) {
 	poolConfiguration.value.fillNewPoolData();
 	creatingPool.value = true;
 	console.log('newPoolData received:', newPoolData);
+	const { name, vdevs, ...options } = newPoolData;
+	const poolBase: ZPoolBase = { name, vdevs };
+	const poolOptions: ZpoolCreateOptions = options;
+	console.log("poolBasae: ", poolBase," PoolOption: ",poolOptions)
 	
 	try {
-		const output = await newPool(newPoolData);
+		const output = await zfsManager.createPool(poolBase,poolOptions);
 
 		if (output == null || output.error) {
 			const errorMessage = output?.error || 'Unknown error';

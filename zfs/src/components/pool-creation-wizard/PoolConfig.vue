@@ -63,11 +63,14 @@
 								class="flex flex-col w-full py-4 px-2 text-sm gap-0.5">
 								<span class="flex flex-row flex-grow w-full justify-between">
 
-									<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)"
-										v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox"
-										:value="`${disk.name}`" :name="`disk-${disk.name}`"
-										class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
-									<div v-if="disk.hasPartitions!"
+									<input
+										:id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)"
+										v-model="poolConfig.vdevs[vDevIdx].selectedDisks"
+										type="checkbox"
+										:value="{ path: disk.path }" 
+										:name="`disk-${disk.name}`"
+										class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"
+										/>									<div v-if="disk.hasPartitions!"
 										title="Disk already has partitions. Procees with caution."
 										class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
 										<ExclamationCircleIcon class="h-6 text-orange-700" />
@@ -412,7 +415,7 @@ import { ChevronUpIcon, ExclamationCircleIcon, ExclamationTriangleIcon } from '@
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
-import { ZPool ,VDevDisk,ZFSFileSystemInfo,ZpoolCreateOptions , ZPoolBase,VDev,newVDevData} from '@45drives/houston-common-lib';
+import { ZPool ,VDevDisk,ZFSFileSystemInfo,ZpoolCreateOptions , ZPoolBase,VDev,VDevBase} from '@45drives/houston-common-lib';
 
 interface PoolConfigProps {
 	tag: string;
@@ -487,7 +490,7 @@ const vDevAvailDisks = computed<VDevDisk[][]>(() => {
 
 //change color of disk when selected
 const diskCardClass = (diskName, vDevIdx) => {
-  const isSelected = poolConfig.value.vdevs[vDevIdx].selectedDisks.includes(diskName);
+  const isSelected = poolConfig.value.vdevs[vDevIdx].disks.includes(diskName);
   return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
@@ -641,7 +644,7 @@ watch(
 	{ deep: true } // Ensure the watcher deeply watches the selectedDisks arrays
 );
 
-const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const importablePools = inject<Ref<ZPool[]>>('importable-pools')!;
 const diskBelongsToImportablePool = () => {
 	let result = false;
 	diskBelongsFeedback.value = '';
@@ -787,23 +790,29 @@ function removeVDev(index: number) {
 }
 
 const newPoolData  = inject<Ref<ZpoolCreateOptions & ZPoolBase>>('new-pool-data')!;
-const newVDevs = ref<newVDevData[]>([]);
-const newVDevDisks = ref<string[]>([]);
+const newVDevs = ref<VDevBase[]>([]);
+const newVDevDisks = ref<VDevDisk[]>([]);
 
 function fillNewPoolData() {
 	newPoolData.value.name = poolConfig.value.name;
 	poolConfig.value.vdevs.forEach(vDev => {
-		const newVDev : newVDevData = {
-			type: '',
+		const newVDev : VDevBase = {
+			type: 'disk',
 			disks: [],
 		}
 		newVDev.type = vDev.type;
 		newVDev.isMirror = vDev.isMirror;
 
-		vDev.selectedDisks.forEach(selectedDisk => {
-			const diskNameFinal = getDiskIDName(disks.value, vDev.diskIdentifier!, selectedDisk);
-			newVDevDisks.value.push(diskNameFinal);
-		});
+		vDev.disks.forEach(selectedDisk => {
+			const diskNameFinal = getDiskIDName(disks.value, vDev.diskIdentifier!, selectedDisk.path);
+			const fullDisk = disks.value.find(disk => disk.path === diskNameFinal);
+
+			if (fullDisk) {
+				newVDevDisks.value.push(fullDisk); // ✅ Push the full `VDevDisk` object
+				} else {
+				console.error(`Disk with path ${diskNameFinal} not found in available disks.`);
+				}
+			});
 
 		newVDev.disks = newVDevDisks.value;
 		newVDevDisks.value = [];

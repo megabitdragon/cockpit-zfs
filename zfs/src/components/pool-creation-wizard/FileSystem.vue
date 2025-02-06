@@ -718,7 +718,7 @@ import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, isBoolOnOff, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
 import {  createEncryptedDataset } from '../../composables/datasets';
-import { ZFSFileSystemInfo, Dataset,DatasetCreateOptions, ZPool ,} from '@45drives/houston-common-lib';
+import { ZFSManager, ZFSFileSystemInfo, Dataset,DatasetCreateOptions, ZPool ,} from '@45drives/houston-common-lib';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
@@ -729,6 +729,7 @@ interface FileSystemProps {
 	isStandalone: boolean;
 }
 
+const zfsManager = new ZFSManager()
 const props = defineProps<FileSystemProps>();
 
 const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
@@ -1061,7 +1062,8 @@ async function fsCreateBtn(fileSystem : ZFSFileSystemInfo) {
 						saving.value = true;
 						confirmCreateFS.value = false;
 						try {
-							const output = await createDataset(newDataset.value);
+							const { name, parent, ...options } = newDataset.value;
+							const output = await zfsManager.addDataset(parent,name,options);
 							
 							if (output == null || output.error) {
 								const errorMessage = output?.error || 'Unknown error';
@@ -1151,7 +1153,8 @@ async function newFileSystemInPoolWizard() {
 						saving.value = true;
 
 						try {
-							const output = await createDataset(newDataset.value);
+							const { name, parent, ...options } = newDataset.value;
+							const output = await zfsManager.addDataset(parent,name,options);
 							
 							if (output == null || output.error) {
 								const errorMessage = output?.error || 'Unknown error';
