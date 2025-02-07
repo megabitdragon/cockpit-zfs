@@ -1,6 +1,6 @@
 <template>
     <Modal :isOpen="showImportModal" @close="showImportModal = false" :marginTop="'mt-28'" :width="'w-3/5'"
-        :minWidth="'min-w-3/5'">
+        :minWidth="'min-w-3/5'" :closeOnBackgroundClick="true">
         <template v-slot:title>
             <legend class="flex justify-center">Import Pool</legend>
         </template>
@@ -371,6 +371,7 @@ import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } 
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { VDevDisk, ZPool, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { ImportablePoolData, PoolScanObjectGroup, PoolDiskStats, Activity, ImportedPool } from '../../types';
 
 
 interface ImportPoolProps {
@@ -540,21 +541,21 @@ async function importPoolBtn() {
         try {
             importing.value = true;
 
-            const output = await importPool(importedPool.value);
+            const output: any = await importPool(importedPool.value);
 
             if (output == null || output.error) {
                 const errorMessage = output?.error || 'Unknown error';
-                pushNotification(new Notification('Import Failed', `Failed to Import Pool: ${errorMessage}.`, 'error', 8000));
+                pushNotification(new Notification('Import Failed', `Failed to Import Pool: ${errorMessage}.`, 'error', 5000));
 
             } else {
-                pushNotification(new Notification('Import Completed', `Imported Pool ${importedPool.value!.name!} from Pool ${importedPool.value!.name!}`, 'success', 8000));
+                pushNotification(new Notification('Import Completed', `Imported Pool ${importedPool.value!.name!} from Pool ${importedPool.value!.name!}`, 'success', 5000));
 
                 showImportModal.value = false;
             }
             importing.value = false;
             await refreshAllData();
         } catch (error) {
-            pushNotification(new Notification('Import Failed', `Failed to Import Pool: ${error}.`, 'error', 8000));
+            pushNotification(new Notification('Import Failed', `Failed to Import Pool: ${error}.`, 'error', 5000));
 
             importing.value = false;
         }

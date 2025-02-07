@@ -1,21 +1,19 @@
 <template>
-    <Modal @clickOutside="closeModal()" :show="showAddVDevModal" 
-    class=" !w-3/5 !mt-28" >
+    <!-- <Modal @clickOutside="closeModal()" :show="showAddVDevModal" class=" !w-3/5 !mt-28"> -->
+    <Modal :isOpen="showAddVDevModal" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="true">
         <CardContainer class="!w-3/5 !mt-28 mx-auto">
-
             <template v-slot:header>
                 Add Virtual Device
             </template>
             <div>
                 <!-- Virtual Device (Select) -->
                 <div>
-                    <label :for="getIdKey('virtual-device')"
-                        class="block text-sm font-medium leading-6 text-default">Type</label>
+                    <label :for="getIdKey('virtual-device')" class="block text-sm font-medium leading-6 text-default">Type</label>
                     <!-- if first VDev, always either DISK, MIRROR, RAIDZ1-3 -->
                     <!-- if NOT first VDev, always either CACHE, LOG, SPECIAL, SPARE, DEDUP, or TYPE OF FIRST VDEV -->
-                    <select id="virtual-device" v-model="newVDev.type" name="virtual-device"
-                        class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
-                        <option v-if="props.pool.vdevs[0].type == 'data' && firstVDevType == 'disk'" value="disk">Disk
+                    <select id="virtual-device" v-model="newVDev.type" name="virtual-device" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
+                        <option v-if="props.pool.vdevs[0].type == 'data' && firstVDevType == 'disk'" value="disk">
+                            Disk
                         </option>
                         <option v-if="props.pool.vdevs[0].type == 'data' && firstVDevType == 'mirror'" value="mirror">
                             Mirror</option>
@@ -37,29 +35,20 @@
                 <!-- If secondary VDev is LOG or SPECIAL or DEDUP, have option for them to be MIRROR also -->
                 <!-- If Primary VDev is MIRROR or RAIDZ(x) then SPECIAL, LOG and DEDUP must be MIRROR -->
                 <div v-if="newVDev.type == 'log' || newVDev.type == 'special' || newVDev.type == 'dedup'">
-                    <label :for="getIdKey('mirror-enabled')"
-                        class="mt-1 block text-sm font-medium leading-6 text-default">{{
-                            upperCaseWord(newVDev.type) }}
+                    <label :for="getIdKey('mirror-enabled')" class="mt-1 block text-sm font-medium leading-6 text-default">{{
+                        upperCaseWord(newVDev.type) }}
                         (Mirror)</label>
-                    <Switch v-model="newVDev.isMirror"
-                        :class="[newVDev.isMirror ? 'bg-primary' : 'bg-accent', 'mt-1  relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                    <Switch v-model="newVDev.isMirror" :class="[newVDev.isMirror ? 'bg-primary' : 'bg-accent', 'mt-1  relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                         <span class="sr-only">Use setting</span>
-                        <span
-                            :class="[newVDev.isMirror ? 'translate-x-5' : 'translate-x-0', ' relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-                            <span
-                                :class="[newVDev.isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']"
-                                aria-hidden="true">
+                        <span :class="[newVDev.isMirror ? 'translate-x-5' : 'translate-x-0', ' relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                            <span :class="[newVDev.isMirror ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                                 <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-                                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </span>
-                            <span
-                                :class="[newVDev.isMirror ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']"
-                                aria-hidden="true">
+                            <span :class="[newVDev.isMirror ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                                 <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-                                    <path
-                                        d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
                                 </svg>
                             </span>
                         </span>
@@ -68,11 +57,9 @@
 
                 <!-- Disk ID (Select) -->
                 <div>
-                    <label :for="getIdKey('disk-identifier')"
-                        class="block text-sm font-medium leading-6 text-default">Disk
+                    <label :for="getIdKey('disk-identifier')" class="block text-sm font-medium leading-6 text-default">Disk
                         Identifier</label>
-                    <select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier"
-                        class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
+                    <select :id="getIdKey('disk-identifier')" v-model="diskIdentifier" name="disk-identifier" class="text-default bg-default mt-1 block w-full input-textlike sm:text-sm sm:leading-6">
                         <option value="sd_path">Block Device</option>
                         <!-- <option value="">Disk/WWN</option> -->
                         <option value="phy_path">Hardware Path</option>
@@ -81,34 +68,23 @@
                 </div>
 
                 <!-- Disk selection, shows disks that are not in use and as they are selected it hides them from any additional VDevs so they cannot be selected twice -->
-                <label :for="getIdKey('available-disk-list')"
-                    class="my-1 block text-sm font-medium leading-6 text-default">Select
+                <label :for="getIdKey('available-disk-list')" class="my-1 block text-sm font-medium leading-6 text-default">Select
                     Disks</label>
-                <ul v-if="availableDisks.length > 0" :id="getIdKey('available-disk-list')" role="list"
-                    class="flex flex-row flex-wrap gap-2">
+                <ul v-if="availableDisks.length > 0" :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
-                        <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
-                            :title="disk.hasPartitions! ? 'Disk already has partitions.Procees with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name)"
-                            :class="diskCardClass(disk.name)">
-                            <label :for="getIdKey(`disk-${diskIdx}`)"
-                                class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
+                        <button class="flex min-w-fit w-full h-full border border-default rounded-lg" :title="disk.hasPartitions! ? 'Disk already has partitions.Procees with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name!)" :class="diskCardClass(disk.name)">
+                            <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <span class="flex flex-row flex-grow w-full justify-between">
-                                    <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisks" type="checkbox"
-                                        :value="`${disk.name}`" :name="`disk-${disk.name}`"
-                                        class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
-                                    <div v-if="disk.hasPartitions!"
-                                        title="Disk already has partitions. Procees with caution."
-                                        class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
+                                    <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
+                                    <div v-if="disk.hasPartitions!" title="Disk already has partitions. Procees with caution." class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
                                         <ExclamationCircleIcon class="h-6 text-orange-700" />
                                     </div>
-                                    <div v-if="disk.errors && disk.errors!.length > 0"
-                                        title="This disk belongs to an exported pool. Force Add to override."
-                                        class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
+                                    <div v-if="disk.errors && disk.errors!.length > 0" title="This disk belongs to an exported pool. Force Add to override." class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
                                         <ExclamationTriangleIcon class="h-6 text-danger" />
                                     </div>
                                 </span>
                                 <h3 class="truncate text-sm font-medium text-default">
-                                    {{ truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
+                                    {{ truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name!)), 8) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
@@ -135,32 +111,22 @@
 
                     <div class="button-group-row w-full justify-between row-start-2">
                         <div class="button-group-row mt-2">
-                            <button @click="showAddVDevModal = false" :id="getIdKey('close-add-vdev-btn')"
-                                name="close-add-vdev-btn" class="mt-1 btn btn-danger">Close</button>
+                            <button @click="showAddVDevModal = false" :id="getIdKey('close-add-vdev-btn')" name="close-add-vdev-btn" class="mt-1 btn btn-danger">Close</button>
 
                             <div class="flex flex-row">
-                                <label :for="getIdKey('force-add-vdev')"
-                                    class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully
+                                <label :for="getIdKey('force-add-vdev')" class="mt-2 mr-2 block text-sm font-medium leading-6 text-default">Forcefully
                                     Add</label>
-                                <Switch @click="newVDev.forceAdd = !newVDev.forceAdd" :id="getIdKey('force-add-vdev')"
-                                    :class="[newVDev.forceAdd! ? 'bg-primary' : 'bg-accent', ' mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
+                                <Switch @click="newVDev.forceAdd = !newVDev.forceAdd" :id="getIdKey('force-add-vdev')" :class="[newVDev.forceAdd! ? 'bg-primary' : 'bg-accent', ' mt-2 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
                                     <span class="sr-only">Use setting</span>
-                                    <span
-                                        :class="[newVDev.forceAdd! ? 'translate-x-5' : 'translate-x-0', ' relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
-                                        <span
-                                            :class="[newVDev.forceAdd! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']"
-                                            aria-hidden="true">
+                                    <span :class="[newVDev.forceAdd! ? 'translate-x-5' : 'translate-x-0', ' relative inline-block h-5 w-5 transform rounded-full bg-default shadow ring-0 transition duration-200 ease-in-out']">
+                                        <span :class="[newVDev.forceAdd! ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                                             <svg class="h-3 w-3 text-muted" fill="none" viewBox="0 0 12 12">
-                                                <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                             </svg>
                                         </span>
-                                        <span
-                                            :class="[newVDev.forceAdd! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']"
-                                            aria-hidden="true">
+                                        <span :class="[newVDev.forceAdd! ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
                                             <svg class="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 12 12">
-                                                <path
-                                                    d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                                                <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
                                             </svg>
                                         </span>
                                     </span>
@@ -168,21 +134,12 @@
                             </div>
                         </div>
                         <div class="button-group-row mt-2">
-                            <button v-if="!adding" id="add-vdev-btn"
-                                class="btn btn-primary object-right justify-end mr-4 h-fit w-full"
-                                @click="addVDevBtn">Add
+                            <button v-if="!adding" id="add-vdev-btn" class="btn btn-primary object-right justify-end mr-4 h-fit w-full" @click="addVDevBtn">Add
                                 VDev</button>
-                            <button disabled v-if="adding" id="finish" type="button"
-                                class="btn btn-primary object-right justify-end">
-                                <svg aria-hidden="true" role="status"
-                                    class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default"
-                                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                        fill="currentColor" />
-                                    <path
-                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                        fill="text-success" />
+                            <button disabled v-if="adding" id="finish" type="button" class="btn btn-primary object-right justify-end">
+                                <svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-gray-200 animate-spin text-default" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="text-success" />
                                 </svg>
                                 Adding...
                             </button>
@@ -193,6 +150,7 @@
         </CardContainer>
     </Modal>
 </template>
+
 <style>
 .switch-class,
 input[type="checkbox"] {
@@ -203,19 +161,21 @@ input[type="checkbox"] {
 <script setup lang="ts">
 import { ref, inject, Ref, computed, watch, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
-// import Modal from '../common/Modal.vue';
+import Modal from '../common/Modal.vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 import { upperCaseWord, convertSizeToBytes } from '../../composables/helpers';
 import { setRefreservation } from '../../composables/pools';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
-import {ZFSManager , ZPool, ZFSFileSystemInfo, ZPoolBase ,newVDevData, DiskIdentifier, VDevDisk, ZPoolAddVDevOptions } from "@45drives/houston-common-lib"
-import { pushNotification, Notification, Modal, CardContainer,CenteredCardColumn } from '@45drives/houston-common-ui';
+import { ZFSManager, ZPool, ZFSFileSystemInfo, ZPoolBase, VDev, DiskIdentifier, VDevDisk, ZPoolAddVDevOptions } from "@45drives/houston-common-lib"
+// import { pushNotification, Notification, Modal, CardContainer,CenteredCardColumn } from '@45drives/houston-common-ui';
+import { pushNotification, Notification, CardContainer, CenteredCardColumn } from '@45drives/houston-common-ui';
+import { PoolScanObjectGroup, PoolDiskStats, Activity } from '../../types';
 
 interface AddVDevModalProps {
     idKey: string;
-    pool: ZPoolBase & ZPoolAddVDevOptions;
+    pool: ZPool;
     marginTop: string;
 }
 
@@ -231,7 +191,7 @@ function getVDevType() {
     const firstVDevName = props.pool.vdevs[0].name;
     firstVDevIsDisk.value = (props.pool.vdevs[0].disks.length == 1) ? true : false;
     if (!firstVDevIsDisk.value) {
-        const strippedType = firstVDevName.substring(0, firstVDevName.indexOf('-'));
+        const strippedType = firstVDevName!.substring(0, firstVDevName!.indexOf('-'));
         firstVDevType.value = strippedType;
     } else {
         firstVDevType.value = 'disk';
@@ -241,15 +201,17 @@ function getVDevType() {
     newVDev.value.type = firstVDevType.value;
 }
 
-const newVDev = ref<newVDevData>({
+const newVDev = ref<VDev>({
     type: firstVDevType.value,
     disks: [],
     isMirror: false,
-    forceAdd: false,
+    forceAdd: {force: false },
 });
+
 watch(() => newVDev.value.forceAdd, (newVal) => {
     console.log("forceAdd changed:", newVal);
 });
+
 const selectedDisks = ref<string[]>([])!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
@@ -298,28 +260,28 @@ async function addVDevBtn() {
                         console.log('selectedDisk', selectedDisk);
                         const diskNameFinal = getDiskIDName(allDisks.value, diskIdentifier.value, selectedDisk)
                         console.log('disk:', diskNameFinal);
-                        newVDev.value.disks.push(diskNameFinal);
+                        newVDev.value.selectedDisks!.push(diskNameFinal);
                         console.log('newVdev.disks:', newVDev.value.disks);
                     });
                     adding.value = true;
                     
                     try {
-                        const output = await zfsManager.addVDevsToPool(props.pool, [newVDev.value],newVDev.value.forceAdd!);
+                        const output: any = await zfsManager.addVDevsToPool(props.pool, [newVDev.value], newVDev.value.forceAdd!);
 
                         if (output == null || output.error) {
                             const errorMessage = output?.error || 'Unknown error';
-                            pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${errorMessage}`, 'error', 8000));
+                            pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${errorMessage}`, 'error', 5000));
 
                         } else {
-                            pushNotification(new Notification('Added VDev', `Virtual device added successfully.`, 'success', 8000));
+                            pushNotification(new Notification('Added VDev', `Virtual device added successfully.`, 'success', 5000));
 
                             if (props.pool.properties.refreservationRawSize!) {
-                                const output = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
+                                const output: any = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
                                 if (output == null || output.error) {
                                     const errorMessage = output?.error || 'Unknown error';
-                                    pushNotification(new Notification('Refreservation Update Failed', `There was an error updating pools refreservation value: ${errorMessage}`, 'error', 8000));
+                                    pushNotification(new Notification('Refreservation Update Failed', `There was an error updating pools refreservation value: ${errorMessage}`, 'error', 5000));
                                 } else {
-                                    pushNotification(new Notification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success', 8000));
+                                    pushNotification(new Notification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success', 5000));
                                     showAddVDevModal.value = false;
                                 }
                             } else {
@@ -390,7 +352,7 @@ const diskSizeMatch = () => {
         const disk = allDisks.value.find(fullDisk => fullDisk.name == selDisk);
 
         if (disk) {
-            const currentCapacity = convertSizeToBytes(disk.capacity);
+            const currentCapacity = convertSizeToBytes(disk.capacity!);
 
             if (previousCapacity != 0 && currentCapacity != previousCapacity) {
                 diskSizeFeedback.value = `Mirror contains devices of different sizes. Forcefully create to override.\n`;

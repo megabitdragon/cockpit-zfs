@@ -25,6 +25,7 @@ import { ref, Ref, provide, watchEffect } from 'vue';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
 import { ZPool, VDevDisk, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
+import { ImportablePoolData, Snapshot, Activity, PoolScanObjectGroup, PoolDiskStats } from '../types';
 
 interface ZFSProps {
   	tag: string;

@@ -10,6 +10,7 @@ import check_dataset_script from"../scripts/check-dataset.py?raw";
 import get_recent_snaps_script from"../scripts/find-last-common-snap.py?raw";
 // @ts-ignore
 import check_remote_snaps_script from"../scripts/check-remote-snapshots.py?raw";
+import { NewSnapshot, SendingDataset, SnapSnippet } from '../types';
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 const {errorString, useSpawn } = legacy;
@@ -20,7 +21,7 @@ export async function getSnapshots() {
 
         const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_snapshots_script, argument], { superuser: 'try' });
         const snapshots = (await state.promise()).stdout;
-        return JSON.parse(snapshots); 
+        return JSON.parse(snapshots!); 
     } catch (error) {
         console.error("Error fetching all snapshots:", error);
         return null;
@@ -35,7 +36,7 @@ export async function getSnapshotsOfDataset(datasetName) {
         const command = ['/usr/bin/env', 'python3','-c', get_snapshots_script, argument]; // Pass the script and argument separately
         const state = useSpawn(command, { superuser: 'try' });
         const snapshots = (await state.promise()).stdout;
-        return JSON.parse(snapshots); // Assuming the snapshots are in JSON format
+        return JSON.parse(snapshots!); // Assuming the snapshots are in JSON format
     } catch (error) {
         console.error(`Error fetching snapshots for dataset "${datasetName}":`, error);
         return null;
@@ -51,7 +52,7 @@ export async function getSnapshotsOfPool(poolName) {
         const command = ['/usr/bin/env', 'python3','-c', get_snapshots_script, argument];
         const state = useSpawn(command, { superuser: 'try' });
         const snapshots = (await state.promise()).stdout;
-        return JSON.parse(snapshots); // Assuming the snapshots are in JSON format
+        return JSON.parse(snapshots!); // Assuming the snapshots are in JSON format
     } catch (error) {
         console.error(`Error fetching snapshots for dataset "${poolName}":`, error);
         return null;
@@ -187,7 +188,7 @@ export async function sendSnapshot(sendingData : SendingDataset) {
 	try {
         console.log('sendingData (snapshots.ts - sendSnapshot):', sendingData);
 
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser, sendingData.mBufferConfig!.size, sendingData.mBufferConfig!.unit], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', send_dataset_script, sendingData.sendName, sendingData.recvName, sendingData.sendIncName!, sendingData.sendOpts.forceOverwrite!, sendingData.sendOpts.compressed, sendingData.sendOpts.raw, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser, sendingData.mBufferConfig!.size, sendingData.mBufferConfig!.unit], { superuser: 'try' });
 
 		const output = await state.promise();
 		console.log('sendSnapshot completed');
@@ -204,12 +205,12 @@ export async function doesDatasetExist(sendingData : SendingDataset) {
     try {
         console.log('sendingData (snapshots.ts - checkDataset - doesDatasetExist):', sendingData);
 
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', check_dataset_script, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', check_dataset_script, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try'});
 
 		const output = await state.promise();
 		console.log(output);
 		
-		if (output.stdout.includes('True')) {
+		if (output.stdout!.includes('True')) {
 			return true;
 		} else {
 			return false;
@@ -225,12 +226,12 @@ export async function doesDatasetHaveSnaps(sendingData : SendingDataset) {
     try {
         console.log('sendingData (snapshots.ts - checkDataset - doesDatasetHaveSnaps):', sendingData);
 
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', check_remote_snaps_script, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', check_remote_snaps_script, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try' });
 
 		const output = await state.promise();
 		console.log(output);
 		
-		if (output.stdout.includes('True')) {
+		if (output.stdout!.includes('True')) {
 			return true;
 		} else {
 			return false;
@@ -246,7 +247,7 @@ export async function getRecentSnaps(sendingData : SendingDataset) {
     try {
         console.log('sendingData (snapshots.ts - getRecentSnaps):', sendingData);
 
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_recent_snaps_script, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_recent_snaps_script, sendingData.recvName, sendingData.recvHost, sendingData.recvPort, sendingData.recvHostUser], { superuser: 'try' });
 
 		const output = await state.promise();
 		console.log(output);
@@ -255,7 +256,7 @@ export async function getRecentSnaps(sendingData : SendingDataset) {
     } catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
-		return { error: errorMessage };
+        return JSON.stringify({ error: errorMessage }); 
 	}
 }
 

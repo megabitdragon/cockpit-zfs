@@ -5,7 +5,8 @@ import { getDatasets } from "./datasets";
 import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal, formatCapacityString, isCapacityPatternInvalid, changeUnitToBinary } from "./helpers";
 import { getSnapshots, getSnapshotsOfDataset,getSnapshotsOfPool } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
-import {VDevDisk, ZFSFileSystemInfo, VDev} from "@45drives/houston-common-lib"
+import { VDevDisk, ZFSFileSystemInfo, VDev } from "@45drives/houston-common-lib"
+import { PoolDiskStats, PoolScanObjectGroup, Snapshot } from '../types';
 
 const vDevs = ref<VDev[]>([]);
 const errors: string[] = [];
@@ -13,7 +14,7 @@ const errors: string[] = [];
 export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 	try {
 		const rawJSON = await getDiskStats();
-		const parsedJSON = JSON.parse(rawJSON);
+		const parsedJSON = JSON.parse(rawJSON!);
 		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
@@ -26,7 +27,7 @@ export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
 export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) {
 	try {
 		const rawJSON = await getScanGroup();
-		const parsedJSON = JSON.parse(rawJSON);
+		const parsedJSON = JSON.parse(rawJSON!);
 		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
@@ -41,14 +42,14 @@ export async function loadDisksThenPools(disks, pools) {
 	try {
 		const rawJSON = await getDisks();
 		// console.log('Raw JSON:', rawJSON);
-		const parsedJSON = JSON.parse(rawJSON);
+		const parsedJSON = JSON.parse(rawJSON!);
 		console.log('Disks JSON:', parsedJSON);
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
 			const disk = {
 				name: parsedJSON[i].name,
-				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : changeUnitToBinary(parsedJSON[i].capacity),
+				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
 				model: parsedJSON[i].model,
 				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
 				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
@@ -77,7 +78,7 @@ export async function loadDisksThenPools(disks, pools) {
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
 			const rawJSON = await getPools();
-			const parsedJSON = JSON.parse(rawJSON);
+			const parsedJSON = JSON.parse(rawJSON!);
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
 				//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
@@ -259,7 +260,7 @@ export async function loadDatasets(datasets) {
 	//executes a python script to retrieve all dataset data and outputs a JSON
 	try {
 		const rawJSON = await getDatasets();
-		const parsedJSON = JSON.parse(rawJSON);
+		const parsedJSON = JSON.parse(rawJSON!);
 		// console.log('Datasets JSON:', parsedJSON);
 
 		//loops through JSON data and adds data to a Dataset object
@@ -326,14 +327,14 @@ export async function loadDatasets(datasets) {
 export async function loadDisks(disks) {
 	try {
 		const rawJSON = await getDisks();
-		const parsedJSON = JSON.parse(rawJSON);
+		const parsedJSON = JSON.parse(rawJSON!);
 		// console.log('Disks JSON:', parsedJSON);
 		
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
 			const disk = {
 				name: parsedJSON[i].name,
-				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : changeUnitToBinary(parsedJSON[i].capacity),
+				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
 				model: parsedJSON[i].model,
 				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
 				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
@@ -475,7 +476,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	};
 
 	console.log("parsedVdevdata: ",vDev, poolName, disks, vDevType )
-	if (vDevData.type === 'Disk') {
+	if (vDevData.type === 'disk') {
 		vDevData.path = 'N/A';  // Default path for VM Disk
 	}
 
@@ -585,7 +586,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			health: diskVDev.value!.status,
 			stats: diskVDev.value!.stats,
 			// capacity: diskVDev.value!.capacity,
-			capacity: isCapacityPatternInvalid(diskVDev.value!.capacity) ?formatCapacityString(diskVDev.value!.capacity) : changeUnitToBinary(diskVDev.value!.capacity),
+			capacity: isCapacityPatternInvalid(diskVDev.value!.capacity) ? formatCapacityString(diskVDev.value!.capacity) : diskVDev.value!.capacity,
 			model: diskVDev.value!.model,
 			phy_path: diskVDev.value!.phy_path,
 			sd_path: diskVDev.value!.sd_path,
@@ -630,7 +631,7 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 		// Create missing disk and add error
 		fullDiskData = createMissingDisk(child.path, child.name, vDevType, poolName);
 		fullDiskData.errors!.push(errorMessage); // Add the error to disk object
-	} else if (fullDiskData.type === 'Disk') {
+	} else if (fullDiskData.type === 'disk') {
 		fullDiskData.vdev_path = fullDiskData.vdev_path || 'N/A';
 		fullDiskData.phy_path = fullDiskData.phy_path || 'N/A';
 	}
@@ -827,7 +828,7 @@ export async function loadSnapshotsInDataset(snapshots, datasetName,snapshotNotF
 
 
 // Function to determine the type of disks in a VDev
-function determineDiskType(vDev, disks) {
+function determineDiskType(vDev, disks): string {
 	const childDisks = vDev.children.map(child => child.name);
 
 	const diskTypes = childDisks.map(diskName => {
@@ -841,7 +842,7 @@ function determineDiskType(vDev, disks) {
 	if (uniqueDiskTypes.has('MISSING')) {
 		return 'MISSING';
 	} else if (uniqueDiskTypes.size === 1) {
-		return Array.from(uniqueDiskTypes)[0]; // Return the single type if all disks are the same
+		return Array.from(uniqueDiskTypes)[0] as string; // Return the single type if all disks are the same
 	} else if (uniqueDiskTypes.has('Disk')) {
 		return 'Disk'; // All disks in VDev are Disks
 	} else if (uniqueDiskTypes.has('SSD') || uniqueDiskTypes.has('HDD') || uniqueDiskTypes.has('NVMe')) {

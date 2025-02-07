@@ -12,9 +12,9 @@
 					</template>
 					<template v-slot:content>
 						<div>
-							<p>Compression: <b>{{ isBoolCompression(poolConfig.properties.compression).toUpperCase() }}</b></p>
-							<p>Sector Size: <b>{{ getValue('sector', poolConfig.properties.sector) }}</b></p>
-							<p>Record Size: <b>{{ getValue('record', poolConfig.properties.record) }}</b></p>
+							<p>Compression: <b>{{ isBoolCompression(poolConfig.compression).toUpperCase() }}</b></p>
+							<p>Sector Size: <b>{{ getValue('sector', poolConfig.sectorsize) }}</b></p>
+							<p>Record Size: <b>{{ getValue('record', poolConfig.record) }}</b></p>
 							<div class="rounded-lg mt-1 border border-default bg-default">
 								<Disclosure v-slot="{ open }">
 									<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
@@ -29,11 +29,11 @@
 									</DisclosureButton>
 									<DisclosurePanel>
 										<div class="p-2 rounded-lg bg-default">
-											<p>Refreservation: <b>{{ poolConfig.properties.refreservationPercent! }}%</b></p>
-											<p>Deduplication: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }}</b></p>
-											<p>Auto-Expand: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoExpand)) }}</b></p>
-											<p>Auto-Replace: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoReplace)) }}</b></p>
-											<p>Auto-TRIM: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoTrim)) }}</b></p>
+											<p>Refreservation: <b>{{ poolConfig.refreservationPercent! }}%</b></p>
+											<p>Deduplication: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.deduplication)) }}</b></p>
+											<p>Auto-Expand: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.autoExpand)) }}</b></p>
+											<p>Auto-Replace: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.autoReplace)) }}</b></p>
+											<p>Auto-TRIM: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.autoTrim)) }}</b></p>
 										</div>
 									</DisclosurePanel>
 								</Disclosure>
@@ -90,9 +90,9 @@
 					</template>
 					<template v-slot:footer>
 						<div>
-							<p>Quota: <b>{{ convertBytesToSize(convertSizeToBytes((fileSystemData.properties.quota.raw.toString()) + fileSystemData.properties.quota.unit)) }}</b></p>
-							<p>Read Only: <b>{{ upperCaseWord(isBoolOnOff(fileSystemData.properties.isReadOnly!)) }}</b></p>	
-							<p v-if="fileSystemData.encrypted">Encryption: <b>{{ fileSystemData.properties.encryption.toUpperCase() }}</b></p>
+							<p>Quota: <b>{{ convertBytesToSize(convertSizeToBytes((fileSystemData.quota.raw.toString()) + fileSystemData.quota.unit)) }}</b></p>
+							<p>Read Only: <b>{{ upperCaseWord(isBoolOnOff(fileSystemData.isReadOnly!)) }}</b></p>	
+							<p v-if="fileSystemData.encrypted">Encryption: <b>{{ fileSystemData.encryption.toUpperCase() }}</b></p>
 							<p class="mt-1 border rounded-lg border-default bg-default">
 								<Disclosure v-slot="{ open }">
 									<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
@@ -107,22 +107,22 @@
 									</DisclosureButton>
 									<DisclosurePanel>
 										<div v-if="fileSystemData.inherit" class="p-2 rounded-lg">
-											<p>Compression: <b>{{ upperCaseWord(fileSystemData.properties.compression) }} ({{ isBoolCompression(poolConfig.properties.compression).toUpperCase() }})</b></p>
-											<p>Deduplication: <b>{{ upperCaseWord(fileSystemData.properties.deduplication) }} ({{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }})</b></p>
-											<p>Record Size: <b>{{ upperCaseWord(fileSystemData.properties.recordSize) }} ({{ getValue('record', poolConfig.properties.record) }})</b></p>
-											<p>Access Time: <b>{{ upperCaseWord(fileSystemData.properties.accessTime) }} (On)</b></p>
-											<p>Case Sensitivity: <b>{{ upperCaseWord(fileSystemData.properties.caseSensitivity) }} (Sensitive)</b></p>
-											<p>DNode Size: <b>{{ upperCaseWord(fileSystemData.properties.dNodeSize) }} (Legacy)</b></p>
-											<p>Extended Attributes: <b>{{ upperCaseWord(fileSystemData.properties.extendedAttributes) }} (System Attribute)</b></p>
+											<p>Compression: <b>{{ upperCaseWord(fileSystemData.compression) }} ({{ isBoolCompression(poolConfig.compression).toUpperCase() }})</b></p>
+											<p>Deduplication: <b>{{ upperCaseWord(fileSystemData.deduplication) }} ({{ upperCaseWord(isBoolOnOff(poolConfig.deduplication)) }})</b></p>
+											<p>Record Size: <b>{{ upperCaseWord(fileSystemData.recordSize) }} ({{ getValue('record', poolConfig.record) }})</b></p>
+											<p>Access Time: <b>{{ upperCaseWord(fileSystemData.accessTime) }} (On)</b></p>
+											<p>Case Sensitivity: <b>{{ upperCaseWord(fileSystemData.caseSensitivity) }} (Sensitive)</b></p>
+											<p>DNode Size: <b>{{ upperCaseWord(fileSystemData.dNodeSize) }} (Legacy)</b></p>
+											<p>Extended Attributes: <b>{{ upperCaseWord(fileSystemData.extendedAttributes) }} (System Attribute)</b></p>
 										</div>
 										<div v-else class="p-2 rounded-lg">
-											<p>Compression: <b>{{ checkInheritance('compression', fileSystemData.properties.compression, poolConfig) }}</b></p>
-											<p>Deduplication: <b>{{ checkInheritance('dedup', fileSystemData.properties.deduplication, poolConfig) }}</b></p>
-											<p>Record Size: <b>{{ checkInheritance('record', fileSystemData.properties.recordSize, poolConfig) }}</b></p>
-											<p>Access Time: <b>{{ checkInheritance('atime', fileSystemData.properties.accessTime, poolConfig) }}</b></p>
-											<p>Case Sensitivity: <b>{{ checkInheritance('case', fileSystemData.properties.caseSensitivity, poolConfig) }}</b></p>
-											<p>DNode Size: <b>{{ checkInheritance('dnode', fileSystemData.properties.dNodeSize, poolConfig) }}</b></p>
-											<p>Extended Attributes: <b>{{ checkInheritance('xattr', fileSystemData.properties.extendedAttributes, poolConfig) }}</b></p>
+											<p>Compression: <b>{{ checkInheritance('compression', fileSystemData.compression, poolConfig) }}</b></p>
+											<p>Deduplication: <b>{{ checkInheritance('dedup', fileSystemData.deduplication, poolConfig) }}</b></p>
+											<p>Record Size: <b>{{ checkInheritance('record', fileSystemData.recordSize, poolConfig) }}</b></p>
+											<p>Access Time: <b>{{ checkInheritance('atime', fileSystemData.accessTime, poolConfig) }}</b></p>
+											<p>Case Sensitivity: <b>{{ checkInheritance('case', fileSystemData.caseSensitivity, poolConfig) }}</b></p>
+											<p>DNode Size: <b>{{ checkInheritance('dnode', fileSystemData.dNodeSize, poolConfig) }}</b></p>
+											<p>Extended Attributes: <b>{{ checkInheritance('xattr', fileSystemData.extendedAttributes, poolConfig) }}</b></p>
 										</div>
 									</DisclosurePanel>
 								</Disclosure>

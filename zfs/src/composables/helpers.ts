@@ -2,8 +2,11 @@ import { legacy } from '@45drives/houston-common-lib';
 import { ref, Ref } from 'vue';
 // @ts-ignore
 import test_ssh_script from"../scripts/test-ssh.py?raw";
-import {VDevDisk, ZPool} from "@45drives/houston-common-lib"
+import {VDevDisk, ZPool} from "@45drives/houston-common-lib";
+import { Activity } from '../types';
+
 const { errorString, useSpawn } = legacy;
+
 //change true to 'on' and false to 'off'
 export function isBoolOnOff(bool : boolean) {
 	if (bool) {return 'on'} else {return 'off'}
@@ -47,37 +50,6 @@ export const convertBytesToSize = (bytes: number, precision: number = 2): string
 	return `${convertedSize} ${binarySizes[i]}`;
 };
 
-// Convert readable binary data size to raw bytes
-// export const convertSizeToBytes = (size: string): number => {
-// 	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-// 	const base = 1024;
-// 	console.log('size:', size)
-// 	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
-
-// 	if (!match) {
-// 		throw new Error(`Invalid size format: "${size}"`);
-// 	}
-
-// 	const [value, unit] = match.slice(1);
-// 	const normalizedUnit = unit.toLowerCase();
-
-// 	console.log('normalizedUnit:', normalizedUnit)
-
-// 	const decimalSizes = ['b', 'kb', 'mb', 'gb', 'tb', 'pb', 'eb', 'zb', 'yb'];
-
-// 	const index = binarySizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
-// 	if (index === -1) {
-// 		const decimalIndex = decimalSizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
-// 		if (decimalIndex === -1) {
-// 			throw new Error(`Unrecognized unit: "${unit}"`);
-// 		} else {
-
-// 		}
-// 	}
-
-// 	const bytes = parseFloat(value) * Math.pow(base, index);
-// 	return bytes;
-// };
 
 // Convert readable binary data size to raw bytes
 export const convertSizeToBytes = (size: string): number => {
@@ -482,12 +454,12 @@ export function checkInheritance(type: string, value : string, poolConfig : ZPoo
 export async function testSSH(sshTarget) {
     try {
         console.log(`target: ${sshTarget}`);
-        const state = useSpawn(['/usr/bin/env', 'python3', '-c', test_ssh_script, sshTarget], { superuser: 'try', stderr: 'out' });
+        const state = useSpawn(['/usr/bin/env', 'python3', '-c', test_ssh_script, sshTarget], { superuser: 'try' });
 
         const output = await state.promise();
         console.log('testSSH output:', output);
 
-        if (output.stdout.includes('True')) {
+        if (output.stdout!.includes('True')) {
 			return true;
 		} else {
 			return false;
@@ -558,7 +530,7 @@ export function getDiskIDName(disks: VDevDisk[], diskIdentifier: string, selecte
 	const diskPath = ref('');
 	console.log("getDiskIDNAme: disks: ", disks," diskIdentifier: ", diskIdentifier," selectDiskName: ",selectedDiskName )
 	// Find the selected disk
-	newDisk.value = disks.find(disk => disk.name.trim() == selectedDiskName.trim());
+	newDisk.value = disks.find(disk => disk.name!.trim() == selectedDiskName.trim());
 
 	switch (diskIdentifier) {
 		case 'vdev_path':
@@ -639,13 +611,13 @@ export function truncateName(name : string, threshold : number) {
 
 export async function isPoolUpgradable(poolName: string) {
 	try {
-		const state = useSpawn(['zpool', 'status', poolName], { superuser: 'try', stderr: 'out' });
+		const state = useSpawn(['zpool', 'status', poolName], { superuser: 'try' });
 
 		const output = await state.promise();
 		// console.log('zpool status output:', output.stdout);
 
 		// Split the output into lines
-		const lines = output.stdout.split('\n');
+		const lines = output.stdout!.split('\n');
 
 		// Define the patterns to match
 		const statusPattern = /The pool is formatted using a legacy on-disk format/;

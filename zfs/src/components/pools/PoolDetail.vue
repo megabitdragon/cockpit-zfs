@@ -22,7 +22,7 @@
 								<br />as of {{ getTimestampString() }}</p>
 							<p :id="getIdKey('pool-refreservation')" name="pool-refreservation" class="text-sm">
 								Refreservation: {{
-								convertBytesToSize(props.pool.properties.refreservationRawSize!, true) }} ({{
+								convertBytesToSize(props.pool.properties.refreservationRawSize!) }} ({{
 								props.pool.properties.refreservationPercent }}%)</p>
 						</div>
 						<div class="m-2 col-span-1">
@@ -323,7 +323,7 @@
 			:item="'pool'" />
 	</div>
 	<div v-if="showAddVDevModal">
-		<component :is="addVDevComponent" @close="updateShowAddVDev"     :key="showAddVDevModal" :idKey="getIdKey(`show-vdev-modal`)"
+		<component :is="addVDevComponent" @close="updateShowAddVDev" :key="showAddVDevModal" :idKey="getIdKey(`show-vdev-modal`)"
 			:pool="poolConfig" :marginTop="'mt-48'" />
 	</div>
 
@@ -347,7 +347,7 @@ import Navigation from '../common/Navigation.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
 
 interface PoolDetailsProps {
-	pool: PoolData;
+	pool: ZPool;
 	confirmation: ConfirmationCallback;
 	showFlag: boolean;
 }
@@ -411,6 +411,7 @@ const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 import { ZPool, VDevDisk } from '@45drives/houston-common-lib';
+import { Activity, ConfirmationCallback, NavigationCallback, NavigationItem, PoolDiskStats, PoolEditConfig, PoolScanObjectGroup, Snapshot } from '../../types';
 
 const snapshotListComponent = ref();
 const loadSnapshotListComponent = async () => {
@@ -589,12 +590,12 @@ async function poolConfigureBtn() {
 			if (!result.success) {
 				const errorMessage = result.error || 'Unknown error occurred';
 				console.log('configurePool failed');
-				pushNotification(new Notification('Save Pool Config Failed',`There was an error saving this pool: ${errorMessage}.`,'error', 8000));
+				pushNotification(new Notification('Save Pool Config Failed',`There was an error saving this pool: ${errorMessage}.`,'error', 5000));
 
 				confirmSavePool.value = false;
 			} else {
 				console.log('configurePool succeeded');
-				pushNotification(new Notification('Pool Config Saved',"Successfully saved this pool's configuration.",'success', 8000));
+				pushNotification(new Notification('Pool Config Saved',"Successfully saved this pool's configuration.",'success', 5000));
 
 
 				confirmSavePool.value = true;
@@ -605,7 +606,7 @@ async function poolConfigureBtn() {
 
 		} catch (error: any) {
 			console.error(error);
-			pushNotification(new Notification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error', 8000));
+			pushNotification(new Notification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error', 5000));
 
 		}
 	}

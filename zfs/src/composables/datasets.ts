@@ -8,7 +8,9 @@ import change_passphrase_script from "../scripts/change-encrypted-key.py?raw";
 import unlock_dataset_script from "../scripts/unlock-encrypted-dataset.py?raw";
 // @ts-ignore
 import validate_passphrase_script from "../scripts/encryption-key-validation.py?raw";
-import {ZFSFileSystemInfo, Dataset,DatasetCreateOptions} from "@45drives/houston-common-lib"
+import {ZFSFileSystemInfo, Dataset, DatasetCreateOptions} from "@45drives/houston-common-lib"
+import { FileSystemEditConfig } from '../types';
+
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 const { errorString, useSpawn } = legacy;
 export async function getDatasets() {
@@ -21,8 +23,6 @@ export async function getDatasets() {
         return null;
     }
 }
-
-
 
 export async function createEncryptedDataset(fileSystemData : Dataset&DatasetCreateOptions, passphrase? : string) {
 	try {
@@ -49,7 +49,7 @@ export async function createEncryptedDataset(fileSystemData : Dataset&DatasetCre
 			path : (fileSystemData.parent + '/' + fileSystemData.name),
 			passphrase : passphrase!,
 		}
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_encrypted_dataset_script, args.cmd, args.atime, args.case, args.compress, args.dedup, args.dnode, args.xattr, args.record, args.quota, args.readonly, args.encryption, args.keyformat, args.keylocation, args.path, args.passphrase], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', create_encrypted_dataset_script, args.cmd, args.atime, args.case, args.compress, args.dedup, args.dnode, args.xattr, args.record, args.quota, args.readonly, args.encryption, args.keyformat, args.keylocation, args.path, args.passphrase], { superuser: 'try'});
 
 		const output = await state.promise();
 		console.log(output)
@@ -64,7 +64,7 @@ export async function createEncryptedDataset(fileSystemData : Dataset&DatasetCre
 
 export async function changePassphrase(fileSystemName : string, newPassphrase : string) {
 	try {
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', change_passphrase_script, fileSystemName, newPassphrase], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', change_passphrase_script, fileSystemName, newPassphrase], { superuser: 'try'});
 		const output = await state.promise();
 		console.log(output);
 
@@ -78,11 +78,11 @@ export async function changePassphrase(fileSystemName : string, newPassphrase : 
 
 export async function isPassphraseValid(fileSystemName : string, passphrase : string) {
 	try {
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', validate_passphrase_script, fileSystemName, passphrase], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', validate_passphrase_script, fileSystemName, passphrase], { superuser: 'try'});
 		const output = await state.promise();
 		console.log(`fileSystemName: ${fileSystemName}, pass: ${passphrase}, function call output: ${output.stdout}`);
 
-		if (output.stdout.includes('true')) {
+		if (output.stdout!.includes('true')) {
 			return true;
 		} else {
 			return false;
@@ -266,7 +266,7 @@ export async function lockFileSystem(fileSystemData: ZFSFileSystemInfo) {
 
 export async function unlockFileSystem(fileSystemData: ZFSFileSystemInfo, passphrase : string) {
 	try {
-		const state = useSpawn(['/usr/bin/env', 'python3', '-c', unlock_dataset_script, fileSystemData.name, passphrase], { superuser: 'try', stderr: 'out'});
+		const state = useSpawn(['/usr/bin/env', 'python3', '-c', unlock_dataset_script, fileSystemData.name, passphrase], { superuser: 'try'});
 		const output = await state.promise();
 		console.log(output);
 		return output.stdout;

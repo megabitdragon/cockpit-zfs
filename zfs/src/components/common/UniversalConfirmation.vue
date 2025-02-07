@@ -6,7 +6,7 @@
  -->
 
 <template>
-    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-56'" :width="'w-96'" :minWidth="'min-w-min'">
+    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-56'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick="true">
         <template v-slot:title>
             <legend class="flex justify-center">{{ upperCaseWord(props.operation) }} {{ upperCaseWord(props.item) }}</legend>
         </template>
@@ -160,6 +160,7 @@ import { Ref, inject, ref, computed, watch} from 'vue';
 import { upperCaseWord } from '../../composables/helpers';
 import Modal from './Modal.vue';
 import { ZFSFileSystemInfo,ZPool,VDev,VDevDisk } from '@45drives/houston-common-lib';
+import { ConfirmationCallback, Snapshot } from '../../types';
 
 interface UniversalConfirmationProps {
     showFlag: boolean;

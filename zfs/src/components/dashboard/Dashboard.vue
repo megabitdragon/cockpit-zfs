@@ -61,6 +61,7 @@ import DashPoolCard from "./DashPoolCard.vue";
 import DashboardLoadingSkeleton from './DashboardLoadingSkeleton.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ZPool, VDevDisk } from '@45drives/houston-common-lib';
+import { PoolScanObjectGroup, PoolDiskStats, Activity } from '../../types';
 
 const pools = inject<Ref<ZPool[]>>("pools")!;
 const disks = inject<Ref<VDevDisk[]>>("disks")!;

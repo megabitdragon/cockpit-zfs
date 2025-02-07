@@ -22,7 +22,7 @@ export async function getDisks() {
     const result = await spawnState.promise();
 	console.log(result.stdout)
     return result.stdout;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in getDisks:', error.message);
     throw new Error(error.message); // Propagate the error to the caller
   }

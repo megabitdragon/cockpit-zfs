@@ -286,6 +286,7 @@ import { destroySnapshot, rollbackSnapshot } from '../../composables/snapshots';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ZPool,ZFSFileSystemInfo} from "@45drives/houston-common-lib"
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { Snapshot, ConfirmationCallback } from '../../types';
 
 
 interface SnapshotsListProps {
@@ -387,17 +388,17 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 		console.log('now destroying:', newVal);
 
 		try {
-			const output = await destroySnapshot(selectedSnapshot.value?.name, firstOptionToggle.value, secondOptionToggle.value);
+			const output: any = await destroySnapshot(selectedSnapshot.value?.name, firstOptionToggle.value, secondOptionToggle.value);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 
 				confirmDestroy.value = false;
-				pushNotification(new Notification('Destroy Snapshot Failed', `${selectedSnapshot.value!.name} was not destroyed: ${errorMessage}.`, 'error', 8000));
+				pushNotification(new Notification('Destroy Snapshot Failed', `${selectedSnapshot.value!.name} was not destroyed: ${errorMessage}.`, 'error', 5000));
 
 			} else {
-				pushNotification(new Notification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success', 8000));
+				pushNotification(new Notification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success', 5000));
 
 				await refreshSnaps();
 
@@ -456,7 +457,7 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 
 			for (const snapshot of selectedForDestroy.value) {
                 console.log('currently destroying:', snapshot);
-                const output = await destroySnapshot(snapshot, false, false);
+                const output: any = await destroySnapshot(snapshot, false, false);
 				
                 if (output == null || output.error) {
 					errorMessage = output?.error || 'Unknown error';;
@@ -473,11 +474,11 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 			operationRunning.value = false;
 
 			if (failedToDestroySnaps.length !== 0) {
-				pushNotification(new Notification('Destroy Snapshots Failed', `The folllowing snapshots were not destroyed: \n${failedToDestroySnaps.join(', ')}: ${errorMessage}`, 'error', 8000));
+				pushNotification(new Notification('Destroy Snapshots Failed', `The folllowing snapshots were not destroyed: \n${failedToDestroySnaps.join(', ')}: ${errorMessage}`, 'error', 5000));
 
 			}
 			if (destroyedSnaps.length !== 0) {
-				pushNotification(new Notification('Snapshot Destroyed', `The folllowing snapshots were destroyed: \n${destroyedSnaps.join(', ')}`, 'success', 8000));
+				pushNotification(new Notification('Snapshot Destroyed', `The folllowing snapshots were destroyed: \n${destroyedSnaps.join(', ')}`, 'success', 5000));
 
 			}
 			showDestroyBulkSnapshotModal.value = false;
@@ -585,19 +586,19 @@ watch(confirmRollback, async (newVal, oldVal) => {
 		operationRunning.value = true;
 
 		try {
-			const output = await rollbackSnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
+			const output: any = await rollbackSnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmRollback.value = false;
-				pushNotification(new Notification('Rollback Snapshot Failed', `${selectedSnapshot.value!.name} was not rolled back: ${errorMessage}.`, 'error', 8000));
+				pushNotification(new Notification('Rollback Snapshot Failed', `${selectedSnapshot.value!.name} was not rolled back: ${errorMessage}.`, 'error', 5000));
 			} else {
 				console.log('rolled back:', selectedSnapshot.value);
 				await refreshSnaps();
 				confirmRollback.value = false;
 				operationRunning.value = false;
-				pushNotification(new Notification('Snapshot Rolled Back', `Rolled back to snapshot ${selectedSnapshot.value!.name} .`, 'success', 8000));
+				pushNotification(new Notification('Snapshot Rolled Back', `Rolled back to snapshot ${selectedSnapshot.value!.name} .`, 'success', 5000));
 
 				showRollbackSnapshotModal.value = false;
 			}

@@ -53,18 +53,15 @@ interface ModalProps {
 	width: string;
 	minWidth: string;
 	closeOnBackgroundClick: boolean;
-
-
 }
 
 const closeModal = () => {
-	  emit('close');
-  }
+	emit('close');
+}
+
 const props = defineProps<ModalProps>();
 
-// const open = ref(true)
 const open = ref(props.isOpen);
 const emit = defineEmits(['close']);
-
 
 </script>

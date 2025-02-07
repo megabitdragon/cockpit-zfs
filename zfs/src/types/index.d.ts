@@ -1,4 +1,4 @@
-
+import { PoolScanObject } from "@45drives/houston-common-lib";
 
 //object for importing pools
 interface ImportedPool {
@@ -57,17 +57,7 @@ interface PoolEditConfig {
 	listsnapshots?: string;
 }
 
-interface newPoolData{
-	name: string;
-	vdevs: newVDevData[];
-}
 
-interface newVDevData {
-	type: string;
-	disks: string[];
-	isMirror?: boolean;
-	forceAdd?: boolean;
-}
 interface FileSystemEditConfig {
 	name: string;
 	guid: string;
@@ -87,7 +77,6 @@ interface FileSystemEditConfig {
 	quota?: number;
 	refreservation?: number;
 }
-
 
 
 //object for snapshots
