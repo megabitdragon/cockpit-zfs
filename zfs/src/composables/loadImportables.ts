@@ -1,15 +1,15 @@
 import { ref } from 'vue';
 import { getImportablePools, getImportableDestroyedPools } from "./pools";
-import { loadDisksExtraData } from './loadData';
+import { VDev } from '@45drives/houston-common-lib';
 
 // const vDevs = ref<ImportablePoolvDevData[]>([]);
-const vDevs = ref<vDevData[]>([]);
+const vDevs = ref<VDev[]>([]);
 const errors: string[] = [];
 
 export function parseImportVDevData(vDev, poolName, vDevType) {
     try {
         // console.log('vDevData Importing:', vDev);
-        const vDevData : vDevData = {
+        const vDevData : VDev = {
             name: vDev.name,
             type: vDevType,
             status: vDev.status,

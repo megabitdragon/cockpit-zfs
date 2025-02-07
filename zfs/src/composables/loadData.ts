@@ -5,8 +5,9 @@ import { getDatasets } from "./datasets";
 import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal, formatCapacityString, isCapacityPatternInvalid, changeUnitToBinary } from "./helpers";
 import { getSnapshots, getSnapshotsOfDataset,getSnapshotsOfPool } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
+import {VDevDisk, ZFSFileSystemInfo, VDev} from "@45drives/houston-common-lib"
 
-const vDevs = ref<vDevData[]>([]);
+const vDevs = ref<VDev[]>([]);
 const errors: string[] = [];
 
 export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
@@ -263,7 +264,7 @@ export async function loadDatasets(datasets) {
 
 		//loops through JSON data and adds data to a Dataset object
 		for (let i = 0; i < parsedJSON.length; i++) {
-			const dataset : FileSystemData = {
+			const dataset : ZFSFileSystemInfo = {
 				name: parsedJSON[i].name,
 				id: parsedJSON[i].id,
 				mountpoint: parsedJSON[i].properties.mountpoint.value,
@@ -459,7 +460,7 @@ export async function loadDisksExtraData(disks, pools) {
 
 
 export function parseVDevData(vDev, poolName, disks, vDevType) {
-	const vDevData: vDevData = {
+	const vDevData: VDev = {
 		name: vDev.name,
 		type: vDevType,
 		status: vDev.status,
@@ -473,6 +474,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		errors: [],
 	};
 
+	console.log("parsedVdevdata: ",vDev, poolName, disks, vDevType )
 	if (vDevData.type === 'Disk') {
 		vDevData.path = 'N/A';  // Default path for VM Disk
 	}
@@ -575,7 +577,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			diskName.value = diskVDev.value.name;
 		}
 
-		const notAChildDisk: DiskData = {
+		const notAChildDisk: VDevDisk = {
 			name: diskName!.value,
 			path: diskPath.value,
 			guid: vDev.guid,
@@ -615,7 +617,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 
 
 function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
-    let fullDiskData: DiskData = disks.value.find(disk => {
+    let fullDiskData: VDevDisk = disks.value.find(disk => {
         return disk.phy_path + '-part1' === child.path ||
                disk.sd_path + '1' === child.path ||
                disk.vdev_path + '-part1' === child.path;

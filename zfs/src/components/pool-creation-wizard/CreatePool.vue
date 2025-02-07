@@ -105,11 +105,13 @@ import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
-import { newPool } from "../../composables/pools";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../../composables/helpers';
 import { setRefreservation } from '../../composables/pools';
+import {ZFSManager, ZPool ,VDevDisk,ZFSFileSystemInfo,ZpoolCreateOptions,ZPoolBase} from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
+const zfsManager = new ZFSManager();
 const show = ref(true);
 const navTag = ref('name-entry');
 const tabError = ref(false);
@@ -133,12 +135,12 @@ const diskBelongsFeedback = ref('');
 const isProperReplicationFeedback = ref('');
 
 //injecting provided disk and pools rray
-const disks = inject<Ref<DiskData[]>>('disks')!;
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 
 //setting defaults for pool object
-const poolConfig = ref<PoolData>({
+const poolConfig = ref<ZPool>({
 	name: '',
 	status: '',
 	guid: '',
@@ -169,7 +171,7 @@ const poolConfig = ref<PoolData>({
 
 
 //setting default values for file system object
-const fileSystemConfig = ref<FileSystemData>({
+const fileSystemConfig = ref<ZFSFileSystemInfo>({
 	parentFS: poolConfig.value.name,
     name: '',
     id: '',
@@ -211,7 +213,7 @@ const fileSystemConfig = ref<FileSystemData>({
     children: [],
 });
 
-const newPoolData = ref<newPoolData>({
+const newPoolData = ref<ZpoolCreateOptions & ZPoolBase>({
 	name: '',
 	vdevs : [],
 	autoexpand: '',
@@ -239,7 +241,6 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 }
-const notifications = inject<Ref<any>>('notifications')!;
 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
@@ -255,15 +256,18 @@ async function finishBtn(newPoolData) {
 	poolConfiguration.value.fillNewPoolData();
 	creatingPool.value = true;
 	console.log('newPoolData received:', newPoolData);
+	const { name, vdevs, ...options } = newPoolData;
+	const poolBase: ZPoolBase = { name, vdevs };
+	const poolOptions: ZpoolCreateOptions = options;
+	console.log("poolBasae: ", poolBase," PoolOption: ",poolOptions)
 	
 	try {
-		const output = await newPool(newPoolData);
+		const output = await zfsManager.createPool(poolBase,poolOptions);
 
 		if (output == null || output.error) {
 			const errorMessage = output?.error || 'Unknown error';
 			finishPressed.value = false;
-		
-			notifications.value.constructNotification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}.`, 'error');	
+			pushNotification(new Notification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}.`, 'error', 8000));
 			await newFS();
 			await refreshAllData();
 			showWizard.value = false;
@@ -275,7 +279,7 @@ async function finishBtn(newPoolData) {
 			const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
 			creatingPool.value = false;
 			poolCreated.value = true;
-			notifications.value.constructNotification('Pool Created!', `Created new pool.`, 'success');
+			pushNotification(new Notification('Pool Created!', `Created new pool.`, 'success', 8000));
 			if (newPoolFound) {
 				console.log('newPoolFound:', newPoolFound);
 				setRefreservation(newPoolFound!, newPoolData.refreservationPercent);

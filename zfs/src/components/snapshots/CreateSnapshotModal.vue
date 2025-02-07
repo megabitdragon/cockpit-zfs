@@ -88,22 +88,24 @@ import Modal from '../common/Modal.vue';
 import { getSnapshotTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
 import { loadSnapshotsInDataset, loadSnapshotsInPool, loadDatasets, loadSnapshots } from '../../composables/loadData';
+import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+
 
 interface CreateSnapshotModalProps {
     item: 'pool' | 'filesystem';
     poolName?: string;
 }
-const notifications = inject<Ref<any>>('notifications')!;
     
 const props = defineProps<CreateSnapshotModalProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
-const datasetsInSamePool = computed<FileSystemData[]>(() => {
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
+const datasetsInSamePool = computed<ZFSFileSystemInfo[]>(() => {
     return datasets.value.filter(dataset => dataset.pool === props.poolName);
 });
 
 const defaultFileSystem = ref();
-const selectedDataset= inject<Ref<FileSystemData>>('selected-dataset')!;
+const selectedDataset= inject<Ref<ZFSFileSystemInfo>>('selected-dataset')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 
 const showSnapshotModal = inject<Ref<boolean>>('create-snap-modal')!;
@@ -129,8 +131,8 @@ function loadTheseSnapshots() {
 }
 
 function initialize() {
-    clearSnapshots();
-    loadTheseSnapshots();
+    //clearSnapshots();
+  //  loadTheseSnapshots();
     if (props.item == 'pool') {
         defaultFileSystem.value = datasetsInSamePool.value[0];
     } else if (props.item == 'filesystem') {
@@ -222,13 +224,14 @@ async function create(newSnapshot) {
         
         if (output == null || output.error) {
             const errorMessage = output?.error || 'Unknown error';
-            notifications.value.constructNotification('Create Snapshot Failed', `There was an error creating this snapshot: ${errorMessage}`, 'error'); 
+            pushNotification(new Notification('Create Snapshot Failed', `There was an error creating this snapshot: ${errorMessage}`, 'error', 8000));
             confirmCreate.value = false;
         } else {
             confirmCreate.value = true;
             newSnapshot.isCustomName = false;
             newSnapshot.snapChildren = false;
-            notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+            pushNotification(new Notification('Snapshot Created', `Created new snapshot.`, 'success', 8000));
+            refreshSnapshots()
             showSnapshotModal.value = false;
         }
     } catch (error) {

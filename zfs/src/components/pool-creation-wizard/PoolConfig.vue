@@ -64,10 +64,10 @@
 								<span class="flex flex-row flex-grow w-full justify-between">
 
 									<input :id="getIdKey(`vdev-${vDevIdx}-disk-${diskIdx}`)"
-										v-model="poolConfig.vdevs[vDevIdx].selectedDisks" type="checkbox"
+										v-model="poolConfig.vdevs[vDevIdx].disks" type="checkbox"
 										:value="`${disk.name}`" :name="`disk-${disk.name}`"
 										class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
-									<div v-if="disk.hasPartitions!"
+										<div v-if="disk.hasPartitions!"
 										title="Disk already has partitions. Procees with caution."
 										class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
 										<ExclamationCircleIcon class="h-6 text-orange-700" />
@@ -412,6 +412,7 @@ import { ChevronUpIcon, ExclamationCircleIcon, ExclamationTriangleIcon } from '@
 import { Switch, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { isBoolOnOff, convertSizeToBytes, upperCaseWord, isBoolCompression, getDiskIDName, truncateName } from '../../composables/helpers';
 import { loadImportablePools } from '../../composables/loadImportables';
+import { ZPool ,VDevDisk,ZFSFileSystemInfo,ZpoolCreateOptions , ZPoolBase,VDev,VDevBase} from '@45drives/houston-common-lib';
 
 interface PoolConfigProps {
 	tag: string;
@@ -422,10 +423,10 @@ interface PoolConfigProps {
 
 const props = defineProps<PoolConfigProps>();
 
-const poolConfig = inject<Ref<PoolData>>('pool-config-data')!;
-const disks = inject<Ref<DiskData[]>>('disks')!;
-const allPools = inject<Ref<PoolData[]>>('pools')!;
-const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
+const poolConfig = inject<Ref<ZPool>>('pool-config-data')!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
+const allPools = inject<Ref<ZPool[]>>('pools')!;
+const fileSystemConfig = inject<Ref<ZFSFileSystemInfo>>('file-system-data')!;
 
 const nameFeedback = inject<Ref<string>>('feedback-name')!;
 const vDevFeedback = inject<Ref<string>>('feedback-vdev')!;
@@ -472,7 +473,7 @@ const additionalVDevType = computed(() => {
 });
 
 //computed property to determine which disks are in use and which ones are not in use and therefore available for selection
-const vDevAvailDisks = computed<DiskData[][]>(() => {
+const vDevAvailDisks = computed<VDevDisk[][]>(() => {
 	return poolConfig.value.vdevs.map((vdev, vdevIdx) => {
 		const claimed = poolConfig.value.vdevs
 		.filter((_, idx) => idx !== vdevIdx)
@@ -486,7 +487,7 @@ const vDevAvailDisks = computed<DiskData[][]>(() => {
 
 //change color of disk when selected
 const diskCardClass = (diskName, vDevIdx) => {
-  const isSelected = poolConfig.value.vdevs[vDevIdx].selectedDisks.includes(diskName);
+  const isSelected = poolConfig.value.vdevs[vDevIdx].disks.includes(diskName);
   return isSelected ? 'bg-green-300 dark:bg-green-700' : '';
 };
 
@@ -497,7 +498,7 @@ const createFileSystemCardClass = (createFileSystem : boolean) => {
 
 //method for adding initial vdev with default values 
 function initialVDev() {
-	const vDevConfig: vDevData = {
+	const vDevConfig: VDev = {
 		name: '',
 		type: 'raidz2',
 		status: '',
@@ -517,7 +518,7 @@ function initialVDev() {
 
 //method for adding additional vdev
 function addVDev() {
-	const vDevConfig: vDevData = {
+	const vDevConfig: VDev = {
 		name: '',
 		type: poolConfig.value.vdevs[0].type,
 		status: '',
@@ -640,7 +641,7 @@ watch(
 	{ deep: true } // Ensure the watcher deeply watches the selectedDisks arrays
 );
 
-const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const importablePools = inject<Ref<ZPool[]>>('importable-pools')!;
 const diskBelongsToImportablePool = () => {
 	let result = false;
 	diskBelongsFeedback.value = '';
@@ -684,36 +685,37 @@ const diskBelongsToImportablePool = () => {
 const diskCheck = () => {
 	let result = true;
 	diskFeedback.value = '';
-	
 	poolConfig.value.vdevs.forEach(vdev => {
-		if (vdev.type == 'mirror' && vdev.selectedDisks.length < 2) {
+		console.log("diskCheck : " ,vdev.disks )
+
+		if (vdev.type == 'mirror' && vdev.disks.length < 2) {
 			result = false;
 			diskFeedback.value = 'Two or more Disks are required for Mirror.';
-		} else if (vdev.type == 'raidz1' && vdev.selectedDisks.length < 2) {
+		} else if (vdev.type == 'raidz1' && vdev.disks.length < 2) {
 			result = false;
 			diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
-		} else if (vdev.type == 'raidz2' && vdev.selectedDisks.length < 3) {
+		} else if (vdev.type == 'raidz2' && vdev.disks.length < 3) {
 			result = false;
 			diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
-		} else if (vdev.type == 'raidz3' && vdev.selectedDisks.length < 4) {
+		} else if (vdev.type == 'raidz3' && vdev.disks.length < 4) {
 			result = false;
 			diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
-		} else if (vdev.type == 'disk' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'disk' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required.';
-		} else if (vdev.type == 'log' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'log' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Log.';
-		} else if (vdev.type == 'cache' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'cache' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Cache.';		
-		} else if (vdev.type == 'special' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'special' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Special.';
-		} else if (vdev.type == 'spare' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'spare' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Spare.';
-		} else if (vdev.type == 'dedup' && vdev.selectedDisks.length < 1) {
+		} else if (vdev.type == 'dedup' && vdev.disks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required for Dedup.';
 		} 
@@ -785,24 +787,33 @@ function removeVDev(index: number) {
   	poolConfig.value.vdevs = poolConfig.value.vdevs.filter((_, idx) => idx !== index) ?? [];
 }
 
-const newPoolData  = inject<Ref<newPoolData>>('new-pool-data')!;
-const newVDevs = ref<newVDevData[]>([]);
-const newVDevDisks = ref<string[]>([]);
+const newPoolData  = inject<Ref<ZpoolCreateOptions & ZPoolBase>>('new-pool-data')!;
+const newVDevs = ref<VDevBase[]>([]);
+const newVDevDisks = ref<VDevDisk[]>([]);
 
 function fillNewPoolData() {
 	newPoolData.value.name = poolConfig.value.name;
 	poolConfig.value.vdevs.forEach(vDev => {
-		const newVDev : newVDevData = {
-			type: '',
+		const newVDev : VDevBase = {
+			type: 'disk',
 			disks: [],
 		}
 		newVDev.type = vDev.type;
 		newVDev.isMirror = vDev.isMirror;
+		console.log("fillNewPoolData : ", vDev)
 
-		vDev.selectedDisks.forEach(selectedDisk => {
-			const diskNameFinal = getDiskIDName(disks.value, vDev.diskIdentifier!, selectedDisk);
-			newVDevDisks.value.push(diskNameFinal);
-		});
+		vDev.disks.forEach(selectedDisk => {
+			const diskObject = typeof selectedDisk === "string" ? { path: selectedDisk } : selectedDisk;
+			console.log("diskObject: ", diskObject)
+			const diskNameFinal = getDiskIDName(disks.value, vDev.diskIdentifier!, diskObject.path.toString());
+			const fullDisk = disks.value.find(disk => disk.path === diskNameFinal);
+
+			if (fullDisk) {
+				newVDevDisks.value.push(fullDisk); // ✅ Push the full `VDevDisk` object
+				} else {
+				console.error(`Disk with path ${diskNameFinal} not found in available disks.`);
+				}
+			});
 
 		newVDev.disks = newVDevDisks.value;
 		newVDevDisks.value = [];

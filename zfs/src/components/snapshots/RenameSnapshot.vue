@@ -92,17 +92,19 @@ import { convertRawTimestampToString } from '../../composables/helpers';
 import { renameSnapshot } from '../../composables/snapshots';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
+import {ZFSFileSystemInfo} from "../../../../houston-common/houston-common-lib/lib/managers/index"
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+
 
 interface RenameSnapshotProps {
     idKey: string;
     snapshot: Snapshot;
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 
 const props = defineProps<RenameSnapshotProps>();
 const showRenameSnapModal = inject<Ref<boolean>>('show-rename-snap-modal')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 const renaming = inject<Ref<boolean>>('renaming')!;
@@ -128,11 +130,12 @@ async function renameBtn() {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				renaming.value = false;
-				notifications.value.constructNotification('Rename Dataset Failed', `${props.snapshot.name} was not renamed: ${errorMessage}.`, 'error');
+                pushNotification(new Notification('Rename Dataset Failed', `${props.snapshot.name} was not renamed: ${errorMessage}.`, 'error', 8000));
+
 			} else {
                 confirmRename.value = true;
+                pushNotification(new Notification('Snapshot Renamed', `Renamed snapshot ${props.snapshot.name} to ${newName.value}.`, 'success', 8000));
 
-				notifications.value.constructNotification('Snapshot Renamed', `Renamed snapshot ${props.snapshot.name} to ${newName.value}.`, 'success');
                 renaming.value = false;
                 showRenameSnapModal.value = false;
 			}
@@ -175,7 +178,7 @@ const nameCheck = (snapshotName, fileSystemParent) => {
     return result;
 }
 
-function snapshotNameExists(snapshotName, fileSystemParent, datasets : FileSystemData[]) {
+function snapshotNameExists(snapshotName, fileSystemParent, datasets : ZFSFileSystemInfo[]) {
 	const newParentPath = fileSystemParent;
 	for (const dataset of datasets) {
 		const existingParentPath = dataset.parentFS;

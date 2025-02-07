@@ -1,4 +1,4 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { legacy } from '@45drives/houston-common-lib';
 import { convertTimestampToLocal, convertTimestampFormat } from '../composables/helpers';
 // @ts-ignore
 import get_snapshots_script from "../scripts/get-snapshots.py?raw";
@@ -12,7 +12,7 @@ import get_recent_snaps_script from"../scripts/find-last-common-snap.py?raw";
 import check_remote_snaps_script from"../scripts/check-remote-snapshots.py?raw";
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
-
+const {errorString, useSpawn } = legacy;
 export async function getSnapshots() {
     try {
         // Use the script without any dataset name to get all snapshots

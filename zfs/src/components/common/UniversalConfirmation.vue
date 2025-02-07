@@ -159,6 +159,7 @@ import { Switch } from '@headlessui/vue';
 import { Ref, inject, ref, computed, watch} from 'vue';
 import { upperCaseWord } from '../../composables/helpers';
 import Modal from './Modal.vue';
+import { ZFSFileSystemInfo,ZPool,VDev,VDevDisk } from '@45drives/houston-common-lib';
 
 interface UniversalConfirmationProps {
     showFlag: boolean;
@@ -167,10 +168,10 @@ interface UniversalConfirmationProps {
     operation: string;
     operation2?: string;
     confirmOperation: ConfirmationCallback;
-    pool?: PoolData;
-    vdev?: vDevData;
-    disk?: DiskData;
-    filesystem?: FileSystemData;
+    pool?: ZPool;
+    vdev?: VDev;
+    disk?: VDevDisk;
+    filesystem?: ZFSFileSystemInfo;
     snapshot?: Snapshot;
     snapshots?: string[];
     firstOption?: string;

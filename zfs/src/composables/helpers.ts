@@ -1,8 +1,9 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { legacy } from '@45drives/houston-common-lib';
 import { ref, Ref } from 'vue';
 // @ts-ignore
 import test_ssh_script from"../scripts/test-ssh.py?raw";
-
+import {VDevDisk, ZPool} from "@45drives/houston-common-lib"
+const { errorString, useSpawn } = legacy;
 //change true to 'on' and false to 'off'
 export function isBoolOnOff(bool : boolean) {
 	if (bool) {return 'on'} else {return 'off'}
@@ -432,7 +433,7 @@ export function getValue(type : string, value : string) {
 	}
 }
 
-export function checkInheritance(type: string, value : string, poolConfig : PoolData) {
+export function checkInheritance(type: string, value : string, poolConfig : ZPool) {
 	if (type == 'compression') {
 		if (value == 'inherited') {
 			return `${upperCaseWord(value)} (${isBoolCompression(poolConfig.properties.compression).toUpperCase()})`
@@ -543,7 +544,7 @@ export function getCapacityColor(type: 'text' | 'bg', capacity: number, refreser
 	return colorString;
 }
 
-export function getDiskIDName(disks: DiskData[], diskIdentifier: string, selectedDiskName: string) {
+export function getDiskIDName(disks: VDevDisk[], diskIdentifier: string, selectedDiskName: string) {
 	const phyPathPrefix = '/dev/disk/by-path/';
 	const sdPathPrefix = '/dev/';
 	const idPathPrefix = '/dev/disk/by-id/';
@@ -555,9 +556,9 @@ export function getDiskIDName(disks: DiskData[], diskIdentifier: string, selecte
 	const newDisk = ref();
 	const diskName = ref('');
 	const diskPath = ref('');
-
+	console.log("getDiskIDNAme: disks: ", disks," diskIdentifier: ", diskIdentifier," selectDiskName: ",selectedDiskName )
 	// Find the selected disk
-	newDisk.value = disks.find(disk => disk.name === selectedDiskName);
+	newDisk.value = disks.find(disk => disk.name.trim() == selectedDiskName.trim());
 
 	switch (diskIdentifier) {
 		case 'vdev_path':

@@ -135,18 +135,19 @@ import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, lo
 import { attachDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets, loadDiskStats, loadScanObjectGroup } from '../../composables/loadData';
 import { loadImportablePools } from '../../composables/loadImportables';
+import { ZPool, VDev, VDevDisk, ZFSFileSystemInfo, DiskIdentifier } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface AttachDiskModalProps {
 	idKey: string;
-    pool: PoolData;
-    vDev: vDevData;
+    pool: ZPool;
+    vDev: VDev;
     showFlag: boolean;
 }
 
 const props = defineProps<AttachDiskModalProps>();
 const showFlag = ref(props.showFlag);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
-const notifications = inject<Ref<any>>('notifications')!;
 
 const emit = defineEmits(['close']);
 
@@ -176,9 +177,9 @@ function selectSingleDisk(diskName) {
     selectedDisk.value = selectedDisk.value === diskName ? '' : diskName;
 }
 
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const allDisks = inject<Ref<DiskData[]>>('disks')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const allDisks = inject<Ref<VDevDisk[]>>('disks')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 
 const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 const diskSizeFeedback = ref('')
@@ -195,7 +196,7 @@ const diskBelongsFeedback = ref('');
 
 const adding = ref(false);
 
-const poolData = inject<Ref<PoolData[]>>("pools")!;
+const poolData = inject<Ref<ZPool[]>>("pools")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
@@ -214,7 +215,7 @@ const diskVDevPoolData = ref({
 });
 
 
-const availableDisks = computed<DiskData[]>(() => {
+const availableDisks = computed<VDevDisk[]>(() => {
     return allDisks.value.filter(disk => disk.guid === "");
 });
 
@@ -277,12 +278,12 @@ async function attachDiskBtn() {
                 if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    notifications.value.constructNotification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error'); 
+                    pushNotification(new Notification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error', 8000));
                 } else {
                     showAttachDiskModal.value = false;
                     adding.value = false;
                     await refreshAllData();
-                    notifications.value.constructNotification('Disk Attached', `Attached disk to virtual device successfully.`, 'success');
+                    pushNotification(new Notification('Disk Attached', `Attached disk to virtual device successfully.`, 'success', 8000));
                 }
             } catch (error) {
                 console.error(error);
@@ -328,7 +329,7 @@ const diskSizeMatch = () => {
     return result;
 };
 
-const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const importablePools = inject<Ref<ZPool[]>>('importable-pools')!;
 const diskBelongsToImportablePool = () => {
 	let result = false;
 	diskBelongsFeedback.value = '';

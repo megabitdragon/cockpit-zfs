@@ -717,25 +717,28 @@ import { EyeSlashIcon, EyeIcon } from '@heroicons/vue/24/outline';
 import { ref, Ref, inject, computed, onMounted, onUpdated } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, isBoolOnOff, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
-import { createDataset, createEncryptedDataset } from '../../composables/datasets';
+import {  createEncryptedDataset } from '../../composables/datasets';
+import { ZFSManager, ZFSFileSystemInfo, Dataset,DatasetCreateOptions, ZPool ,} from '@45drives/houston-common-lib';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface FileSystemProps {
 	idKey: string;
 	isStandalone: boolean;
 }
 
+const zfsManager = new ZFSManager()
 const props = defineProps<FileSystemProps>();
 
 const showFSWizard = inject<Ref<boolean>>('show-fs-wizard')!;
 
-const poolConfig = inject<Ref<PoolData>>("pool-config-data")!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const poolConfig = inject<Ref<ZPool>>("pool-config-data")!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 
-const fileSystemConfig = inject<Ref<FileSystemData>>('file-system-data')!;
+const fileSystemConfig = inject<Ref<ZFSFileSystemInfo>>('file-system-data')!;
 
 const parentFileSystem = computed(() => {
 	return poolConfig.value.name;
@@ -757,7 +760,7 @@ const quotaFeedback = ref('');
 
 const saving = ref(false);
 
-const newFileSystemConfig = ref<FileSystemData>({
+const newFileSystemConfig = ref<ZFSFileSystemInfo>({
     parentFS: '',
     name: '',
     id: '',
@@ -860,7 +863,7 @@ function getInheritedProperties() {
 	}
 }
 
-const nameCheck = (fileSystem : FileSystemData) => {
+const nameCheck = (fileSystem : ZFSFileSystemInfo) => {
 	let result = true;
 	nameFeedback.value = '';
 	
@@ -887,7 +890,7 @@ const nameCheck = (fileSystem : FileSystemData) => {
     return result;
 }
 
-const parentCheck = (fileSystem : FileSystemData) => {
+const parentCheck = (fileSystem : ZFSFileSystemInfo) => {
 	let result = true;
 	parentFeedback.value = '';
 
@@ -908,7 +911,7 @@ const parentCheck = (fileSystem : FileSystemData) => {
 	return result;
 }
 
-function fileSystemNameExists(filesystem : FileSystemData, datasets : FileSystemData[]) {
+function fileSystemNameExists(filesystem : ZFSFileSystemInfo, datasets : ZFSFileSystemInfo[]) {
 	const newParentPath = filesystem.parentFS;
 	//console.log('newParentPath:', newParentPath);
 	for (const dataset of datasets) {
@@ -925,7 +928,7 @@ function fileSystemNameExists(filesystem : FileSystemData, datasets : FileSystem
 	return false;
 }
 
-const encryptPasswordCheck = (fileSystem : FileSystemData) => {
+const encryptPasswordCheck = (fileSystem : ZFSFileSystemInfo) => {
 	let result = true;
 	passFeedback.value = '';
 
@@ -945,7 +948,7 @@ const encryptPasswordCheck = (fileSystem : FileSystemData) => {
 	return result;
 }
 
-const checkQuota = (filesystem : FileSystemData) => {
+const checkQuota = (filesystem : ZFSFileSystemInfo) => {
     let result = true;
     quotaFeedback.value = '';
 
@@ -957,7 +960,7 @@ const checkQuota = (filesystem : FileSystemData) => {
     return result;
 }
 
-const newDataset = ref<NewDataset>({
+const newDataset = ref<Dataset & DatasetCreateOptions>({
 	name: '',
 	parent: '',
 	encrypted: false,
@@ -1007,7 +1010,7 @@ function fillDatasetData() {
 
 const confirmCreateFS = inject<Ref<boolean>>('confirm-create-filesystem')!;
 
-async function fsCreateBtn(fileSystem : FileSystemData) {
+async function fsCreateBtn(fileSystem : ZFSFileSystemInfo) {
 	console.log('fsCreateBtn fired');
 	if (props.isStandalone) {
 		if (parentCheck(fileSystem)) {
@@ -1028,7 +1031,8 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 								if (output == null || output.error) {
 									const errorMessage = output?.error || 'Unknown error';
 									saving.value = false;
-									notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}`, 'error');
+									pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}`, 'error', 8000));
+
 								} else {
 									console.log('encryption check passed');
 									fileSystemsLoaded.value = false;
@@ -1037,7 +1041,8 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 									showFSWizard.value = false;
 									saving.value = false;
 									fileSystemsLoaded.value = true;
-									notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+									pushNotification(new Notification('File System Created!', `Created new dataset.`, 'success', 8000));
+
 									confirmCreateFS.value = true;
 								}
 
@@ -1057,12 +1062,13 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 						saving.value = true;
 						confirmCreateFS.value = false;
 						try {
-							const output = await createDataset(newDataset.value);
+							const { name, parent, ...options } = newDataset.value;
+							const output = await zfsManager.addDataset(parent,name,options);
 							
 							if (output == null || output.error) {
 								const errorMessage = output?.error || 'Unknown error';
 								saving.value = false;
-								notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error');
+								pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error', 8000));
 							} else {
 								console.log('encryption check passed');
 								fileSystemsLoaded.value = false;
@@ -1071,7 +1077,7 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 								showFSWizard.value = false;
 								saving.value = false;
 								fileSystemsLoaded.value = true;
-								notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+								pushNotification(new Notification('File System Created!', `Created new dataset.`, 'success', 8000));
 								confirmCreateFS.value = true;
 							}
 
@@ -1091,7 +1097,6 @@ async function fsCreateBtn(fileSystem : FileSystemData) {
 	} 
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 	
 async function newFileSystemInPoolWizard() {
 	console.log('newFileSystemInPool method fired');
@@ -1117,7 +1122,7 @@ async function newFileSystemInPoolWizard() {
 								if (output == null || output.error) {
 									const errorMessage = output?.error || 'Unknown error';
 									saving.value = false;
-									notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error');
+									pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error', 8000));
 								} else {
 									console.log('encryption check passed');
 									fileSystemsLoaded.value = false;
@@ -1125,7 +1130,7 @@ async function newFileSystemInPoolWizard() {
 									await loadDatasets(datasets);
 									saving.value = false;
 									fileSystemsLoaded.value = true;
-									notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+									pushNotification(new Notification('File System Created!', `Created new dataset.`, 'success', 8000));
 									confirmCreateFS.value = true;
 								}
 
@@ -1148,12 +1153,13 @@ async function newFileSystemInPoolWizard() {
 						saving.value = true;
 
 						try {
-							const output = await createDataset(newDataset.value);
+							const { name, parent, ...options } = newDataset.value;
+							const output = await zfsManager.addDataset(parent,name,options);
 							
 							if (output == null || output.error) {
 								const errorMessage = output?.error || 'Unknown error';
 								saving.value = false;
-								notifications.value.constructNotification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}.`, 'error');
+								pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}.`, 'error', 8000));
 							} else {
 								console.log('encryption check passed');
 								fileSystemsLoaded.value = false;
@@ -1161,7 +1167,7 @@ async function newFileSystemInPoolWizard() {
 								await loadDatasets(datasets);
 								saving.value = false;
 								fileSystemsLoaded.value = true;
-								notifications.value.constructNotification('File System Created!', `Created new dataset.`, 'success');
+								pushNotification(new Notification('File System Created!', `Created new dataset.`, 'success', 8000));
 							}
 
 						} catch (error) {

@@ -94,17 +94,18 @@ import { ref, Ref, inject, computed } from 'vue';
 import { renameFileSystem } from '../../composables/datasets';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
+import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface RenameFileSystemProps {
     idKey: string;
-    filesystem: FileSystemData;
+    filesystem: ZFSFileSystemInfo;
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 
 const props = defineProps<RenameFileSystemProps>();
 const showRenameModal = inject<Ref<boolean>>('show-rename-modal')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const renaming = inject<Ref<boolean>>('renaming')!;
 const confirmRename = inject<Ref<boolean>>('confirm-rename')!;
@@ -128,7 +129,7 @@ function getChildDatasetIds(dataset, allDatasets): string[] {
     return childIds;
 }
 
-const datasetsInSamePool = computed<FileSystemData[]>(() => {
+const datasetsInSamePool = computed<ZFSFileSystemInfo[]>(() => {
     const currentDataset = props.filesystem;
 
     const childDatasetIds = getChildDatasetIds(currentDataset, datasets.value);
@@ -150,11 +151,11 @@ async function renameBtn() {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				renaming.value = false;
-				notifications.value.constructNotification('Rename Dataset Failed', `${props.filesystem.name} was not renamed: ${errorMessage}.`, 'error');
+                pushNotification(new Notification('Rename Dataset Failed', `${props.filesystem.name} was not renamed: ${errorMessage}.`, 'error', 8000));
 			} else {
                 confirmRename.value = true;
+                pushNotification(new Notification('File System Renamed', `${props.filesystem.name} renamed to ${newName.value}.`, 'success', 8000));
 
-				notifications.value.constructNotification('File System Renamed', `${props.filesystem.name} renamed to ${newName.value}.`, 'success');
                 renaming.value = false;
                 showRenameModal.value = false;
 			}
@@ -191,7 +192,7 @@ const nameCheck = (fileSystemName, fileSystemParent) => {
     return result;
 }
 
-function fileSystemNameExists(filesystemName, fileSystemParent, datasets : FileSystemData[]) {
+function fileSystemNameExists(filesystemName, fileSystemParent, datasets : ZFSFileSystemInfo[]) {
 	const newParentPath = fileSystemParent;
 	for (const dataset of datasets) {
 		const existingParentPath = dataset.parentFS;

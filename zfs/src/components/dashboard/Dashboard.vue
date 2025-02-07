@@ -60,9 +60,10 @@ import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import DashPoolCard from "./DashPoolCard.vue";
 import DashboardLoadingSkeleton from './DashboardLoadingSkeleton.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
+import { ZPool, VDevDisk } from '@45drives/houston-common-lib';
 
-const pools = inject<Ref<PoolData[]>>("pools")!;
-const disks = inject<Ref<DiskData[]>>("disks")!;
+const pools = inject<Ref<ZPool[]>>("pools")!;
+const disks = inject<Ref<VDevDisk[]>>("disks")!;
 
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;

@@ -240,24 +240,27 @@ import { configureDataset } from '../../composables/datasets';
 import { Switch } from '@headlessui/vue';
 import Modal from '../common/Modal.vue';
 import { loadDatasets } from '../../composables/loadData';
+import { ZFSFileSystemInfo, ZPool } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+
 
 interface FileSystemConfigModalProps {
     idKey: string;
-    filesystem: FileSystemData;
+    filesystem: ZFSFileSystemInfo;
 }
 
 const props = defineProps<FileSystemConfigModalProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const showFSConfig = inject<Ref<boolean>>('show-fs-config')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 
-const pools = inject<Ref<PoolData[]>>('pools')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
 
 const quotaFeedback = ref('');
 const refreservationFeedback = ref('');
 const saving = ref(false);
 
-const fileSystemConfig = ref<FileSystemData>({
+const fileSystemConfig = ref<ZFSFileSystemInfo>({
     parentFS: props.filesystem.parentFS,
     name: props.filesystem.name,
     id: props.filesystem.id,
@@ -387,7 +390,6 @@ async function checkForChanges(fileSystemCheck) {
 }
 
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
-const notifications = inject<Ref<any>>('notifications')!;
 
 async function fsConfigureBtn() {
     if (checkSizes()) {
@@ -401,10 +403,11 @@ async function fsConfigureBtn() {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				console.log('configureFS failed');
-				notifications.value.constructNotification('Save File System Config Failed', `There was an error saving this file system: ${errorMessage}.`, 'error')
+                pushNotification(new Notification('Save File System Config Failed', `There was an error saving this file system: ${errorMessage}.`, 'error', 8000));
+
 			} else {
 				console.log('configureFS succeeded');
-				notifications.value.constructNotification('File System Config Saved', "Successfully saved this file system's configuration.", 'success');
+                pushNotification(new Notification('File System Config Saved', "Successfully saved this file system's configuration.", 'success', 8000));
                 datasets.value = [];
                 fileSystemsLoaded.value = false;
                 await loadDatasets(datasets);

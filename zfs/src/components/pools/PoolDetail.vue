@@ -1,12 +1,12 @@
 <template>
-	<Modal @close="closeModal" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'"
-		class="z-10">
+	<Modal @close="closeModal"  :class="{ 'inert': showAddVDevModal }" :close-on-background-click="false"  :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'"
+		    :inert="false">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem"
 				:navigationCallback="navigationCallback" :show="show" />
 		</template>
 		<template v-slot:content>
-			<div v-if="navTag == 'stats'">
+			<div v-if="navTag == 'stats'" >
 				<div class="mt-6 grid grid-cols-3 grid-rows-2 text-default">
 					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="capacityColor"
 						:name="props.pool.name" :totalSize="props.pool.properties.size"
@@ -49,13 +49,13 @@
 				</div>
 			</div>
 
-			<div v-if="navTag == 'topology'" class="mt-2 grid" :class="`grid-cols-${props.pool.vdevs.length}`">
+			<div v-if="navTag == 'topology'"  class="mt-2 grid" :class="`grid-cols-${props.pool.vdevs.length}`" >
 				<div v-for="vDev, vDevIdx in props.pool.vdevs" :key="vDevIdx"
 					class="p-2 m-2 rounded-md border border-default bg-accent">
 					<legend class="mb-1 text-base font-medium leading-6 text-default">{{ vDev.name }} ({{ vDev.type }})
 					</legend>
 
-					<div class="grid" :class="vDev.disks.length < 2 ? 'grid-cols-1' : 'grid-cols-2'">
+					<div class="grid" :class="vDev.disks.length < 2 ? 'grid-cols-1' : 'grid-cols-2'" >
 						<div v-for="disk, diskIdx in vDev.disks" :key="diskIdx" class="m-1">
 							<PoolDetailDiskCard :disk="vDev.disks[diskIdx]" />
 						</div>
@@ -117,7 +117,7 @@
 					<div class="col-span-1 col-start-1 row-start-3">
 						<label :for="getIdKey('settings-pool-auto-expand')"
 							class="mt-1 block text-sm leading-6 text-default">Auto-Expand Pool</label>
-						<Switch v-model="poolConfig.properties.autoExpand" :id="getIdKey('settings-pool-auto-expand')"
+						<Switch     :initialFocus="null" v-model="poolConfig.properties.autoExpand" :id="getIdKey('settings-pool-auto-expand')"
 							:class="[poolConfig.properties.autoExpand ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -146,7 +146,7 @@
 					<div class="col-span-1 col-start-2 row-start-3">
 						<label :for="getIdKey('settings-pool-auto-replace')"
 							class="mt-1 block text-sm leading-6 text-default">Auto-Replace Drives</label>
-						<Switch v-model="poolConfig.properties.autoReplace" :id="getIdKey('settings-pool-auto-replace')"
+						<Switch     :initialFocus="null" v-model="poolConfig.properties.autoReplace" :id="getIdKey('settings-pool-auto-replace')"
 							:class="[poolConfig.properties.autoReplace ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -175,7 +175,7 @@
 					<div class="col-span-2 col-start-3 row-start-3">
 						<label :for="getIdKey('settings-pool-display-snapshots')"
 							class="mt-1 block text-sm leading-6 text-default">List Snapshots With File Systems</label>
-						<Switch v-model="poolConfig.properties.listSnapshots"
+						<Switch     :initialFocus="null" v-model="poolConfig.properties.listSnapshots"
 							:id="getIdKey('settings-pool-display-snapshots')"
 							:class="[poolConfig.properties.listSnapshots ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
@@ -208,7 +208,7 @@
 								class="block text-sm text-default">Delegation</label>
 							<p class="text-xs text-muted mt-0.5">(Access based on dataset permissions)</p>
 						</div>
-						<Switch v-model="poolConfig.properties.delegation" :id="getIdKey('settings-pool-delegation')"
+						<Switch      :initialFocus="null" v-model="poolConfig.properties.delegation" :id="getIdKey('settings-pool-delegation')"
 							:class="[poolConfig.properties.delegation ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -238,7 +238,7 @@
 						class="col-span-1 col-start-3 row-start-4">
 						<label :for="getIdKey('settings-pool-auto-trim')"
 							class="mt-1 block text-sm leading-6 text-default">Auto-TRIM Pool</label>
-						<Switch v-model="poolConfig.properties.autoTrim" :id="getIdKey('settings-pool-auto-trim')"
+						<Switch     :initialFocus="null" v-model="poolConfig.properties.autoTrim" :id="getIdKey('settings-pool-auto-trim')"
 							:class="[poolConfig.properties.autoTrim ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -323,12 +323,18 @@
 			:item="'pool'" />
 	</div>
 	<div v-if="showAddVDevModal">
-		<component :is="addVDevComponent" @close="updateShowAddVDev" :idKey="getIdKey(`show-vdev-modal`)"
+		<component :is="addVDevComponent" @close="updateShowAddVDev"     :key="showAddVDevModal" :idKey="getIdKey(`show-vdev-modal`)"
 			:pool="poolConfig" :marginTop="'mt-48'" />
 	</div>
 
 </template>
+<style >
+.inert {
+    pointer-events: none !important;
+    opacity: 0.5;
+}
 
+</style>
 <script setup lang="ts">
 import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
@@ -355,7 +361,7 @@ const closeModal = () => {
 const props = defineProps<PoolDetailsProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-const poolConfig = ref<PoolData>({
+const poolConfig = ref<ZPool>({
 	name: props.pool.name,
 	status: props.pool.status,
 	guid: props.pool.guid,
@@ -394,8 +400,8 @@ const capacityColor = computed(() =>
 
 ////////////////// Loading Data /////////////////////
 /////////////////////////////////////////////////////
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const disks = inject<Ref<DiskData[]>>('disks')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
@@ -403,6 +409,8 @@ const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { ZPool, VDevDisk } from '@45drives/houston-common-lib';
 
 const snapshotListComponent = ref();
 const loadSnapshotListComponent = async () => {
@@ -570,7 +578,6 @@ async function refreshAllData() {
 }
 
 const confirmSavePool = inject<Ref<boolean>>('confirm-save-pool')!;
-const notifications = inject<Ref<any>>('notifications')!;
 	
 async function poolConfigureBtn() {
 	if (commentLengthCheck(poolConfig.value)) {
@@ -582,21 +589,14 @@ async function poolConfigureBtn() {
 			if (!result.success) {
 				const errorMessage = result.error || 'Unknown error occurred';
 				console.log('configurePool failed');
+				pushNotification(new Notification('Save Pool Config Failed',`There was an error saving this pool: ${errorMessage}.`,'error', 8000));
 
-				notifications.value.constructNotification(
-					'Save Pool Config Failed',
-					`There was an error saving this pool: ${errorMessage}.`,
-					'error'
-				);
 				confirmSavePool.value = false;
 			} else {
 				console.log('configurePool succeeded');
+				pushNotification(new Notification('Pool Config Saved',"Successfully saved this pool's configuration.",'success', 8000));
 
-				notifications.value.constructNotification(
-					'Pool Config Saved',
-					"Successfully saved this pool's configuration.",
-					'success'
-				);
+
 				confirmSavePool.value = true;
 				showPoolDetails.value = false;
 			}
@@ -605,7 +605,8 @@ async function poolConfigureBtn() {
 
 		} catch (error: any) {
 			console.error(error);
-			notifications.value.constructNotification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error');
+			pushNotification(new Notification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error', 8000));
+
 		}
 	}
 }

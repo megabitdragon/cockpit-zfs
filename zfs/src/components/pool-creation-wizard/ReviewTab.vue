@@ -63,10 +63,10 @@
 										<template v-slot:footer>
 											<div class="flex flex-row gap-1">
 												<p class="mt-3">Disks:</p>
-												<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
+												<Card v-for="disk, diskIdx in vDev.disks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
 													<template v-slot:title>
 														<div>
-															<b :class="truncateText" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk)">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk) }}</b>
+															<b :class="truncateText" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk.path)">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk.path) }}</b>
 														</div>
 													</template>
 												</Card>
@@ -177,10 +177,11 @@ import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { CheckCircleIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
+import { ZPool, VDevDisk, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 
-const poolConfig = inject<PoolData>("pool-config-data")!;
-const disks = inject<Ref<DiskData[]>>('disks')!;
-const fileSystemData = inject<Ref<FileSystemData>>('file-system-data')!;
+const poolConfig = inject<ZPool>("pool-config-data")!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
+const fileSystemData = inject<Ref<ZFSFileSystemInfo>>('file-system-data')!;
 
 const finishPressed = inject<Ref<boolean>>('finish-pressed')!;
 const creatingPool = inject<Ref<boolean>>('creating-pool')!;
