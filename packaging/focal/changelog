@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.12-2focal) focal; urgency=medium
+
+  * rebuilding package
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:18:44 -0400
+
 cockpit-zfs (1.1.12-1focal) focal; urgency=medium
 
   * Implements some common-library refactoring and some UI improvements
