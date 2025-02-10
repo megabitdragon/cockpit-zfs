@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick="true">
+    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">{{ upperCaseWord(props.mode) }} File System</legend>
         </template>

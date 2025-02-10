@@ -1,6 +1,6 @@
 <template>
     <!-- <Modal @clickOutside="closeModal()" :show="showAddVDevModal" class=" !w-3/5 !mt-28"> -->
-    <!-- <Modal :isOpen="showAddVDevModal" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="true"> -->
+    <!-- <Modal :isOpen="showAddVDevModal" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false"> -->
     <Modal @close="closeModal" :isOpen="showAddVDevModal" :marginTop="props.marginTop" :width="'w-3/5'"
         :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <!-- <CardContainer class="!w-3/5 !mt-28 mx-auto"> -->

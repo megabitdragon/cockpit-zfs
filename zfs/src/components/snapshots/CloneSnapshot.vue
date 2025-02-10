@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showCloneSnapModal" @close="showCloneSnapModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'" :closeOnBackgroundClick="true">
+    <Modal :isOpen="showCloneSnapModal" @close="showCloneSnapModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Clone Snapshot</legend>
         </template>

@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFSConfig" @close="showFSConfig = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="true">
+    <Modal :isOpen="showFSConfig" @close="showFSConfig = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Configure File System</legend>
         </template>

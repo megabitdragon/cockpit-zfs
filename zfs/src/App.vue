@@ -3,7 +3,6 @@
 		<HoustonAppContainer moduleName="ZFS" :appVersion="version">
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 			<ZFS :tag="navTag"/>
-
 		</HoustonAppContainer>
 	</div>
 </template>

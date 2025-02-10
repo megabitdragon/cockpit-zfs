@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showSendDataset" @close="showSendDataset = false" :marginTop="'mt-28'" :width="'w-5/12'" :minWidth="'min-w-5/12'" :closeOnBackgroundClick="true">
+    <Modal :isOpen="showSendDataset" @close="showSendDataset = false" :marginTop="'mt-28'" :width="'w-5/12'" :minWidth="'min-w-5/12'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Send Dataset</legend>
         </template>
