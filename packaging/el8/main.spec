@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-3
+- removed module test from makefile to fix build error
 * Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-2
 - rebuilding package
 * Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-1

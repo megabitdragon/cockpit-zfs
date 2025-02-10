@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.12-3focal) focal; urgency=medium
+
+  * removed module test from makefile to fix build error
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:20:39 -0400
+
 cockpit-zfs (1.1.12-2focal) focal; urgency=medium
 
   * rebuilding package
