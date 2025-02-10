@@ -1,3 +1,3 @@
-## zfs module 1.1.11-1
+## zfs module 1.1.12-1
 
-* making package
+* Implements some common-library refactoring and some UI improvements
