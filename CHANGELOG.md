@@ -1,3 +1,3 @@
-## zfs module 1.1.12-3
+## zfs module 1.1.12-4
 
-* removed module test from makefile to fix build error
+* retrying build
