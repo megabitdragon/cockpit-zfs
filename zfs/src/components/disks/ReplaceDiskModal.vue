@@ -24,7 +24,7 @@
                     class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
-                            :title="disk.hasPartitions! ? 'Disk already has partitions.Procees with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name!)"
+                            :title="disk.hasPartitions! ? 'Disk already has partitions. Proceed with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name!)"
                             :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)"
                                 class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">

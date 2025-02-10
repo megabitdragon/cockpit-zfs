@@ -20,7 +20,9 @@ export async function getDisks() {
 
     // Await the promise and retrieve disks
     const result = await spawnState.promise();
-	console.log(result.stdout)
+
+	// console.log(result.stdout)
+	
     return result.stdout;
   } catch (error: any) {
     console.error('Error in getDisks:', error.message);

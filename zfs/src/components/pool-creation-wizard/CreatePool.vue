@@ -229,10 +229,12 @@ async function finishBtn(newPoolData) {
 	const { name, vdevs, ...options } = newPoolData;
 	const poolBase: ZPoolBase = { name, vdevs };
 	const poolOptions: ZpoolCreateOptions = options;
-	console.log("poolBasae: ", poolBase," PoolOption: ",poolOptions)
 	
+	console.log("poolBase: ", poolBase)
+	console.log("PoolOptions: ", poolOptions)
+
 	try {
-		const output: any = await zfsManager.createPool(poolBase,poolOptions);
+		const output: any = await zfsManager.createPool(poolBase, poolOptions);
 
 		if (output == null || output.error) {
 			const errorMessage = output?.error || 'Unknown error';

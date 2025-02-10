@@ -1,4 +1,4 @@
-import { legacy } from '@45drives/houston-common-lib';
+import { legacy, ZPoolBase, ZpoolCreateOptions } from '@45drives/houston-common-lib';
 import { ref, Ref } from 'vue';
 // @ts-ignore
 import test_ssh_script from"../scripts/test-ssh.py?raw";
@@ -405,22 +405,22 @@ export function getValue(type : string, value : string) {
 	}
 }
 
-export function checkInheritance(type: string, value : string, poolConfig : ZPool) {
+export function checkInheritance(type: string, value : string, poolConfigOptions : ZpoolCreateOptions) {
 	if (type == 'compression') {
 		if (value == 'inherited') {
-			return `${upperCaseWord(value)} (${isBoolCompression(poolConfig.properties.compression).toUpperCase()})`
+			return `${upperCaseWord(value)} (${poolConfigOptions.compression!.toUpperCase()})`
 		} else {
 			return getValue('compression', value);
 		}
 	} else if (type == 'dedup') {
 		if (value == 'inherited') {
-			return `${upperCaseWord(value)} (${upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication))})`
+			return `${upperCaseWord(value)} (${upperCaseWord(poolConfigOptions.dedup!)})`
 		} else {
 			return getValue('dedup', value);
 		}
 	} else if (type == 'record') {
 		if (value == 'inherited') {
-			return `${upperCaseWord(value)} (${getValue('record', poolConfig.properties.record)})`
+			return `${upperCaseWord(value)} (${getValue('record', poolConfigOptions.recordsize!.toString())})`
 		} else {
 			return getValue('record', value);
 		}
@@ -516,6 +516,51 @@ export function getCapacityColor(type: 'text' | 'bg', capacity: number, refreser
 	return colorString;
 }
 
+export function getFullDiskInfo(disks: VDevDisk[], diskName: string): VDevDisk | undefined {
+	if (!diskName) {
+		console.warn("getFullDiskInfo called with an empty diskName.");
+		return undefined;
+	}
+
+	const pathPrefixes: Record<string, string> = {
+		phy_path: '/dev/disk/by-path/',
+		sd_path: '/dev/',
+		id_path: '/dev/disk/by-id/',
+		label_path: '/dev/disk/by-label/',
+		part_label_path: '/dev/disk/by-partlabel/',
+		part_uuid: '/dev/disk/by-partuuid/',
+		uuid: '/dev/disk/by-uuid/',
+	};
+
+	console.log("Searching for disk with name:", diskName);
+
+	// Find the disk by matching its name against possible paths
+	const foundDisk = disks.find(disk => {
+		if (disk.name?.trim() === diskName.trim() || disk.vdev_path?.trim() === diskName.trim()) {
+			disk.path = disk.vdev_path?.trim() ?? disk.name?.trim() ?? ''; // Ensure it's always a string
+			return true;
+		}
+
+		for (const [key, prefix] of Object.entries(pathPrefixes)) {
+			const diskPath = (disk as any)[key]?.trim();
+			if (diskPath && diskPath.replace(prefix, '') === diskName.trim()) {
+				disk.path = diskPath; // Assign the actual matched path
+				return true;
+			}
+		}
+
+		return false;
+	});
+
+	if (foundDisk) {
+		console.log("Found disk:", foundDisk);
+	}
+
+	return foundDisk;
+}
+
+
+
 export function getDiskIDName(disks: VDevDisk[], diskIdentifier: string, selectedDiskName: string) {
 	const phyPathPrefix = '/dev/disk/by-path/';
 	const sdPathPrefix = '/dev/';
@@ -528,9 +573,16 @@ export function getDiskIDName(disks: VDevDisk[], diskIdentifier: string, selecte
 	const newDisk = ref();
 	const diskName = ref('');
 	const diskPath = ref('');
-	console.log("getDiskIDNAme: disks: ", disks," diskIdentifier: ", diskIdentifier," selectDiskName: ",selectedDiskName )
+
+	// console.log('diskIdentifier:', diskIdentifier);
+	// console.log('selectedDiskName:', selectedDiskName);
+
 	// Find the selected disk
-	newDisk.value = disks.find(disk => disk.name!.trim() == selectedDiskName.trim());
+	// newDisk.value = disks.find(disk => disk.name!.trim() == selectedDiskName.trim());
+	newDisk.value = disks.find(disk => {
+		console.log("Checking disk:", disk.name?.trim(), "against", selectedDiskName.trim());
+		return disk.name?.trim() === selectedDiskName.trim();
+	});
 
 	switch (diskIdentifier) {
 		case 'vdev_path':

@@ -12,9 +12,9 @@
 					</template>
 					<template v-slot:content>
 						<div>
-							<p>Compression: <b>{{ isBoolCompression(poolConfig.compression).toUpperCase() }}</b></p>
-							<p>Sector Size: <b>{{ getValue('sector', poolConfig.sectorsize) }}</b></p>
-							<p>Record Size: <b>{{ getValue('record', poolConfig.record) }}</b></p>
+							<p>Compression: <b>{{ poolConfig.compression!.toUpperCase() }}</b></p>
+							<p>Sector Size: <b>{{ getValue('sector', poolConfig.sectorsize!.toString()) }}</b></p>
+							<p>Record Size: <b>{{ getValue('record', poolConfig.recordsize!.toString()) }}</b></p>
 							<div class="rounded-lg mt-1 border border-default bg-default">
 								<Disclosure v-slot="{ open }">
 									<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
@@ -30,10 +30,10 @@
 									<DisclosurePanel>
 										<div class="p-2 rounded-lg bg-default">
 											<p>Refreservation: <b>{{ poolConfig.refreservationPercent! }}%</b></p>
-											<p>Deduplication: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.deduplication)) }}</b></p>
-											<p>Auto-Expand: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.autoExpand)) }}</b></p>
-											<p>Auto-Replace: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.autoReplace)) }}</b></p>
-											<p>Auto-TRIM: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.autoTrim)) }}</b></p>
+											<p>Deduplication: <b>{{ upperCaseWord(poolConfig.dedup!) }}</b></p>
+											<p>Auto-Expand: <b>{{ upperCaseWord(poolConfig.autoexpand!) }}</b></p>
+											<p>Auto-Replace: <b>{{ upperCaseWord(poolConfig.autoreplace!) }}</b></p>
+											<p>Auto-TRIM: <b>{{ upperCaseWord(poolConfig.autotrim!) }}</b></p>
 										</div>
 									</DisclosurePanel>
 								</Disclosure>
@@ -63,10 +63,12 @@
 										<template v-slot:footer>
 											<div class="flex flex-row gap-1">
 												<p class="mt-3">Disks:</p>
-												<Card v-for="disk, diskIdx in vDev.disks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
+												<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
 													<template v-slot:title>
-														<div>
-															<b :class="truncateText" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk.path)">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk.path) }}</b>
+														<div class="flex flex-col justify-center items-center text-center">
+															<div><b :class="truncateText" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk)">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk) }}</b></div>
+															<br/>
+															<div><b>{{ getFullDiskInfo(disks, disk)!.capacity! }}</b></div>
 														</div>
 													</template>
 												</Card>
@@ -90,9 +92,9 @@
 					</template>
 					<template v-slot:footer>
 						<div>
-							<p>Quota: <b>{{ convertBytesToSize(convertSizeToBytes((fileSystemData.quota.raw.toString()) + fileSystemData.quota.unit)) }}</b></p>
-							<p>Read Only: <b>{{ upperCaseWord(isBoolOnOff(fileSystemData.isReadOnly!)) }}</b></p>	
-							<p v-if="fileSystemData.encrypted">Encryption: <b>{{ fileSystemData.encryption.toUpperCase() }}</b></p>
+							<p>Quota: <b>{{ convertBytesToSize(convertSizeToBytes((fileSystemData.properties.quota.raw.toString()) + fileSystemData.properties.quota.unit)) }}</b></p>
+							<p>Read Only: <b>{{ upperCaseWord(isBoolOnOff(fileSystemData.properties.isReadOnly!)) }}</b></p>	
+							<p v-if="fileSystemData.encrypted">Encryption: <b>{{ fileSystemData.properties.encryption.toUpperCase() }}</b></p>
 							<p class="mt-1 border rounded-lg border-default bg-default">
 								<Disclosure v-slot="{ open }">
 									<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
@@ -107,22 +109,22 @@
 									</DisclosureButton>
 									<DisclosurePanel>
 										<div v-if="fileSystemData.inherit" class="p-2 rounded-lg">
-											<p>Compression: <b>{{ upperCaseWord(fileSystemData.compression) }} ({{ isBoolCompression(poolConfig.compression).toUpperCase() }})</b></p>
-											<p>Deduplication: <b>{{ upperCaseWord(fileSystemData.deduplication) }} ({{ upperCaseWord(isBoolOnOff(poolConfig.deduplication)) }})</b></p>
-											<p>Record Size: <b>{{ upperCaseWord(fileSystemData.recordSize) }} ({{ getValue('record', poolConfig.record) }})</b></p>
-											<p>Access Time: <b>{{ upperCaseWord(fileSystemData.accessTime) }} (On)</b></p>
-											<p>Case Sensitivity: <b>{{ upperCaseWord(fileSystemData.caseSensitivity) }} (Sensitive)</b></p>
-											<p>DNode Size: <b>{{ upperCaseWord(fileSystemData.dNodeSize) }} (Legacy)</b></p>
-											<p>Extended Attributes: <b>{{ upperCaseWord(fileSystemData.extendedAttributes) }} (System Attribute)</b></p>
+											<p>Compression: <b>{{ upperCaseWord(fileSystemData.properties.compression) }} ({{ poolConfig.compression!.toUpperCase() }})</b></p>
+											<p>Deduplication: <b>{{ upperCaseWord(fileSystemData.properties.deduplication) }} ({{ upperCaseWord(poolConfig.dedup!) }})</b></p>
+											<p>Record Size: <b>{{ upperCaseWord(fileSystemData.properties.recordSize) }} ({{ getValue('record', poolConfig.recordsize!.toString()) }})</b></p>
+											<p>Access Time: <b>{{ upperCaseWord(fileSystemData.properties.accessTime) }} (On)</b></p>
+											<p>Case Sensitivity: <b>{{ upperCaseWord(fileSystemData.properties.caseSensitivity) }} (Sensitive)</b></p>
+											<p>DNode Size: <b>{{ upperCaseWord(fileSystemData.properties.dNodeSize) }} (Legacy)</b></p>
+											<p>Extended Attributes: <b>{{ upperCaseWord(fileSystemData.properties.extendedAttributes) }} (System Attribute)</b></p>
 										</div>
 										<div v-else class="p-2 rounded-lg">
-											<p>Compression: <b>{{ checkInheritance('compression', fileSystemData.compression, poolConfig) }}</b></p>
-											<p>Deduplication: <b>{{ checkInheritance('dedup', fileSystemData.deduplication, poolConfig) }}</b></p>
-											<p>Record Size: <b>{{ checkInheritance('record', fileSystemData.recordSize, poolConfig) }}</b></p>
-											<p>Access Time: <b>{{ checkInheritance('atime', fileSystemData.accessTime, poolConfig) }}</b></p>
-											<p>Case Sensitivity: <b>{{ checkInheritance('case', fileSystemData.caseSensitivity, poolConfig) }}</b></p>
-											<p>DNode Size: <b>{{ checkInheritance('dnode', fileSystemData.dNodeSize, poolConfig) }}</b></p>
-											<p>Extended Attributes: <b>{{ checkInheritance('xattr', fileSystemData.extendedAttributes, poolConfig) }}</b></p>
+											<p>Compression: <b>{{ checkInheritance('compression', fileSystemData.properties.compression, poolConfig) }}</b></p>
+											<p>Deduplication: <b>{{ checkInheritance('dedup', fileSystemData.properties.deduplication, poolConfig) }}</b></p>
+											<p>Record Size: <b>{{ checkInheritance('record', fileSystemData.properties.recordSize, poolConfig) }}</b></p>
+											<p>Access Time: <b>{{ checkInheritance('atime', fileSystemData.properties.accessTime, poolConfig) }}</b></p>
+											<p>Case Sensitivity: <b>{{ checkInheritance('case', fileSystemData.properties.caseSensitivity, poolConfig) }}</b></p>
+											<p>DNode Size: <b>{{ checkInheritance('dnode', fileSystemData.properties.dNodeSize, poolConfig) }}</b></p>
+											<p>Extended Attributes: <b>{{ checkInheritance('xattr', fileSystemData.properties.extendedAttributes, poolConfig) }}</b></p>
 										</div>
 									</DisclosurePanel>
 								</Disclosure>
@@ -175,11 +177,11 @@ import { inject, Ref} from 'vue';
 import Card from '../common/Card.vue';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { CheckCircleIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
-import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
+import { getFullDiskInfo, isBoolOnOff, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { ZPool, VDevDisk, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
+import { VDevDisk, ZFSFileSystemInfo, ZPoolBase, ZpoolCreateOptions } from '@45drives/houston-common-lib';
 
-const poolConfig = inject<ZPool>("pool-config-data")!;
+const poolConfig = inject<Ref<ZPoolBase & ZpoolCreateOptions>>("pool-config-data")!;
 const disks = inject<Ref<VDevDisk[]>>('disks')!;
 const fileSystemData = inject<Ref<ZFSFileSystemInfo>>('file-system-data')!;
 
@@ -191,6 +193,8 @@ const filesystemCreated = inject<Ref<boolean>>('filesystem-created')!;
 
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-console.log('fileSystemData:', fileSystemData.value);
+console.log('ReviewTab -> poolConfig:', poolConfig.value);
+console.log('ReviewTab -> fileSystemData:', fileSystemData.value);
+console.log('ReviewTab -> all disks:', disks.value);
 
 </script>

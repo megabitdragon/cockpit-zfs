@@ -72,7 +72,7 @@
                     Disks</label>
                 <ul v-if="availableDisks.length > 0" :id="getIdKey('available-disk-list')" role="list" class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
-                        <button class="flex min-w-fit w-full h-full border border-default rounded-lg" :title="disk.hasPartitions! ? 'Disk already has partitions.Procees with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name!)" :class="diskCardClass(disk.name)">
+                        <button class="flex min-w-fit w-full h-full border border-default rounded-lg" :title="disk.hasPartitions! ? 'Disk already has partitions. Proceed with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name!)" :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)" class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
                                 <span class="flex flex-row flex-grow w-full justify-between">
                                     <input :id="getIdKey(`disk-${diskIdx}`)" v-model="selectedDisks" type="checkbox" :value="`${disk.name}`" :name="`disk-${disk.name}`" class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />

@@ -475,7 +475,8 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		errors: [],
 	};
 
-	console.log("parsedVdevdata: ",vDev, poolName, disks, vDevType )
+	// console.log("parsedVdevdata: ",vDev, poolName, disks, vDevType )
+	
 	if (vDevData.type === 'disk') {
 		vDevData.path = 'N/A';  // Default path for VM Disk
 	}
@@ -520,7 +521,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 				// Check for other disk types with standard paths
 				const standardDiskPath = disk.sd_path + (partitionSuffix ? partitionSuffix.replace(/^p/, '') : '');
 
-				console.log('Comparing:', standardDiskPath, 'with', vDevData.path);
+				// console.log('Comparing:', standardDiskPath, 'with', vDevData.path);
 				return (
 					disk.phy_path === cleanedVDevPath ||
 					standardDiskPath === vDevData.path ||
