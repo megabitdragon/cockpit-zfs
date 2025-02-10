@@ -16,7 +16,6 @@ import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';
 import { NavigationItem, NavigationCallback } from './types';
 
-
 const show = ref(true);
 const navTag = ref('dashboard');
 const version = __APP_VERSION__;

@@ -3,7 +3,7 @@
 
   "menu": {
       "zfs": {
-          "label": "45Drives ZFS (TESTING)",
+          "label": "45Drives ZFS",
           "path": "index.html",
           "order": 111
       }
