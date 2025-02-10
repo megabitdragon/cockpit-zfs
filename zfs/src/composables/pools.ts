@@ -130,10 +130,10 @@ export async function configurePool(pool: PoolEditConfig) {
 
 		return { success: true };
 
-	} catch (state) {
-		const errorMessage = errorString(state);  // Assuming errorString formats the error
+	} catch (error: any) {
+		const errorMessage = errorString(error);
 		console.error(errorMessage);
-		return { success: false, error: errorMessage };  // Return error message
+		return { success: false, error: errorMessage };
 	}
 }
 

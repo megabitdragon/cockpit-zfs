@@ -357,9 +357,6 @@ watch(confirmSavePool, async (newVal, oldVal) => {
 	if (confirmSavePool.value == true) {
 		pushNotification(new Notification('Pool Config Saved', `Successfully saved this pool's configuration`, 'success', 5000));
 		await refreshAllData();
-		
-	} else {
-		pushNotification(new Notification('Save Pool Config Failed', `There was an error saving this pool`, 'success', 5000));
 	}
 });
 
