@@ -13,7 +13,6 @@
 			<div v-if="props.tag === 'filesystems'" class="p-2">
 				<component :is="fileSystemListComponent"/>
 			</div>
-
 		</div>
 	</div>
 </template>
@@ -72,7 +71,35 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 	fileSystemsLoaded.value = true;
 	// console.log('ZFS.vue scanActivities', scanActivities.value);
 	// console.log('ZFS.vue trimActivities', trimActivities.value);
+	console.log("hello befor")
+	setUpMessageHandler((message) => {
+        console.log("Received DBus Message:", message);
+    });
+console.log("hello after")
 }
+async function setUpMessageHandler(handler) {
+    try {
+        console.log("Setting up DBus message handler...");
+
+        const client = cockpit.dbus("org._45drives.Houston");
+        const houston = await client.proxy("org._45drives.Houston", "/org/_45drives/Houston");
+
+        console.log("Connected to DBus. Subscribing to Message signal...");
+
+        houston.addEventListener("Message", (_, message) => {
+            console.log("Received DBus message event.");
+            handler(message);
+        });
+
+        console.log("DBus message handler successfully set up.");
+    } catch (error) {
+        console.error("Error setting up DBus message handler:", error);
+    }
+}
+
+// setUpMessageHandler((message) => {
+//     console.log("hello")
+// })
 
 initialLoad(disks, pools, datasets, snapshots);
 

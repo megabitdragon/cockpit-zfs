@@ -26,6 +26,12 @@ make DESTDIR=%{buildroot} install
 %files
 /usr/share/cockpit/zfs/*
 
+%post
+# Ensure systemd reloads and starts the service after installation
+systemctl daemon-reload
+systemctl enable houston-dbus
+systemctl start houston-dbus || true
+
 %changelog
 * Fri Jan 17 2025 Rachit Hans <rhans@45drives.com> 1.1.11-1
 - Refacotred UI and script code
