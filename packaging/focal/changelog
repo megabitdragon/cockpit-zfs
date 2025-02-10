@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.12-7focal) focal; urgency=medium
+
+  * build pkg
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:42:04 -0400
+
 cockpit-zfs (1.1.12-6focal) focal; urgency=medium
 
   * rebuilding again

@@ -1,3 +1,3 @@
-## zfs module 1.1.12-6
+## zfs module 1.1.12-7
 
-* rebuilding again
+* build pkg
