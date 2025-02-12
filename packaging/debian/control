@@ -1,0 +1,11 @@
+Source: houston
+Section: utils
+Priority: optional
+Maintainer: Your Name <your.email@example.com>
+Standards-Version: 4.5.0
+
+Package: houston
+Architecture: amd64
+Depends: systemd, dbus
+Description: Houston DBus Service for 45Drives
+ This package provides the Houston DBus service for 45Drives.

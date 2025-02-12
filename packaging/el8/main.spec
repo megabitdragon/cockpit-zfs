@@ -29,8 +29,8 @@ make DESTDIR=%{buildroot} install
 %post
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
-systemctl enable houston-dbus
-systemctl start houston-dbus || true
+systemctl enable houston-dbus.service
+systemctl start houston-dbus.service || true
 
 %changelog
 * Fri Jan 17 2025 Rachit Hans <rhans@45drives.com> 1.1.11-1

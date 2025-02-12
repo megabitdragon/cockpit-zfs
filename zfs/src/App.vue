@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed,onMounted } from 'vue';
 import "@45drives/houston-common-ui/style.css";
 import '@45drives/houston-common-css/src/index.css';
 import { HoustonAppContainer } from "@45drives/houston-common-ui";
@@ -20,6 +20,7 @@ import ZFS from './views/ZFS.vue';
 const show = ref(true);
 const navTag = ref('dashboard');
 const version = __APP_VERSION__;
+
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
 
@@ -35,6 +36,15 @@ const navigation = reactive<NavigationItem[]>([
 	{ name: 'File Systems', tag: 'filesystems', current: computed(() => navTag.value == 'filesystems') as unknown as boolean, show: true, },
 ].filter(item => item.show));
 
+// function setUpMessageHandler(handler: (message:string) => void) {
+//     const client = cockpit.dbus("org._45drives.Houston");
+//     const houston = client.proxy("org._45drives.Houston", "/org/_45drives/Houston");
+//     houston.addEventListener("Message", (event_, message: string) => handler(message));
+// }
+
+// setUpMessageHandler((message) => {
+//     console.log("message from dbus",message)
+// })
 
 </script>
 
