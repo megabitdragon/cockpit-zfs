@@ -53,9 +53,9 @@
 						</td>
 						<td
 							class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end">
-							<Menu as="div" class="relative inline-block text-right">
+							<Menu as="div"  class="relative  menu-container inline-block text-right">
 								<div>
-									<MenuButton
+									<MenuButton @click="isMenuOpen = !isMenuOpen"
 										class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 										<span class="sr-only">Open options</span>
 										<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
@@ -68,8 +68,8 @@
 									leave-active-class="transition ease-in duration-75"
 									leave-from-class="transform opacity-100 scale-100"
 									leave-to-class="transform opacity-0 scale-95">
-									<MenuItems @click.stop
-										class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+									<MenuItems @click.stop @mouseleave="closeMenu"
+										class="fixed  z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 										<div class="py-1">
 											<!-- <MenuItem as="div" v-slot="{ active }">
 												<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
@@ -178,9 +178,9 @@
 						</td>
 						<td
 							class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end">
-							<Menu as="div" class="relative inline-block text-right">
+							<Menu as="div"  class="relative menu-container inline-block text-right">
 								<div>
-									<MenuButton
+									<MenuButton @click="isMenuOpen = !isMenuOpen"
 										class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
 										<span class="sr-only">Open options</span>
 										<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
@@ -193,8 +193,8 @@
 									leave-active-class="transition ease-in duration-75"
 									leave-from-class="transform opacity-100 scale-100"
 									leave-to-class="transform opacity-0 scale-95">
-									<MenuItems
-										class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+									<MenuItems @mouseleave="closeMenu"
+										class="fixed right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 										<div class="py-1">
 											<MenuItem as="div" v-slot="{ active }">
 											<a href="#" @click="cloneThisSnapshot(snapshot)"
@@ -278,7 +278,7 @@
 
 </template>
 <script setup lang="ts">
-import { ref, inject, Ref, provide, watch, onMounted } from 'vue';
+import { ref, inject, Ref, provide, watch, onMounted,onUnmounted } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { loadSnapshotsInPool, loadSnapshotsInDataset } from '../../composables/loadData';
@@ -670,6 +670,62 @@ watch(confirmSendSnap, async (newVal, oldVal) => {
 		await refreshSnaps();
 	} else {
 	}
+});
+
+const isMenuOpen = ref(false);
+//disabling scrolling of page////////
+const disableScroll = () => {
+  document.querySelectorAll('.stop-scroll').forEach((el) => {
+    if (el instanceof HTMLElement) {
+      el.style.overflow = 'hidden';
+      el.style.position = 'fixed';
+      el.style.width = '100%';
+    }
+  });
+};
+const enableScroll = () => {
+	console.log("enable scroll is called")
+	document.querySelectorAll('.stop-scroll').forEach((el) => {
+		console.log("enable scroll hello")
+
+    if (el instanceof HTMLElement) {
+      el.style.overflow = 'auto';
+      el.style.position = 'relative';
+      el.style.width = '100%';
+    }
+  });
+};
+const closeMenu = (event) => {
+  const menuElements = document.querySelectorAll(".menu-container");
+
+  let clickedInsideAnyMenu = false;
+
+  // ✅ Check if the click is inside any menu container
+  menuElements.forEach((menuElement) => {
+    if (menuElement.contains(event.target)) {
+      clickedInsideAnyMenu = true;
+    }
+  });
+
+  // ✅ Close menu if the click was outside all menus
+  if (!clickedInsideAnyMenu) {
+    isMenuOpen.value = false;
+    enableScroll();
+  }
+};// Watch for menu open/close state and toggle scrolling on `.stop-scroll` elements
+watch(isMenuOpen, (newVal) => {
+  if (newVal) {
+    disableScroll();
+    document.addEventListener('click', closeMenu);
+  } else {
+    enableScroll();
+    document.removeEventListener('click', closeMenu);
+  }
+});
+
+// Ensure cleanup when the component is unmounted
+onUnmounted(() => {
+  enableScroll();
 });
 
 
