@@ -580,7 +580,7 @@ export function getDiskIDName(disks: VDevDisk[], diskIdentifier: string, selecte
 	// Find the selected disk
 	// newDisk.value = disks.find(disk => disk.name!.trim() == selectedDiskName.trim());
 	newDisk.value = disks.find(disk => {
-		console.log("Checking disk:", disk.name?.trim(), "against", selectedDiskName.trim());
+		// console.log("Checking disk:", disk.name?.trim(), "against", selectedDiskName.trim());
 		return disk.name?.trim() === selectedDiskName.trim();
 	});
 
