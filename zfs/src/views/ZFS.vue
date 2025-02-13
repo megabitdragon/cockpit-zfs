@@ -6,11 +6,11 @@
 			   	<component :is="dashboardComponent"/> 
 			</div>
 
-			<div v-if="props.tag === 'pools'" class="p-2 stop-scroll">
+			<div v-if="props.tag === 'pools'" class="p-2">
 				<component :is="poolListComponent"/>
 			</div>
 
-			<div v-if="props.tag === 'filesystems'" class="p-2 stop-scroll">
+			<div v-if="props.tag === 'filesystems'" class="p-2">
 				<component :is="fileSystemListComponent"/>
 			</div>
 
