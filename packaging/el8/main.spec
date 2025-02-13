@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Thu Feb 13 2025 Jordan Keough <jkeough@45drives.com> 1.1.13-1
+- Fixed an issue with houston-common import not getting correct types
 * Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-7
 - build pkg
 * Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-6

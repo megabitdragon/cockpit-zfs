@@ -1,3 +1,3 @@
-## zfs module 1.1.12-7
+## zfs module 1.1.13-1
 
-* build pkg
+* Fixed an issue with houston-common import not getting correct types
