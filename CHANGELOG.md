@@ -1,3 +1,3 @@
-## zfs module 1.1.13-1
+## zfs module 1.1.13-2
 
-* Fixed an issue with houston-common import not getting correct types
+* Fixes RaidZ levels' minimum disk quantity
