@@ -700,15 +700,15 @@ const diskCheck = () => {
 		if (vdev.type == 'mirror' && vdev.selectedDisks!.length < 2) {
 			result = false;
 			diskFeedback.value = 'Two or more Disks are required for Mirror.';
-		} else if (vdev.type == 'raidz1' && vdev.selectedDisks!.length < 2) {
+		} else if (vdev.type == 'raidz1' && vdev.selectedDisks!.length < 3) {
 			result = false;
-			diskFeedback.value = 'Two or more Disks are required for RaidZ1.';
-		} else if (vdev.type == 'raidz2' && vdev.selectedDisks!.length < 3) {
+			diskFeedback.value = 'Three or more Disks are required for RaidZ1.';
+		} else if (vdev.type == 'raidz2' && vdev.selectedDisks!.length < 4) {
 			result = false;
-			diskFeedback.value = 'Three or more Disks are required for RaidZ2.';
-		} else if (vdev.type == 'raidz3' && vdev.selectedDisks!.length < 4) {
+			diskFeedback.value = 'Four or more Disks are required for RaidZ2.';
+		} else if (vdev.type == 'raidz3' && vdev.selectedDisks!.length < 5) {
 			result = false;
-			diskFeedback.value = 'Four or more Disks are required for RaidZ3.';
+			diskFeedback.value = 'Five or more Disks are required for RaidZ2.';
 		} else if (vdev.type == 'disk' && vdev.selectedDisks!.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required.';

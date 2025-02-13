@@ -690,8 +690,8 @@ async function resumeScrub(pool) {
 		const output: any = await scrubPool(selectedPool.value!);
 
 		if (output == null || output.error) {
-				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Scrub Resume Failed', `Scrub failed to resume: ${errorMessage}.`, 'error', 5000));
+			const errorMessage = output?.error || 'Unknown error';
+			pushNotification(new Notification('Scrub Resume Failed', `Scrub failed to resume: ${errorMessage}.`, 'error', 5000));
 
 			confirmScrub.value = false;
 		} else {
