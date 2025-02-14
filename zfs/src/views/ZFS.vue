@@ -24,6 +24,7 @@ import { ref, Ref, provide, watchEffect } from 'vue';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
 import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
 import { ZPool, VDevDisk, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
+import { notificationStore } from "../store/notification";
 
 interface ZFSProps {
   	tag: string;
@@ -88,6 +89,7 @@ async function setUpMessageHandler(handler) {
 
         houston.addEventListener("Message", (_, message) => {
             console.log("Received DBus message event.");
+			notificationStore.addNotification(message);
             handler(message);
         });
 
