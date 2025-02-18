@@ -131,6 +131,20 @@
 												<XMarkIcon class="size-icon text-gray-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="" /> 
 											</div>
 										</div>
+										<div class="flex items-start gap-3" v-if="notification.event === 'resilver_finish'" >
+											<div >
+												<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
+											</div>
+											<div class="w-full">
+											<p class="text-xl font-semibold text-green-500">Resilver Finished - {{ notification.pool }}</p>
+											<p class="pl-4 text-sm text-gray-400">- Resilvering completed successfully for the pool {{ notification.pool }}
+												<br> timestamp: {{ notification.timestamp }}
+											</p>
+											</div>
+											<div>
+												<XMarkIcon class="size-icon text-gray-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="" /> 
+											</div>
+										</div>
 								</MenuItem>
 								</div>
 
