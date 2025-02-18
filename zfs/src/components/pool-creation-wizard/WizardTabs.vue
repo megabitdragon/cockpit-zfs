@@ -40,6 +40,7 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon } from '@heroicons/vue/24/outline';
+import { StepsNavigationItem, StepNavigationCallback } from '../../types';
 
 interface WizardTabsProps {
 	show: boolean;

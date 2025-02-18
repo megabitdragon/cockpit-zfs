@@ -12,9 +12,9 @@
 					</template>
 					<template v-slot:content>
 						<div>
-							<p>Compression: <b>{{ isBoolCompression(poolConfig.properties.compression).toUpperCase() }}</b></p>
-							<p>Sector Size: <b>{{ getValue('sector', poolConfig.properties.sector) }}</b></p>
-							<p>Record Size: <b>{{ getValue('record', poolConfig.properties.record) }}</b></p>
+							<p>Compression: <b>{{ poolConfig.compression!.toUpperCase() }}</b></p>
+							<p>Sector Size: <b>{{ getValue('sector', poolConfig.sectorsize!.toString()) }}</b></p>
+							<p>Record Size: <b>{{ getValue('record', poolConfig.recordsize!.toString()) }}</b></p>
 							<div class="rounded-lg mt-1 border border-default bg-default">
 								<Disclosure v-slot="{ open }">
 									<DisclosureButton class="bg-default grid grid-cols-8 w-full justify-start text-center rounded-lg">
@@ -29,11 +29,11 @@
 									</DisclosureButton>
 									<DisclosurePanel>
 										<div class="p-2 rounded-lg bg-default">
-											<p>Refreservation: <b>{{ poolConfig.properties.refreservationPercent! }}%</b></p>
-											<p>Deduplication: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }}</b></p>
-											<p>Auto-Expand: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoExpand)) }}</b></p>
-											<p>Auto-Replace: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoReplace)) }}</b></p>
-											<p>Auto-TRIM: <b>{{ upperCaseWord(isBoolOnOff(poolConfig.properties.autoTrim)) }}</b></p>
+											<p>Refreservation: <b>{{ poolConfig.refreservationPercent! }}%</b></p>
+											<p>Deduplication: <b>{{ upperCaseWord(poolConfig.dedup!) }}</b></p>
+											<p>Auto-Expand: <b>{{ upperCaseWord(poolConfig.autoexpand!) }}</b></p>
+											<p>Auto-Replace: <b>{{ upperCaseWord(poolConfig.autoreplace!) }}</b></p>
+											<p>Auto-TRIM: <b>{{ upperCaseWord(poolConfig.autotrim!) }}</b></p>
 										</div>
 									</DisclosurePanel>
 								</Disclosure>
@@ -63,10 +63,12 @@
 										<template v-slot:footer>
 											<div class="flex flex-row gap-1">
 												<p class="mt-3">Disks:</p>
-												<Card v-for="disk, diskIdx in vDev.disks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
+												<Card v-for="disk, diskIdx in vDev.selectedDisks" :key="diskIdx" :bgColor="'bg-well'" :titleSection="true" :contentSection="false" :footerSection="false" class="rounded-lg text-default border border-default">
 													<template v-slot:title>
-														<div>
-															<b :class="truncateText" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk.path)">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk.path) }}</b>
+														<div class="flex flex-col justify-center items-center text-center">
+															<div><b :class="truncateText" :title="getDiskIDName(disks, vDev.diskIdentifier!, disk)">{{ getDiskIDName(disks, vDev.diskIdentifier!, disk) }}</b></div>
+															<br/>
+															<div><b>{{ getFullDiskInfo(disks, disk)!.capacity! }}</b></div>
 														</div>
 													</template>
 												</Card>
@@ -107,9 +109,9 @@
 									</DisclosureButton>
 									<DisclosurePanel>
 										<div v-if="fileSystemData.inherit" class="p-2 rounded-lg">
-											<p>Compression: <b>{{ upperCaseWord(fileSystemData.properties.compression) }} ({{ isBoolCompression(poolConfig.properties.compression).toUpperCase() }})</b></p>
-											<p>Deduplication: <b>{{ upperCaseWord(fileSystemData.properties.deduplication) }} ({{ upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication)) }})</b></p>
-											<p>Record Size: <b>{{ upperCaseWord(fileSystemData.properties.recordSize) }} ({{ getValue('record', poolConfig.properties.record) }})</b></p>
+											<p>Compression: <b>{{ upperCaseWord(fileSystemData.properties.compression) }} ({{ poolConfig.compression!.toUpperCase() }})</b></p>
+											<p>Deduplication: <b>{{ upperCaseWord(fileSystemData.properties.deduplication) }} ({{ upperCaseWord(poolConfig.dedup!) }})</b></p>
+											<p>Record Size: <b>{{ upperCaseWord(fileSystemData.properties.recordSize) }} ({{ getValue('record', poolConfig.recordsize!.toString()) }})</b></p>
 											<p>Access Time: <b>{{ upperCaseWord(fileSystemData.properties.accessTime) }} (On)</b></p>
 											<p>Case Sensitivity: <b>{{ upperCaseWord(fileSystemData.properties.caseSensitivity) }} (Sensitive)</b></p>
 											<p>DNode Size: <b>{{ upperCaseWord(fileSystemData.properties.dNodeSize) }} (Legacy)</b></p>
@@ -175,11 +177,11 @@ import { inject, Ref} from 'vue';
 import Card from '../common/Card.vue';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { CheckCircleIcon, ChevronUpIcon } from '@heroicons/vue/24/outline';
-import { isBoolOnOff, isBoolCompression, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
+import { getFullDiskInfo, isBoolOnOff, convertBytesToSize, upperCaseWord, getValue, checkInheritance, convertSizeToBytes, getDiskIDName } from '../../composables/helpers';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { ZPool, VDevDisk, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
+import { VDevDisk, ZFSFileSystemInfo, ZPoolBase, ZpoolCreateOptions } from '@45drives/houston-common-lib';
 
-const poolConfig = inject<ZPool>("pool-config-data")!;
+const poolConfig = inject<Ref<ZPoolBase & ZpoolCreateOptions>>("pool-config-data")!;
 const disks = inject<Ref<VDevDisk[]>>('disks')!;
 const fileSystemData = inject<Ref<ZFSFileSystemInfo>>('file-system-data')!;
 
@@ -191,6 +193,8 @@ const filesystemCreated = inject<Ref<boolean>>('filesystem-created')!;
 
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-console.log('fileSystemData:', fileSystemData.value);
+console.log('ReviewTab -> poolConfig:', poolConfig.value);
+console.log('ReviewTab -> fileSystemData:', fileSystemData.value);
+console.log('ReviewTab -> all disks:', disks.value);
 
 </script>

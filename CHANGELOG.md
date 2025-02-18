@@ -1,3 +1,3 @@
-## zfs module 1.1.11-1
+## zfs module 1.1.13-2
 
-* making package
+* Fixes RaidZ levels' minimum disk quantity

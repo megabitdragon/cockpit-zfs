@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
+    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             Attach Disk
         </template>
@@ -24,7 +24,7 @@
                     class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
-                            :title="disk.hasPartitions! ? 'Disk already has partitions.Procees with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name)"
+                            :title="disk.hasPartitions! ? 'Disk already has partitions. Proceed with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name!)"
                             :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)"
                                 class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
@@ -45,7 +45,7 @@
                                     </div>
                                 </span>
                                 <h3 class="truncate text-sm font-medium text-default">
-                                    {{ truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
+                                    {{ truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name!)), 8) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
@@ -137,6 +137,7 @@ import { loadDisksThenPools, loadDatasets, loadDiskStats, loadScanObjectGroup } 
 import { loadImportablePools } from '../../composables/loadImportables';
 import { ZPool, VDev, VDevDisk, ZFSFileSystemInfo, DiskIdentifier } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { PoolScanObjectGroup, PoolDiskStats, Activity } from '../../types';
 
 interface AttachDiskModalProps {
 	idKey: string;
@@ -164,7 +165,7 @@ function debuggingInfo() {
     console.log('vDev:', props.vDev);
     console.log('allDisks:', allDisks.value);
     availableDisks.value.forEach(availableDisk => {
-        console.log(getDiskIDName(allDisks.value, diskIdentifier.value, availableDisk.name));
+        console.log(getDiskIDName(allDisks.value, diskIdentifier.value, availableDisk.name!));
     });
 }
 
@@ -273,17 +274,17 @@ async function attachDiskBtn() {
                 
             adding.value = true;
             try {
-                const output = await attachDisk(diskVDevPoolData.value);
+                const output: any = await attachDisk(diskVDevPoolData.value);
 
                 if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    pushNotification(new Notification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error', 8000));
+                    pushNotification(new Notification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error', 5000));
                 } else {
                     showAttachDiskModal.value = false;
                     adding.value = false;
                     await refreshAllData();
-                    pushNotification(new Notification('Disk Attached', `Attached disk to virtual device successfully.`, 'success', 8000));
+                    pushNotification(new Notification('Disk Attached', `Attached disk to virtual device successfully.`, 'success', 5000));
                 }
             } catch (error) {
                 console.error(error);
@@ -308,14 +309,14 @@ const diskSizeMatch = () => {
     const newDiskData = allDisks.value.find(fullDisk => fullDisk.name === selectedDisk.value);
 
     if (newDiskData) {
-        const newCapacity = convertSizeToBytes(newDiskData!.capacity);
+        const newCapacity = convertSizeToBytes(newDiskData!.capacity!);
         console.log('newCapacity:', newCapacity);
 
         const oldDisks = props.vDev.disks;
         console.log('oldDisks:', oldDisks);
 
         for (const oldDisk of oldDisks) {
-            const currentCapacity = convertSizeToBytes(oldDisk.capacity);
+            const currentCapacity = convertSizeToBytes(oldDisk.capacity!);
             console.log('currentCapacity:', currentCapacity);
 
             if (newCapacity < currentCapacity) {

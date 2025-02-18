@@ -1,9 +1,8 @@
 <template>
 	<div class="min-h-screen h-full w-full min-w-fit flex flex-col bg-default overflow-auto">
-		<HoustonAppContainer moduleName="zfs" :appVersion="version">
+		<HoustonAppContainer moduleName="ZFS" :appVersion="version">
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 			<ZFS :tag="navTag"/>
-
 		</HoustonAppContainer>
 	</div>
 </template>
@@ -15,7 +14,7 @@ import '@45drives/houston-common-css/src/index.css';
 import { HoustonAppContainer } from "@45drives/houston-common-ui";
 import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';
-
+import { NavigationItem, NavigationCallback } from './types';
 
 const show = ref(true);
 const navTag = ref('dashboard');

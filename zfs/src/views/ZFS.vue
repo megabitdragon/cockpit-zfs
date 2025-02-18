@@ -25,6 +25,7 @@ import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, l
 import { loadScanActivities, loadTrimActivities } from '../composables/helpers';
 import { ZPool, VDevDisk, ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 import { notificationStore } from "../store/notification";
+import { ImportablePoolData, Snapshot, Activity, PoolScanObjectGroup, PoolDiskStats } from '../types';
 
 interface ZFSProps {
   	tag: string;

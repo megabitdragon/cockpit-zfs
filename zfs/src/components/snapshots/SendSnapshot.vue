@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showSendDataset" @close="showSendDataset = false" :marginTop="'mt-28'" :width="'w-5/12'" :minWidth="'min-w-5/12'">
+    <Modal :isOpen="showSendDataset" @close="showSendDataset = false" :marginTop="'mt-28'" :width="'w-5/12'" :minWidth="'min-w-5/12'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Send Dataset</legend>
         </template>
@@ -16,7 +16,7 @@
                 <div class="mt-2 col-span-2">
                     <!-- Receiving Dataset: [User Supplied] -->
                     <label :for="getIdKey('receiving-dataset-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Dataset:</label>
-                    <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="destinationName" placeholder="Destination Name Here"/>
+                    <input @keydown.enter="" @change="doesRecvDatasetExist()" :id="getIdKey('receiving-dataset-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-dataset-name" v-model="destinationName" placeholder="Destination Name Here" />
                     <p v-if="invalidConfig" class="mt-1 text-sm text-danger">{{ invalidConfigMsg }}</p>
                     <p v-if="invalidDest" class="mt-1 text-sm text-danger">{{ invalidDestMsg }}</p>
                     <p v-if="invalidConfig" class="mt-1 text-sm text-muted"><i>{{ mostRecentDestSnapMsg }}</i></p>
@@ -25,23 +25,23 @@
                 <div class="mt-2 col-span-2">
                     <!-- Receiving Host: (Optional-> If Empty, then Local) -->
                     <label :for="getIdKey('receiving-host-name')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Host:</label>
-                    <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="destinationHost" placeholder="(Leave empty if sending locally.)"/>
+                    <input @keydown.enter="" :id="getIdKey('receiving-host-name')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-name" v-model="destinationHost" placeholder="(Leave empty if sending locally.)" />
                 </div>
                 <div class="mt-2 col-span-2">
                     <!-- Host User -->
                     <label :for="getIdKey('receiving-host-user')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving User:</label>
-                    <input @keydown.enter="" :id="getIdKey('receiving-host-user')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-user" v-model="destinationHostUser" placeholder="Destination Host User"/>
+                    <input @keydown.enter="" :id="getIdKey('receiving-host-user')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-host-user" v-model="destinationHostUser" placeholder="Destination Host User" />
                 </div>
                 <div class="mt-2 col-span-2">
                     <!-- Receiving Port: [Default -> 22, User Can Change]-->
                     <label :for="getIdKey('receiving-port')" class="mt-1 block text-sm font-medium leading-6 text-default">Receiving Port:</label>
-                    <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort"/>
+                    <input @keydown.enter="" :id="getIdKey('receiving-port')" type="text" class="input-textlike bg-default mt-1 block w-full py-1.5 px-1.5 text-default" name="receiving-port" v-model="destinationPort" />
                 </div>
                 <!-- If Remote Send, have mBuffer size configurable -->
                 <div v-if="destinationHost != ''" class="mt-2 grid grid-cols-4 gap-2 col-span-2">
                     <div class="col-span-2 grid grid-cols-2 justify-items-center">
                         <label :for="getIdKey('mbuffer-size')" class="mt-1 text-sm font-medium leading-6 text-default w-full col-span-1">mBuffer Size:</label>
-                        <input @keydown.enter="" :id="getIdKey('mbuffer-size')" type="number" class="input-textlike bg-default mt-1 w-full py-1.5 px-1.5 text-default col-span-1" name="mbuffer-size" v-model="mBufferSize"/>
+                        <input @keydown.enter="" :id="getIdKey('mbuffer-size')" type="number" class="input-textlike bg-default mt-1 w-full py-1.5 px-1.5 text-default col-span-1" name="mbuffer-size" v-model="mBufferSize" />
                     </div>
                     <div class="col-span-2 grid grid-cols-2 justify-items-center">
                         <label :for="getIdKey('mbuffer-unit')" class="mt-1 text-sm font-medium leading-6 text-default w-full col-span-1">mBuffer Unit:</label>
@@ -53,22 +53,22 @@
                         </select>
                     </div>
                 </div>
-              
+
                 <div class="mt-2 grid grid-flow-col col-span-2">
                     <!-- Send Compressed: [Checkbox -> (-Lce) options] *** Cannot be used if Encrypted -->
                     <label :for="getIdKey('send-compressed-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
-                        Send Compressed: 
-                        <input :id="getIdKey('send-compressed-toggle')" v-model="sendCompressed" @change="handleCheckboxChange('sendCompressed')" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
+                        Send Compressed:
+                        <input :id="getIdKey('send-compressed-toggle')" v-model="sendCompressed" @change="handleCheckboxChange('sendCompressed')" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
                     </label>
                     <!-- Send Raw: [Checkbox -> (-w) option] *** If Encrypted, force this mode -->
                     <label :for="getIdKey('send-raw-toggle')" class="mt-1 block text-sm font-medium leading-6 text-default col-span-1">
                         Send Raw:
-                        <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" @change="handleCheckboxChange('sendRaw')" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
+                        <input :id="getIdKey('send-raw-toggle')" v-model="sendRaw" @change="handleCheckboxChange('sendRaw')" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
                     </label>
                     <!-- Force Overwrite: [Checkbox -> (-F) option] -->
                     <label v-if="invalidConfig" :for="getIdKey('force-overwrite-toggle')" class="mt-1 block text-sm font-medium leading-6 text-danger col-span-1">
                         Force Overwrite:
-                        <input :id="getIdKey('force-overwrite-toggle')" v-model="forceOverwrite" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2"/>	
+                        <input :id="getIdKey('force-overwrite-toggle')" v-model="forceOverwrite" type="checkbox" class="ml-2 w-5 h-5 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
                     </label>
                 </div>
                 <div class="mt-2 col-span-2">
@@ -102,7 +102,7 @@
     </Modal>
 
     <div v-if="showTestSSH">
-        <component :is="testSSHComponent" @close="updateShowTestSSH" :idKey="'test-ssh-modal'" :showFlag="showTestSSH"/>
+        <component :is="testSSHComponent" @close="updateShowTestSSH" :idKey="'test-ssh-modal'" :showFlag="showTestSSH" />
     </div>
 
 </template>
@@ -114,6 +114,7 @@ import { sendSnapshot, doesDatasetExist, formatRecentSnaps, doesDatasetHaveSnaps
 import { convertTimestampToLocal, getRawTimestampFromString, convertRawTimestampToString, convertSizeToBytes } from '../../composables/helpers';
 import {ZPool,ZFSFileSystemInfo} from "@45drives/houston-common-lib"
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { SendingDataset, SendProgress, Snapshot, SnapSnippet } from '../../types';
 
 const { BetterCockpitFile } = legacy;
 interface SendSnapshotProps {
@@ -121,7 +122,6 @@ interface SendSnapshotProps {
     snapshot: Snapshot;
     name: string;
 }
-
 
 const props = defineProps<SendSnapshotProps>();
 const pools = inject<Ref<ZPool[]>>('pools')!;
@@ -521,7 +521,7 @@ async function sendBtn() {
         console.error("Error occurred during snapshot send:", error);
         pushNotification(new Notification(            'Failed Snapshot Send',
             `Failed to send snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}: ${error.message}`,
-            'error', 8000));
+            'error', 5000));
     }
 }
 
@@ -533,7 +533,7 @@ async function handleSend() {
         await sendAndReadProgress(sendingData.value, sendProgressData.value);
         pushNotification(new Notification('Snapshot Sent',
             `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName}.`,
-            'success', 8000));
+            'success', 5000));
 
         confirmSend.value = true;
         showSendDataset.value = false;
@@ -551,7 +551,7 @@ async function handleSendWithOverwrite() {
         await sendAndReadProgress(sendingData.value, sendProgressData.value);
         pushNotification(new Notification('Snapshot Sent',
             `Sent snapshot ${props.snapshot!.name} to ${sendingData.value.recvName} with overwrite.`,
-            'success', 8000));
+            'success', 5000));
 
         confirmSend.value = true;
         showSendDataset.value = false;
@@ -581,7 +581,7 @@ const sendPercentage = computed(() => {
     }
 });
 
-async function readSendProgress(sendProgressData : SendProgress[], fileReader : BetterCockpitFile) {
+async function readSendProgress(sendProgressData : SendProgress[], fileReader: InstanceType<typeof BetterCockpitFile>) {
     try {
         let initialRun = true;
         let nullRun = true;
@@ -609,7 +609,7 @@ async function readSendProgress(sendProgressData : SendProgress[], fileReader : 
         fileReader.watch((content) => {
             fillProgressArray(content, sendProgressData);
             console.log('fileReaderContent:', content);
-        });
+        }, {});
 
     } catch (error) {
         console.error("An error occurred loading send progress:", error);

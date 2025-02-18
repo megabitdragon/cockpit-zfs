@@ -7,9 +7,11 @@ import get_pools_script from "../scripts/get-pools.py?raw";
 import get_importable_pools_script from "../scripts/get-importable-pools.py?raw";
 // @ts-ignore
 import get_importable_destroyed_pools_script from "../scripts/get-importable-destroyed-pools.py?raw";
+import { PoolEditConfig } from '../types';
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 const { errorString, useSpawn } = legacy;
+
 export async function getPools() {
 	try {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_pools_script], { superuser: 'try' });
@@ -18,99 +20,15 @@ export async function getPools() {
 	} catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
-		return { error: errorMessage };
+		return JSON.stringify({ error: errorMessage }); 
 	}
 }
 
+export async function newPool(pool) {
+	//need pool (baseBool w/vdevs w/disks) + pooloptions + dataset + datasetoptions
 
+}
   
-// export async function newPool(pool: newPoolData) {
-// 	try {
-// 		newVDevs.value = [];
-// 		newPoolDisks.value = [];
-
-// 		let cmdString = ['zpool', 'create', '-o', 'ashift=' + pool.sectorsize, '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
-// 			'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
-// 			'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name];
-
-// 		if (pool.forceCreate) {
-// 			cmdString.push('-f');
-// 		}
-
-// 		if (pool.vdevs[0].type != 'disk') {
-// 			pool.vdevs.forEach(vDev => {
-// 				if (vDev.isMirror && (vDev.type == 'special' || vDev.type == 'dedup' || vDev.type == 'log')) {
-// 					cmdString.push(vDev.type);
-// 					cmdString.push('mirror');
-// 					vDev.disks.forEach(disk => {
-// 						cmdString.push(disk);
-// 					});
-// 				} else {
-// 					cmdString.push(vDev.type);
-// 					vDev.disks.forEach(disk => {
-// 						cmdString.push(disk);
-// 					});
-// 				}
-// 			});
-			
-// 		} else {
-// 			pool.vdevs.forEach(vDev => {
-// 				if (vDev.type == 'disk') {
-// 					vDev.disks.forEach(disk => {
-// 						if (!newPoolDisks.value.includes(disk)) {
-// 							newPoolDisks.value.push(disk);
-// 						}
-// 					});
-// 				} else if (vDev.type == 'cache' || vDev.type == 'log' || vDev.type == 'special' || vDev.type == 'spare' || vDev.type == 'dedup') {
-// 					if ((vDev.type == 'log' || vDev.type == 'special' || vDev.type == 'dedup') && vDev.isMirror) {
-// 						newVDevData.value.type = vDev.type;
-// 						newVDevData.value.isMirror = true;
-// 						vDev.disks.forEach(disk => {
-// 							newVDevData.value.disks.push(disk);
-// 						});
-// 						newVDevs.value.push(newVDevData.value);
-// 						newVDevData.value = {type: '', disks: [], isMirror: false};			
-// 					} else {
-// 						newVDevData.value.type = vDev.type;
-// 						vDev.disks.forEach(disk => {
-// 							newVDevData.value.disks.push(disk);
-// 						});
-// 						newVDevs.value.push(newVDevData.value);
-// 						newVDevData.value = {type: '', disks: [], isMirror: false};
-// 					}
-// 				}
-// 			});
-
-// 			if (newPoolDisks.value.length > 0) {
-// 				cmdString.push(...newPoolDisks.value);
-// 				if (newVDevs.value.length > 0) {
-// 					newVDevs.value.forEach(vDev => {
-// 						if (vDev.isMirror) {
-// 							cmdString.push(vDev.type);
-// 							cmdString.push('mirror');
-// 							cmdString.push(...vDev.disks);
-// 						} else {
-// 							cmdString.push(vDev.type);
-// 							cmdString.push(...vDev.disks);
-// 						}
-// 					});
-// 				}
-// 			}
-// 		}
-		
-// 		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
-		
-// 		const state = useSpawn(cmdString);
-// 		const output = await state.promise();
-// 		console.log(output)
-// 		return output.stdout;
-	
-// 	} catch (state) {
-// 		const errorMessage = errorString(state);
-// 		console.error(errorMessage);
-// 		return { error: errorMessage };
-// 	}
-// }
 
 export async function setRefreservation(pool: ZPool, refreservationPercent: number) {
 	try {
@@ -138,8 +56,8 @@ export async function setRefreservation(pool: ZPool, refreservationPercent: numb
 export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
 	try {
 		// Force unmount datasets before destruction
-		console.log(`Unmounting datasets in pool: ${pool.name}`);
-		await useSpawn(['zfs', 'unmount', '-f', pool.name]);
+		// console.log(`Unmounting datasets in pool: ${pool.name}`);
+		// await useSpawn(['zfs', 'unmount', '-f', pool.name]);
 
 		// Destroy the pool
 		const cmdString = ['zpool', 'destroy'];
@@ -159,7 +77,7 @@ export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
 
 		console.log('Destroy command output:', output.stdout);
 		return output.stdout;
-	} catch (err) {
+	} catch (err: any) {
 		// If unmount error, retry
 		if (err.stderr && err.stderr.includes('cannot unmount')) {
 			console.warn(`Unmount failed for pool: ${pool.name}. Retrying...`);
@@ -212,10 +130,10 @@ export async function configurePool(pool: PoolEditConfig) {
 
 		return { success: true };
 
-	} catch (state) {
-		const errorMessage = errorString(state);  // Assuming errorString formats the error
+	} catch (error: any) {
+		const errorMessage = errorString(error);
 		console.error(errorMessage);
-		return { success: false, error: errorMessage };  // Return error message
+		return { success: false, error: errorMessage };
 	}
 }
 

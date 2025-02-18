@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
+    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             Replace Disk
         </template>
@@ -24,7 +24,7 @@
                     class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
-                            :title="disk.hasPartitions! ? 'Disk already has partitions.Procees with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name)"
+                            :title="disk.hasPartitions! ? 'Disk already has partitions. Proceed with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name!)"
                             :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)"
                                 class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
@@ -45,7 +45,7 @@
                                     </div>
                                 </span>
                                 <h3 class="truncate text-sm font-medium text-default">
-                                    {{ truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
+                                    {{ truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name!)), 8) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
@@ -136,6 +136,7 @@ import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } 
 import { loadImportablePools } from '../../composables/loadImportables';
 import { ZPool, VDev, VDevDisk, ZFSFileSystemInfo, DiskIdentifier } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { PoolScanObjectGroup, PoolDiskStats, Activity } from '../../types';
 
 
 interface ReplaceDiskModalProps {
@@ -258,18 +259,18 @@ async function replaceDiskBtn() {
                 
             adding.value = true;
             try {
-                const output =  await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
+                const output: any =  await replaceDisk(diskVDevPoolData.value.poolName, diskVDevPoolData.value.existingDiskName, diskVDevPoolData.value.newDiskName, diskVDevPoolData.value.forceReplace);
 
                 if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    pushNotification(new Notification('Replace Disk Failed', `There was an error replacing this disk: ${errorMessage}.`, 'error', 8000));
+                    pushNotification(new Notification('Replace Disk Failed', `There was an error replacing this disk: ${errorMessage}.`, 'error', 5000));
                 } else {
            
                     showReplaceDiskModal.value = false;
                     adding.value = false;
                     await refreshAllData();
-                    pushNotification(new Notification('Disk Replaced', `Replaced disk successfully.`, 'success', 8000));
+                    pushNotification(new Notification('Disk Replaced', `Replaced disk successfully.`, 'success', 5000));
                 }
             } catch (error) {
                 console.error(error);
@@ -293,7 +294,7 @@ const diskSizeMatch = () => {
 
     if (newDiskData) {
         console.log('newDiskCapacity before conversion:', newDiskData!.capacity);
-        const newCapacity = convertSizeToBytes(newDiskData!.capacity);
+        const newCapacity = convertSizeToBytes(newDiskData!.capacity!);
         console.log('newCapacity:', newCapacity);
 
         const oldDisks = props.vDev.disks;
@@ -302,7 +303,7 @@ const diskSizeMatch = () => {
         for (const oldDisk of oldDisks) {
 
             console.log('currentCapacity before conversion:', oldDisk!.capacity, false);
-            const currentCapacity = convertSizeToBytes(oldDisk.capacity);
+            const currentCapacity = convertSizeToBytes(oldDisk.capacity!);
             console.log('currentCapacity:', currentCapacity);
 
             if (newCapacity < currentCapacity) {

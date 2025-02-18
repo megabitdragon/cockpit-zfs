@@ -1,6 +1,5 @@
 <template>
-    <Modal :isOpen="showChangePassphrase" @close="showChangePassphrase = false" :marginTop="'mt-28'" :width="'w-96'"
-        :minWidth="'min-w-min'">
+    <Modal :isOpen="showChangePassphrase" @close="showChangePassphrase = false" :marginTop="'mt-28'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick ="false">
         <template v-slot:title>
             <legend class="flex justify-center">Change Passphrase</legend>
         </template>
@@ -102,16 +101,16 @@ async function changeBtn() {
         changing.value = true;
 
         try {
-            const output = await changePassphrase(fileSystem.value.name, passphrase.value);
+            const output: any = await changePassphrase(fileSystem.value.name, passphrase.value);
 
             if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                 changing.value = false;
-                pushNotification(new Notification('Passphrase Change Failed', `There was an error changing this passphrase: ${errorMessage}`, 'error', 8000));
+                pushNotification(new Notification('Passphrase Change Failed', `There was an error changing this passphrase: ${errorMessage}`, 'error', 5000));
 
             } else {
                 confirmChange.value = true;
-                pushNotification(new Notification('Encryption Passphrase Changed', `Changed passphrase for ${fileSystem.value!.name}.`, 'success', 8000));
+                pushNotification(new Notification('Encryption Passphrase Changed', `Changed passphrase for ${fileSystem.value!.name}.`, 'success', 5000));
 
                 changing.value = false;
                 showChangePassphrase.value = false;
