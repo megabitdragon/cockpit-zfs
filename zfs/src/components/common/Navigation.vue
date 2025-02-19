@@ -92,43 +92,70 @@
 								
 								<!-- Pool Degraded (Unrecoverable Error) -->
 								<MenuItem as="div" v-for="notification in notificationStore.notifications" :key="notification.id" v-slot="{ active }">
-										<div class="flex items-start gap-3" v-if="notification.event === 'scrub_finish'" >
-											<div >
-												<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
-											</div>
-											<div class="w-full">
-											<p class="text-xl font-semibold text-green-500">Scrub Finished - {{ notification.pool }}</p>
-											<p class="pl-4 text-sm text-gray-400">- Scrubbing of pool {{ notification.pool }} finished at {{ notification.timestamp }}</p>
-											</div>
-											<div>
-												<XMarkIcon class="size-icon text-gray-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="" /> 
-											</div>
+									<div class="flex items-start gap-3" v-if="notification.event === 'scrub_finish'">
+										<!-- Icon Based on Scrub Status -->
+										<div>
+											<CheckCircleIcon 
+											v-if="notification.errors === 'No' && notification.error !== 'null'" 
+											class="icon-success size-icon-lg text-green-500" 
+											aria-hidden="true" 
+											/>
+											<ExclamationCircleIcon 
+											v-else 
+											class="icon-warning size-icon-lg text-yellow-500" 
+											aria-hidden="true" 
+											/>
 										</div>
-										<div class="flex items-start gap-3" v-if="notification.event === 'scrub_finish'" >
-											<div >
-												<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
-											</div>
-											<div class="w-full">
-											<p class="text-xl font-semibold text-green-500">Scrub Finished - {{ notification.pool }}</p>
-											<p class="pl-4 text-sm text-gray-400">- Scrubbing of pool {{ notification.pool }} finished at {{ notification.timestamp }}</p>
-											</div>
-											<div>
-												<XMarkIcon class="size-icon text-gray-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="" /> 
-											</div>
+
+										<!-- Notification Content -->
+										<div class="w-full">
+											<p class="text-xl font-semibold" 
+											:class="{
+												'text-green-500': notification.errors === 'No',
+												'text-yellow-500': notification.errors !== 'No'
+											}"
+											>
+											Scrub Finished - {{ notification.pool }}
+											</p>
+											<p class="pl-4 text-sm text-white-400">
+											- Scrubbing of pool <strong>{{ notification.pool }}</strong> finished at <strong>{{ notification.timestamp }}</strong>
+											</p>
+
+											<!-- Show Errors if Found -->
+											<p class="pl-4 text-sm" v-if="notification.errors !== '0' && notification.errors !== 'null' ">
+											Errors Detected:<strong class="text-yellow-500">{{ notification.errors }}</strong>
+											</p>
 										</div>
+
+										<!-- Close Button -->
+										<div>
+											<XMarkIcon 
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500" 
+											aria-hidden="true" 
+											@click="handleDismiss(notification.id)" 
+											/> 
+										</div>
+									</div>
+
 										<div class="flex items-start gap-3" v-if="notification.event === 'vdev_attach'" >
 											<div >
 												<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
 											</div>
 											<div class="w-full">
 											<p class="text-xl font-semibold text-green-500">VDev Added - {{ notification.pool }}</p>
-											<p class="pl-4 text-sm text-gray-400">- A new virtual device {{ notification.vdev }} has been successfully added to the pool {{ notification.pool }}
-												<br> Status: {{ notification.state }}
-												<br> timestamp: {{ notification.timestamp }}
+											<p class="pl-4 text-sm" :class="{
+												'text-green-500': notification.state === 'ONLINE',
+												'text-yellow-500': notification.state === 'DEGRADED',
+												'text-red-500': notification.state === 'FAULTED'
+											}">
+												Status: <strong>{{ notification.state }}</strong>
+											</p>
+											<p class="pl-4 text-sm text-white-500">- A new virtual device <strong>{{ notification.vdev }}</strong> has been successfully added to the pool {{ notification.pool }}
+												<br> <strong>timestamp:</strong> {{ notification.timestamp }}
 											</p>
 											</div>
 											<div>
-												<XMarkIcon class="size-icon text-gray-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="" /> 
+												<XMarkIcon class="size-icon text-white-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="handleDismiss(notification.id)"  /> 
 											</div>
 										</div>
 										<div class="flex items-start gap-3" v-if="notification.event === 'resilver_finish'" >
@@ -137,20 +164,145 @@
 											</div>
 											<div class="w-full">
 											<p class="text-xl font-semibold text-green-500">Resilver Finished - {{ notification.pool }}</p>
-											<p class="pl-4 text-sm text-gray-400">- Resilvering completed successfully for the pool {{ notification.pool }}
-												<br> timestamp: {{ notification.timestamp }}
+											<p class="pl-4 text-sm text-white-500">- Resilvering completed successfully for the pool <strong>{{ notification.pool }}</strong>
+												<br> <strong>timestamp: </strong> {{ notification.timestamp }}
 											</p>
 											</div>
 											<div>
-												<XMarkIcon class="size-icon text-gray-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="" /> 
+												<XMarkIcon class="size-icon text-white-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="handleDismiss(notification.id)"  /> 
 											</div>
 										</div>
+										<div class="flex items-start gap-3" v-if="notification.event === 'vdev_clear'" >
+											<div >
+												<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
+											</div>
+											<div class="w-full">
+												<p class="text-xl font-semibold text-green-500">VDEV Cleared - {{ notification.pool }}</p>
+												<p>
+													- Virtual device <strong>{{ notification.vdev }}</strong> was cleared in pool <strong>{{ notification.pool }}</strong>.
+												</p>
+
+												<!-- Status -->
+												<p class="pl-4 text-sm" :class="{
+													'text-green-500': notification.state === 'ONLINE',
+													'text-yellow-500': notification.state === 'DEGRADED',
+													'text-red-500': notification.state === 'FAULTED' || notification.state === 'UNAVAIL'
+													}">
+													Status: {{ notification.state }}
+												</p>
+
+												<!-- Show Last Recorded Error Only If It Exists -->
+												<p class="pl-4 text-sm text-white-500" v-if="notification.description && notification.description !== 'None'">
+													Last Recorded Error: <strong>{{ notification.description }}</strong>
+												</p>
+
+												<!-- GUID, Error, Timestamp Section -->
+												<div class="mt-2 text-sm text-white-500 border-t pt-2">
+													<p v-if="notification.guid">
+													 GUID: <strong>{{ notification.guid }}</strong>
+													</p>
+													<p v-if="notification.error && notification.error !== 'None' && notification.error !== 'null' ">
+													 Error:<strong> {{ notification.error }}</strong>
+													</p>
+													<p><strong>Timestamp: </strong> {{ notification.timestamp }}</p>
+												</div>
+												</div>
+											<div>
+												<XMarkIcon class="size-icon text-white-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="handleDismiss(notification.id)"  /> 
+											</div>
+										</div>
+										<div class="flex items-start gap-3" v-if="notification.event === 'pool_import'" >
+											  <!-- Icon Based on Pool Health -->
+											<div>
+												<CheckCircleIcon v-if="notification.health === 'ONLINE'" class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
+												<ExclamationCircleIcon v-else-if="notification.health === 'DEGRADED'" class="icon-warning size-icon-lg text-yellow-500" aria-hidden="true" />
+												<XCircleIcon v-else class="icon-error size-icon-lg text-red-500" aria-hidden="true" />
+											</div>
+												<!-- Event Details -->
+												<div class="w-full">
+													<p :class="{
+														'text-green-500': notification.health === 'ONLINE',
+														'text-yellow-500': notification.health === 'DEGRADED',
+														'text-red-500': notification.health === 'FAULTED'
+													}">ZFS Pool Imported - {{ notification.pool }}</p>
+													<p class="pl-4 text-sm text-white-500">
+													- Pool <strong>{{ notification.pool }}</strong> has been successfully imported.
+													<br> Status:  
+													<strong :class="{
+														'text-green-500': notification.health === 'ONLINE',
+														'text-yellow-500': notification.health === 'DEGRADED',
+														'text-red-500': notification.health === 'FAULTED'
+													}">
+														{{ notification.health }}
+													</strong>
+													<br><strong> Timestamp: </strong> {{ notification.timestamp }}
+													</p>
+												</div>
+											<div>
+												<XMarkIcon class="size-icon text-white-500 cursor-pointer hover:text-red-500" aria-hidden="true" @click="handleDismiss(notification.id)"  /> 
+											</div>
+										</div>
+										<div class="flex items-start gap-3" v-if="notification.event === 'statechange'">
+										<!-- Icon Based on Scrub Status -->
+										<!-- Status Icon -->
+										<div>
+										<CheckCircleIcon v-if="notification.state === 'ONLINE'" class="text-green-500 size-icon-lg" />
+										<ExclamationCircleIcon v-else-if="notification.state === 'DEGRADED'" class="text-orange-600 size-icon-lg" />
+										<ExclamationCircleIcon v-else class="text-red-500 size-icon-lg" />
+										</div>
+
+										<!-- Notification Content -->
+										<div class="w-full">
+										<p class="text-lg font-semibold" :class="{
+											'text-green-600': notification.state === 'ONLINE',
+											'text-yellow-600': notification.state === 'DEGRADED',
+											'text-red-600': notification.state === 'FAULTED',
+										}">
+											{{ notification.event.replace("_", " ").toUpperCase() }} - {{ notification.pool }}
+										</p>
+										<p class="text-sm text-white-600">
+											<strong>Pool:</strong> {{ notification.pool ?? "N/A" }}  
+											<br><strong>VDEV:</strong> {{ notification.vdev ?? "Unknown" }}  
+											<br><strong>Status: </strong>  
+											<span :class="{
+											'text-green-500': notification.state === 'ONLINE',
+											'text-yellow-500': notification.state === 'DEGRADED',
+											'text-red-500': notification.state === 'FAULTED'
+											}">
+											{{ notification.state }}
+											</span>
+										</p>
+
+										<!-- Show Error if Exists -->
+										<p v-if="notification.error !== 'None' && notification.error !== 'null'" class="text-sm text-red-500">
+											<strong>Error:</strong> {{ notification.error }}
+										</p>
+
+										<!-- Show Description if Exists -->
+										<p v-if="notification.description !== 'None'" class="text-sm text-white-500">
+											 <strong>Description:</strong> {{ notification.description }}
+										</p>
+
+										<!-- Timestamp -->
+										<p class="text-sm text-white-500">
+											 <strong>Timestamp:</strong> {{ notification.timestamp }}
+										</p>
+										</div>
+										<!-- Close Button -->
+										<div>
+											<XMarkIcon 
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500" 
+											aria-hidden="true" 
+											@click="handleDismiss(notification.id)"
+											/> 
+										</div>
+									</div>
 								</MenuItem>
 								</div>
 
 								<!-- Dismiss Button -->
 								<div class="text-md p-4 flex justify-center border-t border-gray-300">
-								<button class=" hover:underline">Dismiss all Notifications</button>
+								<button   @click="dismissAllNotifications()" class=" hover:underline">Dismiss all Notifications</button>
 								</div>
 							
 							</MenuItems>
@@ -178,6 +330,19 @@ interface NavigationProps {
 	currentNavigationItem?: NavigationItem;
 	navigationCallback: NavigationCallback;
 }
+
+async function handleDismiss(notificationId) {
+  await notificationStore.markNotificationAsRead(notificationId);
+ notificationStore.removeNotification(notificationId);
+}
+async function dismissAllNotifications() {
+  await notificationStore.clearAllNotifications();
+ notificationStore.removeAllNotifications();
+}
+onMounted(() => {
+  notificationStore.fetchMissedNotifications();
+  console.log("hello from navigation notification")
+});
 
 const props = defineProps<NavigationProps>();
 
