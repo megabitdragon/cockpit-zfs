@@ -71,7 +71,7 @@ all: default
 .PHONY: default all install clean help install-local install-remote install
 
 $(VERSION_FILES): ./manifest.json
-	echo 'export const pluginVersion = "$(shell jq -r '.version' ./manifest.json)-$(shell jq -r '.buildVersion' ./manifest.json)$(OS_PACKAGE_RELEASE)";' > $@
+	mkdir -p cockpit-zfs-1.1.14/src && echo 'export const pluginVersion = "1.1.14-2built_from_source";' > cockpit-zfs-1.1.14/src/version.js
 
 # build outputs
 .SECONDEXPANSION:
