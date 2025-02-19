@@ -132,8 +132,7 @@
 					</div>
 				</div>
 				<div v-else>
-					<div
-						class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
+					<div class="w-full bg-well rounded-full mt-2 relative flex h-6 overflow-hidden">
 						<div :class="capacityColor" class="h-6"
 							:style="{ width: `${Number(props.pool.properties.capacity)}%` }">
 							<div
@@ -157,6 +156,24 @@
 				</div>
 			</template>
 			<template v-slot:footer>
+				<div class="flex flex-col text-center justify-center items-center">
+					<b class="mb-2">
+						{{ `${props.pool.vdevs.length} Virtual Device${props.pool.vdevs.length > 1 ? 's' : ''}:` }}
+					</b>
+
+					<div class="grid gap-2 p-2 w-full justify-center items-center" :class="{
+						'grid-cols-1': props.pool.vdevs.length === 1,
+						'grid-cols-2': props.pool.vdevs.length === 2,
+						'grid-cols-3': props.pool.vdevs.length === 3,
+						'grid-cols-4': props.pool.vdevs.length >= 4
+					}">
+						<div v-for="vdev in props.pool.vdevs" :key="vdev.name"
+							class="p-2 border border-default rounded-md bg-accent text-center">
+							<p class="font-medium text-default">{{ vdev.name }}</p>
+							<p class="text-sm text-muted">({{ vdev.type }})</p>
+						</div>
+					</div>
+				</div>
 				<div class="flex flex-row items-center text-center justify-center">
 					Errors: {{ props.pool.errorCount }}
 				</div>
@@ -355,8 +372,8 @@ watch(confirmSavePool, async (newVal, oldVal) => {
 	if (confirmSavePool.value == true) {
 		notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
 		await refreshAllData();
-		
-	} else {
+	} 
+	else {
 		notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool.', 'error');
 	}
 });

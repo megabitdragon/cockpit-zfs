@@ -11,7 +11,7 @@
 					<PoolCapacity :id="getIdKey('pool-visual-capacity')" :fillColor="capacityColor"
 						:name="props.pool.name" :totalSize="props.pool.properties.size"
 						:percentage="props.pool.properties.capacity" :radius="50" :coordX="60" :coordY="60"
-						:strokeWidth="10" :percentFontSize="'text-2xl'" class="w-full col-span-3" />
+						:strokeWidth="10" :percentFontSize="'text-2xl'" class="w-full col-span-3 grow" />
 					<div
 						class="mt-2 px-8 col-span-3 row-start-2 grid grid-cols-3 justify-items-center min-w-fit max-w-fit">
 						<div class="m-2 col-span-1">
@@ -22,7 +22,7 @@
 								<br />as of {{ getTimestampString() }}</p>
 							<p :id="getIdKey('pool-refreservation')" name="pool-refreservation" class="text-sm">
 								Refreservation: {{
-								convertBytesToSize(props.pool.properties.refreservationRawSize!, true) }} ({{
+								convertBytesToSize(props.pool.properties.refreservationRawSize!) }} ({{
 								props.pool.properties.refreservationPercent }}%)</p>
 						</div>
 						<div class="m-2 col-span-1">
@@ -405,10 +405,10 @@ const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
 
 const snapshotListComponent = ref();
-const loadSnapshotListComponent = async () => {
-	const module = await import('../snapshots/SnapshotsList.vue');
-	snapshotListComponent.value = module.default;
-}
+// const loadSnapshotListComponent = async () => {
+// 	const module = await import('../snapshots/SnapshotsList.vue');
+// 	snapshotListComponent.value = module.default;
+// }
 
 const showPoolDetails = inject<Ref<boolean>>("show-pool-deets")!;
 
@@ -623,7 +623,10 @@ const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 
 watch(navTag, (newVal, oldVal) => {
 	if (navTag.value == 'snapshots') {
-		loadSnapshotListComponent();
+		// loadSnapshotListComponent();
+		import('../snapshots/SnapshotsList.vue').then(module => {
+			snapshotListComponent.value = module.default;
+		});
 	}
 }, {immediate: true});
 
