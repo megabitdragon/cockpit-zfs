@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-3
+- trying to build debs
 * Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-2
 - Trying to build package again after cleaning remnants of common lib
 * Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-1

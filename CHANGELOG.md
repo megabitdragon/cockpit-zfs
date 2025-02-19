@@ -1,3 +1,3 @@
-## zfs module 1.1.14-2
+## zfs module 1.1.14-3
 
-* Trying to build package again after cleaning remnants of common lib
+* trying to build debs
