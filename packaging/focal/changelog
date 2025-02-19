@@ -1,3 +1,12 @@
+cockpit-zfs (1.1.14-1focal) focal; urgency=medium
+
+  * Rolls back previous Houston-Common-Library updates due to some bugs that came
+    up during usage. Bugfixes pushed during common lib implementation should all
+    be retained, but removed common library usage for the time being to work out
+    those issues.
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:28:57 -0400
+
 cockpit-zfs (1.1.11-1focal) focal; urgency=medium
 
   * Fixed UI and refactored UI code

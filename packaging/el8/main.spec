@@ -27,6 +27,10 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-1
+- Rolls back previous Houston-Common-Library updates due to some bugs that came up
+  during usage. Bugfixes pushed during common lib implementation should all be retained,
+  but removed common library usage for the time being to work out those issues.
 * Fri Jan 17 2025 Rachit Hans <rhans@45drives.com> 1.1.11-1
 - Refacotred UI and script code
 * Tue Jan 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.10-1
