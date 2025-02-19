@@ -14,7 +14,7 @@
 
 # PLUGIN_SRCS is space-delimited list of subdirectories containg a plugin project.
 # You can leave it empty for automatic detection based on directories containing a package.json file.
-PLUGIN_SRCS=
+PLUGIN_SRCS=zfs
 
 # For installing to a remote machine for testing with `make install-remote`
 REMOTE_TEST_HOST=192.168.123.5
@@ -71,7 +71,7 @@ all: default
 .PHONY: default all install clean help install-local install-remote install
 
 $(VERSION_FILES): ./manifest.json
-	mkdir -p cockpit-zfs-1.1.14/src && echo 'export const pluginVersion = "1.1.14-2built_from_source";' > cockpit-zfs-1.1.14/src/version.js
+	echo 'export const pluginVersion = "$(shell jq -r '.version' ./manifest.json)-$(shell jq -r '.buildVersion' ./manifest.json)$(OS_PACKAGE_RELEASE)";' > $@
 
 # build outputs
 .SECONDEXPANSION:
