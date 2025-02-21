@@ -1,3 +1,3 @@
-## zfs module 1.1.15-4
+## zfs module 1.1.15-5
 
-* build
+* build attempt again with submodule checkout
