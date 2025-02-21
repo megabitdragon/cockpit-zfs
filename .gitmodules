@@ -1,4 +1,4 @@
 [submodule "houston-common"]
 	path = houston-common
-	url = git@github.com:45Drives/houston-common.git
+	url = ../houston-common.git
 	branch = use-for-zfs-module
