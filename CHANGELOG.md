@@ -1,3 +1,3 @@
-## zfs module 1.1.15-1
+## zfs module 1.1.15-2
 
-* Re-implements common-library and fixes bugs relating to nvme disks, ui layouts and datatypes
+* building again with diff git url as build failed
