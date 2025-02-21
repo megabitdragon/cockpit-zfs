@@ -138,9 +138,7 @@
 												</DisclosureButton>
 									
 												<DisclosurePanel>
-													<div>
 														<SnapshotsList :filesystem="allDatasets[datasetIdx]" :item="'filesystem'" :bulkSnapDestroyMode="bulkSnapDestroyMode.get(allDatasets[datasetIdx].name)"/>
-													</div>
 												</DisclosurePanel>
 
 											</Disclosure>
@@ -534,7 +532,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
-				pushNotification(new Notification('Destroy Dataset Failed', `${selectedDataset.value!.name} was not destroyed: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Destroy Dataset Failed', `${selectedDataset.value!.name} was not destroyed: ${errorMessage}`, 'error', 5000));
 				confirmDelete.value = false;
 			} else {
 				operationRunning.value = false;
@@ -600,7 +598,7 @@ watch(confirmUnmount, async (newValue, oldValue) => {
 				operationRunning.value = false;
 				unmounting.value = false;
 				confirmUnmount.value = false;
-				pushNotification(new Notification('Unmount Dataset Failed', `${selectedDataset.value!.name} was not unmounted: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Unmount Dataset Failed', `${selectedDataset.value!.name} was not unmounted: ${errorMessage}`, 'error', 5000));
 
 			} else {
 				console.log('unmounted:', selectedDataset.value!);
@@ -680,7 +678,7 @@ watch(confirmMount, async (newValue, oldValue) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				mounting.value = false;
-				pushNotification(new Notification('Mount Dataset Failed', `${selectedDataset.value!.name} was not mounted: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Mount Dataset Failed', `${selectedDataset.value!.name} was not mounted: ${errorMessage}`, 'error', 5000));
 
 				confirmMount.value = false;
 			} else {

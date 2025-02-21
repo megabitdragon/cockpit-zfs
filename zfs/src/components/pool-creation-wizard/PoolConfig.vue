@@ -68,7 +68,7 @@
 										:value="`${disk.name}`" :name="`disk-${disk.name}`"
 										class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
 									<div v-if="disk.hasPartitions!"
-										title="Disk already has partitions. Procees with caution."
+										title="Disk already has partitions. Proceed with caution."
 										class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
 										<ExclamationCircleIcon class="h-6 text-orange-700" />
 									</div>

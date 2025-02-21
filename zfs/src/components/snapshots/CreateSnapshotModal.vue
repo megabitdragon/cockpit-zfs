@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showSnapshotModal" :marginTop="'mt-48'" :width="'w-4/12'" :minWidth="'min-w-4/12'" class="z-20" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showSnapshotModal" :marginTop="'mt-48'" :width="'w-4/12'" :minWidth="'min-w-4/12'" class="z-20" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Create Snapshot</legend>
         </template>
@@ -78,13 +78,13 @@
             </div>
 
         </template>
-    </Modal>
+    </OldModal>
 </template>
 
 <script setup lang="ts">
 import { ref, inject, Ref, computed } from 'vue';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { getSnapshotTimestamp } from '../../composables/helpers';
 import { createSnapshot } from '../../composables/snapshots';
 import { loadSnapshotsInDataset, loadSnapshotsInPool, loadDatasets, loadSnapshots } from '../../composables/loadData';

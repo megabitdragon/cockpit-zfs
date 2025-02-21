@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showImportModal" @close="showImportModal = false" :marginTop="'mt-28'" :width="'w-3/5'"
+    <OldModal :isOpen="showImportModal" @close="showImportModal = false" :marginTop="'mt-28'" :width="'w-3/5'"
         :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Import Pool</legend>
@@ -357,12 +357,12 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { inject, ref, Ref, computed, watch } from 'vue';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ExclamationCircleIcon } from '@heroicons/vue/24/outline';
 import { loadImportablePools, loadImportableDestroyedPools } from '../../composables/loadImportables';
@@ -545,7 +545,7 @@ async function importPoolBtn() {
 
             if (output == null || output.error) {
                 const errorMessage = output?.error || 'Unknown error';
-                pushNotification(new Notification('Import Failed', `Failed to Import Pool: ${errorMessage}.`, 'error', 5000));
+                pushNotification(new Notification('Import Failed', `Failed to Import Pool: ${errorMessage}`, 'error', 5000));
 
             } else {
                 pushNotification(new Notification('Import Completed', `Imported Pool ${importedPool.value!.name!} from Pool ${importedPool.value!.name!}`, 'success', 5000));

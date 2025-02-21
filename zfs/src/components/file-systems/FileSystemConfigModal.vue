@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFSConfig" @close="showFSConfig = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showFSConfig" @close="showFSConfig = false" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Configure File System</legend>
         </template>
@@ -230,7 +230,7 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 
 <script setup lang="ts">
@@ -238,7 +238,7 @@ import { ref, Ref, inject } from 'vue';
 import { onOffToBool, isBoolOnOff, upperCaseWord, convertBytesToSize, convertSizeToBytes, getSizeNumberFromString, getSizeUnitFromString, getQuotaRefreservUnit } from '../../composables/helpers';
 import { configureDataset } from '../../composables/datasets';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { loadDatasets } from '../../composables/loadData';
 import { ZFSFileSystemInfo, ZPool } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
@@ -404,7 +404,7 @@ async function fsConfigureBtn() {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				console.log('configureFS failed');
-                pushNotification(new Notification('Save File System Config Failed', `There was an error saving this file system: ${errorMessage}.`, 'error', 5000));
+                pushNotification(new Notification('Save File System Config Failed', `There was an error saving this file system: ${errorMessage}`, 'error', 5000));
 
 			} else {
 				console.log('configureFS succeeded');

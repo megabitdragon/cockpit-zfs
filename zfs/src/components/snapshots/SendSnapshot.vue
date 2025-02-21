@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showSendDataset" @close="showSendDataset = false" :marginTop="'mt-28'" :width="'w-5/12'" :minWidth="'min-w-5/12'" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showSendDataset" @close="showSendDataset = false" :marginTop="'mt-28'" :width="'w-5/12'" :minWidth="'min-w-5/12'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Send Dataset</legend>
         </template>
@@ -99,7 +99,7 @@
                 </button>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 
     <div v-if="showTestSSH">
         <component :is="testSSHComponent" @close="updateShowTestSSH" :idKey="'test-ssh-modal'" :showFlag="showTestSSH" />
@@ -107,7 +107,7 @@
 
 </template>
 <script setup lang="ts">
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { legacy } from '@45drives/houston-common-lib';
 import { ref, Ref, inject, computed } from 'vue';
 import { sendSnapshot, doesDatasetExist, formatRecentSnaps, doesDatasetHaveSnaps } from '../../composables/snapshots';

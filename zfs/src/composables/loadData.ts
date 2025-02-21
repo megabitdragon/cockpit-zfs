@@ -47,17 +47,38 @@ export async function loadDisksThenPools(disks, pools) {
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
+			// const disk = {
+			// 	name: parsedJSON[i].name,
+			// 	capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
+			// 	model: parsedJSON[i].model,
+			// 	type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
+			// 	phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
+			// 	sd_path: parsedJSON[i].sd_path || 'N/A',
+			// 	vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
+			// 	serial: parsedJSON[i].serial || 'N/A',
+			// 	usable: parsedJSON[i].usable || false,
+			// 	path: '',
+			// 	guid: '',
+			// 	status: parsedJSON[i].health || 'Unknown',
+			// 	powerOnHours: parsedJSON[i].power_on_time || 0,
+			// 	powerOnCount: parsedJSON[i].power_on_count || 0,
+			// 	temp: parsedJSON[i].temp || 'N/A',
+			// 	rotationRate: parsedJSON[i].rotation_rate || 0,
+			// 	stats: {},
+			// 	errors: errors,
+			// 	hasPartitions: parsedJSON[i].has_partitions || false,
+			// };
 			const disk = {
 				name: parsedJSON[i].name,
 				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
 				model: parsedJSON[i].model,
 				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
-				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
+				phy_path: parsedJSON[i].phy_path || 'N/A',
 				sd_path: parsedJSON[i].sd_path || 'N/A',
-				vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
+				vdev_path: parsedJSON[i].type === 'NVMe' ? parsedJSON[i].sd_path : parsedJSON[i].vdev_path, // Fix for NVMe drives
 				serial: parsedJSON[i].serial || 'N/A',
 				usable: parsedJSON[i].usable || false,
-				path: '',
+				path: parsedJSON[i].type === 'NVMe' ? parsedJSON[i].sd_path : parsedJSON[i].vdev_path, // Ensure a valid path
 				guid: '',
 				status: parsedJSON[i].health || 'Unknown',
 				powerOnHours: parsedJSON[i].power_on_time || 0,
@@ -68,6 +89,7 @@ export async function loadDisksThenPools(disks, pools) {
 				errors: errors,
 				hasPartitions: parsedJSON[i].has_partitions || false,
 			};
+
 
 			disks.value.push(disk);
 		// console.log("Disk:");
@@ -332,17 +354,38 @@ export async function loadDisks(disks) {
 		
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
+			// const disk = {
+			// 	name: parsedJSON[i].name,
+			// 	capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
+			// 	model: parsedJSON[i].model,
+			// 	type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
+			// 	phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
+			// 	sd_path: parsedJSON[i].sd_path || 'N/A',
+			// 	vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
+			// 	serial: parsedJSON[i].serial || 'N/A',
+			// 	usable: parsedJSON[i].usable || false,
+			// 	path: '',
+			// 	guid: '',
+			// 	status: parsedJSON[i].health || 'Unknown',
+			// 	powerOnHours: parsedJSON[i].power_on_time || 0,
+			// 	powerOnCount: parsedJSON[i].power_on_count || 0,
+			// 	temp: parsedJSON[i].temp || 'N/A',
+			// 	rotationRate: parsedJSON[i].rotation_rate || 0,
+			// 	stats: {},
+			// 	errors: errors,
+			// 	hasPartitions: parsedJSON[i].has_partitions || false,
+			// }
 			const disk = {
 				name: parsedJSON[i].name,
 				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
 				model: parsedJSON[i].model,
 				type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
-				phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
+				phy_path: parsedJSON[i].phy_path || 'N/A',
 				sd_path: parsedJSON[i].sd_path || 'N/A',
-				vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
+				vdev_path: parsedJSON[i].type === 'NVMe' ? parsedJSON[i].sd_path : parsedJSON[i].vdev_path, // Fix for NVMe drives
 				serial: parsedJSON[i].serial || 'N/A',
 				usable: parsedJSON[i].usable || false,
-				path: '',
+				path: parsedJSON[i].type === 'NVMe' ? parsedJSON[i].sd_path : parsedJSON[i].vdev_path, // Ensure a valid path
 				guid: '',
 				status: parsedJSON[i].health || 'Unknown',
 				powerOnHours: parsedJSON[i].power_on_time || 0,
@@ -352,7 +395,8 @@ export async function loadDisks(disks) {
 				stats: {},
 				errors: errors,
 				hasPartitions: parsedJSON[i].has_partitions || false,
-			}
+			};
+
 			disks.value.push(disk);
 			// console.log("Disk:", disk);
 		}
@@ -373,7 +417,8 @@ export async function loadDisks(disks) {
 // 	// If path doesn't match those patterns, return as is
 // 	return path;
 // }
-function cleanDiskPath(path) {
+
+/* function cleanDiskPath(path) {
 	if (!path) return ''; // Handle null/undefined paths gracefully
 
 	// Handle known patterns for paths with partitions
@@ -389,7 +434,45 @@ function cleanDiskPath(path) {
 
 	// Return unmodified for unknown patterns
 	return path;
+} */
+
+/* function cleanDiskPath(path) {
+	if (!path) return '';
+
+	// Remove partition numbers but keep NVMe device names intact
+	if (/\/dev\/sd[a-z][0-9]+$/.test(path)) {
+		return path.replace(/[0-9]+$/, ''); // Remove numbers from end (e.g., /dev/sda1 → /dev/sda)
+	}
+	if (/\/dev\/nvme\d+n\d+p\d+$/.test(path)) {
+		return path.replace(/p\d+$/, ''); // Remove pN from NVMe paths (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
+	}
+
+	return path; // Return as is if no modifications are needed
 }
+ */
+
+function cleanDiskPath(path) {
+	if (!path) return '';
+
+	// Remove partition numbers from standard disks (e.g., /dev/sda1 → /dev/sda)
+	if (/\/dev\/sd[a-z][0-9]+$/.test(path)) {
+		return path.replace(/[0-9]+$/, '');
+	}
+
+	// Remove 'pN' from NVMe paths (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
+	if (/\/dev\/nvme\d+n\d+p\d+$/.test(path)) {
+		return path.replace(/p\d+$/, '');
+	}
+
+	// Remove '-partN' suffix (e.g., /dev/disk/by-vdev/1-1-part1 → /dev/disk/by-vdev/1-1)
+	if (/-part\d+$/.test(path)) {
+		return path.replace(/-part\d+$/, '');
+	}
+
+	return path; // Return unchanged if no modifications needed
+}
+
+
 // function cleanDiskPath(path) {
 // 	if (!path) return ''; // Handle null/undefined paths gracefully
 
@@ -553,9 +636,12 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		if (vDevData.path!.match(phyPathRegex)) {
 			diskPath.value = diskVDev.value.phy_path;
 			diskName.value = diskVDev.value.phy_path.replace(phyPathPrefix, '');
+		// } else if (vDevData.path!.match(nvmePathRegex)) { // Check for NVMe path match
+		// 	diskPath.value = diskVDev.value.sd_path; // NVMe paths will use sd_path
+		// 	diskName.value = diskVDev.value.sd_path.replace(sdPathPrefix, '');
 		} else if (vDevData.path!.match(nvmePathRegex)) { // Check for NVMe path match
-			diskPath.value = diskVDev.value.sd_path; // NVMe paths will use sd_path
-			diskName.value = diskVDev.value.sd_path.replace(sdPathPrefix, '');
+			diskPath.value = diskVDev.value.sd_path || diskVDev.value.phy_path || diskVDev.value.vdev_path;
+			diskName.value = diskVDev.value.sd_path ? diskVDev.value.sd_path.replace(sdPathPrefix, '') : diskVDev.value.name;
 		} else if (vDevData.path!.match(sdPathRegex)) {
 			diskPath.value = diskVDev.value.sd_path;
 			diskName.value = diskVDev.value.sd_path.replace(sdPathPrefix, '');
@@ -591,7 +677,8 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			model: diskVDev.value!.model,
 			phy_path: diskVDev.value!.phy_path,
 			sd_path: diskVDev.value!.sd_path,
-			vdev_path: diskVDev.value!.vdev_path,
+			// vdev_path: diskVDev.value!.vdev_path,
+			vdev_path: diskVDev.value!.vdev_path !== "N/A" ? diskVDev.value!.vdev_path : diskVDev.value!.sd_path,
 			serial: diskVDev.value!.serial,
 			powerOnHours: diskVDev.value!.powerOnHours,
 			powerOnCount: diskVDev.value!.powerOnCount,
@@ -618,50 +705,227 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 }
 
 
-function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
-    let fullDiskData: VDevDisk = disks.value.find(disk => {
-        return disk.phy_path + '-part1' === child.path ||
-               disk.sd_path + '1' === child.path ||
-               disk.vdev_path + '-part1' === child.path;
-    });
+// function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
+//     let fullDiskData: VDevDisk = disks.value.find(disk => {
+//         return disk.phy_path + '-part1' === child.path ||
+//                disk.sd_path + '1' === child.path ||
+//                disk.vdev_path + '-part1' === child.path;
+//     });
 
+// 	if (!fullDiskData) {
+// 		const errorMessage = `Disk not found for path: ${child.path}. Pool might be degraded.`;
+// 		console.error(errorMessage);
+
+// 		// Create missing disk and add error
+// 		fullDiskData = createMissingDisk(child.path, child.name, vDevType, poolName);
+// 		fullDiskData.errors!.push(errorMessage); // Add the error to disk object
+// 	} else if (fullDiskData.type === 'disk') {
+// 		fullDiskData.vdev_path = fullDiskData.vdev_path || 'N/A';
+// 		fullDiskData.phy_path = fullDiskData.phy_path || 'N/A';
+// 	}
+
+//     const childDisk = {
+//         name: child.name || 'Unknown',
+//         path: child.path,
+//         guid: child.guid,
+//         type: fullDiskData.type,
+// 		health: fullDiskData.health,
+//         stats: child.stats || {},
+//         capacity: fullDiskData.capacity || 'Unknown',
+// 		// capacity: isCapacityPatternInvalid(fullDiskData.capacity) ? formatCapacityString(fullDiskData.capacity) : changeUnitToBinary(fullDiskData.capacity),
+//         model: fullDiskData.model || 'Unknown',
+//         phy_path: fullDiskData.phy_path,
+//         sd_path: fullDiskData.sd_path,
+//         vdev_path: fullDiskData.vdev_path,
+//         serial: fullDiskData.serial || 'Unknown',
+//         powerOnHours: fullDiskData.powerOnHours || 0,
+//         powerOnCount: fullDiskData.powerOnCount || '0',
+//         temp: fullDiskData.temp || 0,
+//         rotationRate: fullDiskData.rotationRate || 0,
+//         vDevName: vDevName,
+//         poolName: poolName,
+//         vDevType: vDevType,
+// 		errors: errors // Propagate errors
+//     };
+
+// 	// Add the disk only if it's not already in the vDevData.disks array
+// 	if (!vDevData.disks.some(disk => disk.guid === childDisk.guid)) {
+// 		vDevData.disks.push(childDisk);
+// 	}
+
+// 	return childDisk;
+// }
+
+// function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
+// 	const cleanedChildPath = child.path.replace(/-part\d+$/, '').replace(/p\d+$/, ''); // Remove `-partN` or `pN`
+
+// 	let fullDiskData: VDevDisk = disks.value.find(disk => {
+// 		const cleanedDiskSdPath = disk.sd_path ? disk.sd_path.replace(/p\d+$/, '') : ''; // Remove `pN` from NVMe
+// 		return (
+// 			cleanedDiskSdPath === cleanedChildPath ||
+// 			disk.phy_path === cleanedChildPath ||
+// 			disk.vdev_path === cleanedChildPath
+// 		);
+// 	});
+
+// 	if (!fullDiskData) {
+// 		const errorMessage = `Disk not found for path: ${child.path}. Cleaned path: ${cleanedChildPath}`;
+// 		console.error(errorMessage);
+// 		fullDiskData = createMissingDisk(child.path, child.name, vDevType, poolName);
+// 		fullDiskData.errors!.push(errorMessage);
+// 	}
+
+// 	const childDisk = {
+// 		name: child.name || 'Unknown',
+// 		path: child.path,
+// 		guid: child.guid,
+// 		type: fullDiskData.type,
+// 		health: fullDiskData.health,
+// 		stats: child.stats || {},
+// 		capacity: fullDiskData.capacity || 'Unknown',
+// 		model: fullDiskData.model || 'Unknown',
+// 		phy_path: fullDiskData.phy_path,
+// 		sd_path: fullDiskData.sd_path,
+// 		vdev_path: fullDiskData.vdev_path,
+// 		serial: fullDiskData.serial || 'Unknown',
+// 		powerOnHours: fullDiskData.powerOnHours || 0,
+// 		powerOnCount: fullDiskData.powerOnCount || '0',
+// 		temp: fullDiskData.temp || 0,
+// 		rotationRate: fullDiskData.rotationRate || 0,
+// 		vDevName: vDevName,
+// 		poolName: poolName,
+// 		vDevType: vDevType,
+// 		errors: errors // Propagate errors
+// 	};
+
+// 	if (!vDevData.disks.some(disk => disk.guid === childDisk.guid)) {
+// 		vDevData.disks.push(childDisk);
+// 	}
+
+// 	return childDisk;
+// }
+
+/* function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
+	const cleanedChildPath = cleanDiskPath(child.path); // Remove partitions for better matching
+
+	// Find the disk based on possible matching paths
+	let fullDiskData: VDevDisk | undefined = disks.value.find(disk => {
+		const cleanedDiskSdPath = cleanDiskPath(disk.sd_path);
+		const cleanedPhyPath = cleanDiskPath(disk.phy_path);
+		const cleanedVdevPath = cleanDiskPath(disk.vdev_path);
+
+		return (
+			cleanedDiskSdPath === cleanedChildPath ||
+			cleanedPhyPath === cleanedChildPath ||
+			cleanedVdevPath === cleanedChildPath ||
+			child.path.startsWith(cleanedDiskSdPath) || // Handle partitioned paths like /dev/sdb1
+			child.path.startsWith(cleanedPhyPath) ||
+			child.path.startsWith(cleanedVdevPath)
+		);
+	});
+
+	// If still not found, attempt to match by removing partition numbers
 	if (!fullDiskData) {
-		const errorMessage = `Disk not found for path: ${child.path}. Pool might be degraded.`;
-		console.error(errorMessage);
-
-		// Create missing disk and add error
-		fullDiskData = createMissingDisk(child.path, child.name, vDevType, poolName);
-		fullDiskData.errors!.push(errorMessage); // Add the error to disk object
-	} else if (fullDiskData.type === 'disk') {
-		fullDiskData.vdev_path = fullDiskData.vdev_path || 'N/A';
-		fullDiskData.phy_path = fullDiskData.phy_path || 'N/A';
+		console.warn(`Trying fallback search for missing disk: ${child.path}`);
+		fullDiskData = disks.value.find(disk => {
+			return (
+				child.path.startsWith(disk.sd_path) ||
+				child.path.startsWith(disk.phy_path) ||
+				child.path.startsWith(disk.vdev_path)
+			);
+		});
 	}
 
-    const childDisk = {
-        name: child.name || 'Unknown',
-        path: child.path,
-        guid: child.guid,
-        type: fullDiskData.type,
-		health: fullDiskData.health,
-        stats: child.stats || {},
-        capacity: fullDiskData.capacity || 'Unknown',
-		// capacity: isCapacityPatternInvalid(fullDiskData.capacity) ? formatCapacityString(fullDiskData.capacity) : changeUnitToBinary(fullDiskData.capacity),
-        model: fullDiskData.model || 'Unknown',
-        phy_path: fullDiskData.phy_path,
-        sd_path: fullDiskData.sd_path,
-        vdev_path: fullDiskData.vdev_path,
-        serial: fullDiskData.serial || 'Unknown',
-        powerOnHours: fullDiskData.powerOnHours || 0,
-        powerOnCount: fullDiskData.powerOnCount || '0',
-        temp: fullDiskData.temp || 0,
-        rotationRate: fullDiskData.rotationRate || 0,
-        vDevName: vDevName,
-        poolName: poolName,
-        vDevType: vDevType,
-		errors: errors // Propagate errors
-    };
+	// If still not found, log a clear warning
+	if (!fullDiskData) {
+		console.error(`Disk still not found for path: ${child.path} (Cleaned: ${cleanedChildPath})`);
+		return;
+	}
 
-	// Add the disk only if it's not already in the vDevData.disks array
+	// If found, create the disk entry
+	const childDisk = {
+		name: child.name || fullDiskData.name,
+		path: child.path,
+		guid: child.guid,
+		type: fullDiskData.type,
+		health: fullDiskData.health,
+		stats: child.stats || {},
+		capacity: fullDiskData.capacity,
+		model: fullDiskData.model,
+		phy_path: fullDiskData.phy_path,
+		sd_path: fullDiskData.sd_path,
+		vdev_path: fullDiskData.vdev_path,
+		serial: fullDiskData.serial,
+		powerOnHours: fullDiskData.powerOnHours,
+		powerOnCount: fullDiskData.powerOnCount,
+		temp: fullDiskData.temp,
+		rotationRate: fullDiskData.rotationRate,
+		vDevName: vDevName,
+		poolName: poolName,
+		vDevType: vDevType,
+		errors: [],
+	};
+
+	// Ensure we don't duplicate disks in the vDev
+	if (!vDevData.disks.some(disk => disk.guid === childDisk.guid)) {
+		vDevData.disks.push(childDisk);
+	}
+
+	return childDisk;
+} */
+function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
+	const cleanedChildPath = cleanDiskPath(child.path); // Strip partition suffix for comparison
+
+	// Try finding the disk using cleaned paths
+	let fullDiskData: VDevDisk | undefined = disks.value.find(disk => {
+		const cleanedDiskSdPath = cleanDiskPath(disk.sd_path);
+		const cleanedPhyPath = cleanDiskPath(disk.phy_path);
+		const cleanedVdevPath = cleanDiskPath(disk.vdev_path);
+		const cleanedDiskPath = cleanDiskPath(disk.path);
+
+		return (
+			cleanedDiskSdPath === cleanedChildPath ||
+			cleanedPhyPath === cleanedChildPath ||
+			cleanedVdevPath === cleanedChildPath ||
+			cleanedDiskPath === cleanedChildPath ||
+			child.path.startsWith(cleanedDiskSdPath) || // Handle /dev/sdb1 → /dev/sdb
+			child.path.startsWith(cleanedPhyPath) ||
+			child.path.startsWith(cleanedVdevPath) ||
+			child.path.startsWith(cleanedDiskPath)
+		);
+	});
+
+	// If not found, log only if there's no path match
+	if (!fullDiskData) {
+		console.warn(`Disk not found for path: ${child.path}. Cleaned path: ${cleanedChildPath}`);
+		return; // Skip adding if truly not found
+	}
+
+	// Construct the disk object
+	const childDisk = {
+		name: child.name || fullDiskData.name,
+		path: child.path,
+		guid: child.guid,
+		type: fullDiskData.type,
+		health: fullDiskData.health,
+		stats: child.stats || {},
+		capacity: fullDiskData.capacity,
+		model: fullDiskData.model,
+		phy_path: fullDiskData.phy_path,
+		sd_path: fullDiskData.sd_path,
+		vdev_path: fullDiskData.vdev_path,
+		serial: fullDiskData.serial,
+		powerOnHours: fullDiskData.powerOnHours,
+		powerOnCount: fullDiskData.powerOnCount,
+		temp: fullDiskData.temp,
+		rotationRate: fullDiskData.rotationRate,
+		vDevName: vDevName,
+		poolName: poolName,
+		vDevType: vDevType,
+		errors: [],
+	};
+
+	// Ensure no duplicates in vDevData
 	if (!vDevData.disks.some(disk => disk.guid === childDisk.guid)) {
 		vDevData.disks.push(childDisk);
 	}

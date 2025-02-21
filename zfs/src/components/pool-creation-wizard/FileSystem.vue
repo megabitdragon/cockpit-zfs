@@ -338,7 +338,7 @@
 
 	<!-- STANDALONE FILE SYSTEM CREATION -->
 	<div v-if="isStandalone == true">
-		<Modal :isOpen="showFSWizard" @close="showFSWizard = false" :marginTop="'mt-28'" :width="'w-3/5'"
+		<OldModal :isOpen="showFSWizard" @close="showFSWizard = false" :marginTop="'mt-28'" :width="'w-3/5'"
 			:minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
 			<template v-slot:title>
 				<legend class="flex justify-center">Create a New File System</legend>
@@ -709,7 +709,7 @@
 					</div>
 				</div>
 			</template>
-		</Modal>
+		</OldModal>
 	</div>
 </template>
 
@@ -720,7 +720,7 @@ import { Switch } from '@headlessui/vue';
 import { convertSizeToBytes, isBoolOnOff, isBoolCompression, getValue, upperCaseWord } from '../../composables/helpers';
 import {  createEncryptedDataset } from '../../composables/datasets';
 import { ZFSManager, ZFSFileSystemInfo, Dataset,DatasetCreateOptions, ZPool, ZPoolBase, ZpoolCreateOptions ,} from '@45drives/houston-common-lib';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { loadDatasets } from '../../composables/loadData';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
@@ -1073,7 +1073,7 @@ async function fsCreateBtn(fileSystem : ZFSFileSystemInfo) {
 							// if (output == null || output.error) {
 							// 	const errorMessage = output?.error || 'Unknown error';
 							// 	saving.value = false;
-							// 	pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error', 5000));
+							// 	pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}`, 'error', 5000));
 							// } else {
 							// 	console.log('encryption check passed');
 							// 	fileSystemsLoaded.value = false;
@@ -1150,7 +1150,7 @@ async function newFileSystemInPoolWizard() {
 								if (output == null || output.error) {
 									const errorMessage = output?.error || 'Unknown error';
 									saving.value = false;
-									pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}.`, 'error', 5000));
+									pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset ${errorMessage}`, 'error', 5000));
 								} else {
 									console.log('encryption check passed');
 									fileSystemsLoaded.value = false;
@@ -1187,7 +1187,7 @@ async function newFileSystemInPoolWizard() {
 							if (output == null || output.error) {
 								const errorMessage = output?.error || 'Unknown error';
 								saving.value = false;
-								pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}.`, 'error', 5000));
+								pushNotification(new Notification('Error Creating Dataset', `There was an error creating this dataset: ${errorMessage}`, 'error', 5000));
 							} else {
 								console.log('encryption check passed');
 								fileSystemsLoaded.value = false;
