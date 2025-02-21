@@ -1,3 +1,3 @@
-## zfs module 1.1.14-4
+## zfs module 1.1.15-1
 
-* trying to build again
+* Re-implements common-library and fixes bugs relating to nvme disks, ui layouts and datatypes

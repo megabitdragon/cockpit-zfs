@@ -1,3 +1,10 @@
+cockpit-zfs (1.1.15-1focal) focal; urgency=medium
+
+  * Re-implements common-library and fixes bugs relating to nvme disks, ui layouts
+    and datatypes
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 06:54:49 -0400
+
 cockpit-zfs (1.1.14-4focal) focal; urgency=medium
 
   * trying to build again

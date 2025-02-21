@@ -27,6 +27,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-1
+- Re-implements common-library and fixes bugs relating to nvme disks, ui layouts
+  and datatypes
 * Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-4
 - trying to build again
 * Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-3
