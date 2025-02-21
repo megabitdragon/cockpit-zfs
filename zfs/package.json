@@ -1,6 +1,5 @@
 {
   "name": "cockpit-zfs",
-  "private": true,
   "version": "1.0.2",
   "description": "Redesigned ZFS Manager for Cockpit",
   "types": "./src/index.d.ts",
@@ -17,9 +16,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@45drives/cockpit-css": "^0.1.12",
-    "@45drives/cockpit-helpers": "^0.1.19",
-    "@45drives/cockpit-typings": "^0.1.2",
+    "@45drives/houston-common-css": "workspace:^",
+    "@45drives/houston-common-lib": "workspace:^",
+    "@45drives/houston-common-ui": "workspace:^",
     "@headlessui/vue": "^1.7.13",
     "@heroicons/vue": "^2.0.18",
     "@tailwindcss/forms": "^0.5.2",
@@ -28,7 +27,6 @@
     "vue": "^3.2.37"
   },
   "devDependencies": {
-    "@45drives/cockpit-vue-components": "^0.1.0-beta2",
     "@vitejs/plugin-vue": "^3.0.0",
     "autoprefixer": "^10.4.8",
     "postcss": "^8.4.16",

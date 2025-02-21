@@ -11,9 +11,9 @@
 					<div name="vdev-name" class="p-1 mt-1 col-span-1 text-base text-left" :class="truncateText" :title="props.vDev.name">{{ props.vDev.name }}</div>
 					<div name="vdev-status" class="p-1 mt-1 col-span-1 font-semibold text-base" :class="[formatStatus(props.vDev.status), truncateText]" :title="props.vDev.status">{{ props.vDev.status }}</div>
 					<div name="vdev-type" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="upperCaseWord(props.vDev.type) + ' Device'">{{ upperCaseWord(props.vDev.type) }} Device</div>
-					<div name="vdev-read-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.read_errors + ' Read Errors'">{{ props.vDev.stats.read_errors }} Read Errors</div>
-					<div name="vdev-write-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.write_errors + ' Write Errors'">{{ props.vDev.stats.write_errors }} Write Errors</div>
-					<div name="vdev-checksum-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats.checksum_errors + ' Checksum Errors'">{{ props.vDev.stats.checksum_errors }} Checksum Errors</div>
+					<div name="vdev-read-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats!.read_errors + ' Read Errors'">{{ props.vDev.stats!.read_errors }} Read Errors</div>
+					<div name="vdev-write-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats!.write_errors + ' Write Errors'">{{ props.vDev.stats!.write_errors }} Write Errors</div>
+					<div name="vdev-checksum-err" class="p-1 mt-1 col-span-1 text-base" :class="truncateText" :title="props.vDev.stats!.checksum_errors + ' Checksum Errors'">{{ props.vDev.stats!.checksum_errors }} Checksum Errors</div>
 					<div name="vdev-menu" class="col-span-1 relative p-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
@@ -84,30 +84,33 @@ import { clearErrors, removeVDevFromPool, setRefreservation } from "../../compos
 import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
 import { formatStatus, loadScanActivities, loadTrimActivities, upperCaseWord,  } from '../../composables/helpers';
 import DiskElement from '../pools/DiskElement.vue';
+import { ZPool, VDev, VDevDisk, ZFSFileSystemInfo } from "@45drives/houston-common-lib";
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { Activity, PoolScanObjectGroup, PoolDiskStats, ConfirmationCallback } from "../../types";
+
 
 interface VDevElementProps {
-	pool: PoolData;
+	pool: ZPool;
 	poolIdx: number;
-	vDev: vDevData;
+	vDev: VDev;
 	vDevIdx: number;
 }
 
 const props = defineProps<VDevElementProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-const notifications = inject<Ref<any>>('notifications')!;
 
-const selectedPool = ref<PoolData>();
-const selectedVDev = ref<vDevData>();
+const selectedPool = ref<ZPool>();
+const selectedVDev = ref<VDev>();
 
 const operationRunning = ref(false);
 
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
-const poolData = inject<Ref<PoolData[]>>("pools")!;
-const diskData = inject<Ref<DiskData[]>>("disks")!;
-const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
+const poolData = inject<Ref<ZPool[]>>("pools")!;
+const diskData = inject<Ref<VDevDisk[]>>("disks")!;
+const filesystemData = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
@@ -157,7 +160,7 @@ const loadShowRemoveVDevComponent = async () => {
 	showRemoveVDevComponent.value = module.default;
 }
 
-async function removeVDev(pool : PoolData, vDev : vDevData) {
+async function removeVDev(pool: ZPool, vDev : VDev) {
 	selectedPool.value = pool;
 	selectedVDev.value = vDev;
 	await loadShowRemoveVDevComponent();
@@ -180,21 +183,25 @@ watch(confirmRemove, async (newValue, oldValue) => {
 		console.log('now removing:', selectedVDev.value, 'from pool:', selectedPool.value);
 
 		try {
-			const output = await removeVDevFromPool(selectedVDev.value, selectedPool.value);
+			const output: any = await removeVDevFromPool(selectedVDev.value, selectedPool.value);
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Remove Failed', `Failed to remove Virtual Device: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Remove Failed', `Failed to remove Virtual Device: ${errorMessage}`, 'error', 5000));
+
 
 			} else {
-				notifications.value.constructNotification('Remove Completed', `Removed VDev ${selectedVDev.value!.name} from Pool ${selectedPool.value!.name}`, 'success');
+				pushNotification(new Notification('Remove Completed', `Removed VDev ${selectedVDev.value!.name} from Pool ${selectedPool.value!.name}`, 'success', 5000));
+
 
 				if (props.pool.properties.refreservationRawSize!) {
-					const output = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
+					const output: any = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
 					if (output == null || output.error) {
 						const errorMessage = output?.error || 'Unknown error';
-						notifications.value.constructNotification('Refreservation Update Failed', `Error updating refreservation: ${errorMessage}.`, 'error');
+						pushNotification(new Notification('Refreservation Update Failed', `Error updating refreservation: ${errorMessage}`, 'error', 5000));
+
 					} else {
-						notifications.value.constructNotification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success');
+						pushNotification(new Notification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success', 5000));
+
 						showRemoveVDevConfirm.value = false;
 					}
 				} else {
@@ -232,7 +239,7 @@ const updateShowAttachDisk = (newVal) => {
 	showAttachDiskModal.value = newVal;
 }
 
-async function showAttachDisk(pool: PoolData, vdev: vDevData) {
+async function showAttachDisk(pool: ZPool, vdev: VDev) {
 	selectedPool.value = pool;
 	selectedVDev.value = vdev;
 	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)

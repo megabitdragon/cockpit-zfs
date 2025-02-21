@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'">
+    <OldModal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             Attach Disk
         </template>
@@ -24,7 +24,7 @@
                     class="flex flex-row flex-wrap gap-2">
                     <li v-for="(disk, diskIdx) in availableDisks" :key="diskIdx" class="my-2">
                         <button class="flex min-w-fit w-full h-full border border-default rounded-lg"
-                            :title="disk.hasPartitions! ? 'Disk already has partitions.Procees with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name)"
+                            :title="disk.hasPartitions! ? 'Disk already has partitions. Proceed with caution.' : getDiskIDName(allDisks, diskIdentifier, disk.name!)"
                             :class="diskCardClass(disk.name)">
                             <label :for="getIdKey(`disk-${diskIdx}`)"
                                 class="flex flex-col w-full py-4 mx-2 text-sm gap-0.5 justify-start">
@@ -34,7 +34,7 @@
                                         @change="selectSingleDisk(disk.name)"
                                         class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
                                     <div v-if="disk.hasPartitions!"
-                                        title="Disk already has partitions. Procees with caution."
+                                        title="Disk already has partitions. Proceed with caution."
                                         class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
                                         <ExclamationCircleIcon class="h-6 text-orange-700" />
                                     </div>
@@ -45,7 +45,7 @@
                                     </div>
                                 </span>
                                 <h3 class="truncate text-sm font-medium text-default">
-                                    {{ truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name)), 8) }}</h3>
+                                    {{ truncateName((getDiskIDName(allDisks, diskIdentifier, disk.name!)), 8) }}</h3>
                                 <p class="mt-1 truncate text-sm text-default">{{ disk.type }}</p>
                                 <p class="mt-1 truncate text-sm text-default">Capacity: {{ disk.capacity }}</p>
                             </label>
@@ -123,30 +123,32 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 
 <script setup lang="ts">
 import { ref, inject, Ref, computed, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, loadScanActivities } from '../../composables/helpers';
 import { attachDisk } from '../../composables/disks';
 import { loadDisksThenPools, loadDatasets, loadDiskStats, loadScanObjectGroup } from '../../composables/loadData';
 import { loadImportablePools } from '../../composables/loadImportables';
+import { ZPool, VDev, VDevDisk, ZFSFileSystemInfo, DiskIdentifier } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { PoolScanObjectGroup, PoolDiskStats, Activity } from '../../types';
 
 interface AttachDiskModalProps {
 	idKey: string;
-    pool: PoolData;
-    vDev: vDevData;
+    pool: ZPool;
+    vDev: VDev;
     showFlag: boolean;
 }
 
 const props = defineProps<AttachDiskModalProps>();
 const showFlag = ref(props.showFlag);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
-const notifications = inject<Ref<any>>('notifications')!;
 
 const emit = defineEmits(['close']);
 
@@ -163,7 +165,7 @@ function debuggingInfo() {
     console.log('vDev:', props.vDev);
     console.log('allDisks:', allDisks.value);
     availableDisks.value.forEach(availableDisk => {
-        console.log(getDiskIDName(allDisks.value, diskIdentifier.value, availableDisk.name));
+        console.log(getDiskIDName(allDisks.value, diskIdentifier.value, availableDisk.name!));
     });
 }
 
@@ -176,9 +178,9 @@ function selectSingleDisk(diskName) {
     selectedDisk.value = selectedDisk.value === diskName ? '' : diskName;
 }
 
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const allDisks = inject<Ref<DiskData[]>>('disks')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const allDisks = inject<Ref<VDevDisk[]>>('disks')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 
 const diskIdentifier = ref<DiskIdentifier>('vdev_path');
 const diskSizeFeedback = ref('')
@@ -195,7 +197,7 @@ const diskBelongsFeedback = ref('');
 
 const adding = ref(false);
 
-const poolData = inject<Ref<PoolData[]>>("pools")!;
+const poolData = inject<Ref<ZPool[]>>("pools")!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
@@ -214,7 +216,7 @@ const diskVDevPoolData = ref({
 });
 
 
-const availableDisks = computed<DiskData[]>(() => {
+const availableDisks = computed<VDevDisk[]>(() => {
     return allDisks.value.filter(disk => disk.guid === "");
 });
 
@@ -272,17 +274,17 @@ async function attachDiskBtn() {
                 
             adding.value = true;
             try {
-                const output = await attachDisk(diskVDevPoolData.value);
+                const output: any = await attachDisk(diskVDevPoolData.value);
 
                 if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    notifications.value.constructNotification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error'); 
+                    pushNotification(new Notification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}`, 'error', 5000));
                 } else {
                     showAttachDiskModal.value = false;
                     adding.value = false;
                     await refreshAllData();
-                    notifications.value.constructNotification('Disk Attached', `Attached disk to virtual device successfully.`, 'success');
+                    pushNotification(new Notification('Disk Attached', `Attached disk to virtual device successfully.`, 'success', 5000));
                 }
             } catch (error) {
                 console.error(error);
@@ -307,14 +309,14 @@ const diskSizeMatch = () => {
     const newDiskData = allDisks.value.find(fullDisk => fullDisk.name === selectedDisk.value);
 
     if (newDiskData) {
-        const newCapacity = convertSizeToBytes(newDiskData!.capacity);
+        const newCapacity = convertSizeToBytes(newDiskData!.capacity!);
         console.log('newCapacity:', newCapacity);
 
         const oldDisks = props.vDev.disks;
         console.log('oldDisks:', oldDisks);
 
         for (const oldDisk of oldDisks) {
-            const currentCapacity = convertSizeToBytes(oldDisk.capacity);
+            const currentCapacity = convertSizeToBytes(oldDisk.capacity!);
             console.log('currentCapacity:', currentCapacity);
 
             if (newCapacity < currentCapacity) {
@@ -328,7 +330,7 @@ const diskSizeMatch = () => {
     return result;
 };
 
-const importablePools = inject<Ref<PoolData[]>>('importable-pools')!;
+const importablePools = inject<Ref<ZPool[]>>('importable-pools')!;
 const diskBelongsToImportablePool = () => {
 	let result = false;
 	diskBelongsFeedback.value = '';

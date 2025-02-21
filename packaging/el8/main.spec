@@ -37,6 +37,24 @@ make DESTDIR=%{buildroot} install
 - Rolls back previous Houston-Common-Library updates due to some bugs that came up
   during usage. Bugfixes pushed during common lib implementation should all be retained,
   but removed common library usage for the time being to work out those issues.
+* Thu Feb 13 2025 Jordan Keough <jkeough@45drives.com> 1.1.13-2
+- Fixes RaidZ levels' minimum disk quantity
+* Thu Feb 13 2025 Jordan Keough <jkeough@45drives.com> 1.1.13-1
+- Fixed an issue with houston-common import not getting correct types
+* Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-7
+- build pkg
+* Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-6
+- rebuilding again
+* Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-5
+- updating build
+* Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-4
+- retrying build
+* Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-3
+- removed module test from makefile to fix build error
+* Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-2
+- rebuilding package
+* Mon Feb 10 2025 Jordan Keough <jkeough@45drives.com> 1.1.12-1
+- Implements some common-library refactoring and some UI improvements
 * Fri Jan 17 2025 Rachit Hans <rhans@45drives.com> 1.1.11-1
 - Refacotred UI and script code
 * Tue Jan 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.10-1

@@ -253,19 +253,21 @@ import { loadDatasets, loadDisksThenPools, loadScanObjectGroup, loadDiskStats } 
 import { loadScanActivities, loadTrimActivities, formatStatus, isPoolUpgradable, getCapacityColor  } from '../../composables/helpers';
 import VDevElement from "./VDevElement.vue";
 import Status from "../common/Status.vue";
+import { ZPool, VDevDisk, ZFSFileSystemInfo } from "@45drives/houston-common-lib";
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { PoolScanObjectGroup, PoolDiskStats, ConfirmationCallback, Activity } from "../../types";
 
 interface PoolListElementProps {
     poolIdx: number;
-	pool: PoolData;
+	pool: ZPool;
 }
 
 const props = defineProps<PoolListElementProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-const notifications = inject<Ref<any>>('notifications')!;
 
-const selectedPool = ref<PoolData>();
-const selectedDisk = ref<DiskData>();
+const selectedPool = ref<ZPool>();
+const selectedDisk = ref<VDevDisk>();
 
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
 const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
@@ -330,19 +332,17 @@ const updateShowPoolDetails = (newVal) => {
 
 watch(confirmSavePool, async (newVal, oldVal) => {
 	if (confirmSavePool.value == true) {
-		notifications.value.constructNotification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success');
+		pushNotification(new Notification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success', 5000));
 		await refreshAllData();
-	} else {
-		notifications.value.constructNotification('Save Pool Config Failed', 'There was an error saving this pool.', 'error');
 	}
 });
 
 
 /////////////// Loading/Refreshing //////////////////
 /////////////////////////////////////////////////////
-const poolData = inject<Ref<PoolData[]>>("pools")!;
-const diskData = inject<Ref<DiskData[]>>("disks")!;
-const filesystemData = inject<Ref<FileSystemData[]>>('datasets')!;
+const poolData = inject<Ref<ZPool[]>>("pools")!;
+const diskData = inject<Ref<VDevDisk[]>>("disks")!;
+const filesystemData = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
@@ -409,13 +409,14 @@ watch(confirmDelete, async (newValue, oldValue) => {
 		console.log('now deleting:', selectedPool.value);
 
 		try {
-			const output = await destroyPool(selectedPool.value!, firstOptionToggle.value);
+			const output: any = await destroyPool(selectedPool.value!, firstOptionToggle.value);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmDelete.value = false;
-				notifications.value.constructNotification('Destroy Pool Failed', selectedPool.value!.name + ` was not destroyed: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Destroy Pool Failed', selectedPool.value!.name + ` was not destroyed: ${errorMessage}`, 'error', 5000));
+
 			} else {
 				if (secondOptionToggle.value == true) {
 					selectedPool.value!.vdevs.forEach(vDev => {
@@ -429,7 +430,8 @@ watch(confirmDelete, async (newValue, oldValue) => {
 				await refreshAllData();
 				confirmDelete.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Pool Destroyed', `${poolName} destroyed.`, 'success');
+				pushNotification(new Notification('Pool Destroyed', `${poolName} destroyed.`, 'success', 5000));
+
 				showDeletePoolConfirm.value = false;
 			}
 
@@ -474,11 +476,12 @@ watch(confirmResilver, async (newValue, oldValue) => {
 		
 		console.log('now resilvering:', selectedPool.value);
 		try {
-			const output = await resilverPool(selectedPool.value!);
+			const output: any = await resilverPool(selectedPool.value!);
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmResilver.value = false;
-				notifications.value.constructNotification('Resilver Failed', `Resilver failed to start:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Resilver Failed', `Resilver failed to start:${errorMessage}`, 'error', 5000));
+
 				operationRunning.value = false;
 			} else {
 				getScanStatus();
@@ -487,7 +490,8 @@ watch(confirmResilver, async (newValue, oldValue) => {
 				resilvered.value = true;
 				operationRunning.value = false;
 				showResilverModal.value = false;
-				notifications.value.constructNotification('Resilver Started', 'Resilver on ' + selectedPool.value!.name + " started.", 'success');
+				pushNotification(new Notification('Resilver Started', 'Resilver on ' + selectedPool.value!.name + " started.", 'success', 5000));
+
 			}
 		} catch (error) { 
 			console.error(error);
@@ -534,18 +538,20 @@ watch(confirmUpgrade, async (newVal, oldVal) => {
 		console.log('now upgrading:', selectedPool.value);
 		upgrading.value = true;
 		try {
-			const output = await upgradePool(selectedPool.value!);
+			const output: any = await upgradePool(selectedPool.value!);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Upgrade Failed', `Upgrade failed: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Upgrade Failed', `Upgrade failed: ${errorMessage}`, 'error', 5000));
+
 				operationRunning.value = false;
 				confirmUpgrade.value = false;
 			} else {
 				getScanStatus();
 				confirmUpgrade.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Upgrade Successful', 'Upgrade on ' + selectedPool.value!.name + " succeeded.", 'success');
+				pushNotification(new Notification('Upgrade Successful', 'Upgrade on ' + selectedPool.value!.name + " succeeded.", 'success', 5000));
+
 				showUpgradeModal.value = false;
 				canUpgradePool(selectedPool.value!.name);
 			}
@@ -605,18 +611,20 @@ watch(confirmScrub, async (newVal, oldVal) => {
 		console.log('now scrubbing:', selectedPool.value);
 		starting.value = true;
 		try {
-			const output = await scrubPool(selectedPool.value!);
+			const output: any = await scrubPool(selectedPool.value!);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Scrub Failed', `Scrub failed to start:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Scrub Failed', `Scrub failed to start:${errorMessage}`, 'error', 5000));
+
 				operationRunning.value = false;
 				confirmScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmScrub.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success');
+				pushNotification(new Notification('Scrub Started', 'Scrub on ' + selectedPool.value!.name + " started.", 'success', 5000));
+
 				showScrubModal.value = false;
 			}
 		} catch (error) {
@@ -635,16 +643,18 @@ async function pauseScrub(pool) {
 async function resumeScrub(pool) {
 	resuming.value = true;
 	try {
-		const output = await scrubPool(selectedPool.value!);
+		const output: any = await scrubPool(selectedPool.value!);
 
 		if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-			notifications.value.constructNotification('Scrub Resume Failed', `Scrub failed to resume:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Scrub Resume Failed', `Scrub failed to resume:${errorMessage}`, 'error', 5000));
+
 			confirmScrub.value = false;
 		} else {
 			getScanStatus();
 			confirmScrub.value = false;
-			notifications.value.constructNotification('Scrub Resumed', 'Scrub on ' + selectedPool.value!.name + " resumed.", 'success');
+			pushNotification(new Notification('Scrub Resumed', 'Scrub on ' + selectedPool.value!.name + " resumed.", 'success', 5000));
+
 			showScrubModal.value = false;
 		}
 	} catch (error) {
@@ -676,16 +686,18 @@ watch(confirmPauseScrub, async (newVal, oldVal) => {
 		console.log('now pausing scrub:', selectedPool.value);
 		pausing.value = true;
 		try {
-			const output = await scrubPool(selectedPool.value, 'pause');
+			const output: any = await scrubPool(selectedPool.value, 'pause');
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Scrub Pause Failed', `Scrub failed to pause:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Scrub Pause Failed', `Scrub failed to pause:${errorMessage}`, 'error', 5000));
+
 				confirmPauseScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmPauseScrub.value = false;
-				notifications.value.constructNotification('Scrub Paused', 'Scrub on ' + selectedPool.value!.name + " paused.", 'success');
+				pushNotification(new Notification('Scrub Paused', 'Scrub on ' + selectedPool.value!.name + " paused.", 'success', 5000));
+
 				showPauseScrubConfirm.value = false;
 			}
 		} catch (error) {
@@ -713,16 +725,18 @@ watch(confirmStopScrub, async (newVal, oldVal) => {
 		stopping.value = true;
 
 		try {
-			const output = await scrubPool(selectedPool.value, 'stop');
+			const output: any = await scrubPool(selectedPool.value, 'stop');
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Scrub Stop Failed', `Scrub failed to stop:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Scrub Stop Failed', `Scrub failed to stop:${errorMessage}`, 'error', 5000));
+
 				confirmStopScrub.value = false;
 			} else {
 				getScanStatus();
 				confirmStopScrub.value = false;
-				notifications.value.constructNotification('Scrub Stopped', 'Scrub on ' + selectedPool.value!.name + " stopped.", 'success');
+				pushNotification(new Notification('Scrub Stopped', 'Scrub on ' + selectedPool.value!.name + " stopped.", 'success', 5000));
+
 				showStopScrubConfirm.value = false;
 			}
 		} catch (error) {
@@ -782,15 +796,17 @@ watch(confirmTrim, async (newValue, oldValue) => {
 		startingTrim.value = true;
 		console.log('now trimming:', selectedPool.value);
 		try {
-			const output = await trimPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
+			const output: any = await trimPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Trim Failed', `Trim failed to start:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Trim Failed', `Trim failed to start:${errorMessage}`, 'error', 5000));
+
 				confirmTrim.value = false
 			} else {
 				getTrimStatus();
 				confirmTrim.value = false
-				notifications.value.constructNotification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success');
+				pushNotification(new Notification('Trim Started', 'Trim on ' + selectedPool.value!.name + " started.", 'success', 5000));
+
 				showTrimModal.value = false;
 			}
 		} catch (error) {
@@ -811,16 +827,17 @@ async function pauseTrim(pool) {
 async function resumeTrim(pool) {
 	resumingTrim.value = true;
 	try {
-		const output = await trimPool(pool)
+		const output: any = await trimPool(pool)
 
 		if (output == null || output.error) {
 			const errorMessage = output?.error || 'Unknown error';
-			notifications.value.constructNotification('Trim Resume Failed', `Trim failed to resume:${errorMessage}.`, 'error');
+			pushNotification(new Notification('Trim Resume Failed', `Trim failed to resume:${errorMessage}`, 'error', 5000));
+
 			confirmTrim.value = false;
 		} else {
 			getTrimStatus();
 			confirmTrim.value = false;
-			notifications.value.constructNotification('Trim Resumed', 'Trim on ' + selectedPool.value!.name + " resumed.", 'success');
+			pushNotification(new Notification('Trim Resumed', 'Trim on ' + selectedPool.value!.name + " resumed.", 'success', 5000));
 		}
 	} catch (error) {
 		console.error(error)
@@ -852,15 +869,17 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 		console.log('now pausing trim:', selectedPool.value);
 		pausingTrim.value = true;
 		try {
-			const output = 	await trimPool(selectedPool.value!, false, 'pause');
+			const output: any = 	await trimPool(selectedPool.value!, false, 'pause');
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Trim Pause Failed', `Trim failed to pause:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Trim Pause Failed', `Trim failed to pause:${errorMessage}`, 'error', 5000));
+
 				confirmPauseTrim.value = false;
 			} else {
 				getTrimStatus();
 				confirmPauseTrim.value = false;
-				notifications.value.constructNotification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success');
+				pushNotification(new Notification('Trim Paused', 'Trim on ' + selectedPool.value!.name + " paused.", 'success', 5000));
+
 				showPauseTrimConfirm.value = false;
 			}
 			
@@ -888,15 +907,16 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 		console.log('now stopping trim:', selectedPool.value);
 		stoppingTrim.value = true;
 		try {
-			const output = await trimPool(selectedPool.value!, false, 'stop');
+			const output: any = await trimPool(selectedPool.value!, false, 'stop');
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Trim Stop Failed', `Trim failed to stop:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Trim Stop Failed', `Trim failed to stop:${errorMessage}`, 'error', 5000));
 				confirmStopTrim.value = false;
 			} else {
 				getTrimStatus();
 				confirmStopTrim.value = false;
-				notifications.value.constructNotification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success');
+				pushNotification(new Notification('Trim Stopped', 'Trim on ' + selectedPool.value!.name + " stopped.", 'success', 5000));
+
 				showStopTrimConfirm.value = false;
 			}
 		} catch (error) {
@@ -943,13 +963,14 @@ watch(confirmExport, async (newVal, oldVal) => {
 		console.log('now exporting:', selectedPool.value);
 
 		try {
-			const output = await exportPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
+			const output: any = await exportPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				notifications.value.constructNotification('Export Failed', `Pool failed to export:${errorMessage}.`, 'error');
+				pushNotification(new Notification('Export Failed', `Pool failed to export:${errorMessage}`, 'error', 5000));
 				confirmExport.value = false;
 			} else {
-				notifications.value.constructNotification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success');
+				pushNotification(new Notification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success', 5000));
+
 				await refreshAllData();
 				confirmExport.value = false;
 				showExportModal.value = false;

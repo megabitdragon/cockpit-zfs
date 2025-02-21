@@ -1,6 +1,5 @@
 <template>
-    <Modal :isOpen="showChangePassphrase" @close="showChangePassphrase = false" :marginTop="'mt-28'" :width="'w-96'"
-        :minWidth="'min-w-min'">
+    <OldModal :isOpen="showChangePassphrase" @close="showChangePassphrase = false" :marginTop="'mt-28'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick ="false">
         <template v-slot:title>
             <legend class="flex justify-center">Change Passphrase</legend>
         </template>
@@ -71,23 +70,24 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { ref, Ref, inject } from 'vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { changePassphrase } from '../../composables/datasets';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
+import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
 interface ChangePassphraseProps {
     idKey: string;
-    filesystem: FileSystemData;
+    filesystem: ZFSFileSystemInfo;
 }
 
-const notifications = inject<Ref<any>>('notifications')!;
 const props = defineProps<ChangePassphraseProps>();
 const showChangePassphrase = inject<Ref<boolean>>('show-change-passphrase')!;
-const datasets = inject<Ref<FileSystemData[]>>('datasets')!;
+const datasets = inject<Ref<ZFSFileSystemInfo[]>>('datasets')!;
 const fileSystemsLoaded = inject<Ref<boolean>>('datasets-loaded')!;
 const fileSystem = ref(props.filesystem);
 const changing = inject<Ref<boolean>>('changing')!;
@@ -101,16 +101,17 @@ async function changeBtn() {
         changing.value = true;
 
         try {
-            const output = await changePassphrase(fileSystem.value.name, passphrase.value);
+            const output: any = await changePassphrase(fileSystem.value.name, passphrase.value);
 
             if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                 changing.value = false;
-                notifications.value.constructNotification('Passphrase Change Failed', `There was an error changing this passphrase: ${errorMessage}`, 'error')
+                pushNotification(new Notification('Passphrase Change Failed', `There was an error changing this passphrase: ${errorMessage}`, 'error', 5000));
+
             } else {
                 confirmChange.value = true;
+                pushNotification(new Notification('Encryption Passphrase Changed', `Changed passphrase for ${fileSystem.value!.name}.`, 'success', 5000));
 
-                notifications.value.constructNotification('Encryption Passphrase Changed', `Changed passphrase for ${fileSystem.value!.name}.`, 'success');
                 changing.value = false;
                 showChangePassphrase.value = false;
             }
@@ -121,7 +122,7 @@ async function changeBtn() {
     }
 }
 
-const encryptPasswordCheck = (fileSystem : FileSystemData) => {
+const encryptPasswordCheck = (fileSystem : ZFSFileSystemInfo) => {
 	let result = true;
 	passFeedback.value = '';
 

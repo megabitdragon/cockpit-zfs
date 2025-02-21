@@ -1,7 +1,11 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { legacy, ZPoolBase, ZpoolCreateOptions } from '@45drives/houston-common-lib';
 import { ref, Ref } from 'vue';
 // @ts-ignore
 import test_ssh_script from"../scripts/test-ssh.py?raw";
+import {VDevDisk, ZPool} from "@45drives/houston-common-lib";
+import { Activity } from '../types';
+
+const { errorString, useSpawn } = legacy;
 
 //change true to 'on' and false to 'off'
 export function isBoolOnOff(bool : boolean) {
@@ -46,37 +50,6 @@ export const convertBytesToSize = (bytes: number, precision: number = 2): string
 	return `${convertedSize} ${binarySizes[i]}`;
 };
 
-// Convert readable binary data size to raw bytes
-// export const convertSizeToBytes = (size: string): number => {
-// 	const binarySizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-// 	const base = 1024;
-// 	console.log('size:', size)
-// 	const match = size.trim().match(/(\d+\.?\d*)\s*([a-zA-Z]+)/i);
-
-// 	if (!match) {
-// 		throw new Error(`Invalid size format: "${size}"`);
-// 	}
-
-// 	const [value, unit] = match.slice(1);
-// 	const normalizedUnit = unit.toLowerCase();
-
-// 	console.log('normalizedUnit:', normalizedUnit)
-
-// 	const decimalSizes = ['b', 'kb', 'mb', 'gb', 'tb', 'pb', 'eb', 'zb', 'yb'];
-
-// 	const index = binarySizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
-// 	if (index === -1) {
-// 		const decimalIndex = decimalSizes.findIndex((sizeUnit) => sizeUnit.toLowerCase() === normalizedUnit);
-// 		if (decimalIndex === -1) {
-// 			throw new Error(`Unrecognized unit: "${unit}"`);
-// 		} else {
-
-// 		}
-// 	}
-
-// 	const bytes = parseFloat(value) * Math.pow(base, index);
-// 	return bytes;
-// };
 
 // Convert readable binary data size to raw bytes
 export const convertSizeToBytes = (size: string): number => {
@@ -432,22 +405,22 @@ export function getValue(type : string, value : string) {
 	}
 }
 
-export function checkInheritance(type: string, value : string, poolConfig : PoolData) {
+export function checkInheritance(type: string, value : string, poolConfigOptions : ZpoolCreateOptions) {
 	if (type == 'compression') {
 		if (value == 'inherited') {
-			return `${upperCaseWord(value)} (${isBoolCompression(poolConfig.properties.compression).toUpperCase()})`
+			return `${upperCaseWord(value)} (${poolConfigOptions.compression!.toUpperCase()})`
 		} else {
 			return getValue('compression', value);
 		}
 	} else if (type == 'dedup') {
 		if (value == 'inherited') {
-			return `${upperCaseWord(value)} (${upperCaseWord(isBoolOnOff(poolConfig.properties.deduplication))})`
+			return `${upperCaseWord(value)} (${upperCaseWord(poolConfigOptions.dedup!)})`
 		} else {
 			return getValue('dedup', value);
 		}
 	} else if (type == 'record') {
 		if (value == 'inherited') {
-			return `${upperCaseWord(value)} (${getValue('record', poolConfig.properties.record)})`
+			return `${upperCaseWord(value)} (${getValue('record', poolConfigOptions.recordsize!.toString())})`
 		} else {
 			return getValue('record', value);
 		}
@@ -481,12 +454,12 @@ export function checkInheritance(type: string, value : string, poolConfig : Pool
 export async function testSSH(sshTarget) {
     try {
         console.log(`target: ${sshTarget}`);
-        const state = useSpawn(['/usr/bin/env', 'python3', '-c', test_ssh_script, sshTarget], { superuser: 'try', stderr: 'out' });
+        const state = useSpawn(['/usr/bin/env', 'python3', '-c', test_ssh_script, sshTarget], { superuser: 'try' });
 
         const output = await state.promise();
         console.log('testSSH output:', output);
 
-        if (output.stdout.includes('True')) {
+        if (output.stdout!.includes('True')) {
 			return true;
 		} else {
 			return false;
@@ -543,7 +516,52 @@ export function getCapacityColor(type: 'text' | 'bg', capacity: number, refreser
 	return colorString;
 }
 
-export function getDiskIDName(disks: DiskData[], diskIdentifier: string, selectedDiskName: string) {
+export function getFullDiskInfo(disks: VDevDisk[], diskName: string): VDevDisk | undefined {
+	if (!diskName) {
+		console.warn("getFullDiskInfo called with an empty diskName.");
+		return undefined;
+	}
+
+	const pathPrefixes: Record<string, string> = {
+		phy_path: '/dev/disk/by-path/',
+		sd_path: '/dev/',
+		id_path: '/dev/disk/by-id/',
+		label_path: '/dev/disk/by-label/',
+		part_label_path: '/dev/disk/by-partlabel/',
+		part_uuid: '/dev/disk/by-partuuid/',
+		uuid: '/dev/disk/by-uuid/',
+	};
+
+	console.log("Searching for disk with name:", diskName);
+
+	// Find the disk by matching its name against possible paths
+	const foundDisk = disks.find(disk => {
+		if (disk.name?.trim() === diskName.trim() || disk.vdev_path?.trim() === diskName.trim()) {
+			disk.path = disk.vdev_path?.trim() ?? disk.name?.trim() ?? ''; // Ensure it's always a string
+			return true;
+		}
+
+		for (const [key, prefix] of Object.entries(pathPrefixes)) {
+			const diskPath = (disk as any)[key]?.trim();
+			if (diskPath && diskPath.replace(prefix, '') === diskName.trim()) {
+				disk.path = diskPath; // Assign the actual matched path
+				return true;
+			}
+		}
+
+		return false;
+	});
+
+	if (foundDisk) {
+		console.log("Found disk:", foundDisk);
+	}
+
+	return foundDisk;
+}
+
+
+
+export function getDiskIDName(disks: VDevDisk[], diskIdentifier: string, selectedDiskName: string) {
 	const phyPathPrefix = '/dev/disk/by-path/';
 	const sdPathPrefix = '/dev/';
 	const idPathPrefix = '/dev/disk/by-id/';
@@ -556,8 +574,15 @@ export function getDiskIDName(disks: DiskData[], diskIdentifier: string, selecte
 	const diskName = ref('');
 	const diskPath = ref('');
 
+	// console.log('diskIdentifier:', diskIdentifier);
+	// console.log('selectedDiskName:', selectedDiskName);
+
 	// Find the selected disk
-	newDisk.value = disks.find(disk => disk.name === selectedDiskName);
+	// newDisk.value = disks.find(disk => disk.name!.trim() == selectedDiskName.trim());
+	newDisk.value = disks.find(disk => {
+		// console.log("Checking disk:", disk.name?.trim(), "against", selectedDiskName.trim());
+		return disk.name?.trim() === selectedDiskName.trim();
+	});
 
 	switch (diskIdentifier) {
 		case 'vdev_path':
@@ -638,13 +663,13 @@ export function truncateName(name : string, threshold : number) {
 
 export async function isPoolUpgradable(poolName: string) {
 	try {
-		const state = useSpawn(['zpool', 'status', poolName], { superuser: 'try', stderr: 'out' });
+		const state = useSpawn(['zpool', 'status', poolName], { superuser: 'try' });
 
 		const output = await state.promise();
 		// console.log('zpool status output:', output.stdout);
 
 		// Split the output into lines
-		const lines = output.stdout.split('\n');
+		const lines = output.stdout!.split('\n');
 
 		// Define the patterns to match
 		const statusPattern = /The pool is formatted using a legacy on-disk format/;

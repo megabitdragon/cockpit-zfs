@@ -1,6 +1,6 @@
 <template>
-	<Modal @close="closeModal" :isOpen="showPoolDetails" :marginTop="'mt-28'" :width="'w-7/12'" :minWidth="'min-w-7/12'"
-		class="z-10">
+	<OldModal @close="closeModal" :close-on-background-click="false" :isOpen="showPoolDetails" :marginTop="'mt-28'"
+		:width="'w-7/12'" :minWidth="'min-w-7/12'" :initialFocus="null">
 		<template v-slot:title>
 			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem"
 				:navigationCallback="navigationCallback" :show="show" />
@@ -19,9 +19,11 @@
 									:class="formatStatus(props.pool.status)" class="">{{ props.pool.status }}</span></p>
 							<p :id="getIdKey('pool-errors')" name="pool-errors" class="text-sm">Errors: <span
 									:class="formatStatus(props.pool.status)" class="">{{ props.pool.errorCount }}</span>
-								<br />as of {{ getTimestampString() }}</p>
+								<br />as of {{ getTimestampString() }}
+							</p>
 							<p :id="getIdKey('pool-refreservation')" name="pool-refreservation" class="text-sm">
 								Refreservation: {{
+								convertBytesToSize(props.pool.properties.refreservationRawSize!) }} ({{
 								convertBytesToSize(props.pool.properties.refreservationRawSize!) }} ({{
 								props.pool.properties.refreservationPercent }}%)</p>
 						</div>
@@ -208,7 +210,8 @@
 								class="block text-sm text-default">Delegation</label>
 							<p class="text-xs text-muted mt-0.5">(Access based on dataset permissions)</p>
 						</div>
-						<Switch v-model="poolConfig.properties.delegation" :id="getIdKey('settings-pool-delegation')"
+						<Switch :initialFocus="null" v-model="poolConfig.properties.delegation"
+							:id="getIdKey('settings-pool-delegation')"
 							:class="[poolConfig.properties.delegation ? 'bg-secondary' : 'bg-accent', 'mt-1 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2']">
 							<span class="sr-only">Use setting</span>
 							<span
@@ -316,18 +319,28 @@
 				</div>
 			</div>
 		</template>
-	</Modal>
+	</OldModal>
 
 	<div v-if="showSnapshotModal">
 		<component :is="createSnapshotComponent" @close="updateShowNewSnapshot" :poolName="props.pool.name"
 			:item="'pool'" />
+		<!-- <CreateSnapshotModal @close="updateShowNewSnapshot" :poolName="props.pool.name" :item="'pool'" /> -->
 	</div>
 	<div v-if="showAddVDevModal">
-		<component :is="addVDevComponent" @close="updateShowAddVDev" :idKey="getIdKey(`show-vdev-modal`)"
-			:pool="poolConfig" :marginTop="'mt-48'" />
+		<component :is="addVDevComponent" @close="updateShowAddVDev" :key="showAddVDevModal"
+			:idKey="getIdKey(`show-vdev-modal`)" :pool="poolConfig" :marginTop="'mt-48'" />
+		<!-- <AddVDevModal @close="updateShowAddVDev" :idKey="getIdKey(`show-vdev-modal`)"
+			:pool="poolConfig" :marginTop="'mt-48'" /> -->
 	</div>
 
 </template>
+<!-- <style >
+.inert {
+    pointer-events: none !important;
+    opacity: 0.5;
+}
+
+</style> -->
 
 <script setup lang="ts">
 import { reactive, ref, inject, Ref, computed, provide, watch } from 'vue';
@@ -335,13 +348,15 @@ import { Switch } from '@headlessui/vue';
 import { configurePool } from '../../composables/pools';
 import { getTimestampString, upperCaseWord, isBoolOnOff, loadScanActivities, loadTrimActivities, formatStatus, getCapacityColor, convertBytesToSize } from '../../composables/helpers';
 import { loadDisksThenPools, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import PoolCapacity from '../common/PoolCapacity.vue';
 import Navigation from '../common/Navigation.vue';
 import PoolDetailDiskCard from '../disks/PoolDetailDiskCard.vue';
+import AddVDevModal from './AddVDevModal.vue';
+import CreateSnapshotModal from '../snapshots/CreateSnapshotModal.vue';
 
 interface PoolDetailsProps {
-	pool: PoolData;
+	pool: ZPool;
 	confirmation: ConfirmationCallback;
 	showFlag: boolean;
 }
@@ -355,7 +370,7 @@ const closeModal = () => {
 const props = defineProps<PoolDetailsProps>();
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
-const poolConfig = ref<PoolData>({
+const poolConfig = ref<ZPool>({
 	name: props.pool.name,
 	status: props.pool.status,
 	guid: props.pool.guid,
@@ -394,8 +409,8 @@ const capacityColor = computed(() =>
 
 ////////////////// Loading Data /////////////////////
 /////////////////////////////////////////////////////
-const pools = inject<Ref<PoolData[]>>('pools')!;
-const disks = inject<Ref<DiskData[]>>('disks')!;
+const pools = inject<Ref<ZPool[]>>('pools')!;
+const disks = inject<Ref<VDevDisk[]>>('disks')!;
 const disksLoaded = inject<Ref<boolean>>('disks-loaded')!;
 const poolsLoaded = inject<Ref<boolean>>('pools-loaded')!;
 const scanObjectGroup = inject<Ref<PoolScanObjectGroup>>('scan-object-group')!;
@@ -403,6 +418,9 @@ const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 const snapshots = inject<Ref<Snapshot[]>>('snapshots')!;
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { ZPool, VDevDisk } from '@45drives/houston-common-lib';
+import { Activity, ConfirmationCallback, NavigationCallback, NavigationItem, PoolDiskStats, PoolEditConfig, PoolScanObjectGroup, Snapshot } from '../../types';
 
 const snapshotListComponent = ref();
 // const loadSnapshotListComponent = async () => {
@@ -505,43 +523,60 @@ const updatedProperties: Partial<PoolEditConfig> = ({
 	readonly: isBoolOnOff(poolConfig.value.properties.readOnly),
 });
 
-async function checkForChanges(poolDataCheck) {
-	//failmode
-	if (poolDataCheck.failMode != props.pool.failMode) {
-		updatedProperties.failmode = poolDataCheck.failMode;
-	}
-	//comment
-	if (poolDataCheck.comment != props.pool.comment) {
-		updatedProperties.comment = poolDataCheck.comment;
-	}
-	//autoexpand
-	if (poolDataCheck.properties.autoExpand != props.pool.properties.autoExpand) {
-		updatedProperties.autoexpand = isBoolOnOff(poolDataCheck.properties.autoExpand);
-	}
-	//autoreplace
-	if (poolDataCheck.properties.autoReplace != props.pool.properties.autoReplace) {
-		updatedProperties.autoreplace = isBoolOnOff(poolDataCheck.properties.autoReplace);
-	}
-	//autotrim
-	if (poolDataCheck.properties.autoTrim != props.pool.properties.autoTrim) {
-		updatedProperties.autotrim = isBoolOnOff(poolDataCheck.properties.autoTrim);
-	}
-	//delegation
-	if (poolDataCheck.properties.delegation != props.pool.properties.delegation) {
-		updatedProperties.delegation = isBoolOnOff(poolDataCheck.properties.delegation);
-	}
-	//listsnapshots
-	if (poolDataCheck.properties.listSnapshots != props.pool.properties.listSnapshots) {
-		updatedProperties.listsnapshots = isBoolOnOff(poolDataCheck.properties.listSnapshots);
-	}
 
-	const newChanges = {
-        ...newChangesToPool.value,
-        ...updatedProperties,
-    }
+async function checkForChanges() {
+	const changes: Partial<PoolEditConfig> = {};
 
-    newChangesToPool.value = newChanges;
+	if (poolConfig.value.failMode !== props.pool.failMode) changes.failmode = poolConfig.value.failMode;
+	if (poolConfig.value.comment !== props.pool.comment) changes.comment = poolConfig.value.comment;
+	if (poolConfig.value.properties.autoExpand !== props.pool.properties.autoExpand) changes.autoexpand = isBoolOnOff(poolConfig.value.properties.autoExpand);
+	if (poolConfig.value.properties.autoReplace !== props.pool.properties.autoReplace) changes.autoreplace = isBoolOnOff(poolConfig.value.properties.autoReplace);
+	if (poolConfig.value.properties.autoTrim !== props.pool.properties.autoTrim) changes.autotrim = isBoolOnOff(poolConfig.value.properties.autoTrim);
+	if (poolConfig.value.properties.delegation !== props.pool.properties.delegation) changes.delegation = isBoolOnOff(poolConfig.value.properties.delegation!);
+	if (poolConfig.value.properties.listSnapshots !== props.pool.properties.listSnapshots) changes.listsnapshots = isBoolOnOff(poolConfig.value.properties.listSnapshots!);
+
+	newChangesToPool.value = { ...newChangesToPool.value, ...changes };
+	return Object.keys(changes).length > 0;
 }
+
+// async function checkForChanges(poolDataCheck) {
+// 	//failmode
+// 	if (poolDataCheck.failMode != props.pool.failMode) {
+// 		updatedProperties.failmode = poolDataCheck.failMode;
+// 	}
+// 	//comment
+// 	if (poolDataCheck.comment != props.pool.comment) {
+// 		updatedProperties.comment = poolDataCheck.comment;
+// 	}
+// 	//autoexpand
+// 	if (poolDataCheck.properties.autoExpand != props.pool.properties.autoExpand) {
+// 		updatedProperties.autoexpand = isBoolOnOff(poolDataCheck.properties.autoExpand);
+// 	}
+// 	//autoreplace
+// 	if (poolDataCheck.properties.autoReplace != props.pool.properties.autoReplace) {
+// 		updatedProperties.autoreplace = isBoolOnOff(poolDataCheck.properties.autoReplace);
+// 	}
+// 	//autotrim
+// 	if (poolDataCheck.properties.autoTrim != props.pool.properties.autoTrim) {
+// 		updatedProperties.autotrim = isBoolOnOff(poolDataCheck.properties.autoTrim);
+// 	}
+// 	//delegation
+// 	if (poolDataCheck.properties.delegation != props.pool.properties.delegation) {
+// 		updatedProperties.delegation = isBoolOnOff(poolDataCheck.properties.delegation);
+// 	}
+// 	//listsnapshots
+// 	if (poolDataCheck.properties.listSnapshots != props.pool.properties.listSnapshots) {
+// 		updatedProperties.listsnapshots = isBoolOnOff(poolDataCheck.properties.listSnapshots);
+// 	}
+
+// 	const newChanges = {
+//         ...newChangesToPool.value,
+//         ...updatedProperties,
+//     }
+
+//     newChangesToPool.value = newChanges;
+
+// }
 
 const commentLengthCheck = (poolData) => {
 	let result = true;
@@ -570,43 +605,66 @@ async function refreshAllData() {
 }
 
 const confirmSavePool = inject<Ref<boolean>>('confirm-save-pool')!;
-const notifications = inject<Ref<any>>('notifications')!;
 	
+// async function poolConfigureBtn() {
+// 	if (commentLengthCheck(poolConfig.value)) {
+// 		await checkForChanges();
+		
+// 		if (newChangesToPool.value)
+// 		saving.value = true;
+// 		try {
+// 			const result = await configurePool(newChangesToPool.value);
+
+// 			if (!result.success) {
+// 				const errorMessage = result.error || 'Unknown error occurred';
+// 				console.log('configurePool failed');
+// 				pushNotification(new Notification('Save Pool Config Failed',`There was an error saving this pool: ${errorMessage}`,'error', 5000));
+
+// 				confirmSavePool.value = false;
+// 			} else {
+// 				console.log('configurePool succeeded');
+// 				pushNotification(new Notification('Pool Config Saved',"Successfully saved this pool's configuration.",'success', 5000));
+// 				console.log('notification triggered in PoolDetail')
+// 				confirmSavePool.value = true;
+// 				showPoolDetails.value = false;
+// 			}
+
+// 			saving.value = false;
+
+// 		} catch (error: any) {
+// 			console.error(error);
+// 			pushNotification(new Notification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error', 5000));
+
+// 		}
+// 	}
+// }
+
 async function poolConfigureBtn() {
 	if (commentLengthCheck(poolConfig.value)) {
-		await checkForChanges(poolConfig.value);
+		if (!(await checkForChanges())) {
+			pushNotification(new Notification('No Changes', 'No modifications detected in the pool configuration.', 'info', 5000));
+			showPoolDetails.value = false;
+			return;
+		}
+
 		saving.value = true;
 		try {
 			const result = await configurePool(newChangesToPool.value);
 
-			if (!result.success) {
-				const errorMessage = result.error || 'Unknown error occurred';
-				console.log('configurePool failed');
-
-				notifications.value.constructNotification(
-					'Save Pool Config Failed',
-					`There was an error saving this pool: ${errorMessage}.`,
-					'error'
-				);
+			if (result.success === false) { 
+				pushNotification(new Notification('Save Pool Config Failed', `There was an error saving this pool: ${result.error || 'Unknown error occurred'}.`, 'error', 5000));
 				confirmSavePool.value = false;
-			} else {
-				console.log('configurePool succeeded');
-
-				notifications.value.constructNotification(
-					'Pool Config Saved',
-					"Successfully saved this pool's configuration.",
-					'success'
-				);
+			} else if (result.success === true) {
+				// pushNotification(new Notification('Pool Config Saved', "Successfully saved this pool's configuration.", 'success', 5000));
 				confirmSavePool.value = true;
 				showPoolDetails.value = false;
 			}
-
-			saving.value = false;
-
 		} catch (error: any) {
-			console.error(error);
-			notifications.value.constructNotification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error');
+			pushNotification(new Notification('Operation Failed', `An unexpected error occurred: ${error.message}`, 'error', 5000));
+		} finally {
+			saving.value = false;
 		}
+
 	}
 }
 

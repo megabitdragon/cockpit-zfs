@@ -6,7 +6,7 @@
  -->
 
 <template>
-    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-56'" :width="'w-96'" :minWidth="'min-w-min'">
+    <OldModal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-56'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">{{ upperCaseWord(props.operation) }} {{ upperCaseWord(props.item) }}</legend>
         </template>
@@ -66,7 +66,6 @@
                                 </Switch>
                             </div>
                         </div>
-                     
                     </div>
 
                     <div v-if="props.item == 'snapshot'">
@@ -152,13 +151,15 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { Switch } from '@headlessui/vue';
 import { Ref, inject, ref, computed, watch} from 'vue';
 import { upperCaseWord } from '../../composables/helpers';
-import Modal from './Modal.vue';
+import OldModal from './OldModal.vue';
+import { ZFSFileSystemInfo,ZPool,VDev,VDevDisk } from '@45drives/houston-common-lib';
+import { ConfirmationCallback, Snapshot } from '../../types';
 
 interface UniversalConfirmationProps {
     showFlag: boolean;
@@ -167,10 +168,10 @@ interface UniversalConfirmationProps {
     operation: string;
     operation2?: string;
     confirmOperation: ConfirmationCallback;
-    pool?: PoolData;
-    vdev?: vDevData;
-    disk?: DiskData;
-    filesystem?: FileSystemData;
+    pool?: ZPool;
+    vdev?: VDev;
+    disk?: VDevDisk;
+    filesystem?: ZFSFileSystemInfo;
     snapshot?: Snapshot;
     snapshots?: string[];
     firstOption?: string;

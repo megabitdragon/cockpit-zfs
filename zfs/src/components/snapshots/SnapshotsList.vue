@@ -1,5 +1,5 @@
 <template>
-	<div class="TableDIv">
+	<div class="TableDiv">
 		<!-- POOLS -->
 		<div v-if="props.item == 'pool'"
 			class="inline-block min-w-full max-h-96 align-middle border border-default border-collapse overflow-y-auto">
@@ -103,8 +103,10 @@
 		</div>
 
 		<!-- FILESYSTEMS -->
-		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-96 overflow-y-auto align-middle border-collapse">
-			<table v-if="!snapshotsInDatasetLoaded && !snapshotNotFound" class="table-auto min-w-full min-h-full divide-y divide-default">
+		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-96 align-middle border-collapse"
+			:class="{ 'overflow-y-auto': snapshotsInFilesystem.length > 15 }">
+			<table v-if="!snapshotsInDatasetLoaded && !snapshotNotFound"
+				class="table-auto min-w-full min-h-full divide-y divide-default">
 				<tr class="rounded-md flex bg-well justify-center">
 					<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'"
 						:fillColor="'fill-slate-500'" />
@@ -125,8 +127,7 @@
 						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center"
 							:class="truncateText" title="Select">Select</th>
 						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center">
-							<label
-								class="flex flex-row items-center w-full h-full rounded-lg"
+							<label class="flex flex-row items-center w-full h-full rounded-lg"
 								:class="checkboxSelectedAllClass">
 								<input type="checkbox" v-model="isSelectAllChecked" @change="toggleSelectAll"
 									class="w-4 h-4 mr-2 text-success border-default rounded focus:ring-green-500 dark:focus:ring-green-600 focus:ring-2" />
@@ -284,12 +285,14 @@ import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { loadSnapshotsInPool, loadSnapshotsInDataset } from '../../composables/loadData';
 import { destroySnapshot, rollbackSnapshot } from '../../composables/snapshots';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
+import { ZPool,ZFSFileSystemInfo} from "@45drives/houston-common-lib"
+import { pushNotification, Notification } from '@45drives/houston-common-ui';
+import { Snapshot, ConfirmationCallback } from '../../types';
 
-const notifications = inject<Ref<any>>('notifications')!;
 
 interface SnapshotsListProps {
-	pool?: PoolData;
-	filesystem?: FileSystemData;
+	pool?: ZPool;
+	filesystem?: ZFSFileSystemInfo;
 	singleSnap?: Snapshot;
 	item: 'pool' | 'filesystem' | 'singleSnap';
 	bulkSnapDestroyMode?: boolean;
@@ -346,15 +349,17 @@ const fourthOptionToggle = ref(false);
 /////////////////////////////////////////////////////
 const showDestroySnapshotModal = ref(false);
 const hasChildren = ref(false);
-const confirmDestroy = inject<Ref<boolean>>('confirm-destroy-snap')!;
+const confirmDestroy = ref(false);
 
 const destroySnapshotComponent = ref();
 const loadDestroySnapshotComponent = async () => {
+
 	const module = await import('../common/UniversalConfirmation.vue');
 	destroySnapshotComponent.value = module.default;
 }
 
 async function destroyThisSnapshot(snapshot) {
+	console.log("snapshot: ", snapshot)
 	operationRunning.value = false;
 	selectedSnapshot.value = snapshot;
 	
@@ -368,7 +373,9 @@ async function destroyThisSnapshot(snapshot) {
 }
 
 const confirmThisDestroy : ConfirmationCallback = () => {
+
 	confirmDestroy.value = true;
+
 }
 
 const updateShowDestroySnapshot = (newVal) => {
@@ -378,19 +385,24 @@ const updateShowDestroySnapshot = (newVal) => {
 watch (confirmDestroy, async (newVal, oldVal) => {
 	if (confirmDestroy.value == true) {
 		operationRunning.value = true;
+
 		console.log('now destroying:', newVal);
 
 		try {
-			const output = await destroySnapshot(selectedSnapshot.value?.name, firstOptionToggle.value, secondOptionToggle.value);
+			const output: any = await destroySnapshot(selectedSnapshot.value?.name, firstOptionToggle.value, secondOptionToggle.value);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
+
 				confirmDestroy.value = false;
-				notifications.value.constructNotification('Destroy Snapshot Failed', `${selectedSnapshot.value!.name} was not destroyed: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Destroy Snapshot Failed', `${selectedSnapshot.value!.name} was not destroyed: ${errorMessage}`, 'error', 5000));
+
 			} else {
-				notifications.value.constructNotification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success');
+				pushNotification(new Notification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success', 5000));
+
 				await refreshSnaps();
+
 				confirmDestroy.value = false;
 				operationRunning.value = false;
 				hasChildren.value = false;
@@ -446,7 +458,7 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 
 			for (const snapshot of selectedForDestroy.value) {
                 console.log('currently destroying:', snapshot);
-                const output = await destroySnapshot(snapshot, false, false);
+                const output: any = await destroySnapshot(snapshot, false, false);
 				
                 if (output == null || output.error) {
 					errorMessage = output?.error || 'Unknown error';;
@@ -463,10 +475,12 @@ watch(confirmBulkDestroy, async (newVal, oldVal) => {
 			operationRunning.value = false;
 
 			if (failedToDestroySnaps.length !== 0) {
-				notifications.value.constructNotification('Destroy Snapshots Failed', `The folllowing snapshots were not destroyed: \n${failedToDestroySnaps.join(', ')}: ${errorMessage}`, 'error');
+				pushNotification(new Notification('Destroy Snapshots Failed', `The folllowing snapshots were not destroyed: \n${failedToDestroySnaps.join(', ')}: ${errorMessage}`, 'error', 5000));
+
 			}
 			if (destroyedSnaps.length !== 0) {
-				notifications.value.constructNotification('Snapshot Destroyed', `The folllowing snapshots were destroyed: \n${destroyedSnaps.join(', ')}`, 'success');
+				pushNotification(new Notification('Snapshot Destroyed', `The folllowing snapshots were destroyed: \n${destroyedSnaps.join(', ')}`, 'success', 5000));
+
 			}
 			showDestroyBulkSnapshotModal.value = false;
 			await refreshSnaps();
@@ -573,19 +587,20 @@ watch(confirmRollback, async (newVal, oldVal) => {
 		operationRunning.value = true;
 
 		try {
-			const output = await rollbackSnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
+			const output: any = await rollbackSnapshot(selectedSnapshot.value, firstOptionToggle.value, secondOptionToggle.value);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmRollback.value = false;
-				notifications.value.constructNotification('Rollback Snapshot Failed', `${selectedSnapshot.value!.name} was not rolled back: ${errorMessage}.`, 'error');
+				pushNotification(new Notification('Rollback Snapshot Failed', `${selectedSnapshot.value!.name} was not rolled back: ${errorMessage}`, 'error', 5000));
 			} else {
 				console.log('rolled back:', selectedSnapshot.value);
 				await refreshSnaps();
 				confirmRollback.value = false;
 				operationRunning.value = false;
-				notifications.value.constructNotification('Snapshot Rolled Back', `Rolled back to snapshot ${selectedSnapshot.value!.name} .`, 'success');
+				pushNotification(new Notification('Snapshot Rolled Back', `Rolled back to snapshot ${selectedSnapshot.value!.name} .`, 'success', 5000));
+
 				showRollbackSnapshotModal.value = false;
 			}
 

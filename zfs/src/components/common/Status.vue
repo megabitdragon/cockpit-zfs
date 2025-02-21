@@ -198,10 +198,12 @@
 import { ref, inject, Ref, computed, ComputedRef, onMounted, watch, defineExpose } from "vue";
 import { convertBytesToSize, convertSecondsToString, convertRawTimestampToString, upperCaseWord, convertTimestampToLocal } from "../../composables/helpers";
 import { loadScanObjectGroup, loadDiskStats } from "../../composables/loadData";
+import { ZPool, VDevDisk} from "@45drives/houston-common-lib";
+import { PoolScanObjectGroup, Activity, PoolDiskStats } from "../../types";
 
 interface StatusProps {
-    pool: PoolData;
-    disk?: DiskData;
+    pool: ZPool;
+    disk?: VDevDisk;
     isPoolList: boolean;
     isPoolDetail: boolean;
     isDisk: boolean;
@@ -498,7 +500,7 @@ const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 const trimActivity = computed(() => {
     if (props.disk!) {
-        return trimActivities.value.get(props.disk!.name);
+        return trimActivities.value.get(props.disk!.name!);
     } else {
         return trimActivities.value.get(poolID.value);
     }

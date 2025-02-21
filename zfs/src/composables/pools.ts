@@ -1,4 +1,4 @@
-import { useSpawn, errorString } from '@45drives/cockpit-helpers';
+import { legacy, ZPool } from '@45drives/houston-common-lib';
 import { convertSizeToBytes } from './helpers';
 import { ref } from 'vue';
 // @ts-ignore
@@ -7,8 +7,10 @@ import get_pools_script from "../scripts/get-pools.py?raw";
 import get_importable_pools_script from "../scripts/get-importable-pools.py?raw";
 // @ts-ignore
 import get_importable_destroyed_pools_script from "../scripts/get-importable-destroyed-pools.py?raw";
+import { PoolEditConfig } from '../types';
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
+const { errorString, useSpawn } = legacy;
 
 export async function getPools() {
 	try {
@@ -18,107 +20,17 @@ export async function getPools() {
 	} catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
-		return { error: errorMessage };
+		return JSON.stringify({ error: errorMessage }); 
 	}
 }
 
-const newPoolDisks = ref<string[]>([]);
-const newVDevs = ref<newVDevData[]>([]);
-const newVDevData = ref<newVDevData>({
-	type: '',
-	disks: [],
-	isMirror: false,
-});
+export async function newPool(pool) {
+	//need pool (baseBool w/vdevs w/disks) + pooloptions + dataset + datasetoptions
 
-export async function newPool(pool: newPoolData) {
-	try {
-		newVDevs.value = [];
-		newPoolDisks.value = [];
-
-		let cmdString = ['zpool', 'create', '-o', 'ashift=' + pool.sectorsize, '-o', 'autoexpand=' + pool.autoexpand, '-o', 'autoreplace=' + pool.autoreplace, '-o', 'autotrim=' + pool.autotrim, '-O', 'aclinherit=passthrough', '-O',
-			'acltype=posixacl', '-O', 'casesensitivity=sensitive', '-O', 'compression=' + pool.compression, '-O', 'normalization=formD', '-O', 'recordsize=' + pool.recordsize, '-O', 'sharenfs=off', '-O', 'sharesmb=off', '-O', 
-			'utf8only=on', '-O', 'xattr=sa', '-O', 'dedup=' + pool.dedup, pool.name];
-
-		if (pool.forceCreate) {
-			cmdString.push('-f');
-		}
-
-		if (pool.vdevs[0].type != 'disk') {
-			pool.vdevs.forEach(vDev => {
-				if (vDev.isMirror && (vDev.type == 'special' || vDev.type == 'dedup' || vDev.type == 'log')) {
-					cmdString.push(vDev.type);
-					cmdString.push('mirror');
-					vDev.disks.forEach(disk => {
-						cmdString.push(disk);
-					});
-				} else {
-					cmdString.push(vDev.type);
-					vDev.disks.forEach(disk => {
-						cmdString.push(disk);
-					});
-				}
-			});
-			
-		} else {
-			pool.vdevs.forEach(vDev => {
-				if (vDev.type == 'disk') {
-					vDev.disks.forEach(disk => {
-						if (!newPoolDisks.value.includes(disk)) {
-							newPoolDisks.value.push(disk);
-						}
-					});
-				} else if (vDev.type == 'cache' || vDev.type == 'log' || vDev.type == 'special' || vDev.type == 'spare' || vDev.type == 'dedup') {
-					if ((vDev.type == 'log' || vDev.type == 'special' || vDev.type == 'dedup') && vDev.isMirror) {
-						newVDevData.value.type = vDev.type;
-						newVDevData.value.isMirror = true;
-						vDev.disks.forEach(disk => {
-							newVDevData.value.disks.push(disk);
-						});
-						newVDevs.value.push(newVDevData.value);
-						newVDevData.value = {type: '', disks: [], isMirror: false};			
-					} else {
-						newVDevData.value.type = vDev.type;
-						vDev.disks.forEach(disk => {
-							newVDevData.value.disks.push(disk);
-						});
-						newVDevs.value.push(newVDevData.value);
-						newVDevData.value = {type: '', disks: [], isMirror: false};
-					}
-				}
-			});
-
-			if (newPoolDisks.value.length > 0) {
-				cmdString.push(...newPoolDisks.value);
-				if (newVDevs.value.length > 0) {
-					newVDevs.value.forEach(vDev => {
-						if (vDev.isMirror) {
-							cmdString.push(vDev.type);
-							cmdString.push('mirror');
-							cmdString.push(...vDev.disks);
-						} else {
-							cmdString.push(vDev.type);
-							cmdString.push(...vDev.disks);
-						}
-					});
-				}
-			}
-		}
-		
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
-		
-		const state = useSpawn(cmdString);
-		const output = await state.promise();
-		console.log(output)
-		return output.stdout;
-	
-	} catch (state) {
-		const errorMessage = errorString(state);
-		console.error(errorMessage);
-		return { error: errorMessage };
-	}
 }
+  
 
-export async function setRefreservation(pool: PoolData, refreservationPercent: number) {
+export async function setRefreservation(pool: ZPool, refreservationPercent: number) {
 	try {
 		const sizeInBytes = convertSizeToBytes(pool.properties.size);
 	
@@ -141,25 +53,85 @@ export async function setRefreservation(pool: PoolData, refreservationPercent: n
 	}
 }
 
-export async function destroyPool(pool: PoolData, forceDestroy?: boolean) {
-	try {
-		const cmdString = ['zpool', 'destroy'];
+// export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
+// 	try {
+// 		// Force unmount datasets before destruction
+// 		// console.log(`Unmounting datasets in pool: ${pool.name}`);
+// 		// await useSpawn(['zfs', 'unmount', '-f', pool.name]);
 
-		if(forceDestroy) {
+// 		// Destroy the pool
+// 		const cmdString = ['zpool', 'destroy'];
+// 		if (forceDestroy) {
+// 			cmdString.push('-f');
+// 		}
+// 		cmdString.push(pool.name);
+
+// 		console.log('Executing command:', cmdString.join(' '));
+
+// 		const state = useSpawn(cmdString);
+// 		const output = await state.promise();
+
+// 		if (output.stderr) {
+// 			console.warn('Destroy command warnings:', output.stderr);
+// 		}
+
+// 		console.log('Destroy command output:', output.stdout);
+// 		return output.stdout;
+// 	} catch (err: any) {
+// 		// If unmount error, retry
+// 		if (err.stderr && err.stderr.includes('cannot unmount')) {
+// 			console.warn(`Unmount failed for pool: ${pool.name}. Retrying...`);
+// 			await useSpawn(['zfs', 'unmount', '-f', pool.name]);
+// 			return destroyPool(pool, true); // Retry destruction
+// 		}
+
+// 		// Handle other errors
+// 		console.error('Error during destroyPool:', err);
+// 		const errorMessage = errorString(err);
+// 		return { error: errorMessage };
+// 	}
+// }
+export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
+	try {
+		// Construct the zpool destroy command
+		const cmdString = ['zpool', 'destroy'];
+		if (forceDestroy) {
 			cmdString.push('-f');
 		}
 		cmdString.push(pool.name);
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+
+		console.log('Executing command:', cmdString.join(' '));
+
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+
+		if (output.stderr) {
+			console.warn('Destroy command warnings:', output.stderr);
+		}
+
+		console.log('Destroy command output:', output.stdout);
 		return output.stdout;
-	} catch (state) {
-		const errorMessage = errorString(state);
-		console.error(errorMessage);
+	} catch (err: any) {
+		console.error('Error during destroyPool:', err);
+
+		const errorMessage = errorString(err);
+
+		// Detect if the error is related to "pool is busy"
+		if (err.stderr && err.stderr.includes('is busy')) {
+			return { error: 'Pool is busy. Please ensure no active processes are using it and try again.' };
+		}
+
+		// If unmount error, try unmounting once and retry destruction
+		if (err.stderr && err.stderr.includes('cannot unmount')) {
+			console.warn(`Unmount failed for pool: ${pool.name}. Retrying forced unmount...`);
+			await useSpawn(['zfs', 'unmount', '-f', pool.name]);
+			return destroyPool(pool, true);
+		}
+
 		return { error: errorMessage };
 	}
 }
+
 
 const properties = [
 	// "ashift",
@@ -200,10 +172,10 @@ export async function configurePool(pool: PoolEditConfig) {
 
 		return { success: true };
 
-	} catch (state) {
-		const errorMessage = errorString(state);  // Assuming errorString formats the error
+	} catch (error: any) {
+		const errorMessage = errorString(error);
 		console.error(errorMessage);
-		return { success: false, error: errorMessage };  // Return error message
+		return { success: false, error: errorMessage };
 	}
 }
 
@@ -238,7 +210,7 @@ export async function clearErrors(poolName, deviceName?) {
 	}
 }
 
-export async function trimPool(pool : PoolData, isSecure? : boolean, action? : string) {
+export async function trimPool(pool : ZPool, isSecure? : boolean, action? : string) {
 	try {
 		let cmdString = ['zpool', 'trim'];
 
@@ -425,45 +397,6 @@ export async function importPool(pool) {
 	}
 }
 
-export async function addVDev(pool, vdev) {
-	try {
-		let cmdString = ['zpool', 'add'];
-
-		if (vdev.forceAdd) {
-			cmdString.push('-f');
-		}
-
-		cmdString.push(pool.name);
-		if (vdev.type != 'disk') {
-			cmdString.push(vdev.type);
-		}
-
-		if (vdev.isMirror) {
-			cmdString.push('mirror');
-		}
-		
-		//console.log('vdev.disks', vdev.disks);
-		vdev.disks.forEach(disk => {
-			//console.log(disk);
-			cmdString.push(disk);
-		});
-
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
-
-		const state = useSpawn(cmdString);
-		const output = await state.promise();
-
-		console.log(output);
-		return output.stdout;
-
-	} catch (state) {
-		// console.error(errorString(state));
-		// return null;
-		const errorMessage = errorString(state);
-		console.error(errorMessage);
-		return { error: errorMessage };
-	}
-}
 
 export async function removeVDevFromPool(vdev, pool) {
 	try {

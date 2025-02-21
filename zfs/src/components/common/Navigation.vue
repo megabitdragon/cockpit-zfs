@@ -7,10 +7,6 @@
 						@click.prevent="navigationCallback(item)"
 						:class="[item.current ? 'border-default text-default' : 'border-transparent text-secondary hover:border-default hover:text-default', 'whitespace-nowrap border-b-4 py-4 px-4 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
 				</nav>
-				<Notifications
-					:notificationFIFO="notificationFIFO"
-					ref="notifications"
-				/>
 			</div>
 		</div>
 
@@ -19,9 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, Ref } from 'vue';
-import Notifications from "../common/Notifications.vue";
-import { FIFO } from '@45drives/cockpit-helpers';
+import { NavigationItem, NavigationCallback } from '../../types';
 
 interface NavigationProps {
 	show: boolean;
@@ -32,6 +26,4 @@ interface NavigationProps {
 
 const props = defineProps<NavigationProps>();
 
-const notificationFIFO = inject<Ref<FIFO>>('notification-fifo')!;
-const notifications = inject<Ref<any>>('notifications')!;
 </script>
