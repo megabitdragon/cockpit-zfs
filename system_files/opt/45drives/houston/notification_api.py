@@ -21,6 +21,7 @@ class Notification(BaseModel):
     errors: Optional[str] = None
     repaired: Optional[str] = None
     received: int = 0  # 0 = unread, 1 = read
+    health: Optional[str] = None
 
 # 🟢 Create SQLite Table If Not ExistsERROR: Could not find a version that satisfies the requirement sqlite3 (from versions: none)
 def setup_database():
@@ -80,22 +81,25 @@ def store_notification(notification: Notification):
 def get_missed_notifications():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+    print("[DEBUG] Executing SQL Query: SELECT id, timestamp, event, pool, vdev, state, error, description, health, scrub_details, errors, repaired, received FROM notifications WHERE received = 0;")
     cursor.execute("""
-        SELECT id, timestamp, event, pool, vdev, state, error, description, scrub_details, errors, repaired, received
+        SELECT id, timestamp, event, pool, vdev, state, error, description, scrub_details, errors, repaired, received, health
         FROM notifications WHERE received = 0
     """)
+    rows = cursor.fetchall()
+    print(f"[DEBUG] Raw Rows from DB: {rows}")
     notifications = [
         Notification(
             id=row[0], timestamp=row[1], event=row[2], pool=row[3], vdev=row[4],
             state=row[5], error=row[6], description=row[7], scrub_details=row[8],
-            errors=row[9], repaired=row[10], received=row[11]
+            errors=row[9], repaired=row[10], received=row[11], health=row[12]
         )
-        for row in cursor.fetchall()
+        for row in rows
     ]
 
     conn.commit()
     conn.close()
-
+    print(f"[DEBUG] Missed Notifications: {notifications}")
     return notifications
 
 # 🟢 API Endpoint to Fetch All Notifications (History)
@@ -104,14 +108,13 @@ def get_all_notifications():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT id, timestamp, event, pool, vdev, state, error, description, scrub_details, errors, repaired, received
-        FROM notifications ORDER BY timestamp DESC
-    """)
+        SELECT id, timestamp, event, pool, vdev, state, error, description, health, scrub_details, errors, repaired, received
+        FROM notifications ORDER BY timestamp DESC    """)
     notifications = [
         Notification(
             id=row[0], timestamp=row[1], event=row[2], pool=row[3], vdev=row[4],
-            state=row[5], error=row[6], description=row[7], scrub_details=row[8],
-            errors=row[9], repaired=row[10], received=row[11]
+            state=row[5], error=row[6], description=row[7], health=row[8],  # ✅ Include health
+            scrub_details=row[9], errors=row[10], repaired=row[11], received=row[12]
         )
         for row in cursor.fetchall()
     ]

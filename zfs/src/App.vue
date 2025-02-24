@@ -15,6 +15,7 @@ import { HoustonAppContainer } from "@45drives/houston-common-ui";
 import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';
 import { NavigationItem, NavigationCallback } from './types';
+import { notificationStore } from './store/notification';
 
 const show = ref(true);
 const navTag = ref('dashboard');
@@ -22,11 +23,21 @@ const version = __APP_VERSION__;
 
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
-
+	onMounted(() => {
+  notificationStore.fetchMissedNotifications();
+  console.log("hello from navigation notification in app vue" )
+});
 //navigation for tabs
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;
 };
+cockpit.transport.control("notify", {
+        page_status: {
+            type: "info",
+            title: cockpit.gettext(notificationStore.notifications.length + "Updates available"),
+            details: { num_updates: 5 }
+        }
+    });
 
 //tabs for navigation
 const navigation = reactive<NavigationItem[]>([

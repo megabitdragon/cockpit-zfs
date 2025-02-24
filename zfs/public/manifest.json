@@ -6,6 +6,8 @@
           "label": "45Drives ZFS",
           "path": "index.html",
           "order": 111
+          
       }
-  }
+  },
+  "preload": ["index"]
 }

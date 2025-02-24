@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, provide, watchEffect } from 'vue';
+import { ref, Ref, provide, watchEffect, onMounted } from 'vue';
 //import "@45drives/cockpit-css/src/index.css";
 //import "@45drives/cockpit-vue-components/dist/style.css";
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats, loadSnapshots } from '../composables/loadData';
@@ -30,6 +30,14 @@ import { ImportablePoolData, Snapshot, Activity, PoolScanObjectGroup, PoolDiskSt
 interface ZFSProps {
   	tag: string;
 }
+
+cockpit.transport.control("notify", {
+        page_status: {
+            type: "info",
+            title: cockpit.gettext(notificationStore.notifications.length + "Updates available"),
+            details: { num_updates: 5 }
+        }
+    });
 
 const props = defineProps<ZFSProps>();
 
@@ -89,7 +97,7 @@ async function setUpMessageHandler(handler) {
         console.log("Connected to DBus. Subscribing to Message signal...");
 
         houston.addEventListener("Message", (_, message) => {
-            console.log("Received DBus message event.");
+            console.log("Received DBus message event."), message;
 			notificationStore.addNotification(message);
             handler(message);
         });
@@ -135,7 +143,10 @@ const loadFileSystemListComponent = async () => {
 	const module = await import('../components/file-systems/FileSystemList.vue');
 	fileSystemListComponent.value = module.default;
 }
-
+onMounted(() => {
+  notificationStore.fetchMissedNotifications();
+  console.log("hello from navigation notification in zfs vue" )
+});
 watchEffect(() => {
 	if (props.tag === 'dashboard') {
 		loadDashboardComponent();

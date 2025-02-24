@@ -34,6 +34,7 @@ export const notificationStore = reactive<{
   addNotification(message: string) {
     try {
       const parsedMessage = JSON.parse(message) as {
+        id: number;
         timestamp: string;
         event: string;
         pool?: string;
@@ -44,7 +45,7 @@ export const notificationStore = reactive<{
       };
 
       notificationStore.notifications.unshift({
-        id: Date.now(),
+        id: parsedMessage.id,
         timestamp: parsedMessage.timestamp,
         event: parsedMessage.event,
         pool: parsedMessage.pool,
@@ -87,6 +88,13 @@ export const notificationStore = reactive<{
       console.log("response " ,response)
       // Parse response
       const missedNotifications: Notification[] = JSON.parse(response);
+      cockpit.transport.control("notify", {
+        page_status: {
+            type: "info",
+            title: cockpit.gettext(notificationStore.notifications.length + "Updates available"),
+            details: { num_updates: 5 }
+        }
+    });
 
       // Add notifications to store
       missedNotifications.forEach((notification) => {

@@ -6,7 +6,9 @@
     "houston-common/houston-common-*"
   ],
   "scripts": {
-    "build": "yarn build:common && yarn build:app"
+    "build": "yarn build:common && yarn build:app",
+    "prepare-deb": "chmod +x packaging/debian/DEBIAN/postinst",
+    "package": "yarn build && yarn prepare-deb && dpkg-deb --build packaging/debian"
   },
   "packageManager": "yarn@4.6.0"
 }

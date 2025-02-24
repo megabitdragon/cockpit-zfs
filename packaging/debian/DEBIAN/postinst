@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "[INFO] Making Houston scripts executable..."
+chmod +x /usr/local/bin/houston/*.sh
+
+echo "[INFO] Installing Python dependencies..."
+pip3 install --upgrade pip
+pip3 install uvicorn fastapi sqlite
+
+echo "[INFO] Running installation script..."
+/usr/local/bin/houston/install.sh
