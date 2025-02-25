@@ -273,7 +273,7 @@ import { NavigationItem, NavigationCallback } from '../../types';
 
 import { BellIcon, Cog6ToothIcon, CheckCircleIcon,ExclamationCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import {Menu,MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, watch } from 'vue';
 import { notificationStore } from "../../store/notification";
 interface NavigationProps {
 	show: boolean;
@@ -281,14 +281,7 @@ interface NavigationProps {
 	currentNavigationItem?: NavigationItem;
 	navigationCallback: NavigationCallback;
 }
-const updateSidebarBadge = () => {
-	console.log("uodaeside bar hello")
-  cockpit.transport.service("zfs-notifications", {
-    kind: notificationCount.value > 0 ? "warning" : "default",
-    text: notificationCount.value > 0 ? notificationCount.value.toString() : ""
-  });
-};
-watch(notificationStore.notifications.length, updateSidebarBadge);
+
 // Reactive state to track menu visibility
 const menuOpen = ref(false);
 

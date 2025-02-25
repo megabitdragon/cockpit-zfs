@@ -22,6 +22,7 @@ class Notification(BaseModel):
     repaired: Optional[str] = None
     received: int = 0  # 0 = unread, 1 = read
     health: Optional[str] = None
+    severity: Optional[str] = "info"
 
 # 🟢 Create SQLite Table If Not ExistsERROR: Could not find a version that satisfies the requirement sqlite3 (from versions: none)
 def setup_database():
@@ -81,9 +82,9 @@ def store_notification(notification: Notification):
 def get_missed_notifications():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    print("[DEBUG] Executing SQL Query: SELECT id, timestamp, event, pool, vdev, state, error, description, health, scrub_details, errors, repaired, received FROM notifications WHERE received = 0;")
+    print("[DEBUG] Executing SQL Query: SELECT id, timestamp, event, pool, vdev, state, error, description, health, scrub_details, errors, repaired,severity, received  FROM notifications WHERE received = 0;")
     cursor.execute("""
-        SELECT id, timestamp, event, pool, vdev, state, error, description, scrub_details, errors, repaired, received, health
+        SELECT id, timestamp, event, pool, vdev, state, error, description, scrub_details, errors, repaired, received, health, severity
         FROM notifications WHERE received = 0
     """)
     rows = cursor.fetchall()
@@ -92,7 +93,7 @@ def get_missed_notifications():
         Notification(
             id=row[0], timestamp=row[1], event=row[2], pool=row[3], vdev=row[4],
             state=row[5], error=row[6], description=row[7], scrub_details=row[8],
-            errors=row[9], repaired=row[10], received=row[11], health=row[12]
+            errors=row[9], repaired=row[10], received=row[11], health=row[12], severity=row[13]
         )
         for row in rows
     ]

@@ -14,6 +14,7 @@ interface Notification {
   guid?: string;
   health?: string;
   errors?: string;
+  severity?: string;
 }
 
 // Define the reactive notification store
@@ -26,7 +27,6 @@ export const notificationStore = reactive<{
   markNotificationAsRead: (id: number) => Promise<void>;
   
   clearAllNotifications: () => Promise<void>;
-
 }>({
   notifications: [],
 
@@ -54,7 +54,10 @@ export const notificationStore = reactive<{
         vdev: parsedMessage.vdev,
         health: parsedMessage.health,
         errors: parsedMessage.errors,
+        
       });
+      sideBarNotification();
+
     } catch (error) {
       console.error("Invalid JSON format received:", message);
     }
@@ -65,16 +68,21 @@ export const notificationStore = reactive<{
     notificationStore.notifications = notificationStore.notifications.filter(
       (n) => n.id !== id
     );
+    sideBarNotification();
+
+    
   },
     // Remove notification by ID
   removeAllNotifications() {
     notificationStore.notifications = []
+    sideBarNotification();
+
   },
 
   // Fetch missed notifications from FastAPI
   async fetchMissedNotifications() {
     try {
-      const http = cockpit.http({
+      const http = (cockpit as any).http({
         address: "127.0.0.1",
         port: 8000, // FastAPI is running on this port
       });
@@ -88,18 +96,12 @@ export const notificationStore = reactive<{
       console.log("response " ,response)
       // Parse response
       const missedNotifications: Notification[] = JSON.parse(response);
-      cockpit.transport.control("notify", {
-        page_status: {
-            type: "info",
-            title: cockpit.gettext(notificationStore.notifications.length + "Updates available"),
-            details: { num_updates: 5 }
-        }
-    });
 
       // Add notifications to store
       missedNotifications.forEach((notification) => {
         notificationStore.notifications.unshift(notification);
       });
+      sideBarNotification();
 
       console.log("Missed notifications fetched successfully.");
 
@@ -110,7 +112,7 @@ export const notificationStore = reactive<{
   
   async markNotificationAsRead(notificationId: number) {
     try {
-      const http = cockpit.http({
+      const http = (cockpit as any).http({
         address: "127.0.0.1",
         port: 8000, // FastAPI is running on this port
       });
@@ -136,7 +138,7 @@ export const notificationStore = reactive<{
     console.log("🟠 Clearing all notifications...");
   
     try {
-      const http = cockpit.http({
+      const http = (cockpit as any).http({
         address: "127.0.0.1",
         port: 8000, // FastAPI is running on this port
       });
@@ -156,7 +158,28 @@ export const notificationStore = reactive<{
     } catch (error) {
       console.error("❌ Error dismissing all notifications:", error);
     }
-  }
+  },
+
   
   
 });
+
+function sideBarNotification(): void {
+  const count: number = notificationStore.notifications.length;
+    // 🔹 Find the highest severity among all notifications
+    let highestSeverity: "info" | "warning" | "error" = "info";
+    notificationStore.notifications.forEach((notification) => {
+        if (notification.severity === "error") highestSeverity = "error";
+        else if (notification.severity === "warning" && highestSeverity !== "error") highestSeverity = "warning";
+    });
+
+    const severityType = count > 0 ? highestSeverity : null;
+
+  (cockpit.transport as any).control("notify", {
+      page_status: {
+          type: severityType, // Remove notification if count is 0
+          title: cockpit.gettext(`${count} Notifications available`),
+
+      }
+  });
+}

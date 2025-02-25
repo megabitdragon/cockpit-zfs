@@ -31,13 +31,6 @@ interface ZFSProps {
   	tag: string;
 }
 
-cockpit.transport.control("notify", {
-        page_status: {
-            type: "info",
-            title: cockpit.gettext(notificationStore.notifications.length + "Updates available"),
-            details: { num_updates: 5 }
-        }
-    });
 
 const props = defineProps<ZFSProps>();
 

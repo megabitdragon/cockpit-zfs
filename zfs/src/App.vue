@@ -31,13 +31,7 @@ const currentNavigationItem = computed<NavigationItem | undefined>(() => navigat
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {
 	navTag.value = item.tag;
 };
-cockpit.transport.control("notify", {
-        page_status: {
-            type: "info",
-            title: cockpit.gettext(notificationStore.notifications.length + "Updates available"),
-            details: { num_updates: 5 }
-        }
-    });
+
 
 //tabs for navigation
 const navigation = reactive<NavigationItem[]>([
