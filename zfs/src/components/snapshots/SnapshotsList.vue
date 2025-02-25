@@ -103,8 +103,8 @@
 		</div>
 
 		<!-- FILESYSTEMS -->
-		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-96 align-middle border-collapse"
-			:class="{ 'overflow-y-auto': snapshotsInFilesystem.length > 15 }">
+		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-3/4 align-middle border-collapse"
+			:class="{ 'overflow-y-scroll': snapshotsInFilesystem.length > 15 }">
 			<table v-if="!snapshotsInDatasetLoaded && !snapshotNotFound"
 				class="table-auto min-w-full min-h-full divide-y divide-default">
 				<tr class="rounded-md flex bg-well justify-center">

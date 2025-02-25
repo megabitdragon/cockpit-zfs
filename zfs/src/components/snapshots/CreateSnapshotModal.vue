@@ -231,7 +231,7 @@ async function create(newSnapshot) {
             confirmCreate.value = true;
             newSnapshot.isCustomName = false;
             newSnapshot.snapChildren = false;
-            notifications.value.constructNotification('Snapshot Created', `Created new snapshot.`, 'success');
+            pushNotification(new Notification('Snapshot Created', `Created new snapshot.`, 'success', 5000));
             refreshSnapshots();
             showSnapshotModal.value = false;
         }
