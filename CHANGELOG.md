@@ -1,3 +1,3 @@
-## zfs module 1.1.15-5
+## zfs module 1.1.15-6
 
-* build attempt again with submodule checkout
+* fix snapshot list/notification bugs

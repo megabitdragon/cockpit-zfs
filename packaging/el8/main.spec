@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Tue Feb 25 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-6
+- fix snapshot list/notification bugs
 * Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-5
 - build attempt again with submodule checkout
 * Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-4
