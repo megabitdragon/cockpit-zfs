@@ -7,7 +7,6 @@ URL: ::package_url::
 Source0: %{name}-%{version}.tar.gz
 BuildArch: ::package_architecture_el::
 Requires: ::package_dependencies_el_el8::
-
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
@@ -27,12 +26,18 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %post
+pip3 install --upgrade pip
+
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
 systemctl enable houston-dbus.service
+systemctl enable fastapi-notifications.service
 systemctl start houston-dbus.service || true
+systemctl start fastapi-notifications.service || true
 
 %changelog
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.14-y
+- Testin Pakcgae installation
 * Thu Feb 13 2025 Jordan Keough <jkeough@45drives.com> 1.1.13-2
 - Fixes RaidZ levels' minimum disk quantity
 * Thu Feb 13 2025 Jordan Keough <jkeough@45drives.com> 1.1.13-1
