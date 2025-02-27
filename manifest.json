@@ -3,8 +3,8 @@
     "name": "cockpit-zfs",
     "title": "zfs module",
     "prerelease": true,
-    "version": "1.1.14",
-    "buildVersion": "2",
+    "version": "1.1.15",
+    "buildVersion": "7",
     "author": "Jordan Keough <jkeough@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-zfs-45d",
     "category": "utils",
@@ -60,9 +60,9 @@
     "changelog": {
         "urgency": "medium",
         "version": "1.1.15",
-        "buildVersion": "7",
+        "buildVersion": "8",
         "ignore": [],
-        "date": "2025-02-27T13:11:21.136870",
+        "date": "2025-02-27T13:28:10.720498",
         "packager": "Rachit Hans <rhans@45drives.com>",
         "changes": []
     }

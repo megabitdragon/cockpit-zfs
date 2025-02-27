@@ -25,6 +25,23 @@ make DESTDIR=%{buildroot} install
 %files
 /usr/share/cockpit/zfs/*
 
+# D-Bus configuration
+%config(noreplace) /etc/dbus-1/system.d/org._45drives.Houston.conf
+
+# ZED event scripts (set executable permissions)
+%attr(0755, root, root) /etc/dbus-1/system.d/zfs/zed.d/*
+
+# Systemd service files (DO NOT use %config for these)
+/etc/systemd/system/fastapi-notifications.service
+/etc/systemd/system/houston-dbus.service
+
+# 45Drives Houston files (ensure executability)
+%dir /opt/45drives
+%dir /opt/45drives/houston
+%attr(0755, root, root) /opt/45drives/houston/dbus_server.py
+%attr(0755, root, root) /opt/45drives/houston/houston-notify
+%attr(0755, root, root) /opt/45drives/houston/notification_api.py
+
 %post
 pip3 install --upgrade pip
 
@@ -36,6 +53,8 @@ systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 
 %changelog
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-7
+- 1.1.15
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.14-2
 - Testin Pakcgae installation
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.14-y
