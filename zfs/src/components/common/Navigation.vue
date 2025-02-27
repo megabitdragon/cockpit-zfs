@@ -24,7 +24,7 @@
 							</MenuButton>
 
 							<!-- Dropdown Menu Items -->
-							<MenuItems @click.stop class="absolute right-0 z-10 w-[30rem] origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+							<MenuItems @click.stop class="absolute right-0 overflow-y-scroll z-10 w-[30rem] max-h-[40rem] origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 								<div class="flex items-center justify-between text-xl p-4 border-b border-gray-300">
 								<p>Notifications</p>
 								<Cog6ToothIcon class="w-[2rem] h-[2rem]" />
