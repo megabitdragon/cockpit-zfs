@@ -53,6 +53,8 @@ systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 
 %changelog
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-9
+- build package
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-7
 - 1.1.15
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.14-2
