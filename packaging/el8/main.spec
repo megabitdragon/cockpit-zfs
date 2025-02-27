@@ -25,6 +25,19 @@ make DESTDIR=%{buildroot} install
 %files
 /usr/share/cockpit/zfs/*
 
+
+%post
+pip3 install --upgrade pip
+pip3 install fastapi
+pip3 install uvicorn
+dnf install -y sqlite || true  # Ensures SQLite is installed
+
+# Ensure systemd reloads and starts the service after installation
+systemctl daemon-reload
+systemctl enable houston-dbus.service
+systemctl enable fastapi-notifications.service
+systemctl start houston-dbus.service || true
+systemctl start fastapi-notifications.service || true
 # D-Bus configuration
 %config(noreplace) /etc/dbus-1/system.d/org._45drives.Houston.conf
 
@@ -41,19 +54,6 @@ make DESTDIR=%{buildroot} install
 %attr(0755, root, root) /opt/45drives/houston/dbus_server.py
 %attr(0755, root, root) /opt/45drives/houston/houston-notify
 %attr(0755, root, root) /opt/45drives/houston/notification_api.py
-
-%post
-pip3 install --upgrade pip
-pip3 install fastapi
-pip3 install uvicorn
-dnf install -y sqlite || true  # Ensures SQLite is installed
-
-# Ensure systemd reloads and starts the service after installation
-systemctl daemon-reload
-systemctl enable houston-dbus.service
-systemctl enable fastapi-notifications.service
-systemctl start houston-dbus.service || true
-systemctl start fastapi-notifications.service || true
 
 %changelog
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-16
