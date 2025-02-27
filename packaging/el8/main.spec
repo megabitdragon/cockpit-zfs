@@ -46,6 +46,7 @@ make DESTDIR=%{buildroot} install
 pip3 install --upgrade pip
 pip3 install fastapi
 pip3 install uvicorn
+dnf install -y sqlite || true  # Ensures SQLite is installed
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
