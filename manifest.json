@@ -59,11 +59,11 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "1.1.14",
-        "buildVersion": "2",
+        "version": "1.1.15",
+        "buildVersion": "7",
         "ignore": [],
-        "date": null,
-        "packager": "Jordan Keough <jkeough@45drives.com>",
+        "date": "2025-02-27T13:11:21.136870",
+        "packager": "Rachit Hans <rhans@45drives.com>",
         "changes": []
     }
 }
