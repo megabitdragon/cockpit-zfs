@@ -29,7 +29,7 @@ make DESTDIR=%{buildroot} install
 %config(noreplace) /etc/dbus-1/system.d/org._45drives.Houston.conf
 
 # ZED event scripts (set executable permissions)
-%attr(0755, root, root) /etc/dbus-1/system.d/zfs/zed.d/*
+%attr(0755, root, root) /etc/system.d/zfs/zed.d/*
 
 # Systemd service files (DO NOT use %config for these)
 /etc/systemd/system/fastapi-notifications.service
@@ -56,6 +56,8 @@ systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 
 %changelog
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-14
+- build package
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-13
 - build package
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-12
