@@ -44,6 +44,8 @@ make DESTDIR=%{buildroot} install
 
 %post
 pip3 install --upgrade pip
+pip3 install fastapi
+pip3 install uvicorn
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
