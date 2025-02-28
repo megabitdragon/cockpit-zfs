@@ -1,8 +1,9 @@
 <template>
 	<div class="min-h-screen h-full w-full min-w-fit flex flex-col bg-default overflow-auto">
-		<HoustonAppContainer moduleName="ZFS" :appVersion="version">
-			<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
+		<HoustonAppContainer moduleName="ZFS" :appVersion="version" :notificationComponent="NotificationBell" >
+		<Navigation :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show"/>
 			<ZFS :tag="navTag"/>
+			
 		</HoustonAppContainer>
 	</div>
 </template>
@@ -16,6 +17,7 @@ import Navigation from "./components/common/Navigation.vue";
 import ZFS from './views/ZFS.vue';
 import { NavigationItem, NavigationCallback } from './types';
 import { notificationStore } from './store/notification';
+import NotificationBell from './components/notification/Notification.vue';
 
 const show = ref(true);
 const navTag = ref('dashboard');
