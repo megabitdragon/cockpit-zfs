@@ -56,6 +56,8 @@ systemctl start fastapi-notifications.service || true
 
 
 %changelog
+* Tue Mar 04 2025 Rachit Hans <rhans@45drives.com> 1.1.15-19
+- build package
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-18
 - build package
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-17

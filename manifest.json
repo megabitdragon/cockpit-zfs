@@ -4,7 +4,7 @@
     "title": "zfs module",
     "prerelease": true,
     "version": "1.1.15",
-    "buildVersion": "18",
+    "buildVersion": "19",
     "author": "Jordan Keough <jkeough@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-zfs-45d",
     "category": "utils",
@@ -28,7 +28,7 @@
                 "python3",
                 "python3-libzfs",
                 "python3-pip",
-                "sqlite", 
+                "sqlite",
                 "python3-fastapi",
                 "python3-uvicorn"
             ]
@@ -58,7 +58,7 @@
     "changelog": {
         "urgency": "medium",
         "version": "1.1.15",
-        "buildVersion": "18",
+        "buildVersion": "19",
         "ignore": [],
         "date": null,
         "packager": "Jordan Keough <jkeough@45drives.com>",
