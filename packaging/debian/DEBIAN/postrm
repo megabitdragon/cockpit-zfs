@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+# Stop and disable services
+systemctl stop houston-dbus.service || true
+systemctl stop fastapi-notifications.service || true
+systemctl disable houston-dbus.service
+systemctl disable fastapi-notifications.service

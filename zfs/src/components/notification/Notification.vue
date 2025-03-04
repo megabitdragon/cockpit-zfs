@@ -34,7 +34,7 @@
 										<!-- Icon Based on Scrub Status -->
 										<div>
 											<CheckCircleIcon 
-												v-if="notification.errors === '0' || notification.errors === null" 
+												v-if="notification.errors == '0' || notification.errors === null" 
 												class="icon-success size-icon-lg text-green-500" 
 												aria-hidden="true" 
 												/>
@@ -49,8 +49,8 @@
 										<div class="w-full">
 											<p class="text-xl font-semibold" 
 											:class="{
-												'text-green-500': notification.errors === '0' || notification.errors ===null,
-												'text-yellow-500': notification.errors !== null && notification.errors !== '0'
+												'text-green-500': notification.errors == '0' || notification.errors ===null,
+												'text-yellow-500': notification.errors !== null && notification.errors != '0'
 											}"
 											>
 											Scrub Finished - {{ notification.pool }}

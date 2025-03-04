@@ -42,6 +42,7 @@ export const notificationStore = reactive<{
         state?: string;
         health?: string;
         errors?: string;
+        severity?: string;
       };
 
       notificationStore.notifications.unshift({
@@ -54,6 +55,7 @@ export const notificationStore = reactive<{
         vdev: parsedMessage.vdev,
         health: parsedMessage.health,
         errors: parsedMessage.errors,
+        severity: parsedMessage.severity,
         
       });
       sideBarNotification();
@@ -174,7 +176,7 @@ function sideBarNotification(): void {
     });
 
     const severityType = count > 0 ? highestSeverity : null;
-
+    console.log("severityType ", severityType );
   (cockpit.transport as any).control("notify", {
       page_status: {
           type: severityType, // Remove notification if count is 0
