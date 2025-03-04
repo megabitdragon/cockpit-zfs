@@ -11,7 +11,9 @@
 # /usr/local/bin/houston/install.sh
 #!/bin/bash
 set -e
-
+echo "Installing missing dependencies..."
+apt-get update
+apt-get install -y python3-libzfs python3-pip sqlite3 python3-fastapi python3-uvicorn
 # Reload systemd
 systemctl daemon-reload
 
