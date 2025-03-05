@@ -1,5 +1,17 @@
 #!/bin/bash
 set -e
 export DEBIAN_FRONTEND=noninteractive
+
 echo "[INFO] Installing FastAPI and Uvicorn..."
 pip3 install --no-cache-dir fastapi uvicorn
+
+echo "[INFO] Reloading systemd daemon..."
+systemctl daemon-reload
+
+echo "[INFO] Enabling services..."
+systemctl enable houston-dbus.service || true
+systemctl enable fastapi-notifications.service || true
+
+echo "[INFO] Starting services..."
+systemctl start houston-dbus.service || true
+systemctl start fastapi-notifications.service || true
