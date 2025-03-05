@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-row justify-between items-center min-w-max max-w-xl px-2 bg-default rounded-2xl h-20 mt-2">
-        <div class="basis-2/3 flex flex-col min-w-0 ml-8">
+    <div class="flex flex-row justify-between items-center min-w-max w-full px-2 bg-default rounded-2xl h-20 mt-2">
+        <div class="flex basis-2/3 flex-col min-w-0 ml-8">
             <p class="mr-auto font-medium text-default text-xl max-w-sm" :class="truncateText" :title="props.name!">{{ props.name!}}</p>
             <span class="mr-auto text-xl font-medium hidden sm:block" :class="props.fillColor">{{ props.totalSize }}</span>
         </div>

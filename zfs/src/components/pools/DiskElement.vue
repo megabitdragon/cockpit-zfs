@@ -29,7 +29,7 @@
                                         <a href="#" @click="clearDiskErrors(props.pool.name, props.disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
                                     </MenuItem> -->
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a v-if="props.vDev.disks.length > 1" href="#" @click="detachThisDisk(props.pool, props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach Disk</a>
+                                        <a v-if="props.vDev.disks.length > 1 && diskState !== 'REMOVED'" href="#" @click="detachThisDisk(props.pool, props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach Disk</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
                                         <a v-if="diskState == 'ONLINE'" href="#" @click="offlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Offline Disk</a>
@@ -38,19 +38,19 @@
                                         <a v-if="diskState == 'OFFLINE'" href="#" @click="onlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Online Disk</a>
                                     </MenuItem>
                                     <MenuItem as="div" v-slot="{ active }">
-                                        <a href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace Disk</a>
+                                        <a v-if="diskState !== 'REMOVED'" href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace Disk</a>
                                     </MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
+										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'" href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="resumeTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
+										<a v-if="trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'" href="#" @click="resumeTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isActive && props.pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="pauseTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Disk)</a>
+										<a v-if="trimActivity!.isActive && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'" href="#" @click="pauseTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Disk)</a>
 									</MenuItem>						
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable()" href="#" @click="stopTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Disk)</a>
+										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'" href="#" @click="stopTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Disk)</a>
 									</MenuItem>
                                 </div>
                             </MenuItems>
@@ -249,7 +249,7 @@ watch(confirmDetach, async (newValue, oldValue) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmDetach.value = false;
-				pushNotification(new Notification('Detach Disk Failed', `${selectedDisk.value!.name} was not detached: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Detach Disk Failed', `${selectedDisk.value!.name} was not detached: ${errorMessage}`, 'error', 5000));
 
 			} else {
 				if (secondOptionToggle.value == true) {
@@ -312,7 +312,7 @@ watch(confirmOffline, async (newVal, oldVal) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmOffline.value = false;
-				pushNotification(new Notification('Offline Failed', `Offlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Offline Failed', `Offlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}`, 'error', 5000));
 
 			} else {
 				await refreshAllData();
@@ -371,7 +371,7 @@ watch(confirmOnline, async (newVal, oldVal) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmOnline.value = false;
-				pushNotification(new Notification('Online Failed', `Onlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Online Failed', `Onlining of disk ${selectedDisk.value!.name} failed: ${errorMessage}`, 'error', 5000));
 
 			} else {
 				if (secondOptionToggle.value == true) {
@@ -465,7 +465,7 @@ watch(confirmTrimDisk, async (newValue, oldValue) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmTrimDisk.value = false
-				pushNotification(new Notification('Trim Failed', `Trim failed to start: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Trim Failed', `Trim failed to start: ${errorMessage}`, 'error', 5000));
 
 			} else {
 				getDiskTrimStatus();
@@ -498,7 +498,7 @@ async function resumeTrim(pool, disk) {
 
 		if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Trim Resume Failed', "Trim failed to resume:${errorMessage}.", 'error', 5000));
+				pushNotification(new Notification('Trim Resume Failed', "Trim failed to resume:${errorMessage}", 'error', 5000));
 
 			// operationRunning.value = false;
 		} else {
@@ -542,7 +542,7 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmPauseTrim.value = false;
-				pushNotification(new Notification('Trim Pause Failed', `Trim failed to pause: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Trim Pause Failed', `Trim failed to pause: ${errorMessage}`, 'error', 5000));
 
 				// operationRunning.value = false;
 			} else {
@@ -582,7 +582,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmStopTrim.value = false;
-				pushNotification(new Notification('Trim Stop Failed', `Trim failed to stop: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Trim Stop Failed', `Trim failed to stop: ${errorMessage}`, 'error', 5000));
 
 				// operationRunning.value = false;
 			} else {

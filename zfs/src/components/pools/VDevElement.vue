@@ -186,7 +186,7 @@ watch(confirmRemove, async (newValue, oldValue) => {
 			const output: any = await removeVDevFromPool(selectedVDev.value, selectedPool.value);
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Remove Failed', `Failed to remove Virtual Device: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Remove Failed', `Failed to remove Virtual Device: ${errorMessage}`, 'error', 5000));
 
 
 			} else {
@@ -197,7 +197,7 @@ watch(confirmRemove, async (newValue, oldValue) => {
 					const output: any = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
 					if (output == null || output.error) {
 						const errorMessage = output?.error || 'Unknown error';
-						pushNotification(new Notification('Refreservation Update Failed', `Error updating refreservation: ${errorMessage}.`, 'error', 5000));
+						pushNotification(new Notification('Refreservation Update Failed', `Error updating refreservation: ${errorMessage}`, 'error', 5000));
 
 					} else {
 						pushNotification(new Notification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success', 5000));

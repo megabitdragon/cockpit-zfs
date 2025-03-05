@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showRenameSnapModal" @close="showRenameSnapModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showRenameSnapModal" @close="showRenameSnapModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Rename Snapshot</legend>
         </template>
@@ -84,14 +84,14 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { ref, Ref, inject } from 'vue';
 import { convertRawTimestampToString } from '../../composables/helpers';
 import { renameSnapshot } from '../../composables/snapshots';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import {ZFSFileSystemInfo} from "../../../../houston-common/houston-common-lib/lib/managers/index"
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 import { Snapshot } from '../../types';
@@ -131,7 +131,7 @@ async function renameBtn() {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				renaming.value = false;
-                pushNotification(new Notification('Rename Dataset Failed', `${props.snapshot.name} was not renamed: ${errorMessage}.`, 'error', 5000));
+                pushNotification(new Notification('Rename Dataset Failed', `${props.snapshot.name} was not renamed: ${errorMessage}`, 'error', 5000));
 
 			} else {
                 confirmRename.value = true;

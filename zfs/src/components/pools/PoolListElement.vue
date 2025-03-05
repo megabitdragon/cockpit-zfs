@@ -415,7 +415,7 @@ watch(confirmDelete, async (newValue, oldValue) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmDelete.value = false;
-				pushNotification(new Notification('Destroy Pool Failed', selectedPool.value!.name + ` was not destroyed: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Destroy Pool Failed', selectedPool.value!.name + ` was not destroyed: ${errorMessage}`, 'error', 5000));
 
 			} else {
 				if (secondOptionToggle.value == true) {
@@ -480,7 +480,7 @@ watch(confirmResilver, async (newValue, oldValue) => {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				confirmResilver.value = false;
-				pushNotification(new Notification('Resilver Failed', `Resilver failed to start:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Resilver Failed', `Resilver failed to start:${errorMessage}`, 'error', 5000));
 
 				operationRunning.value = false;
 			} else {
@@ -542,7 +542,7 @@ watch(confirmUpgrade, async (newVal, oldVal) => {
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Upgrade Failed', `Upgrade failed: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Upgrade Failed', `Upgrade failed: ${errorMessage}`, 'error', 5000));
 
 				operationRunning.value = false;
 				confirmUpgrade.value = false;
@@ -615,7 +615,7 @@ watch(confirmScrub, async (newVal, oldVal) => {
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Scrub Failed', `Scrub failed to start:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Scrub Failed', `Scrub failed to start:${errorMessage}`, 'error', 5000));
 
 				operationRunning.value = false;
 				confirmScrub.value = false;
@@ -647,7 +647,7 @@ async function resumeScrub(pool) {
 
 		if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Scrub Resume Failed', `Scrub failed to resume:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Scrub Resume Failed', `Scrub failed to resume:${errorMessage}`, 'error', 5000));
 
 			confirmScrub.value = false;
 		} else {
@@ -690,7 +690,7 @@ watch(confirmPauseScrub, async (newVal, oldVal) => {
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Scrub Pause Failed', `Scrub failed to pause:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Scrub Pause Failed', `Scrub failed to pause:${errorMessage}`, 'error', 5000));
 
 				confirmPauseScrub.value = false;
 			} else {
@@ -729,7 +729,7 @@ watch(confirmStopScrub, async (newVal, oldVal) => {
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Scrub Stop Failed', `Scrub failed to stop:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Scrub Stop Failed', `Scrub failed to stop:${errorMessage}`, 'error', 5000));
 
 				confirmStopScrub.value = false;
 			} else {
@@ -799,7 +799,7 @@ watch(confirmTrim, async (newValue, oldValue) => {
 			const output: any = await trimPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Trim Failed', `Trim failed to start:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Trim Failed', `Trim failed to start:${errorMessage}`, 'error', 5000));
 
 				confirmTrim.value = false
 			} else {
@@ -831,7 +831,7 @@ async function resumeTrim(pool) {
 
 		if (output == null || output.error) {
 			const errorMessage = output?.error || 'Unknown error';
-			pushNotification(new Notification('Trim Resume Failed', `Trim failed to resume:${errorMessage}.`, 'error', 5000));
+			pushNotification(new Notification('Trim Resume Failed', `Trim failed to resume:${errorMessage}`, 'error', 5000));
 
 			confirmTrim.value = false;
 		} else {
@@ -872,7 +872,7 @@ watch(confirmPauseTrim, async (newVal, oldVal) => {
 			const output: any = 	await trimPool(selectedPool.value!, false, 'pause');
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Trim Pause Failed', `Trim failed to pause:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Trim Pause Failed', `Trim failed to pause:${errorMessage}`, 'error', 5000));
 
 				confirmPauseTrim.value = false;
 			} else {
@@ -910,7 +910,7 @@ watch(confirmStopTrim, async (newVal, oldVal) => {
 			const output: any = await trimPool(selectedPool.value!, false, 'stop');
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Trim Stop Failed', `Trim failed to stop:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Trim Stop Failed', `Trim failed to stop:${errorMessage}`, 'error', 5000));
 				confirmStopTrim.value = false;
 			} else {
 				getTrimStatus();
@@ -966,7 +966,7 @@ watch(confirmExport, async (newVal, oldVal) => {
 			const output: any = await exportPool(selectedPool.value!, (firstOptionToggle.value ? firstOptionToggle.value : false));
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-				pushNotification(new Notification('Export Failed', `Pool failed to export:${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Export Failed', `Pool failed to export:${errorMessage}`, 'error', 5000));
 				confirmExport.value = false;
 			} else {
 				pushNotification(new Notification('Export Completed', 'Export of pool ' + selectedPool.value!.name + " completed.", 'success', 5000));

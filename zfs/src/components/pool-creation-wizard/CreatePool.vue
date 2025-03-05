@@ -1,5 +1,5 @@
 <template>
-	<Modal :isOpen="showWizard" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
+	<OldModal :isOpen="showWizard" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
 		<template v-slot:title>
 			<!-- navigation tabs for create pool wizard -->
 			<WizardTabs :navigationItems="navigation" :currentNavigationItem="currentNavigationItem" :navigationCallback="navigationCallback" :show="show" />
@@ -71,13 +71,13 @@
 			</div>
 
 		</template>
-	</Modal>
+	</OldModal>
 </template>
 
 <script setup lang="ts">
 import { inject, provide, reactive, ref, Ref, computed, watch, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import WizardTabs from './WizardTabs.vue';
 import PoolConfig from './PoolConfig.vue';
 import { loadDisksThenPools, loadDatasets, loadScanObjectGroup, loadDiskStats } from '../../composables/loadData';
@@ -239,7 +239,7 @@ async function finishBtn(newPoolData) {
 		if (output == null || output.error) {
 			const errorMessage = output?.error || 'Unknown error';
 			finishPressed.value = false;
-			pushNotification(new Notification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}.`, 'error', 5000));
+			pushNotification(new Notification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}`, 'error', 5000));
 			await newFS();
 			await refreshAllData();
 			showWizard.value = false;

@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">{{ upperCaseWord(props.mode) }} File System</legend>
         </template>
@@ -89,7 +89,7 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { Ref, inject, ref } from 'vue';
@@ -97,7 +97,7 @@ import { Switch } from '@headlessui/vue';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
 import { upperCaseWord } from '../../composables/helpers';
 import { lockFileSystem, mountFileSystem, unlockFileSystem, isPassphraseValid } from "../../composables/datasets";
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 
@@ -176,7 +176,7 @@ async function confirmBtn() {
                         
                             if (mountOutput == null || mountOutput.error) {
                                 const errorMessage = mountOutput?.error || 'Unknown error';
-                                pushNotification(new Notification('Mount Dataset Failed', `${props.filesystem.name} was not mounted: ${errorMessage}.`, 'error', 5000));
+                                pushNotification(new Notification('Mount Dataset Failed', `${props.filesystem.name} was not mounted: ${errorMessage}`, 'error', 5000));
                             } else {
                                 pushNotification(new Notification('File System Mounted', props.filesystem.name + " mounted.", 'success', 5000));
                             }

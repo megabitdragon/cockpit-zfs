@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showCloneSnapModal" @close="showCloneSnapModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showCloneSnapModal" @close="showCloneSnapModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Clone Snapshot</legend>
         </template>
@@ -69,13 +69,13 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { ref, Ref, inject, computed } from 'vue';
 import { cloneSnapshot } from '../../composables/snapshots';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import {ZFSFileSystemInfo} from "@45drives/houston-common-lib"
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 import { Snapshot } from '../../types';
@@ -133,7 +133,7 @@ async function cloneBtn() {
             
             if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
-                pushNotification(new Notification('Snapshot Clone Failed', `There was an error cloning this snapshot: ${errorMessage}.`, 'error', 5000));
+                pushNotification(new Notification('Snapshot Clone Failed', `There was an error cloning this snapshot: ${errorMessage}`, 'error', 5000));
 
                 confirmCloneSnap.value = true;
             } else {

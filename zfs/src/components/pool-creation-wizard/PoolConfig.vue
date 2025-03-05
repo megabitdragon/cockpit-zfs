@@ -68,7 +68,7 @@
 										:value="`${disk.name}`" :name="`disk-${disk.name}`"
 										class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
 									<div v-if="disk.hasPartitions!"
-										title="Disk already has partitions. Procees with caution."
+										title="Disk already has partitions. Proceed with caution."
 										class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
 										<ExclamationCircleIcon class="h-6 text-orange-700" />
 									</div>
@@ -701,15 +701,20 @@ const diskCheck = () => {
 			result = false;
 			diskFeedback.value = 'Two or more Disks are required for Mirror.';
 		} else if (vdev.type == 'raidz1' && vdev.selectedDisks!.length < 3) {
+		} else if (vdev.type == 'raidz1' && vdev.selectedDisks!.length < 3) {
 			result = false;
+			diskFeedback.value = 'Three or more Disks are required for RaidZ1.';
+		} else if (vdev.type == 'raidz2' && vdev.selectedDisks!.length < 4) {
 			diskFeedback.value = 'Three or more Disks are required for RaidZ1.';
 		} else if (vdev.type == 'raidz2' && vdev.selectedDisks!.length < 4) {
 			result = false;
 			diskFeedback.value = 'Four or more Disks are required for RaidZ2.';
 		} else if (vdev.type == 'raidz3' && vdev.selectedDisks!.length < 5) {
+			diskFeedback.value = 'Four or more Disks are required for RaidZ2.';
+		} else if (vdev.type == 'raidz3' && vdev.selectedDisks!.length < 5) {
 			result = false;
-			diskFeedback.value = 'Five or more Disks are required for RaidZ2.';
-		} else if (vdev.type == 'disk' && vdev.selectedDisks!.length < 1) {
+			diskFeedback.value = 'Five or more Disks are required for RaidZ3.';
+		} else if (vdev.type == 'disk' && vdev.selectedDisks.length < 1) {
 			result = false;
 			diskFeedback.value = 'At least one Disk is required.';
 		} else if (vdev.type == 'log' && vdev.selectedDisks!.length < 1) {

@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showFlag" @close="updateShowFlag" :marginTop="'mt-60'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Test Passwordless SSH Connection</legend>
         </template>
@@ -26,11 +26,11 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import Modal from '../../components/common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { testSSH } from '../../composables/helpers';
 
 interface TestSSHModalProps {

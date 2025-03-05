@@ -2,7 +2,7 @@
 	<div class="min-w-full max-w-full max-h-full py-2 pb-4 align-middle sm:px-4 lg:px-6 sm:rounded-lg bg-accent rounded-md border border-default">
 		<div name="pools">
 			<!-- Pools summary -->
-			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-well rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
+			<div v-if="pools.length > 0 && poolsLoaded == true" class="grid grid-flow-col bg-well text-center items-center rounded-md shadow text-default my-2 rounded-b-md ring-1 ring-black ring-opacity-5">
 				<div class="p-2 flex justify-start mt-1">
 					<span class="px-3 font-semibold text-lg mt-1 justify-self-start">Pools</span>
 				</div>

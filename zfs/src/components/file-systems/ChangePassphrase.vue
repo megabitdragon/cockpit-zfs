@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showChangePassphrase" @close="showChangePassphrase = false" :marginTop="'mt-28'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick ="false">
+    <OldModal :isOpen="showChangePassphrase" @close="showChangePassphrase = false" :marginTop="'mt-28'" :width="'w-96'" :minWidth="'min-w-min'" :closeOnBackgroundClick ="false">
         <template v-slot:title>
             <legend class="flex justify-center">Change Passphrase</legend>
         </template>
@@ -70,11 +70,11 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { ref, Ref, inject } from 'vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { changePassphrase } from '../../composables/datasets';
 import { InformationCircleIcon } from '@heroicons/vue/24/solid';
 import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';

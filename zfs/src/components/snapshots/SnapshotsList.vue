@@ -1,5 +1,5 @@
 <template>
-	<div class="TableDIv">
+	<div class="TableDiv">
 		<!-- POOLS -->
 		<div v-if="props.item == 'pool'"
 			class="inline-block min-w-full max-h-96 align-middle border border-default border-collapse overflow-y-auto">
@@ -103,8 +103,10 @@
 		</div>
 
 		<!-- FILESYSTEMS -->
-		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-96 overflow-y-auto align-middle border-collapse">
-			<table v-if="!snapshotsInDatasetLoaded && !snapshotNotFound" class="table-auto min-w-full min-h-full divide-y divide-default">
+		<div v-if="props.item == 'filesystem'" class="inline-block min-w-full max-h-3/4 align-middle border-collapse"
+			:class="{ 'overflow-y-scroll': snapshotsInFilesystem.length > 15 }">
+			<table v-if="!snapshotsInDatasetLoaded && !snapshotNotFound"
+				class="table-auto min-w-full min-h-full divide-y divide-default">
 				<tr class="rounded-md flex bg-well justify-center">
 					<LoadingSpinner :width="'w-10'" :height="'h-10'" :baseColor="'text-gray-200'"
 						:fillColor="'fill-slate-500'" />
@@ -125,8 +127,7 @@
 						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center"
 							:class="truncateText" title="Select">Select</th>
 						<th v-if="bulkSnapDestroyMode.get(props.filesystem!.name)" class="py-2 col-span-1 text-center">
-							<label
-								class="flex flex-row items-center w-full h-full rounded-lg"
+							<label class="flex flex-row items-center w-full h-full rounded-lg"
 								:class="checkboxSelectedAllClass">
 								<input type="checkbox" v-model="isSelectAllChecked" @change="toggleSelectAll"
 									class="w-4 h-4 mr-2 text-success border-default rounded focus:ring-green-500 dark:focus:ring-green-600 focus:ring-2" />
@@ -395,7 +396,7 @@ watch (confirmDestroy, async (newVal, oldVal) => {
 				operationRunning.value = false;
 
 				confirmDestroy.value = false;
-				pushNotification(new Notification('Destroy Snapshot Failed', `${selectedSnapshot.value!.name} was not destroyed: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Destroy Snapshot Failed', `${selectedSnapshot.value!.name} was not destroyed: ${errorMessage}`, 'error', 5000));
 
 			} else {
 				pushNotification(new Notification('Snapshot Destroyed', `${selectedSnapshot.value!.name} destroyed.`, 'success', 5000));
@@ -592,7 +593,7 @@ watch(confirmRollback, async (newVal, oldVal) => {
 				const errorMessage = output?.error || 'Unknown error';
 				operationRunning.value = false;
 				confirmRollback.value = false;
-				pushNotification(new Notification('Rollback Snapshot Failed', `${selectedSnapshot.value!.name} was not rolled back: ${errorMessage}.`, 'error', 5000));
+				pushNotification(new Notification('Rollback Snapshot Failed', `${selectedSnapshot.value!.name} was not rolled back: ${errorMessage}`, 'error', 5000));
 			} else {
 				console.log('rolled back:', selectedSnapshot.value);
 				await refreshSnaps();

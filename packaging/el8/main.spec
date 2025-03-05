@@ -116,6 +116,29 @@ systemctl start fastapi-notifications.service || true
 - Testin Pakcgae installation
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.14-y
 - Testin Pakcgae installation
+* Tue Feb 25 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-6
+- fix snapshot list/notification bugs
+* Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-5
+- build attempt again with submodule checkout
+* Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-4
+- build
+* Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-3
+- build
+* Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-2
+- building again with diff git url as build failed
+* Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-1
+- Re-implements common-library and fixes bugs relating to nvme disks, ui layouts
+  and datatypes
+* Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-4
+- trying to build again
+* Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-3
+- trying to build debs
+* Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-2
+- Trying to build package again after cleaning remnants of common lib
+* Wed Feb 19 2025 Jordan Keough <jkeough@45drives.com> 1.1.14-1
+- Rolls back previous Houston-Common-Library updates due to some bugs that came up
+  during usage. Bugfixes pushed during common lib implementation should all be retained,
+  but removed common library usage for the time being to work out those issues.
 * Thu Feb 13 2025 Jordan Keough <jkeough@45drives.com> 1.1.13-2
 - Fixes RaidZ levels' minimum disk quantity
 * Thu Feb 13 2025 Jordan Keough <jkeough@45drives.com> 1.1.13-1

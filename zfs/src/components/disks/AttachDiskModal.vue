@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showFlag" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             Attach Disk
         </template>
@@ -34,7 +34,7 @@
                                         @change="selectSingleDisk(disk.name)"
                                         class="justify-start w-4 h-4 text-success bg-well border-default rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2" />
                                     <div v-if="disk.hasPartitions!"
-                                        title="Disk already has partitions. Procees with caution."
+                                        title="Disk already has partitions. Proceed with caution."
                                         class="flex items-center justify-center h-6 w-6 bg-default rounded-full ml-2">
                                         <ExclamationCircleIcon class="h-6 text-orange-700" />
                                     </div>
@@ -123,13 +123,13 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 
 <script setup lang="ts">
 import { ref, inject, Ref, computed, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 import { convertSizeToBytes, loadTrimActivities, getDiskIDName, truncateName, loadScanActivities } from '../../composables/helpers';
 import { attachDisk } from '../../composables/disks';
@@ -279,7 +279,7 @@ async function attachDiskBtn() {
                 if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
                     adding.value = false;
-                    pushNotification(new Notification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}.`, 'error', 5000));
+                    pushNotification(new Notification('Disk Attach Failed', `There was an error attaching this disk: ${errorMessage}`, 'error', 5000));
                 } else {
                     showAttachDiskModal.value = false;
                     adding.value = false;

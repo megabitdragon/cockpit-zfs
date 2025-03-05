@@ -165,6 +165,70 @@ cockpit-zfs (1.1.14-yfocal) focal; urgency=medium
 
  -- Rachit Hans <rhans@45drives.com>  Thu, 27 Feb 2025 07:58:50 -0400
 
+cockpit-zfs (1.1.15-6focal) focal; urgency=medium
+
+  * fix snapshot list/notification bugs
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 25 Feb 2025 07:43:36 -0400
+
+cockpit-zfs (1.1.15-5focal) focal; urgency=medium
+
+  * build attempt again with submodule checkout
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 07:26:29 -0400
+
+cockpit-zfs (1.1.15-4focal) focal; urgency=medium
+
+  * build
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 07:20:07 -0400
+
+cockpit-zfs (1.1.15-3focal) focal; urgency=medium
+
+  * build
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 07:10:09 -0400
+
+cockpit-zfs (1.1.15-2focal) focal; urgency=medium
+
+  * building again with diff git url as build failed
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 07:00:03 -0400
+
+cockpit-zfs (1.1.15-1focal) focal; urgency=medium
+
+  * Re-implements common-library and fixes bugs relating to nvme disks, ui layouts
+    and datatypes
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 06:54:49 -0400
+
+cockpit-zfs (1.1.14-4focal) focal; urgency=medium
+
+  * trying to build again
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:48:49 -0400
+
+cockpit-zfs (1.1.14-3focal) focal; urgency=medium
+
+  * trying to build debs
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:44:26 -0400
+
+cockpit-zfs (1.1.14-2focal) focal; urgency=medium
+
+  * Trying to build package again after cleaning remnants of common lib
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:36:32 -0400
+
+cockpit-zfs (1.1.14-1focal) focal; urgency=medium
+
+  * Rolls back previous Houston-Common-Library updates due to some bugs that came
+    up during usage. Bugfixes pushed during common lib implementation should all
+    be retained, but removed common library usage for the time being to work out
+    those issues.
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:28:57 -0400
+
 cockpit-zfs (1.1.13-2focal) focal; urgency=medium
 
   * Fixes RaidZ levels' minimum disk quantity

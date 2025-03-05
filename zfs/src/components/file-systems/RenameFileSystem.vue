@@ -1,5 +1,5 @@
 <template>
-    <Modal :isOpen="showRenameModal" @close="showRenameModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'" :closeOnBackgroundClick="false">
+    <OldModal :isOpen="showRenameModal" @close="showRenameModal = false" :marginTop="'mt-28'" :width="'w-4/12'" :minWidth="'min-w-4/12'" :closeOnBackgroundClick="false">
         <template v-slot:title>
             <legend class="flex justify-center">Rename File System</legend>
         </template>
@@ -87,13 +87,13 @@
                 </div>
             </div>
         </template>
-    </Modal>
+    </OldModal>
 </template>
 <script setup lang="ts">
 import { ref, Ref, inject, computed } from 'vue';
 import { renameFileSystem } from '../../composables/datasets';
 import { Switch } from '@headlessui/vue';
-import Modal from '../common/Modal.vue';
+import OldModal from '../common/OldModal.vue';
 import { ZFSFileSystemInfo } from '@45drives/houston-common-lib';
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 
@@ -151,7 +151,7 @@ async function renameBtn() {
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
 				renaming.value = false;
-                pushNotification(new Notification('Rename Dataset Failed', `${props.filesystem.name} was not renamed: ${errorMessage}.`, 'error', 5000));
+                pushNotification(new Notification('Rename Dataset Failed', `${props.filesystem.name} was not renamed: ${errorMessage}`, 'error', 5000));
 			} else {
                 confirmRename.value = true;
                 pushNotification(new Notification('File System Renamed', `${props.filesystem.name} renamed to ${newName.value}.`, 'success', 5000));
