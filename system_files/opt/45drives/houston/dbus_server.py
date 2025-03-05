@@ -159,7 +159,7 @@ def store_notification(message):
         return None  # Return None if there was an error
 
         
-      class DBusService(dbus.service.Object):
+class DBusService(dbus.service.Object):
     def __init__(self, bus_name):
         bus_path = "/org/_45drives/Houston"
         dbus.service.Object.__init__(self, bus_name, bus_path)
