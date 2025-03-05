@@ -1,4 +1,4 @@
-## zfs module 1.1.15-24
+## zfs module 1.1.15-25
 
-* build package
-* build package
+* build pacakge
+* build pacakge
