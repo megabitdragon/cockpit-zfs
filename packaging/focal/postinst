@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+export DEBIAN_FRONTEND=noninteractive
+echo "[INFO] Installing FastAPI and Uvicorn..."
+pip3 install --no-cache-dir fastapi uvicorn
