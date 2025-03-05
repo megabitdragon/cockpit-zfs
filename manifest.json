@@ -4,7 +4,7 @@
     "title": "zfs module",
     "prerelease": true,
     "version": "1.1.15",
-    "buildVersion": "21",
+    "buildVersion": "23",
     "author": "Jordan Keough <jkeough@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-zfs-45d",
     "category": "utils",
@@ -58,7 +58,7 @@
     "changelog": {
         "urgency": "medium",
         "version": "1.1.15",
-        "buildVersion": "21",
+        "buildVersion": "23",
         "ignore": [],
         "date": null,
         "packager": "Jordan Keough <jkeough@45drives.com>",
