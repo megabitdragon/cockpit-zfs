@@ -56,6 +56,9 @@ systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Thu Mar 06 2025 Jordan Keough <jkeough@45drives.com> 1.1.16-1
+- Fixes a bug with RaidZ error handling not working when creating pool or adding
+  vdev
 * Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-39
 - final build package for testing
 * Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-38
