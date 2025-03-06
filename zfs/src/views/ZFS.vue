@@ -91,7 +91,6 @@ async function setUpMessageHandler(handler) {
         console.log("Connected to DBus. Subscribing to Message signal...");
 
         houston.addEventListener("Message", (_, message) => {
-            console.log("Received DBus message event."), message;
 			notificationStore.addNotification(message);
             handler(message);
         });

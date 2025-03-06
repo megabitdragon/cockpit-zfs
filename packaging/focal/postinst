@@ -15,3 +15,4 @@ systemctl enable fastapi-notifications.service || true
 echo "[INFO] Starting services..."
 systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
+systemctl restart zed

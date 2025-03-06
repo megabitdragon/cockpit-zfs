@@ -44,29 +44,47 @@ export const notificationStore = reactive<{
         errors?: string;
         severity?: string;
       };
+      console.log("message id recieved in adddnotification: ", parsedMessage.id)
 
-      notificationStore.notifications.unshift({
-        id: parsedMessage.id,
-        timestamp: parsedMessage.timestamp,
-        event: parsedMessage.event,
-        pool: parsedMessage.pool,
-        text: `Event: ${parsedMessage.event}, Pool: ${parsedMessage.pool ?? "N/A"}`,
-        state: parsedMessage.state,
-        vdev: parsedMessage.vdev,
-        health: parsedMessage.health,
-        errors: parsedMessage.errors,
-        severity: parsedMessage.severity,
-        
-      });
+  
+      // ✅ Find existing notification by ID
+      const existingNotification = notificationStore.notifications.find(
+        (notif) => notif.id === parsedMessage.id
+      );
+  
+      if (existingNotification) {
+        // ✅ If ID exists, update only the state field
+        existingNotification.state = parsedMessage.state;
+        console.log(`✅ Updated state of notification ID ${parsedMessage.id}`);
+      } else {
+        // ✅ If ID does not exist, add new notification
+        notificationStore.notifications.unshift({
+          id: parsedMessage.id,
+          timestamp: parsedMessage.timestamp,
+          event: parsedMessage.event,
+          pool: parsedMessage.pool,
+          text: `Event: ${parsedMessage.event}, Pool: ${parsedMessage.pool ?? "N/A"}`,
+          state: parsedMessage.state,
+          vdev: parsedMessage.vdev,
+          health: parsedMessage.health,
+          errors: parsedMessage.errors,
+          severity: parsedMessage.severity,
+        });
+  
+        console.log(`✅ Added new notification ID ${parsedMessage.id}`);
+      }
+  
+      // ✅ Trigger sidebar notification
       sideBarNotification();
-
     } catch (error) {
-      console.error("Invalid JSON format received:", message);
+      console.error("❌ Invalid JSON format received:", message);
     }
   },
 
+
   // Remove notification by ID
   removeNotification(id: number) {
+    console.log("remove Notivficatio id :", id )
     notificationStore.notifications = notificationStore.notifications.filter(
       (n) => n.id !== id
     );

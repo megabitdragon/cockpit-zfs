@@ -53,7 +53,7 @@ systemctl enable houston-dbus.service
 systemctl enable fastapi-notifications.service
 systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
-
+systemctl restart zed
 
 %changelog
 * Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-36
