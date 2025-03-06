@@ -1,4 +1,3 @@
-## zfs module 1.1.15-37
+## zfs module 1.1.15-38
 
-* build package
-* build package
+* final build package for testing
