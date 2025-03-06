@@ -71,7 +71,7 @@ export const notificationStore = reactive<{
           severity: parsedMessage.severity,
         });
   
-        console.log(`✅ Added new notification ID ${parsedMessage.id}`);
+        console.log(`✅ Added new notification severity ${parsedMessage.severity}`);
       }
   
       // ✅ Trigger sidebar notification
