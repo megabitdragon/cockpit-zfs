@@ -153,25 +153,23 @@
 										<div class="flex items-start gap-3" v-if="notification.event === 'pool_import'" >
 											  <!-- Icon Based on Pool Health -->
 											<div>
-												<CheckCircleIcon v-if="notification.health === 'ONLINE'" class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
-												<ExclamationCircleIcon v-else-if="notification.health === 'DEGRADED'" class="icon-warning size-icon-lg text-yellow-500" aria-hidden="true" />
-												<XCircleIcon v-else class="icon-error size-icon-lg text-red-500" aria-hidden="true" />
+												<CheckCircleIcon v-if="notification.health === 'ACTIVE'" class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
+												<ExclamationCircleIcon v-else-if="notification.health != 'ACTIVE'" class="icon-warning size-icon-lg text-red-500" aria-hidden="true" />
 											</div>
 												<!-- Event Details -->
 												<div class="w-full">
 													<p class="text-xl font-semibold"  :class="{
-														'text-green-500': notification.health === 'ONLINE',
-														'text-yellow-500': notification.health === 'DEGRADED',
-														'text-red-500': notification.health === 'FAULTED'
+														'text-green-500': notification.health === 'ACTIVE',
+														'text-red-500': notification.health != 'ACTIVE'
 													}">ZFS Pool Imported - {{ notification.pool }}</p>
 													<p class="pl-4 text-sm text-white-500">
 													 Pool <strong>{{ notification.pool }}</strong> has been successfully imported.
 													<br> 
 													<strong>Status: </strong>  
 													<span :class="{
-														'text-green-500': notification.health === 'ONLINE',
+														'text-green-500': notification.health === 'ACTIVE',
 														'text-yellow-500': notification.health === 'DEGRADED',
-														'text-red-500': notification.health === 'FAULTED'
+														'text-red-500': notification.health != 'ACTIVE'
 													}">
 														{{ notification.health }}
 												</span>

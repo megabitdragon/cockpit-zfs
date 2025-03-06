@@ -47,55 +47,63 @@ def store_notification(message):
 
         # ✅ Check if a similar event exists (for statechange updates)
         cursor.execute("""
-            SELECT id, state FROM notifications
+            SELECT id, state, health FROM notifications
             WHERE event = ? AND timestamp = ? AND vdev = ?;
         """, (message["event"], message["timestamp"], message.get("vdev", None)))
 
         existing_event = cursor.fetchone()
 
         if existing_event:
-            existing_id, existing_state = existing_event
+            existing_id, existing_state, existing_health = existing_event
 
-            # ✅ If it's a statechange event and the state has changed, update it
-            if message["event"] == "statechange" and existing_state != message.get("state"):
+            # ✅ If it's a statechange event and the state or health has changed, update it
+            if message["event"] == "statechange" and (existing_state != message.get("state") or existing_health != message.get("health")):
+                new_severity = determine_severity(message.get("event"), message)  # ✅ Recalculate severity
+                
                 cursor.execute("""
                     UPDATE notifications
-                    SET state = ?, severity = ?
+                    SET state = ?, severity = ?, health = ?
                     WHERE id = ?;
                 """, (
                     message.get("state"),
-                    determine_severity(message.get("event"), message),
+                    new_severity,
+                    message.get("health", None),
                     existing_id
                 ))
                 conn.commit()
                 print(f"✅ [UPDATE] Statechange event updated: {message}")  
-                
-                # ✅ Include `id` in the returned message
+
+                # ✅ Include `id` and `severity` in the returned message
                 message["id"] = existing_id
+                message["severity"] = new_severity
                 return message  
 
             print(f"❌ Duplicate detected, skipping insert: {message}")
             return None  
 
         # ✅ Insert new notification if no matching event found
+        severity = determine_severity(message.get("event"), message)  # ✅ Get severity for new events
+
         cursor.execute("""
-            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity)
-            VALUES (?, ?, ?, ?, ?, ?);
+            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity, health)
+            VALUES (?, ?, ?, ?, ?, ?, ?);
         """, (
             message.get("timestamp"),
             message.get("event"),
             message.get("pool"),
             message.get("vdev", None),
             message.get("state", None),
-            determine_severity(message.get("event"), message)  
+            severity,
+            message.get("health", None)  
         ))
 
         conn.commit()
         notification_id = cursor.lastrowid  # ✅ Get the new row ID
         print(f"✅ [INSERT] New event stored: {message}")  
 
-        # ✅ Include `id` in the returned message
+        # ✅ Include `id` and `severity` in the returned message
         message["id"] = notification_id
+        message["severity"] = severity
         return message  
 
     except Exception as e:
