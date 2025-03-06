@@ -1,3 +1,3 @@
-## zfs module 1.1.15-6
+## zfs module 1.1.16-1
 
-* fix snapshot list/notification bugs
+* Fixes a bug with RaidZ error handling not working when creating pool or adding vdev

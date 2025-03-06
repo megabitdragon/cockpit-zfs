@@ -27,6 +27,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Thu Mar 06 2025 Jordan Keough <jkeough@45drives.com> 1.1.16-1
+- Fixes a bug with RaidZ error handling not working when creating pool or adding
+  vdev
 * Tue Feb 25 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-6
 - fix snapshot list/notification bugs
 * Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-5
