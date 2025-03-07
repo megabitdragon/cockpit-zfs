@@ -51,11 +51,23 @@ dnf install -y sqlite || true  # Ensures SQLite is installed
 systemctl daemon-reload
 systemctl enable houston-dbus.service
 systemctl enable fastapi-notifications.service
+
+# Ensure the SQLite database directory exists with correct permissions
+mkdir -p /var/lib/sqlite
+chown -R www-data:www-data /var/lib/sqlite
+chmod -R 775 /var/lib/sqlite
+
+# Initialize the SQLite database
+python3 -c "from notification_api import setup_database; setup_database()"
+
+# Start services only after setting up the database
 systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-43
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-42
 - build package for testing for notifications
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-41

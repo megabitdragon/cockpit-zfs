@@ -1,3 +1,3 @@
-## zfs module 1.1.15-42
+## zfs module 1.1.15-43
 
-* build package for testing for notifications
+* build package
