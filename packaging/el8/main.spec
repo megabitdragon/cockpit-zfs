@@ -56,6 +56,8 @@ systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-40
+- Alerts branch working
 * Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-39
 - final build package for testing
 * Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-38

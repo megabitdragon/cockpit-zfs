@@ -106,7 +106,7 @@ def get_boot_disk():
         # Convert partition (e.g., /dev/sda2) to the parent disk (/dev/sda)
         parent_disk = re.sub(r'\d+$', '', boot_device)
 
-        print(f"Detected boot disk: {parent_disk}")
+        # print(f"Detected boot disk: {parent_disk}")
         return parent_disk
 
     except Exception as e:

@@ -85,8 +85,8 @@ def store_notification(message):
         severity = determine_severity(message.get("event"), message)  # ✅ Get severity for new events
 
         cursor.execute("""
-            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity, health)
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity, health, errors)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         """, (
             message.get("timestamp"),
             message.get("event"),
@@ -94,7 +94,8 @@ def store_notification(message):
             message.get("vdev", None),
             message.get("state", None),
             severity,
-            message.get("health", None)  
+            message.get("health", None),
+            message.get("errors", 0)  # ✅ Added errors field with a default of 0
         ))
 
         conn.commit()

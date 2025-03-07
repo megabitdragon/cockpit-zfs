@@ -28,22 +28,27 @@ class Notification(BaseModel):
 def setup_database():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+    
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS notifications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp TEXT NOT NULL,
-            event TEXT NOT NULL,
-            pool TEXT,
-            vdev TEXT,
-            state TEXT,
-            error TEXT,
-            description TEXT,
-            scrub_details TEXT,
-            errors TEXT,
-            repaired TEXT,
-            received INTEGER DEFAULT 0
-        )
+    CREATE TABLE IF NOT EXISTS notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TEXT NOT NULL,
+        event TEXT NOT NULL,
+        pool TEXT,
+        vdev TEXT,
+        state TEXT,
+        error TEXT,
+        description TEXT,
+        health TEXT,
+        guid TEXT,
+        scrub_details TEXT,
+        errors TEXT,
+        repaired TEXT,
+        severity TEXT DEFAULT 'info' CHECK(severity IN ('info', 'warning', 'error')),
+        received INTEGER DEFAULT 0  -- 0 = Not sent to UI, 1 = Sent
+    )
     """)
+    
     conn.commit()
     conn.close()
 
@@ -56,20 +61,17 @@ def store_notification(notification: Notification):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO notifications (timestamp, event, pool, vdev, state, error, description, scrub_details, errors, repaired, received)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity, health, errors)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         """, (
-            notification.timestamp,
-            notification.event,
-            notification.pool,
-            notification.vdev,
-            notification.state,
-            notification.error,
-            notification.description,
-            notification.scrub_details,
-            notification.errors,
-            notification.repaired,
-            notification.received
+            message.get("timestamp"),
+            message.get("event"),
+            message.get("pool"),
+            message.get("vdev", None),
+            message.get("state", None),
+            severity,
+            message.get("health", None),
+            message.get("errors", 0)  # ✅ Added errors field with a default of 0
         ))
         conn.commit()
         conn.close()

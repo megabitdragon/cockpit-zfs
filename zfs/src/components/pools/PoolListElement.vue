@@ -988,6 +988,8 @@ watch(confirmExport, async (newVal, oldVal) => {
 /////////////////////////////////////////////////////
 async function clearPoolErrors(poolName) {
 	await clearErrors(poolName);
+	await refreshAllData();
+
 }
 
 ///////////////////// Add VDev //////////////////////
