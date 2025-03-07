@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.15-47focal) focal; urgency=medium
+
+  * added jq dependency
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 10:42:17 -0400
+
 cockpit-zfs (1.1.15-46focal) focal; urgency=medium
 
   * build package

@@ -48,7 +48,7 @@ make DESTDIR=%{buildroot} install
 %post
 pip3 install --upgrade pip
 pip3 install fastapi uvicorn
-dnf install -y sqlite || true  # Ensures SQLite is installed
+dnf install -y sqlite jq || true  # Ensures SQLite and jq are installed
 
 # Ensure the SQLite database directory exists with correct permissions
 mkdir -p /var/lib/sqlite
@@ -69,6 +69,8 @@ systemctl restart zed
 rm -rf %{buildroot}
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-47
+- added jq dependency
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-45
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-44
