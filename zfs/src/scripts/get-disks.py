@@ -1,5 +1,6 @@
 import subprocess
 import json
+import re
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -68,105 +69,94 @@ def get_lsdev_disks():
         logger.error(f"Exception in get_lsdev_disks: {str(e)}")
         return None
 
-# def get_lsblk_disks(nvme_only=False):
-#     """Get all disks (or only NVMe disks if nvme_only=True) using lsblk JSON output and udevadm."""
-#     try:
-#         # Run lsblk with JSON output
-#         lsblk_result = subprocess.run(['lsblk', '-dnOpJ'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-#         if lsblk_result.returncode != 0:
-#             logger.error(f"lsblk command failed: {lsblk_result.stderr.decode()}")
-#             return []
+def get_boot_disk():
+    """Finds the physical disk that contains the boot partition or root filesystem using lsblk."""
+    try:
+        # Get block devices and mountpoints
+        result = subprocess.run(['lsblk', '-no', 'NAME,MOUNTPOINT'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode != 0:
+            print(f"lsblk command failed: {result.stderr.decode()}")
+            return None
 
-#         logger.debug("lsblk command succeeded.")
-#         lsblk_data = json.loads(lsblk_result.stdout.decode())
-#         disks = []
+        mount_data = result.stdout.decode().strip().split("\n")
 
-#         for device in lsblk_data['blockdevices']:
-#             # Skip if nvme_only is True and device is not NVMe
-#             if nvme_only and 'nvme' not in device['name']:
-#                 continue
+        boot_device = None
+        for line in mount_data:
+            parts = line.strip().split(None, 1)  # Split into two parts (device, mountpoint)
 
-#             # Collect additional information using smartctl if available
-#             smartctl_data = get_smartctl_data(device['name'].split('/')[-1])  # Get only the device name, e.g., 'sda'
-
-#             # Get additional details using udevadm
-#             udevadm_result = subprocess.run(['udevadm', 'info', '--query=all', f'--name={device["name"]}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-#             if udevadm_result.returncode != 0:
-#                 logger.error(f"udevadm failed for {device['name']}: {udevadm_result.stderr.decode()}")
-#                 continue
-
-#             # logger.debug(f"udevadm output for {device['name']}: {udevadm_result.stdout.decode()}")
-#             udevadm_output = udevadm_result.stdout.decode().split('\n')
-#             udev_info = {}
-#             for line in udevadm_output:
-#                 if '=' in line:
-#                     key, value = line.split('=', 1)
-#                     udev_info[key.strip()] = value.strip()
-
-#             # Append the disk data to the list
-#             disk_data = {
-#                 'vdev_path': 'N/A',
-#                 'phy_path': f'/dev/disk/by-path/{udev_info.get("E: ID_PATH", "unknown")}',
-#                 'sd_path': device['name'],
-#                 'name': device['name'].split('/')[-1],
-#                 'model': device.get('model', udev_info.get('E: ID_MODEL', 'Unknown')),
-#                 'serial': device.get('serial', udev_info.get('E: ID_SERIAL_SHORT', 'Unknown')),
-#                 'capacity': device['size'],
-#                 'type': 'NVMe' if 'nvme' in device['name'] else device['type'].capitalize(),
-#                 'usable': device['ro'] == '0',
-#                 'temp': f'{smartctl_data["temp"]}℃' if smartctl_data["temp"] is not None else 'Unknown',
-#                 'health': "OK" if smartctl_data['health'] == 'PASSED' else "POOR",
-#                 'rotation_rate': 0 if 'nvme' in device['name'] else (device['rota'] == '1'),
-#                 'power_on_count': smartctl_data['power_cycle_count'],
-#                 'power_on_time': smartctl_data['power_on_hours'],
-#                 'has_partitions': 'E: ID_PART_TABLE_TYPE' in udev_info
-#             }
+            if len(parts) == 1:
+                continue  # Skip devices with no mountpoints
             
-#             disk_log_data = {
-#                 'name': device['name'].split('/')[-1],
-#                 'type': 'NVMe' if 'nvme' in device['name'] else device['type'].capitalize(),
-#                 'temp': f'{smartctl_data["temp"]}℃' if smartctl_data["temp"] is not None else 'Unknown',
-#                 'health': "OK" if smartctl_data['health'] == 'PASSED' else "POOR",
-#             }
-            
-#             logger.debug(f"Discovered disk: {disk_log_data}")
-#             disks.append(disk_data)
+            device, mountpoint = parts
+            device = f"/dev/{device.strip()}"  # Convert to full path
 
-#         logger.info(f"Disks discovered: {len(disks)}")
-#         return disks
+            # **🔹 FIX: Remove tree characters (├─, └─, etc.) from device names**
+            device = re.sub(r'[^\w/-]', '', device)
 
-#     except Exception as e:
-#         logger.error(f"Exception in get_lsblk_disks: {str(e)}")
-#         return []
+            if mountpoint == "/boot":  # Prefer boot partition first
+                boot_device = device
+                break
+            elif mountpoint == "/":  # Use root partition as fallback
+                boot_device = device
 
+        if not boot_device:
+            print("No boot or root partition found.")
+            return None
+
+        # Convert partition (e.g., /dev/sda2) to the parent disk (/dev/sda)
+        parent_disk = re.sub(r'\d+$', '', boot_device)
+
+        print(f"Detected boot disk: {parent_disk}")
+        return parent_disk
+
+    except Exception as e:
+        print(f"Error determining boot disk: {e}")
+        return None
+    
 def get_lsblk_disks(nvme_only=False):
     """Get all disks (or only NVMe disks if nvme_only=True) using lsblk JSON output and udevadm."""
     try:
+        # Get the boot drive
+        boot_drive = get_boot_disk()
+        logger.info(f"Boot drive detected: {boot_drive}")
+        
         # Run lsblk with JSON output, including mountpoints
-        lsblk_result = subprocess.run(['lsblk', '-dnOpJ', '-o', 'NAME,TYPE,SIZE,ROTA,SERIAL,MODEL,MOUNTPOINT'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        lsblk_result = subprocess.run(['lsblk', '-dnpJ', '-o', 'NAME,TYPE,SIZE,ROTA,SERIAL,MODEL,MOUNTPOINT'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if lsblk_result.returncode != 0:
             logger.error(f"lsblk command failed: {lsblk_result.stderr.decode()}")
             return []
 
         logger.debug("lsblk command succeeded.")
         lsblk_data = json.loads(lsblk_result.stdout.decode())
+        # print('lsblk_data:', lsblk_data)
         disks = []
 
         for device in lsblk_data['blockdevices']:
+            device_name = device['name']
+            
             # Skip if nvme_only is True and device is not NVMe
             if nvme_only and 'nvme' not in device['name']:
+                continue
+            if device['type'] == 'loop':  # Ignore loop devices
+                continue  
+            
+             # Skip the boot disk
+            if device_name == boot_drive:
+                logger.info(f"Skipping boot drive: {device_name}")
                 continue
 
             # Check if this device is a boot drive (mounted at / or /boot)
             if 'children' in device:
                 for partition in device['children']:
+                    # TODO: FILTER OUT BOOT DRIVES
                     if partition.get('mountpoint') in ['/', '/boot']:
                         logger.info(f"Skipping boot drive: {device['name']}")
                         continue
 
             # Collect additional information using smartctl if available
             smartctl_data = get_smartctl_data(device['name'].split('/')[-1])  # Get only the device name, e.g., 'sda'
-
+            # print('smartctl_data', smartctl_data)
+            
             # Get additional details using udevadm
             udevadm_result = subprocess.run(['udevadm', 'info', '--query=all', f'--name={device["name"]}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if udevadm_result.returncode != 0:
@@ -174,6 +164,7 @@ def get_lsblk_disks(nvme_only=False):
                 continue
 
             udevadm_output = udevadm_result.stdout.decode().split('\n')
+            # print('udevadm_output', udevadm_output)
             udev_info = {}
             for line in udevadm_output:
                 if '=' in line:
@@ -190,7 +181,7 @@ def get_lsblk_disks(nvme_only=False):
                 'serial': device.get('serial', udev_info.get('E: ID_SERIAL_SHORT', 'Unknown')),
                 'capacity': device['size'],
                 'type': 'NVMe' if 'nvme' in device['name'] else device['type'].capitalize(),
-                'usable': device['ro'] == '0',
+                'usable': device.get('ro', '0') == '0',
                 'temp': f'{smartctl_data["temp"]}℃' if smartctl_data["temp"] is not None else 'Unknown',
                 'health': "OK" if smartctl_data['health'] == 'PASSED' else "POOR",
                 'rotation_rate': 0 if 'nvme' in device['name'] else (device['rota'] == '1'),
@@ -198,13 +189,16 @@ def get_lsblk_disks(nvme_only=False):
                 'power_on_time': smartctl_data['power_on_hours'],
                 'has_partitions': 'E: ID_PART_TABLE_TYPE' in udev_info
             }
+            # print('disk_data', disk_data)
 
             disk_log_data = {
                 'name': device['name'].split('/')[-1],
                 'type': 'NVMe' if 'nvme' in device['name'] else device['type'].capitalize(),
                 'temp': f'{smartctl_data["temp"]}℃' if smartctl_data["temp"] is not None else 'Unknown',
                 'health': "OK" if smartctl_data['health'] == 'PASSED' else "POOR",
+                'mountpoint': device.get('mountpoint', 'none')
             }
+            # print('disklog_data', disk_log_data)
 
             logger.debug(f"Discovered disk: {disk_log_data}")
             disks.append(disk_data)
