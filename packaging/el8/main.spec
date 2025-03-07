@@ -44,8 +44,6 @@ make DESTDIR=%{buildroot} install
 # ✅ Ensure SQLite Directory Exists and is Tracked
 %dir %attr(0775, www-data, www-data) /var/lib/sqlite
 
-# ✅ Track the Database File as a %ghost File
-%ghost %attr(0664, www-data, www-data) /var/lib/sqlite/notifications.db
 
 %post
 pip3 install --upgrade pip
@@ -57,17 +55,6 @@ mkdir -p /var/lib/sqlite
 chown -R www-data:www-data /var/lib/sqlite
 chmod -R 775 /var/lib/sqlite
 
-# ✅ Create an empty SQLite database file if it does not exist
-if [ ! -f /var/lib/sqlite/notifications.db ]; then
-    touch /var/lib/sqlite/notifications.db
-    chown www-data:www-data /var/lib/sqlite/notifications.db
-    chmod 0664 /var/lib/sqlite/notifications.db
-fi
-
-# ✅ Initialize the database schema only if the file is empty
-if [ ! -s /var/lib/sqlite/notifications.db ]; then
-    python3 -c "from notification_api import setup_database; setup_database()"
-fi
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
