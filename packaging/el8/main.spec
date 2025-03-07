@@ -7,7 +7,7 @@ URL: ::package_url::
 Source0: %{name}-%{version}.tar.gz
 BuildArch: ::package_architecture_el::
 Requires: ::package_dependencies_el_el8::
-Requires(post): systemd, python3, sqlite, jq  # ✅ Added jq to dependencies
+Requires(post): systemd, python3, sqlite, jq
 
 %description
 ::package_title::
@@ -42,40 +42,27 @@ make DESTDIR=%{buildroot} install
 %attr(0755, root, root) /opt/45drives/houston/notification_api.py
 
 # ✅ Ensure SQLite Directory Exists and is Tracked
-%dir %attr(0775, nobody, nobody) /var/lib/sqlite
+%dir %attr(0775, www-data, www-data) /var/lib/sqlite
 
-# ✅ Track the Database File as a %ghost File, but DO NOT create it
-%ghost %attr(0664, nobody, nobody) /var/lib/sqlite/notifications.db
+# ✅ Track the Database File as a %ghost File
 
 %post
 pip3 install --upgrade pip
 pip3 install fastapi uvicorn
+dnf install -y sqlite jq || true  # Ensures SQLite is installed
 
-# ✅ Install SQLite and jq
-dnf install -y sqlite jq || true  # ✅ jq added
 
-# ✅ Ensure the SQLite database directory exists with correct permissions
+
+# Ensure the SQLite database directory exists with correct permissions
 mkdir -p /var/lib/sqlite
-chown -R nobody:nobody /var/lib/sqlite  # Use 'nobody' or another valid user
+chown -R www-data:www-data /var/lib/sqlite
 chmod -R 775 /var/lib/sqlite
 
-# ❌ REMOVE: Do not create notifications.db
-# if [ ! -f /var/lib/sqlite/notifications.db ]; then
-#     touch /var/lib/sqlite/notifications.db
-#     chown nobody:nobody /var/lib/sqlite/notifications.db
-#     chmod 0664 /var/lib/sqlite/notifications.db
-# fi
-
-# ❌ REMOVE: Do not initialize database schema
-# if [ ! -s /var/lib/sqlite/notifications.db ]; then
-#     python3 -c "from notification_api import setup_database; setup_database()"
-# fi
-
-# ✅ Ensure systemd reloads and starts the service after installation
+# Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
 systemctl enable houston-dbus.service fastapi-notifications.service
 
-# ✅ Start services after setup
+# Start services only after setting up the database
 systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 systemctl restart zed
@@ -85,7 +72,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-50
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-51
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-1
 - build package
