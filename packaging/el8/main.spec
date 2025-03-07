@@ -7,7 +7,7 @@ URL: ::package_url::
 Source0: %{name}-%{version}.tar.gz
 BuildArch: ::package_architecture_el::
 Requires: ::package_dependencies_el_el8::
-Requires(post): systemd, python3, sqlite, jq
+Requires(post): systemd, python3, sqlite, jq  # ✅ Added jq to dependencies
 
 %description
 ::package_title::
@@ -21,11 +21,6 @@ make OS_PACKAGE_RELEASE=el8
 
 %install
 make DESTDIR=%{buildroot} install
-
-# ✅ Ensure SQLite directory exists inside %{buildroot} during packaging
-mkdir -p %{buildroot}/var/lib/sqlite
-chown -R www-data:www-data %{buildroot}/var/lib/sqlite
-chmod -R 0775 %{buildroot}/var/lib/sqlite
 
 %files
 /usr/share/cockpit/zfs/*
@@ -47,28 +42,40 @@ chmod -R 0775 %{buildroot}/var/lib/sqlite
 %attr(0755, root, root) /opt/45drives/houston/notification_api.py
 
 # ✅ Ensure SQLite Directory Exists and is Tracked
-%dir %attr(0775, www-data, www-data) /var/lib/sqlite
+%dir %attr(0775, nobody, nobody) /var/lib/sqlite
+
+# ✅ Track the Database File as a %ghost File, but DO NOT create it
+%ghost %attr(0664, nobody, nobody) /var/lib/sqlite/notifications.db
 
 %post
-echo "[INFO] Installing required Python packages..."
 pip3 install --upgrade pip
 pip3 install fastapi uvicorn
 
-echo "[INFO] Installing system dependencies..."
-dnf install -y sqlite jq || true  # ✅ Ensure jq is installed
+# ✅ Install SQLite and jq
+dnf install -y sqlite jq || true  # ✅ jq added
 
-echo "[INFO] Setting up SQLite database directory..."
+# ✅ Ensure the SQLite database directory exists with correct permissions
 mkdir -p /var/lib/sqlite
-chown -R www-data:www-data /var/lib/sqlite
-chmod -R 0775 /var/lib/sqlite
+chown -R nobody:nobody /var/lib/sqlite  # Use 'nobody' or another valid user
+chmod -R 775 /var/lib/sqlite
 
-echo "[INFO] Reloading systemd daemon..."
+# ❌ REMOVE: Do not create notifications.db
+# if [ ! -f /var/lib/sqlite/notifications.db ]; then
+#     touch /var/lib/sqlite/notifications.db
+#     chown nobody:nobody /var/lib/sqlite/notifications.db
+#     chmod 0664 /var/lib/sqlite/notifications.db
+# fi
+
+# ❌ REMOVE: Do not initialize database schema
+# if [ ! -s /var/lib/sqlite/notifications.db ]; then
+#     python3 -c "from notification_api import setup_database; setup_database()"
+# fi
+
+# ✅ Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
-
-echo "[INFO] Enabling services..."
 systemctl enable houston-dbus.service fastapi-notifications.service
 
-echo "[INFO] Starting services..."
+# ✅ Start services after setup
 systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 systemctl restart zed
@@ -78,6 +85,8 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-50
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-1
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-48
