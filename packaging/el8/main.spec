@@ -41,8 +41,6 @@ make DESTDIR=%{buildroot} install
 %attr(0755, root, root) /opt/45drives/houston/dbus_server.py
 %attr(0755, root, root) /opt/45drives/houston/houston-notify
 %attr(0755, root, root) /opt/45drives/houston/notification_api.py
-%dir /var/lib/sqlite
-%attr(0775, root, root) /var/lib/sqlite
 
 %post
 pip3 install --upgrade pip
