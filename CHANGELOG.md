@@ -1,3 +1,3 @@
-## zfs module 1.1.16-1
+## zfs module 1.1.17-1
 
-* Fixes a bug with RaidZ error handling not working when creating pool or adding vdev
+* Updates get_disks.py script to handle lsblk command to account for flag difference in versions, and skips boot drives when returning disks via lsblk

@@ -27,6 +27,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Fri Mar 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.17-1
+- Updates get_disks.py script to handle lsblk command to account for flag difference
+  in versions, and skips boot drives when returning disks via lsblk
 * Thu Mar 06 2025 Jordan Keough <jkeough@45drives.com> 1.1.16-1
 - Fixes a bug with RaidZ error handling not working when creating pool or adding
   vdev
