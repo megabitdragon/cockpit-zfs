@@ -7,7 +7,8 @@ URL: ::package_url::
 Source0: %{name}-%{version}.tar.gz
 BuildArch: ::package_architecture_el::
 Requires: ::package_dependencies_el_el8::
-Requires(post): systemd, python3, sqlite, jq
+
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 ::package_title::
@@ -41,17 +42,15 @@ make DESTDIR=%{buildroot} install
 %attr(0755, root, root) /opt/45drives/houston/houston-notify
 %attr(0755, root, root) /opt/45drives/houston/notification_api.py
 
-# ✅ Ensure SQLite Directory Exists and is Tracked
+# ✅ Ensure SQLite Directory Exists (No notifications.db)
 %dir %attr(0775, www-data, www-data) /var/lib/sqlite
-
-# ✅ Track the Database File as a %ghost File
 
 %post
 pip3 install --upgrade pip
 pip3 install fastapi uvicorn
-dnf install -y sqlite jq || true  # Ensures SQLite is installed
 
-
+# ✅ Ensure SQLite is installed
+dnf install -y sqlite || true  
 
 # Ensure the SQLite database directory exists with correct permissions
 mkdir -p /var/lib/sqlite
@@ -67,11 +66,9 @@ systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
-%clean
-rm -rf %{buildroot}
-
-
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-52
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-51
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-1
