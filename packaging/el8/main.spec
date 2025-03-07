@@ -56,6 +56,8 @@ systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-42
+- build package for testing for notifications
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-41
 - build package for testing for notifications
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-40
