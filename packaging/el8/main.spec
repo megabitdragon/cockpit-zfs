@@ -45,9 +45,8 @@ chown -R www-data:www-data %{buildroot}/var/lib/sqlite
 %attr(0755, root, root) /opt/45drives/houston/dbus_server.py
 %attr(0755, root, root) /opt/45drives/houston/houston-notify
 %attr(0755, root, root) /opt/45drives/houston/notification_api.py
-
-# ✅ Ensure SQLite Directory Exists (No notifications.db)
-%dir %attr(0775, www-data, www-data) /var/lib/sqlite
+%dir /var/lib/sqlite
+%attr(0775, www-data, www-data) /var/lib/sqlite
 
 %post
 pip3 install --upgrade pip
@@ -71,6 +70,8 @@ systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-54
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-53
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-52
