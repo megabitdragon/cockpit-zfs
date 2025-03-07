@@ -22,6 +22,11 @@ make OS_PACKAGE_RELEASE=el8
 %install
 make DESTDIR=%{buildroot} install
 
+# ✅ Ensure SQLite directory exists inside %{buildroot} during packaging
+mkdir -p %{buildroot}/var/lib/sqlite
+chown -R www-data:www-data %{buildroot}/var/lib/sqlite
+chmod -R 0775 %{buildroot}/var/lib/sqlite
+
 %files
 /usr/share/cockpit/zfs/*
 # D-Bus configuration
@@ -45,20 +50,25 @@ make DESTDIR=%{buildroot} install
 %dir %attr(0775, www-data, www-data) /var/lib/sqlite
 
 %post
+echo "[INFO] Installing required Python packages..."
 pip3 install --upgrade pip
 pip3 install fastapi uvicorn
+
+echo "[INFO] Installing system dependencies..."
 dnf install -y sqlite jq || true  # ✅ Ensure jq is installed
 
-# Ensure the SQLite database directory exists with correct permissions
+echo "[INFO] Setting up SQLite database directory..."
 mkdir -p /var/lib/sqlite
 chown -R www-data:www-data /var/lib/sqlite
-chmod -R 775 /var/lib/sqlite
+chmod -R 0775 /var/lib/sqlite
 
-# Ensure systemd reloads and starts the service after installation
+echo "[INFO] Reloading systemd daemon..."
 systemctl daemon-reload
+
+echo "[INFO] Enabling services..."
 systemctl enable houston-dbus.service fastapi-notifications.service
 
-# Start services only after setting up the database
+echo "[INFO] Starting services..."
 systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 systemctl restart zed
@@ -66,7 +76,10 @@ systemctl restart zed
 %clean
 rm -rf %{buildroot}
 
+
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-1
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-48
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-47
