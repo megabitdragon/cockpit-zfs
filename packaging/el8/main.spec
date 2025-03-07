@@ -47,7 +47,8 @@ pip3 install --upgrade pip
 pip3 install fastapi uvicorn
 
 # ✅ Ensure SQLite is installed
-dnf install -y sqlite jq || true  
+dnf install -y sqlite || true  
+dnf install -y jq || true  
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
@@ -59,6 +60,8 @@ systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-59
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-56
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-54

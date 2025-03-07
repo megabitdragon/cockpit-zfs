@@ -5,14 +5,6 @@ export DEBIAN_FRONTEND=noninteractive
 echo "[INFO] Installing FastAPI and Uvicorn..."
 pip3 install --no-cache-dir fastapi uvicorn
 
-echo "[INFO] Installing jq..."
-apt-get update && apt-get install -y jq || true  # ✅ Ensure jq is installed
-
-echo "[INFO] Setting up SQLite database permissions..."
-mkdir -p /var/lib/sqlite
-chown -R www-data:www-data /var/lib/sqlite
-chmod -R 775 /var/lib/sqlite
-
 echo "[INFO] Reloading systemd daemon..."
 systemctl daemon-reload
 

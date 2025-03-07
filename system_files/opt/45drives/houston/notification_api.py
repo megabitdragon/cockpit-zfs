@@ -6,7 +6,7 @@ from pathlib import Path
 
 app = FastAPI()
 
-DB_PATH = "/var/lib/sqlite/notifications.db"
+DB_PATH = "/var/lib/sqlite/45Drives/notifications.db"
 
 # Notification Schema
 class Notification(BaseModel):

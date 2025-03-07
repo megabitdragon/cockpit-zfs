@@ -13,7 +13,7 @@ from gi.repository import GLib
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
 # Define SQLite Database Path
-DB_PATH = "/var/lib/sqlite/notifications.db"
+DB_PATH = "/var/lib/sqlite/45Drives/notifications.db"
 
 def determine_severity(event, message):
     """Determine the severity of the notification based on event type."""
