@@ -41,31 +41,46 @@ make DESTDIR=%{buildroot} install
 %attr(0755, root, root) /opt/45drives/houston/houston-notify
 %attr(0755, root, root) /opt/45drives/houston/notification_api.py
 
+# ✅ Ensure SQLite Directory Exists and is Tracked
+%dir %attr(0775, www-data, www-data) /var/lib/sqlite
+
+# ✅ Track the Database File as a %ghost File
+%ghost %attr(0664, www-data, www-data) /var/lib/sqlite/notifications.db
 %post
 pip3 install --upgrade pip
-pip3 install fastapi
-pip3 install uvicorn
+pip3 install fastapi uvicorn
 dnf install -y sqlite || true  # Ensures SQLite is installed
-
-# Ensure systemd reloads and starts the service after installation
-systemctl daemon-reload
-systemctl enable houston-dbus.service
-systemctl enable fastapi-notifications.service
 
 # Ensure the SQLite database directory exists with correct permissions
 mkdir -p /var/lib/sqlite
 chown -R www-data:www-data /var/lib/sqlite
 chmod -R 775 /var/lib/sqlite
 
-# Initialize the SQLite database
-python3 -c "from notification_api import setup_database; setup_database()"
+# ✅ Create an empty SQLite database file if it does not exist
+if [ ! -f /var/lib/sqlite/notifications.db ]; then
+    touch /var/lib/sqlite/notifications.db
+    chown www-data:www-data /var/lib/sqlite/notifications.db
+    chmod 0664 /var/lib/sqlite/notifications.db
+fi
+
+# ✅ Initialize the database schema only if the file is empty
+if [ ! -s /var/lib/sqlite/notifications.db ]; then
+    python3 -c "from notification_api import setup_database; setup_database()"
+fi
+
+# Ensure systemd reloads and starts the service after installation
+systemctl daemon-reload
+systemctl enable houston-dbus.service fastapi-notifications.service
 
 # Start services only after setting up the database
 systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
+
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-44
+- fixed rpm package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-43
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-42
