@@ -1,3 +1,3 @@
-## zfs module 1.1.15-44
+## zfs module 1.1.15-45
 
-* fixed rpm package
+* build package

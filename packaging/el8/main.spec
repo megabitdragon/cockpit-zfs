@@ -7,7 +7,7 @@ URL: ::package_url::
 Source0: %{name}-%{version}.tar.gz
 BuildArch: ::package_architecture_el::
 Requires: ::package_dependencies_el_el8::
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+Requires(post): systemd, python3, sqlite
 
 %description
 ::package_title::
@@ -46,6 +46,7 @@ make DESTDIR=%{buildroot} install
 
 # ✅ Track the Database File as a %ghost File
 %ghost %attr(0664, www-data, www-data) /var/lib/sqlite/notifications.db
+
 %post
 pip3 install --upgrade pip
 pip3 install fastapi uvicorn
@@ -77,8 +78,12 @@ systemctl start houston-dbus.service || true
 systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
+%clean
+rm -rf %{buildroot}
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-45
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-44
 - fixed rpm package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-43
