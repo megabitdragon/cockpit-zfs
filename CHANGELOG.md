@@ -1,3 +1,3 @@
-## zfs module 1.1.15-47
+## zfs module 1.1.15-48
 
-* added jq dependency
+* build package

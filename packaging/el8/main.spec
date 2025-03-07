@@ -7,7 +7,7 @@ URL: ::package_url::
 Source0: %{name}-%{version}.tar.gz
 BuildArch: ::package_architecture_el::
 Requires: ::package_dependencies_el_el8::
-Requires(post): systemd, python3, sqlite
+Requires(post): systemd, python3, sqlite, jq
 
 %description
 ::package_title::
@@ -44,17 +44,15 @@ make DESTDIR=%{buildroot} install
 # ✅ Ensure SQLite Directory Exists and is Tracked
 %dir %attr(0775, www-data, www-data) /var/lib/sqlite
 
-
 %post
 pip3 install --upgrade pip
 pip3 install fastapi uvicorn
-dnf install -y sqlite jq || true  # Ensures SQLite and jq are installed
+dnf install -y sqlite jq || true  # ✅ Ensure jq is installed
 
 # Ensure the SQLite database directory exists with correct permissions
 mkdir -p /var/lib/sqlite
 chown -R www-data:www-data /var/lib/sqlite
 chmod -R 775 /var/lib/sqlite
-
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
@@ -69,6 +67,8 @@ systemctl restart zed
 rm -rf %{buildroot}
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-48
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-47
 - added jq dependency
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-45
