@@ -48,6 +48,7 @@ pip3 install fastapi uvicorn
 
 # ✅ Ensure SQLite is installed
 dnf install -y sqlite || true  
+dnf install -y jq || true  
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload

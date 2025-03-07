@@ -27,7 +27,7 @@ class Notification(BaseModel):
 
 # 🟢 Create SQLite Table If Not ExistsERROR: Could not find a version that satisfies the requirement sqlite3 (from versions: none)
 def setup_database():
-    Path(DB_PATH).parent.mkdir(parents=True)
+    Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)  # ✅ Prevents FileExistsError
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
