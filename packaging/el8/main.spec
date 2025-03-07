@@ -22,6 +22,10 @@ make OS_PACKAGE_RELEASE=el8
 
 %install
 make DESTDIR=%{buildroot} install
+# ✅ Ensure /var/lib/sqlite exists in BUILDROOT
+mkdir -p %{buildroot}/var/lib/sqlite
+chmod 0775 %{buildroot}/var/lib/sqlite
+chown -R www-data:www-data %{buildroot}/var/lib/sqlite
 
 %files
 /usr/share/cockpit/zfs/*
@@ -67,6 +71,8 @@ systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-53
+- build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-52
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-51
