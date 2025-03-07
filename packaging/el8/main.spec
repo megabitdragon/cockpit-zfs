@@ -22,10 +22,6 @@ make OS_PACKAGE_RELEASE=el8
 
 %install
 make DESTDIR=%{buildroot} install
-# ✅ Ensure /var/lib/sqlite exists in BUILDROOT
-mkdir -p %{buildroot}/var/lib/sqlite
-chmod 0775 %{buildroot}/var/lib/sqlite
-chown -R www-data:www-data %{buildroot}/var/lib/sqlite
 
 %files
 /usr/share/cockpit/zfs/*
@@ -46,7 +42,7 @@ chown -R www-data:www-data %{buildroot}/var/lib/sqlite
 %attr(0755, root, root) /opt/45drives/houston/houston-notify
 %attr(0755, root, root) /opt/45drives/houston/notification_api.py
 %dir /var/lib/sqlite
-%attr(0775, www-data, www-data) /var/lib/sqlite
+%attr(0775, root, root) /var/lib/sqlite
 
 %post
 pip3 install --upgrade pip
@@ -54,11 +50,6 @@ pip3 install fastapi uvicorn
 
 # ✅ Ensure SQLite is installed
 dnf install -y sqlite || true  
-
-# Ensure the SQLite database directory exists with correct permissions
-mkdir -p /var/lib/sqlite
-chown -R www-data:www-data /var/lib/sqlite
-chmod -R 775 /var/lib/sqlite
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
