@@ -60,6 +60,10 @@ systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15-61
+- build package -fixed multiple databasecall 
+* Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15.60-60
+- build package -fixed multiple databasecall 
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-60
 - build package
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-59

@@ -1,3 +1,3 @@
-## zfs module 1.1.15-60
+## zfs module 1.1.15-61
 
-* build package
+* build package -fixed multiple databasecall 
