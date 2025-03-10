@@ -98,87 +98,147 @@ export const notificationStore = reactive<{
     sideBarNotification();
 
   },
-
-  // Fetch missed notifications from FastAPI
   async fetchMissedNotifications() {
     try {
-      const http = (cockpit as any).http({
-        address: "127.0.0.1",
-        port: 8000, // FastAPI is running on this port
-      });
+        console.log("🔄 Fetching missed notifications via D-Bus...");
 
-      // Perform GET request to FastAPI
-      const response = await http.get("/missed-notifications/");
-      
-      if (!response) {
-        throw new Error("No response received from FastAPI.");
-      }
-      console.log("response " ,response)
-      // Parse response
-      const missedNotifications: Notification[] = JSON.parse(response);
+        const dbus = cockpit.dbus("org._45drives.Houston");
 
-      // Add notifications to store
-      missedNotifications.forEach((notification) => {
-        notificationStore.notifications.unshift(notification);
-      });
-      sideBarNotification();
+        // ✅ Call GetMissedNotifications with correct object path & interface
+        const response = await dbus.call(
+          "/org/_45drives/Houston",  // ✅ Object path (MUST match service)
+          "org._45drives.Houston",   // ✅ Interface name (MUST match service)
+          "GetMissedNotifications"   // ✅ Method name (MUST match service)
+      );
+        if (!response) throw new Error("❌ No response received from Houston D-Bus.");
 
-      console.log("Missed notifications fetched successfully.");
+        console.log("📥 Raw response from D-Bus:", response);
 
+        // ✅ Parse response JSON
+        const missedNotifications = JSON.parse(response);
+
+        // ✅ Add notifications to store
+        missedNotifications.forEach((notification) => {
+            notificationStore.notifications.unshift(notification);
+        });
+
+        // ✅ Update UI with new notifications
+        sideBarNotification();
+
+        console.log("✅ Missed notifications fetched successfully.");
     } catch (error) {
-      console.error("Error fetching missed notifications:", error);
+        console.error("❌ Error fetching missed notifications via D-Bus:", error);
     }
-  },
+},
+
+
+  // // Fetch missed notifications from FastAPI
+  // async fetchMissedNotifications() {
+  //   try {
+  //     const http = (cockpit as any).http({
+  //       address: "127.0.0.1",
+  //       port: 8000, // FastAPI is running on this port
+  //     });
+
+  //     // Perform GET request to FastAPI
+  //     const response = await http.get("/missed-notifications/");
+      
+  //     if (!response) {
+  //       throw new Error("No response received from FastAPI.");
+  //     }
+  //     console.log("response " ,response)
+  //     // Parse response
+  //     const missedNotifications: Notification[] = JSON.parse(response);
+
+  //     // Add notifications to store
+  //     missedNotifications.forEach((notification) => {
+  //       notificationStore.notifications.unshift(notification);
+  //     });
+  //     sideBarNotification();
+
+  //     console.log("Missed notifications fetched successfully.");
+
+  //   } catch (error) {
+  //     console.error("Error fetching missed notifications:", error);
+  //   }
+  // },
   
+  // async markNotificationAsRead(notificationId: number) {
+  //   try {
+  //     const http = (cockpit as any).http({
+  //       address: "127.0.0.1",
+  //       port: 8000, // FastAPI is running on this port
+  //     });
+  
+  //     const response = await http.request({
+  //       method: "PUT",
+  //       path: `/markNotificationAsRead/${notificationId}`, // ✅ Correct API path
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ received: 1 }) // ✅ Mark as read
+  //     });
+  
+  
+  //     // ✅ Check if the response is valid
+  //     if (!response) {
+  //       throw new Error("❌ No response received from FastAPI.");
+  //     }
+  
+  //   } catch (error) {
+  //     console.error("❌ Error marking notification as read:", error);
+  //   }
+  // },  
   async markNotificationAsRead(notificationId: number) {
     try {
-      const http = (cockpit as any).http({
-        address: "127.0.0.1",
-        port: 8000, // FastAPI is running on this port
-      });
-  
-      const response = await http.request({
-        method: "PUT",
-        path: `/markNotificationAsRead/${notificationId}`, // ✅ Correct API path
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ received: 1 }) // ✅ Mark as read
-      });
-  
-  
-      // ✅ Check if the response is valid
-      if (!response) {
-        throw new Error("❌ No response received from FastAPI.");
-      }
-  
+        console.log(`🔄 Marking notification ${notificationId} as read via D-Bus...`);
+
+        const dbus = cockpit.dbus("org._45drives.Houston");
+
+        // ✅ Call the D-Bus method instead of FastAPI
+        const response = await dbus.call(
+            "/org/_45drives/Houston",  // ✅ Object path
+            "org._45drives.Houston",   // ✅ Interface
+            "MarkNotificationAsRead",  // ✅ Method name
+            [notificationId]           // ✅ Argument (notification ID)
+        );
+
+        console.log(`✅ D-Bus Response: ${response}`);
+
+        // ✅ Remove from UI after marking as read
+        notificationStore.notifications = notificationStore.notifications.filter(
+            (n) => n.id !== notificationId
+        );
+
+        sideBarNotification();
+
     } catch (error) {
-      console.error("❌ Error marking notification as read:", error);
+        console.error("❌ Error marking notification as read via D-Bus:", error);
     }
-  },  
-  async  clearAllNotifications() {
-    console.log("🟠 Clearing all notifications...");
-  
+},
+
+  async clearAllNotifications() {
     try {
-      const http = (cockpit as any).http({
-        address: "127.0.0.1",
-        port: 8000, // FastAPI is running on this port
-      });
-  
-      // Send a PUT request to mark all as read
-      await http.request({
-        method: "PUT",
-        path: `/mark-all-read/`,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ received: 1 }) // Mark all as read
-      });
-  
-      // Remove all notifications from the UI
-      notificationStore.notifications = [];
-  
-      console.log("✅ All notifications dismissed.");
+        console.log("🔄 Marking all notifications as read via D-Bus...");
+
+        const dbus = cockpit.dbus("org._45drives.Houston");
+
+        // ✅ Call the new D-Bus method
+        const response = await dbus.call(
+            "/org/_45drives/Houston",  // ✅ Object path
+            "org._45drives.Houston",   // ✅ Interface
+            "MarkAllNotificationsAsRead"  // ✅ Method name
+        );
+
+        console.log(`✅ D-Bus Response: ${response}`);
+
+        // ✅ Clear UI notifications
+        notificationStore.notifications = [];
+
+        sideBarNotification();
     } catch (error) {
-      console.error("❌ Error dismissing all notifications:", error);
+        console.error("❌ Error clearing notifications via D-Bus:", error);
     }
-  },
+}
+
 
   
   

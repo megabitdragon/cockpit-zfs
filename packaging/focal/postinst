@@ -2,8 +2,6 @@
 set -e  # Exit immediately if a command exits with a non-zero status
 export DEBIAN_FRONTEND=noninteractive
 
-echo "[INFO] Installing FastAPI and Uvicorn..."
-pip3 install --no-cache-dir fastapi uvicorn
 
 # ✅ Ensure APT Lock is Released Before Installing jq
 echo "[INFO] Waiting for APT lock to release..."
@@ -35,11 +33,9 @@ systemctl daemon-reload
 
 echo "[INFO] Enabling services..."
 systemctl enable houston-dbus.service || true
-systemctl enable fastapi-notifications.service || true
 
 echo "[INFO] Starting services..."
 systemctl start houston-dbus.service || true
-systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 echo "[✅ SUCCESS] jq installed and services started!"

@@ -32,7 +32,6 @@ make DESTDIR=%{buildroot} install
 %attr(0755, root, root) /etc/zfs/zed.d/*
 
 # Systemd service files (DO NOT use %config for these)
-/etc/systemd/system/fastapi-notifications.service
 /etc/systemd/system/houston-dbus.service
 
 # 45Drives Houston files (ensure executability)
@@ -40,11 +39,10 @@ make DESTDIR=%{buildroot} install
 %dir /opt/45drives/houston
 %attr(0755, root, root) /opt/45drives/houston/dbus_server.py
 %attr(0755, root, root) /opt/45drives/houston/houston-notify
-%attr(0755, root, root) /opt/45drives/houston/notification_api.py
+%attr(0755, root, root) /opt/45drives/houston/setup_notification_db.py
 
 %post
 pip3 install --upgrade pip
-pip3 install fastapi uvicorn
 
 # ✅ Ensure SQLite is installed
 dnf install -y sqlite || true  
@@ -52,14 +50,16 @@ dnf install -y jq || true
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
-systemctl enable houston-dbus.service fastapi-notifications.service
+systemctl enable houston-dbus.service
 
 # Start services only after setting up the database
 systemctl start houston-dbus.service || true
-systemctl start fastapi-notifications.service || true
 systemctl restart zed
 
 %changelog
+* Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15-63
+- build pacakge -removed fastapi
+- build pacakge -removed fastapi
 * Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15-61
 - build package -fixed multiple databasecall 
 * Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15.60-60

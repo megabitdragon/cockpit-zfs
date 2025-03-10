@@ -1,3 +1,4 @@
-## zfs module 1.1.15-61
+## zfs module 1.1.15-63
 
-* build package -fixed multiple databasecall 
+* build pacakge -removed fastapi
+* build pacakge -removed fastapi

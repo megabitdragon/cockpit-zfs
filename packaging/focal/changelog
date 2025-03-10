@@ -1,3 +1,10 @@
+cockpit-zfs (1.1.15-63focal) focal; urgency=medium
+
+  * build pacakge -removed fastapi
+  * build pacakge -removed fastapi
+
+ -- Rachit Hans <rhans@45drives.com>  Mon, 10 Mar 2025 09:11:11 -0300
+
 cockpit-zfs (1.1.15-61focal) focal; urgency=medium
 
   * build package -fixed multiple databasecall 

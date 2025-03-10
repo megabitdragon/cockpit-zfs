@@ -113,6 +113,88 @@ def store_notification(message):
 
     finally:
         conn.close()  
+def get_missed_notifications():
+    """Fetch missed notifications (received = 0), mark them as received, and return as JSON."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    try:
+        print("[DEBUG] Executing SQL Query to fetch missed notifications")
+        cursor.execute("""
+            SELECT id, timestamp, event, pool, vdev, state, error, description, scrub_details, 
+                   errors, repaired, received, health, severity
+            FROM notifications WHERE received = 0
+        """)
+        
+        rows = cursor.fetchall()
+        print(f"[DEBUG] Raw Rows from DB: {rows}")
+
+        # Convert rows into a structured list
+        notifications = [
+            {
+                "id": row[0], "timestamp": row[1], "event": row[2], "pool": row[3],
+                "vdev": row[4], "state": row[5], "error": row[6], "description": row[7],
+                "scrub_details": row[8], "errors": row[9], "repaired": row[10],
+                "received": row[11], "health": row[12], "severity": row[13]
+            }
+            for row in rows
+        ]
+
+        conn.commit()
+
+        print(f"[DEBUG] Missed Notifications Processed: {notifications}")
+
+        return json.dumps(notifications)  # ✅ Return JSON for easy integration with D-Bus
+
+    except Exception as e:
+        print(f"❌ [DB Error] Failed to fetch missed notifications: {e}")
+        return json.dumps([])  # Return an empty list on failure
+
+    finally:
+        conn.close()  # ✅ Always close the database connection
+def mark_notification_as_read(notification_id):
+    """Mark a specific notification as read by setting received = 1"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        # Update notification to mark as read
+        cursor.execute("UPDATE notifications SET received = 1 WHERE id = ?", (notification_id,))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return "❌ Notification not found"
+
+        conn.close()
+        return f"✅ Notification {notification_id} marked as read"
+
+    except Exception as e:
+        return f"❌ DB Error: {str(e)}"
+def mark_all_notifications_as_read():
+    """Mark all unread notifications as read via D-Bus."""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        # Check if any notifications are unread
+        cursor.execute("SELECT COUNT(*) FROM notifications WHERE received = 0")
+        unread_count = cursor.fetchone()[0]
+
+        if unread_count == 0:
+            conn.close()
+            return "No unread notifications to mark as read."
+
+        # Update only if there are unread notifications
+        cursor.execute("UPDATE notifications SET received = 1 WHERE received = 0")
+        conn.commit()
+        conn.close()
+
+        return f"✅ Marked {unread_count} notifications as read"  # ✅ Ensure string return type
+
+    except Exception as e:
+        return f"❌ DB Error: {str(e)}"  # ✅ Return error as a string
+
+
 
 class DBusService(dbus.service.Object):
     """D-Bus Service to handle incoming messages and forward valid ones to the UI."""
@@ -142,6 +224,20 @@ class DBusService(dbus.service.Object):
 
         except json.JSONDecodeError:
             print("❌ Error: Invalid JSON format received")
+    @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
+    def GetMissedNotifications(self):
+        """D-Bus method to retrieve missed notifications in JSON format."""
+        return get_missed_notifications()
+    @dbus.service.method("org._45drives.Houston", in_signature="i", out_signature="s")
+    def MarkNotificationAsRead(self, notification_id):
+        return mark_notification_as_read(notification_id)
+    @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
+    def MarkAllNotificationsAsRead(self):
+        return mark_all_notifications_as_read()
+    
+
+        
+    
 
 # Setup D-Bus
 bus = dbus.SystemBus()
