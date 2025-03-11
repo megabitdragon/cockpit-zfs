@@ -21,8 +21,27 @@
 							<!-- Dropdown Menu Items -->
 							<MenuItems @click.stop class="absolute right-0 overflow-y-scroll z-10 w-[30rem] max-h-[40rem] origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 								<div class="flex items-center justify-between text-xl p-4 border-b border-gray-300">
-								<p>Notifications</p>
-								<!-- <Cog6ToothIcon class="w-[2rem] h-[2rem]" /> -->
+									<p>Notifications</p>
+									<div class="relative inline-block">
+										<!-- Dropdown Trigger: Cog Icon -->
+										<button @click="toggleDropdown" class="focus:outline-none">
+											<Cog6ToothIcon class="w-[2rem] h-[2rem] text-gray-300 hover:text-white transition duration-200" />
+										</button>
+
+										<!-- Dropdown Menu -->
+										<transition name="fade">
+											<div v-if="showDropdown" class="absolute right-0 mt-1 w-56 bg-gray-800 rounded-lg shadow-lg z-50 border border-gray-700">
+												<button
+												@click="openEmailSettings"
+												class="block px-4 py-2 text-base text-left text-white hover:bg-gray-700 w-full transition duration-800"
+												>
+												Email Notifications
+												</button>
+											</div>
+										</transition>
+									</div>	
+									<EmailSetupModal v-if="emailSetUpModal" @close="emailSetUpModal = false" />
+							
 								</div>
 
 								<!-- Notification Items -->
@@ -236,7 +255,6 @@
 
 			</div>
 		</div>
-
 	
 	</div>
 </template>
@@ -253,9 +271,14 @@ import { BellIcon, Cog6ToothIcon, CheckCircleIcon,ExclamationCircleIcon, XMarkIc
 import {Menu,MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { ref, watch } from 'vue';
 import { notificationStore } from "../../store/notification";
+import EmailSetupModal from './EmailSetupModal.vue';
 
 // Reactive state to track menu visibility
 const menuOpen = ref(false);
+
+const showDropdown = ref(false);
+
+const emailSetUpModal = ref(false);
 
 // Watch for menu state changes and control page scrolling
 watch(menuOpen, (isOpen) => {
@@ -274,10 +297,14 @@ async function dismissAllNotifications() {
   await notificationStore.clearAllNotifications();
  notificationStore.removeAllNotifications();
 }
-// onMounted(() => {
-//   notificationStore.fetchMissedNotifications();
-//   console.log("hello from navigation notification")
-// });
 
 
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
+};
+const openEmailSettings = () => {
+	console.log("Opening Email Settings...");
+	emailSetUpModal.value = true;
+	showDropdown.value = false; // Close dropdown when opening modal
+};
 </script>
