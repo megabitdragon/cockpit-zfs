@@ -57,6 +57,9 @@ systemctl start houston-dbus.service || true
 systemctl restart zed
 
 %changelog
+* Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-3
+- build  package for notifications
+- build  package for notifications
 * Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-2
 - build  package for notifications
 * Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15-63
@@ -98,6 +101,12 @@ systemctl restart zed
 - build package for testing for notifications
 * Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-40
 - Alerts branch working
+* Fri Mar 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.17-1
+- Updates get_disks.py script to handle lsblk command to account for flag difference
+  in versions, and skips boot drives when returning disks via lsblk
+* Thu Mar 06 2025 Jordan Keough <jkeough@45drives.com> 1.1.16-1
+- Fixes a bug with RaidZ error handling not working when creating pool or adding
+  vdev
 * Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-39
 - final build package for testing
 * Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-38
@@ -165,12 +174,6 @@ systemctl restart zed
 - Testin Pakcgae installation
 * Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.14-y
 - Testin Pakcgae installation
-* Fri Mar 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.17-1
-- Updates get_disks.py script to handle lsblk command to account for flag difference
-  in versions, and skips boot drives when returning disks via lsblk
-* Thu Mar 06 2025 Jordan Keough <jkeough@45drives.com> 1.1.16-1
-- Fixes a bug with RaidZ error handling not working when creating pool or adding
-  vdev
 * Tue Feb 25 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-6
 - fix snapshot list/notification bugs
 * Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-5
