@@ -26,7 +26,7 @@ const version = __APP_VERSION__;
 
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
-	onMounted(() => {
+onMounted(() => {
   notificationStore.fetchMissedNotifications();
   console.log("hello from navigation notification in app vue" )
 });

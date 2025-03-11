@@ -30,7 +30,7 @@ def determine_severity(event, message):
     if event in ["pool_import", "pool_degraded"] and health == "DEGRADED":
         return "warning"  # ⚠️ Pool degraded
         
-    if event == "statechange" and (state == "FAULTED" or state == "DEGRADED"):
+    if event == "statechange" and (state == "FAULTED" or state == "DEGRADED" or state == "REMOVED"):
         return "error"  
 
     return "info"  # ℹ️ Default for general notifications

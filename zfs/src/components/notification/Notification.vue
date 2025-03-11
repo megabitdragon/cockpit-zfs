@@ -12,7 +12,7 @@
 								<BellIcon class="w-8 h-8 text-white-700" aria-hidden="true" />
 								
 								<!-- Notification Badge -->
-								<span class="absolute -top-2 -right-2 max-h-[80vh] overflow-y-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold px-1">
+								<span v-if="notificationStore.notifications.length > 0" class="absolute -top-2 -right-2 max-h-[80vh] overflow-y-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold px-1">
 									{{notificationStore.notifications.length }}
 								</span>
 								</div>
@@ -61,7 +61,7 @@
 
 											<!-- Show Errors if Found -->
 											<p class="pl-4 text-sm" v-if="notification.errors && notification.errors !== '0' && notification.errors !== 'null'">
-    											<strong>Errors Detected:</strong> <span class="text-yellow-500">{{ notification.errors }}</span>
+												<strong>Errors Detected:</strong> <span class="text-yellow-500">{{ notification.errors }}</span>
 											</p>
 
 										</div>
@@ -192,7 +192,7 @@
 										<div class="w-full">
 										<p class="text-xl font-semibold" :class="{
 											'text-green-500': notification.state === 'ONLINE',
-											'text-red-600': notification.state === 'FAULTED' ||  notification.state === 'REMOVED' ||notification.state === 'DEGRADED',
+											'text-red-600': notification.state === 'FAULTED' ||  notification.state === 'REMOVED' ||notification.state === 'DEGRADED' || notification.state === 'OFFLINE',
 										}">
 											{{ notification.event.replace("_", " ").toUpperCase() }} - {{ notification.pool }}
 										</p>
@@ -202,7 +202,7 @@
 											<br><strong>Status: </strong>  
 											<span :class="{
 											'text-green-500': notification.state === 'ONLINE',
-											'text-red-500': notification.state === 'FAULTED' || notification.state === 'REMOVED' || notification.state === 'DEGRADED',
+											'text-red-500': notification.state === 'FAULTED' || notification.state === 'REMOVED' || notification.state === 'DEGRADED' || notification.state === 'OFFLINE',
 											}">
 											{{ notification.state }}
 											</span>
@@ -260,9 +260,9 @@ const menuOpen = ref(false);
 // Watch for menu state changes and control page scrolling
 watch(menuOpen, (isOpen) => {
   if (isOpen) {
-    document.body.classList.add("no-scroll"); // 🚀 Disable scrolling
+	document.body.classList.add("no-scroll"); // 🚀 Disable scrolling
   } else {
-    document.body.classList.remove("no-scroll"); // ✅ Enable scrolling
+	document.body.classList.remove("no-scroll"); // ✅ Enable scrolling
   }
 });
 // Ensure scrolling is enabled if the component unmounts

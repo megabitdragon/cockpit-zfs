@@ -79,8 +79,9 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 	setUpMessageHandler((message) => {
         console.log("Received DBus Message:", message);
     });
-console.log("hello after")
+	console.log("hello after")
 }
+
 async function setUpMessageHandler(handler) {
     try {
         console.log("Setting up DBus message handler...");

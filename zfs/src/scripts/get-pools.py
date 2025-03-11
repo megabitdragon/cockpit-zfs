@@ -61,10 +61,11 @@ def main():
                 z_pools.append(pool)
 
             logger.info(f"Pools discovered: {len(z_pools)}")
-            print(json.dumps(z_pools, indent=4))
-            
+            print(json.dumps(z_pools, indent=4, default=str))
+
     except Exception as e:
         logger.error(f"Exception in main: {str(e)}")
+        print(json.dumps([]))
 
 if __name__ == '__main__':
     main()

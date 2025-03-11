@@ -104,7 +104,8 @@ def get_boot_disk():
             return None
 
         # Convert partition (e.g., /dev/sda2) to the parent disk (/dev/sda)
-        parent_disk = re.sub(r'\d+$', '', boot_device)
+        # parent_disk = re.sub(r'\d+$', '', boot_device)
+        parent_disk = re.sub(r'(p?\d+)$', '', boot_device)
 
         # print(f"Detected boot disk: {parent_disk}")
         return parent_disk
@@ -141,7 +142,7 @@ def get_lsblk_disks(nvme_only=False):
                 continue  
             
              # Skip the boot disk
-            if device_name == boot_drive:
+            if device_name == boot_drive or boot_drive in device_name:
                 logger.info(f"Skipping boot drive: {device_name}")
                 continue
 

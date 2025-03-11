@@ -16,6 +16,7 @@ export async function getPools() {
 	try {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_pools_script], { superuser: 'try' });
 		const pools = (await state.promise()).stdout;
+		// console.log('getPools stdout:', pools);
 		return pools;
 	} catch (state) {
 		const errorMessage = errorString(state);

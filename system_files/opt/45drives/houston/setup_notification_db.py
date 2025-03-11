@@ -1,26 +1,8 @@
 import sqlite3
-from pydantic import BaseModel
-from typing import List, Optional
 from pathlib import Path
 
 DB_PATH = "/var/lib/sqlite/45Drives/notifications.db"
 
-# Notification Schema
-class Notification(BaseModel):
-    id: Optional[int] = None
-    timestamp: str
-    event: str
-    pool: Optional[str] = None
-    vdev: Optional[str] = None
-    state: Optional[str] = None
-    error: Optional[str] = None
-    description: Optional[str] = None
-    scrub_details: Optional[str] = None
-    errors: Optional[str] = None
-    repaired: Optional[str] = None
-    received: int = 0  # 0 = unread, 1 = read
-    health: Optional[str] = None
-    severity: Optional[str] = "info"
 
 # 🟢 Create SQLite Table If Not ExistsERROR: Could not find a version that satisfies the requirement sqlite3 (from versions: none)
 def setup_database():
