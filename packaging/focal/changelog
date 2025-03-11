@@ -1,9 +1,29 @@
+cockpit-zfs (1.1.17-2focal) focal; urgency=medium
+
+  * build  package for notifications
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 11 Mar 2025 13:14:29 -0300
+
 cockpit-zfs (1.1.15-63focal) focal; urgency=medium
 
   * build pacakge -removed fastapi
   * build pacakge -removed fastapi
 
  -- Rachit Hans <rhans@45drives.com>  Mon, 10 Mar 2025 09:11:11 -0300
+ 
+cockpit-zfs (1.1.17-1focal) focal; urgency=medium
+
+  * Updates get_disks.py script to handle lsblk command to account for flag difference
+    in versions, and skips boot drives when returning disks via lsblk
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 07 Mar 2025 07:32:16 -0400
+
+ cockpit-zfs (1.1.16-1focal) focal; urgency=medium
+
+ * Fixes a bug with RaidZ error handling not working when creating pool or adding
+   vdev
+
+-- Jordan Keough <jkeough@45drives.com>  Thu, 06 Mar 2025 12:26:59 -0400
 
 cockpit-zfs (1.1.15-61focal) focal; urgency=medium
 

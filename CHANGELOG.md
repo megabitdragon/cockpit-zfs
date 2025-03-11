@@ -1,4 +1,3 @@
-## zfs module 1.1.15-63
+## zfs module 1.1.17-2
 
-* build pacakge -removed fastapi
-* build pacakge -removed fastapi
+* build  package for notifications

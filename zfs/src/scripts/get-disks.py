@@ -211,7 +211,6 @@ def get_lsblk_disks(nvme_only=False):
         logger.error(f"Exception in get_lsblk_disks: {str(e)}")
         return []
 
-
 def get_smartctl_data(device):
     """Runs smartctl to get additional information like temperature, power-on time, and health status."""
     try:
