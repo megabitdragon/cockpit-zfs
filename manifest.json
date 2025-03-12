@@ -32,13 +32,13 @@
     "builds": [
         {
             "image": "node-ubuntu-focal-builder",
-            "codeName": "ubuntu-focal",
+            "os_name": "ubuntu-focal",
             "group": "ubuntu"
         },
         
         {
             "image": "node-rocky-el8-builder",
-            "codeName": "rocky-el8",
+            "os_name": "rocky-el8",
             "group": "rocky"
         }
     ],
