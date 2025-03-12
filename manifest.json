@@ -1,53 +1,50 @@
 {
-    "__version": "45D-R2",
+    "schema_version": "45D_AP_V2.0",
     "name": "cockpit-zfs",
     "title": "zfs module",
-    "prerelease": false,
+    "stable": false,
     "version": "1.1.17",
-    "buildVersion": "1",
+    "build_number": "1",
     "author": "Jordan Keough <jkeough@45drives.com>",
-    "url": "https://github.com/45Drives/cockpit-zfs-45d",
-    "category": "utils",
-    "priority": "optional",
-    "licence": "GPL-3.0+",
+    "git_url": "https://github.com/45Drives/cockpit-zfs-45d",
+    "license": "GPL-3.0+",
     "architecture": {
-        "deb": "all",
-        "el": "noarch"
+        "ubuntu": "all",
+        "rocky": "noarch"
     },
-    "description": {
-        "long": "zfs manager for cockpit",
-        "short": "zfs manager for cockpit"
-    },
+    "description": "zfs manager for cockpit",
     "defaults": {
         "urgency": "medium"
     },
     "dependencies": {
-        "deb": {
-            "focal": [
-                "cockpit",
-                "python3",
-                "python3-libzfs"
-            ]
-        },
-        "el": {
-            "el8": [
-                "cockpit",
-                "python3",
-                "python3-libzfs"
-            ]
-        }
+        "ubuntu_common": [
+            "cockpit",
+            "python3",
+            "python3-libzfs"
+
+        ],
+        "rocky_common": [
+           "cockpit",
+            "python3",
+            "python3-libzfs"
+        ]
     },
-    "releases": [
+    "builds": [
         {
             "image": "node-ubuntu-focal-builder",
-            "codeName": "focal",
-            "type": "deb"
+            "codeName": "ubuntu-focal",
+            "group": "ubuntu"
         },
+        
         {
             "image": "node-rocky-el8-builder",
-            "codeName": "el8",
-            "type": "el"
+            "codeName": "rocky-el8",
+            "group": "rocky"
         }
+    ],
+    "repos": [
+        "community",
+        "enterprise"
     ],
     "changelog": {
         "urgency": "medium",
