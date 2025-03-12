@@ -1,12 +1,13 @@
 <template>
-    <Modal :show="emailSetUpModal" class=" !w-3/5 !mt-28 rounded-lg">
+    <OldModal :isOpen="emailSetUpModal" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <!-- <OldModal @close="closeModal" :isOpen="showAddVDevModal" :marginTop="props.marginTop" :width="'w-3/5'"
         :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false"> -->
-        <CardContainer class="!w-3/5 !mt-28 mx-auto rounded-lg">
-            <template v-slot:header>
+            <template v-slot:title>
                 Email Notification Settings
             </template>
             <!-- <template v-slot:content> -->
+            <template v-slot:content>
+
             <div>
                 <div class="space-y-4">
                     <div class="flex justify-center space-x-2">
@@ -23,37 +24,37 @@
                     <div v-if="emailProvider === 'smtp'" class="space-y-3">
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Email Address  <InfoTile class="ml-1"
-                            :title="`How long to keep source snapshots for. Leave at 0 to keep ALL snapshots.\nWARNING: Disabling an automated task's schedule for a period of time longer than the retention interval and re-enabling the schedule may result in a purge of snapshots.`" />
-                            </label>
+                                :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
                             <input v-model="emailConfig.email" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
                         </div>
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">SMTP Server <InfoTile class="ml-1"
-                                :title="`How long to keep source snapshots for. Leave at 0 to keep ALL snapshots.\nWARNING: Disabling an automated task's schedule for a period of time longer than the retention interval and re-enabling the schedule may result in a purge of snapshots.`" />
+                                :title="`The address of the outgoing mail server. Example: smtp.gmail.com for Gmail, or smtp.office365.com for Outlook.`" />
                             </label>
                             <input v-model="emailConfig.smtpServer" type="text" placeholder="smtp.example.com" class="w-[50%] p-2 border rounded" />
                         </div>
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">SMTP Port <InfoTile class="ml-1"
-                                :title="`How long to keep source snapshots for. Leave at 0 to keep ALL snapshots.\nWARNING: Disabling an automated task's schedule for a period of time longer than the retention interval and re-enabling the schedule may result in a purge of snapshots.`" />
+                                :title="`The port number used to connect to the SMTP server.\nCommon values:\n- 25: Non-secure SMTP\n- 465: Secure SMTP (SSL)\n- 587: Secure SMTP (STARTTLS)`" />
                             </label>
                             <input v-model="emailConfig.smtpPort" type="number" placeholder="587" class="w-[50%] p-2 border rounded" />
                         </div>
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Username <InfoTile class="ml-1"
-                                :title="`How long to keep source snapshots for. Leave at 0 to keep ALL snapshots.\nWARNING: Disabling an automated task's schedule for a period of time longer than the retention interval and re-enabling the schedule may result in a purge of snapshots.`" />
-                            </label>
+                                :title="`The login username for authentication with the SMTP server. Usually the same as the sender email address.`" />                            </label>
                             <input v-model="emailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
                         </div>
                         <div class="flex justify-center space-x-2">  
                             <label class="block  w-[25%] text-md font-medium">Password <InfoTile class="ml-1"
-                                :title="`How long to keep source snapshots for. Leave at 0 to keep ALL snapshots.\nWARNING: Disabling an automated task's schedule for a period of time longer than the retention interval and re-enabling the schedule may result in a purge of snapshots.`" />
+                                :title="`The password or app-specific password used for authenticating with the SMTP server.\nNote: Some providers require an app password instead of the regular account password.`" />
                             </label>
                             <input  v-model="emailConfig.password" type="password" placeholder="••••••••" class="w-[50%] p-2 border rounded" />
                         </div>
                         <div class="flex justify-center space-x-2">
                             <input type="checkbox" v-model="emailConfig.tls" class="h-4 w-4" />
-                            <label>Enable TLS</label>
+                            <label>Enable TLS             <InfoTile class="ml-1"
+                                :title="`Enable Transport Layer Security (TLS) encryption for secure email transmission.\nThis is required for most modern SMTP providers using port 587.`" />
+                            </label>
                         </div>
                     </div>
 
@@ -77,10 +78,9 @@
                     </div>            
                 </div>
             </div>
-         
-        </CardContainer>
+         </template>
         <!-- </OldModal> -->
-    </Modal>
+    </OldModal>
 </template>
 
 <style>
@@ -95,6 +95,7 @@ import { ref, inject, Ref, computed, watch, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import {Modal, CardContainer } from '@45drives/houston-common-ui';
 import InfoTile from '../common/InfoTile.vue';
+import OldModal from '../common/OldModal.vue';
 
 const emailSetUpModal = ref(false);
 const emailProvider = ref("smtp");
@@ -107,7 +108,6 @@ const emailConfig = ref({
     tls: true
 });
 const closeModal = () => {
-    emailSetUpModal.value = false;
     emit('close');
 }
 const emit = defineEmits(['close']);
