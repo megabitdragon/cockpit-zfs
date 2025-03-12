@@ -31,13 +31,13 @@
     },
     "builds": [
         {
-            "image": "node-ubuntu-focal-builder",
+            "image": "ci.cr.45d.io/ci/simple/ubuntu-focal:1",
             "os_name": "ubuntu-focal",
             "group": "ubuntu"
         },
         
         {
-            "image": "node-rocky-el8-builder",
+            "image": "ci.cr.45d.io/ci/simple/rocky-el8:1",
             "os_name": "rocky-el8",
             "group": "rocky"
         }
