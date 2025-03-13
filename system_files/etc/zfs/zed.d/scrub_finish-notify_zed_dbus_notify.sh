@@ -26,8 +26,6 @@ EMAIL_SUBJECT="ZFS Alert: $EVENT_POOL - $EVENT_CLASS"
 EMAIL_MESSAGE="Timestamp: $EVENT_TIMESTAMP\nPool: $EVENT_POOL\nState: $EVENT_STATE\nErrors: $EVENT_ERRORS\nGUID: $EVENT_POOL_GUID"
 
 
-# ✅ Step 1: Forward Message to Houston D-Bus
 python3 "$DBUS_CLIENT" forward "$FORWARD_MESSAGE"
 
-# ✅ Step 2: Send Email Notification via D-Bus
 python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE"
