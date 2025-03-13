@@ -20,4 +20,6 @@ MESSAGE=$(jq -n \
   '{timestamp: $timestamp, event: $event, pool: $pool, vdev: $vdev, state: $state}')
 
 # Send the message to D-Bus
-python3 "$DBUS_CLIENT" "$MESSAGE"
+python3 "$DBUS_CLIENT" forward "$FORWARD_MESSAGE"
+
+python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE"

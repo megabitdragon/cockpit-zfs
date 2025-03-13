@@ -25,4 +25,6 @@ MESSAGE=$(jq -n \
 echo "Sending JSON: $MESSAGE"
 
 # Send the message to Houston D-Bus service
-python3 "$DBUS_CLIENT" "$MESSAGE"
+python3 "$DBUS_CLIENT" forward "$FORWARD_MESSAGE"
+
+python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE"

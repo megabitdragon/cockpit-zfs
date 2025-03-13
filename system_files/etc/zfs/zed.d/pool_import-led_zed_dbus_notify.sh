@@ -51,4 +51,6 @@ fi
 echo "Generated JSON: $MESSAGE"
 
 # ✅ Send to Houston DBus
-python3 "$DBUS_CLIENT" "$MESSAGE"
+python3 "$DBUS_CLIENT" forward "$FORWARD_MESSAGE"
+
+python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE"

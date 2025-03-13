@@ -4,16 +4,26 @@ import dbus.mainloop.glib
 import sqlite3
 import gi
 import json
+import os
 from datetime import datetime
+import subprocess
+import logging
 
 gi.require_version("GLib", "2.0")
 from gi.repository import GLib
 
+LOG_FILE = "/var/log/msmtp_test.log"
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 # Initialize DBus
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
 # Define SQLite Database Path
 DB_PATH = "/var/lib/sqlite/45Drives/notifications.db"
+MSMTP_CONFIG_PATH = "/etc/45drives/msmtp"
 
 def determine_severity(event, message):
     """Determine the severity of the notification based on event type."""
@@ -35,84 +45,82 @@ def determine_severity(event, message):
 
     return "info"  # ℹ️ Default for general notifications
 
-def store_notification(message):
-    """Stores notifications in SQLite DB, updates statechange events if necessary, and returns the message with ID."""
-    print(f"[DEBUG] Attempting to store: {message}")  
+import subprocess
+import json
+import logging
 
+# Configure logging
+LOG_FILE = "/var/log/msmtp_test.log"
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+def sendTestEmail(config_json):
+    """
+    Sends a test email using msmtp without requiring /etc/msmtprc.
+    Logs all activities to /var/log/msmtp_test.log.
+    """
     try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
+        logging.info("📨 Sending test email via msmtp...")
+        logging.getLogger().handlers[0].flush()  # ✅ Force log to write immediately
 
-        print(f"[DEBUG] Checking if {message.get('event')} already exists")
+        # ✅ Parse SMTP details from UI
+        config = json.loads(config_json)
 
-        # ✅ Check if a similar event exists (for statechange updates)
-        cursor.execute("""
-            SELECT id, state, health FROM notifications
-            WHERE event = ? AND timestamp = ? AND vdev = ?;
-        """, (message["event"], message["timestamp"], message.get("vdev", None)))
+        smtp_server = config.get("smtpServer", "").strip()
+        smtp_port = str(config.get("smtpPort", 587))
+        username = config.get("username", "").strip()
+        password = config.get("password", "").strip()
+        sender_email = config.get("email", "").strip()
+        recipient_email = config.get("recipientEmail", "").strip()
 
-        existing_event = cursor.fetchone()
+        # ✅ Debugging: Show recipient email before sending
+        logging.info(f"📨 Debug: Recipient Email -> {repr(recipient_email)}")
+        logging.getLogger().handlers[0].flush()  # ✅ Flush logs
 
-        if existing_event:
-            existing_id, existing_state, existing_health = existing_event
+        # ✅ Ensure recipient email is valid
+        if not recipient_email or "@" not in recipient_email:
+            logging.error("❌ Error: Invalid recipient email format.")
+            logging.getLogger().handlers[0].flush()
+            return "❌ Error: Invalid recipient email format."
 
-            # ✅ If it's a statechange event and the state or health has changed, update it
-            if message["event"] == "statechange" and (existing_state != message.get("state") or existing_health != message.get("health")):
-                new_severity = determine_severity(message.get("event"), message)  # ✅ Recalculate severity
-                
-                cursor.execute("""
-                    UPDATE notifications
-                    SET state = ?, severity = ?, health = ?
-                    WHERE id = ?;
-                """, (
-                    message.get("state"),
-                    new_severity,
-                    message.get("health", None),
-                    existing_id
-                ))
-                conn.commit()
-                print(f"✅ [UPDATE] Statechange event updated: {message}")  
+        logging.info(f"📨 Sending test email to: {recipient_email}")
+        logging.getLogger().handlers[0].flush()
 
-                # ✅ Include `id` and `severity` in the returned message
-                message["id"] = existing_id
-                message["severity"] = new_severity
-                return message  
+        # ✅ Construct Email Content
+        email_content = f"Subject: Test Email from 45Drives\n\nThis is a test email."
+        
+        # ✅ Proper `msmtp` Command
+        msmtp_command = f"echo -e '{email_content}' | msmtp --host={smtp_server} --port={smtp_port} --auth=on --user={username} --passwordeval='echo {password}' --from={sender_email} --tls --tls-starttls {recipient_email}"
 
-            print(f"❌ Duplicate detected, skipping insert: {message}")
-            return None  
+        # ✅ Execute the command
+        process = subprocess.run(
+            msmtp_command,
+            shell=True,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
 
-        # ✅ Insert new notification if no matching event found
-        severity = determine_severity(message.get("event"), message)  # ✅ Get severity for new events
-
-        cursor.execute("""
-            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity, health, errors)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-        """, (
-            message.get("timestamp"),
-            message.get("event"),
-            message.get("pool"),
-            message.get("vdev", None),
-            message.get("state", None),
-            severity,
-            message.get("health", None),
-            message.get("errors", 0)  # ✅ Added errors field with a default of 0
-        ))
-
-        conn.commit()
-        notification_id = cursor.lastrowid  # ✅ Get the new row ID
-        print(f"✅ [INSERT] New event stored: {message}")  
-
-        # ✅ Include `id` and `severity` in the returned message
-        message["id"] = notification_id
-        message["severity"] = severity
-        return message  
+        # ✅ Check if the email was sent successfully
+        if process.returncode == 0:
+            success_msg = f"✅ Test email sent to {recipient_email} successfully!"
+            logging.info(success_msg)
+            logging.getLogger().handlers[0].flush()
+            return success_msg
+        else:
+            error_message = f"❌ Failed to send test email: {process.stderr.strip()}"
+            logging.error(error_message)
+            logging.getLogger().handlers[0].flush()
+            return error_message
 
     except Exception as e:
-        print(f"❌ [DB Insert Error] {e}")
-        return None  
-
-    finally:
-        conn.close()  
+        error_message = f"❌ Error sending test email: {str(e)}"
+        logging.error(error_message)
+        logging.getLogger().handlers[0].flush()
+        return error_message
 def get_missed_notifications():
     """Fetch missed notifications (received = 0), mark them as received, and return as JSON."""
     conn = sqlite3.connect(DB_PATH)
@@ -193,8 +201,94 @@ def mark_all_notifications_as_read():
 
     except Exception as e:
         return f"❌ DB Error: {str(e)}"  # ✅ Return error as a string
+import subprocess
+import json
 
+def updateSMTPConfig(config_json):
+    """
+    Updates the SMTP configuration in /etc/45Drives/msmtp and stores recipient email.
+    """
+    try:
+        print("🔄 Updating SMTP config...")  # Debugging log
 
+        config = json.loads(config_json)
+
+        email = config.get("email", "")
+        smtp_server = config.get("smtpServer", "")
+        smtp_port = config.get("smtpPort", 587)
+        username = config.get("username", "")
+        password = config.get("password", "")
+        recipient_email = config.get("recieversEmail", "")  # ✅ Store recipient permanently
+        tls = "on" if config.get("tls", True) else "off"
+
+        # ✅ Save password securely in a separate file
+        with open("/etc/45Drives/msmtp_pass", "w") as f:
+            f.write(password)
+        os.chmod("/etc/45Drives/msmtp_pass", 0o600)  # Secure permissions
+
+        # ✅ Store SMTP config in msmtp file
+        config_content = f"""account default
+host {smtp_server}
+port {smtp_port}
+auth on
+user {username}
+passwordeval cat /etc/45Drives/msmtp_pass
+from {email}
+tls {tls}
+tls_starttls on
+"""
+
+        # ✅ Store recipient email in a separate file
+        with open("/etc/45Drives/msmtp_recipient", "w") as f:
+            f.write(recipient_email)
+        os.chmod("/etc/45Drives/msmtp_recipient", 0o600)  # Secure permissions
+
+        # ✅ Write SMTP config
+        with open("/etc/45Drives/msmtp", "w") as f:
+            f.write(config_content)
+        os.chmod("/etc/45Drives/msmtp", 0o600)  # Secure permissions
+
+        print("✅ SMTP configuration updated successfully!")
+        return "✅ SMTP configuration updated successfully!"
+
+    except Exception as e:
+        return f"❌ Error updating SMTP: {str(e)}"
+def sendEmailNotification(subject, message):
+    """
+    Sends an automated notification email using msmtp with the correct config file.
+    """
+    try:
+        print("📨 Sending automated notification email...")  # Debugging log
+
+        # ✅ Read recipient email from the saved file
+        with open("/etc/45Drives/msmtp_recipient", "r") as f:
+            recipient_email = f.read().strip()
+
+        # ✅ Construct the email content
+        email_content = f"""Subject: {subject}\n\n{message}"""
+
+        # ✅ Explicitly specify the `msmtp` config file location
+        process = subprocess.run(
+            ["msmtp", "-C", "/etc/45Drives/msmtp", recipient_email],
+            input=email_content,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        # ✅ Check if the email was sent successfully
+        if process.returncode == 0:
+            print(f"✅ Notification sent to {recipient_email} successfully!")
+            return f"✅ Notification sent to {recipient_email} successfully!"
+        else:
+            error_message = f"❌ Failed to send notification: {process.stderr.strip()}"
+            print(error_message)
+            return error_message
+
+    except Exception as e:
+        error_message = f"❌ Error sending notification: {str(e)}"
+        print(error_message)
+        return error_message
 
 class DBusService(dbus.service.Object):
     """D-Bus Service to handle incoming messages and forward valid ones to the UI."""
@@ -234,7 +328,16 @@ class DBusService(dbus.service.Object):
     @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
     def MarkAllNotificationsAsRead(self):
         return mark_all_notifications_as_read()
-    
+    @dbus.service.method("org._45drives.Houston", in_signature="s", out_signature="s")
+    def UpdateSMTPConfig(self, config_json):
+        return updateSMTPConfig(config_json)
+    @dbus.service.method("org._45drives.Houston", in_signature="s", out_signature="s")
+    def SendTestEmail(self, config_json):    
+        return sendTestEmail(config_json)
+    @dbus.service.method("org._45drives.Houston", in_signature="ss", out_signature="s")
+    def sendEmailNotification(self, subject, message):    
+        return sendEmailNotification(subject, message)
+
 
         
     

@@ -28,6 +28,11 @@
                             <input v-model="emailConfig.email" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
                         </div>
                         <div class="flex justify-center space-x-2">
+                            <label class="block w-[25%] text-md font-medium">Recievers Email Address  <InfoTile class="ml-1"
+                                :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
+                            <input v-model="emailConfig.recieversEmail" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
+                        </div>
+                        <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">SMTP Server <InfoTile class="ml-1"
                                 :title="`The address of the outgoing mail server. Example: smtp.gmail.com for Gmail, or smtp.office365.com for Outlook.`" />
                             </label>
@@ -73,7 +78,7 @@
                         <button @click="testEmail" class="bg-gray-500 text-white p-2 rounded">Send Test Email</button>
                         <div class="space-x-2">
                             <button @click="closeModal" class="bg-red-500 text-white p-2 rounded">Cancel</button>
-                            <button @click="saveSettings" class="bg-green-500 text-white p-2 rounded">Save</button>
+                            <button @click="updateSMTPConfig" class="bg-green-500 text-white p-2 rounded">Save</button>
                         </div>
                     </div>            
                 </div>
@@ -105,6 +110,7 @@ const emailConfig = ref({
     smtpPort: 587,
     username: "",
     password: "",
+    recieversEmail: "",
     tls: true
 });
 const closeModal = () => {
@@ -116,5 +122,79 @@ onMounted(() => {
     emailSetUpModal.value = true;
     console.log("modal is mounted")
 });
+
+const updateSMTPConfig = async () => {
+    try {
+        console.log("🔄 Updating SMTP Config via D-Bus...");
+
+        const cockpit = (window as any).cockpit;
+        const dbus = cockpit.dbus("org._45drives.Houston");
+
+        const config = {
+            email: emailConfig.value.email,
+            smtpServer: emailConfig.value.smtpServer,
+            smtpPort: emailConfig.value.smtpPort,
+            username: emailConfig.value.username,
+            password: emailConfig.value.password,
+            recieversEmail: emailConfig.value.recieversEmail,
+            tls: emailConfig.value.tls
+        };
+
+        // ✅ Ensure the correct D-Bus method call structure
+        const response = await dbus.call(
+            "/org/_45drives/Houston",   // ✅ Object path
+            "org._45drives.Houston",    // ✅ Interface
+            "UpdateSMTPConfig",         // ✅ Method name
+            [JSON.stringify(config)]    // ✅ Argument (as an array)
+        );
+
+        console.log(`✅ D-Bus Response: ${response}`);
+        alert("✅ SMTP Configuration updated successfully!");
+
+    } catch (error) {
+        console.error("❌ Error updating SMTP settings via D-Bus:", error);
+        alert("❌ Failed to update SMTP settings: " + error.message);
+    }
+};
+const testEmail = async () => {
+    try {
+        console.log("🔄 Sending test email via D-Bus...");
+
+        const cockpit = (window as any).cockpit;
+        const dbus = cockpit.dbus("org._45drives.Houston");
+
+        // ✅ Ensure all required fields are included
+        const config = {
+            email: emailConfig.value.email,
+            smtpServer: emailConfig.value.smtpServer,
+            smtpPort: emailConfig.value.smtpPort,
+            username: emailConfig.value.username,
+            password: emailConfig.value.password,
+            tls: emailConfig.value.tls,
+            recipientEmail: emailConfig.value.recieversEmail  // ✅ Added missing recipient
+        };
+
+        // ✅ Ensure correct D-Bus method call
+        const response = await dbus.call(
+            "/org/_45drives/Houston",  // ✅ Object path
+            "org._45drives.Houston",   // ✅ Interface
+            "SendTestEmail",           // ✅ Method name
+            [JSON.stringify(config)]   // ✅ Argument (as an array)
+        );
+
+        console.log(`✅ D-Bus Response: ${response}`);
+
+        // ✅ Display actual response
+        alert(response.includes("✅") ? response : `✅ Test email sent: ${response}`);
+
+    } catch (error) {
+        console.error("❌ Error sending test email via D-Bus:", error);
+
+        // ✅ Display backend error message
+        alert(`❌ Failed to send test email: ${error.message || error}`);
+    }
+};
+
+
 
 </script>
