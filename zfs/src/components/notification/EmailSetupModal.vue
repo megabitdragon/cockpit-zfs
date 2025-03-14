@@ -22,15 +22,28 @@
 
                     <!-- SMTP Settings -->
                     <div v-if="emailProvider === 'smtp'" class="space-y-3">
+                        
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Email Address  <InfoTile class="ml-1"
                                 :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
                             <input v-model="emailConfig.email" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
                         </div>
+                        <div v-if="formValidationAttempted && (!emailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
+                            <div class="w-[25%]"></div>
+                            <p class="text-red-500 text-sm w-[50%]">
+                                {{ !emailConfig.email ? "Email Address is required." : "Invalid email format." }}
+                            </p>
+                        </div>
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Recievers Email Address  <InfoTile class="ml-1"
                                 :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
                             <input v-model="emailConfig.recieversEmail" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
+                        </div>
+                        <div v-if="formValidationAttempted && (!emailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
+                            <div class="w-[25%]"></div>
+                            <p class="text-red-500 text-sm w-[50%]">
+                                {{ !emailConfig.email ? "Email Address is required." : "Invalid email format." }}
+                            </p>
                         </div>
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">SMTP Server <InfoTile class="ml-1"
@@ -38,24 +51,46 @@
                             </label>
                             <input v-model="emailConfig.smtpServer" type="text" placeholder="smtp.example.com" class="w-[50%] p-2 border rounded" />
                         </div>
+                        <div v-if="formValidationAttempted && !emailConfig.smtpServer" class="flex justify-center space-x-2">
+                            <div class="w-[25%]"></div>
+                            <p  class="text-red-500 text-sm w-[50%]">SMTP Server is required.</p>
+
+                        </div> 
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">SMTP Port <InfoTile class="ml-1"
                                 :title="`The port number used to connect to the SMTP server.\nCommon values:\n- 25: Non-secure SMTP\n- 465: Secure SMTP (SSL)\n- 587: Secure SMTP (STARTTLS)`" />
                             </label>
                             <input v-model="emailConfig.smtpPort" type="number" placeholder="587" class="w-[50%] p-2 border rounded" />
-                        </div>
+                        </div>    
+                        <div v-if="formValidationAttempted && !emailConfig.smtpPort" class="flex justify-center space-x-2">
+                            <div class="w-[25%]"></div>
+                            <p  class="text-red-500 w-[50%] text-sm">SMTP Port is required.</p>
+
+                        </div>                      
+
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Username <InfoTile class="ml-1"
                                 :title="`The login username for authentication with the SMTP server. Usually the same as the sender email address.`" />                            </label>
                             <input v-model="emailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
-                        </div>
-                        <div class="flex justify-center space-x-2">  
+
+                        </div>     
+                        <div v-if="formValidationAttempted && !emailConfig.username" class="flex justify-center space-x-2">
+                            <div class="w-[25%]"></div>
+                            <p  class="text-red-500 text-sm w-[50%]">Username is required.</p>
+                        </div>                    
+
+                        <div  class="flex justify-center space-x-2">  
                             <label class="block  w-[25%] text-md font-medium">Password <InfoTile class="ml-1"
                                 :title="`The password or app-specific password used for authenticating with the SMTP server.\nNote: Some providers require an app password instead of the regular account password.`" />
                             </label>
                             <input  v-model="emailConfig.password" type="password" placeholder="••••••••" class="w-[50%] p-2 border rounded" />
                         </div>
-                        <div class="flex justify-center space-x-2">
+                        <div v-if="formValidationAttempted && !emailConfig.password" class="flex justify-center space-x-2">
+                            <div class="w-[25%]"></div>
+                            <p class="text-red-500 text-sm w-[50%]">Password is required.</p>
+                        </div>                      
+
+                        <div class="flex justify-center space-x-2 w-[25%]">
                             <input type="checkbox" v-model="emailConfig.tls" class="h-4 w-4" />
                             <label>Enable TLS             <InfoTile class="ml-1"
                                 :title="`Enable Transport Layer Security (TLS) encryption for secure email transmission.\nThis is required for most modern SMTP providers using port 587.`" />
@@ -97,7 +132,6 @@ input[type="checkbox"] {
 
 <script setup lang="ts">
 import { ref, inject, Ref, computed, watch, onMounted } from 'vue';
-import { Switch } from '@headlessui/vue';
 import {Modal, CardContainer } from '@45drives/houston-common-ui';
 import InfoTile from '../common/InfoTile.vue';
 import OldModal from '../common/OldModal.vue';
@@ -113,6 +147,25 @@ const emailConfig = ref({
     recieversEmail: "",
     tls: true
 });
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isEmailValid = computed(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailConfig.value.email) && emailRegex.test(emailConfig.value.recieversEmail);
+});
+
+const formValidationAttempted = ref(false); // Tracks if validation has been triggered
+
+const isFormValid = () => {
+    formValidationAttempted.value = true; // Mark validation as triggered
+    return (
+        emailConfig.value.email.trim() !== "" &&
+        emailConfig.value.recieversEmail.trim() !== "" &&
+        emailConfig.value.smtpServer.trim() !== "" &&
+        emailConfig.value.smtpPort > 0 &&
+        emailConfig.value.username.trim() !== "" &&
+        emailConfig.value.password.trim() !== ""
+    );
+};
 const closeModal = () => {
     emit('close');
 }
@@ -124,6 +177,16 @@ onMounted(() => {
 });
 
 const updateSMTPConfig = async () => {
+    if (!isFormValid() || !isEmailValid ) {
+        if(!isEmailValid){
+            alert("⚠️ Please fill valid email address  before sending a test email.");
+
+        }else{
+            alert("⚠️ Please fill in all fields before sending a test email.");
+
+        }
+        return;
+    }
     try {
         console.log("🔄 Updating SMTP Config via D-Bus...");
 
@@ -157,6 +220,17 @@ const updateSMTPConfig = async () => {
     }
 };
 const testEmail = async () => {
+
+    if (!isFormValid() || !isEmailValid ) {
+        if(!isEmailValid){
+            alert("⚠️ Please fill valid email address  before sending a test email.");
+
+        }else{
+            alert("⚠️ Please fill in all fields before sending a test email.");
+
+        }
+        return;
+    }
     try {
         console.log("🔄 Sending test email via D-Bus...");
 
