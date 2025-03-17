@@ -9,6 +9,7 @@ from datetime import datetime
 import subprocess
 import logging
 
+
 gi.require_version("GLib", "2.0")
 from gi.repository import GLib
 
@@ -24,6 +25,8 @@ dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 # Define SQLite Database Path
 DB_PATH = "/var/lib/sqlite/45Drives/notifications.db"
 MSMTP_CONFIG_PATH = "/etc/45drives/msmtp"
+MSMTP_RECIPIENT_PATH = "/etc/45drives/msmtp_recipient"
+MSMTP_PASSWORD_PATH = "/etc/45drives/msmtp_pass"
 
 def determine_severity(event, message):
     """Determine the severity of the notification based on event type."""
@@ -44,10 +47,86 @@ def determine_severity(event, message):
         return "error"  
 
     return "info"  # ℹ️ Default for general notifications
+def store_notification(message):
+    """Stores notifications in SQLite DB, updates statechange events if necessary, and returns the message with ID."""
+    print(f"[DEBUG] Attempting to store: {message}")  
 
-import subprocess
-import json
-import logging
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        print(f"[DEBUG] Checking if {message.get('event')} already exists")
+
+        # ✅ Check if a similar event exists (for statechange updates)
+        cursor.execute("""
+            SELECT id, state, health FROM notifications
+            WHERE event = ? AND timestamp = ? AND vdev = ?;
+        """, (message["event"], message["timestamp"], message.get("vdev", None)))
+
+        existing_event = cursor.fetchone()
+
+        if existing_event:
+            existing_id, existing_state, existing_health = existing_event
+
+            # ✅ If it's a statechange event and the state or health has changed, update it
+            if message["event"] == "statechange" and (existing_state != message.get("state") or existing_health != message.get("health")):
+                new_severity = determine_severity(message.get("event"), message)  # ✅ Recalculate severity
+                
+                cursor.execute("""
+                    UPDATE notifications
+                    SET state = ?, severity = ?, health = ?
+                    WHERE id = ?;
+                """, (
+                    message.get("state"),
+                    new_severity,
+                    message.get("health", None),
+                    existing_id
+                ))
+                conn.commit()
+                print(f"✅ [UPDATE] Statechange event updated: {message}")  
+
+                # ✅ Include `id` and `severity` in the returned message
+                message["id"] = existing_id
+                message["severity"] = new_severity
+                return message  
+
+            print(f"❌ Duplicate detected, skipping insert: {message}")
+            return None  
+
+        # ✅ Insert new notification if no matching event found
+        severity = determine_severity(message.get("event"), message)  # ✅ Get severity for new events
+
+        cursor.execute("""
+            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity, health, errors)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+        """, (
+            message.get("timestamp"),
+            message.get("event"),
+            message.get("pool"),
+            message.get("vdev", None),
+            message.get("state", None),
+            severity,
+            message.get("health", None),
+            message.get("errors", 0)  # ✅ Added errors field with a default of 0
+        ))
+
+        conn.commit()
+        notification_id = cursor.lastrowid  # ✅ Get the new row ID
+        print(f"✅ [INSERT] New event stored: {message}")  
+
+        # ✅ Include `id` and `severity` in the returned message
+        message["id"] = notification_id
+        message["severity"] = severity
+        return message  
+
+    except Exception as e:
+        print(f"❌ [DB Insert Error] {e}")
+        return None  
+
+    finally:
+        conn.close()  
+
+
 
 # Configure logging
 LOG_FILE = "/var/log/msmtp_test.log"
@@ -206,7 +285,7 @@ import json
 
 def updateSMTPConfig(config_json):
     """
-    Updates the SMTP configuration in /etc/45Drives/msmtp and stores recipient email.
+    Updates the SMTP configuration in /etc/45drives/msmtp and stores recipient email.
     """
     try:
         print("🔄 Updating SMTP config...")  # Debugging log
@@ -222,9 +301,9 @@ def updateSMTPConfig(config_json):
         tls = "on" if config.get("tls", True) else "off"
 
         # ✅ Save password securely in a separate file
-        with open("/etc/45Drives/msmtp_pass", "w") as f:
+        with open(MSMTP_PASSWORD_PATH, "w") as f:
             f.write(password)
-        os.chmod("/etc/45Drives/msmtp_pass", 0o600)  # Secure permissions
+        os.chmod(MSMTP_PASSWORD_PATH, 0o600)  # Secure permissions
 
         # ✅ Store SMTP config in msmtp file
         config_content = f"""account default
@@ -232,21 +311,21 @@ host {smtp_server}
 port {smtp_port}
 auth on
 user {username}
-passwordeval cat /etc/45Drives/msmtp_pass
+passwordeval cat {MSMTP_PASSWORD_PATH}
 from {email}
 tls {tls}
 tls_starttls on
 """
 
         # ✅ Store recipient email in a separate file
-        with open("/etc/45Drives/msmtp_recipient", "w") as f:
+        with open(MSMTP_RECIPIENT_PATH, "w") as f:
             f.write(recipient_email)
-        os.chmod("/etc/45Drives/msmtp_recipient", 0o600)  # Secure permissions
+        os.chmod(MSMTP_RECIPIENT_PATH, 0o600)  # Secure permissions
 
         # ✅ Write SMTP config
-        with open("/etc/45Drives/msmtp", "w") as f:
+        with open(MSMTP_CONFIG_PATH, "w") as f:
             f.write(config_content)
-        os.chmod("/etc/45Drives/msmtp", 0o600)  # Secure permissions
+        os.chmod(MSMTP_CONFIG_PATH, 0o600)  # Secure permissions
 
         print("✅ SMTP configuration updated successfully!")
         return "✅ SMTP configuration updated successfully!"
@@ -261,7 +340,7 @@ def sendEmailNotification(subject, message):
         print("📨 Sending automated notification email...")  # Debugging log
 
         # ✅ Read recipient email from the saved file
-        with open("/etc/45Drives/msmtp_recipient", "r") as f:
+        with open(MSMTP_RECIPIENT_PATH, "r") as f:
             recipient_email = f.read().strip()
 
         # ✅ Construct the email content
@@ -269,7 +348,7 @@ def sendEmailNotification(subject, message):
 
         # ✅ Explicitly specify the `msmtp` config file location
         process = subprocess.run(
-            ["msmtp", "-C", "/etc/45Drives/msmtp", recipient_email],
+            ["msmtp", "-C", "/etc/45drives/msmtp", recipient_email],
             input=email_content,
             universal_newlines=True,
             stdout=subprocess.PIPE,
@@ -289,6 +368,42 @@ def sendEmailNotification(subject, message):
         error_message = f"❌ Error sending notification: {str(e)}"
         print(error_message)
         return error_message
+def fetchMsmtpDetails():
+    """Fetch the stored SMTP configuration details from /etc/45drives/msmtp"""
+    try:
+
+        # Read SMTP config
+        with open(MSMTP_CONFIG_PATH, "r") as f:
+            config_data = f.readlines()
+        
+        # Extract relevant values
+        smtp_details = {}
+        for line in config_data:
+            if line.startswith("host"):
+                smtp_details["smtpServer"] = line.split(" ")[1].strip()
+            elif line.startswith("port"):
+                smtp_details["smtpPort"] = line.split(" ")[1].strip()
+            elif line.startswith("user"):
+                smtp_details["username"] = line.split(" ")[1].strip()
+            elif line.startswith("from"):
+                smtp_details["email"] = line.split(" ")[1].strip()
+            elif line.startswith("tls "):  # ✅ Extract TLS value
+                smtp_details["tls"] = line.split(" ")[1].strip().lower() == "on"
+        
+        # Read password securely
+        with open(MSMTP_PASSWORD_PATH, "r") as f:
+            smtp_details["password"] = f.read().strip()
+
+        # Read recipient email
+        with open(MSMTP_RECIPIENT_PATH, "r") as f:
+            smtp_details["recieversEmail"] = f.read().strip()
+
+        return json.dumps(smtp_details)  # Convert to JSON string
+
+    except Exception as e:
+        return json.dumps({"error": f"Failed to fetch SMTP details: {str(e)}"})
+
+
 
 class DBusService(dbus.service.Object):
     """D-Bus Service to handle incoming messages and forward valid ones to the UI."""
@@ -337,6 +452,9 @@ class DBusService(dbus.service.Object):
     @dbus.service.method("org._45drives.Houston", in_signature="ss", out_signature="s")
     def sendEmailNotification(self, subject, message):    
         return sendEmailNotification(subject, message)
+    @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
+    def FetchMsmtpDetails(self):    
+        return fetchMsmtpDetails()
 
 
         

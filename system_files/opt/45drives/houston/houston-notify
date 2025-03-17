@@ -5,8 +5,8 @@ def main():
     # Parse command-line arguments
     parser = ArgumentParser(description="Send a message or email notification via Houston D-Bus server.")
     parser.add_argument("action", choices=["forward", "email"], help="Action to perform (forward or email)")
-    parser.add_argument("subject", help="Subject of the email or log message")
-    parser.add_argument("message", help="Message body")
+    parser.add_argument("subject", nargs="?", default="No Subject", help="(Optional) Subject of the email or log message")
+    parser.add_argument("message", nargs="?", default="No Message", help="(Optional) Message body")    
     args = parser.parse_args()
 
     # Connect to the system D-Bus

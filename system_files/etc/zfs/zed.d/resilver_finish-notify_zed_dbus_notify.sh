@@ -2,29 +2,118 @@
 
 # Path to the D-Bus client script
 DBUS_CLIENT="/opt/45drives/houston/houston-notify"
+DEBUG_LOG="/tmp/zed_resilver_debug.log"
 
-# Extract relevant resilver event data
-EVENT_CLASS="${ZEVENT_SUBCLASS:-Unknown}"
+# Extract ZFS event details
+EVENT_CLASS="resilver_finish"
 EVENT_POOL="${ZEVENT_POOL:-Unknown}"
 EVENT_STATE="${ZEVENT_POOL_HEALTH:-Unknown}"  # Pool-wide health
 EVENT_ERRORS="${ZEVENT_ERRORS:-0}"
+EVENT_REPAIRED="${ZEVENT_REPAIRED:-0}"
 EVENT_POOL_GUID="${ZEVENT_POOL_GUID:-Unknown}"
-EVENT_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')  # Always use current time
+EVENT_DURATION="${ZEVENT_DURATION:-Unknown}"  # Resilver duration (if available)
+EVENT_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')  # Use current time
 
-# Construct JSON message
-MESSAGE=$(jq -n \
+# Determine resilver status message
+if [[ "$EVENT_ERRORS" -gt 0 ]]; then
+  IMPACT_MESSAGE="The ZFS resilver process has completed, but errors were detected. Some data may be corrupted or unrecoverable."
+  RECOMMENDATION="Investigate the affected disks and consider replacing any failing devices. If corruption is detected, restore from backups if necessary."
+  URGENCY="WARNING"
+else
+  IMPACT_MESSAGE="The ZFS resilver process has completed successfully with no detected errors."
+  RECOMMENDATION="No immediate action is required. Regular resilvers help maintain data redundancy and system stability."
+  URGENCY="SUCCESS"
+fi
+
+# Construct JSON message for forwarding to Houston UI
+FORWARD_MESSAGE=$(jq -n \
   --arg timestamp "$EVENT_TIMESTAMP" \
   --arg event "$EVENT_CLASS" \
   --arg pool "$EVENT_POOL" \
   --arg state "$EVENT_STATE" \
   --arg pool_guid "$EVENT_POOL_GUID" \
   --argjson errors "$EVENT_ERRORS" \
-  '{timestamp: $timestamp, event: $event, pool: $pool, state: $state, pool_guid: $pool_guid, errors: $errors}')
+  --argjson repaired "$EVENT_REPAIRED" \
+  --arg duration "$EVENT_DURATION" \
+  '{timestamp: $timestamp, event: $event, pool: $pool, state: $state, pool_guid: $pool_guid, errors: $errors, repaired: $repaired, duration: $duration}')
 
-# Print for debugging (Optional)
-echo "Sending JSON: $MESSAGE"
+# Construct Subject & User-Friendly Email Message
+EMAIL_SUBJECT="ZFS Resilver Completed: Pool $EVENT_POOL - $URGENCY"
 
-# Send the message to Houston D-Bus service
-python3 "$DBUS_CLIENT" forward "$FORWARD_MESSAGE"
+EMAIL_MESSAGE=$(cat <<EOF
+====================================================
+ZFS RESILVER COMPLETION REPORT - POOL: $EVENT_POOL
+====================================================
 
-python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE"
+$IMPACT_MESSAGE
+
+----------------------------------------------------
+Resilver Details
+----------------------------------------------------
+- Pool Name: $EVENT_POOL
+- Pool GUID: $EVENT_POOL_GUID
+- Pool State: $EVENT_STATE
+- Errors Found: $EVENT_ERRORS
+- Errors Repaired: $EVENT_REPAIRED
+- Resilver Duration: $EVENT_DURATION
+- Timestamp: $EVENT_TIMESTAMP
+
+----------------------------------------------------
+Recommended Actions
+----------------------------------------------------
+1. Check the detailed resilver report using:
+
+   zpool status $EVENT_POOL
+
+2. If errors were found:
+   - Identify which disks encountered errors.
+   - Consider replacing degraded or failing drives.
+   - Verify data integrity using backups if necessary.
+
+3. If all is well:
+   - No immediate action is needed.
+   - Continue monitoring system health for future issues.
+
+For further details, refer to system logs or ZFS documentation.
+EOF
+)
+
+# ✅ Logging event details for debugging
+{
+  echo "==== DEBUG START ===="
+  echo "DEBUG: Timestamp = $EVENT_TIMESTAMP"
+  echo "DEBUG: Event Class = $EVENT_CLASS"
+  echo "DEBUG: Pool = $EVENT_POOL"
+  echo "DEBUG: State = $EVENT_STATE"
+  echo "DEBUG: Pool GUID = $EVENT_POOL_GUID"
+  echo "DEBUG: Errors Found = $EVENT_ERRORS"
+  echo "DEBUG: Errors Repaired = $EVENT_REPAIRED"
+  echo "DEBUG: Resilver Duration = $EVENT_DURATION"
+  echo "DEBUG: FORWARD_MESSAGE = $FORWARD_MESSAGE"
+  echo "DEBUG: EMAIL_SUBJECT = $EMAIL_SUBJECT"
+  echo "DEBUG: EMAIL_MESSAGE = $EMAIL_MESSAGE"
+  echo "==== DEBUG END ===="
+} >> "$DEBUG_LOG"
+
+# ✅ Send event notification to Houston UI
+python3 "$DBUS_CLIENT" forward "ZFS Resilver Finished" "$FORWARD_MESSAGE" >> "$DEBUG_LOG" 2>&1
+FORWARD_STATUS=$?
+
+# ✅ Send user-friendly email notification
+python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE" >> "$DEBUG_LOG" 2>&1
+EMAIL_STATUS=$?
+
+# ✅ Log final result
+if [ "$FORWARD_STATUS" -eq 0 ]; then
+  echo "[SUCCESS] Resilver event successfully forwarded to Houston UI" >> "$DEBUG_LOG"
+else
+  echo "[ERROR] Failed to forward resilver event to Houston UI" >> "$DEBUG_LOG"
+fi
+
+if [ "$EMAIL_STATUS" -eq 0 ]; then
+  echo "[SUCCESS] Resilver completion email sent successfully" >> "$DEBUG_LOG"
+else
+  echo "[ERROR] Failed to send resilver completion email" >> "$DEBUG_LOG"
+fi
+
+exit 0

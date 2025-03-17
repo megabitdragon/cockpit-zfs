@@ -1,56 +1,122 @@
 #!/bin/bash
 
-# ✅ Log that the script was triggered
-echo "ZED TRIGGERED: $(date)"
-
-# ✅ Log all environment variables passed by ZED
-env | sort
-
 # Path to the D-Bus client script
 DBUS_CLIENT="/opt/45drives/houston/houston-notify"
+DEBUG_LOG="/tmp/zed_pool_import_debug.log"
 
-# Extract available event data
-EVENT_CLASS="${ZEVENT_CLASS:-Unknown}"       # Top-level event category (e.g., EC_pool, EC_dev)
-EVENT_SUBCLASS="${ZEVENT_SUBCLASS:-Unknown}" # More specific event type (e.g., pool_import, dev_fault)
-EVENT_POOL="${ZEVENT_POOL:-Unknown}"         # Pool name
-EVENT_POOL_GUID="${ZEVENT_POOL_GUID:-Unknown}" # Unique pool identifier
+# ✅ Log that the script was triggered
+echo "[INFO] Pool import event detected at $(date)" >> "$DEBUG_LOG"
 
-# ✅ Fix: Use `ZEVENT_POOL_STATE_STR` instead of `ZEVENT_POOL_STATE`
-EVENT_HEALTH="${ZEVENT_POOL_STATE_STR:-Unknown}"
-
-EVENT_VDEV="${ZEVENT_VDEV_PATH:-Unknown}"  # VDEV path (if applicable)
-EVENT_VDEV_GUID="${ZEVENT_VDEV_GUID:-Unknown}"  # VDEV unique identifier
-EVENT_VDEV_STATE="${ZEVENT_VDEV_STATE:-Unknown}"  # VDEV state (e.g., DEGRADED, FAULTED)
-
+# Extract event details
+EVENT_CLASS="pool_import"
+EVENT_POOL="${ZEVENT_POOL:-Unknown}"
+EVENT_POOL_GUID="${ZEVENT_POOL_GUID:-Unknown}"
+EVENT_HEALTH="${ZEVENT_POOL_STATE_STR:-Unknown}"  # Health of the pool
 EVENT_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')  # Capture timestamp
+EVENT_HOST=$(hostname)
 
-# ✅ Log extracted values
-echo "Extracted Data: CLASS=$EVENT_CLASS, SUBCLASS=$EVENT_SUBCLASS, POOL=$EVENT_POOL, HEALTH=$EVENT_HEALTH, VDEV=$EVENT_VDEV, VDEV_STATE=$EVENT_VDEV_STATE"
+# ✅ Ensure EVENT_POOL is set (required for valid notifications)
+if [[ "$EVENT_POOL" == "Unknown" ]]; then
+    echo "[ERROR] Missing EVENT_POOL - Notification aborted" >> "$DEBUG_LOG"
+    exit 1
+fi
 
-# ✅ Construct JSON message
-MESSAGE=$(echo '{}' | jq --compact-output \
+# ✅ Generate an appropriate message based on the health status
+if [[ "$EVENT_HEALTH" == "ONLINE" ]]; then
+  IMPACT_MESSAGE="The ZFS pool '$EVENT_POOL' has been successfully imported and is in a healthy state."
+  RECOMMENDATION="No immediate action is required. However, it's good practice to check the pool's status and ensure all expected datasets are present."
+  URGENCY="SUCCESS"
+elif [[ "$EVENT_HEALTH" == "DEGRADED" ]]; then
+  IMPACT_MESSAGE="The ZFS pool '$EVENT_POOL' has been imported but is in a DEGRADED state. One or more devices may be missing or damaged."
+  RECOMMENDATION="Check the pool status immediately to identify any failed or degraded devices."
+  URGENCY="WARNING"
+else
+  IMPACT_MESSAGE="The ZFS pool '$EVENT_POOL' has been imported but is in an UNKNOWN state."
+  RECOMMENDATION="Manually verify the pool health using 'zpool status' to check for any potential issues."
+  URGENCY="NOTICE"
+fi
+
+# ✅ Construct JSON message for forwarding to Houston UI
+FORWARD_MESSAGE=$(jq -n \
   --arg timestamp "$EVENT_TIMESTAMP" \
-  --arg class "$EVENT_CLASS" \
-  --arg subclass "$EVENT_SUBCLASS" \
-  --arg event "$EVENT_SUBCLASS" \
+  --arg event "$EVENT_CLASS" \
   --arg pool "$EVENT_POOL" \
   --arg health "$EVENT_HEALTH" \
   --arg pool_guid "$EVENT_POOL_GUID" \
-  --arg vdev "$EVENT_VDEV" \
-  --arg vdev_guid "$EVENT_VDEV_GUID" \
-  --arg vdev_state "$EVENT_VDEV_STATE" \
-  '.timestamp=$timestamp | .class=$class | .subclass=$subclass | .event=$event | .pool=$pool | .health=$health | .pool_guid=$pool_guid | .vdev=$vdev | .vdev_guid=$vdev_guid | .vdev_state=$vdev_state')
+  '{timestamp: $timestamp, event: $event, pool: $pool, health: $health, pool_guid: $pool_guid}')
 
-# ✅ Check if MESSAGE is valid
-if [ -z "$MESSAGE" ] || [ "$MESSAGE" == "null" ]; then
-  echo "❌ Error: Failed to construct JSON message"
-  exit 1
+# ✅ Construct Subject & User-Friendly Email Message
+EMAIL_SUBJECT="ZFS Alert: Pool '$EVENT_POOL' Imported - $URGENCY"
+
+EMAIL_MESSAGE=$(cat <<EOF
+====================================================
+ZFS POOL IMPORT REPORT - POOL: $EVENT_POOL
+====================================================
+
+$IMPACT_MESSAGE
+
+----------------------------------------------------
+Pool Details
+----------------------------------------------------
+- Pool Name: $EVENT_POOL
+- Pool GUID: $EVENT_POOL_GUID
+- Pool Health: $EVENT_HEALTH
+- Timestamp: $EVENT_TIMESTAMP
+- Host: $EVENT_HOST
+
+----------------------------------------------------
+Recommended Actions
+----------------------------------------------------
+1. Check the current pool status using:
+
+   zpool status $EVENT_POOL
+
+2. If the pool is DEGRADED:
+   - Identify missing or faulty devices.
+   - Consider replacing or reattaching missing drives.
+   - Monitor system logs for additional details.
+
+3. If the pool is healthy:
+   - No immediate action is required.
+   - Perform a routine check to verify datasets.
+
+For further details, refer to system logs or ZFS documentation.
+EOF
+)
+
+# ✅ Logging event details for debugging
+{
+  echo "==== DEBUG START ===="
+  echo "DEBUG: Timestamp = $EVENT_TIMESTAMP"
+  echo "DEBUG: Event Class = $EVENT_CLASS"
+  echo "DEBUG: Pool = $EVENT_POOL"
+  echo "DEBUG: Pool GUID = $EVENT_POOL_GUID"
+  echo "DEBUG: Health = $EVENT_HEALTH"
+  echo "DEBUG: FORWARD_MESSAGE = $FORWARD_MESSAGE"
+  echo "DEBUG: EMAIL_SUBJECT = $EMAIL_SUBJECT"
+  echo "DEBUG: EMAIL_MESSAGE = $EMAIL_MESSAGE"
+  echo "==== DEBUG END ===="
+} >> "$DEBUG_LOG"
+
+# ✅ Send event notification to Houston UI
+python3 "$DBUS_CLIENT" forward "ZFS Pool Import" "$FORWARD_MESSAGE" >> "$DEBUG_LOG" 2>&1
+FORWARD_STATUS=$?
+
+# ✅ Send user-friendly email notification
+python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE" >> "$DEBUG_LOG" 2>&1
+EMAIL_STATUS=$?
+
+# ✅ Log final result
+if [ "$FORWARD_STATUS" -eq 0 ]; then
+  echo "[SUCCESS] Pool import event successfully forwarded to Houston UI" >> "$DEBUG_LOG"
+else
+  echo "[ERROR] Failed to forward pool import event to Houston UI" >> "$DEBUG_LOG"
 fi
 
-# ✅ Debugging: Log the JSON message before sending
-echo "Generated JSON: $MESSAGE"
+if [ "$EMAIL_STATUS" -eq 0 ]; then
+  echo "[SUCCESS] Pool import email sent successfully" >> "$DEBUG_LOG"
+else
+  echo "[ERROR] Failed to send pool import email" >> "$DEBUG_LOG"
+fi
 
-# ✅ Send to Houston DBus
-python3 "$DBUS_CLIENT" forward "$FORWARD_MESSAGE"
-
-python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE"
+exit 0

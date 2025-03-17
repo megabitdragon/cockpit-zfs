@@ -16,7 +16,6 @@
                     <select v-model="emailProvider" class="w-[50%] p-2 border rounded">
                         <option value="smtp">SMTP</option>
                         <option value="gmail">Google (OAuth)</option>
-                        <option value="outlook">Outlook (OAuth)</option>
                     </select>
                 </div>
 
@@ -172,9 +171,49 @@ const closeModal = () => {
 const emit = defineEmits(['close']);
 
 onMounted(() => {
+    fetchMsmtpDetails();  // ✅ Fetch SMTP details on mount
     emailSetUpModal.value = true;
     console.log("modal is mounted")
 });
+
+const fetchMsmtpDetails = async () => {
+    try {
+        console.log("🔄 Fetching stored SMTP details...");
+
+        const cockpit = (window as any).cockpit;
+        const dbus = cockpit.dbus("org._45drives.Houston");
+
+        // ✅ Call the method WITHOUT arguments
+        const response = await dbus.call(
+            "/org/_45drives/Houston",
+            "org._45drives.Houston",
+            "FetchMsmtpDetails",
+            []  // ✅ Empty array since no arguments are needed
+        );
+
+        const smtpData = JSON.parse(response);
+        if (smtpData.error) {
+            console.error("❌ Error fetching SMTP details:", smtpData.error);
+            alert("❌ Failed to fetch SMTP details.");
+            return;
+        }
+
+        // ✅ Populate Vue state with fetched values
+        emailConfig.value.email = smtpData.email;
+        emailConfig.value.recieversEmail = smtpData.recieversEmail;
+        emailConfig.value.smtpServer = smtpData.smtpServer;
+        emailConfig.value.smtpPort = smtpData.smtpPort;
+        emailConfig.value.username = smtpData.username;
+        emailConfig.value.password = smtpData.password;
+        emailConfig.value.tls = smtpData.tls;
+
+        console.log("✅ SMTP details fetched successfully:", smtpData);
+    } catch (error) {
+        console.error("❌ Error fetching SMTP details:", error);
+        alert("❌ Failed to fetch SMTP details.");
+    }
+};
+
 
 const updateSMTPConfig = async () => {
     if (!isFormValid() || !isEmailValid ) {
@@ -213,6 +252,7 @@ const updateSMTPConfig = async () => {
 
         console.log(`✅ D-Bus Response: ${response}`);
         alert("✅ SMTP Configuration updated successfully!");
+        closeModal()
 
     } catch (error) {
         console.error("❌ Error updating SMTP settings via D-Bus:", error);
