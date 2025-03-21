@@ -13,19 +13,19 @@
                     <div class="flex justify-center space-x-2">
                     <!-- Email Provider Selection -->
                     <label class="block text-md w-[25%] py-2 font-medium">Select Email Provider</label>
-                    <select v-model="emailProvider" class="w-[50%] p-2 border rounded">
+                    <select v-model="emailConfig.authMethod" class="w-[50%] p-2 border rounded-lg">
                         <option value="smtp">SMTP</option>
-                        <option value="gmail">Google (OAuth)</option>
+                        <option value="oauth2">Google (OAuth)</option>
                     </select>
                 </div>
 
                     <!-- SMTP Settings -->
-                    <div v-if="emailProvider === 'smtp'" class="space-y-3">
+                    <div v-if="emailConfig.authMethod === 'smtp'" class="space-y-3">
                         
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Email Address  <InfoTile class="ml-1"
                                 :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
-                            <input v-model="emailConfig.email" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
+                            <input v-model="emailConfig.email" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded-lg" />
                         </div>
                         <div v-if="formValidationAttempted && (!emailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
@@ -48,7 +48,7 @@
                             <label class="block w-[25%] text-md font-medium">SMTP Server <InfoTile class="ml-1"
                                 :title="`The address of the outgoing mail server. Example: smtp.gmail.com for Gmail, or smtp.office365.com for Outlook.`" />
                             </label>
-                            <input v-model="emailConfig.smtpServer" type="text" placeholder="smtp.example.com" class="w-[50%] p-2 border rounded" />
+                            <input v-model="emailConfig.smtpServer" type="text" placeholder="smtp.example.com" class="w-[50%] p-2 border rounded-lg" />
                         </div>
                         <div v-if="formValidationAttempted && !emailConfig.smtpServer" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
@@ -59,7 +59,7 @@
                             <label class="block w-[25%] text-md font-medium">SMTP Port <InfoTile class="ml-1"
                                 :title="`The port number used to connect to the SMTP server.\nCommon values:\n- 25: Non-secure SMTP\n- 465: Secure SMTP (SSL)\n- 587: Secure SMTP (STARTTLS)`" />
                             </label>
-                            <input v-model="emailConfig.smtpPort" type="number" placeholder="587" class="w-[50%] p-2 border rounded" />
+                            <input v-model="emailConfig.smtpPort" type="number" placeholder="587" class="w-[50%] p-2 border rounded-lg" />
                         </div>    
                         <div v-if="formValidationAttempted && !emailConfig.smtpPort" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
@@ -70,7 +70,7 @@
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Username <InfoTile class="ml-1"
                                 :title="`The login username for authentication with the SMTP server. Usually the same as the sender email address.`" />                            </label>
-                            <input v-model="emailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
+                            <input v-model="emailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded-lg" />
 
                         </div>     
                         <div v-if="formValidationAttempted && !emailConfig.username" class="flex justify-center space-x-2">
@@ -82,7 +82,7 @@
                             <label class="block  w-[25%] text-md font-medium">Password <InfoTile class="ml-1"
                                 :title="`The password or app-specific password used for authenticating with the SMTP server.\nNote: Some providers require an app password instead of the regular account password.`" />
                             </label>
-                            <input  v-model="emailConfig.password" type="password" placeholder="••••••••" class="w-[50%] p-2 border rounded" />
+                            <input  v-model="emailConfig.password" type="password"  class="w-[50%] p-2 border rounded-lg" />
                         </div>
                         <div v-if="formValidationAttempted && !emailConfig.password" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
@@ -91,19 +91,22 @@
 
                         <div class="flex justify-center space-x-2 w-[25%]">
                             <input type="checkbox" v-model="emailConfig.tls" class="h-4 w-4" />
-                            <label>Enable TLS             <InfoTile class="ml-1"
+                            <label>Enable TLS      <InfoTile class="ml-1"
                                 :title="`Enable Transport Layer Security (TLS) encryption for secure email transmission.\nThis is required for most modern SMTP providers using port 587.`" />
                             </label>
                         </div>
                     </div>
 
                     <!-- OAuth Setup for Google -->
-                    <div v-if="emailProvider !== 'smtp'" class="space-y-3 text-center">
+                    <div v-if="emailConfig.authMethod !== 'smtp'" class="space-y-3 text-center">
                         <div class="w-[100%] mt-[1rem]">
                             <p class="text-sm text-gray-500">OAuth setup requires authentication via your email provider.</p>
                         </div>
-                        <div>
-                            <button @click="connectOAuth" class="w-[30%] bg-blue-600 text-white p-2 mb-[1rem]rounded">Connect with Google</button>
+                        <div class="flex justify-center">
+                            <button @click="oAuthBtn" class="w-[30%] bg-[#FF4329] flex hover:bg-[#9E2500] text-white p-2 mb-[1rem] btn">
+                                <span class="flex-grow text-center mt-0.5">Connect with Google </span> 
+                                <img src="../../../public/img/icons8-gmail-48.png" alt="provider-logo"
+                                class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2" /></button>
                         </div>
                     </div>
 
@@ -131,12 +134,11 @@ input[type="checkbox"] {
 
 <script setup lang="ts">
 import { ref, inject, Ref, computed, watch, onMounted } from 'vue';
-import {Modal, CardContainer } from '@45drives/houston-common-ui';
+import {Modal, CardContainer, pushNotification, Notification } from '@45drives/houston-common-ui';
 import InfoTile from '../common/InfoTile.vue';
 import OldModal from '../common/OldModal.vue';
 
 const emailSetUpModal = ref(false);
-const emailProvider = ref("smtp");
 const emailConfig = ref({
     email: "",
     smtpServer: "",
@@ -144,7 +146,10 @@ const emailConfig = ref({
     username: "",
     password: "",
     recieversEmail: "",
-    tls: true
+    tls: true,
+    authMethod: "smtp",
+    oauthAccessToken: "",              
+    tokenExpiry: ""           
 });
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const isEmailValid = computed(() => {
@@ -259,55 +264,134 @@ const updateSMTPConfig = async () => {
         alert("❌ Failed to update SMTP settings: " + error.message);
     }
 };
+
+
 const testEmail = async () => {
-
-    if (!isFormValid() || !isEmailValid ) {
-        if(!isEmailValid){
-            alert("⚠️ Please fill valid email address  before sending a test email.");
-
-        }else{
+    if (!isFormValid() || !isEmailValid) {
+        if (!isEmailValid) {
+            alert("⚠️ Please enter a valid email address before sending a test email.");
+        } else {
             alert("⚠️ Please fill in all fields before sending a test email.");
-
         }
         return;
     }
+
     try {
         console.log("🔄 Sending test email via D-Bus...");
 
         const cockpit = (window as any).cockpit;
         const dbus = cockpit.dbus("org._45drives.Houston");
 
-        // ✅ Ensure all required fields are included
-        const config = {
+        const config: any = {
             email: emailConfig.value.email,
             smtpServer: emailConfig.value.smtpServer,
             smtpPort: emailConfig.value.smtpPort,
             username: emailConfig.value.username,
-            password: emailConfig.value.password,
             tls: emailConfig.value.tls,
-            recipientEmail: emailConfig.value.recieversEmail  // ✅ Added missing recipient
+            recipientEmail: emailConfig.value.recieversEmail
         };
 
-        // ✅ Ensure correct D-Bus method call
+        if (emailConfig.value.authMethod === 'smtp') {
+            config.password = emailConfig.value.password;
+        } else {
+            config.password = accessToken.value || emailConfig.value.oauthAccessToken;
+            config.tokenExpiry = tokenExpiry.value;
+        }
+
+
+        console.log("Testing with config: ", config);
+
         const response = await dbus.call(
-            "/org/_45drives/Houston",  // ✅ Object path
-            "org._45drives.Houston",   // ✅ Interface
-            "SendTestEmail",           // ✅ Method name
-            [JSON.stringify(config)]   // ✅ Argument (as an array)
+            "/org/_45drives/Houston",
+            "org._45drives.Houston",
+            "SendTestEmail",
+            [JSON.stringify(config)]
         );
 
         console.log(`✅ D-Bus Response: ${response}`);
-
-        // ✅ Display actual response
         alert(response.includes("✅") ? response : `✅ Test email sent: ${response}`);
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("❌ Error sending test email via D-Bus:", error);
-
-        // ✅ Display backend error message
         alert(`❌ Failed to send test email: ${error.message || error}`);
     }
 };
+
+const accessToken = ref<string | null>(null);
+const refreshToken = ref<string | null>(null);
+const userEmail = ref<string | null>(null);
+const tokenExpiry = ref<string | null>(null);
+const oAuthenticated = ref(false);
+
+async function oAuthBtn() {
+    try {
+        const providerAuthUrl = `https://email-auth.45d.io/auth/gmail`;
+        const authWindow = window.open(providerAuthUrl, '_blank', 'width=500,height=900');
+
+        if (!authWindow) {
+            throw new Error('Failed to open Gmail authentication window. Please check your popup settings.');
+        }
+
+        const handleAuthMessage = async (event: MessageEvent) => {
+            try {
+                if (event.origin !== 'https://email-auth.45d.io') return;
+
+                const { accessToken: tokenValue, refreshToken: refreshValue, expiry, userEmail: emailFromOAuth } = event.data;
+
+                if (tokenValue && refreshValue && emailFromOAuth) {
+                    accessToken.value = tokenValue;
+                    refreshToken.value = refreshValue;
+                    tokenExpiry.value = expiry;
+                    userEmail.value = emailFromOAuth;
+
+
+
+                    oAuthenticated.value = true;
+
+                    // Prepare emailConfig for DBus call
+                    emailConfig.value.email = emailFromOAuth;
+                    emailConfig.value.username = emailFromOAuth;
+                    emailConfig.value.password = refreshValue; // refresh_token
+                    emailConfig.value.recieversEmail = emailFromOAuth;
+                    emailConfig.value.smtpServer = "smtp.gmail.com";
+                    emailConfig.value.smtpPort = 587;
+                    emailConfig.value.tls = true;
+                    emailConfig.value.authMethod = "oauth2";
+                    emailConfig.value.oauthAccessToken = tokenValue;
+                    emailConfig.value.tokenExpiry = expiry;
+                    
+                    pushNotification(new Notification('Gmail Authentication Successful', `Tokens updated for ${emailFromOAuth}`, 'success', 8000));
+                    const cockpit = (window as any).cockpit;
+                    const dbus = cockpit.dbus("org._45drives.Houston");
+
+                    // ✅ Call DBus to update SMTP config
+                    const configPayload = JSON.stringify(emailConfig.value);
+                    const response = await dbus.call(
+                        "/org/_45drives/Houston",
+                        "org._45drives.Houston",
+                        "UpdateSMTPConfig",
+                        [configPayload]
+                    );
+
+                    console.log('DBus UpdateSMTPConfig response:', response);
+
+                    window.removeEventListener('message', handleAuthMessage);
+                } else {
+                    throw new Error('Gmail authentication failed. Missing token or email.');
+                }
+            } catch (error: any) {
+                console.error('Error during Gmail authentication:', error);
+                oAuthenticated.value = false;
+                pushNotification(new Notification('Authentication Failed', `${error.message}`, 'error', 8000));
+            }
+        };
+
+        window.addEventListener('message', handleAuthMessage);
+    } catch (error: any) {
+        console.error('Error initializing Gmail OAuth:', error);
+        pushNotification(new Notification('Authentication Error', `${error.message}`, 'error', 8000));
+    }
+}
 
 
 

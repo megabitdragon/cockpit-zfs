@@ -27,6 +27,8 @@ DB_PATH = "/var/lib/sqlite/45Drives/notifications.db"
 MSMTP_CONFIG_PATH = "/etc/45drives/msmtp"
 MSMTP_RECIPIENT_PATH = "/etc/45drives/msmtp_recipient"
 MSMTP_PASSWORD_PATH = "/etc/45drives/msmtp_pass"
+MSMTP_OAUTH_JSON_PATH = '/etc/45drives/msmtp_auth_token.json'
+MSMTP_OAUTH_REFRESH_SCRIPT = "/etc45drives/msmtp_oauth-email.py"
 
 def determine_severity(event, message):
     """Determine the severity of the notification based on event type."""
@@ -136,16 +138,22 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+import json
+import subprocess
+import logging
+import os
+
+MSMTP_CONFIG_PATH = "/etc/45drives/msmtp"
+MSMTP_OAUTH_REFRESH_SCRIPT = "/etc/45drives/msmtp_oauth-email.py"
+
 def sendTestEmail(config_json):
     """
-    Sends a test email using msmtp without requiring /etc/msmtprc.
-    Logs all activities to /var/log/msmtp_test.log.
+    Sends a test email using msmtp, and if current msmtp config is OAuth with matching username, refreshes the token.
     """
     try:
-        logging.info("📨 Sending test email via msmtp...")
-        logging.getLogger().handlers[0].flush()  # ✅ Force log to write immediately
+        logging.info("📨 Preparing to send test email via msmtp...")
+        logging.getLogger().handlers[0].flush()
 
-        # ✅ Parse SMTP details from UI
         config = json.loads(config_json)
 
         smtp_server = config.get("smtpServer", "").strip()
@@ -154,52 +162,56 @@ def sendTestEmail(config_json):
         password = config.get("password", "").strip()
         sender_email = config.get("email", "").strip()
         recipient_email = config.get("recipientEmail", "").strip()
+        auth_method = config.get("authMethod", "plain").strip()
 
-        # ✅ Debugging: Show recipient email before sending
-        logging.info(f"📨 Debug: Recipient Email -> {repr(recipient_email)}")
-        logging.getLogger().handlers[0].flush()  # ✅ Flush logs
-
-        # ✅ Ensure recipient email is valid
         if not recipient_email or "@" not in recipient_email:
             logging.error("❌ Error: Invalid recipient email format.")
-            logging.getLogger().handlers[0].flush()
             return "❌ Error: Invalid recipient email format."
 
-        logging.info(f"📨 Sending test email to: {recipient_email}")
-        logging.getLogger().handlers[0].flush()
+        # ✅ If msmtp config is oauthbearer and matches username, refresh token
+        if os.path.exists(MSMTP_CONFIG_PATH):
+            with open(MSMTP_CONFIG_PATH, "r") as f:
+                current_config = f.read()
 
-        # ✅ Construct Email Content
-        email_content = f"Subject: Test Email from 45Drives\n\nThis is a test email."
+            if "auth oauthbearer" in current_config:
+                current_user_line = next((line for line in current_config.split('\n') if line.startswith("user ")), None)
+                current_user = current_user_line.split(" ")[1] if current_user_line else ""
+
+                if current_user == username:
+                    logging.info("🔄 Detected existing OAuth config with matching user. Refreshing token...")
+                    subprocess.run(
+                        ["python3", MSMTP_OAUTH_REFRESH_SCRIPT],
+                        check=False
+                    )
+                else:
+                    logging.info("ℹ️ Current msmtp OAuth config username differs from incoming config. Skipping refresh.")
         
-        # ✅ Proper `msmtp` Command
-        msmtp_command = f"echo -e '{email_content}' | msmtp --host={smtp_server} --port={smtp_port} --auth=on --user={username} --passwordeval='echo {password}' --from={sender_email} --tls --tls-starttls {recipient_email}"
+        # ✅ Construct the email content
+        email_content = f"Subject: Test Email from 45Drives\n\nThis is a test email."
 
-        # ✅ Execute the command
+        # ✅ Send using existing msmtp config
         process = subprocess.run(
-            msmtp_command,
-            shell=True,
+            ["msmtp", "-C", MSMTP_CONFIG_PATH, recipient_email],
+            input=email_content,
             universal_newlines=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
 
-        # ✅ Check if the email was sent successfully
         if process.returncode == 0:
             success_msg = f"✅ Test email sent to {recipient_email} successfully!"
             logging.info(success_msg)
-            logging.getLogger().handlers[0].flush()
             return success_msg
         else:
             error_message = f"❌ Failed to send test email: {process.stderr.strip()}"
             logging.error(error_message)
-            logging.getLogger().handlers[0].flush()
             return error_message
 
     except Exception as e:
         error_message = f"❌ Error sending test email: {str(e)}"
         logging.error(error_message)
-        logging.getLogger().handlers[0].flush()
         return error_message
+
 def get_missed_notifications():
     """Fetch missed notifications (received = 0), mark them as received, and return as JSON."""
     conn = sqlite3.connect(DB_PATH)
@@ -288,25 +300,49 @@ def updateSMTPConfig(config_json):
     Updates the SMTP configuration in /etc/45drives/msmtp and stores recipient email.
     """
     try:
-        print("🔄 Updating SMTP config...")  # Debugging log
+        print("🔄 Updating SMTP config...")
 
         config = json.loads(config_json)
 
         email = config.get("email", "")
-        smtp_server = config.get("smtpServer", "")
+        smtp_server = config.get("smtpServer", "smtp.gmail.com")
         smtp_port = config.get("smtpPort", 587)
         username = config.get("username", "")
-        password = config.get("password", "")
-        recipient_email = config.get("recieversEmail", "")  # ✅ Store recipient permanently
+        password = config.get("password", "")  # This will be refresh_token for OAuth2
+        recipient_email = config.get("recieversEmail", "")
         tls = "on" if config.get("tls", True) else "off"
+        auth_method = config.get("authMethod", "plain")
 
-        # ✅ Save password securely in a separate file
-        with open(MSMTP_PASSWORD_PATH, "w") as f:
-            f.write(password)
-        os.chmod(MSMTP_PASSWORD_PATH, 0o600)  # Secure permissions
+        if auth_method == "oauth2":
+            # Save refresh_token and user email; access_token will be fetched later
+            oauth_data = {
+                "access_token": config.get("oauthAccessToken",""),  # initially empty, will be refreshed
+                "refresh_token": password,   
+                "user_email": username,
+                "expiry": config.get("tokenExpiry","")
+            }
+            with open(MSMTP_OAUTH_JSON_PATH, "w") as f:
+                json.dump(oauth_data, f, indent=4)
+            os.chmod(MSMTP_OAUTH_JSON_PATH, 0o600)
 
-        # ✅ Store SMTP config in msmtp file
-        config_content = f"""account default
+            config_content = f"""account default
+host {smtp_server}
+port {smtp_port}
+auth oauthbearer
+user {username}
+from {email}
+passwordeval "jq -r .access_token {MSMTP_OAUTH_JSON_PATH}"
+tls {tls}
+tls_starttls on
+"""
+
+        else:
+            # Save plain password securely
+            with open(MSMTP_PASSWORD_PATH, "w") as f:
+                f.write(password)
+            os.chmod(MSMTP_PASSWORD_PATH, 0o600)
+
+            config_content = f"""account default
 host {smtp_server}
 port {smtp_port}
 auth on
@@ -317,48 +353,68 @@ tls {tls}
 tls_starttls on
 """
 
-        # ✅ Store recipient email in a separate file
+        # Store recipient email in a separate file
         with open(MSMTP_RECIPIENT_PATH, "w") as f:
             f.write(recipient_email)
-        os.chmod(MSMTP_RECIPIENT_PATH, 0o600)  # Secure permissions
+        os.chmod(MSMTP_RECIPIENT_PATH, 0o600)
 
-        # ✅ Write SMTP config
+        # Write msmtp config file
         with open(MSMTP_CONFIG_PATH, "w") as f:
             f.write(config_content)
-        os.chmod(MSMTP_CONFIG_PATH, 0o600)  # Secure permissions
+        os.chmod(MSMTP_CONFIG_PATH, 0o600)
 
         print("✅ SMTP configuration updated successfully!")
         return "✅ SMTP configuration updated successfully!"
 
     except Exception as e:
-        return f"❌ Error updating SMTP: {str(e)}"
+        error_message = f"❌ Error updating SMTP: {str(e)}"
+        print(error_message)
+        return error_message
+
 def sendEmailNotification(subject, message):
     """
-    Sends an automated notification email using msmtp with the correct config file.
+    Sends an automated notification email using msmtp, refreshing the OAuth token if needed.
     """
     try:
-        print("📨 Sending automated notification email...")  # Debugging log
+        print("📨 Preparing to send automated notification email...")
 
-        # ✅ Read recipient email from the saved file
+        # ✅ Check if msmtp config uses oauthbearer
+        with open(MSMTP_CONFIG_PATH, "r") as f:
+            config_content = f.read()
+
+        if "auth oauthbearer" in config_content:
+            print("🔄 Detected OAuth config. Refreshing token...")
+            refresh_process = subprocess.run(
+                ["python3", MSMTP_OAUTH_REFRESH_SCRIPT],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True
+            )
+            if refresh_process.returncode == 0:
+                print("✅ OAuth token refreshed successfully.")
+            else:
+                print(f"⚠️ Failed to refresh OAuth token: {refresh_process.stderr.strip()}")
+
+        # ✅ Read recipient email
         with open(MSMTP_RECIPIENT_PATH, "r") as f:
             recipient_email = f.read().strip()
 
-        # ✅ Construct the email content
+        # ✅ Construct email content
         email_content = f"""Subject: {subject}\n\n{message}"""
 
-        # ✅ Explicitly specify the `msmtp` config file location
+        # ✅ Send email using msmtp
         process = subprocess.run(
-            ["msmtp", "-C", "/etc/45drives/msmtp", recipient_email],
+            ["msmtp", "-C", MSMTP_CONFIG_PATH, recipient_email],
             input=email_content,
             universal_newlines=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
 
-        # ✅ Check if the email was sent successfully
         if process.returncode == 0:
-            print(f"✅ Notification sent to {recipient_email} successfully!")
-            return f"✅ Notification sent to {recipient_email} successfully!"
+            success_msg = f"✅ Notification sent to {recipient_email} successfully!"
+            print(success_msg)
+            return success_msg
         else:
             error_message = f"❌ Failed to send notification: {process.stderr.strip()}"
             print(error_message)
@@ -368,6 +424,7 @@ def sendEmailNotification(subject, message):
         error_message = f"❌ Error sending notification: {str(e)}"
         print(error_message)
         return error_message
+
 def fetchMsmtpDetails():
     """Fetch the stored SMTP configuration details from /etc/45drives/msmtp"""
     try:
@@ -455,10 +512,6 @@ class DBusService(dbus.service.Object):
     @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
     def FetchMsmtpDetails(self):    
         return fetchMsmtpDetails()
-
-
-        
-    
 
 # Setup D-Bus
 bus = dbus.SystemBus()
