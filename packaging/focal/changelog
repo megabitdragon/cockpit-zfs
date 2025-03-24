@@ -1,3 +1,9 @@
+cockpit-zfs (1.1.18-1focal) focal; urgency=medium
+
+  * Updates rules + control file to fix deb issue
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:04:56 -0300
+
 cockpit-zfs (1.1.17-1focal) focal; urgency=medium
 
   * Updates get_disks.py script to handle lsblk command to account for flag difference
