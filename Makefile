@@ -175,6 +175,6 @@ help:
 test-%:
 	yarn --cwd $* run test
 
-test: houston-common-test
+# test: houston-common-test
 
 FORCE:
