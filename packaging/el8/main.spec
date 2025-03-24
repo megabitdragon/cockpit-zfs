@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-2
+- retrying build
 * Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-1
 - Updates rules + control file to fix deb issue
 * Fri Mar 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.17-1

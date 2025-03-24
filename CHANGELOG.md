@@ -1,3 +1,3 @@
-## zfs module 1.1.18-1
+## zfs module 1.1.18-2
 
-* Updates rules + control file to fix deb issue
+* retrying build
