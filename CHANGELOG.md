@@ -1,3 +1,3 @@
-## zfs module 1.1.18-3
+## zfs module 1.1.18-4
 
 * trying deb build again
