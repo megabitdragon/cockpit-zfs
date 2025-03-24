@@ -21,19 +21,19 @@ Homepage: ::package_url::
 
 Package: ::package_name::
 Architecture: ::package_architecture_deb::
-Depends: 
-  cockpit,
-  python3,
-  python3-libzfs,
-  zfsutils-linux,
-  network-manager,
-  firewalld,
-  samba,
-  winbind,
-  tuned,
-  nfs-kernel-server,
-  realmd,
-  udisks2-lvm2,
-  jq,
-  ${misc:Depends}
+Depends: ::package_dependencies_deb_focal::
+  # cockpit,
+  # python3,
+  # python3-libzfs,
+  # zfsutils-linux,
+  # network-manager,
+  # firewalld,
+  # samba,
+  # winbind,
+  # tuned,
+  # nfs-kernel-server,
+  # realmd,
+  # udisks2-lvm2,
+  # jq,
+  # ${misc:Depends}
 Description: ::package_description_short::
