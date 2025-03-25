@@ -5,6 +5,9 @@ export DEBIAN_FRONTEND=noninteractive
 echo "[INFO] Updating APT package list..."
 apt-get update
 
+echo "[INFO] Installing jq..."
+apt-get install -y jq
+
 echo "[INFO] Reloading systemd daemon..."
 systemctl daemon-reload
 
@@ -15,4 +18,4 @@ echo "[INFO] Starting services..."
 systemctl start houston-dbus.service || true
 systemctl restart zed || true
 
-echo "[✅ SUCCESS] Services started!"
+echo "[✅ SUCCESS] jq installed and services started!"

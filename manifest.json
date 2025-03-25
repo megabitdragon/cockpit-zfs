@@ -28,8 +28,7 @@
                 "python3",
                 "python3-libzfs",
                 "python3-pip",
-                "sqlite",
-                "jq"
+                "sqlite"
             ]
         },
         "el": {
