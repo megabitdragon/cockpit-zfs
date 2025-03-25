@@ -57,6 +57,8 @@ systemctl start houston-dbus.service || true
 systemctl restart zed
 
 %changelog
+* Tue Mar 25 2025 Rachit Hans <rhans@45drives.com> 1.1.17-5
+- build package
 * Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-4
 - build  package for notifications
 * Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-3
