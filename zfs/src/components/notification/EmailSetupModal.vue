@@ -1,4 +1,4 @@
-<template>
+<template>		
     <OldModal :isOpen="emailSetUpModal" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <!-- <OldModal @close="closeModal" :isOpen="showAddVDevModal" :marginTop="props.marginTop" :width="'w-3/5'"
         :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false"> -->
@@ -7,17 +7,58 @@
             </template>
             <!-- <template v-slot:content> -->
             <template v-slot:content>
+                <div class="flex border-b mb-6">
+                    <button
+                        @click="activeTab = 'email-settings'"
+                        :class="['px-4 py-2', activeTab === 'email-settings' ? 'border-b-2 border-blue-500 font-semibold' : 'text-gray-500']"
+                    >
+                        Email Settings
+                    </button>
+                    <button
+                        @click="activeTab = 'warning-levels'"
+                        :class="['px-4 py-2', activeTab === 'warning-levels' ? 'border-b-2 border-blue-500 font-semibold' : 'text-gray-500']"
+                    >
+                        Warning Levels
+                    </button>
+                    </div>
+                    <div v-if="activeTab === 'warning-levels'" class="p-4 space-y-4">
+                        <h2 class="text-lg font-semibold mb-2">Set Warning Levels</h2>
+                        
+                        <div
+                            v-for="(label, key) in warningEvents"
+                            :key="key"
+                            v-if="key !== 'stateChange'"
+                            class="flex justify-center space-x-2"
+                        >
+                            <label class="w-[25%] text-md font-medium">{{ label }}</label>
+                            <select v-model="warningConfig[key]" class="w-[50%] p-2 border rounded-lg">
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="critical">Critical</option>
+                            </select>
+                        </div>
 
+                        <!-- Fixed Critical field for State Change -->
+                        <div class="flex justify-center space-x-2">
+                            <label class="w-[25%] text-md font-medium">State Change - Degraded/Faulted</label>
+                            <input type="text" value="Critical" disabled class="w-[50%] p-2 border rounded-lg bg-gray-100 text-red-600 font-semibold text-center" />
+                        </div>
+
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button @click="closeModal" class="bg-red-500 text-white p-2 rounded">Cancel</button>
+                            <button @click="saveWarningConfig" class="bg-green-500 text-white p-2 rounded">Save</button>
+                        </div>
+                        </div>
             <div>
-                <div class="space-y-4">
+                <div v-if="activeTab === 'email-settings'" class="space-y-4">
                     <div class="flex justify-center space-x-2">
-                    <!-- Email Provider Selection -->
-                    <label class="block text-md w-[25%] py-2 font-medium">Select Email Provider</label>
-                    <select v-model="emailConfig.authMethod" class="w-[50%] p-2 border rounded-lg">
-                        <option value="smtp">SMTP</option>
-                        <option value="oauth2">Google (OAuth)</option>
-                    </select>
-                </div>
+                        <!-- Email Provider Selection -->
+                        <label class="block text-md w-[25%] py-2 font-medium">Select Email Provider</label>
+                        <select v-model="emailConfig.authMethod" class="w-[50%] p-2 border rounded-lg">
+                            <option value="smtp">SMTP</option>
+                            <option value="oauth2">Google (OAuth)</option>
+                        </select>
+                    </div>
 
                     <!-- SMTP Settings -->
                     <div v-if="emailConfig.authMethod === 'smtp'" class="space-y-3">
@@ -109,7 +150,23 @@
                                 class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2" /></button>
                         </div>
                     </div>
-
+                    <div class="flex justify-center space-x-2 items-start">
+                        <label class="block text-md w-[25%] py-2 font-medium">Alert Levels</label>
+                        <div class="w-[50%] flex ">
+                            <div class="flex items-center space-x-2 mr-4">
+                            <input type="checkbox" v-model="alertLevels.info" class="h-4 w-4" />
+                            <label>Info</label>
+                            </div>
+                            <div class="flex items-center space-x-2 mr-4">
+                            <input type="checkbox" v-model="alertLevels.warning" class="h-4 w-4" />
+                            <label>Warning</label>
+                            </div>
+                            <div class="flex items-center space-x-2 mr-4">
+                            <input type="checkbox" v-model="alertLevels.critical" checked disabled class="h-4 w-4" />
+                            <label>Critical</label>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Test Email & Save -->
                     <div class="flex justify-between mt-4">
                         <button @click="testEmail" class="bg-gray-500 text-white p-2 rounded">Send Test Email</button>
@@ -133,11 +190,45 @@ input[type="checkbox"] {
 </style>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, watch, onMounted } from 'vue';
+import { ref, inject, Ref, computed, watch, onMounted, reactive } from 'vue';
 import {Modal, CardContainer, pushNotification, Notification } from '@45drives/houston-common-ui';
 import InfoTile from '../common/InfoTile.vue';
 import OldModal from '../common/OldModal.vue';
 
+const activeTab = ref('email-settings')
+
+
+const alertLevels = reactive({
+  info: false,
+  warning: false,
+  critical: true // or false by default if you don't want it pre-selected
+});
+
+interface WarningConfig {
+  scrubFinish: string;
+  vdevCleared: string;
+  resilverFinish: string;
+  clearPoolErrors: string;
+  snapshotCreation: string;
+  stateChange: string; // even though not user-editable, can still be tracked
+}
+const warningConfig = reactive<WarningConfig>({
+  scrubFinish: 'info',
+  vdevCleared: 'info',
+  resilverFinish: 'info',
+  clearPoolErrors: 'info',
+  snapshotCreation: 'info',
+  stateChange: 'critical',
+});
+
+const warningEvents: Record<keyof WarningConfig, string> = {
+  scrubFinish: 'Scrub Finish',
+  vdevCleared: 'Vdev Cleared',
+  resilverFinish: 'Resilver Finish',
+  clearPoolErrors: 'Clear Pool Errors',
+  snapshotCreation: 'Snapshot Creation',
+  stateChange: 'State Change - Degraded/Faulted',
+};
 const emailSetUpModal = ref(false);
 const emailConfig = ref({
     email: "",
@@ -170,6 +261,14 @@ const isFormValid = () => {
         emailConfig.value.password.trim() !== ""
     );
 };
+
+
+
+function saveWarningConfig() {
+  console.log('Warning levels saved:', warningConfig.value);
+  // Add your saving logic here
+}
+
 const closeModal = () => {
     emit('close');
 }
