@@ -2,31 +2,8 @@
 set -e  # Exit immediately if a command exits with a non-zero status
 export DEBIAN_FRONTEND=noninteractive
 
-
-# ✅ Ensure APT Lock is Released Before Installing jq
-echo "[INFO] Waiting for APT lock to release..."
-while sudo fuser /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-    echo "🔒 Another apt process is running. Waiting..."
-    sleep 5
-done
-
-# ✅ Update Package List & Install jq
 echo "[INFO] Updating APT package list..."
 apt-get update
-
-echo "[INFO] Installing jq..."
-if ! apt-get install -y jq; then
-    echo "❌ ERROR: Failed to install jq. Retrying in 5 seconds..."
-    sleep 5
-    apt-get install -y jq || echo "⚠️ Warning: jq installation failed again."
-fi
-
-# ✅ Verify jq Installation
-echo "[INFO] Verifying jq installation..."
-if ! command -v jq &>/dev/null; then
-    echo "❌ ERROR: jq is still missing! Exiting..."
-    exit 1
-fi
 
 echo "[INFO] Reloading systemd daemon..."
 systemctl daemon-reload
@@ -36,6 +13,6 @@ systemctl enable houston-dbus.service || true
 
 echo "[INFO] Starting services..."
 systemctl start houston-dbus.service || true
-systemctl restart zed
+systemctl restart zed || true
 
-echo "[✅ SUCCESS] jq installed and services started!"
+echo "[✅ SUCCESS] Services started!"
