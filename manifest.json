@@ -35,7 +35,11 @@
             "os_name": "ubuntu-focal",
             "group": "ubuntu"
         },
-        
+        {
+            "group": "debian",
+            "os_name": "debian-bookworm",
+            "image": "ci.cr.45d.io/ci/simple/ubuntu-jammy:1"
+        },
         {
             "image": "ci.cr.45d.io/ci/simple/rocky-el8:1",
             "os_name": "rocky-el8",

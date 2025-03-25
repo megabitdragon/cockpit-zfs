@@ -1,0 +1,267 @@
+cockpit-zfs (1.1.17-1bookworm) bookworm; urgency=medium
+
+  * Updates get_disks.py script to handle lsblk command to account for flag difference
+    in versions, and skips boot drives when returning disks via lsblk
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 07 Mar 2025 07:32:16 -0400
+
+cockpit-zfs (1.1.16-1bookworm) bookworm; urgency=medium
+
+  * Fixes a bug with RaidZ error handling not working when creating pool or adding
+    vdev
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 06 Mar 2025 12:26:59 -0400
+
+cockpit-zfs (1.1.15-6bookworm) bookworm; urgency=medium
+
+  * fix snapshot list/notification bugs
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 25 Feb 2025 07:43:36 -0400
+
+cockpit-zfs (1.1.15-5bookworm) bookworm; urgency=medium
+
+  * build attempt again with submodule checkout
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 07:26:29 -0400
+
+cockpit-zfs (1.1.15-4bookworm) bookworm; urgency=medium
+
+  * build
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 07:20:07 -0400
+
+cockpit-zfs (1.1.15-3bookworm) bookworm; urgency=medium
+
+  * build
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 07:10:09 -0400
+
+cockpit-zfs (1.1.15-2bookworm) bookworm; urgency=medium
+
+  * building again with diff git url as build failed
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 07:00:03 -0400
+
+cockpit-zfs (1.1.15-1bookworm) bookworm; urgency=medium
+
+  * Re-implements common-library and fixes bugs relating to nvme disks, ui layouts
+    and datatypes
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 21 Feb 2025 06:54:49 -0400
+
+cockpit-zfs (1.1.14-4bookworm) bookworm; urgency=medium
+
+  * trying to build again
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:48:49 -0400
+
+cockpit-zfs (1.1.14-3bookworm) bookworm; urgency=medium
+
+  * trying to build debs
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:44:26 -0400
+
+cockpit-zfs (1.1.14-2bookworm) bookworm; urgency=medium
+
+  * Trying to build package again after cleaning remnants of common lib
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:36:32 -0400
+
+cockpit-zfs (1.1.14-1bookworm) bookworm; urgency=medium
+
+  * Rolls back previous Houston-Common-Library updates due to some bugs that came
+    up during usage. Bugfixes pushed during common lib implementation should all
+    be retained, but removed common library usage for the time being to work out
+    those issues.
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 19 Feb 2025 11:28:57 -0400
+
+cockpit-zfs (1.1.13-2bookworm) bookworm; urgency=medium
+
+  * Fixes RaidZ levels' minimum disk quantity
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 13 Feb 2025 10:53:50 -0400
+
+cockpit-zfs (1.1.13-1bookworm) bookworm; urgency=medium
+
+  * Fixed an issue with houston-common import not getting correct types
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 13 Feb 2025 10:14:01 -0400
+
+cockpit-zfs (1.1.12-7bookworm) bookworm; urgency=medium
+
+  * build pkg
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:42:04 -0400
+
+cockpit-zfs (1.1.12-6bookworm) bookworm; urgency=medium
+
+  * rebuilding again
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:34:24 -0400
+
+cockpit-zfs (1.1.12-5bookworm) bookworm; urgency=medium
+
+  * updating build
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:29:39 -0400
+
+cockpit-zfs (1.1.12-4bookworm) bookworm; urgency=medium
+
+  * retrying build
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:25:34 -0400
+
+cockpit-zfs (1.1.12-3bookworm) bookworm; urgency=medium
+
+  * removed module test from makefile to fix build error
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:20:39 -0400
+
+cockpit-zfs (1.1.12-2bookworm) bookworm; urgency=medium
+
+  * rebuilding package
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 11:18:44 -0400
+
+cockpit-zfs (1.1.12-1bookworm) bookworm; urgency=medium
+
+  * Implements some common-library refactoring and some UI improvements
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 10 Feb 2025 10:45:30 -0400
+
+cockpit-zfs (1.1.11-1bookworm) bookworm; urgency=medium
+
+  * Fixed UI and refactored UI code
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 17 Jan 2025 06:50:13 -0400
+
+cockpit-zfs (1.1.10-1bookworm) bookworm; urgency=medium
+
+  * Fixes package number
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 07 Jan 2025 07:15:40 -0400
+
+cockpit-zfs (1.1.20-1bookworm) bookworm; urgency=medium
+
+  * Fixes binary size bug
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 07 Jan 2025 07:11:56 -0400
+
+cockpit-zfs (1.1.9-1bookworm) bookworm; urgency=medium
+
+  * Adds block device name to disk name for better UX, fixes available disk selection
+    issue where in-use disks shown as available
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 07 Jan 2025 06:52:20 -0400
+
+cockpit-zfs (1.1.8-1bookworm) bookworm; urgency=medium
+
+  * Updates readme and fixes get-importable-pools functionality.
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 16 Dec 2024 06:11:33 -0400
+
+cockpit-zfs (1.1.7-2bookworm) bookworm; urgency=medium
+
+  * Testing capacity bugfix for non-aliased disks
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 09 Dec 2024 11:26:54 -0400
+
+cockpit-zfs (1.1.7-1bookworm) bookworm; urgency=medium
+
+  * Adjusts disk capacity strings and removes accidental double conversion of binary
+    size values where applicable
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 09 Dec 2024 05:30:51 -0400
+
+cockpit-zfs (1.1.6-1bookworm) bookworm; urgency=medium
+
+  * Fixes issue with convertSizeToBytes function, which would give errors when creating
+    vdevs with same size disks (incorrectly flagging as different sizes)
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 06 Dec 2024 10:30:15 -0400
+
+cockpit-zfs (1.1.5-1bookworm) bookworm; urgency=medium
+
+  * Updated Datatypes
+
+ -- Rachit Hans <rhans@45drives.com>  Thu, 05 Dec 2024 08:13:49 -0400
+
+cockpit-zfs (1.1.4-1bookworm) bookworm; urgency=medium
+
+  * Fixes some notification bugs (errorString formatting issues)
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 28 Nov 2024 13:05:54 -0400
+
+cockpit-zfs (1.1.3-1bookworm) bookworm; urgency=medium
+
+  * FIXED VERSION NUMBER - Adds log files for getDisks and getPools scripts
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 21 Nov 2024 06:28:40 -0400
+
+cockpit-zfs (1.2.3-1bookworm) bookworm; urgency=medium
+
+  * Adds log files for getDisks and getPools script execution for better debugging
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 21 Nov 2024 06:26:56 -0400
+
+cockpit-zfs (1.1.2-1bookworm) bookworm; urgency=medium
+
+  * Reworked bytes conversion function to fix mismatched disk size bug
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 18 Nov 2024 04:01:54 -0400
+
+cockpit-zfs (1.1.1-1bookworm) bookworm; urgency=medium
+
+  * Updates disk data retrieval using lsdev with a fallback to lsblk data if lsdev
+    is not available (on VMs or non-aliased third party hardware)
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 06 Nov 2024 09:17:48 -0400
+
+cockpit-zfs (1.1.0-1bookworm) bookworm; urgency=medium
+
+  * Stable Release
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 04 Nov 2024 06:32:17 -0400
+
+cockpit-zfs (1.0.4-3bookworm) bookworm; urgency=medium
+
+  * Rebuilding
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 23 Oct 2024 07:37:57 -0300
+
+cockpit-zfs (1.0.4-2bookworm) bookworm; urgency=medium
+
+  * Rebuilding
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 23 Oct 2024 07:33:36 -0300
+
+cockpit-zfs (1.0.4-1bookworm) bookworm; urgency=medium
+
+  * Adds upgrade pool feature for pools made in legacy zfs version
+
+ -- Jordan Keough <jkeough@45drives.com>  Wed, 23 Oct 2024 07:17:25 -0300
+
+cockpit-zfs (1.0.3-1bookworm) bookworm; urgency=medium
+
+  * Bug fixes and some minor updates
+
+ -- Jordan Keough <jkeough@45drives.com>  Mon, 21 Oct 2024 12:53:49 -0300
+
+cockpit-zfs (1.0.2-3bookworm) bookworm; urgency=medium
+
+  * Fixes rendering issue with status bar in Pools list
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 24 Sep 2024 06:03:50 -0300
+
+cockpit-zfs (1.0.2-2bookworm) bookworm; urgency=medium
+
+  * Building for bookworm
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 28 May 2024 07:48:45 -0300
+
+cockpit-zfs (0.1.0-1bookworm) bookworm; urgency=medium
+
+  * initial release
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 08 Mar 2024 09:23:59 -0400
