@@ -10,13 +10,13 @@
                 <div class="flex border-b mb-6">
                     <button
                         @click="activeTab = 'email-settings'"
-                        :class="['px-4 py-2', activeTab === 'email-settings' ? 'border-b-2 border-blue-500 font-semibold' : 'text-gray-500']"
+                        :class="['px-4 py-2', activeTab === 'email-settings' ? 'border-b-2 text-white font-semibold' : 'text-gray-500']"
                     >
                         Email Settings
                     </button>
                     <button
                         @click="activeTab = 'warning-levels'"
-                        :class="['px-4 py-2', activeTab === 'warning-levels' ? 'border-b-2 border-blue-500 font-semibold' : 'text-gray-500']"
+                        :class="['px-4 py-2', activeTab === 'warning-levels' ? 'border-b-2 text-white font-semibold' : 'text-gray-500']"
                     >
                         Warning Levels
                     </button>
