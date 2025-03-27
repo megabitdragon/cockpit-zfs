@@ -466,6 +466,8 @@ def fetchMsmtpDetails():
                 smtp_details["email"] = line.split(" ")[1].strip()
             elif line.startswith("tls "):  # ✅ Extract TLS value
                 smtp_details["tls"] = line.split(" ")[1].strip().lower() == "on"
+            elif line.startswith("auth"):
+                smtp_details["auth"] = line.split(" ")[1].strip()
         
         # Read password securely
         with open(MSMTP_PASSWORD_PATH, "r") as f:
@@ -587,3 +589,33 @@ if __name__ == "__main__":
     severity = "info"  # Can be "info", "warning", or "critical"
     
     print(sendEmailNotification(subject, message, severity))
+
+def resetMsmtpData():
+    """Reset the msmtp configuration files to empty or default state."""
+    try:
+        # Default or empty values
+        default_config = [
+            "host \n",
+            "port \n",
+            "user \n",
+            "from \n",
+            "tls off\n",
+            "auth plain\n"
+        ]
+
+        # Reset msmtprc
+        with open(MSMTP_CONFIG_PATH, "w") as config_file:
+            config_file.writelines(default_config)
+
+        # Clear password file
+        with open(MSMTP_PASSWORD_PATH, "w") as pw_file:
+            pw_file.write("")
+
+        # Clear recipient file
+        with open(MSMTP_RECIPIENT_PATH, "w") as recipient_file:
+            recipient_file.write("")
+
+        return json.dumps({"success": "SMTP config reset successfully."})
+
+    except Exception as e:
+        return json.dumps({"error": f"Failed to reset SMTP config: {str(e)}"})

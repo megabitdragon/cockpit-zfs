@@ -56,44 +56,52 @@
                     <div class="flex justify-center space-x-2">
                         <!-- Email Provider Selection -->
                         <label class="block text-md w-[25%] py-2 font-medium">Select Email Provider</label>
-                        <select v-model="emailConfig.authMethod" class="w-[50%] p-2 border rounded-lg">
+                        <select v-model="smtpMethod" class="w-[50%] p-2 border rounded-lg">
                             <option value="smtp">SMTP</option>
                             <option value="oauth2">Google (OAuth)</option>
                         </select>
                     </div>
 
                     <!-- SMTP Settings -->
-                    <div v-if="emailConfig.authMethod === 'smtp'" class="space-y-3">
+                    <div v-if="smtpMethod === 'smtp'" class="space-y-3">
                         
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Email Address  <InfoTile class="ml-1"
                                 :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
-                            <input v-model="emailConfig.email" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded-lg" />
+
+
+                                <!-- Bound input when authDetailsExist is false -->
+                                <input
+                                v-model="smtpEmailConfig.email"
+                                type="email"
+                                placeholder="your-email@example.com"
+                                class="w-[50%] p-2 border rounded-lg"
+                                />                        
                         </div>
-                        <div v-if="formValidationAttempted && (!emailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
+                        <div v-if="formValidationAttempted && (!smtpEmailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p class="text-red-500 text-sm w-[50%]">
-                                {{ !emailConfig.email ? "Email Address is required." : "Invalid email format." }}
+                                {{ !smtpEmailConfig.email ? "Email Address is required." : "Invalid email format." }}
                             </p>
                         </div>
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Recievers Email Address  <InfoTile class="ml-1"
                                 :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
-                            <input v-model="emailConfig.recieversEmail" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
+                            <input v-model="smtpEmailConfig.recieversEmail" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
                         </div>
-                        <div v-if="formValidationAttempted && (!emailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
+                        <div v-if="formValidationAttempted && (!smtpEmailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p class="text-red-500 text-sm w-[50%]">
-                                {{ !emailConfig.email ? "Email Address is required." : "Invalid email format." }}
+                                {{ !smtpEmailConfig.email ? "Email Address is required." : "Invalid email format." }}
                             </p>
                         </div>
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">SMTP Server <InfoTile class="ml-1"
                                 :title="`The address of the outgoing mail server. Example: smtp.gmail.com for Gmail, or smtp.office365.com for Outlook.`" />
                             </label>
-                            <input v-model="emailConfig.smtpServer" type="text" placeholder="smtp.example.com" class="w-[50%] p-2 border rounded-lg" />
+                            <input v-model="smtpEmailConfig.smtpServer" type="text" placeholder="smtp.example.com" class="w-[50%] p-2 border rounded-lg" />
                         </div>
-                        <div v-if="formValidationAttempted && !emailConfig.smtpServer" class="flex justify-center space-x-2">
+                        <div v-if="formValidationAttempted && !smtpEmailConfig.smtpServer" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p  class="text-red-500 text-sm w-[50%]">SMTP Server is required.</p>
 
@@ -102,9 +110,9 @@
                             <label class="block w-[25%] text-md font-medium">SMTP Port <InfoTile class="ml-1"
                                 :title="`The port number used to connect to the SMTP server.\nCommon values:\n- 25: Non-secure SMTP\n- 465: Secure SMTP (SSL)\n- 587: Secure SMTP (STARTTLS)`" />
                             </label>
-                            <input v-model="emailConfig.smtpPort" type="number" placeholder="587" class="w-[50%] p-2 border rounded-lg" />
+                            <input v-model="smtpEmailConfig.smtpPort" type="number" placeholder="587" class="w-[50%] p-2 border rounded-lg" />
                         </div>    
-                        <div v-if="formValidationAttempted && !emailConfig.smtpPort" class="flex justify-center space-x-2">
+                        <div v-if="formValidationAttempted && !smtpEmailConfig.smtpPort" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p  class="text-red-500 w-[50%] text-sm">SMTP Port is required.</p>
 
@@ -113,10 +121,10 @@
                         <div class="flex justify-center space-x-2">
                             <label class="block w-[25%] text-md font-medium">Username <InfoTile class="ml-1"
                                 :title="`The login username for authentication with the SMTP server. Usually the same as the sender email address.`" />                            </label>
-                            <input v-model="emailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded-lg" />
+                            <input v-model="smtpEmailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded-lg" />
 
                         </div>     
-                        <div v-if="formValidationAttempted && !emailConfig.username" class="flex justify-center space-x-2">
+                        <div v-if="formValidationAttempted && !smtpEmailConfig.username" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p  class="text-red-500 text-sm w-[50%]">Username is required.</p>
                         </div>                    
@@ -125,15 +133,15 @@
                             <label class="block  w-[25%] text-md font-medium">Password <InfoTile class="ml-1"
                                 :title="`The password or app-specific password used for authenticating with the SMTP server.\nNote: Some providers require an app password instead of the regular account password.`" />
                             </label>
-                            <input  v-model="emailConfig.password" type="password"  class="w-[50%] p-2 border rounded-lg" />
+                            <input  v-model="smtpEmailConfig.password" type="password"  class="w-[50%] p-2 border rounded-lg" />
                         </div>
-                        <div v-if="formValidationAttempted && !emailConfig.password" class="flex justify-center space-x-2">
+                        <div v-if="formValidationAttempted && !smtpEmailConfig.password" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p class="text-red-500 text-sm w-[50%]">Password is required.</p>
                         </div>                      
 
                         <div class="flex justify-center space-x-2 w-[25%]">
-                            <input type="checkbox" v-model="emailConfig.tls" class="h-4 w-4" />
+                            <input type="checkbox" v-model="smtpEmailConfig.tls" class="h-4 w-4" />
                             <label>Enable TLS      <InfoTile class="ml-1"
                                 :title="`Enable Transport Layer Security (TLS) encryption for secure email transmission.\nThis is required for most modern SMTP providers using port 587.`" />
                             </label>
@@ -141,37 +149,49 @@
                     </div>
 
                     <!-- OAuth Setup for Google -->
-                    <div v-if="emailConfig.authMethod !== 'smtp'" class="space-y-3 text-center">
+                    <div v-if="smtpMethod !== 'smtp'" class="space-y-3 text-center">
                         <div class="w-[100%] mt-[1rem]">
                             <p class="text-sm text-gray-500">OAuth setup requires authentication via your email provider.</p>
                         </div>
                         <div class="flex justify-center">
-                            <button @click="oAuthBtn" class="w-[30%] bg-[#FF4329] flex hover:bg-[#9E2500] text-white p-2 mb-[1rem] btn">
-                                <span class="flex-grow text-center mt-0.5">Connect with Google </span> 
+                            <button class="w-[30%] bg-green-600 flex  text-white p-2 mb-[1rem] btn pointer-events-none" v-if="authDetailsExist==true">
+                                <span class="flex-grow text-center mt-0.5">Connected as {{ authEmailConfig.username }}</span>
+                            </button>
+                            <button v-if="authDetailsExist==true" @click="oAuthBtn" class="w-[30%] ml-[1rem] bg-[#FF4329] flex hover:bg-[#9E2500] text-white p-2 mb-[1rem] btn">
+                                <span  class="flex-grow text-center mt-0.5">Reconnect with Google with different account </span>
+                                <img src="../../../public/img/icons8-gmail-48.png" alt="provider-logo"
+                                class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2" /></button>
+                                
+                                <button v-else="authDetailsExist==false" @click="oAuthBtn" class="w-[30%] bg-[#FF4329] flex hover:bg-[#9E2500] text-white p-2 mb-[1rem] btn">
+                                <span class="flex-grow text-center mt-0.5">Connect with Google </span>
                                 <img src="../../../public/img/icons8-gmail-48.png" alt="provider-logo"
                                 class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2" /></button>
                         </div>
                     </div>
                     <div class="flex justify-center space-x-2 items-start">
                         <label class="block text-md w-[25%] py-2 font-medium">Alert Levels</label>
-                        <div class="w-[50%] flex ">
+                        <div class="w-[50%] flex py-2 ">
                             <div class="flex items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="emailConfig.send_info" class="h-4 w-4" />
+                            <input type="checkbox" v-model="send_info" class="h-4 w-4" />
                             <label>Info</label>
                             </div>
                             <div class="flex items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="emailConfig.send_warning" class="h-4 w-4" />
+                            <input type="checkbox" v-model="send_warning" class="h-4 w-4" />
                             <label>Warning</label>
                             </div>
                             <div class="flex items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="emailConfig.send_critical" checked disabled class="h-4 w-4" />
+                            <input type="checkbox" v-model="send_critical" checked disabled class="h-4 w-4" />
                             <label>Critical</label>
                             </div>
                         </div>
                     </div>
                     <!-- Test Email & Save -->
                     <div class="flex justify-between mt-4">
-                        <button @click="testEmail" class="bg-gray-500 text-white p-2 rounded">Send Test Email</button>
+                        <div>
+                        <button @click="testEmail" class=" bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">Send Test Email</button>
+                        <button :disabled="!authEmailConfig.username && !smtpEmailConfig.email" @click="resetMsmtpData" class="bg-gray-500 hover:bg-gray-600 ml-2 text-white p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                             Reset Data</button>                    
+                    </div>
                         <div class="space-x-2">
                             <button @click="closeModal" class="bg-red-500 text-white p-2 rounded">Cancel</button>
                             <button @click="updateSMTPConfig" class="bg-green-500 text-white p-2 rounded">Save</button>
@@ -199,7 +219,11 @@ import OldModal from '../common/OldModal.vue';
 import { WarningConfig } from '../../types';
 
 const activeTab = ref('email-settings')
-
+const authDetailsExist = ref(false)
+const smtpMethod = ref("oauth2")
+const send_info = ref(false)
+const send_warning = ref(false)
+const send_critical = true
 
 const warningConfig = reactive<WarningConfig>({
   scrubFinish: 'info',
@@ -219,7 +243,22 @@ const warningEvents: Record<keyof WarningConfig, string> = {
   stateChange: 'State Change - Degraded/Faulted',
 };
 const emailSetUpModal = ref(false);
-const emailConfig = ref({
+
+const authEmailConfig = ref({
+    email: "",
+    smtpServer: "",
+    smtpPort: 587,
+    username: "",
+    password: "",
+    recieversEmail: "",
+    tls: true,
+    authMethod: "oauth2",
+    oauthAccessToken: "",              
+    tokenExpiry: "",
+    email_enabled: true,    
+  
+});
+const smtpEmailConfig = ref({
     email: "",
     smtpServer: "",
     smtpPort: 587,
@@ -238,21 +277,33 @@ const emailConfig = ref({
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const isEmailValid = computed(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(emailConfig.value.email) && emailRegex.test(emailConfig.value.recieversEmail);
+    return emailRegex.test(smtpEmailConfig.value.email) && emailRegex.test(smtpEmailConfig.value.recieversEmail);
 });
 
 const formValidationAttempted = ref(false); // Tracks if validation has been triggered
 
 const isFormValid = () => {
     formValidationAttempted.value = true; // Mark validation as triggered
-    return (
-        emailConfig.value.email.trim() !== "" &&
-        emailConfig.value.recieversEmail.trim() !== "" &&
-        emailConfig.value.smtpServer.trim() !== "" &&
-        emailConfig.value.smtpPort > 0 &&
-        emailConfig.value.username.trim() !== "" &&
-        emailConfig.value.password.trim() !== ""
-    );
+    if (smtpMethod.value=="smtp"){
+        return (
+        smtpEmailConfig.value.email.trim() !== "" &&
+        smtpEmailConfig.value.recieversEmail.trim() !== "" &&
+        smtpEmailConfig.value.smtpServer.trim() !== "" &&
+        smtpEmailConfig.value.smtpPort > 0 &&
+        smtpEmailConfig.value.username.trim() !== "" &&
+        smtpEmailConfig.value.password.trim() !== ""
+        );
+    }else{
+        return(
+            authEmailConfig.value.email.trim() !== "" &&
+            authEmailConfig.value.recieversEmail.trim() !== "" &&
+            authEmailConfig.value.smtpServer.trim() !== "" &&
+            authEmailConfig.value.smtpPort > 0 &&
+            authEmailConfig.value.username.trim() !== "" &&
+            authEmailConfig.value.password.trim() !== ""
+        )
+    }
+
 };
 
 
@@ -317,16 +368,33 @@ const fetchMsmtpDetails = async () => {
             alert("❌ Failed to fetch SMTP details.");
             return;
         }
+        console.log("smtpData.auth", smtpData.auth)
+        if(smtpData.auth=="on"){
+            smtpMethod.value = "smtp"
+            smtpEmailConfig.value.email = smtpData.email;
+            smtpEmailConfig.value.recieversEmail = smtpData.recieversEmail;
+            smtpEmailConfig.value.smtpServer = smtpData.smtpServer;
+            smtpEmailConfig.value.smtpPort = smtpData.smtpPort;
+            smtpEmailConfig.value.username = smtpData.username;
+            smtpEmailConfig.value.password = smtpData.password;
+            smtpEmailConfig.value.tls = smtpData.tls;
+            smtpEmailConfig.value.authMethod = smtpData.auth
+        }else if(smtpData.auth!="on" || smtpData.auth!="") {
+            smtpMethod.value = "oauth2"
 
+            authEmailConfig.value.email = smtpData.email;
+            authEmailConfig.value.recieversEmail = smtpData.recieversEmail;
+            authEmailConfig.value.smtpServer = smtpData.smtpServer;
+            authEmailConfig.value.smtpPort = smtpData.smtpPort;
+            authEmailConfig.value.username = smtpData.username;
+            authEmailConfig.value.password = smtpData.password;
+            authEmailConfig.value.tls = smtpData.tls;
+            authEmailConfig.value.authMethod = smtpData.auth
+            authEmailConfig.value.authMethod = "oauth2"
+            authDetailsExist.value = true;
+
+        }
         // ✅ Populate Vue state with fetched values
-        emailConfig.value.email = smtpData.email;
-        emailConfig.value.recieversEmail = smtpData.recieversEmail;
-        emailConfig.value.smtpServer = smtpData.smtpServer;
-        emailConfig.value.smtpPort = smtpData.smtpPort;
-        emailConfig.value.username = smtpData.username;
-        emailConfig.value.password = smtpData.password;
-        emailConfig.value.tls = smtpData.tls;
-
         console.log("✅ SMTP details fetched successfully:", smtpData);
     } catch (error) {
         console.error("❌ Error fetching SMTP details:", error);
@@ -334,66 +402,88 @@ const fetchMsmtpDetails = async () => {
     }
 };
 
-
 const updateSMTPConfig = async () => {
-    if (!isFormValid() || !isEmailValid ) {
-        if(!isEmailValid){
-            alert("⚠️ Please fill valid email address  before sending a test email.");
-
-        }else{
-            alert("⚠️ Please fill in all fields before sending a test email.");
-
-        }
-        return;
+  if (!isFormValid() || !isEmailValid) {
+    if (!isEmailValid) {
+      alert("⚠️ Please fill valid email address before sending a test email.");
+    } else {
+      alert("⚠️ Please fill in all fields before sending a test email.");
     }
-    try {
-        console.log("🔄 Updating SMTP Config via D-Bus...");
+    return; // ⬅️ Don't continue if the form isn't valid
+  }
 
-        const cockpit = (window as any).cockpit;
-        const dbus = cockpit.dbus("org._45drives.Houston");
+  try {
+    console.log("🔄 Updating SMTP Config via D-Bus...");
 
-        const config = {
-            email: emailConfig.value.email,
-            smtpServer: emailConfig.value.smtpServer,
-            smtpPort: emailConfig.value.smtpPort,
-            username: emailConfig.value.username,
-            password: emailConfig.value.password,
-            recieversEmail: emailConfig.value.recieversEmail,
-            tls: emailConfig.value.tls,
-            send_info: emailConfig.value.send_info,
-            send_warning: emailConfig.value.send_warning,
-            send_critical: true,
-            email_enabled: true,
-            authMethod: emailConfig.value.authMethod    
+    const cockpit = (window as any).cockpit;
+    const dbus = cockpit.dbus("org._45drives.Houston");
 
+    let config;
 
-        };
-        console.log("configemail  ", config)
-        // ✅ Ensure the correct D-Bus method call structure
-        const response = await dbus.call(
-            "/org/_45drives/Houston",   // ✅ Object path
-            "org._45drives.Houston",    // ✅ Interface
-            "UpdateSMTPConfig",         // ✅ Method name
-            [JSON.stringify(config)]    // ✅ Argument (as an array)
-        );
-
-        console.log(`✅ D-Bus Response: ${response}`);
-        alert("✅ SMTP Configuration updated successfully!");
-        closeModal()
-
-    } catch (error) {
-        console.error("❌ Error updating SMTP settings via D-Bus:", error);
-        alert("❌ Failed to update SMTP settings: " + error.message);
+    if (smtpMethod.value === "smtp") {
+      config = {
+        email: smtpEmailConfig.value.email,
+        smtpServer: smtpEmailConfig.value.smtpServer,
+        smtpPort: smtpEmailConfig.value.smtpPort,
+        username: smtpEmailConfig.value.username,
+        password: smtpEmailConfig.value.password,
+        recieversEmail: smtpEmailConfig.value.recieversEmail,
+        tls: smtpEmailConfig.value.tls,
+        send_info: send_info.value,
+        send_warning: send_warning.value,
+        send_critical: true,
+        email_enabled: true,
+        authMethod: smtpMethod.value,
+      };
+    } else {
+      config = {
+        email: authEmailConfig.value.email,
+        smtpServer: authEmailConfig.value.smtpServer,
+        smtpPort: authEmailConfig.value.smtpPort,
+        username: authEmailConfig.value.username,
+        password: authEmailConfig.value.password,
+        recieversEmail: authEmailConfig.value.recieversEmail,
+        tls: authEmailConfig.value.tls,
+        send_info: send_info.value,
+        send_warning: send_warning.value,
+        send_critical: true,
+        email_enabled: true,
+        authMethod: smtpMethod.value,
+      };
     }
+
+    console.log("📤 Config to send:", config);
+
+    const response = await dbus.call(
+      "/org/_45drives/Houston",
+      "org._45drives.Houston",
+      "UpdateSMTPConfig",
+      [JSON.stringify(config)]
+    );
+
+    console.log(`✅ D-Bus Response: ${response}`);
+    alert("✅ SMTP Configuration updated successfully!");
+    closeModal();
+  } catch (error: any) {
+    console.error("❌ Error updating SMTP settings via D-Bus:", error);
+    alert("❌ Failed to update SMTP settings: " + (error.message || error));
+  }
 };
+
 
 
 const testEmail = async () => {
     if (!isFormValid() || !isEmailValid) {
         if (!isEmailValid) {
             alert("⚠️ Please enter a valid email address before sending a test email.");
-        } else {
+        } 
+        if(smtpMethod.value=="smtp"){
             alert("⚠️ Please fill in all fields before sending a test email.");
+
+        }
+        else {
+            alert("⚠️ Please sign in with Gmail.");
+
         }
         return;
     }
@@ -403,21 +493,30 @@ const testEmail = async () => {
 
         const cockpit = (window as any).cockpit;
         const dbus = cockpit.dbus("org._45drives.Houston");
+        let config;
+        if(smtpMethod.value=="smtp"){
+             config = {
+            email: smtpEmailConfig.value.email,
+            smtpServer: smtpEmailConfig.value.smtpServer,
+            smtpPort: smtpEmailConfig.value.smtpPort,
+            username: smtpEmailConfig.value.username,
+            tls: smtpEmailConfig.value.tls,
+            recipientEmail: smtpEmailConfig.value.recieversEmail,
+            password: smtpEmailConfig.value.password
 
-        const config: any = {
-            email: emailConfig.value.email,
-            smtpServer: emailConfig.value.smtpServer,
-            smtpPort: emailConfig.value.smtpPort,
-            username: emailConfig.value.username,
-            tls: emailConfig.value.tls,
-            recipientEmail: emailConfig.value.recieversEmail
-        };
+            };
+        }else{
+             config = {
+            email: authEmailConfig.value.email,
+            smtpServer: authEmailConfig.value.smtpServer,
+            smtpPort: authEmailConfig.value.smtpPort,
+            username: authEmailConfig.value.username,
+            tls: authEmailConfig.value.tls,
+            recipientEmail: authEmailConfig.value.recieversEmail,
+            password: accessToken.value || authEmailConfig.value.oauthAccessToken,
+            tokenExpiry : tokenExpiry.value
 
-        if (emailConfig.value.authMethod === 'smtp') {
-            config.password = emailConfig.value.password;
-        } else {
-            config.password = accessToken.value || emailConfig.value.oauthAccessToken;
-            config.tokenExpiry = tokenExpiry.value;
+            };
         }
 
 
@@ -471,23 +570,23 @@ async function oAuthBtn() {
                     oAuthenticated.value = true;
 
                     // Prepare emailConfig for DBus call
-                    emailConfig.value.email = emailFromOAuth;
-                    emailConfig.value.username = emailFromOAuth;
-                    emailConfig.value.password = refreshValue; // refresh_token
-                    emailConfig.value.recieversEmail = emailFromOAuth;
-                    emailConfig.value.smtpServer = "smtp.gmail.com";
-                    emailConfig.value.smtpPort = 587;
-                    emailConfig.value.tls = true;
-                    emailConfig.value.authMethod = "oauth2";
-                    emailConfig.value.oauthAccessToken = tokenValue;
-                    emailConfig.value.tokenExpiry = expiry;
+                    authEmailConfig.value.email = emailFromOAuth;
+                    authEmailConfig.value.username = emailFromOAuth;
+                    authEmailConfig.value.password = refreshValue; // refresh_token
+                    authEmailConfig.value.recieversEmail = emailFromOAuth;
+                    authEmailConfig.value.smtpServer = "smtp.gmail.com";
+                    authEmailConfig.value.smtpPort = 587;
+                    authEmailConfig.value.tls = true;
+                    authEmailConfig.value.authMethod = "oauth2";
+                    authEmailConfig.value.oauthAccessToken = tokenValue;
+                    authEmailConfig.value.tokenExpiry = expiry;
                     
                     pushNotification(new Notification('Gmail Authentication Successful', `Tokens updated for ${emailFromOAuth}`, 'success', 8000));
                     const cockpit = (window as any).cockpit;
                     const dbus = cockpit.dbus("org._45drives.Houston");
 
                     // ✅ Call DBus to update SMTP config
-                    const configPayload = JSON.stringify(emailConfig.value);
+                    const configPayload = JSON.stringify(authEmailConfig.value);
                     const response = await dbus.call(
                         "/org/_45drives/Houston",
                         "org._45drives.Houston",
@@ -514,6 +613,22 @@ async function oAuthBtn() {
         pushNotification(new Notification('Authentication Error', `${error.message}`, 'error', 8000));
     }
 }
+
+const resetMsmtpData = async () => {
+    const cockpit = (window as any).cockpit;
+        const dbus = cockpit.dbus("org._45drives.Houston");
+
+        const response = await dbus.call(
+            "/org/_45drives/Houston",
+            "org._45drives.Houston",
+            "resetMsmtpData",
+        );
+
+        console.log(`✅ D-Bus Response: ${response}`);
+        alert(response.includes("✅") ? response : `✅ Test email sent: ${response}`);
+
+
+};
 
 
 
