@@ -26,15 +26,6 @@ fi
 IMPACT_MESSAGE="A device in the ZFS pool '$EVENT_POOL' has been manually cleared. This may indicate previous errors were acknowledged, or a device issue has been resolved."
 RECOMMENDATION="Monitor the device health closely to ensure no further errors occur."
 
-# ✅ Construct JSON message for forwarding to Houston UI
-FORWARD_MESSAGE=$(jq -n \
-  --arg timestamp "$EVENT_TIMESTAMP" \
-  --arg event "$EVENT_CLASS" \
-  --arg pool "$EVENT_POOL" \
-  --arg vdev "$EVENT_VDEV" \
-  --arg vdev_guid "$EVENT_VDEV_GUID" \
-  --arg pool_guid "$EVENT_POOL_GUID" \
-  '{timestamp: $timestamp, event: $event, pool: $pool, vdev: $vdev, vdev_guid: $vdev_guid, pool_guid: $pool_guid}')
 
 # ✅ Construct Subject & User-Friendly Email Message
 EMAIL_SUBJECT="ZFS Alert: Device Cleared in Pool '$EVENT_POOL'"
@@ -74,6 +65,18 @@ Recommended Actions
 For further details, refer to system logs or ZFS documentation.
 EOF
 )
+# ✅ Construct JSON message for forwarding to Houston UI
+FORWARD_MESSAGE=$(jq -n \
+  --arg timestamp "$EVENT_TIMESTAMP" \
+  --arg event "$EVENT_CLASS" \
+  --arg pool "$EVENT_POOL" \
+  --arg vdev "$EVENT_VDEV" \
+  --arg vdev_guid "$EVENT_VDEV_GUID" \
+  --arg pool_guid "$EVENT_POOL_GUID" \
+  --arg subject "$EMAIL_SUBJECT" \
+  --arg email_message "$EMAIL_MESSAGE" \
+  '{timestamp: $timestamp, event: $event, pool: $pool, vdev: $vdev, vdev_guid: $vdev_guid, pool_guid: $pool_guid,subject: $subject, email_message: $email_message}')
+
 
 # ✅ Logging event details for debugging
 {
@@ -94,10 +97,6 @@ EOF
 python3 "$DBUS_CLIENT" forward "ZFS VDEV Cleared" "$FORWARD_MESSAGE" >> "$DEBUG_LOG" 2>&1
 FORWARD_STATUS=$?
 
-# ✅ Send user-friendly email notification
-python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE" >> "$DEBUG_LOG" 2>&1
-EMAIL_STATUS=$?
-
 # ✅ Log final result
 if [ "$FORWARD_STATUS" -eq 0 ]; then
   echo "[SUCCESS] VDEV clear event successfully forwarded to Houston UI" >> "$DEBUG_LOG"
@@ -105,10 +104,6 @@ else
   echo "[ERROR] Failed to forward VDEV clear event to Houston UI" >> "$DEBUG_LOG"
 fi
 
-if [ "$EMAIL_STATUS" -eq 0 ]; then
-  echo "[SUCCESS] VDEV clear email sent successfully" >> "$DEBUG_LOG"
-else
-  echo "[ERROR] Failed to send VDEV clear email" >> "$DEBUG_LOG"
-fi
+
 
 exit 0

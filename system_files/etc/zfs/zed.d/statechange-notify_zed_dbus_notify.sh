@@ -50,17 +50,6 @@ case "$EVENT_STATE" in
     ;;
 esac
 
-# Construct JSON message for forwarding to Houston UI
-FORWARD_MESSAGE=$(jq -n \
-  --arg timestamp "$EVENT_TIMESTAMP" \
-  --arg event "$EVENT_CLASS" \
-  --arg pool "$EVENT_POOL" \
-  --arg vdev "$EVENT_VDEV" \
-  --arg state "$EVENT_STATE" \
-  --arg vphys "$EVENT_VPHYS" \
-  --arg vguid "$EVENT_VGUID" \
-  --arg devid "$EVENT_DEVID" \
-  '{timestamp: $timestamp, event: $event, pool: $pool, vdev: $vdev, state: $state, vphys: $vphys, vguid: $vguid, devid: $devid}')
 
 # Construct Subject & User-Friendly Email Message
 EMAIL_SUBJECT="ZFS ALERT: $EVENT_POOL - $EVENT_STATE ($URGENCY)"
@@ -116,6 +105,22 @@ For further troubleshooting and guidance, refer to ZFS documentation or your sto
 EOF
 )
 
+
+# Construct JSON message for forwarding to Houston UI
+FORWARD_MESSAGE=$(jq -n \
+  --arg timestamp "$EVENT_TIMESTAMP" \
+  --arg event "$EVENT_CLASS" \
+  --arg pool "$EVENT_POOL" \
+  --arg vdev "$EVENT_VDEV" \
+  --arg state "$EVENT_STATE" \
+  --arg vphys "$EVENT_VPHYS" \
+  --arg vguid "$EVENT_VGUID" \
+  --arg devid "$EVENT_DEVID" \
+  --arg subject "$EMAIL_SUBJECT" \
+  --arg email_message "$EMAIL_MESSAGE" \
+  '{timestamp: $timestamp, event: $event, pool: $pool, vdev: $vdev, state: $state, vphys: $vphys, vguid: $vguid, devid: $devid,subject: $subject, email_message: $email_message}')
+
+
 # Logging event details for debugging
 {
   echo "==== DEBUG START ===="
@@ -137,9 +142,6 @@ EOF
 python3 "$DBUS_CLIENT" forward "ZFS State Change" "$FORWARD_MESSAGE" >> "$DEBUG_LOG" 2>&1
 FORWARD_STATUS=$?
 
-# Send user-friendly email notification
-python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE" >> "$DEBUG_LOG" 2>&1
-EMAIL_STATUS=$?
 
 # Log final result
 if [ "$FORWARD_STATUS" -eq 0 ]; then
@@ -148,10 +150,6 @@ else
   echo "[ERROR] Failed to forward event to Houston UI" >> "$DEBUG_LOG"
 fi
 
-if [ "$EMAIL_STATUS" -eq 0 ]; then
-  echo "[SUCCESS] Email sent successfully" >> "$DEBUG_LOG"
-else
-  echo "[ERROR] Failed to send email notification" >> "$DEBUG_LOG"
-fi
+
 
 exit 0
