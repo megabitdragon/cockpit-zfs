@@ -18,12 +18,6 @@ def save_token_data(token_data):
         json.dump(token_data, f, indent=4)
     print(f"✅ Token file updated at {TOKEN_PATH}")
 
-def is_token_expired(token_data):
-    expiry = token_data.get("expiry")
-    if not expiry:
-        raise ValueError("No expiry info found in token.")
-    expiry_dt = normalize_to_utc(expiry)
-    return datetime.now(timezone.utc) >= expiry_dt
 
 def refresh_token_via_server(token_data):
     refresh_token = token_data.get("refresh_token")
@@ -45,11 +39,7 @@ def refresh_token_via_server(token_data):
 
 def validate_and_refresh_token():
     token_data = load_token_data()
-    if is_token_expired(token_data):
-        print("⚠️ Access token expired. Refreshing...")
-        refresh_token_via_server(token_data)
-    else:
-        print("✅ Access token is still valid.")
+    refresh_token_via_server(token_data)
 
 if __name__ == "__main__":
     validate_and_refresh_token()

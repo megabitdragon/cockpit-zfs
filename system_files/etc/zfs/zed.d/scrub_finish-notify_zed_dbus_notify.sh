@@ -24,20 +24,8 @@ else
   URGENCY="SUCCESS"
 fi
 
-# Construct JSON message for forwarding to Houston UI
-FORWARD_MESSAGE=$(jq -n \
-  --arg timestamp "$EVENT_TIMESTAMP" \
-  --arg event "$EVENT_CLASS" \
-  --arg pool "$EVENT_POOL" \
-  --arg state "$EVENT_STATE" \
-  --arg pool_guid "$EVENT_POOL_GUID" \
-  --argjson errors "$EVENT_ERRORS" \
-  --argjson repaired "$EVENT_REPAIRED" \
-  '{timestamp: $timestamp, event: $event, pool: $pool, state: $state, pool_guid: $pool_guid, errors: $errors, repaired: $repaired}')
-
 # Construct Subject & User-Friendly Email Message
 EMAIL_SUBJECT="ZFS Scrub Completed: Pool $EVENT_POOL - $URGENCY"
-
 EMAIL_MESSAGE=$(cat <<EOF
 ====================================================
 ZFS SCRUB COMPLETION REPORT - POOL: $EVENT_POOL
@@ -75,7 +63,20 @@ For further details, refer to system logs or ZFS documentation.
 EOF
 )
 
-# Logging event details for debugging
+# Construct JSON message for forwarding to Houston UI
+FORWARD_MESSAGE=$(jq -n \
+  --arg timestamp "$EVENT_TIMESTAMP" \
+  --arg event "$EVENT_CLASS" \
+  --arg pool "$EVENT_POOL" \
+  --arg state "$EVENT_STATE" \
+  --arg pool_guid "$EVENT_POOL_GUID" \
+  --argjson errors "$EVENT_ERRORS" \
+  --argjson repaired "$EVENT_REPAIRED" \
+  --arg subject "$EMAIL_SUBJECT" \
+  --arg email_message "$EMAIL_MESSAGE" \
+  '{timestamp: $timestamp, event: $event, pool: $pool, state: $state, pool_guid: $pool_guid, errors: $errors, repaired: $repaired, subject: $subject, email_message: $email_message}')
+
+# Log all the data (for debug)
 {
   echo "==== DEBUG START ===="
   echo "DEBUG: Timestamp = $EVENT_TIMESTAMP"
@@ -91,25 +92,15 @@ EOF
   echo "==== DEBUG END ===="
 } >> "$DEBUG_LOG"
 
-# ✅ Send event notification to Houston UI
-python3 "$DBUS_CLIENT" forward "ZFS Scrub Finished" "$FORWARD_MESSAGE" >> "$DEBUG_LOG" 2>&1
-FORWARD_STATUS=$?
+# Send the message to Houston D-Bus listener
+python3 "$DBUS_CLIENT" "$FORWARD_MESSAGE" >> "$DEBUG_LOG" 2>&1
+STATUS=$?
 
-# ✅ Send user-friendly email notification
-python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE" >> "$DEBUG_LOG" 2>&1
-EMAIL_STATUS=$?
-
-# ✅ Log final result
-if [ "$FORWARD_STATUS" -eq 0 ]; then
-  echo "[SUCCESS] Scrub event successfully forwarded to Houston UI" >> "$DEBUG_LOG"
+# Final result
+if [ "$STATUS" -eq 0 ]; then
+  echo "[SUCCESS] Scrub event forwarded to Houston UI" >> "$DEBUG_LOG"
 else
   echo "[ERROR] Failed to forward scrub event to Houston UI" >> "$DEBUG_LOG"
-fi
-
-if [ "$EMAIL_STATUS" -eq 0 ]; then
-  echo "[SUCCESS] Scrub completion email sent successfully" >> "$DEBUG_LOG"
-else
-  echo "[ERROR] Failed to send scrub completion email" >> "$DEBUG_LOG"
 fi
 
 exit 0

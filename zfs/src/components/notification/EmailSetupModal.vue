@@ -21,6 +21,7 @@
                         Warning Levels
                     </button>
                     </div>
+                 <!-- UI for setting up warning levels -->
                     <div v-if="activeTab === 'warning-levels'" class="p-4 space-y-4">
                         <h2 class="text-lg font-semibold mb-2">Set Warning Levels</h2>
                         
@@ -49,6 +50,7 @@
                             <button @click="saveWarningConfig" class="bg-green-500 text-white p-2 rounded">Save</button>
                         </div>
                         </div>
+             <!-- UI for setting up emails -->
             <div>
                 <div v-if="activeTab === 'email-settings'" class="space-y-4">
                     <div class="flex justify-center space-x-2">
@@ -154,15 +156,15 @@
                         <label class="block text-md w-[25%] py-2 font-medium">Alert Levels</label>
                         <div class="w-[50%] flex ">
                             <div class="flex items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="alertLevels.info" class="h-4 w-4" />
+                            <input type="checkbox" v-model="emailConfig.send_info" class="h-4 w-4" />
                             <label>Info</label>
                             </div>
                             <div class="flex items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="alertLevels.warning" class="h-4 w-4" />
+                            <input type="checkbox" v-model="emailConfig.send_warning" class="h-4 w-4" />
                             <label>Warning</label>
                             </div>
                             <div class="flex items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="alertLevels.critical" checked disabled class="h-4 w-4" />
+                            <input type="checkbox" v-model="emailConfig.send_critical" checked disabled class="h-4 w-4" />
                             <label>Critical</label>
                             </div>
                         </div>
@@ -194,24 +196,11 @@ import { ref, inject, Ref, computed, watch, onMounted, reactive } from 'vue';
 import {Modal, CardContainer, pushNotification, Notification } from '@45drives/houston-common-ui';
 import InfoTile from '../common/InfoTile.vue';
 import OldModal from '../common/OldModal.vue';
+import { WarningConfig } from '../../types';
 
 const activeTab = ref('email-settings')
 
 
-const alertLevels = reactive({
-  info: false,
-  warning: false,
-  critical: true // or false by default if you don't want it pre-selected
-});
-
-interface WarningConfig {
-  scrubFinish: string;
-  vdevCleared: string;
-  resilverFinish: string;
-  clearPoolErrors: string;
-  snapshotCreation: string;
-  stateChange: string; // even though not user-editable, can still be tracked
-}
 const warningConfig = reactive<WarningConfig>({
   scrubFinish: 'info',
   vdevCleared: 'info',
@@ -240,7 +229,11 @@ const emailConfig = ref({
     tls: true,
     authMethod: "smtp",
     oauthAccessToken: "",              
-    tokenExpiry: ""           
+    tokenExpiry: "",
+    email_enabled: true,    
+    send_info: false,
+    send_warning: false,
+    send_critical: true     
 });
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const isEmailValid = computed(() => {
@@ -264,8 +257,31 @@ const isFormValid = () => {
 
 
 
-function saveWarningConfig() {
-  console.log('Warning levels saved:', warningConfig.value);
+async function saveWarningConfig() {
+  console.log('Warning levels saved:', warningConfig);
+  try {
+        console.log("🔄 Updating events warning levels for emails via D-Bus...");
+
+        const cockpit = (window as any).cockpit;
+        const dbus = cockpit.dbus("org._45drives.Houston");
+
+        // ✅ Ensure the correct D-Bus method call structure
+        const response = await dbus.call(
+            "/org/_45drives/Houston",   // ✅ Object path
+            "org._45drives.Houston",    // ✅ Interface
+            "UpdateWarningLevels",         // ✅ Method name
+            [JSON.stringify(warningConfig)]    // ✅ Argument (as an array)
+        );
+        console.log("warningconfig   " , warningConfig)
+        console.log(`✅ D-Bus Response: ${response}`);
+        alert("✅ warninglevels config updated successfully!");
+        closeModal()
+
+    } catch (error) {
+        console.error("❌ Error updating SMTP settings via D-Bus:", error);
+        alert("❌ Failed to update SMTP settings: " + error.message);
+    }
+
   // Add your saving logic here
 }
 
@@ -343,9 +359,16 @@ const updateSMTPConfig = async () => {
             username: emailConfig.value.username,
             password: emailConfig.value.password,
             recieversEmail: emailConfig.value.recieversEmail,
-            tls: emailConfig.value.tls
-        };
+            tls: emailConfig.value.tls,
+            send_info: emailConfig.value.send_info,
+            send_warning: emailConfig.value.send_warning,
+            send_critical: true,
+            email_enabled: true,
+            authMethod: emailConfig.value.authMethod    
 
+
+        };
+        console.log("configemail  ", config)
         // ✅ Ensure the correct D-Bus method call structure
         const response = await dbus.call(
             "/org/_45drives/Houston",   // ✅ Object path

@@ -47,7 +47,43 @@ def setup_database():
         received INTEGER DEFAULT 0  -- 0 = Not sent to UI, 1 = Sent
     )
     """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS warning_levels (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_type TEXT NOT NULL UNIQUE,
+        severity TEXT NOT NULL CHECK(severity IN ('info', 'warning', 'critical'))
+    )
+    """)
+
+    # Insert default values
+    defaults = {
+        "scrubFinish": "info",
+        "vdevCleared": "info",
+        "resilverFinish": "info",
+        "clearPoolErrors": "info",
+        "snapshotCreation": "info",
+        "stateChange": "critical"
+    }
+
+    for event_type, severity in defaults.items():
+        cursor.execute("""
+            INSERT OR IGNORE INTO warning_levels (event_type, severity)
+            VALUES (?, ?)
+        """, (event_type, severity))
     
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS smtp_settings (
+        id INTEGER PRIMARY KEY,
+        email_enabled INTEGER DEFAULT 1,          -- 0 = disabled, 1 = enabled
+        send_info INTEGER DEFAULT 0,
+        send_warning INTEGER DEFAULT 1,
+        send_critical INTEGER DEFAULT 1
+    );    
+        """)
+    cursor.execute("""
+    INSERT OR IGNORE INTO smtp_settings (id, email_enabled, send_info, send_warning, send_critical)
+    VALUES (1, 1, 0, 1, 1);
+        """)
     conn.commit()
     conn.close()
 

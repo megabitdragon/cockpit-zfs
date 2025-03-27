@@ -2,31 +2,18 @@ import dbus
 from argparse import ArgumentParser
 
 def main():
-    # Parse command-line arguments
-    parser = ArgumentParser(description="Send a message or email notification via Houston D-Bus server.")
-    parser.add_argument("action", choices=["forward", "email"], help="Action to perform (forward or email)")
-    parser.add_argument("subject", nargs="?", default="No Subject", help="(Optional) Subject of the email or log message")
-    parser.add_argument("message", nargs="?", default="No Message", help="(Optional) Message body")    
+    parser = ArgumentParser(description="Send a structured message via Houston D-Bus server.")
+    parser.add_argument("message", help="JSON message to forward to Houston (as a string)")
     args = parser.parse_args()
 
-    # Connect to the system D-Bus
+    # Connect to system D-Bus
     bus = dbus.SystemBus()
-
-    # Get a reference to the D-Bus object
     remote_object = bus.get_object("org._45drives.Houston", "/org/_45drives/Houston")
-
-    # Get an interface for the object
     interface = dbus.Interface(remote_object, "org._45drives.Houston")
 
-    if args.action == "forward":
-        # Forward message via D-Bus
-        response = interface.ForwardMessage(args.message)
-        print(f"D-Bus Response (ForwardMessage): {response}")
-
-    elif args.action == "email":
-        # Send email notification via D-Bus
-        response = interface.sendEmailNotification(args.subject, args.message)
-        print(f"D-Bus Response (sendEmailNotification): {response}")
+    # Send the structured message
+    response = interface.ForwardMessage(args.message)
+    print(f"D-Bus Response (ForwardMessage): {response}")
 
 if __name__ == "__main__":
     main()
