@@ -100,7 +100,7 @@ def get_boot_disk():
                 boot_device = device
 
         if not boot_device:
-            print("No boot or root partition found.")
+            # print("No boot or root partition found.")
             return None
 
         # Convert partition (e.g., /dev/sda2) to the parent disk (/dev/sda)
