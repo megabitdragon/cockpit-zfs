@@ -1,0 +1,9 @@
+[Unit]
+Description=ZFS Storage Alert Script
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=THRESHOLD=80
+ExecStart=/bin/bash etc/45drives/zfs_storage_alert.sh

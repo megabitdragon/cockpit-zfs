@@ -2,7 +2,7 @@
     <OldModal :isOpen="emailSetUpModal" @close="closeModal()" :marginTop="'mt-28'" :width="'w-3/5'" :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false">
         <!-- <OldModal @close="closeModal" :isOpen="showAddVDevModal" :marginTop="props.marginTop" :width="'w-3/5'"
         :minWidth="'min-w-3/5'" :closeOnBackgroundClick="false"> -->
-            <template v-slot:title>
+            <template v-slot:title >
                 Email Notification Settings
             </template>
             <!-- <template v-slot:content> -->
@@ -10,44 +10,45 @@
                 <div class="flex border-b mb-6">
                     <button
                         @click="activeTab = 'email-settings'"
-                        :class="['px-4 py-2', activeTab === 'email-settings' ? 'border-b-2 text-white font-semibold' : 'text-gray-500']"
+                        :class="['px-4 py-2', activeTab === 'email-settings' ? 'border-b-2 text-default font-semibold' : 'text-gray-500 hover:text-default']"
                     >
                         Email Settings
                     </button>
                     <button
                         @click="activeTab = 'warning-levels'"
-                        :class="['px-4 py-2', activeTab === 'warning-levels' ? 'border-b-2 text-white font-semibold' : 'text-gray-500']"
+                        :class="['px-4 py-2', activeTab === 'warning-levels' ? 'border-b-2 text-default font-semibold' : 'text-gray-500 hover:text-default']"
                     >
                         Warning Levels
                     </button>
                     </div>
                  <!-- UI for setting up warning levels -->
                     <div v-if="activeTab === 'warning-levels'" class="p-4 space-y-4">
-                        <h2 class="text-lg font-semibold mb-2">Set Warning Levels</h2>
+                        <h2 class="text-lg  text-default font-semibold mb-2">Set Warning Levels</h2>
                         
                         <div
-                            v-for="(label, key) in warningEvents"
+                            v-for="([key, label]) in Object.entries(warningEvents)"
                             :key="key"
-                            v-if="key !== 'stateChange'"
                             class="flex justify-center space-x-2"
-                        >
-                            <label class="w-[25%] text-md font-medium">{{ label }}</label>
-                            <select v-model="warningConfig[key]" class="w-[50%] p-2 border rounded-lg">
-                            <option value="info">Info</option>
-                            <option value="warning">Warning</option>
-                            <option value="critical">Critical</option>
-                            </select>
+                            >
+                            <template v-if="key !== 'stateChange'">
+                                <label class="w-[25%] py-2 text-default text-md font-medium">{{ label }}</label>
+                                <select v-model="warningConfig[key]" class="w-[50%] p-2 text-default bg-default border rounded-lg">
+                                <option value="info">Info</option>
+                                <option value="warning">Warning</option>
+                                <option value="critical">Critical</option>
+                                </select>
+                            </template>
                         </div>
 
                         <!-- Fixed Critical field for State Change -->
                         <div class="flex justify-center space-x-2">
-                            <label class="w-[25%] text-md font-medium">State Change - Degraded/Faulted</label>
-                            <input type="text" value="Critical" disabled class="w-[50%] p-2 border rounded-lg bg-gray-100 text-red-600 font-semibold text-center" />
+                            <label class="w-[25%] text-default  py-2 text-md font-medium">State Change - Degraded/Faulted</label>
+                            <input type="text" value="Critical" disabled class="w-[50%] p-2 text-red bg-default border rounded-lg bg-gray-100 text-red-600 font-semibold " />
                         </div>
 
                         <div class="flex justify-end space-x-2 mt-4">
-                            <button @click="closeModal" class="bg-red-500 text-white p-2 rounded">Cancel</button>
-                            <button @click="saveWarningConfig" class="bg-green-500 text-white p-2 rounded">Save</button>
+                            <button @click="closeModal" class="bg-red-500 text-default p-2 rounded">Cancel</button>
+                            <button @click="saveWarningConfig" class="bg-green-500 text-default p-2 rounded">Save</button>
                         </div>
                         </div>
              <!-- UI for setting up emails -->
@@ -55,8 +56,8 @@
                 <div v-if="activeTab === 'email-settings'" class="space-y-4">
                     <div class="flex justify-center space-x-2">
                         <!-- Email Provider Selection -->
-                        <label class="block text-md w-[25%] py-2 font-medium">Select Email Provider</label>
-                        <select v-model="smtpMethod" class="w-[50%] p-2 border rounded-lg">
+                        <label  class="block text-default  text-md w-[25%] py-2 font-medium">Select Email Provider</label>
+                        <select v-model="smtpMethod" class="w-[50%] bg-default text-default p-2 border rounded-lg">
                             <option value="smtp">SMTP</option>
                             <option value="oauth2">Google (OAuth)</option>
                         </select>
@@ -66,7 +67,7 @@
                     <div v-if="smtpMethod === 'smtp'" class="space-y-3">
                         
                         <div class="flex justify-center space-x-2">
-                            <label class="block w-[25%] text-md font-medium">Email Address  <InfoTile class="ml-1"
+                            <label class="block w-[25%] text-default  text-md font-medium">Email Address  <InfoTile class="ml-1"
                                 :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
 
 
@@ -75,7 +76,7 @@
                                 v-model="smtpEmailConfig.email"
                                 type="email"
                                 placeholder="your-email@example.com"
-                                class="w-[50%] p-2 border rounded-lg"
+                                class="w-[50%] bg-default text-default p-2 border rounded-lg"
                                 />                        
                         </div>
                         <div v-if="formValidationAttempted && (!smtpEmailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
@@ -85,9 +86,9 @@
                             </p>
                         </div>
                         <div class="flex justify-center space-x-2">
-                            <label class="block w-[25%] text-md font-medium">Recievers Email Address  <InfoTile class="ml-1"
+                            <label class="block w-[25%] text-default  text-md font-medium">Recievers Email Address  <InfoTile class="ml-1"
                                 :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
-                            <input v-model="smtpEmailConfig.recieversEmail" type="email" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded" />
+                            <input v-model="smtpEmailConfig.recieversEmail" type="email" placeholder="your-email@example.com" class="w-[50%] bg-default text-default p-2 border rounded-lg" />
                         </div>
                         <div v-if="formValidationAttempted && (!smtpEmailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
@@ -96,10 +97,10 @@
                             </p>
                         </div>
                         <div class="flex justify-center space-x-2">
-                            <label class="block w-[25%] text-md font-medium">SMTP Server <InfoTile class="ml-1"
+                            <label class="block w-[25%] text-default  text-md font-medium">SMTP Server <InfoTile class="ml-1"
                                 :title="`The address of the outgoing mail server. Example: smtp.gmail.com for Gmail, or smtp.office365.com for Outlook.`" />
                             </label>
-                            <input v-model="smtpEmailConfig.smtpServer" type="text" placeholder="smtp.example.com" class="w-[50%] p-2 border rounded-lg" />
+                            <input v-model="smtpEmailConfig.smtpServer" type="text" placeholder="smtp.example.com" class="w-[50%] bg-default text-default p-2 border rounded-lg" />
                         </div>
                         <div v-if="formValidationAttempted && !smtpEmailConfig.smtpServer" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
@@ -107,10 +108,10 @@
 
                         </div> 
                         <div class="flex justify-center space-x-2">
-                            <label class="block w-[25%] text-md font-medium">SMTP Port <InfoTile class="ml-1"
+                            <label class="block w-[25%] text-default  text-md font-medium">SMTP Port <InfoTile class="ml-1"
                                 :title="`The port number used to connect to the SMTP server.\nCommon values:\n- 25: Non-secure SMTP\n- 465: Secure SMTP (SSL)\n- 587: Secure SMTP (STARTTLS)`" />
                             </label>
-                            <input v-model="smtpEmailConfig.smtpPort" type="number" placeholder="587" class="w-[50%] p-2 border rounded-lg" />
+                            <input v-model="smtpEmailConfig.smtpPort" type="number" placeholder="587" class="w-[50%] bg-default text-default p-2 border rounded-lg" />
                         </div>    
                         <div v-if="formValidationAttempted && !smtpEmailConfig.smtpPort" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
@@ -119,9 +120,9 @@
                         </div>                      
 
                         <div class="flex justify-center space-x-2">
-                            <label class="block w-[25%] text-md font-medium">Username <InfoTile class="ml-1"
+                            <label class="block w-[25%] text-default  text-md font-medium">Username <InfoTile class="ml-1"
                                 :title="`The login username for authentication with the SMTP server. Usually the same as the sender email address.`" />                            </label>
-                            <input v-model="smtpEmailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] p-2 border rounded-lg" />
+                            <input v-model="smtpEmailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] bg-default text-default p-2 border rounded-lg" />
 
                         </div>     
                         <div v-if="formValidationAttempted && !smtpEmailConfig.username" class="flex justify-center space-x-2">
@@ -130,71 +131,97 @@
                         </div>                    
 
                         <div  class="flex justify-center space-x-2">  
-                            <label class="block  w-[25%] text-md font-medium">Password <InfoTile class="ml-1"
+                            <label class="block  w-[25%] text-default  text-md font-medium">Password <InfoTile class="ml-1"
                                 :title="`The password or app-specific password used for authenticating with the SMTP server.\nNote: Some providers require an app password instead of the regular account password.`" />
                             </label>
-                            <input  v-model="smtpEmailConfig.password" type="password"  class="w-[50%] p-2 border rounded-lg" />
+                            <input  v-model="smtpEmailConfig.password" type="password"  class="w-[50%] bg-default text-default p-2 border rounded-lg" />
                         </div>
                         <div v-if="formValidationAttempted && !smtpEmailConfig.password" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p class="text-red-500 text-sm w-[50%]">Password is required.</p>
                         </div>                      
 
-                        <div class="flex justify-center space-x-2 w-[25%]">
-                            <input type="checkbox" v-model="smtpEmailConfig.tls" class="h-4 w-4" />
-                            <label>Enable TLS      <InfoTile class="ml-1"
+                        <div class="flex justify-center space-x-2">
+                            <label class="text-default w-[25%]">Enable TLS      <InfoTile class="ml-1"
                                 :title="`Enable Transport Layer Security (TLS) encryption for secure email transmission.\nThis is required for most modern SMTP providers using port 587.`" />
                             </label>
+                            <div class="w-[50%]">
+                                <input type="checkbox" v-model="smtpEmailConfig.tls" class="h-4 w-4" />
+                            </div>
                         </div>
                     </div>
 
                     <!-- OAuth Setup for Google -->
                     <div v-if="smtpMethod !== 'smtp'" class="space-y-3 text-center">
                         <div class="w-[100%] mt-[1rem]">
-                            <p class="text-sm text-gray-500">OAuth setup requires authentication via your email provider.</p>
+                            <p class="text-sm text-default">OAuth setup requires authentication via your email provider.</p>
                         </div>
-                        <div class="flex justify-center">
-                            <button class="w-[30%] bg-green-600 flex  text-white p-2 mb-[1rem] btn pointer-events-none" v-if="authDetailsExist==true">
+                        <div  class="flex justify-center">
+                            <button class="w-[30%] bg-green-600 flex  text-default p-2 mb-[1rem] btn pointer-events-none" v-if="authDetailsExist==true && authEmailConfig.username" >
                                 <span class="flex-grow text-center mt-0.5">Connected as {{ authEmailConfig.username }}</span>
                             </button>
-                            <button v-if="authDetailsExist==true" @click="oAuthBtn" class="w-[30%] ml-[1rem] bg-[#FF4329] flex hover:bg-[#9E2500] text-white p-2 mb-[1rem] btn">
+                            <button v-if="authDetailsExist==true && authEmailConfig.username"  @click="oAuthBtn" class="w-[30%] ml-[1rem] bg-[#FF4329] flex hover:bg-[#9E2500] text-default p-2 mb-[1rem] btn">
                                 <span  class="flex-grow text-center mt-0.5">Reconnect with Google with different account </span>
-                                <img src="../../../public/img/icons8-gmail-48.png" alt="provider-logo"
-                                class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2" /></button>
-                                
-                                <button v-else="authDetailsExist==false" @click="oAuthBtn" class="w-[30%] bg-[#FF4329] flex hover:bg-[#9E2500] text-white p-2 mb-[1rem] btn">
+                                <div class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2">
+                                    <img src="../../../public/img/icons8-gmail-48.png" alt="provider-logo"
+                                    class="inline-block w-4 h-4" />
+                                </div>
+                            </button>
+                                <button v-else="authDetailsExist==false" @click="oAuthBtn" class="w-[30%] bg-[#FF4329] flex hover:bg-[#9E2500] text-default p-2 mb-[1rem] btn">
                                 <span class="flex-grow text-center mt-0.5">Connect with Google </span>
                                 <img src="../../../public/img/icons8-gmail-48.png" alt="provider-logo"
                                 class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2" /></button>
                         </div>
+                        <div class="flex justify-center" style="margin-top: 0;">
+                        <div class="space-x-4">
+                            <a
+                                :href="privacyPolicyUrl"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="underline text-blue-500 hover:text-blue-700 transition-colors duration-200"
+                            >
+                                Privacy Policy
+                            </a>
+                            <a
+                                :href="termsOfServiceUrl"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="underline text-blue-500 hover:text-blue-700 transition-colors duration-200"
+                            >
+                                Terms of Service
+                            </a>
+                        </div>
+                    </div>
+
+
                     </div>
                     <div class="flex justify-center space-x-2 items-start">
-                        <label class="block text-md w-[25%] py-2 font-medium">Alert Levels</label>
+                        <label class="block text-md text-default  w-[25%] py-2 font-medium">Alert Levels</label>
                         <div class="w-[50%] flex py-2 ">
-                            <div class="flex items-center space-x-2 mr-4">
+                            <div class="flex text-default  items-center space-x-2 mr-4">
                             <input type="checkbox" v-model="send_info" class="h-4 w-4" />
                             <label>Info</label>
                             </div>
-                            <div class="flex items-center space-x-2 mr-4">
+                            <div class="flex text-default  items-center space-x-2 mr-4">
                             <input type="checkbox" v-model="send_warning" class="h-4 w-4" />
                             <label>Warning</label>
                             </div>
-                            <div class="flex items-center space-x-2 mr-4">
+                            <div class="flex text-default  items-center space-x-2 mr-4">
                             <input type="checkbox" v-model="send_critical" checked disabled class="h-4 w-4" />
                             <label>Critical</label>
                             </div>
                         </div>
                     </div>
                     <!-- Test Email & Save -->
-                    <div class="flex justify-between mt-4">
+                    <div class="flex justify-between mt-4" style="margin-top: 5rem;">
                         <div>
-                        <button @click="testEmail" class=" bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">Send Test Email</button>
-                        <button :disabled="!authEmailConfig.username && !smtpEmailConfig.email" @click="resetMsmtpData" class="bg-gray-500 hover:bg-gray-600 ml-2 text-white p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button @click="testEmail" class=" bg-blue-500 hover:bg-blue-600 text-default p-2 rounded">Send Test Email</button>
+                        <button :disabled="!authEmailConfig.username && !smtpEmailConfig.email" @click="resetMsmtpData" class="bg-gray-500 hover:bg-gray-600 ml-2 text-default p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
                              Reset Data</button>                    
                     </div>
                         <div class="space-x-2">
-                            <button @click="closeModal" class="bg-red-500 text-white p-2 rounded">Cancel</button>
-                            <button @click="updateSMTPConfig" class="bg-green-500 text-white p-2 rounded">Save</button>
+                            <button @click="closeModal" class="bg-red-500 text-default p-2 rounded">Cancel</button>
+                            <button @click="updateSMTPConfig" class="bg-green-500 text-default p-2 rounded">Save</button>
                         </div>
                     </div>            
                 </div>
@@ -232,6 +259,7 @@ const warningConfig = reactive<WarningConfig>({
   clearPoolErrors: 'info',
   snapshotCreation: 'info',
   stateChange: 'critical',
+  poolImport: 'info'
 });
 
 const warningEvents: Record<keyof WarningConfig, string> = {
@@ -241,6 +269,8 @@ const warningEvents: Record<keyof WarningConfig, string> = {
   clearPoolErrors: 'Clear Pool Errors',
   snapshotCreation: 'Snapshot Creation',
   stateChange: 'State Change - Degraded/Faulted',
+  poolImport: 'info'
+
 };
 const emailSetUpModal = ref(false);
 
@@ -279,6 +309,9 @@ const isEmailValid = computed(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(smtpEmailConfig.value.email) && emailRegex.test(smtpEmailConfig.value.recieversEmail);
 });
+
+const privacyPolicyUrl = ref('https://email-auth.45d.io/privacy');
+const termsOfServiceUrl = ref('https://email-auth.45d.io/tos');
 
 const formValidationAttempted = ref(false); // Tracks if validation has been triggered
 
@@ -345,6 +378,7 @@ onMounted(() => {
     fetchMsmtpDetails();  // ✅ Fetch SMTP details on mount
     emailSetUpModal.value = true;
     console.log("modal is mounted")
+    console.log("authEmailConfig.username != ''" , authEmailConfig.value.username)
 });
 
 const fetchMsmtpDetails = async () => {

@@ -218,5 +218,6 @@ interface WarningConfig {
 	clearPoolErrors: string;
 	snapshotCreation: string;
 	stateChange: string; // even though not user-editable, can still be tracked
+	poolImport: string
   }
 type StepNavigationCallback = (item: StepsNavigationItem) => void;
