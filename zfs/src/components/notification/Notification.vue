@@ -12,7 +12,7 @@
 								<BellIcon class="w-8 h-8 text-white-700" aria-hidden="true" />
 								
 								<!-- Notification Badge -->
-								<span class="absolute -top-2 -right-2 max-h-[80vh] overflow-y-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold px-1">
+								<span v-if="notificationStore.notifications.length>0" class="absolute -top-2 -right-2 max-h-[80vh] overflow-y-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold px-1">
 									{{notificationStore.notifications.length }}
 								</span>
 								</div>
