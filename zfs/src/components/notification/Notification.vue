@@ -95,7 +95,52 @@
 										</div>
 									</div>
 
-										<div class="flex items-start gap-3" v-if="notification.event === 'vdev_attach'" >
+
+
+									<div class="flex items-start gap-3" v-if="notification.event === 'storage_threshold'">
+										<!-- Icon Based on Scrub Status -->
+										<div>
+
+											<ExclamationCircleIcon 
+												class="icon-warning size-icon-lg text-yellow-500" 
+												aria-hidden="true" 
+											/>
+										</div>
+
+										<!-- Notification Content -->
+										<div class="w-full">
+											<p class="text-xl font-semibold text-yellow-500">
+											Storage Warning - {{ notification.pool }}
+											</p>
+											<p class="pl-4 text-sm text-white-400">
+												- Pool <strong>{{ notification.pool }}</strong> is more than 80% full (triggered at {{ notification.timestamp }})		
+											</p>
+										</div>
+
+										<!-- Close Button -->
+										<div>
+											<XMarkIcon 
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500" 
+											aria-hidden="true" 
+											@click.stop="handleDismiss(notification.id)" 
+											/> 
+										</div>
+									</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+									
+									<div class="flex items-start gap-3" v-if="notification.event === 'vdev_attach'" >
 											<div >
 												<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
 											</div>
