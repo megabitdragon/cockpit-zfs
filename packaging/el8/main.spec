@@ -27,6 +27,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 
 %changelog
+* Fri Mar 28 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-5
+- Comments out erroneous print statement in get-disks.py
 * Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-4
 - trying deb build again
 * Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-3

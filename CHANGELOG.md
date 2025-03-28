@@ -1,3 +1,3 @@
-## zfs module 1.1.18-4
+## zfs module 1.1.18-5
 
-* trying deb build again
+* Comments out erroneous print statement in get-disks.py
