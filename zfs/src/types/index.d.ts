@@ -219,5 +219,6 @@ interface WarningConfig {
 	snapshotCreation: string;
 	stateChange: string; // even though not user-editable, can still be tracked
 	poolImport: string
+	storage_threshold: string
   }
 type StepNavigationCallback = (item: StepsNavigationItem) => void;

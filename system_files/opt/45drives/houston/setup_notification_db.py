@@ -62,7 +62,9 @@ def setup_database():
         "resilverFinish": "info",
         "clearPoolErrors": "info",
         "snapshotCreation": "info",
-        "stateChange": "critical"
+        "stateChange": "critical",
+        "storage_threshold": "warning",
+        "poolImport": "info"
     }
 
     for event_type, severity in defaults.items():

@@ -157,10 +157,10 @@
                             <p class="text-sm text-default">OAuth setup requires authentication via your email provider.</p>
                         </div>
                         <div  class="flex justify-center">
-                            <button class="w-[30%] bg-green-600 flex  text-default p-2 mb-[1rem] btn pointer-events-none" v-if="authDetailsExist==true && authEmailConfig.username" >
-                                <span class="flex-grow text-center mt-0.5">Connected as {{ authEmailConfig.username }}</span>
+                            <button class="w-[30%] bg-green-600 flex  text-default p-2 mb-[1rem] btn pointer-events-none" v-if="authDetailsExist==true && authEmailConfig.email" >
+                                <span class="flex-grow text-center mt-0.5">Connected as {{ authEmailConfig.email }}</span>
                             </button>
-                            <button v-if="authDetailsExist==true && authEmailConfig.username"  @click="oAuthBtn" class="w-[30%] ml-[1rem] bg-[#FF4329] flex hover:bg-[#9E2500] text-default p-2 mb-[1rem] btn">
+                            <button v-if="authDetailsExist==true "  @click="oAuthBtn" class="w-[30%] ml-[1rem] bg-[#FF4329] flex hover:bg-[#9E2500] text-default p-2 mb-[1rem] btn">
                                 <span  class="flex-grow text-center mt-0.5">Reconnect with Google with different account </span>
                                 <div class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2">
                                     <img src="../../../public/img/icons8-gmail-48.png" alt="provider-logo"
@@ -216,7 +216,7 @@
                     <div class="flex justify-between mt-4" style="margin-top: 5rem;">
                         <div>
                         <button @click="testEmail" class=" bg-blue-500 hover:bg-blue-600 text-default p-2 rounded">Send Test Email</button>
-                        <button :disabled="!authEmailConfig.username && !smtpEmailConfig.email" @click="resetMsmtpData" class="bg-gray-500 hover:bg-gray-600 ml-2 text-default p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button :disabled="!authEmailConfig.email && !smtpEmailConfig.email" @click="resetMsmtpData" class="bg-gray-500 hover:bg-gray-600 ml-2 text-default p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
                              Reset Data</button>                    
                     </div>
                         <div class="space-x-2">
@@ -259,7 +259,8 @@ const warningConfig = reactive<WarningConfig>({
   clearPoolErrors: 'info',
   snapshotCreation: 'info',
   stateChange: 'critical',
-  poolImport: 'info'
+  poolImport: 'info',
+  storage_threshold: 'warning'
 });
 
 const warningEvents: Record<keyof WarningConfig, string> = {
@@ -269,23 +270,21 @@ const warningEvents: Record<keyof WarningConfig, string> = {
   clearPoolErrors: 'Clear Pool Errors',
   snapshotCreation: 'Snapshot Creation',
   stateChange: 'State Change - Degraded/Faulted',
-  poolImport: 'info'
+  poolImport: 'Pool Import',
+  storage_threshold: 'Storage Threshold'
+
 
 };
 const emailSetUpModal = ref(false);
 
 const authEmailConfig = ref({
     email: "",
-    smtpServer: "",
-    smtpPort: 587,
-    username: "",
-    password: "",
     recieversEmail: "",
-    tls: true,
     authMethod: "oauth2",
     oauthAccessToken: "",              
     tokenExpiry: "",
     email_enabled: true,    
+    oauthRefreshToken: ""
   
 });
 const smtpEmailConfig = ref({
@@ -329,11 +328,7 @@ const isFormValid = () => {
     }else{
         return(
             authEmailConfig.value.email.trim() !== "" &&
-            authEmailConfig.value.recieversEmail.trim() !== "" &&
-            authEmailConfig.value.smtpServer.trim() !== "" &&
-            authEmailConfig.value.smtpPort > 0 &&
-            authEmailConfig.value.username.trim() !== "" &&
-            authEmailConfig.value.password.trim() !== ""
+            authEmailConfig.value.recieversEmail.trim() !== ""
         )
     }
 
@@ -378,7 +373,6 @@ onMounted(() => {
     fetchMsmtpDetails();  // ✅ Fetch SMTP details on mount
     emailSetUpModal.value = true;
     console.log("modal is mounted")
-    console.log("authEmailConfig.username != ''" , authEmailConfig.value.username)
 });
 
 const fetchMsmtpDetails = async () => {
@@ -402,8 +396,9 @@ const fetchMsmtpDetails = async () => {
             alert("❌ Failed to fetch SMTP details.");
             return;
         }
-        console.log("smtpData.auth", smtpData.auth)
-        if(smtpData.auth=="on"){
+        
+        console.log("smtpData.auth", smtpData)
+        if(smtpData.authMethod=="on"){
             smtpMethod.value = "smtp"
             smtpEmailConfig.value.email = smtpData.email;
             smtpEmailConfig.value.recieversEmail = smtpData.recieversEmail;
@@ -413,16 +408,11 @@ const fetchMsmtpDetails = async () => {
             smtpEmailConfig.value.password = smtpData.password;
             smtpEmailConfig.value.tls = smtpData.tls;
             smtpEmailConfig.value.authMethod = smtpData.auth
-        }else if(smtpData.auth!="on" || smtpData.auth!="") {
+        }else if(smtpData.authMethod!="on" || smtpData.authMethod!="") {
             smtpMethod.value = "oauth2"
 
             authEmailConfig.value.email = smtpData.email;
             authEmailConfig.value.recieversEmail = smtpData.recieversEmail;
-            authEmailConfig.value.smtpServer = smtpData.smtpServer;
-            authEmailConfig.value.smtpPort = smtpData.smtpPort;
-            authEmailConfig.value.username = smtpData.username;
-            authEmailConfig.value.password = smtpData.password;
-            authEmailConfig.value.tls = smtpData.tls;
             authEmailConfig.value.authMethod = smtpData.auth
             authEmailConfig.value.authMethod = "oauth2"
             authDetailsExist.value = true;
@@ -472,17 +462,14 @@ const updateSMTPConfig = async () => {
     } else {
       config = {
         email: authEmailConfig.value.email,
-        smtpServer: authEmailConfig.value.smtpServer,
-        smtpPort: authEmailConfig.value.smtpPort,
-        username: authEmailConfig.value.username,
-        password: authEmailConfig.value.password,
-        recieversEmail: authEmailConfig.value.recieversEmail,
-        tls: authEmailConfig.value.tls,
         send_info: send_info.value,
         send_warning: send_warning.value,
         send_critical: true,
         email_enabled: true,
-        authMethod: smtpMethod.value,
+        authMethod: "oauth2",
+        oauthAccessToken: authEmailConfig.value.oauthAccessToken,
+        oauthRefreshToken: authEmailConfig.value.oauthRefreshToken
+    
       };
     }
 
@@ -542,13 +529,10 @@ const testEmail = async () => {
         }else{
              config = {
             email: authEmailConfig.value.email,
-            smtpServer: authEmailConfig.value.smtpServer,
-            smtpPort: authEmailConfig.value.smtpPort,
-            username: authEmailConfig.value.username,
-            tls: authEmailConfig.value.tls,
             recipientEmail: authEmailConfig.value.recieversEmail,
             password: accessToken.value || authEmailConfig.value.oauthAccessToken,
-            tokenExpiry : tokenExpiry.value
+            tokenExpiry : tokenExpiry.value,
+            authMethod: "oauth2"  //
 
             };
         }
@@ -605,12 +589,8 @@ async function oAuthBtn() {
 
                     // Prepare emailConfig for DBus call
                     authEmailConfig.value.email = emailFromOAuth;
-                    authEmailConfig.value.username = emailFromOAuth;
-                    authEmailConfig.value.password = refreshValue; // refresh_token
+                    authEmailConfig.value.oauthRefreshToken = refreshValue; // refresh_token
                     authEmailConfig.value.recieversEmail = emailFromOAuth;
-                    authEmailConfig.value.smtpServer = "smtp.gmail.com";
-                    authEmailConfig.value.smtpPort = 587;
-                    authEmailConfig.value.tls = true;
                     authEmailConfig.value.authMethod = "oauth2";
                     authEmailConfig.value.oauthAccessToken = tokenValue;
                     authEmailConfig.value.tokenExpiry = expiry;
