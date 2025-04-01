@@ -1,0 +1,6 @@
+cockpit-zfs (1.2.1-1jammy) jammy; urgency=medium
+
+  * Added zfs alerts bell
+  * Initial build for jammy
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 01 Apr 2025 08:30:56 -0300
