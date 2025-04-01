@@ -81,7 +81,7 @@ class DBusService(dbus.service.Object):
     def UpdateWarningLevels(self, config_json):
         return updateWarningLevels(config_json)
     @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
-    def resetMsmtpData(self, config_json):
+    def resetMsmtpData(self):
         return resetMsmtpData()
 
 

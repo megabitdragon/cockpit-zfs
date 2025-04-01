@@ -815,19 +815,11 @@ if __name__ == "__main__":
 def resetMsmtpData():
     """Reset the msmtp configuration files to empty or default state."""
     try:
-        # Default or empty values
-        default_config = [
-            "host \n",
-            "port \n",
-            "user \n",
-            "from \n",
-            "tls off\n",
-            "auth plain\n"
-        ]
-
+        with open(MSMTP_OAUTH_JSON_PATH,"w") as auth_file:
+            auth_file.write("")
         # Reset msmtprc
         with open(MSMTP_CONFIG_PATH, "w") as config_file:
-            config_file.writelines(default_config)
+            config_file.write("")
 
         # Clear password file
         with open(MSMTP_PASSWORD_PATH, "w") as pw_file:

@@ -638,6 +638,21 @@ const resetMsmtpData = async () => {
             "resetMsmtpData",
         );
 
+        if(smtpMethod.value=="smtp"){
+            smtpEmailConfig.value.email = "",
+            smtpEmailConfig.value.smtpServer = "",
+            smtpEmailConfig.value.smtpPort = 587,
+            smtpEmailConfig.value.username = "",
+            smtpEmailConfig.value.recieversEmail = "",
+            smtpEmailConfig.value.password = ""
+
+        }else{
+            authEmailConfig.value.email = "",
+            authEmailConfig.value.recieversEmail = "",
+            accessToken.value = "" 
+            authEmailConfig.value.oauthAccessToken = "",
+            tokenExpiry.value = ""
+        }
         console.log(`✅ D-Bus Response: ${response}`);
         alert(response.includes("✅") ? response : `✅ Test email sent: ${response}`);
 
