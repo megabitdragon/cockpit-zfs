@@ -25,14 +25,171 @@ make DESTDIR=%{buildroot} install
 
 %files
 /usr/share/cockpit/zfs/*
+# D-Bus configuration
+%config(noreplace) /etc/dbus-1/system.d/org._45drives.Houston.conf
+
+# ZED event scripts (set executable permissions)
+%attr(0755, root, root) /etc/zfs/zed.d/*
+
+# Systemd service files (DO NOT use %config for these)
+/etc/systemd/system/houston-dbus.service
+
+# 45Drives Houston files (ensure executability)
+%dir /opt/45drives
+%dir /opt/45drives/houston
+%attr(0755, root, root) /opt/45drives/houston/dbus_server.py
+%attr(0755, root, root) /opt/45drives/houston/houston-notify
+%attr(0755, root, root) /opt/45drives/houston/setup_notification_db.py
+
+%post
+pip3 install --upgrade pip
+
+# ✅ Ensure SQLite is installed
+dnf install -y sqlite || true  
+dnf install -y jq || true  
+
+# Ensure systemd reloads and starts the service after installation
+systemctl daemon-reload
+systemctl enable houston-dbus.service
+
+# Start services only after setting up the database
+systemctl start houston-dbus.service || true
+systemctl restart zed
 
 %changelog
+* Fri Mar 28 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-5
+- Comments out erroneous print statement in get-disks.py
+* Tue Mar 25 2025 Rachit Hans <rhans@45drives.com> 1.1.17-6
+- build package
+* Tue Mar 25 2025 Rachit Hans <rhans@45drives.com> 1.1.17-5
+- build package
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-4
+- trying deb build again
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-3
+- trying deb build again
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-2
+- retrying build
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-1
+- Updates rules + control file to fix deb issue
+* Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-4
+- build  package for notifications
+* Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-3
+- build  package for notifications
+- build  package for notifications
+* Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-2
+- build  package for notifications
+* Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15-63
+- build pacakge -removed fastapi
+- build pacakge -removed fastapi
+* Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15-61
+- build package -fixed multiple databasecall 
+* Mon Mar 10 2025 Rachit Hans <rhans@45drives.com> 1.1.15.60-60
+- build package -fixed multiple databasecall 
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-60
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-59
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-56
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-54
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-53
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-52
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-51
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-1
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-48
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-47
+- added jq dependency
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-45
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-44
+- fixed rpm package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-43
+- build package
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-42
+- build package for testing for notifications
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-41
+- build package for testing for notifications
+* Fri Mar 07 2025 Rachit Hans <rhans@45drives.com> 1.1.15-40
+- Alerts branch working
 * Fri Mar 07 2025 Jordan Keough <jkeough@45drives.com> 1.1.17-1
 - Updates get_disks.py script to handle lsblk command to account for flag difference
   in versions, and skips boot drives when returning disks via lsblk
 * Thu Mar 06 2025 Jordan Keough <jkeough@45drives.com> 1.1.16-1
 - Fixes a bug with RaidZ error handling not working when creating pool or adding
   vdev
+* Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-39
+- final build package for testing
+* Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-38
+- final build package for testing
+* Thu Mar 06 2025 Rachit Hans <rhans@45drives.com> 1.1.15-37
+- build package
+- build package
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-36
+- build package
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-35
+- build package
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-34
+- build package
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-33
+- build package
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-32
+- build package
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-31
+- build package
+- build package
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-29
+- build package
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-28
+- build pacakge
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> v1.1.15-27
+- build pacakge
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> v1.1.15-26-26
+- build pacakgae
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-25
+- build pacakge
+- build pacakge
+* Wed Mar 05 2025 Rachit Hans <rhans@45drives.com> 1.1.15-24
+- build package
+- build package
+* Tue Mar 04 2025 Rachit Hans <rhans@45drives.com> 1.1.15-23
+- build package
+* Tue Mar 04 2025 Rachit Hans <rhans@45drives.com> 1.1.15-21
+- build package
+* Tue Mar 04 2025 Rachit Hans <rhans@45drives.com> 1.1.15-22
+- build package
+* Tue Mar 04 2025 Rachit Hans <rhans@45drives.com> 1.1.15-20
+- build package
+* Tue Mar 04 2025 Rachit Hans <rhans@45drives.com> 1.1.15-19
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-18
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-17
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-16
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-14
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-13
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-12
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-11
+- build package
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-9
+- build package
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.15-7
+- 1.1.15
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.14-2
+- Testin Pakcgae installation
+* Thu Feb 27 2025 Rachit Hans <rhans@45drives.com> 1.1.14-y
+- Testin Pakcgae installation
 * Tue Feb 25 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-6
 - fix snapshot list/notification bugs
 * Fri Feb 21 2025 Jordan Keough <jkeough@45drives.com> 1.1.15-5

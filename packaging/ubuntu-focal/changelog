@@ -1,16 +1,193 @@
+cockpit-zfs (1.1.18-5focal) focal; urgency=medium
+
+  * Comments out erroneous print statement in get-disks.py
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 28 Mar 2025 08:05:57 -0300
+
 cockpit-zfs (1.1.17-1focal) focal; urgency=medium
+cockpit-zfs (1.1.17-6focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 25 Mar 2025 11:15:27 -0300
+
+cockpit-zfs (1.1.17-5focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 25 Mar 2025 11:00:27 -0300
+
+ cockpit-zfs (1.1.18-4focal) focal; urgency=medium
+
+ * trying deb build again
+
+-- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:15:37 -0300
+
+cockpit-zfs (1.1.18-3focal) focal; urgency=medium
+
+ * trying deb build again
+
+-- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:12:03 -0300
+
+cockpit-zfs (1.1.18-2focal) focal; urgency=medium
+
+ * retrying build
+
+-- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:06:54 -0300
+
+cockpit-zfs (1.1.18-1focal) focal; urgency=medium
+
+ * Updates rules + control file to fix deb issue
+
+-- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:04:56 -0300
+
+cockpit-zfs (1.1.17-4focal) focal; urgency=medium
+
+  * build  package for notifications
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 11 Mar 2025 13:36:09 -0300
+
+cockpit-zfs (1.1.17-3focal) focal; urgency=medium
+
+  * build  package for notifications
+  * build  package for notifications
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 11 Mar 2025 13:30:00 -0300
+
+cockpit-zfs (1.1.17-2focal) focal; urgency=medium
+
+  * build  package for notifications
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 11 Mar 2025 13:14:29 -0300
+
+cockpit-zfs (1.1.15-63focal) focal; urgency=medium
+
+  * build pacakge -removed fastapi
+  * build pacakge -removed fastapi
+
+ -- Rachit Hans <rhans@45drives.com>  Mon, 10 Mar 2025 09:11:11 -0300
+ 
+cockpit-zfs (1.1.15-61focal) focal; urgency=medium
+
+  * build package -fixed multiple databasecall 
+
+ -- Rachit Hans <rhans@45drives.com>  Mon, 10 Mar 2025 06:56:32 -0300
+
+cockpit-zfs (1.1.15.60-60focal) focal; urgency=medium
+
+  * build package -fixed multiple databasecall 
+
+ -- Rachit Hans <rhans@45drives.com>  Mon, 10 Mar 2025 06:55:22 -0300
+
+cockpit-zfs (1.1.15-60focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 13:35:52 -0400
+
+cockpit-zfs (1.1.15-59focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 13:26:00 -0400
+
+cockpit-zfs (1.1.15-58focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 13:19:00 -0400
+
+cockpit-zfs (1.1.15-56focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 12:49:13 -0400
+
+cockpit-zfs (1.1.15-55focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 12:14:42 -0400
+
+cockpit-zfs (1.1.15-54focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 12:07:50 -0400
+
+cockpit-zfs (1.1.15-53focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 11:51:42 -0400
+
+cockpit-zfs (1.1.15-52focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 11:46:39 -0400
+
+cockpit-zfs (1.1.15-51focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 11:35:29 -0400
+
+cockpit-zfs (1.1.15-50focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 11:18:41 -0400
+
+cockpit-zfs (1.1.15-1focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 11:07:27 -0400
+
+cockpit-zfs (1.1.15-48focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 10:53:37 -0400
+
+cockpit-zfs (1.1.15-47focal) focal; urgency=medium
+
+  * added jq dependency
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 10:42:17 -0400
+
+cockpit-zfs (1.1.15-46focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 10:04:06 -0400
+
+cockpit-zfs (1.1.15-45focal) focal; urgency=medium
+
+  * build package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 09:21:20 -0400
+
+cockpit-zfs (1.1.15-44focal) focal; urgency=medium
+
+  * fixed rpm package
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 07 Mar 2025 09:12:31 -0400
+ 
+ cockpit-zfs (1.1.17-1focal) focal; urgency=medium
 
   * Updates get_disks.py script to handle lsblk command to account for flag difference
     in versions, and skips boot drives when returning disks via lsblk
 
  -- Jordan Keough <jkeough@45drives.com>  Fri, 07 Mar 2025 07:32:16 -0400
 
-cockpit-zfs (1.1.16-1focal) focal; urgency=medium
+ cockpit-zfs (1.1.16-1focal) focal; urgency=medium
 
-  * Fixes a bug with RaidZ error handling not working when creating pool or adding
-    vdev
+ * Fixes a bug with RaidZ error handling not working when creating pool or adding
+   vdev
 
- -- Jordan Keough <jkeough@45drives.com>  Thu, 06 Mar 2025 12:26:59 -0400
+-- Jordan Keough <jkeough@45drives.com>  Thu, 06 Mar 2025 12:26:59 -0400
 
 cockpit-zfs (1.1.15-6focal) focal; urgency=medium
 

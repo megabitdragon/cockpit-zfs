@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e  # Exit immediately if a command exits with a non-zero status
+export DEBIAN_FRONTEND=noninteractive
+
+echo "[INFO] Updating APT package list..."
+apt-get update
+
+echo "[INFO] Installing jq..."
+apt-get install -y jq
+
+echo "[INFO] Reloading systemd daemon..."
+systemctl daemon-reload
+
+echo "[INFO] Enabling services..."
+systemctl enable houston-dbus.service || true
+
+echo "[INFO] Starting services..."
+systemctl start houston-dbus.service || true
+systemctl restart zed || true
+
+echo "[✅ SUCCESS] jq installed and services started!"

@@ -460,7 +460,9 @@ const diskSizeMatch = () => {
     if (newVDev.value!.forceAdd) {
         return true;
     }
-
+    if (newVDev.value.type === 'disk') {
+        return true;
+    }
     let previousCapacity = 0;
 
     selectedDisks.value.forEach(selDisk => {
