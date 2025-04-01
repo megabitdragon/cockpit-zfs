@@ -1,3 +1,3 @@
-## zfs module 1.1.18-5
+## zfs module 1.2.1-1
 
-* Comments out erroneous print statement in get-disks.py
+* Updates Build Number + Added zfs alerts bell

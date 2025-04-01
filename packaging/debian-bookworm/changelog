@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.1-1bookworm) bookworm; urgency=medium
+
+  * Updates Build Number + Added zfs alerts bell
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 01 Apr 2025 08:30:56 -0300
+
 cockpit-zfs (1.1.17-1bookworm) bookworm; urgency=medium
 
   * Updates get_disks.py script to handle lsblk command to account for flag difference
