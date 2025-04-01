@@ -1,3 +1,10 @@
+cockpit-zfs (1.1.18-5focal) focal; urgency=medium
+
+  * Comments out erroneous print statement in get-disks.py
+
+ -- Jordan Keough <jkeough@45drives.com>  Fri, 28 Mar 2025 08:05:57 -0300
+
+cockpit-zfs (1.1.17-1focal) focal; urgency=medium
 cockpit-zfs (1.1.17-6focal) focal; urgency=medium
 
   * build package
@@ -9,6 +16,30 @@ cockpit-zfs (1.1.17-5focal) focal; urgency=medium
   * build package
 
  -- Rachit Hans <rhans@45drives.com>  Tue, 25 Mar 2025 11:00:27 -0300
+
+ cockpit-zfs (1.1.18-4focal) focal; urgency=medium
+
+ * trying deb build again
+
+-- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:15:37 -0300
+
+cockpit-zfs (1.1.18-3focal) focal; urgency=medium
+
+ * trying deb build again
+
+-- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:12:03 -0300
+
+cockpit-zfs (1.1.18-2focal) focal; urgency=medium
+
+ * retrying build
+
+-- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:06:54 -0300
+
+cockpit-zfs (1.1.18-1focal) focal; urgency=medium
+
+ * Updates rules + control file to fix deb issue
+
+-- Jordan Keough <jkeough@45drives.com>  Mon, 24 Mar 2025 09:04:56 -0300
 
 cockpit-zfs (1.1.17-4focal) focal; urgency=medium
 

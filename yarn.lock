@@ -88,6 +88,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@45drives/houston-common@workspace:houston-common"
   dependencies:
+    "@45drives/houston-common-css": "workspace:^"
+    "@45drives/houston-common-lib": "workspace:^"
+    "@45drives/houston-common-ui": "workspace:^"
     p5: "npm:^1.11.3"
     typedoc: "npm:^0.27.6"
     typedoc-plugin-mdn-links: "npm:^4.0.10"
@@ -95,6 +98,7 @@ __metadata:
     typedoc-plugin-vue: "npm:^1.3.0"
     typedoc-umlclass: "npm:^0.10.1"
     typescript: "npm:^5.4.5"
+    vue: "npm:^3.5.13"
   languageName: unknown
   linkType: soft
 

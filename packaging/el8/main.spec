@@ -57,10 +57,20 @@ systemctl start houston-dbus.service || true
 systemctl restart zed
 
 %changelog
+* Fri Mar 28 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-5
+- Comments out erroneous print statement in get-disks.py
 * Tue Mar 25 2025 Rachit Hans <rhans@45drives.com> 1.1.17-6
 - build package
 * Tue Mar 25 2025 Rachit Hans <rhans@45drives.com> 1.1.17-5
 - build package
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-4
+- trying deb build again
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-3
+- trying deb build again
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-2
+- retrying build
+* Mon Mar 24 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-1
+- Updates rules + control file to fix deb issue
 * Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-4
 - build  package for notifications
 * Tue Mar 11 2025 Rachit Hans <rhans@45drives.com> 1.1.17-3

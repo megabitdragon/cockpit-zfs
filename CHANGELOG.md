@@ -1,3 +1,3 @@
-## zfs module 1.1.17-6
+## zfs module 1.1.18-5
 
-* build package
+* Comments out erroneous print statement in get-disks.py

@@ -329,6 +329,7 @@ export async function getImportableDestroyedPools() {
 }
 
 export async function importPool(pool) {
+	console.log("hello from import pool")
 	try {
 		let cmdString = ['zpool', 'import'];
 
@@ -354,22 +355,10 @@ export async function importPool(pool) {
 
 		cmdString.push('-d');
 
-		switch(pool.identifier) {
-			case 'vdev_path':
-				cmdString.push('/dev/disk/by-vdev');
-				break;
-
-			case 'phy_path':
-				cmdString.push('/dev/disk/by-path');
-				break;
-
-			case 'sd_path':
-				cmdString.push('/dev');
-				break;
-			
-			default:
-				break;
-		}
+		cmdString.push('/dev/disk/by-vdev');
+		cmdString.push('-d', '/dev/disk/by-path');
+		cmdString.push('-d', '/dev');
+		
 
 		if(pool.altRoot != '') {
 			cmdString.push('-o', 'altroot=' + pool.altRoot);
