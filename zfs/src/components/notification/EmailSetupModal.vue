@@ -85,11 +85,35 @@
                                 {{ !smtpEmailConfig.email ? "Email Address is required." : "Invalid email format." }}
                             </p>
                         </div>
-                        <div class="flex justify-center space-x-2">
-                            <label class="block w-[25%] text-default  text-md font-medium">Recievers Email Address  <InfoTile class="ml-1"
-                                :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            </label>
-                            <input v-model="smtpEmailConfig.recieversEmail" type="email" placeholder="your-email@example.com" class="w-[50%] bg-default text-default p-2 border rounded-lg" />
+                        <div class="flex justify-center space-x-2 items-start">
+                        <label class="block text-md text-default w-[25%] py-2 font-medium">Receivers Email</label>
+
+                        <!-- Wrapping container -->
+                        <div class="w-[50%] py-2 flex flex-wrap gap-1 min-h-[48px] px-2">
+                            <!-- Chips -->
+                            <span
+                            v-for="(email, index) in emailChips"
+                            :key="index"
+                            class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center space-x-1"
+                            >
+                            <span>{{ email }}</span>
+                            <button @click="removeEmail(index)" class="text-blue-500 hover:text-red-500 font-bold">&times;</button>
+                            </span>
+
+                            <!-- Input -->
+                            <input
+                            v-model="emailInput"
+                            @keydown.enter.prevent="addEmail"
+                            @keydown.tab.prevent="addEmail"
+                            @keydown.space.prevent="addEmail"
+                            @keydown.,.prevent="addEmail"
+                            @blur="addEmail"
+                            placeholder="Enter email "
+                            class="flex-1 min-w-[120px] bg-default text-default p-2 border rounded-lg"
+                            type="email"
+                            />
                         </div>
+                    </div>
                         <div v-if="formValidationAttempted && (!smtpEmailConfig.email || !isEmailValid)" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p class="text-red-500 text-sm w-[50%]">
@@ -196,6 +220,36 @@
 
                     </div>
                     <div class="flex justify-center space-x-2 items-start">
+                        <label class="block text-md text-default w-[25%] py-2 font-medium">Receivers Email</label>
+
+                        <!-- Wrapping container -->
+                        <div class="w-[50%] py-2  flex flex-wrap gap-1 min-h-[48px] px-2">
+                            <!-- Chips -->
+                            <span
+                            v-for="(email, index) in emailChips"
+                            :key="index"
+                            class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center space-x-1"
+                            >
+                            <span>{{ email }}</span>
+                            <button @click="removeEmail(index)" class="text-blue-500 hover:text-red-500 font-bold">&times;</button>
+                            </span>
+
+                            <!-- Input -->
+                            <input
+                            v-model="emailInput"
+                            @keydown.enter.prevent="addEmail"
+                            @keydown.tab.prevent="addEmail"
+                            @keydown.space.prevent="addEmail"
+                            @keydown.,.prevent="addEmail"
+                            @blur="addEmail"
+                            placeholder="Enter email and press Enter"
+                            class="flex-1 min-w-[120px] bg-default text-default p-2 border rounded-lg"
+                            type="email"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center space-x-2 items-start">
                         <label class="block text-md text-default  w-[25%] py-2 font-medium">Alert Levels</label>
                         <div class="w-[50%] flex py-2 ">
                             <div class="flex text-default  items-center space-x-2 mr-4">
@@ -244,6 +298,7 @@ import {pushNotification, Notification } from '@45drives/houston-common-ui';
 import InfoTile from '../common/InfoTile.vue';
 import OldModal from '../common/OldModal.vue';
 import { WarningConfig } from '../../types';
+import { RefSymbol } from '@vue/reactivity';
 
 const activeTab = ref('email-settings')
 const authDetailsExist = ref(false)
@@ -251,6 +306,8 @@ const smtpMethod = ref("oauth2")
 const send_info = ref(false)
 const send_warning = ref(false)
 const send_critical = true
+const emailInput = ref('')
+const emailChips = ref([])
 
 const warningConfig = reactive<WarningConfig>({
   scrubFinish: 'info',
@@ -281,7 +338,7 @@ const emailSetUpModal = ref(false);
 
 const authEmailConfig = ref({
     email: "",
-    recieversEmail: "",
+    recieversEmail: [],
     authMethod: "oauth2",
     oauthAccessToken: "",              
     tokenExpiry: "",
@@ -294,7 +351,7 @@ const smtpEmailConfig = ref({
     smtpPort: 587,
     username: "",
     password: "",
-    recieversEmail: "",
+    recieversEmail: [],
     tls: true,
     authMethod: "smtp",
     oauthAccessToken: "",              
@@ -303,11 +360,27 @@ const smtpEmailConfig = ref({
     send_warning: false,
     send_critical: true     
 });
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const isEmailValid = computed(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(smtpEmailConfig.value.email) && emailRegex.test(smtpEmailConfig.value.recieversEmail);
+
+    if (smtpMethod.value === "smtp") {
+        return (
+            emailRegex.test(smtpEmailConfig.value.email) &&
+            Array.isArray(smtpEmailConfig.value.recieversEmail) &&      
+                smtpEmailConfig.value.recieversEmail.length > 0 &&
+                smtpEmailConfig.value.recieversEmail.every(email => emailRegex.test(email)) 
+        );
+    } else {
+        console.log("authEmailConfig.value.email ", authEmailConfig.value.email, "authEmailConfig.value.recieversEmail ", authEmailConfig.value.recieversEmail)
+
+        return (
+            emailRegex.test(authEmailConfig.value.email) &&
+            Array.isArray(authEmailConfig.value.recieversEmail) &&
+                authEmailConfig.value.recieversEmail.length > 0 &&
+                authEmailConfig.value.recieversEmail.every(email => emailRegex.test(email))        );
+    }
 });
+
 
 const privacyPolicyUrl = ref('https://email-auth.45d.io/privacy');
 const termsOfServiceUrl = ref('https://email-auth.45d.io/tos');
@@ -401,23 +474,31 @@ const fetchMsmtpDetails = async () => {
         if(smtpData.authMethod=="on"){
             smtpMethod.value = "smtp"
             smtpEmailConfig.value.email = smtpData.email;
-            smtpEmailConfig.value.recieversEmail = smtpData.recieversEmail;
             smtpEmailConfig.value.smtpServer = smtpData.smtpServer;
             smtpEmailConfig.value.smtpPort = smtpData.smtpPort;
             smtpEmailConfig.value.username = smtpData.username;
             smtpEmailConfig.value.password = smtpData.password;
             smtpEmailConfig.value.tls = smtpData.tls;
-            smtpEmailConfig.value.authMethod = smtpData.auth
+            smtpEmailConfig.value.authMethod = smtpData.auth;
+            // Handle multi-recipient emails
+            emailChips.value = Array.isArray(smtpData.recieversEmail)
+                ? smtpData.recieversEmail
+                : smtpData.recieversEmail.split(",").map(e => e.trim()).filter(Boolean);
         }else if(smtpData.authMethod!="on" || smtpData.authMethod!="") {
             smtpMethod.value = "oauth2"
 
             authEmailConfig.value.email = smtpData.email;
-            authEmailConfig.value.recieversEmail = smtpData.recieversEmail;
             authEmailConfig.value.authMethod = smtpData.auth
             authEmailConfig.value.authMethod = "oauth2"
             authDetailsExist.value = true;
+            console.log("smtpData Recived" , smtpData)
 
-        }
+            // Handle multi-recipient emails
+            emailChips.value = Array.isArray(smtpData.recieversEmail)
+                ? smtpData.recieversEmail
+                : smtpData.recieversEmail.split(",").map(e => e.trim()).filter(Boolean);
+
+            }
         // ✅ Populate Vue state with fetched values
         console.log("✅ SMTP details fetched successfully:", smtpData);
     } catch (error) {
@@ -429,8 +510,8 @@ const fetchMsmtpDetails = async () => {
 };
 
 const updateSMTPConfig = async () => {
-  if (!isFormValid() || !isEmailValid) {
-    if (!isEmailValid) {
+  if (!isFormValid() || !isEmailValid.value) {
+    if (!isEmailValid.value) {
       alert("⚠️ Please fill valid email address before sending a test email.");
     } else {
       alert("⚠️ Please fill in all fields before sending a test email.");
@@ -446,6 +527,7 @@ const updateSMTPConfig = async () => {
 
     let config;
 
+
     if (smtpMethod.value === "smtp") {
       config = {
         email: smtpEmailConfig.value.email,
@@ -453,7 +535,7 @@ const updateSMTPConfig = async () => {
         smtpPort: smtpEmailConfig.value.smtpPort,
         username: smtpEmailConfig.value.username,
         password: smtpEmailConfig.value.password,
-        recieversEmail: smtpEmailConfig.value.recieversEmail,
+        recieversEmail: smtpEmailConfig.value.recieversEmail.join(","), 
         tls: smtpEmailConfig.value.tls,
         send_info: send_info.value,
         send_warning: send_warning.value,
@@ -465,6 +547,7 @@ const updateSMTPConfig = async () => {
         email: authEmailConfig.value.email,
         send_info: send_info.value,
         send_warning: send_warning.value,
+        recieversEmail: authEmailConfig.value.recieversEmail.join(","), 
         send_critical: true,
         authMethod: "oauth2",
         oauthAccessToken: authEmailConfig.value.oauthAccessToken,
@@ -473,7 +556,7 @@ const updateSMTPConfig = async () => {
       };
     }
 
-    console.log("📤 Config to send:", config);
+    console.log("Config to send:", config);
 
     const response = await dbus.call(
       "/org/_45drives/Houston",
@@ -494,17 +577,15 @@ const updateSMTPConfig = async () => {
 
 
 const testEmail = async () => {
-    if (!isFormValid() || !isEmailValid) {
-        if (!isEmailValid) {
+    if (!isFormValid() || !isEmailValid.value) {
+        if (!isEmailValid.value) {
             alert("⚠️ Please enter a valid email address before sending a test email.");
         } 
-        if(smtpMethod.value=="smtp"){
+        if (smtpMethod.value === "smtp") {
             alert("⚠️ Please fill in all fields before sending a test email.");
-
-        }
-        else {
+        } else {
+            console.log("isEmailValid:", isEmailValid.value, "isFormValid:", isFormValid());
             alert("⚠️ Please sign in with Gmail.");
-
         }
         return;
     }
@@ -514,31 +595,35 @@ const testEmail = async () => {
 
         const cockpit = (window as any).cockpit;
         const dbus = cockpit.dbus("org._45drives.Houston");
+
         let config;
-        if(smtpMethod.value=="smtp"){
-             config = {
-            email: smtpEmailConfig.value.email,
-            smtpServer: smtpEmailConfig.value.smtpServer,
-            smtpPort: smtpEmailConfig.value.smtpPort,
-            username: smtpEmailConfig.value.username,
-            tls: smtpEmailConfig.value.tls,
-            recipientEmail: smtpEmailConfig.value.recieversEmail,
-            password: smtpEmailConfig.value.password
 
+        if (smtpMethod.value === "smtp") {
+            config = {
+                email: smtpEmailConfig.value.email,
+                smtpServer: smtpEmailConfig.value.smtpServer,
+                smtpPort: smtpEmailConfig.value.smtpPort,
+                username: smtpEmailConfig.value.username,
+                password: smtpEmailConfig.value.password,
+                tls: smtpEmailConfig.value.tls,
+                recieversEmail: Array.isArray(smtpEmailConfig.value.recieversEmail)
+                    ? smtpEmailConfig.value.recieversEmail.join(",")
+                    : smtpEmailConfig.value.recieversEmail,
+                authMethod: "plain"
             };
-        }else{
-             config = {
-            email: authEmailConfig.value.email,
-            recipientEmail: authEmailConfig.value.recieversEmail,
-            password: accessToken.value || authEmailConfig.value.oauthAccessToken,
-            tokenExpiry : tokenExpiry.value,
-            authMethod: "oauth2"  //
-
+        } else {
+            config = {
+                email: authEmailConfig.value.email,
+                password: accessToken.value || authEmailConfig.value.oauthAccessToken,
+                tokenExpiry: tokenExpiry.value || authEmailConfig.value.tokenExpiry,
+                authMethod: "oauth2",
+                recieversEmail: Array.isArray(authEmailConfig.value.recieversEmail)
+                    ? authEmailConfig.value.recieversEmail.join(",")
+                    : authEmailConfig.value.recieversEmail
             };
         }
 
-
-        console.log("Testing with config: ", config);
+        console.log("Testing with config:", config);
 
         const response = await dbus.call(
             "/org/_45drives/Houston",
@@ -555,6 +640,7 @@ const testEmail = async () => {
         alert(`❌ Failed to send test email: ${error.message || error}`);
     }
 };
+ 
 
 const accessToken = ref<string | null>(null);
 const refreshToken = ref<string | null>(null);
@@ -643,21 +729,48 @@ const resetMsmtpData = async () => {
             smtpEmailConfig.value.smtpServer = "",
             smtpEmailConfig.value.smtpPort = 587,
             smtpEmailConfig.value.username = "",
-            smtpEmailConfig.value.recieversEmail = "",
+            smtpEmailConfig.value.recieversEmail = [],
             smtpEmailConfig.value.password = ""
 
         }else{
             authEmailConfig.value.email = "",
-            authEmailConfig.value.recieversEmail = "",
+            authEmailConfig.value.recieversEmail = [],
             accessToken.value = "" 
             authEmailConfig.value.oauthAccessToken = "",
             tokenExpiry.value = ""
         }
         console.log(`✅ D-Bus Response: ${response}`);
         alert(response.includes("✅") ? response : `✅ Test email sent: ${response}`);
-
-
 };
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const addEmail = () => {
+  const trimmed = emailInput.value.trim().replace(/,$/, "");
+
+  if (!trimmed || !emailRegex.test(trimmed)) {
+    emailInput.value = "";
+    return;
+  }
+
+  if (!emailChips.value.includes(trimmed)) {
+    emailChips.value.push(trimmed);
+  }
+
+  emailInput.value = ""; // Clear input
+};
+
+
+const removeEmail = (index) => {
+  emailChips.value.splice(index, 1)
+}
+
+watch(emailChips, (newList) => {
+  if (smtpMethod.value === "smtp") {
+    smtpEmailConfig.value.recieversEmail = [...newList];
+  } else {
+    authEmailConfig.value.recieversEmail = [...newList];
+  }
+});
 
 
 

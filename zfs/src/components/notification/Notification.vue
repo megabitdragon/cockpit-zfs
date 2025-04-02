@@ -310,11 +310,6 @@
 													}">{{ notification.state }}</span>
 												</p>
 
-												<!-- Show Last Recorded Error Only If It Exists -->
-												<p class="pl-4 text-sm text-white-500" v-if="notification.description && notification.description !== 'None'">
-													Last Recorded Error: <strong>{{ notification.description }}</strong>
-												</p>
-
 												<!-- GUID, Error, Timestamp Section -->
 												<div class=" text-sm text-white-500 pl-4">
 													<p v-if="notification.guid">

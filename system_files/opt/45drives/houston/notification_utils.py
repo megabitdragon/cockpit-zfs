@@ -8,6 +8,7 @@ from pathlib import Path
 import tempfile
 import base64
 import requests
+import re
 
 LOG_FILE = "/var/log/msmtp_test.log"
 logging.basicConfig(
@@ -47,6 +48,7 @@ def determine_severity(event, message):
         return "error"  
 
     return "info"  # ℹ️ Default for general notifications
+
 def store_notification(message):
     """Stores notifications in SQLite DB, updates statechange events if necessary, and returns the message with ID."""
     print(f"[DEBUG] Attempting to store: {message}")  
@@ -124,31 +126,25 @@ def store_notification(message):
 
 
 
-# def sendTestEmail(config_json):
+# def sendTestEmailViaSMTP(config):
 #     """
-#     Sends a test email using msmtp. If OAuth config matches username, refresh token. 
-#     If plain auth is detected, dynamically construct and use a temporary msmtp config.
+#     Sends a test email using msmtp (plain authentication).
 #     """
 #     try:
-#         logging.info("📨 Preparing to send test email via msmtp...")
-#         logging.getLogger().handlers[0].flush()
-
-#         config = json.loads(config_json)
-
 #         smtp_server = config.get("smtpServer", "").strip()
 #         smtp_port = str(config.get("smtpPort", 587))
 #         username = config.get("username", "").strip()
 #         password = config.get("password", "").strip()
 #         sender_email = config.get("email", "").strip()
 #         recipient_email = config.get("recipientEmail", "").strip()
-#         auth_method = config.get("authMethod", "plain").strip()
 #         tls = "on" if config.get("tls", True) else "off"
 
 #         if not recipient_email or "@" not in recipient_email:
-#             logging.error("❌ Error: Invalid recipient email format.")
-#             return "❌ Error: Invalid recipient email format."
+#             return "❌ Invalid recipient email."
 
-#         # Check if using existing OAuth config
+#         email_content = f"Subject: Test Email from 45Drives\n\nThis is a test email."
+
+#         # Check for existing msmtp OAuth config (optional legacy support)
 #         use_existing_config = False
 #         if os.path.exists(MSMTP_CONFIG_PATH):
 #             with open(MSMTP_CONFIG_PATH, "r") as f:
@@ -157,17 +153,11 @@ def store_notification(message):
 #                 current_user_line = next((line for line in current_config.split('\n') if line.startswith("user ")), None)
 #                 current_user = current_user_line.split(" ")[1] if current_user_line else ""
 #                 if current_user == username:
-#                     logging.info("🔄 Detected existing OAuth config with matching user. Refreshing token...")
 #                     subprocess.run(["python3", MSMTP_OAUTH_REFRESH_SCRIPT], check=False)
 #                     use_existing_config = True
-#                 else:
-#                     logging.info("ℹ️ OAuth config user does not match — using incoming config.")
 
-#         # Construct the email content
-#         email_content = f"Subject: Test Email from 45Drives\n\nThis is a test email."
-
+#         # Use system config if available
 #         if use_existing_config:
-#             # Send using system-wide msmtp config
 #             process = subprocess.run(
 #                 ["msmtp", "-C", MSMTP_CONFIG_PATH, recipient_email],
 #                 input=email_content,
@@ -176,7 +166,7 @@ def store_notification(message):
 #                 stderr=subprocess.PIPE
 #             )
 #         else:
-#             # Dynamically create temporary msmtp config for plain-auth
+#             # Temporary config for plain SMTP
 #             with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp:
 #                 tmp.write(f"""account default
 # host {smtp_server}
@@ -199,95 +189,69 @@ def store_notification(message):
 #                 stdout=subprocess.PIPE,
 #                 stderr=subprocess.PIPE
 #             )
+#             os.unlink(temp_config_path)
 
-#             os.unlink(temp_config_path)  # Cleanup temp file
-
-#         # Handle result
 #         if process.returncode == 0:
-#             success_msg = f"✅ Test email sent to {recipient_email} successfully!"
-#             logging.info(success_msg)
-#             return success_msg
+#             return f"✅ Test email sent to {recipient_email} via SMTP!"
 #         else:
-#             error_message = f"❌ Failed to send test email: {process.stderr.strip()}"
-#             logging.error(error_message)
-#             return error_message
+#             return f"❌ SMTP error: {process.stderr.strip()}"
 
 #     except Exception as e:
-#         error_message = f"❌ Error sending test email: {str(e)}"
-#         logging.error(error_message)
-#         return error_message
+#         return f"❌ Exception in SMTP send: {str(e)}"
 def sendTestEmailViaSMTP(config):
-    """
-    Sends a test email using msmtp (plain authentication).
-    """
     try:
-        smtp_server = config.get("smtpServer", "").strip()
-        smtp_port = str(config.get("smtpPort", 587))
-        username = config.get("username", "").strip()
-        password = config.get("password", "").strip()
-        sender_email = config.get("email", "").strip()
-        recipient_email = config.get("recipientEmail", "").strip()
-        tls = "on" if config.get("tls", True) else "off"
+        email = config.get("email")
+        username = config.get("username")
+        password = config.get("password")
+        server = config.get("smtpServer")
+        port = config.get("smtpPort")
+        tls = config.get("tls", True)
+        recipients = config.get("recieversEmail", [])
 
-        if not recipient_email or "@" not in recipient_email:
-            return "❌ Invalid recipient email."
+        if isinstance(recipients, str):
+            recipients = [r.strip() for r in recipients.split(",") if r.strip()]
 
-        email_content = f"Subject: Test Email from 45Drives\n\nThis is a test email."
+        # Save password securely
+        with open(MSMTP_PASSWORD_PATH, "w") as f:
+            f.write(password)
+        os.chmod(MSMTP_PASSWORD_PATH, 0o600)
 
-        # Check for existing msmtp OAuth config (optional legacy support)
-        use_existing_config = False
-        if os.path.exists(MSMTP_CONFIG_PATH):
-            with open(MSMTP_CONFIG_PATH, "r") as f:
-                current_config = f.read()
-            if "auth oauthbearer" in current_config:
-                current_user_line = next((line for line in current_config.split('\n') if line.startswith("user ")), None)
-                current_user = current_user_line.split(" ")[1] if current_user_line else ""
-                if current_user == username:
-                    subprocess.run(["python3", MSMTP_OAUTH_REFRESH_SCRIPT], check=False)
-                    use_existing_config = True
-
-        # Use system config if available
-        if use_existing_config:
-            process = subprocess.run(
-                ["msmtp", "-C", MSMTP_CONFIG_PATH, recipient_email],
-                input=email_content,
-                universal_newlines=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-        else:
-            # Temporary config for plain SMTP
-            with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp:
-                tmp.write(f"""account default
-host {smtp_server}
-port {smtp_port}
+        # Write msmtp config
+        config_content = f"""account default
+host {server}
+port {port}
 auth on
 user {username}
-password {password}
-from {sender_email}
-tls {tls}
+passwordeval cat {MSMTP_PASSWORD_PATH}
+from {email}
+tls {"on" if tls else "off"}
 tls_starttls on
-logfile /var/log/msmtp.log
-""")
-                tmp.flush()
-                temp_config_path = tmp.name
+"""
+        with open(MSMTP_CONFIG_PATH, "w") as f:
+            f.write(config_content)
+        os.chmod(MSMTP_CONFIG_PATH, 0o600)
 
-            process = subprocess.run(
-                ["msmtp", "-C", temp_config_path, recipient_email],
-                input=email_content,
-                universal_newlines=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-            os.unlink(temp_config_path)
+        # Compose and send test email
+        test_subject = "SMTP Test Email from 45Drives"
+        test_body = "This is a test email to verify your SMTP settings are working properly."
+        email_msg = f"Subject: {test_subject}\n\n{test_body}"
 
-        if process.returncode == 0:
-            return f"✅ Test email sent to {recipient_email} via SMTP!"
+        proc = subprocess.run(
+            ["msmtp", "-C", MSMTP_CONFIG_PATH] + recipients,
+            input=email_msg,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+        if proc.returncode == 0:
+            return f"✅ Test email sent successfully to: {', '.join(recipients)}"
         else:
-            return f"❌ SMTP error: {process.stderr.strip()}"
+            return f"❌ Failed to send test email: {proc.stderr.strip()}"
 
     except Exception as e:
-        return f"❌ Exception in SMTP send: {str(e)}"
+        return f"❌ SMTP test failed: {str(e)}"
+
 
 import base64
 import requests
@@ -295,45 +259,81 @@ import email.message
 
 # Paths to token info and refresh script
 
+# def sendTestEmailViaGmailApi(config):
+#     try:
+#         if not os.path.exists(MSMTP_OAUTH_JSON_PATH):
+#             return "❌ Gmail OAuth credentials file not found."
+
+#         # 🔄 Refresh access token
+#         logging.info("🔄 Refreshing Gmail token...")
+#         refresh = subprocess.run(
+#             ["python3", MSMTP_OAUTH_REFRESH_SCRIPT],
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#             universal_newlines=True
+#         )
+
+#         if refresh.returncode != 0:
+#             logging.error(f"❌ Refresh script failed: {refresh.stderr.strip()}")
+#             return f"❌ Token refresh failed: {refresh.stderr.strip()}"
+
+#         # ✅ Load refreshed token data
+#         with open(MSMTP_OAUTH_JSON_PATH) as f:
+#             oauth = json.load(f)
+
+#         access_token = oauth.get("access_token")
+#         sender_email = oauth.get("user_email")
+#         recipient_email = config.get("recipientEmail", "").strip()
+
+#         if not all([access_token, sender_email, recipient_email]):
+#             return "❌ Missing required fields: access token, sender, or recipient."
+
+#         # 🔁 Call your own API endpoint
+#         payload = {
+#             "accessToken": access_token,
+#             "from": sender_email,
+#             "to": recipient_email,
+#             "subject": "Test Email from 45Drives",
+#             "body": "This is a test email from the ZFS notification system."
+#         }
+
+#         logging.info(f"📡 Calling {AUTH_SEND_EMAIL_URL} to send email...")
+#         response = requests.post(
+#             AUTH_SEND_EMAIL_URL,
+#             json=payload,
+#             headers={"Content-Type": "application/json"}
+#         )
+
+#         if response.status_code == 200:
+#             return response.text.strip()
+#         else:
+#             return f"❌ Failed to send via API ({response.status_code}): {response.text.strip()}"
+
+#     except Exception as e:
+#         logging.error(f"❌ Exception in sendViaGmailApi: {str(e)}")
+#         return f"❌ Exception in sendViaGmailApi: {str(e)}"
+
 def sendTestEmailViaGmailApi(config):
     try:
-        if not os.path.exists(MSMTP_OAUTH_JSON_PATH):
-            return "❌ Gmail OAuth credentials file not found."
+        access_token = config.get("oauthAccessToken")
+        sender_email = config.get("email")
+        recipients = config.get("recieversEmail", [])
 
-        # 🔄 Refresh access token
-        logging.info("🔄 Refreshing Gmail token...")
-        refresh = subprocess.run(
-            ["python3", MSMTP_OAUTH_REFRESH_SCRIPT],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True
-        )
+        if isinstance(recipients, str):
+            recipients = [r.strip() for r in recipients.split(",") if r.strip()]
 
-        if refresh.returncode != 0:
-            logging.error(f"❌ Refresh script failed: {refresh.stderr.strip()}")
-            return f"❌ Token refresh failed: {refresh.stderr.strip()}"
+        if not all([access_token, sender_email, recipients]):
+            return "❌ Missing required fields for Gmail API test."
 
-        # ✅ Load refreshed token data
-        with open(MSMTP_OAUTH_JSON_PATH) as f:
-            oauth = json.load(f)
-
-        access_token = oauth.get("access_token")
-        sender_email = oauth.get("user_email")
-        recipient_email = config.get("recipientEmail", "").strip()
-
-        if not all([access_token, sender_email, recipient_email]):
-            return "❌ Missing required fields: access token, sender, or recipient."
-
-        # 🔁 Call your own API endpoint
         payload = {
             "accessToken": access_token,
             "from": sender_email,
-            "to": recipient_email,
-            "subject": "Test Email from 45Drives",
-            "body": "This is a test email from the ZFS notification system."
+            "to": recipients,
+            "subject": "Gmail API Test Email from 45Drives",
+            "body": "This is a test email to verify your Gmail integration is working."
         }
 
-        logging.info(f"📡 Calling {AUTH_SEND_EMAIL_URL} to send email...")
+        AUTH_SEND_EMAIL_URL = "https://email-auth.45d.io/auth/send-email"
         response = requests.post(
             AUTH_SEND_EMAIL_URL,
             json=payload,
@@ -341,13 +341,12 @@ def sendTestEmailViaGmailApi(config):
         )
 
         if response.status_code == 200:
-            return response.text.strip()
+            return f"✅ Gmail API test email sent successfully to: {', '.join(recipients)}"
         else:
-            return f"❌ Failed to send via API ({response.status_code}): {response.text.strip()}"
+            return f"❌ Gmail API error {response.status_code}: {response.text.strip()}"
 
     except Exception as e:
-        logging.error(f"❌ Exception in sendViaGmailApi: {str(e)}")
-        return f"❌ Exception in sendViaGmailApi: {str(e)}"
+        return f"❌ Gmail API test failed: {str(e)}"
 
 def sendTestEmail(config_json):
     """
@@ -376,7 +375,7 @@ def get_missed_notifications():
     try:
         print("[DEBUG] Executing SQL Query to fetch missed notifications")
         cursor.execute("""
-            SELECT id, timestamp, event, pool, vdev, state, error, description, scrub_details, 
+            SELECT id, timestamp, event, pool, vdev, state, error, description, 
                    errors, repaired, received, health, severity
             FROM notifications WHERE received = 0
         """)
@@ -389,7 +388,7 @@ def get_missed_notifications():
             {
                 "id": row[0], "timestamp": row[1], "event": row[2], "pool": row[3],
                 "vdev": row[4], "state": row[5], "error": row[6], "description": row[7],
-                "scrub_details": row[8], "errors": row[9], "repaired": row[10],
+                "errors": row[9], "repaired": row[10],
                 "received": row[11], "health": row[12], "severity": row[13]
             }
             for row in rows
@@ -455,7 +454,6 @@ def mark_all_notifications_as_read():
 
 MSMTP_CONFIG_PATH = "/etc/45drives/msmtp"
 MSMTP_PASSWORD_PATH = "/etc/45drives/msmtp_pass"
-MSMTP_RECIPIENT_PATH = "/etc/45drives/msmtp_recipients"
 
 def updateSMTPConfig(config_json):
     """
@@ -467,20 +465,24 @@ def updateSMTPConfig(config_json):
         config = json.loads(config_json)
 
         email = config.get("email", "")
-        recipient_email = config.get("recieversEmail", "")
         auth_method = config.get("authMethod", "plain")
         tls = "on" if config.get("tls", True) else "off"
 
+        recipient_email_raw = config.get("recieversEmail", "")
+        recipients = [e.strip() for e in recipient_email_raw.split(",") if e.strip()]
+        email_regex = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+        valid_recipients = [e for e in recipients if email_regex.match(e)]
+
         # Store recipient email for both cases
         with open(MSMTP_RECIPIENT_PATH, "w") as f:
-            f.write(recipient_email)
+              f.write(", ".join(valid_recipients))
         os.chmod(MSMTP_RECIPIENT_PATH, 0o600)
 
         if auth_method == "oauth2":
             # Gmail API OAuth2 setup (NOT msmtp)
-            user_email = config.get("username", "")
+            user_email = config.get("email", "")
             access_token = config.get("oauthAccessToken", "")
-            refresh_token = config.get("refreshToken", "")  # storing under 'password' for consistency
+            refresh_token = config.get("oauthRefreshToken", "")  # storing under 'password' for consistency
             expiry = config.get("tokenExpiry", "")
 
             oauth_data = {
@@ -563,7 +565,6 @@ def sendEmailNotification(subject, message, severity):
             return msg
 
         use_gmail_api = False
-        config_content = ""
 
         if msmtp_exists:
             with open(MSMTP_CONFIG_PATH, "r") as f:
@@ -571,6 +572,17 @@ def sendEmailNotification(subject, message, severity):
             use_gmail_api = "auth oauthbearer" in config_content
         elif oauth_exists:
             use_gmail_api = True
+
+        if not os.path.exists(MSMTP_RECIPIENT_PATH):
+            return "❌ Recipient email file missing."
+
+        with open(MSMTP_RECIPIENT_PATH, "r") as f:
+            raw_recipients = f.read().strip()
+
+        recipients = [email.strip() for email in raw_recipients.split(",") if email.strip()]
+
+        if not recipients:
+            return "❌ No valid recipients found."
 
         if use_gmail_api:
             logging.info("🔄 Using Gmail API. Refreshing token...")
@@ -593,19 +605,13 @@ def sendEmailNotification(subject, message, severity):
             access_token = oauth_data.get("access_token")
             sender_email = oauth_data.get("user_email")
 
-            if not os.path.exists(MSMTP_RECIPIENT_PATH):
-                return "❌ Recipient email file missing."
-
-            with open(MSMTP_RECIPIENT_PATH, "r") as f:
-                recipient_email = f.read().strip()
-
-            if not all([access_token, sender_email, recipient_email]):
+            if not all([access_token, sender_email]):
                 return "❌ Missing required OAuth fields."
 
             payload = {
                 "accessToken": access_token,
                 "from": sender_email,
-                "to": recipient_email,
+                "to": recipients,
                 "subject": subject,
                 "body": message
             }
@@ -625,18 +631,12 @@ def sendEmailNotification(subject, message, severity):
                 return f"❌ Gmail API error {response.status_code}: {response.text.strip()}"
 
         else:
-            # Fallback to msmtp
-            if not os.path.exists(MSMTP_RECIPIENT_PATH):
-                return "❌ Recipient email file missing."
-
-            with open(MSMTP_RECIPIENT_PATH, "r") as f:
-                recipient_email = f.read().strip()
-
+            # Use msmtp
             email_content = f"""Subject: {subject}\n\n{message}"""
 
-            logging.info(f"📤 Sending email to {recipient_email} using msmtp...")
+            logging.info(f"📤 Sending email to: {', '.join(recipients)} using msmtp...")
             process = subprocess.run(
-                ["msmtp", "-C", MSMTP_CONFIG_PATH, recipient_email],
+                ["msmtp", "-C", MSMTP_CONFIG_PATH] + recipients,
                 input=email_content,
                 universal_newlines=True,
                 stdout=subprocess.PIPE,
@@ -647,7 +647,7 @@ def sendEmailNotification(subject, message, severity):
             logging.debug(f"[msmtp STDERR]: {process.stderr.strip()}")
 
             if process.returncode == 0:
-                success_msg = f"✅ Notification sent to {recipient_email} successfully!"
+                success_msg = f"✅ Notification sent to: {', '.join(recipients)}"
                 print(success_msg)
                 logging.info(success_msg)
                 return success_msg
@@ -663,48 +663,114 @@ def sendEmailNotification(subject, message, severity):
         logging.exception(error_message)
         return error_message
 
+# def fetchMsmtpDetails():
+#     """Fetch the stored SMTP or Gmail OAuth configuration details."""
+#     try:
+#         smtp_details = {}
+
+#         if not os.path.exists(MSMTP_CONFIG_PATH) or os.stat(MSMTP_CONFIG_PATH).st_size == 0:
+#             # Fallback to Gmail OAuth mode
+#             if os.path.exists(MSMTP_OAUTH_JSON_PATH) and os.stat(MSMTP_OAUTH_JSON_PATH).st_size > 0:
+#                 with open(MSMTP_OAUTH_JSON_PATH, "r") as f:
+#                     oauth_data = json.load(f)
+#                 smtp_details["authMethod"] = "oauth2"
+#                 smtp_details["email"] = oauth_data.get("user_email", "")
+#                 smtp_details["oauthAccessToken"] = oauth_data.get("access_token", "")
+#                 with open(MSMTP_RECIPIENT_PATH, "r") as f:
+#                     smtp_details["recieversEmail"] = f.read().strip()
+                    
+#             else:
+#                 return json.dumps({
+#                     "status": "empty",
+#                     "message": "No SMTP or OAuth config found"
+#                 })
+#         else:
+#             # Traditional SMTP config (plain auth)
+#             with open(MSMTP_CONFIG_PATH, "r") as f:
+#                 config_data = f.readlines()
+
+#             for line in config_data:
+#                 if line.startswith("host"):
+#                     smtp_details["smtpServer"] = line.split(" ")[1].strip()
+#                 elif line.startswith("port"):
+#                     smtp_details["smtpPort"] = line.split(" ")[1].strip()
+#                 elif line.startswith("user"):
+#                     smtp_details["username"] = line.split(" ")[1].strip()
+#                 elif line.startswith("from"):
+#                     smtp_details["email"] = line.split(" ")[1].strip()
+#                 elif line.startswith("tls "):
+#                     smtp_details["tls"] = line.split(" ")[1].strip().lower() == "on"
+#                 elif line.startswith("auth"):
+#                     smtp_details["authMethod"] = line.split(" ")[1].strip()
+
+#             if "authMethod" not in smtp_details:
+#                 smtp_details["authMethod"] = "plain"
+
+#             if os.path.exists(MSMTP_PASSWORD_PATH):
+#                 with open(MSMTP_PASSWORD_PATH, "r") as f:
+#                     smtp_details["password"] = f.read().strip()
+#             else:
+#                 return json.dumps({
+#                     "status": "empty",
+#                     "message": "SMTP password file missing"
+#                 })
+
+#         # Optional: recipient email
+#         if os.path.exists(MSMTP_RECIPIENT_PATH):
+#             with open(MSMTP_RECIPIENT_PATH, "r") as f:
+#                 smtp_details["recieversEmail"] = f.read().strip()
+
+#         return json.dumps(smtp_details)
+
+#     except Exception as e:
+#         return json.dumps({
+#             "status": "error",
+#             "message": f"Exception occurred: {str(e)}"
+#         })
+
 def fetchMsmtpDetails():
     """Fetch the stored SMTP or Gmail OAuth configuration details."""
     try:
         smtp_details = {}
 
         if not os.path.exists(MSMTP_CONFIG_PATH) or os.stat(MSMTP_CONFIG_PATH).st_size == 0:
-            # Fallback to Gmail OAuth mode
+            # Fallback to Gmail OAuth
             if os.path.exists(MSMTP_OAUTH_JSON_PATH) and os.stat(MSMTP_OAUTH_JSON_PATH).st_size > 0:
                 with open(MSMTP_OAUTH_JSON_PATH, "r") as f:
                     oauth_data = json.load(f)
+
                 smtp_details["authMethod"] = "oauth2"
-                smtp_details["username"] = oauth_data.get("user_email", "")
                 smtp_details["email"] = oauth_data.get("user_email", "")
                 smtp_details["oauthAccessToken"] = oauth_data.get("access_token", "")
-                smtp_details["password"] = oauth_data.get("refresh_token", "")
+                smtp_details["oauthRefreshToken"] = oauth_data.get("refresh_token", "")
                 smtp_details["tokenExpiry"] = oauth_data.get("expiry", "")
+
             else:
                 return json.dumps({
                     "status": "empty",
-                    "message": "No SMTP or OAuth config found"
+                    "message": "No SMTP or Gmail OAuth configuration found"
                 })
         else:
-            # Traditional SMTP config (plain auth)
+            # Parse traditional SMTP (plain auth)
             with open(MSMTP_CONFIG_PATH, "r") as f:
-                config_data = f.readlines()
+                config_lines = f.readlines()
 
-            for line in config_data:
+            for line in config_lines:
                 if line.startswith("host"):
-                    smtp_details["smtpServer"] = line.split(" ")[1].strip()
+                    smtp_details["smtpServer"] = line.split(" ", 1)[1].strip()
                 elif line.startswith("port"):
-                    smtp_details["smtpPort"] = line.split(" ")[1].strip()
+                    smtp_details["smtpPort"] = int(line.split(" ", 1)[1].strip())
                 elif line.startswith("user"):
-                    smtp_details["username"] = line.split(" ")[1].strip()
+                    smtp_details["username"] = line.split(" ", 1)[1].strip()
                 elif line.startswith("from"):
-                    smtp_details["email"] = line.split(" ")[1].strip()
+                    smtp_details["email"] = line.split(" ", 1)[1].strip()
                 elif line.startswith("tls "):
-                    smtp_details["tls"] = line.split(" ")[1].strip().lower() == "on"
+                    smtp_details["tls"] = line.split(" ", 1)[1].strip().lower() == "on"
                 elif line.startswith("auth"):
-                    smtp_details["authMethod"] = line.split(" ")[1].strip()
+                    smtp_details["authMethod"] = line.split(" ", 1)[1].strip()
 
-            if "authMethod" not in smtp_details:
-                smtp_details["authMethod"] = "plain"
+            # Default to plain if authMethod isn't found
+            smtp_details.setdefault("authMethod", "plain")
 
             if os.path.exists(MSMTP_PASSWORD_PATH):
                 with open(MSMTP_PASSWORD_PATH, "r") as f:
@@ -715,10 +781,13 @@ def fetchMsmtpDetails():
                     "message": "SMTP password file missing"
                 })
 
-        # Optional: recipient email
+        # Load recipient email(s)
         if os.path.exists(MSMTP_RECIPIENT_PATH):
             with open(MSMTP_RECIPIENT_PATH, "r") as f:
-                smtp_details["recieversEmail"] = f.read().strip()
+                recipients = [e.strip() for e in f.read().split(",") if e.strip()]
+                smtp_details["recieversEmail"] = recipients
+        else:
+            smtp_details["recieversEmail"] = []
 
         return json.dumps(smtp_details)
 
@@ -727,7 +796,7 @@ def fetchMsmtpDetails():
             "status": "error",
             "message": f"Exception occurred: {str(e)}"
         })
-
+        
 def updateWarningLevels(config_json):
     """Updates warning_levels table based on frontend config"""
     try:
