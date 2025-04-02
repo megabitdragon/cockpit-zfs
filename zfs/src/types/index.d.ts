@@ -243,3 +243,27 @@ interface Notification {
 	snapShot?: string;
 	replicationDestination?: string
   }
+  interface AuthEmailConfig {
+	email: string;
+	recieversEmail: string[];
+	authMethod: string;
+	oauthAccessToken: string;
+	tokenExpiry: string;
+	oauthRefreshToken: string;
+  }
+
+  interface SmtpEmailConfig {
+	email: string;
+	smtpServer: string;
+	smtpPort: number;
+	username: string;
+	password: string;
+	recieversEmail: string[];
+	tls: boolean;
+	authMethod: string;
+	oauthAccessToken: string;
+	tokenExpiry: string;
+	send_info: boolean;
+	send_warning: boolean;
+	send_critical: boolean;
+  }

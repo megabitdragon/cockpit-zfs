@@ -297,7 +297,7 @@ import { ref, computed, watch, onMounted, reactive } from 'vue';
 import {pushNotification, Notification } from '@45drives/houston-common-ui';
 import InfoTile from '../common/InfoTile.vue';
 import OldModal from '../common/OldModal.vue';
-import { WarningConfig } from '../../types';
+import { AuthEmailConfig, SmtpEmailConfig, WarningConfig } from '../../types';
 import { RefSymbol } from '@vue/reactivity';
 
 const activeTab = ref('email-settings')
@@ -336,30 +336,31 @@ const warningEvents: Record<keyof WarningConfig, string> = {
 };
 const emailSetUpModal = ref(false);
 
-const authEmailConfig = ref({
-    email: "",
-    recieversEmail: [],
-    authMethod: "oauth2",
-    oauthAccessToken: "",              
-    tokenExpiry: "",
-    oauthRefreshToken: ""
-  
+const authEmailConfig = ref<AuthEmailConfig>({
+  email: "",
+  recieversEmail: [],
+  authMethod: "oauth2",
+  oauthAccessToken: "",
+  tokenExpiry: "",
+  oauthRefreshToken: ""
 });
-const smtpEmailConfig = ref({
-    email: "",
-    smtpServer: "",
-    smtpPort: 587,
-    username: "",
-    password: "",
-    recieversEmail: [],
-    tls: true,
-    authMethod: "smtp",
-    oauthAccessToken: "",              
-    tokenExpiry: "",
-    send_info: false,
-    send_warning: false,
-    send_critical: true     
+
+const smtpEmailConfig = ref<SmtpEmailConfig>({
+  email: "",
+  smtpServer: "",
+  smtpPort: 587,
+  username: "",
+  password: "",
+  recieversEmail: [],
+  tls: true,
+  authMethod: "smtp",
+  oauthAccessToken: "",
+  tokenExpiry: "",
+  send_info: false,
+  send_warning: false,
+  send_critical: true
 });
+
 const isEmailValid = computed(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -392,17 +393,22 @@ const isFormValid = () => {
     if (smtpMethod.value=="smtp"){
         return (
         smtpEmailConfig.value.email.trim() !== "" &&
-        smtpEmailConfig.value.recieversEmail.trim() !== "" &&
+        smtpEmailConfig.value.recieversEmail.every(email => email.trim() !== "") &&
         smtpEmailConfig.value.smtpServer.trim() !== "" &&
         smtpEmailConfig.value.smtpPort > 0 &&
         smtpEmailConfig.value.username.trim() !== "" &&
         smtpEmailConfig.value.password.trim() !== ""
         );
     }else{
-        return(
-            authEmailConfig.value.email.trim() !== "" &&
-            authEmailConfig.value.recieversEmail.trim() !== ""
-        )
+        authEmailConfig.value.recieversEmail = authEmailConfig.value.recieversEmail
+        .map(email => email.trim())
+        .filter(email => email.length > 0);
+
+        return (
+        authEmailConfig.value.email.trim() !== "" &&
+        authEmailConfig.value.recieversEmail.length > 0
+        );
+
     }
 
 };
