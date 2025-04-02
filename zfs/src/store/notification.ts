@@ -1,21 +1,7 @@
 import { reactive } from "vue";
-
+import { Notification } from "../types";
 // Define the Notification type
-interface Notification {
-  id: number;
-  timestamp: string;
-  event: string;
-  pool?: string;
-  text: string;
-  state?: string;
-  vdev?: string;
-  error?: string;
-  description?: string;
-  guid?: string;
-  health?: string;
-  errors?: string;
-  severity?: string;
-}
+
 
 // Define the reactive notification store
 export const notificationStore = reactive<{
@@ -43,6 +29,9 @@ export const notificationStore = reactive<{
         health?: string;
         errors?: string;
         severity?: string;
+        fileSystem?: string;
+        snapShot?: string;
+        replicationDestination?: string
       };
       console.log("message id recieved in adddnotification: ", parsedMessage.id)
 
@@ -69,6 +58,9 @@ export const notificationStore = reactive<{
           health: parsedMessage.health,
           errors: parsedMessage.errors,
           severity: parsedMessage.severity,
+          fileSystem: parsedMessage.fileSystem,
+          snapShot: parsedMessage.snapShot,
+          replicationDestination: parsedMessage.replicationDestination
         });
   
         console.log(`✅ Added new notification severity ${parsedMessage.severity}`);
@@ -112,7 +104,7 @@ export const notificationStore = reactive<{
       );
         if (!response) throw new Error("❌ No response received from Houston D-Bus.");
 
-        console.log("📥 Raw response from D-Bus:", response);
+        //console.log("📥 Raw response from D-Bus:", response);
 
         // ✅ Parse response JSON
         const missedNotifications = JSON.parse(response);
@@ -125,68 +117,13 @@ export const notificationStore = reactive<{
         // ✅ Update UI with new notifications
         sideBarNotification();
 
-        console.log("✅ Missed notifications fetched successfully.");
+        //console.log("✅ Missed notifications fetched successfully.");
     } catch (error) {
         console.error("❌ Error fetching missed notifications via D-Bus:", error);
     }
 },
 
 
-  // // Fetch missed notifications from FastAPI
-  // async fetchMissedNotifications() {
-  //   try {
-  //     const http = (cockpit as any).http({
-  //       address: "127.0.0.1",
-  //       port: 8000, // FastAPI is running on this port
-  //     });
-
-  //     // Perform GET request to FastAPI
-  //     const response = await http.get("/missed-notifications/");
-      
-  //     if (!response) {
-  //       throw new Error("No response received from FastAPI.");
-  //     }
-  //     console.log("response " ,response)
-  //     // Parse response
-  //     const missedNotifications: Notification[] = JSON.parse(response);
-
-  //     // Add notifications to store
-  //     missedNotifications.forEach((notification) => {
-  //       notificationStore.notifications.unshift(notification);
-  //     });
-  //     sideBarNotification();
-
-  //     console.log("Missed notifications fetched successfully.");
-
-  //   } catch (error) {
-  //     console.error("Error fetching missed notifications:", error);
-  //   }
-  // },
-  
-  // async markNotificationAsRead(notificationId: number) {
-  //   try {
-  //     const http = (cockpit as any).http({
-  //       address: "127.0.0.1",
-  //       port: 8000, // FastAPI is running on this port
-  //     });
-  
-  //     const response = await http.request({
-  //       method: "PUT",
-  //       path: `/markNotificationAsRead/${notificationId}`, // ✅ Correct API path
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ received: 1 }) // ✅ Mark as read
-  //     });
-  
-  
-  //     // ✅ Check if the response is valid
-  //     if (!response) {
-  //       throw new Error("❌ No response received from FastAPI.");
-  //     }
-  
-  //   } catch (error) {
-  //     console.error("❌ Error marking notification as read:", error);
-  //   }
-  // },  
   async markNotificationAsRead(notificationId: number) {
     try {
         console.log(`🔄 Marking notification ${notificationId} as read via D-Bus...`);

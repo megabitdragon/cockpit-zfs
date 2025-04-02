@@ -95,8 +95,6 @@
 										</div>
 									</div>
 
-
-
 									<div class="flex items-start gap-3" v-if="notification.event === 'storage_threshold'">
 										<!-- Icon Based on Scrub Status -->
 										<div>
@@ -127,19 +125,137 @@
 										</div>
 									</div>
 
+									<!-- Snapshot Creation -->
+									<div class="flex items-start gap-3" v-if="notification.event === 'snapshot_created'">
+									<!-- Icon -->
+										<div>
+											<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
+										</div>
 
+										<!-- Message Content -->
+										<div class="w-full">
+											<p class="text-xl font-semibold text-green-500">
+											Snapshot Created - <span class="text-lg">{{ notification.snapShot }}</span>
+											</p>
 
+											<p class="pl-4 text-sm text-white-500">
+											 - A new snapshot <strong>{{ notification.snapShot }}</strong> has been successfully created
+											for the filesystem <strong>{{ notification.fileSystem }}</strong>.
+											<br />
+											<br />
+											<strong>Timestamp:</strong> {{ notification.timestamp }}
+											</p>
+										</div>
+										<!-- Dismiss Icon -->
+										<div>
+											<XMarkIcon
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500"
+											aria-hidden="true"
+											@click.stop="handleDismiss(notification.id)"
+											/>
+										</div>
+									</div>
 
+										<!-- Snapshot Failed -->
+									<!-- Snapshot Creation Failed -->
+									<div class="flex items-start gap-3" v-if="notification.event === 'snapshot_failed'">
+									<!-- Icon -->
+										<div>
+											<XCircleIcon class="icon-error size-icon-lg text-red-500" aria-hidden="true" />
+										</div>
 
+									<!-- Message Content -->
+										<div class="w-full">
+											<p class="text-xl font-semibold text-red-500">
+											Snapshot Creation Failed - {{ notification.snapShot || 'Unknown Snapshot' }}
+											</p>
 
+											<p class="pl-4 text-sm text-white-500">
+											 Failed to create snapshot on <strong>{{ notification.fileSystem || 'unknown filesystem' }}</strong>.
+											<br />
+											 <strong>Error:</strong> {{ notification.error  || 'Unknown error' }}
+											<br />
+											<strong>Timestamp:</strong> {{ notification.timestamp }}
+											</p>
+										</div>
 
-
-
-
-
-
-
+									<!-- Dismiss Icon -->
+										<div>
+											<XMarkIcon
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500"
+											aria-hidden="true"
+											@click.stop="handleDismiss(notification.id)"
+											/>
+										</div>
+									</div>
 									
+									<!-- ZFS Replication Success -->
+									<div class="flex items-start gap-3" v-if="notification.event === 'zfs_replication_success'">
+										<!-- Icon -->
+										<div>
+											<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
+										</div>
+										<div class="w-full">
+											<p class="text-xl font-semibold text-green-500">
+											ZFS Replication Completed - <span class="text-lg">{{ notification.snapShot || 'Snapshot Unknown' }}</span>
+											</p>
+
+											<p class="pl-4 text-sm text-white-500">
+											- Snapshot <strong>{{ notification.snapShot }}</strong> was successfully replicated
+											from <strong>{{ notification.fileSystem || 'source unknown' }}</strong>.
+											<br />
+											Destination: <strong>{{ notification.replicationDestination || 'N/A' }}</strong>
+											<br />
+											 <strong>Timestamp:</strong> {{ notification.timestamp }}
+											</p>
+										</div>
+
+											<!-- Dismiss Icon -->
+										<div>
+											<XMarkIcon
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500"
+											aria-hidden="true"
+											@click.stop="handleDismiss(notification.id)"
+											/>
+										</div>
+									</div>
+									<!-- ZFS Replication Failed -->
+										<div class="flex items-start gap-3" v-if="notification.event === 'zfs_replication_failed'">
+										<!-- Icon -->
+										<div>
+											<XCircleIcon class="icon-error size-icon-lg text-red-500" aria-hidden="true" />
+										</div>
+
+										<!-- Message Content -->
+										<div class="w-full">
+											<p class="text-xl font-semibold text-red-500">
+											ZFS Replication Failed - <span class="text-lg">{{ notification.snapShot || 'Snapshot Unknown' }}</span>
+											</p>
+
+											<p class="pl-4 text-sm text-white-500">
+											- Replication failed for snapshot <strong>{{ notification.snapShot || 'unknown' }}</strong>
+											from <strong>{{ notification.fileSystem || 'unknown filesystem' }}</strong>.
+											<br />
+											<br />
+											 <strong>Error:</strong> {{ notification.errors ||  'Unknown error' }}
+											<br />
+											<br />
+											 <strong>Timestamp:</strong> {{ notification.timestamp }}
+											</p>
+										</div>
+
+										<!-- Dismiss Icon -->
+										<div>
+											<XMarkIcon
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500"
+											aria-hidden="true"
+											@click.stop="handleDismiss(notification.id)"
+											/>
+										</div>
+										</div>
+
+
+										<!-- Vdev Attatch -->
 									<div class="flex items-start gap-3" v-if="notification.event === 'vdev_attach'" >
 											<div >
 												<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />

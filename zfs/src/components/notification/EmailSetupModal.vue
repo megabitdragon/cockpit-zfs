@@ -239,8 +239,8 @@ input[type="checkbox"] {
 </style>
 
 <script setup lang="ts">
-import { ref, inject, Ref, computed, watch, onMounted, reactive } from 'vue';
-import {Modal, CardContainer, pushNotification, Notification } from '@45drives/houston-common-ui';
+import { ref, computed, watch, onMounted, reactive } from 'vue';
+import {pushNotification, Notification } from '@45drives/houston-common-ui';
 import InfoTile from '../common/InfoTile.vue';
 import OldModal from '../common/OldModal.vue';
 import { WarningConfig } from '../../types';
@@ -260,7 +260,8 @@ const warningConfig = reactive<WarningConfig>({
   snapshotCreation: 'info',
   stateChange: 'critical',
   poolImport: 'info',
-  storage_threshold: 'warning'
+  replicationTask: 'info',
+  storageThreshold: 'warning'
 });
 
 const warningEvents: Record<keyof WarningConfig, string> = {
@@ -271,7 +272,8 @@ const warningEvents: Record<keyof WarningConfig, string> = {
   snapshotCreation: 'Snapshot Creation',
   stateChange: 'State Change - Degraded/Faulted',
   poolImport: 'Pool Import',
-  storage_threshold: 'Storage Threshold'
+  storageThreshold: 'Storage Threshold',
+  replicationTask: 'Replication Task'
 
 
 };
@@ -283,7 +285,6 @@ const authEmailConfig = ref({
     authMethod: "oauth2",
     oauthAccessToken: "",              
     tokenExpiry: "",
-    email_enabled: true,    
     oauthRefreshToken: ""
   
 });
@@ -298,7 +299,6 @@ const smtpEmailConfig = ref({
     authMethod: "smtp",
     oauthAccessToken: "",              
     tokenExpiry: "",
-    email_enabled: true,    
     send_info: false,
     send_warning: false,
     send_critical: true     
@@ -351,8 +351,8 @@ async function saveWarningConfig() {
             "UpdateWarningLevels",         // ✅ Method name
             [JSON.stringify(warningConfig)]    // ✅ Argument (as an array)
         );
-        console.log("warningconfig   " , warningConfig)
-        console.log(`✅ D-Bus Response: ${response}`);
+        //console.log("warningconfig   " , warningConfig)
+        //console.log(`✅ D-Bus Response: ${response}`);
         alert("✅ warninglevels config updated successfully!");
         closeModal()
 
@@ -372,7 +372,6 @@ const emit = defineEmits(['close']);
 onMounted(() => {
     fetchMsmtpDetails();  // ✅ Fetch SMTP details on mount
     emailSetUpModal.value = true;
-    console.log("modal is mounted")
 });
 
 const fetchMsmtpDetails = async () => {
@@ -391,6 +390,7 @@ const fetchMsmtpDetails = async () => {
         );
 
         const smtpData = JSON.parse(response);
+
         if (smtpData.error) {
             console.error("❌ Error fetching SMTP details:", smtpData.error);
             alert("❌ Failed to fetch SMTP details.");
@@ -421,6 +421,8 @@ const fetchMsmtpDetails = async () => {
         // ✅ Populate Vue state with fetched values
         console.log("✅ SMTP details fetched successfully:", smtpData);
     } catch (error) {
+        console.log("response ")
+
         console.error("❌ Error fetching SMTP details:", error);
         alert("❌ Failed to fetch SMTP details.");
     }
@@ -456,7 +458,6 @@ const updateSMTPConfig = async () => {
         send_info: send_info.value,
         send_warning: send_warning.value,
         send_critical: true,
-        email_enabled: true,
         authMethod: smtpMethod.value,
       };
     } else {
@@ -465,7 +466,6 @@ const updateSMTPConfig = async () => {
         send_info: send_info.value,
         send_warning: send_warning.value,
         send_critical: true,
-        email_enabled: true,
         authMethod: "oauth2",
         oauthAccessToken: authEmailConfig.value.oauthAccessToken,
         oauthRefreshToken: authEmailConfig.value.oauthRefreshToken

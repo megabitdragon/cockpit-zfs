@@ -218,7 +218,28 @@ interface WarningConfig {
 	clearPoolErrors: string;
 	snapshotCreation: string;
 	stateChange: string; // even though not user-editable, can still be tracked
-	poolImport: string
-	storage_threshold: string
+	poolImport: string;
+	storageThreshold: string;
+	replicationTask: string;
+
   }
 type StepNavigationCallback = (item: StepsNavigationItem) => void;
+
+interface Notification {
+	id: number;
+	timestamp: string;
+	event: string;
+	pool?: string;
+	text: string;
+	state?: string;
+	vdev?: string;
+	error?: string;
+	description?: string;
+	guid?: string;
+	health?: string;
+	errors?: string;
+	severity?: string;
+	fileSystem?: string;
+	snapShot?: string;
+	replicationDestination?: string
+  }

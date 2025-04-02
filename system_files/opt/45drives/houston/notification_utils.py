@@ -553,15 +553,24 @@ def sendEmailNotification(subject, message, severity):
     try:
         logging.info("📨 Preparing to send automated notification email...")
 
-        # ✅ Check if msmtp config exists and is non-empty
-        if not os.path.exists(MSMTP_CONFIG_PATH) or os.stat(MSMTP_CONFIG_PATH).st_size == 0:
-            logging.warning("⚠️ msmtp config missing or empty, falling back to Gmail API.")
-            use_gmail_api = True
-            config_content = ""
-        else:
+        msmtp_exists = os.path.exists(MSMTP_CONFIG_PATH) and os.stat(MSMTP_CONFIG_PATH).st_size > 0
+        oauth_exists = os.path.exists(MSMTP_OAUTH_JSON_PATH) and os.stat(MSMTP_OAUTH_JSON_PATH).st_size > 0
+
+        if not msmtp_exists and not oauth_exists:
+            msg = "❌ No email configuration found. Cannot send notification."
+            print(msg)
+            logging.error(msg)
+            return msg
+
+        use_gmail_api = False
+        config_content = ""
+
+        if msmtp_exists:
             with open(MSMTP_CONFIG_PATH, "r") as f:
                 config_content = f.read()
             use_gmail_api = "auth oauthbearer" in config_content
+        elif oauth_exists:
+            use_gmail_api = True
 
         if use_gmail_api:
             logging.info("🔄 Using Gmail API. Refreshing token...")
@@ -575,7 +584,7 @@ def sendEmailNotification(subject, message, severity):
             logging.debug(f"[OAuth Refresh STDERR]: {refresh_process.stderr.strip()}")
 
             if refresh_process.returncode != 0:
-                logging.warning(f"⚠️ Failed to refresh OAuth token.")
+                logging.warning("⚠️ Failed to refresh OAuth token.")
                 return f"⚠️ Failed to refresh OAuth token."
 
             with open(MSMTP_OAUTH_JSON_PATH) as f:
@@ -583,6 +592,9 @@ def sendEmailNotification(subject, message, severity):
 
             access_token = oauth_data.get("access_token")
             sender_email = oauth_data.get("user_email")
+
+            if not os.path.exists(MSMTP_RECIPIENT_PATH):
+                return "❌ Recipient email file missing."
 
             with open(MSMTP_RECIPIENT_PATH, "r") as f:
                 recipient_email = f.read().strip()
@@ -613,14 +625,15 @@ def sendEmailNotification(subject, message, severity):
                 return f"❌ Gmail API error {response.status_code}: {response.text.strip()}"
 
         else:
-            # ✅ Read recipient email
+            # Fallback to msmtp
+            if not os.path.exists(MSMTP_RECIPIENT_PATH):
+                return "❌ Recipient email file missing."
+
             with open(MSMTP_RECIPIENT_PATH, "r") as f:
                 recipient_email = f.read().strip()
 
-            # ✅ Construct email content
             email_content = f"""Subject: {subject}\n\n{message}"""
 
-            # ✅ Send email using msmtp
             logging.info(f"📤 Sending email to {recipient_email} using msmtp...")
             process = subprocess.run(
                 ["msmtp", "-C", MSMTP_CONFIG_PATH, recipient_email],
@@ -657,7 +670,7 @@ def fetchMsmtpDetails():
 
         if not os.path.exists(MSMTP_CONFIG_PATH) or os.stat(MSMTP_CONFIG_PATH).st_size == 0:
             # Fallback to Gmail OAuth mode
-            if os.path.exists(MSMTP_OAUTH_JSON_PATH):
+            if os.path.exists(MSMTP_OAUTH_JSON_PATH) and os.stat(MSMTP_OAUTH_JSON_PATH).st_size > 0:
                 with open(MSMTP_OAUTH_JSON_PATH, "r") as f:
                     oauth_data = json.load(f)
                 smtp_details["authMethod"] = "oauth2"
@@ -667,12 +680,15 @@ def fetchMsmtpDetails():
                 smtp_details["password"] = oauth_data.get("refresh_token", "")
                 smtp_details["tokenExpiry"] = oauth_data.get("expiry", "")
             else:
-                return json.dumps({"error": "OAuth credentials not found."})
+                return json.dumps({
+                    "status": "empty",
+                    "message": "No SMTP or OAuth config found"
+                })
         else:
             # Traditional SMTP config (plain auth)
             with open(MSMTP_CONFIG_PATH, "r") as f:
                 config_data = f.readlines()
-            
+
             for line in config_data:
                 if line.startswith("host"):
                     smtp_details["smtpServer"] = line.split(" ")[1].strip()
@@ -687,14 +703,19 @@ def fetchMsmtpDetails():
                 elif line.startswith("auth"):
                     smtp_details["authMethod"] = line.split(" ")[1].strip()
 
-            # Default to "plain" if not explicitly defined
             if "authMethod" not in smtp_details:
                 smtp_details["authMethod"] = "plain"
 
-            with open(MSMTP_PASSWORD_PATH, "r") as f:
-                smtp_details["password"] = f.read().strip()
+            if os.path.exists(MSMTP_PASSWORD_PATH):
+                with open(MSMTP_PASSWORD_PATH, "r") as f:
+                    smtp_details["password"] = f.read().strip()
+            else:
+                return json.dumps({
+                    "status": "empty",
+                    "message": "SMTP password file missing"
+                })
 
-        # Read recipient email (shared by both modes)
+        # Optional: recipient email
         if os.path.exists(MSMTP_RECIPIENT_PATH):
             with open(MSMTP_RECIPIENT_PATH, "r") as f:
                 smtp_details["recieversEmail"] = f.read().strip()
@@ -702,7 +723,10 @@ def fetchMsmtpDetails():
         return json.dumps(smtp_details)
 
     except Exception as e:
-        return json.dumps({"error": f"Failed to fetch email config: {str(e)}"})
+        return json.dumps({
+            "status": "error",
+            "message": f"Exception occurred: {str(e)}"
+        })
 
 def updateWarningLevels(config_json):
     """Updates warning_levels table based on frontend config"""
@@ -733,7 +757,7 @@ def should_send_email(severity: str):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT email_enabled, send_info, send_warning, send_critical
+        SELECT send_info, send_warning, send_critical
         FROM smtp_settings
         WHERE id = 1
     """)
@@ -743,10 +767,8 @@ def should_send_email(severity: str):
     if not result:
         return False
 
-    email_enabled, send_info, send_warning, send_critical = result
-    if not email_enabled:
-        return False
-
+    send_info, send_warning, send_critical = result
+    
     return (
         (severity == "info" and send_info) or
         (severity == "warning" and send_warning) or
@@ -759,16 +781,14 @@ def updateEmailSeverities(json_string):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
-        email_enabled = 1 if data.get("email_enabled") else 0
         send_info = 1 if data.get("send_info") else 0
         send_warning = 1 if data.get("send_warning") else 0
         send_critical = 1 if data.get("send_critical") else 0
 
         cursor.execute("""
-            INSERT OR REPLACE INTO smtp_settings (id, email_enabled, send_info, send_warning, send_critical)
-            VALUES (1, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO smtp_settings (id, send_info, send_warning, send_critical)
+            VALUES (1, ?, ?, ?)
         """, (
-            email_enabled,
             send_info,
             send_warning,
             send_critical
@@ -781,29 +801,6 @@ def updateEmailSeverities(json_string):
     except Exception as e:
         return f"❌ Failed to update email severity config: {str(e)}"
 
-def should_send_email(severity: str):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT email_enabled, send_info, send_warning, send_critical
-        FROM smtp_settings
-        WHERE id = 1
-    """)
-    result = cursor.fetchone()
-    conn.close()
-
-    if not result:
-        return False
-
-    email_enabled, send_info, send_warning, send_critical = result
-    if not email_enabled:
-        return False
-
-    return (
-        (severity == "info" and send_info) or
-        (severity == "warning" and send_warning) or
-        (severity == "critical" and send_critical)
-    )
 
 if __name__ == "__main__":
     subject = "Manual Test from Terminal"

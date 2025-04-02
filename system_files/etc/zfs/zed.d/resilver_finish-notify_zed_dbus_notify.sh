@@ -99,7 +99,7 @@ FORWARD_MESSAGE=$(jq -n \
 } >> "$DEBUG_LOG"
 
 # ✅ Send event notification to Houston UI
-python3 "$DBUS_CLIENT" forward "ZFS Resilver Finished" "$FORWARD_MESSAGE" >> "$DEBUG_LOG" 2>&1
+python3 "$DBUS_CLIENT" "$FORWARD_MESSAGE" >> "$DEBUG_LOG" 2>&1
 FORWARD_STATUS=$?
 
 # ✅ Log final result

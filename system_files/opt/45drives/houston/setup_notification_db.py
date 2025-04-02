@@ -76,15 +76,14 @@ def setup_database():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS smtp_settings (
         id INTEGER PRIMARY KEY,
-        email_enabled INTEGER DEFAULT 1,          -- 0 = disabled, 1 = enabled
         send_info INTEGER DEFAULT 0,
         send_warning INTEGER DEFAULT 1,
         send_critical INTEGER DEFAULT 1
     );    
         """)
     cursor.execute("""
-    INSERT OR IGNORE INTO smtp_settings (id, email_enabled, send_info, send_warning, send_critical)
-    VALUES (1, 1, 0, 1, 1);
+    INSERT OR IGNORE INTO smtp_settings (id, send_info, send_warning, send_critical)
+    VALUES (1, 0, 1, 1);
         """)
     conn.commit()
     conn.close()
