@@ -17,7 +17,8 @@ from notification_utils import (
     sendEmailNotification,
     fetchMsmtpDetails,
     updateWarningLevels,
-    resetMsmtpData
+    resetMsmtpData,
+    fetchWarningLevels
 )
 
 # Initialize DBus
@@ -83,6 +84,9 @@ class DBusService(dbus.service.Object):
     @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
     def resetMsmtpData(self):
         return resetMsmtpData()
+    @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
+    def fetchWarningLevels(self):
+        return fetchWarningLevels()
 
 
 

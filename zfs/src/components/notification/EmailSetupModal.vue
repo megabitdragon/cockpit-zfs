@@ -147,7 +147,6 @@
                             <label class="block w-[25%] text-default  text-md font-medium">Username <InfoTile class="ml-1"
                                 :title="`The login username for authentication with the SMTP server. Usually the same as the sender email address.`" />                            </label>
                             <input v-model="smtpEmailConfig.username" type="text" placeholder="your-email@example.com" class="w-[50%] bg-default text-default p-2 border rounded-lg" />
-
                         </div>     
                         <div v-if="formValidationAttempted && !smtpEmailConfig.username" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
@@ -159,7 +158,8 @@
                                 :title="`The password or app-specific password used for authenticating with the SMTP server.\nNote: Some providers require an app password instead of the regular account password.`" />
                             </label>
                             <input  v-model="smtpEmailConfig.password" type="password"  class="w-[50%] bg-default text-default p-2 border rounded-lg" />
-                        </div>
+                        </div>   
+
                         <div v-if="formValidationAttempted && !smtpEmailConfig.password" class="flex justify-center space-x-2">
                             <div class="w-[25%]"></div>
                             <p class="text-red-500 text-sm w-[50%]">Password is required.</p>
@@ -184,7 +184,7 @@
                             <button class="w-[30%] bg-green-600 flex  text-default p-2 mb-[1rem] btn pointer-events-none" v-if="authDetailsExist==true && authEmailConfig.email" >
                                 <span class="flex-grow text-center mt-0.5">Connected as {{ authEmailConfig.email }}</span>
                             </button>
-                            <button v-if="authDetailsExist==true "  @click="oAuthBtn" class="w-[30%] ml-[1rem] bg-[#FF4329] flex hover:bg-[#9E2500] text-default p-2 mb-[1rem] btn">
+                            <button v-if="authDetailsExist==true && authEmailConfig.email"  @click="oAuthBtn" class="w-[30%] ml-[1rem] bg-[#FF4329] flex hover:bg-[#9E2500] text-default p-2 mb-[1rem] btn">
                                 <span  class="flex-grow text-center mt-0.5">Reconnect with Google with different account </span>
                                 <div class="flex items-center justify-center h-6 w-6 bg-white rounded-full ml-2">
                                     <img src="../../../public/img/icons8-gmail-48.png" alt="provider-logo"
@@ -219,7 +219,7 @@
 
 
                     </div>
-                    <div class="flex justify-center space-x-2 items-start">
+                    <div v-if="smtpMethod !== 'smtp'" class="flex justify-center space-x-2 items-start">
                         <label class="block text-md text-default w-[25%] py-2 font-medium">Receivers Email</label>
 
                         <!-- Wrapping container -->
@@ -253,15 +253,15 @@
                         <label class="block text-md text-default  w-[25%] py-2 font-medium">Alert Levels</label>
                         <div class="w-[50%] flex py-2 ">
                             <div class="flex text-default  items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="send_info" class="h-4 w-4" />
+                            <input type="checkbox" v-model="sendInfo" class="h-4 w-4" />
                             <label>Info</label>
                             </div>
                             <div class="flex text-default  items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="send_warning" class="h-4 w-4" />
+                            <input type="checkbox" v-model="sendWarning" class="h-4 w-4" />
                             <label>Warning</label>
                             </div>
                             <div class="flex text-default  items-center space-x-2 mr-4">
-                            <input type="checkbox" v-model="send_critical" checked disabled class="h-4 w-4" />
+                            <input type="checkbox" v-model="sendCritical" checked disabled class="h-4 w-4" />
                             <label>Critical</label>
                             </div>
                         </div>
@@ -303,11 +303,11 @@ import { RefSymbol } from '@vue/reactivity';
 const activeTab = ref('email-settings')
 const authDetailsExist = ref(false)
 const smtpMethod = ref("oauth2")
-const send_info = ref(false)
-const send_warning = ref(false)
-const send_critical = true
+const sendInfo = ref(false)
+const sendWarning = ref(false)
+const sendCritical = true
 const emailInput = ref('')
-const emailChips = ref([])
+const emailChips = ref<string[]>([]);
 
 const warningConfig = reactive<WarningConfig>({
   scrubFinish: 'info',
@@ -315,6 +315,7 @@ const warningConfig = reactive<WarningConfig>({
   resilverFinish: 'info',
   clearPoolErrors: 'info',
   snapshotCreation: 'info',
+  snapshotFailure: 'warning',
   stateChange: 'critical',
   poolImport: 'info',
   replicationTask: 'info',
@@ -327,13 +328,13 @@ const warningEvents: Record<keyof WarningConfig, string> = {
   resilverFinish: 'Resilver Finish',
   clearPoolErrors: 'Clear Pool Errors',
   snapshotCreation: 'Snapshot Creation',
+  snapshotFailure: 'snapshot Failure',
   stateChange: 'State Change - Degraded/Faulted',
   poolImport: 'Pool Import',
   storageThreshold: 'Storage Threshold',
-  replicationTask: 'Replication Task'
-
-
+  replicationTask: 'Replication Task',
 };
+
 const emailSetUpModal = ref(false);
 
 const authEmailConfig = ref<AuthEmailConfig>({
@@ -356,9 +357,6 @@ const smtpEmailConfig = ref<SmtpEmailConfig>({
   authMethod: "smtp",
   oauthAccessToken: "",
   tokenExpiry: "",
-  send_info: false,
-  send_warning: false,
-  send_critical: true
 });
 
 const isEmailValid = computed(() => {
@@ -372,8 +370,6 @@ const isEmailValid = computed(() => {
                 smtpEmailConfig.value.recieversEmail.every(email => emailRegex.test(email)) 
         );
     } else {
-        console.log("authEmailConfig.value.email ", authEmailConfig.value.email, "authEmailConfig.value.recieversEmail ", authEmailConfig.value.recieversEmail)
-
         return (
             emailRegex.test(authEmailConfig.value.email) &&
             Array.isArray(authEmailConfig.value.recieversEmail) &&
@@ -413,8 +409,6 @@ const isFormValid = () => {
 
 };
 
-
-
 async function saveWarningConfig() {
   console.log('Warning levels saved:', warningConfig);
   try {
@@ -449,7 +443,8 @@ const closeModal = () => {
 const emit = defineEmits(['close']);
 
 onMounted(() => {
-    fetchMsmtpDetails();  // ✅ Fetch SMTP details on mount
+    fetchMsmtpDetails();
+    fetchWarningLevels()  // ✅ Fetch SMTP details on mount
     emailSetUpModal.value = true;
 });
 
@@ -486,10 +481,7 @@ const fetchMsmtpDetails = async () => {
             smtpEmailConfig.value.password = smtpData.password;
             smtpEmailConfig.value.tls = smtpData.tls;
             smtpEmailConfig.value.authMethod = smtpData.auth;
-            // Handle multi-recipient emails
-            emailChips.value = Array.isArray(smtpData.recieversEmail)
-                ? smtpData.recieversEmail
-                : smtpData.recieversEmail.split(",").map(e => e.trim()).filter(Boolean);
+
         }else if(smtpData.authMethod!="on" || smtpData.authMethod!="") {
             smtpMethod.value = "oauth2"
 
@@ -499,19 +491,78 @@ const fetchMsmtpDetails = async () => {
             authDetailsExist.value = true;
             console.log("smtpData Recived" , smtpData)
 
-            // Handle multi-recipient emails
-            emailChips.value = Array.isArray(smtpData.recieversEmail)
-                ? smtpData.recieversEmail
-                : smtpData.recieversEmail.split(",").map(e => e.trim()).filter(Boolean);
 
             }
+        emailChips.value = Array.isArray(smtpData.recieversEmail)
+            ? smtpData.recieversEmail
+            : typeof smtpData.recieversEmail === "string" && smtpData.recieversEmail.trim() !== ""
+            ?smtpData.recieversEmail.split(",").map(e => e.trim()).filter(Boolean)
+            : [];
+
+            if(smtpData.sendInfo == 0){
+                sendInfo.value = false
+
+            }else{
+                sendInfo.value = true
+            }
+            if(smtpData.sendWarning == 0){
+                sendWarning.value = false
+
+            }else{
+                sendWarning.value = true
+            }
+
         // ✅ Populate Vue state with fetched values
         console.log("✅ SMTP details fetched successfully:", smtpData);
+        console.log("✅ authEmailConfig.value.email fetched successfully:", authEmailConfig.value.email);
+
     } catch (error) {
         console.log("response ")
 
         console.error("❌ Error fetching SMTP details:", error);
         alert("❌ Failed to fetch SMTP details.");
+    }
+};
+
+const fetchWarningLevels = async () => {
+    try {
+        console.log("🔄 Fetching stored SMTP details...");
+
+        const cockpit = (window as any).cockpit;
+        const dbus = cockpit.dbus("org._45drives.Houston");
+
+        // ✅ Call the method WITHOUT arguments
+        const response = await dbus.call(
+            "/org/_45drives/Houston",
+            "org._45drives.Houston",
+            "fetchWarningLevels",
+            []  // ✅ Empty array since no arguments are needed
+        );
+
+        const data = JSON.parse(response);
+
+      
+        
+        console.log("smtpData.auth", data)
+        warningConfig.scrubFinish = data.scrubFinish || "info";
+        warningConfig.vdevCleared = data.vdevCleared || "info";
+        warningConfig.resilverFinish = data.resilverFinish || "info";
+        warningConfig.clearPoolErrors = data.clearPoolErrors || "info";
+        warningConfig.snapshotCreation = data.snapshotCreation || "info";
+        warningConfig.snapshotFailure = data.snapshotFailure || "warning";
+        warningConfig.stateChange = data.stateChange || "critical";
+        warningConfig.storageThreshold = data.storage_threshold || "warning";
+        warningConfig.poolImport = data.poolImport || "info";
+        warningConfig.replicationTask = data.zfsReplication || "info";
+
+        
+
+        
+    } catch (error) {
+        console.log("response ")
+
+        console.error("❌ Error fetching warningLevels details:", error);
+        alert("❌ Failed to fetch warningLevels details.");
     }
 };
 
@@ -543,18 +594,18 @@ const updateSMTPConfig = async () => {
         password: smtpEmailConfig.value.password,
         recieversEmail: smtpEmailConfig.value.recieversEmail.join(","), 
         tls: smtpEmailConfig.value.tls,
-        send_info: send_info.value,
-        send_warning: send_warning.value,
-        send_critical: true,
+        sendInfo: sendInfo.value,
+        sendWarning: sendWarning.value,
+        sendCritical: true,
         authMethod: smtpMethod.value,
       };
     } else {
       config = {
         email: authEmailConfig.value.email,
-        send_info: send_info.value,
-        send_warning: send_warning.value,
+        sendInfo: sendInfo.value,
+        sendWarning: sendWarning.value,
         recieversEmail: authEmailConfig.value.recieversEmail.join(","), 
-        send_critical: true,
+        sendCritical: true,
         authMethod: "oauth2",
         oauthAccessToken: authEmailConfig.value.oauthAccessToken,
         oauthRefreshToken: authEmailConfig.value.oauthRefreshToken
@@ -737,13 +788,15 @@ const resetMsmtpData = async () => {
             smtpEmailConfig.value.username = "",
             smtpEmailConfig.value.recieversEmail = [],
             smtpEmailConfig.value.password = ""
+            emailChips.value = []
 
         }else{
             authEmailConfig.value.email = "",
             authEmailConfig.value.recieversEmail = [],
             accessToken.value = "" 
             authEmailConfig.value.oauthAccessToken = "",
-            tokenExpiry.value = ""
+            tokenExpiry.value = "",
+            emailChips.value = []
         }
         console.log(`✅ D-Bus Response: ${response}`);
         alert(response.includes("✅") ? response : `✅ Test email sent: ${response}`);
@@ -771,12 +824,13 @@ const removeEmail = (index) => {
 }
 
 watch(emailChips, (newList) => {
+  console.log("📌 emailChips changed:", newList);
   if (smtpMethod.value === "smtp") {
     smtpEmailConfig.value.recieversEmail = [...newList];
   } else {
     authEmailConfig.value.recieversEmail = [...newList];
   }
-});
+}, { deep: true }); // ← add this
 
 
 

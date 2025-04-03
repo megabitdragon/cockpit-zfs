@@ -1,8 +1,7 @@
 import sqlite3
 from pathlib import Path
 
-DB_PATH = "/var/lib/houston/zed/notifications.db"
-
+DB_PATH = "/var/lib/sqlite/45drives/notifications.db"
 EXPECTED_COLUMNS = {
     "id", "timestamp", "event", "pool", "vdev", "state", "health", "guid",
     "severity", "received", "fileSystem", "snapShot", "replicationDestination"
@@ -42,6 +41,7 @@ def setup_database():
                 state TEXT,
                 health TEXT,
                 guid TEXT,
+                errors TEXT,
                 severity TEXT DEFAULT 'info' CHECK(severity IN ('info', 'warning', 'error')),
                 received INTEGER DEFAULT 0,
                 fileSystem TEXT,
@@ -72,6 +72,7 @@ def setup_database():
             vdev TEXT,
             state TEXT,
             health TEXT,
+            errors TEXT,
             guid TEXT,
             severity TEXT DEFAULT 'info' CHECK(severity IN ('info', 'warning', 'error')),
             received INTEGER DEFAULT 0,
@@ -95,6 +96,7 @@ def setup_database():
         "resilverFinish": "info",
         "clearPoolErrors": "info",
         "snapshotCreation": "info",
+        "snapshotFailure": "warning",
         "stateChange": "critical",
         "storage_threshold": "warning",
         "poolImport": "info",

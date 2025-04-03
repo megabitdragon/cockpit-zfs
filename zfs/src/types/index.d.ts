@@ -221,6 +221,7 @@ interface WarningConfig {
 	poolImport: string;
 	storageThreshold: string;
 	replicationTask: string;
+	snapshotFailure: string;
 
   }
 type StepNavigationCallback = (item: StepsNavigationItem) => void;
@@ -263,7 +264,4 @@ interface Notification {
 	authMethod: string;
 	oauthAccessToken: string;
 	tokenExpiry: string;
-	send_info: boolean;
-	send_warning: boolean;
-	send_critical: boolean;
   }

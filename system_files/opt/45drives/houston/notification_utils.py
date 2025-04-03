@@ -19,7 +19,7 @@ logging.basicConfig(
 
 
 # Define SQLite Database Path
-DB_PATH = "/var/lib/sqlite/45Drives/notifications.db"
+DB_PATH = "/var/lib/sqlite/45drives/notifications.db"
 MSMTP_CONFIG_PATH = "/etc/45drives/msmtp"
 MSMTP_RECIPIENT_PATH = "/etc/45drives/msmtp_recipient"
 MSMTP_PASSWORD_PATH = "/etc/45drives/msmtp_pass"
@@ -38,7 +38,7 @@ def determine_severity(event, message):
     if event in ["pool_fail", "pool_faulted"] or health == "FAULTED":
         return "error"  # ❌ Critical failure
 
-    if event in ["scrub_finish", "scrub_warning"] and errors and errors.lower() != "no":
+    if event in ["scrub_finish", "scrub_warning","snapshot_failed"] and errors and errors.lower() != "no":
         return "warning"  # ⚠️ Scrub completed with errors
 
     if event in ["pool_import", "pool_degraded"] and health == "DEGRADED":
@@ -96,8 +96,8 @@ def store_notification(message):
         severity = determine_severity(message.get("event"), message)
 
         cursor.execute("""
-            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity, health, errors)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO notifications (timestamp, event, pool, vdev, state, severity, health, errors,snapShot,fileSystem,replicationDestination)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?);
         """, (
             message.get("timestamp"),
             message.get("event"),
@@ -106,7 +106,11 @@ def store_notification(message):
             message.get("state", None),
             severity,
             message.get("health", None),
-            message.get("errors", 0)
+            message.get("errors", 0),
+            message.get("snapShot",None),
+            message.get("fileSystem",None),
+            message.get("replicationDestination",None)
+
         ))
 
         conn.commit()
@@ -239,7 +243,7 @@ tls_starttls on
         proc = subprocess.run(
             ["msmtp", "-C", MSMTP_CONFIG_PATH] + recipients,
             input=email_msg,
-            text=True,
+            universal_newlines=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -375,8 +379,8 @@ def get_missed_notifications():
     try:
         print("[DEBUG] Executing SQL Query to fetch missed notifications")
         cursor.execute("""
-            SELECT id, timestamp, event, pool, vdev, state, error, description, 
-                   errors, repaired, received, health, severity
+            SELECT id, timestamp, event, pool, vdev, state, snapShot, fileSystem, 
+                   errors, replicationDestination, received, health, severity
             FROM notifications WHERE received = 0
         """)
         
@@ -387,9 +391,9 @@ def get_missed_notifications():
         notifications = [
             {
                 "id": row[0], "timestamp": row[1], "event": row[2], "pool": row[3],
-                "vdev": row[4], "state": row[5], "error": row[6], "description": row[7],
-                "errors": row[9], "repaired": row[10],
-                "received": row[11], "health": row[12], "severity": row[13]
+                "vdev": row[4], "state": row[5], "snapShot": row[6], "fileSystem": row[7],
+                "errors": row[8], "replicationDestination": row[9],
+                "received": row[10], "health": row[11], "severity": row[12]
             }
             for row in rows
         ]
@@ -788,6 +792,26 @@ def fetchMsmtpDetails():
                 smtp_details["recieversEmail"] = recipients
         else:
             smtp_details["recieversEmail"] = []
+        
+
+
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT send_info, send_warning, send_critical
+            FROM smtp_settings
+            WHERE id = 1
+        """)
+        result = cursor.fetchone()
+        conn.close()
+
+        if not result:
+            return False
+
+        sendInfo, sendWarning, sendCritical = result
+        smtp_details["sendInfo"] = sendInfo
+        smtp_details["sendWarning"] = sendWarning
+        smtp_details["sendCritical"] = sendCritical
 
         return json.dumps(smtp_details)
 
@@ -795,6 +819,28 @@ def fetchMsmtpDetails():
         return json.dumps({
             "status": "error",
             "message": f"Exception occurred: {str(e)}"
+        })
+
+def fetchWarningLevels():
+    """Fetch current event-type-to-severity mapping from warning_levels table."""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT event_type, severity FROM warning_levels
+        """)
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        warning_levels = {event_type: severity for event_type, severity in rows}
+        return json.dumps(warning_levels)
+
+    except Exception as e:
+        return json.dumps({
+            "status": "error",
+            "message": f"Failed to fetch warning levels: {str(e)}"
         })
         
 def updateWarningLevels(config_json):
@@ -850,9 +896,9 @@ def updateEmailSeverities(json_string):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
-        send_info = 1 if data.get("send_info") else 0
-        send_warning = 1 if data.get("send_warning") else 0
-        send_critical = 1 if data.get("send_critical") else 0
+        send_info = 1 if data.get("sendInfo") else 0
+        send_warning = 1 if data.get("sendWarning") else 0
+        send_critical = 1 if data.get("sendCritical") else 0
 
         cursor.execute("""
             INSERT OR REPLACE INTO smtp_settings (id, send_info, send_warning, send_critical)
