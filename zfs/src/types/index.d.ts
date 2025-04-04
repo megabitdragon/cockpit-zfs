@@ -220,7 +220,8 @@ interface WarningConfig {
 	stateChange: string; // even though not user-editable, can still be tracked
 	poolImport: string;
 	storageThreshold: string;
-	replicationTask: string;
+	replicationTaskSuccess: string,
+	replicationTaskFailure: string,
 	snapshotFailure: string;
 
   }

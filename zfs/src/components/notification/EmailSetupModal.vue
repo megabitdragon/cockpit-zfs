@@ -89,7 +89,7 @@
                         <label class="block text-md text-default w-[25%] py-2 font-medium">Receivers Email</label>
 
                         <!-- Wrapping container -->
-                        <div class="w-[50%] py-2 flex flex-wrap gap-1 min-h-[48px] px-2">
+                        <div class="w-[50%] py-2 flex flex-wrap gap-1 min-h-[48px]">
                             <!-- Chips -->
                             <span
                             v-for="(email, index) in emailChips"
@@ -318,7 +318,8 @@ const warningConfig = reactive<WarningConfig>({
   snapshotFailure: 'warning',
   stateChange: 'critical',
   poolImport: 'info',
-  replicationTask: 'info',
+  replicationTaskSuccess: 'info',
+  replicationTaskFailure: 'warning',
   storageThreshold: 'warning'
 });
 
@@ -332,7 +333,8 @@ const warningEvents: Record<keyof WarningConfig, string> = {
   stateChange: 'State Change - Degraded/Faulted',
   poolImport: 'Pool Import',
   storageThreshold: 'Storage Threshold',
-  replicationTask: 'Replication Task',
+  replicationTaskSuccess: 'Replication Success',
+  replicationTaskFailure: 'Replication Failure'
 };
 
 const emailSetUpModal = ref(false);
@@ -553,7 +555,8 @@ const fetchWarningLevels = async () => {
         warningConfig.stateChange = data.stateChange || "critical";
         warningConfig.storageThreshold = data.storage_threshold || "warning";
         warningConfig.poolImport = data.poolImport || "info";
-        warningConfig.replicationTask = data.zfsReplication || "info";
+        warningConfig.replicationTaskSuccess = data.zfsReplicationSuccess || "info";
+        warningConfig.replicationTaskFailure = data.replicationTaskFailure || "warning";
 
         
 

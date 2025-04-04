@@ -38,7 +38,7 @@ def determine_severity(event, message):
     if event in ["pool_fail", "pool_faulted"] or health == "FAULTED":
         return "error"  # ❌ Critical failure
 
-    if event in ["scrub_finish", "scrub_warning","snapshot_failed"] and errors and errors.lower() != "no":
+    if event in ["scrub_finish", "scrub_warning","snapshot_failed","zfs_replication_failed"] and errors and errors.lower() != "no":
         return "warning"  # ⚠️ Scrub completed with errors
 
     if event in ["pool_import", "pool_degraded"] and health == "DEGRADED":
@@ -842,7 +842,7 @@ def fetchWarningLevels():
             "status": "error",
             "message": f"Failed to fetch warning levels: {str(e)}"
         })
-        
+
 def updateWarningLevels(config_json):
     """Updates warning_levels table based on frontend config"""
     try:
