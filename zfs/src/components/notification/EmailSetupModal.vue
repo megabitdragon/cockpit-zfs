@@ -398,10 +398,13 @@ const isFormValid = () => {
         smtpEmailConfig.value.password.trim() !== ""
         );
     }else{
-        authEmailConfig.value.recieversEmail = authEmailConfig.value.recieversEmail
+        authEmailConfig.value.recieversEmail = (
+        Array.isArray(authEmailConfig.value.recieversEmail)
+            ? authEmailConfig.value.recieversEmail
+            : (authEmailConfig.value.recieversEmail || "").split(",")
+        )
         .map(email => email.trim())
         .filter(email => email.length > 0);
-
         return (
         authEmailConfig.value.email.trim() !== "" &&
         authEmailConfig.value.recieversEmail.length > 0
@@ -491,7 +494,8 @@ const fetchMsmtpDetails = async () => {
             authEmailConfig.value.authMethod = smtpData.auth
             authEmailConfig.value.authMethod = "oauth2"
             authDetailsExist.value = true;
-           // console.log("smtpData Recived" , smtpData)
+            authEmailConfig.value.oauthRefreshToken = smtpData.oauthRefreshToken
+           console.log("smtpData Recived" , smtpData)
 
 
             }
@@ -553,9 +557,9 @@ const fetchWarningLevels = async () => {
         warningConfig.snapshotCreation = data.snapshotCreation || "info";
         warningConfig.snapshotFailure = data.snapshotFailure || "warning";
         warningConfig.stateChange = data.stateChange || "critical";
-        warningConfig.storageThreshold = data.storage_threshold || "warning";
+        warningConfig.storageThreshold = data.storageThreshold || "warning";
         warningConfig.poolImport = data.poolImport || "info";
-        warningConfig.replicationTaskSuccess = data.zfsReplicationSuccess || "info";
+        warningConfig.replicationTaskSuccess = data.replicationTaskSuccess || "info";
         warningConfig.replicationTaskFailure = data.replicationTaskFailure || "warning";
 
         
@@ -674,8 +678,9 @@ const testEmail = async () => {
         } else {
             config = {
                 email: authEmailConfig.value.email,
-                password: accessToken.value || authEmailConfig.value.oauthAccessToken,
+                oauthAccessToken: accessToken.value || authEmailConfig.value.oauthAccessToken,
                 tokenExpiry: tokenExpiry.value || authEmailConfig.value.tokenExpiry,
+                oauthRefreshToken: authEmailConfig.value.oauthAccessToken,
                 authMethod: "oauth2",
                 recieversEmail: Array.isArray(authEmailConfig.value.recieversEmail)
                     ? authEmailConfig.value.recieversEmail.join(",")
@@ -693,8 +698,19 @@ const testEmail = async () => {
         );
 
         //console.log(`✅ D-Bus Response: ${response}`);
-        alert(response.includes("✅") ? response : `✅ Test email sent: ${response}`);
+        let parsed;
+            try {
+                parsed = JSON.parse(response);
+            } catch (e) {
+                alert(`❌ Failed to parse D-Bus response: ${response}`);
+                return;
+            }
 
+            if (parsed.success) {
+                alert(`✅ ${parsed.message}`);
+            } else {
+                alert(`❌ ${parsed.message}`);
+            }
     } catch (error: any) {
         console.error("❌ Error sending test email via D-Bus:", error);
         alert(`❌ Failed to send test email: ${error.message || error}`);

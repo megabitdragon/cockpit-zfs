@@ -98,10 +98,10 @@ def setup_database():
         "snapshotCreation": "info",
         "snapshotFailure": "warning",
         "stateChange": "critical",
-        "storage_threshold": "warning",
+        "storageThreshold": "warning",
         "poolImport": "info",
-        "zfsReplicationSuccess": "info",
-        "zfsReplicationFailure": "warning"
+        "replicationTaskFailure": "info",
+        "replicationTaskFailure": "warning"
     }
     for event_type, severity in defaults.items():
         cursor.execute("""

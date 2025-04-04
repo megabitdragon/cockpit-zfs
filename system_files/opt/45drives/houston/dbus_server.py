@@ -74,7 +74,8 @@ class DBusService(dbus.service.Object):
         return updateSMTPConfig(config_json)
     @dbus.service.method("org._45drives.Houston", in_signature="s", out_signature="s")
     def SendTestEmail(self, config_json):    
-        return sendTestEmail(config_json)
+        result = sendTestEmail(config_json)  # returns a dict like { success, message }
+        return json.dumps(result)  
     @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
     def FetchMsmtpDetails(self):    
         return fetchMsmtpDetails()

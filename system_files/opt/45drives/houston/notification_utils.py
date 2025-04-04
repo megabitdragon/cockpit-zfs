@@ -317,27 +317,72 @@ import email.message
 #         logging.error(f"❌ Exception in sendViaGmailApi: {str(e)}")
 #         return f"❌ Exception in sendViaGmailApi: {str(e)}"
 
+import requests
+
 def sendTestEmailViaGmailApi(config):
     try:
-        access_token = config.get("oauthAccessToken")
-        sender_email = config.get("email")
+        # 🔄 Refresh token first
+        if not os.path.exists(MSMTP_OAUTH_REFRESH_SCRIPT):
+            return {
+                "success": False,
+                "message": "OAuth refresh script not found."
+            }
+
+        refresh = subprocess.run(
+            ["python3", MSMTP_OAUTH_REFRESH_SCRIPT],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True
+        )
+
+        if refresh.returncode != 0:
+            return {
+                "success": False,
+                "message": f"Failed to refresh OAuth token: {refresh.stderr.strip()}"
+            }
+
+        # ✅ Load refreshed token info
+        if not os.path.exists(MSMTP_OAUTH_JSON_PATH):
+            return {
+                "success": False,
+                "message": "OAuth credentials file not found after refresh."
+            }
+
+        with open(MSMTP_OAUTH_JSON_PATH, "r") as f:
+            oauth_data = json.load(f)
+
+        access_token = oauth_data.get("access_token")
+        sender_email = oauth_data.get("user_email")
         recipients = config.get("recieversEmail", [])
 
+        # Normalize recipients from string to list
         if isinstance(recipients, str):
             recipients = [r.strip() for r in recipients.split(",") if r.strip()]
 
-        if not all([access_token, sender_email, recipients]):
-            return "❌ Missing required fields for Gmail API test."
+        # ✅ Validate required fields
+        missing = []
+        if not access_token:
+            missing.append("OAuth access token")
+        if not sender_email:
+            missing.append("sender email")
+        if not recipients:
+            missing.append("recipient(s)")
 
+        if missing:
+            return {
+                "success": False,
+                "message": f"Missing required fields for Gmail API test: {', '.join(missing)}"
+            }
+
+        # ✅ Compose payload with joined recipients
         payload = {
             "accessToken": access_token,
             "from": sender_email,
-            "to": recipients,
+            "to": ", ".join(recipients),
             "subject": "Gmail API Test Email from 45Drives",
             "body": "This is a test email to verify your Gmail integration is working."
         }
 
-        AUTH_SEND_EMAIL_URL = "https://email-auth.45d.io/auth/send-email"
         response = requests.post(
             AUTH_SEND_EMAIL_URL,
             json=payload,
@@ -345,12 +390,22 @@ def sendTestEmailViaGmailApi(config):
         )
 
         if response.status_code == 200:
-            return f"✅ Gmail API test email sent successfully to: {', '.join(recipients)}"
+            return {
+                "success": True,
+                "message": f"Gmail API test email sent successfully to: {', '.join(recipients)}"
+            }
         else:
-            return f"❌ Gmail API error {response.status_code}: {response.text.strip()}"
+            return {
+                "success": False,
+                "message": f"Gmail API error {response.status_code}: {response.text.strip()}"
+            }
 
     except Exception as e:
-        return f"❌ Gmail API test failed: {str(e)}"
+        return {
+            "success": False,
+            "message": f"Gmail API test failed: {str(e)}"
+        }
+
 
 def sendTestEmail(config_json):
     """
@@ -368,7 +423,10 @@ def sendTestEmail(config_json):
     except Exception as e:
         error_message = f"❌ Error sending test email: {str(e)}"
         logging.error(error_message)
-        return error_message
+        return {
+			"success": False,
+			"message": error_message
+		}
 
 
 def get_missed_notifications():
