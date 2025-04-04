@@ -76,7 +76,7 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 	// console.log('ZFS.vue scanActivities', scanActivities.value);
 	// console.log('ZFS.vue trimActivities', trimActivities.value);
 	setUpMessageHandler((message) => {
-        console.log("Received DBus Message:", message);
+        //console.log("Received DBus Message:", message);
     });
 }
 
