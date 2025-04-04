@@ -1,3 +1,3 @@
-## zfs module 1.2.1-1
+## zfs module 1.2.2-1
 
-* Updates Build Number + Added zfs alerts bell
+* building package + added email functionality in zfs notifications

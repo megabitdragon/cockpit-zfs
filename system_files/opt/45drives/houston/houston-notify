@@ -1,19 +1,19 @@
 import dbus
 from argparse import ArgumentParser
+
 def main():
-    # Parse command-line arguments and concatenate them like `echo`
-    parser = ArgumentParser(description="Send a message to the Houston D-Bus server.")
-    parser.add_argument("message", nargs="+", help="Message to send")
+    parser = ArgumentParser(description="Send a structured message via Houston D-Bus server.")
+    parser.add_argument("message", help="JSON message to forward to Houston (as a string)")
     args = parser.parse_args()
-    # Combine all args into a single string (like echo)
-    message = " ".join(args.message)
-    # Connect to the system bus
+
+    # Connect to system D-Bus
     bus = dbus.SystemBus()
-    # Get a reference to the D-Bus object
     remote_object = bus.get_object("org._45drives.Houston", "/org/_45drives/Houston")
-    # Get an interface for the object
     interface = dbus.Interface(remote_object, "org._45drives.Houston")
-    # Call the method
-    interface.ForwardMessage(message)
+
+    # Send the structured message
+    response = interface.ForwardMessage(args.message)
+    print(f"D-Bus Response (ForwardMessage): {response}")
+
 if __name__ == "__main__":
     main()

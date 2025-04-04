@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.2-1bookworm) bookworm; urgency=medium
+
+  * building package + added email functionality in zfs notifications
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 04 Apr 2025 09:52:56 -0300
+
 cockpit-zfs (1.2.1-1bookworm) bookworm; urgency=medium
 
   * Updates Build Number + Added zfs alerts bell
