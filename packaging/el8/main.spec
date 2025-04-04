@@ -43,6 +43,7 @@ make DESTDIR=%{buildroot} install
 
 %post
 pip3 install --upgrade pip
+pip3 install --upgrade google-auth google-auth-oauthlib
 
 # ✅ Ensure SQLite is installed
 dnf install -y sqlite || true  
@@ -51,6 +52,10 @@ dnf install -y jq || true
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
 systemctl enable houston-dbus.service
+sudo systemctl enable --now houstonzfs-storage-alert.timer
+systemctl enable houstonzfs-storage-alert.service
+
+
 
 # Start services only after setting up the database
 systemctl start houston-dbus.service || true
