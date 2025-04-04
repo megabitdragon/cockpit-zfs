@@ -80,7 +80,7 @@
 
 											<!-- Show Errors if Found -->
 											<p class="pl-4 text-sm" v-if="notification.errors && notification.errors !== '0' && notification.errors !== 'null'">
-    											<strong>Errors Detected:</strong> <span class="text-yellow-500">{{ notification.errors }}</span>
+												<strong>Errors Detected:</strong> <span class="text-yellow-500">{{ notification.errors }}</span>
 											</p>
 
 										</div>
@@ -367,7 +367,7 @@
 										<div class="w-full">
 										<p class="text-xl font-semibold" :class="{
 											'text-green-500': notification.state === 'ONLINE',
-											'text-red-600': notification.state === 'FAULTED' ||  notification.state === 'REMOVED' ||notification.state === 'DEGRADED',
+											'text-red-600': notification.state === 'FAULTED' ||  notification.state === 'REMOVED' ||notification.state === 'DEGRADED' || notification.state === 'OFFLINE',
 										}">
 											{{ notification.event.replace("_", " ").toUpperCase() }} - {{ notification.pool }}
 										</p>
@@ -377,7 +377,7 @@
 											<br><strong>Status: </strong>  
 											<span :class="{
 											'text-green-500': notification.state === 'ONLINE',
-											'text-red-500': notification.state === 'FAULTED' || notification.state === 'REMOVED' || notification.state === 'DEGRADED',
+											'text-red-500': notification.state === 'FAULTED' || notification.state === 'REMOVED' || notification.state === 'DEGRADED' || notification.state === 'OFFLINE',
 											}">
 											{{ notification.state }}
 											</span>
@@ -439,9 +439,9 @@ const emailSetUpModal = ref(false);
 // Watch for menu state changes and control page scrolling
 watch(menuOpen, (isOpen) => {
   if (isOpen) {
-    document.body.classList.add("no-scroll"); // 🚀 Disable scrolling
+	document.body.classList.add("no-scroll"); // 🚀 Disable scrolling
   } else {
-    document.body.classList.remove("no-scroll"); // ✅ Enable scrolling
+	document.body.classList.remove("no-scroll"); // ✅ Enable scrolling
   }
 });
 // Ensure scrolling is enabled if the component unmounts

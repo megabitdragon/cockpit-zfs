@@ -100,11 +100,12 @@ def get_boot_disk():
                 boot_device = device
 
         if not boot_device:
-            print("No boot or root partition found.")
+            # print("No boot or root partition found.")
             return None
 
         # Convert partition (e.g., /dev/sda2) to the parent disk (/dev/sda)
-        parent_disk = re.sub(r'\d+$', '', boot_device)
+        # parent_disk = re.sub(r'\d+$', '', boot_device)
+        parent_disk = re.sub(r'(p?\d+)$', '', boot_device)
 
         # print(f"Detected boot disk: {parent_disk}")
         return parent_disk
@@ -141,7 +142,7 @@ def get_lsblk_disks(nvme_only=False):
                 continue  
             
              # Skip the boot disk
-            if device_name == boot_drive:
+            if device_name == boot_drive or boot_drive in device_name:
                 logger.info(f"Skipping boot drive: {device_name}")
                 continue
 
@@ -209,7 +210,6 @@ def get_lsblk_disks(nvme_only=False):
     except Exception as e:
         logger.error(f"Exception in get_lsblk_disks: {str(e)}")
         return []
-
 
 def get_smartctl_data(device):
     """Runs smartctl to get additional information like temperature, power-on time, and health status."""

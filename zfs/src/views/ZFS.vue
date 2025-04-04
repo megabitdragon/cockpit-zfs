@@ -79,6 +79,7 @@ async function initialLoad(disks, pools, datasets, snapshots) {
         console.log("Received DBus Message:", message);
     });
 }
+
 async function setUpMessageHandler(handler) {
     try {
         console.log("Setting up DBus message handler...");

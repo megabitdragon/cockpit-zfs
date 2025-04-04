@@ -624,7 +624,9 @@ const diskSizeMatch = () => {
 
 		vDev.selectedDisks!.forEach(selDisk => {
 			const disk = disks.value.find(fullDisk => fullDisk.name == selDisk);
-			
+			if (vDev.type === 'disk' || vDev.type === 'cache') {
+				return;
+			}
 			if (disk) {
 				const currentCapacity = convertSizeToBytes(disk.capacity!);
 

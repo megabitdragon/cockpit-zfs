@@ -1,4 +1,3 @@
-## zfs module 1.1.15-63
+## zfs module 1.1.18-5
 
-* build pacakge -removed fastapi
-* build pacakge -removed fastapi
+* Comments out erroneous print statement in get-disks.py
