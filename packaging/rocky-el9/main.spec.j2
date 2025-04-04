@@ -59,8 +59,8 @@ dnf install -y jq || true
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
 systemctl enable houston-dbus.service
-sudo systemctl enable --now houstonzfs-storage-alert.timer
-systemctl enable houstonzfs-storage-alert.service
+sudo systemctl enable --now houston-zfs-storage-alert.timer
+systemctl enable houston-zfs-storage-alert.service
 
 
 
