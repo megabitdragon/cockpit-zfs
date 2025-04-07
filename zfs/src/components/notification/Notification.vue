@@ -204,7 +204,7 @@
 											- Snapshot <strong>{{ notification.snapShot }}</strong> was successfully replicated
 											from <strong>{{ notification.fileSystem || 'source unknown' }}</strong>.
 											<br />
-											Destination: <strong>{{ notification.replicationDestination || 'N/A' }}</strong>
+											<strong>Destination:</strong> {{ notification.replicationDestination || 'N/A' }}
 											<br />
 											 <strong>Timestamp:</strong> {{ notification.timestamp }}
 											</p>
@@ -236,9 +236,7 @@
 											- Replication failed for snapshot <strong>{{ notification.snapShot || 'unknown' }}</strong>
 											from <strong>{{ notification.fileSystem || 'unknown filesystem' }}</strong>.
 											<br />
-											<br />
 											 <strong>Error:</strong> {{ notification.errors ||  'Unknown error' }}
-											<br />
 											<br />
 											 <strong>Timestamp:</strong> {{ notification.timestamp }}
 											</p>

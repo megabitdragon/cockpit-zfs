@@ -86,7 +86,10 @@
                             </p>
                         </div>
                         <div class="flex justify-center space-x-2 items-start">
-                        <label class="block text-md text-default w-[25%] py-2 font-medium">Receivers Email</label>
+                        <label class="block text-md text-default w-[25%] py-2 font-medium">Receivers Email
+                            <InfoTile class="ml-1"
+                                :title="`The sender's email address used for sending notifications. This should be a valid email that matches the SMTP provider's domain.`" />                            
+                            </label>
 
                         <!-- Wrapping container -->
                         <div class="w-[50%] py-2 flex flex-wrap gap-1 min-h-[48px]">
@@ -476,7 +479,7 @@ const fetchMsmtpDetails = async () => {
             return;
         }
         
-        console.log("smtpData.auth", smtpData)
+        //console.log("smtpData.auth", smtpData)
         if(smtpData.authMethod=="on"){
             smtpMethod.value = "smtp"
             smtpEmailConfig.value.email = smtpData.email;

@@ -202,6 +202,10 @@ def store_notification(message):
 
 #     except Exception as e:
 #         return f"❌ Exception in SMTP send: {str(e)}"
+import tempfile
+import subprocess
+import os
+
 def sendTestEmailViaSMTP(config):
     try:
         email = config.get("email")
@@ -214,51 +218,62 @@ def sendTestEmailViaSMTP(config):
 
         if isinstance(recipients, str):
             recipients = [r.strip() for r in recipients.split(",") if r.strip()]
+        if not recipients:
+            return {
+                "success": False,
+                "message": "❌ No valid recipients provided."
+            }
 
-        # Save password securely
-        with open(MSMTP_PASSWORD_PATH, "w") as f:
-            f.write(password)
-        os.chmod(MSMTP_PASSWORD_PATH, 0o600)
-
-        # Write msmtp config
-        config_content = f"""account default
+        # Create a secure temporary file for msmtp config
+        with tempfile.NamedTemporaryFile("w", delete=False) as tmp:
+            config_path = tmp.name
+            tmp.write(f"""account default
 host {server}
 port {port}
 auth on
 user {username}
-passwordeval cat {MSMTP_PASSWORD_PATH}
+password {password}
 from {email}
 tls {"on" if tls else "off"}
 tls_starttls on
-"""
-        with open(MSMTP_CONFIG_PATH, "w") as f:
-            f.write(config_content)
-        os.chmod(MSMTP_CONFIG_PATH, 0o600)
+""")
+        
+        os.chmod(config_path, 0o600)
 
-        # Compose and send test email
+        # Compose test message
         test_subject = "SMTP Test Email from 45Drives"
         test_body = "This is a test email to verify your SMTP settings are working properly."
         email_msg = f"Subject: {test_subject}\n\n{test_body}"
 
+        # Run msmtp with temporary config
         proc = subprocess.run(
-            ["msmtp", "-C", MSMTP_CONFIG_PATH] + recipients,
+            ["msmtp", "-C", config_path] + recipients,
             input=email_msg,
             universal_newlines=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
 
+        os.remove(config_path)  # Clean up after use
+
         if proc.returncode == 0:
-            return f"✅ Test email sent successfully to: {', '.join(recipients)}"
+            return {
+                "success": True,
+                "message": f"✅ Test email sent successfully to: {', '.join(recipients)}"
+            }
         else:
-            return f"❌ Failed to send test email: {proc.stderr.strip()}"
+            return {
+                "success": False,
+                "message": f"❌ Failed to send test email: {proc.stderr.strip()}"
+            }
 
     except Exception as e:
-        return f"❌ SMTP test failed: {str(e)}"
+        return {
+            "success": False,
+            "message": f"❌ SMTP test failed: {str(e)}"
+        }
 
 
-import base64
-import requests
 import email.message
 
 # Paths to token info and refresh script
@@ -317,7 +332,6 @@ import email.message
 #         logging.error(f"❌ Exception in sendViaGmailApi: {str(e)}")
 #         return f"❌ Exception in sendViaGmailApi: {str(e)}"
 
-import requests
 
 def sendTestEmailViaGmailApi(config):
     try:

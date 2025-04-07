@@ -34,6 +34,7 @@ export const notificationStore = reactive<{
         replicationDestination?: string
       };
       console.log("message id recieved in adddnotification: ", parsedMessage.id)
+   //   console.log("message recieved in adddnotification: ", message)
 
   
       // ✅ Find existing notification by ID
