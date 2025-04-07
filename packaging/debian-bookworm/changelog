@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.2-2bookworm) bookworm; urgency=medium
+
+  * build package to checkup if new builds will have new method of installing msmtp
+
+ -- Rachit Hans <rhans@45drives.com>  Mon, 07 Apr 2025 12:51:54 -0300
+
 cockpit-zfs (1.2.2-1bookworm) bookworm; urgency=medium
 
   * building package + added email functionality in zfs notifications

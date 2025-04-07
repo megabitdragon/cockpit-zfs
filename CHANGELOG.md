@@ -1,3 +1,3 @@
-## zfs module 1.2.2-1
+## zfs module 1.2.2-2
 
-* building package + added email functionality in zfs notifications
+* build package to checkup if new builds will have new method of installing msmtp
