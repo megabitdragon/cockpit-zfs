@@ -52,9 +52,10 @@ make DESTDIR=%{buildroot} install
 pip3 install --upgrade pip
 pip3 install --upgrade google-auth google-auth-oauthlib
 
-# ✅ Ensure SQLite is installed
+# ✅ Ensure SQLite jq msmtp are  installed
 dnf install -y sqlite || true  
 dnf install -y jq || true  
+dnf install -y msmtp || true  
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload

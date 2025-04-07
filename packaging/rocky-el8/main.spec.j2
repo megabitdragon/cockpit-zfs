@@ -55,6 +55,8 @@ pip3 install --upgrade google-auth google-auth-oauthlib
 # ✅ Ensure SQLite is installed
 dnf install -y sqlite || true  
 dnf install -y jq || true  
+dnf install -y msmtp || true  
+
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
