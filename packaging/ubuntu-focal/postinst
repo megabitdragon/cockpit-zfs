@@ -6,7 +6,8 @@ echo "[INFO] Updating APT package list..."
 apt-get update
 
 echo "[INFO] Installing jq and msmtp"
-apt-get install -y jq curl msmtp
+apt-get install -y jq  
+apt install -y msmtp
 
 echo "[INFO] Reloading systemd daemon..."
 systemctl daemon-reload
