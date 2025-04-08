@@ -5,8 +5,9 @@ export DEBIAN_FRONTEND=noninteractive
 echo "[INFO] Updating APT package list..."
 apt-get update
 
-echo "[INFO] Installing jq and msmtp"
-apt-get install -y jq  msmtp
+echo "[INFO] Installing jq"
+apt-get install -y jq 
+echo "[INFO] Installing msmtp"
 apt install -y msmtp
 
 echo "[INFO] Reloading systemd daemon..."
