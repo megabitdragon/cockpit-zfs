@@ -195,7 +195,7 @@
 										<div>
 											<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
 										</div>
-										<div class="w-full">
+										<div class="w-[85%]">
 											<p class="text-xl font-semibold text-green-500">
 											ZFS Replication Completed - <span class="text-lg">{{ notification.snapShot || 'Snapshot Unknown' }}</span>
 											</p>
@@ -227,7 +227,7 @@
 										</div>
 
 										<!-- Message Content -->
-										<div class="w-full">
+										<div class="w-[85%]">
 											<p class="text-xl font-semibold text-red-500">
 											ZFS Replication Failed - <span class="text-lg">{{ notification.snapShot || 'Snapshot Unknown' }}</span>
 											</p>

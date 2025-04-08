@@ -314,8 +314,8 @@ const emailChips = ref<string[]>([]);
 
 const warningConfig = reactive<WarningConfig>({
   scrubFinish: 'info',
-  vdevCleared: 'info',
-  resilverFinish: 'info',
+//   vdevCleared: 'info',
+//   resilverFinish: 'info',
   clearPoolErrors: 'info',
   snapshotCreation: 'info',
   snapshotFailure: 'warning',
@@ -328,8 +328,8 @@ const warningConfig = reactive<WarningConfig>({
 
 const warningEvents: Record<keyof WarningConfig, string> = {
   scrubFinish: 'Scrub Finish',
-  vdevCleared: 'Vdev Cleared',
-  resilverFinish: 'Resilver Finish',
+//   vdevCleared: 'Vdev Cleared',
+//   resilverFinish: 'Resilver Finish',
   clearPoolErrors: 'Clear Pool Errors',
   snapshotCreation: 'Snapshot Creation',
   snapshotFailure: 'snapshot Failure',

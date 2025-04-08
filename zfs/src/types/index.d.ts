@@ -213,8 +213,8 @@ interface StepsNavigationItem {
 //object for warning levels
 interface WarningConfig {
 	scrubFinish: string;
-	vdevCleared: string;
-	resilverFinish: string;
+	// vdevCleared: string;
+	// resilverFinish: string;
 	clearPoolErrors: string;
 	snapshotCreation: string;
 	stateChange: string; // even though not user-editable, can still be tracked

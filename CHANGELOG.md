@@ -1,3 +1,3 @@
-## zfs module 1.2.2-5
+## zfs module 1.2.2-6
 
-* fixing ubuntu posinst script
+* build packag + fix UI and email issues

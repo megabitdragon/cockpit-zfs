@@ -959,7 +959,7 @@ def should_send_email(severity: str):
     return (
         (severity == "info" and send_info) or
         (severity == "warning" and send_warning) or
-        (severity == "critical" and send_critical)
+        (severity == "error" and send_critical)
     )
 
 def updateEmailSeverities(json_string):
