@@ -1,3 +1,3 @@
-## zfs module 1.2.2-3
+## zfs module 1.2.2-4
 
-* build package to install msmtp
+* fixing ubuntu posinst script
