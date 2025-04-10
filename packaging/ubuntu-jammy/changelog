@@ -1,3 +1,10 @@
+cockpit-zfs (1.2.3-2jammy) jammy; urgency=medium
+
+  * Fixes replacing disk issue where pools/disks were failing to show in UI during
+    replacement
+
+ -- Jordan Keough <jkeough@45drives.com>  Thu, 10 Apr 2025 08:23:24 -0300
+
 cockpit-zfs (1.2.1-1jammy) jammy; urgency=medium
 
   * Added zfs alerts bell

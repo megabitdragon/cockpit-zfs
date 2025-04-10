@@ -1,3 +1,3 @@
-## zfs module 1.2.1-1
+## zfs module 1.2.3-2
 
-* Updates Build Number + Added zfs alerts bell
+* Fixes replacing disk issue where pools/disks were failing to show in UI during replacement
