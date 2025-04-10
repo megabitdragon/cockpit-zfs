@@ -1,66 +1,108 @@
 <template>
-    <div class="border-b border-t border-collapse border-default ">
-        <div class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default ">
+	<div class="border-b border-t border-collapse border-default ">
+		<div class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default ">
 			<!-- <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
 				<span class="sr-only"></span>
 			</div> -->
-            <div name="disk-name" class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">{{ props.disk.name }} {{ diskSdName }}</div>
-            <div name="disk-state" class="py-1 mt-1 col-span-1 font-semibold" :class="[formatStatus(diskState), truncateText]" :title="diskState">{{ diskState }}</div>
-            <div name="disk-type" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.type">{{ props.disk.type }}</div>
-            <div name="disk-temp" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.temp">{{ props.disk.temp }}</div>
-            <div name="disk-capacity" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.capacity">{{ props.disk.capacity }}</div>
-            <div name="disk-message" class="py-1 -mt-1 col-span-2">
-                <Status :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true" :isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox" :isTrimmable="getIsTrimmable()"/>
-            </div>
-            <div name="disk-" class="col-span-1">
-                <div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
-                    <Menu as="div" class="relative inline-block text-right">
-                        <div>
-                            <MenuButton @click.stop class="flex items-center rounded-full bg-accent p-2 hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
-                                <span class="sr-only">Open options</span>
-                                <EllipsisVerticalIcon class="w-5" aria-hidden="true" />
-                            </MenuButton>
-                        </div>
+			<!-- <div name="disk-name" class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">{{ props.disk.name }} {{ diskSdName }}</div> -->
+			<div name="disk-name" class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">
+				{{ props.disk.name }} {{ diskSdName }} <span v-if="props.disk.replacingTarget">
+					<span class="text-orange-600">replacing</span> {{ props.disk.replacingTarget }}</span>
+			</div>
+			<div name="disk-state" class="py-1 mt-1 col-span-1 font-semibold"
+				:class="[formatStatus(diskState), truncateText]" :title="diskState">{{ diskState }}</div>
+			<div name="disk-type" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.type">{{
+				props.disk.type }}</div>
+			<div name="disk-temp" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.temp">{{
+				props.disk.temp }}</div>
+			<div name="disk-capacity" class="py-1 mt-1 col-span-1" :class="truncateText" :title="props.disk.capacity">{{
+				props.disk.capacity }}</div>
+			<div name="disk-message" class="py-1 -mt-1 col-span-2">
+				<Status :isTrim="false" :disk="props.disk" :pool="props.pool" :isDisk="true" :isPoolList="true"
+					:isPoolDetail="false" :idKey="'trim-status-box'" ref="trimStatusBox"
+					:isTrimmable="getIsTrimmable()" />
+			</div>
+			<div name="disk-" class="col-span-1">
+				<div class="relative py-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8">
+					<Menu as="div" class="relative inline-block text-right">
+						<div>
+							<MenuButton @click.stop
+								class="flex items-center rounded-full bg-accent p-2 hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+								<span class="sr-only">Open options</span>
+								<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
+							</MenuButton>
+						</div>
 
-                        <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                            <MenuItems class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                <div class="py-1">
-                                    <!-- <MenuItem as="div" v-slot="{ active }">
+						<transition enter-active-class="transition ease-out duration-100"
+							enter-from-class="transform opacity-0 scale-95"
+							enter-to-class="transform opacity-100 scale-100"
+							leave-active-class="transition ease-in duration-75"
+							leave-from-class="transform opacity-100 scale-100"
+							leave-to-class="transform opacity-0 scale-95">
+							<MenuItems
+								class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+								<div class="py-1">
+									<!-- <MenuItem as="div" v-slot="{ active }">
                                         <a href="#" @click="clearDiskErrors(props.pool.name, props.disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
                                     </MenuItem> -->
-                                    <MenuItem as="div" v-slot="{ active }">
-                                        <a v-if="props.vDev.disks.length > 1 && diskState !== 'REMOVED'" href="#" @click="detachThisDisk(props.pool, props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach Disk</a>
-                                    </MenuItem>
-                                    <MenuItem as="div" v-slot="{ active }">
-                                        <a v-if="diskState == 'ONLINE'" href="#" @click="offlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Offline Disk</a>
-                                    </MenuItem>
-                                    <MenuItem as="div" v-slot="{ active }">
-                                        <a v-if="diskState == 'OFFLINE'" href="#" @click="onlineThisDisk(props.pool, props.disk)" :class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Online Disk</a>
-                                    </MenuItem>
-                                    <MenuItem as="div" v-slot="{ active }">
-                                        <a v-if="diskState !== 'REMOVED'" href="#" @click="replaceThisDisk(props.pool, props.vDev, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace Disk</a>
-                                    </MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'" href="#" @click="trimThisDisk(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
+									<a v-if="props.vDev.disks.length > 1 && diskState !== 'REMOVED'" href="#"
+										@click="detachThisDisk(props.pool, props.disk)"
+										:class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach
+										Disk</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'" href="#" @click="resumeTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM Disk</a>
+									<a v-if="diskState == 'ONLINE'" href="#"
+										@click="offlineThisDisk(props.pool, props.disk)"
+										:class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Offline
+										Disk</a>
 									</MenuItem>
 									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isActive && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'" href="#" @click="pauseTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause TRIM (Disk)</a>
-									</MenuItem>						
-									<MenuItem as="div" v-slot="{ active }">
-										<a v-if="trimActivity!.isActive || trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'" href="#" @click="stopTrim(props.pool, props.disk)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel TRIM (Disk)</a>
+									<a v-if="diskState == 'OFFLINE'" href="#"
+										@click="onlineThisDisk(props.pool, props.disk)"
+										:class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Online
+										Disk</a>
 									</MenuItem>
-                                </div>
-                            </MenuItems>
-                        </transition>
-                    </Menu>
-                </div>
-            </div>
-        </div>
+									<MenuItem as="div" v-slot="{ active }">
+									<a v-if="diskState !== 'REMOVED'" href="#"
+										@click="replaceThisDisk(props.pool, props.vDev, props.disk)"
+										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace
+										Disk</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+									<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'"
+										href="#" @click="trimThisDisk(props.pool, props.disk)"
+										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM
+										Disk</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+									<a v-if="trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'"
+										href="#" @click="resumeTrim(props.pool, props.disk)"
+										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM
+										Disk</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+									<a v-if="trimActivity!.isActive && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'"
+										href="#" @click="pauseTrim(props.pool, props.disk)"
+										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause
+										TRIM (Disk)</a>
+									</MenuItem>
+									<MenuItem as="div" v-slot="{ active }">
+									<a v-if="trimActivity!.isActive || trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'"
+										href="#" @click="stopTrim(props.pool, props.disk)"
+										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel
+										TRIM (Disk)</a>
+									</MenuItem>
+								</div>
+							</MenuItems>
+						</transition>
+					</Menu>
+				</div>
+			</div>
+		</div>
 		<div v-if="diskState == 'REPLACING' || diskState == 'MISSING'" class="border border-collapse border-default ">
-			<div v-for="disk in props.disk.children!" class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
+			<div v-for="disk in props.disk.children!"
+				class="grid grid-cols-9 grid-flow-cols w-full text-center bg-accent text-default">
 				<div class="py-1 mt-1 col-span-3" :class="truncateText" :title="disk.name">{{ props.disk.name }}</div>
 				<div class="py-1 mt-1 col-span-3"></div>
 				<div class="py-1 mt-1 col-span-3"></div>
@@ -69,33 +111,50 @@
 	</div>
 
 	<div v-if="showDetachDiskModal">
-		<component :is="detachDiskComponent" :showFlag="showDetachDiskModal" @close="updateShowDetachDisk" :idKey="'confirm-detach-disk'" :item="'disk'" :operation="'detach'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDetach" :secondOption="'clear disk labels'" :hasChildren="false"/>
+		<component :is="detachDiskComponent" :showFlag="showDetachDiskModal" @close="updateShowDetachDisk"
+			:idKey="'confirm-detach-disk'" :item="'disk'" :operation="'detach'" :pool="selectedPool!"
+			:disk="selectedDisk!" :confirmOperation="confirmThisDetach" :secondOption="'clear disk labels'"
+			:hasChildren="false" />
 	</div>
 
 	<div v-if="showOfflineDiskModal">
-		<component :is="offlineDiskComponent" :showFlag="showOfflineDiskModal" @close="updateShowOfflineDisk" :idKey="'confirm-offline-disk'" :item="'disk'" :operation="'offline'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisOffline" :firstOption="'forcefully offline'" :secondOption="'temporarily offline until next reboot'" :hasChildren="false"/>
+		<component :is="offlineDiskComponent" :showFlag="showOfflineDiskModal" @close="updateShowOfflineDisk"
+			:idKey="'confirm-offline-disk'" :item="'disk'" :operation="'offline'" :pool="selectedPool!"
+			:disk="selectedDisk!" :confirmOperation="confirmThisOffline" :firstOption="'forcefully offline'"
+			:secondOption="'temporarily offline until next reboot'" :hasChildren="false" />
 	</div>
 
 	<div v-if="showOnlineDiskModal">
-		<component :is="onlineDiskComponent" :showFlag="showOnlineDiskModal" @close="updateShowOnlineDisk" :idKey="'confirm-online-disk'" :item="'disk'" :operation="'online'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisOnline" :firstOption="'expand devices to use whole disk'" :secondOption="'scrub pool after coming online'" :hasChildren="false"/>
+		<component :is="onlineDiskComponent" :showFlag="showOnlineDiskModal" @close="updateShowOnlineDisk"
+			:idKey="'confirm-online-disk'" :item="'disk'" :operation="'online'" :pool="selectedPool!"
+			:disk="selectedDisk!" :confirmOperation="confirmThisOnline"
+			:firstOption="'expand devices to use whole disk'" :secondOption="'scrub pool after coming online'"
+			:hasChildren="false" />
 	</div>
 
 	<div v-if="showTrimDiskModal">
-		<component :is="trimDiskComponent" :showFlag="showTrimDiskModal" @close="updateShowTrimDisk" :idKey="'confirm-trim-disk'" :item="'disk'" :operation="'trim'" :pool="selectedPool!" :disk="selectedDisk!" :confirmOperation="confirmThisDiskTrim" :firstOption="'secure TRIM'" :hasChildren="false"/>
+		<component :is="trimDiskComponent" :showFlag="showTrimDiskModal" @close="updateShowTrimDisk"
+			:idKey="'confirm-trim-disk'" :item="'disk'" :operation="'trim'" :pool="selectedPool!" :disk="selectedDisk!"
+			:confirmOperation="confirmThisDiskTrim" :firstOption="'secure TRIM'" :hasChildren="false" />
 	</div>
 
 	<div v-if="showPauseTrimConfirm">
-		<component :is="trimPauseDiskComponent" :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim" :idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmPauseThisTrim" :hasChildren="false"/>
+		<component :is="trimPauseDiskComponent" :showFlag="showPauseTrimConfirm" @close="updateShowPauseTrim"
+			:idKey="'confirm-pause-trim'" :item="'pool'" :operation="'pause'" :operation2="'trim'" :pool="selectedPool!"
+			:confirmOperation="confirmPauseThisTrim" :hasChildren="false" />
 	</div>
 
 	<div v-if="showStopTrimConfirm">
-		<component :is="trimStopDiskComponent" :showFlag="showStopTrimConfirm" @close="updateShowStopTrim" :idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!" :confirmOperation="confirmStopThisTrim" :hasChildren="false"/>
+		<component :is="trimStopDiskComponent" :showFlag="showStopTrimConfirm" @close="updateShowStopTrim"
+			:idKey="'confirm-stop-trim'" :item="'pool'" :operation="'stop'" :operation2="'trim'" :pool="selectedPool!"
+			:confirmOperation="confirmStopThisTrim" :hasChildren="false" />
 	</div>
 
 	<div v-if="showReplaceDiskModal">
-		<component :is="replaceDiskComponent" :showFlag="showReplaceDiskModal" @close="updateShowReplaceDisk" :idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!"/>
+		<component :is="replaceDiskComponent" :showFlag="showReplaceDiskModal" @close="updateShowReplaceDisk"
+			:idKey="'show-replace-modal'" :pool="selectedPool!" :vDev="selectedVDev!" :disk="selectedDisk!" />
 	</div>
-	
+
 </template>
 <script setup lang="ts">
 import { ref, inject, Ref, watch, computed, provide, onMounted } from "vue";

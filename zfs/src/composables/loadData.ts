@@ -3,7 +3,7 @@ import { getPools, getImportablePools } from "./pools";
 import { getDisks } from "./disks";
 import { getDatasets } from "./datasets";
 import { findDiskByPath, convertBytesToSize, isBoolOnOff, onOffToBool, getQuotaRefreservUnit, getSizeUnitFromString, getParentPath, convertTimestampToLocal, formatCapacityString, isCapacityPatternInvalid, changeUnitToBinary } from "./helpers";
-import { getSnapshots, getSnapshotsOfDataset,getSnapshotsOfPool } from './snapshots';
+import { getSnapshots, getSnapshotsOfDataset, getSnapshotsOfPool } from './snapshots';
 import { getDiskStats, getScanGroup } from './scan';
 import { VDevDisk, ZFSFileSystemInfo, VDev } from "@45drives/houston-common-lib"
 import { PoolDiskStats, PoolScanObjectGroup, Snapshot } from '../types';
@@ -11,7 +11,7 @@ import { PoolDiskStats, PoolScanObjectGroup, Snapshot } from '../types';
 const vDevs = ref<VDev[]>([]);
 const errors: string[] = [];
 
-export async function loadDiskStats(poolDiskStats : Ref<PoolDiskStats>) {
+export async function loadDiskStats(poolDiskStats: Ref<PoolDiskStats>) {
 	try {
 		const rawJSON = await getDiskStats();
 		const parsedJSON = JSON.parse(rawJSON!);
@@ -47,6 +47,27 @@ export async function loadDisksThenPools(disks, pools) {
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
+			// const disk = {
+			// 	name: parsedJSON[i].name,
+			// 	capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
+			// 	model: parsedJSON[i].model,
+			// 	type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
+			// 	phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
+			// 	sd_path: parsedJSON[i].sd_path || 'N/A',
+			// 	vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
+			// 	serial: parsedJSON[i].serial || 'N/A',
+			// 	usable: parsedJSON[i].usable || false,
+			// 	path: '',
+			// 	guid: '',
+			// 	status: parsedJSON[i].health || 'Unknown',
+			// 	powerOnHours: parsedJSON[i].power_on_time || 0,
+			// 	powerOnCount: parsedJSON[i].power_on_count || 0,
+			// 	temp: parsedJSON[i].temp || 'N/A',
+			// 	rotationRate: parsedJSON[i].rotation_rate || 0,
+			// 	stats: {},
+			// 	errors: errors,
+			// 	hasPartitions: parsedJSON[i].has_partitions || false,
+			// };
 			const disk = {
 				name: parsedJSON[i].name,
 				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
@@ -71,7 +92,8 @@ export async function loadDisksThenPools(disks, pools) {
 
 
 			disks.value.push(disk);
-		// console.log("Disk:", disk);
+			// console.log("Disk:");
+			// console.log(disk);
 		}
 		console.log("pre-loaded Disks:", disks);
 
@@ -79,8 +101,6 @@ export async function loadDisksThenPools(disks, pools) {
 		try {
 			const rawJSON = await getPools();
 			const parsedJSON = JSON.parse(rawJSON!);
-			// console.log('getPools rawJson:', rawJSON);
-			console.log('getPools parsedJson:', parsedJSON);
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
 				//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
@@ -90,7 +110,7 @@ export async function loadDisksThenPools(disks, pools) {
 				parsedJSON[i].groups.log.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'log'));
 				parsedJSON[i].groups.spare.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'spare'));
 				parsedJSON[i].groups.special.forEach(vDev => parseVDevData(vDev, parsedJSON[i].name, disks, 'special'));
-				
+
 				//adds pool data from JSON into pool data object, pushes into array 
 				if (parsedJSON[i].root_dataset != null) {
 					const poolData = {
@@ -102,23 +122,25 @@ export async function loadDisksThenPools(disks, pools) {
 							size: convertBytesToSize(parsedJSON[i].properties.size.parsed),
 							allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
 							capacity: parsedJSON[i].properties.capacity.rawvalue,
-							free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
+							free: convertBytesToSize(parsedJSON[i].properties.free.parsed),
 							readOnly: parsedJSON[i].properties.readonly.parsed,
 							sector: parsedJSON[i].properties.ashift.rawvalue,
 							record: parsedJSON[i].root_dataset.properties.recordsize.value,
 							compression: parsedJSON[i].root_dataset.properties.compression.parsed,
 							deduplication: onOffToBool(parsedJSON[i].root_dataset.properties.dedup.parsed),
 							refreservationRawSize: parsedJSON[i].root_dataset.properties.refreservation.parsed,
+							// refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)) : 0,
 							refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].properties.size.parsed) * 100).toFixed(2)) : 0,
 							autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 							autoReplace: parsedJSON[i].properties.autoreplace.parsed,
 							autoTrim: onOffToBool(parsedJSON[i].properties.autotrim.parsed),
 							delegation: parsedJSON[i].properties.delegation.parsed,
 							listSnapshots: parsedJSON[i].properties.listsnapshots.parsed,
+							// multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
 							health: parsedJSON[i].properties.health.parsed,
 							altroot: parsedJSON[i].properties.altroot.value,
 							available: convertBytesToSize(parsedJSON[i]?.root_dataset?.properties?.available.parsed),
-						
+
 						},
 						failMode: parsedJSON[i].properties.failmode.parsed,
 						comment: parsedJSON[i].properties.comment.value !== '-' ? parsedJSON[i].properties.comment.value : '',
@@ -143,7 +165,7 @@ export async function loadDisksThenPools(disks, pools) {
 
 						//adds VDev array to Pool data object
 						vdevs: vDevs.value,
-	
+
 						// fileSystems: parsedJSON[i].root_dataset.value,
 					}
 					pools.value.push(poolData);
@@ -160,19 +182,21 @@ export async function loadDisksThenPools(disks, pools) {
 							size: convertBytesToSize(parsedJSON[i].properties.size.parsed),
 							allocated: convertBytesToSize(parsedJSON[i].properties.allocated.parsed),
 							capacity: Number(parsedJSON[i].properties.capacity.rawvalue),
-							free:  convertBytesToSize(parsedJSON[i].properties.free.parsed),
+							free: convertBytesToSize(parsedJSON[i].properties.free.parsed),
 							readOnly: parsedJSON[i].properties.readonly.parsed,
 							sector: parsedJSON[i].properties.ashift.rawvalue,
 							record: '',
 							compression: false,
 							deduplication: false,
 							refreservationRawSize: 0,
+							// refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].root_dataset.properties.used.parsed) * 100).toFixed(2)) : 0,
 							refreservationPercent: parsedJSON[i].root_dataset ? Number(((parsedJSON[i].root_dataset.properties.refreservation.parsed / parsedJSON[i].properties.size.parsed) * 100).toFixed(2)) : 0,
 							autoExpand: parsedJSON[i].properties.autoexpand.parsed,
 							autoReplace: parsedJSON[i].properties.autoreplace.parsed,
 							autoTrim: onOffToBool(parsedJSON[i].properties.autotrim.parsed),
 							delegation: parsedJSON[i].properties.delegation.parsed,
 							listSnapshots: parsedJSON[i].properties.listsnapshots.parsed,
+							// multiHost: isBoolOnOff(parsedJSON[i].properties.multihost),
 							health: parsedJSON[i].properties.health.parsed,
 							altroot: parsedJSON[i].properties.altroot.value,
 							available: convertBytesToSize(parsedJSON[i]?.root_dataset?.properties?.available.parsed),
@@ -197,10 +221,10 @@ export async function loadDisksThenPools(disks, pools) {
 						statusCode: parsedJSON[i].status_code,
 						statusDetail: parsedJSON[i].status_detail,
 						errorCount: parsedJSON[i].error_count,
-						
+
 						//adds VDev array to Pool data object
 						vdevs: vDevs.value,
-	
+
 						// fileSystems: parsedJSON[i].root_dataset.value,
 					}
 					pools.value.push(poolData);
@@ -216,27 +240,27 @@ export async function loadDisksThenPools(disks, pools) {
 					// console.log('mapping pool disk types for vdev:', vDev.name);
 					// Map over the disks within each VDev and extract their types
 					const diskTypes = vDev.disks.map(disk => disk.type);
-					
+
 					// Check if all disk types within this VDev are the same
 					// does not currently account for 'replacing' type
 					const allSameDiskType = diskTypes.every(type => type === diskTypes[0]);
-				
+
 					// Return the disk type for this VDev
 					return allSameDiskType ? diskTypes[0] : 'Hybrid';
 				});
-			
+
 				// Check if all VDev disk types within the pool are the same
 				const allSameDiskType = vDevDiskTypes.every(type => type === vDevDiskTypes[0]);
-			
+
 				// Determine the pool's diskType based on VDev diskTypes
 				return allSameDiskType ? vDevDiskTypes[0] : 'Hybrid';
 			});
-			
+
 			pools.value.forEach((pool, index) => {
 				pool.diskType = poolDiskTypes[index];
 				// console.log(`pool: ${pool.name} type: ${poolDiskTypes[index]}`);
 			});
-			  
+
 			console.log("loaded Pools:", pools);
 
 			await loadDisksExtraData(disks.value, pools.value);
@@ -263,7 +287,7 @@ export async function loadDatasets(datasets) {
 
 		//loops through JSON data and adds data to a Dataset object
 		for (let i = 0; i < parsedJSON.length; i++) {
-			const dataset : ZFSFileSystemInfo = {
+			const dataset: ZFSFileSystemInfo = {
 				name: parsedJSON[i].name,
 				id: parsedJSON[i].id,
 				mountpoint: parsedJSON[i].properties.mountpoint.value,
@@ -305,7 +329,7 @@ export async function loadDatasets(datasets) {
 						unit: getSizeUnitFromString(getQuotaRefreservUnit(parsedJSON[i].properties.refreservation.parsed)),
 					},
 					used: parsedJSON[i].properties.used.parsed,
-					
+
 				},
 				children: parsedJSON[i].children,
 				parentFS: getParentPath(parsedJSON[i].name),
@@ -327,10 +351,30 @@ export async function loadDisks(disks) {
 		const rawJSON = await getDisks();
 		const parsedJSON = JSON.parse(rawJSON!);
 		// console.log('Disks JSON:', parsedJSON);
-		
+
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
-
+			// const disk = {
+			// 	name: parsedJSON[i].name,
+			// 	capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
+			// 	model: parsedJSON[i].model,
+			// 	type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
+			// 	phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
+			// 	sd_path: parsedJSON[i].sd_path || 'N/A',
+			// 	vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
+			// 	serial: parsedJSON[i].serial || 'N/A',
+			// 	usable: parsedJSON[i].usable || false,
+			// 	path: '',
+			// 	guid: '',
+			// 	status: parsedJSON[i].health || 'Unknown',
+			// 	powerOnHours: parsedJSON[i].power_on_time || 0,
+			// 	powerOnCount: parsedJSON[i].power_on_count || 0,
+			// 	temp: parsedJSON[i].temp || 'N/A',
+			// 	rotationRate: parsedJSON[i].rotation_rate || 0,
+			// 	stats: {},
+			// 	errors: errors,
+			// 	hasPartitions: parsedJSON[i].has_partitions || false,
+			// }
 			const disk = {
 				name: parsedJSON[i].name,
 				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
@@ -365,6 +409,48 @@ export async function loadDisks(disks) {
 }
 
 // Helper function to clean disk paths by removing partition numbers but leaving the rest intact
+// function cleanDiskPath(path) {
+// 	// Only strip suffixes for paths that are known to contain partitions (e.g., /dev/sdX, /dev/nvmeXnY)
+// 	if (/\/dev\/sd[a-z][0-9]*$/.test(path) || /\/dev\/nvme\d+n\d+p[0-9]+$/.test(path) || /-part\d+$/.test(path)) {
+// 		return path.replace(/[-p]?\d+$/, ''); // Removes -partN or pN at the end
+// 	}
+// 	// If path doesn't match those patterns, return as is
+// 	return path;
+// }
+
+/* function cleanDiskPath(path) {
+	if (!path) return ''; // Handle null/undefined paths gracefully
+
+	// Handle known patterns for paths with partitions
+	if (/\/dev\/sd[a-z][0-9]*$/.test(path)) {
+		return path.replace(/\d+$/, ''); // Remove numeric suffix (e.g., /dev/sda1 → /dev/sda)
+	}
+	if (/\/dev\/nvme\d+n\d+p[0-9]+$/.test(path)) {
+		return path.replace(/p\d+$/, ''); // Remove 'pN' suffix (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
+	}
+	if (/-part\d+$/.test(path)) {
+		return path.replace(/-part\d+$/, ''); // Remove '-partN' suffix (e.g., /dev/disk/by-vdev/1-1-part1 → /dev/disk/by-vdev/1-1)
+	}
+
+	// Return unmodified for unknown patterns
+	return path;
+} */
+
+/* function cleanDiskPath(path) {
+	if (!path) return '';
+
+	// Remove partition numbers but keep NVMe device names intact
+	if (/\/dev\/sd[a-z][0-9]+$/.test(path)) {
+		return path.replace(/[0-9]+$/, ''); // Remove numbers from end (e.g., /dev/sda1 → /dev/sda)
+	}
+	if (/\/dev\/nvme\d+n\d+p\d+$/.test(path)) {
+		return path.replace(/p\d+$/, ''); // Remove pN from NVMe paths (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
+	}
+
+	return path; // Return as is if no modifications are needed
+}
+ */
+
 function cleanDiskPath(path) {
 	if (!path) return '';
 
@@ -385,6 +471,26 @@ function cleanDiskPath(path) {
 
 	return path; // Return unchanged if no modifications needed
 }
+
+
+// function cleanDiskPath(path) {
+// 	if (!path) return ''; // Handle null/undefined paths gracefully
+
+// 	// Handle known patterns for paths with partitions
+// 	if (/\/dev\/sd[a-z]\d*$/.test(path)) {
+// 		return path.replace(/\d+$/, ''); // Remove numeric suffix (e.g., /dev/sda1 → /dev/sda)
+// 	}
+// 	if (/\/dev\/nvme\d+n\d+p\d+$/.test(path)) {
+// 		return path.replace(/p\d+$/, ''); // Remove 'pN' suffix (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
+// 	}
+// 	if (/-part\d+$/.test(path)) {
+// 		return path.replace(/-part\d+$/, ''); // Remove '-partN' suffix (e.g., /dev/disk/by-vdev/1-1-part1 → /dev/disk/by-vdev/1-1)
+// 	}
+
+// 	// Return unmodified for unknown patterns
+// 	return path;
+// }
+
 
 export async function loadDisksExtraData(disks, pools) {
 	try {
@@ -453,7 +559,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 	};
 
 	// console.log("parsedVdevdata: ",vDev, poolName, disks, vDevType )
-	
+
 	if (vDevData.type === 'disk') {
 		vDevData.path = 'N/A';  // Default path for VM Disk
 	}
@@ -525,17 +631,15 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		if (!diskVDev.value) {
 			console.error(`Disk not found for path: ${vDevData.path}.`);
 			diskVDev.value = createMissingDisk(vDev.path, vDev.name, vDevType, poolName);
-
-			// Ensure the missing disk is added to the VDev
-			if (!vDevData.disks.some(disk => disk.path === diskVDev.value.path)) {
-				vDevData.disks.push(diskVDev.value);
-			}
 		}
 
 		if (vDevData.path!.match(phyPathRegex)) {
 			diskPath.value = diskVDev.value.phy_path;
 			diskName.value = diskVDev.value.phy_path.replace(phyPathPrefix, '');
-		} else if (vDevData.path!.match(nvmePathRegex)) {
+			// } else if (vDevData.path!.match(nvmePathRegex)) { // Check for NVMe path match
+			// 	diskPath.value = diskVDev.value.sd_path; // NVMe paths will use sd_path
+			// 	diskName.value = diskVDev.value.sd_path.replace(sdPathPrefix, '');
+		} else if (vDevData.path!.match(nvmePathRegex)) { // Check for NVMe path match
 			diskPath.value = diskVDev.value.sd_path || diskVDev.value.phy_path || diskVDev.value.vdev_path;
 			diskName.value = diskVDev.value.sd_path ? diskVDev.value.sd_path.replace(sdPathPrefix, '') : diskVDev.value.name;
 		} else if (vDevData.path!.match(sdPathRegex)) {
@@ -568,10 +672,12 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			type: diskVDev.value!.type,
 			health: diskVDev.value!.status,
 			stats: diskVDev.value!.stats,
+			// capacity: diskVDev.value!.capacity,
 			capacity: isCapacityPatternInvalid(diskVDev.value!.capacity) ? formatCapacityString(diskVDev.value!.capacity) : diskVDev.value!.capacity,
 			model: diskVDev.value!.model,
 			phy_path: diskVDev.value!.phy_path,
 			sd_path: diskVDev.value!.sd_path,
+			// vdev_path: diskVDev.value!.vdev_path,
 			vdev_path: diskVDev.value!.vdev_path !== "N/A" ? diskVDev.value!.vdev_path : diskVDev.value!.sd_path,
 			serial: diskVDev.value!.serial,
 			powerOnHours: diskVDev.value!.powerOnHours,
@@ -589,59 +695,87 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 		}
 
 	} else {
-		vDev.children.forEach(child => {
-			handleDiskChild(child, vDevData, disks, vDev.name, poolName, vDevType);
-		});
-	}
+		// vDev.children.forEach(child => {
+		//  console.log("vdev Child: ", vDev)
+		//  handleDiskChild(child, vDevData, disks, vDev.name, poolName, vDevType);
+		// });
+		if (vDev.name.startsWith("replacing-")) {
+			const result = handleDiskChild(vDev.children[1], vDevData, disks, vDev.name, poolName, vDevType)
+			if (result) {
 
+				const fullOldDisk = disks.value.find(d => d.name === vDev.children[0].name);
+				console.log("vDev.children[0]", fullOldDisk)
+				const shortSdPath = fullOldDisk?.sd_path?.replace(sdPathPrefix, "") ?? "";
+				console.log("shortSdPath", shortSdPath)
+				result.replacingTarget = (vDev.children[0].name + " (" + shortSdPath + ")") as any;
+			}
+		} else {
+			vDev.children.forEach(child => {
+				if (child.type === "disk") {
+					// Regular disk under vDev
+					handleDiskChild(child, vDevData, disks, vDev.name, poolName, vDevType);
+				}
+				else if (child.type === "replacing" && child.children?.length >= 2) {
+					// Handle replacement: show only the new disk
+					const [oldDisk, newDisk] = child.children;
+					console.log("oldDisk, ", disks)
+					const result = handleDiskChild(newDisk, vDevData, disks, child.name, poolName, child.type);
+					if (result) {
+
+						const fullOldDisk = disks.value.find(d => d.name === oldDisk.name);
+						const shortSdPath = fullOldDisk?.sd_path?.replace(sdPathPrefix, "") ?? "";
+						result.replacingTarget = `${oldDisk.name} (${cleanDiskPath(shortSdPath)})` as any;
+
+					}
+				}
+			});
+		}
+	}
 	vDevs.value.push(vDevData);
-	console.log("Updated vDevs Array:", vDevs.value);
+	// console.log("Updated vDevs Array:", vDevs.value);
 }
 
-
 function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
+	if (!child || child.path === null) {
+		return null;
+	}
+	console.log("child", child)
 	const cleanedChildPath = cleanDiskPath(child.path); // Strip partition suffix for comparison
-
 	// Try finding the disk using cleaned paths
 	let fullDiskData: VDevDisk | undefined = disks.value.find(disk => {
 		const cleanedDiskSdPath = cleanDiskPath(disk.sd_path);
 		const cleanedPhyPath = cleanDiskPath(disk.phy_path);
 		const cleanedVdevPath = cleanDiskPath(disk.vdev_path);
 		const cleanedDiskPath = cleanDiskPath(disk.path);
-
 		return (
 			cleanedDiskSdPath === cleanedChildPath ||
 			cleanedPhyPath === cleanedChildPath ||
 			cleanedVdevPath === cleanedChildPath ||
 			cleanedDiskPath === cleanedChildPath ||
-			child.path.startsWith(cleanedDiskSdPath) || // Handle /dev/sdb1 → /dev/sdb
-			child.path.startsWith(cleanedPhyPath) ||
-			child.path.startsWith(cleanedVdevPath) ||
-			child.path.startsWith(cleanedDiskPath)
+			child.path?.startsWith(cleanedDiskSdPath) || // Handle /dev/sdb1 → /dev/sdb
+			child.path?.startsWith(cleanedPhyPath) ||
+			child.path?.startsWith(cleanedVdevPath) ||
+			child.path?.startsWith(cleanedDiskPath)
 		);
 	});
-
 	// // If not found, log only if there's no path match
 	// if (!fullDiskData) {
-	// 	console.warn(`Disk not found for path: ${child.path}. Cleaned path: ${cleanedChildPath}`);
-	// 	fullDiskData = createMissingDisk(vDevData.path, vDevData.name, vDevType, poolName);
-
-	// 	// Ensure the missing disk is added to the VDev
-	// 	if (!vDevData.disks.some(disk => disk.path === fullDiskData!.path)) {
-	// 		vDevData.disks.push(fullDiskData);
-	// 	}
+	//  console.warn(`Disk not found for path: ${child.path}. Cleaned path: ${cleanedChildPath}`);
+	//  fullDiskData = createMissingDisk(vDevData.path, vDevData.name, vDevType, poolName);
+	//  // Ensure the missing disk is added to the VDev
+	//  if (!vDevData.disks.some(disk => disk.path === fullDiskData!.path)) {
+	//      vDevData.disks.push(fullDiskData);
+	//  }
 	// }
 	// If no matching disk was found, create a missing disk ONLY if the original disk is truly missing
 	if (!fullDiskData && (child.path === null || child.path === "")) {
 		console.warn(`Disk not found for path: ${child.path}. Creating placeholder.`);
 		fullDiskData = createMissingDisk(child.path, vDevName, vDevType, poolName);
-
 		// Ensure the missing disk is added only once
 		if (!vDevData.disks.some(disk => disk.path === fullDiskData!.path)) {
 			vDevData.disks.push(fullDiskData);
 		}
 	}
-
 	// If fullDiskData is still null (but child has a valid path), assume it was REMOVED but still exists in JSON
 	if (!fullDiskData) {
 		console.warn(`Disk marked as REMOVED but not found in disks array: ${child.path}`);
@@ -668,7 +802,8 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 			errors: [`Disk was removed from pool: ${poolName}, vDev: ${vDevName}`],
 		};
 	}
-
+	console.log("fulldisk stats", fullDiskData)
+	console.log("child.path 2 ", child.path)
 	// Construct the disk object
 	const childDisk = {
 		name: child.name || fullDiskData.name,
@@ -691,52 +826,50 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 		poolName: poolName,
 		vDevType: vDevType,
 		errors: [],
+		replacingTarget: null
 	};
-
 	// Ensure no duplicates in vDevData
 	if (!vDevData.disks.some(disk => disk.guid === childDisk.guid)) {
 		vDevData.disks.push(childDisk);
 	}
-
 	return childDisk;
 }
 
-
 function createMissingDisk(path, vDevName, vDevType, poolName) {
 	console.log(`Creating placeholder for missing disk at path: ${path}`);
-    return {
-        name: 'Missing Disk',
-        path: path,
-        guid: 'N/A',
-        type: 'N/A',
-        health: 'MISSING',
-        stats: {},
+	return {
+		name: 'Missing Disk',
+		path: path,
+		guid: 'N/A',
+		type: 'N/A',
+		health: 'MISSING',
+		stats: {},
 		capacity: 'Unknown',
-        model: 'N/A',
-        phy_path: path,
-        sd_path: 'N/A',
-        vdev_path: '',
-        serial: 'N/A',
-        powerOnHours: 0,
-        powerOnCount: '0',
-        temp: '0',
-        rotationRate: 0,
-        vDevName: vDevName,
-        poolName: poolName,
-        vDevType: vDevType,
+		model: 'N/A',
+		phy_path: path,
+		sd_path: '',
+		vdev_path: '',
+		serial: 'N/A',
+		powerOnHours: 0,
+		powerOnCount: '0',
+		temp: '0',
+		rotationRate: 0,
+		vDevName: vDevName,
+		poolName: poolName,
+		vDevType: vDevType,
 		errors: [`Disk missing from pool: ${poolName}, vDev: ${vDevName}`],
-    };
+	};
 }
 
 
 export async function loadSnapshots(snapshots) {
 	try {
 		const rawJSON = await getSnapshots();
-        // console.log('Snapshots JSON (all):', parsedJSON);
+		// console.log('Snapshots JSON (all):', parsedJSON);
 		const allSnapshots: Snapshot[] = [];
 
-        for (const dataset in rawJSON) {
-            rawJSON[dataset].forEach(snapshot => {
+		for (const dataset in rawJSON) {
+			rawJSON[dataset].forEach(snapshot => {
 				const snap = {
 					name: snapshot.name,
 					id: snapshot.id,
@@ -751,110 +884,110 @@ export async function loadSnapshots(snapshots) {
 					holds: snapshot.holds
 				};
 				allSnapshots.push(snap);
-            });
-        }
+			});
+		}
 
 		// // Sort the snapshots by creationTimestamp
-        // allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
+		// allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
 
-        // // Push sorted snapshots into the reactive data
-        // allSnapshots.forEach(snap => snapshots.value.push(snap));
+		// // Push sorted snapshots into the reactive data
+		// allSnapshots.forEach(snap => snapshots.value.push(snap));
 		snapshots.value = allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
 
 
-	} catch(error) {
+	} catch (error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
 }
 
 export async function loadSnapshotsInPool(snapshots, poolName) {
-    try {
-        const rawJSON = await getSnapshotsOfPool(poolName);
-       // const parsedJSON = JSON.parse(rawJSON);
-        // console.log('Snapshots JSON (loadByPool):', parsedJSON);
+	try {
+		const rawJSON = await getSnapshotsOfPool(poolName);
+		// const parsedJSON = JSON.parse(rawJSON);
+		// console.log('Snapshots JSON (loadByPool):', parsedJSON);
 		const allSnapshots: Snapshot[] = [];
 
-        for (const dataset in rawJSON) {
-            rawJSON[dataset].forEach(snapshot => {
-					const snap = {
-						name: snapshot.name,
-						id: snapshot.id,
-						snapName: snapshot.snapshot_name,
-						dataset: snapshot.dataset,
-						pool: snapshot.pool,
-						mountpoint: snapshot.mountpoint,
-						type: snapshot.type,
-						guid: snapshot.properties.guid.value,
-						creationTimestamp: snapshot.properties.creation.rawvalue,
-						properties: snapshot.properties,
-						holds: snapshot.holds
-					};
-				
-					allSnapshots.push(snap);
-                
-            });
-        }
+		for (const dataset in rawJSON) {
+			rawJSON[dataset].forEach(snapshot => {
+				const snap = {
+					name: snapshot.name,
+					id: snapshot.id,
+					snapName: snapshot.snapshot_name,
+					dataset: snapshot.dataset,
+					pool: snapshot.pool,
+					mountpoint: snapshot.mountpoint,
+					type: snapshot.type,
+					guid: snapshot.properties.guid.value,
+					creationTimestamp: snapshot.properties.creation.rawvalue,
+					properties: snapshot.properties,
+					holds: snapshot.holds
+				};
+
+				allSnapshots.push(snap);
+
+			});
+		}
 
 		// Sort the snapshots by creationTimestamp
 		snapshots.value = allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
 
 
 		console.log('loaded snapshots in:', poolName, '\n', snapshots);
-    } catch (error) {
-        console.error("An error occurred getting snapshots:", error);
-    }
+	} catch (error) {
+		console.error("An error occurred getting snapshots:", error);
+	}
 }
 
 
-export async function loadSnapshotsInDataset(snapshots, datasetName,snapshotNotFound,snapshotFound ){
-    try {
+export async function loadSnapshotsInDataset(snapshots, datasetName, snapshotNotFound, snapshotFound) {
+	try {
 
-        const rawJSON = await getSnapshotsOfDataset(datasetName);
-			const allSnapshots: Snapshot[] = [];
+		const rawJSON = await getSnapshotsOfDataset(datasetName);
+		const allSnapshots: Snapshot[] = [];
 
-			for (const dataset in rawJSON) {
-				rawJSON[dataset].forEach(snapshot => {
-						const snap = {
-							name: snapshot.name,
-							id: snapshot.id,
-							snapName: snapshot.snapshot_name,
-							dataset: snapshot.dataset,
-							pool: snapshot.pool,
-							mountpoint: snapshot.mountpoint,
-							type: snapshot.type,
-							guid: snapshot.properties.guid.value,
-							creationTimestamp: snapshot.properties.creation.rawvalue,
-							properties: {
-								clones: snapshot.properties.clones.parsed,
-								creation: {
-									rawTimestamp: snapshot.properties.creation.rawvalue,
-									parsed: convertTimestampToLocal(snapshot.properties.creation.parsed),
-									value: snapshot.properties.creation.value,
-								},
-								referenced: snapshot.properties.referenced,
-								used: snapshot.properties.used,
-							},
-							holds: snapshot.holds
-						}
-		
-						allSnapshots.push(snap);
-					
-				});
-			}
-
-			// Sort the snapshots by creationTimestamp
-			snapshots.value = allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
-			if (snapshots.value.length === 0) {
-				if (snapshotNotFound) {
-					snapshotNotFound.value = true;
+		for (const dataset in rawJSON) {
+			rawJSON[dataset].forEach(snapshot => {
+				const snap = {
+					name: snapshot.name,
+					id: snapshot.id,
+					snapName: snapshot.snapshot_name,
+					dataset: snapshot.dataset,
+					pool: snapshot.pool,
+					mountpoint: snapshot.mountpoint,
+					type: snapshot.type,
+					guid: snapshot.properties.guid.value,
+					creationTimestamp: snapshot.properties.creation.rawvalue,
+					properties: {
+						clones: snapshot.properties.clones.parsed,
+						creation: {
+							rawTimestamp: snapshot.properties.creation.rawvalue,
+							parsed: convertTimestampToLocal(snapshot.properties.creation.parsed),
+							value: snapshot.properties.creation.value,
+						},
+						referenced: snapshot.properties.referenced,
+						used: snapshot.properties.used,
+					},
+					holds: snapshot.holds
 				}
-			} else {
-				if (snapshotFound) {
-					snapshotFound.value = true;
-				}
+
+				allSnapshots.push(snap);
+
+			});
+		}
+
+		// Sort the snapshots by creationTimestamp
+		snapshots.value = allSnapshots.sort((a, b) => parseFloat(a.creationTimestamp) - parseFloat(b.creationTimestamp));
+		if (snapshots.value.length === 0) {
+			if (snapshotNotFound) {
+				snapshotNotFound.value = true;
 			}
+		} else {
+			if (snapshotFound) {
+				snapshotFound.value = true;
+			}
+		}
 		console.log('loaded snapshots in:', datasetName, '\n', snapshots);
-	} catch(error) {
+	} catch (error) {
 		console.error("An error occurred getting snapshots:", error);
 	}
 }
