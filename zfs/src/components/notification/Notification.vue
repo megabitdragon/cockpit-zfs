@@ -26,8 +26,7 @@
 								</div>
 
 								<!-- Notification Items -->
-								<div class="py-4 px-4 space-y-4">
-								
+								<div class="overflow-y-auto max-h-[30rem] px-4 py-4 space-y-4">								
 								<!-- Pool Degraded (Unrecoverable Error) -->
 								<MenuItem as="div" v-for="notification in notificationStore.notifications" :key="notification.id" v-slot="{ active }">
 									<div class="flex items-start gap-3" v-if="notification.event === 'scrub_finish'">
@@ -223,15 +222,20 @@
 										</div>
 									</div>
 								</MenuItem>
-								</div>
+							</div>
 
-								<!-- Dismiss Button -->
+								<!-- Dismiss Button
 								<div class="text-md p-4 flex justify-center border-t border-gray-300">
 								<button   @click="dismissAllNotifications()" class=" hover:underline">Dismiss all Notifications</button>
-								</div>
+								</div> -->
+								<div class="text-md p-4 border-t border-gray-300">
+									<button @click="dismissAllNotifications()" class="hover:underline w-full text-center">
+									Dismiss all Notifications
+									</button>
+  								</div>
 							
 							</MenuItems>
-							</Menu>
+						</Menu>
 
 
 			</div>
