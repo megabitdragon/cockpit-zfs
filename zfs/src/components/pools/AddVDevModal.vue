@@ -382,7 +382,6 @@ async function addVDevBtn() {
 
                     try {
                         const output: any = await zfsManager.addVDevsToPool(props.pool, [newVDev.value], newVDev.value.forceAdd!);
-
                         if (output == null || output.error) {
                             const errorMessage = output?.error || 'Unknown error';
                             pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${errorMessage}`, 'error', 5000));
@@ -408,6 +407,8 @@ async function addVDevBtn() {
                         await refreshAllData();
 
                     } catch (error) {
+                        pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${error}`, 'error', 5000));
+                        adding.value = false;
                         console.error(error);
                     }
 
