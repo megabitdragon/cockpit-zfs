@@ -48,9 +48,11 @@
 
                         <div class="flex justify-end space-x-2 mt-4">
                             <button @click="closeModal" class="bg-red-500 text-default p-2 rounded">Cancel</button>
-                            <button @click="saveWarningConfig" class="bg-green-500 text-default p-2 rounded">Save</button>
+                            <button @click="saveWarningConfig" :disabled="savingWarningLevels" class="bg-green-500 text-white p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed" >
+                                {{ savingWarningLevels ? "Saving..." : "Save" }}
+                            </button>
                         </div>
-                        </div>
+                    </div>
              <!-- UI for setting up emails -->
             <div>
                 <div v-if="activeTab === 'email-settings'" class="space-y-4">
@@ -272,13 +274,17 @@
                     <!-- Test Email & Save -->
                     <div class="flex justify-between mt-4" style="margin-top: 5rem;">
                         <div>
-                        <button @click="testEmail" class=" bg-blue-500 hover:bg-blue-600 text-default p-2 rounded">Send Test Email</button>
-                        <button :disabled="!authEmailConfig.email && !smtpEmailConfig.email" @click="resetMsmtpData" class="bg-gray-500 hover:bg-gray-600 ml-2 text-default p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                            <button @click="testEmail" :disabled="sendingTestEmail" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                                {{ sendingTestEmail ? "Sending..." : "Send Test Email" }}
+                            </button>                        
+                            <button :disabled="!authEmailConfig.email && !smtpEmailConfig.email" @click="resetMsmtpData" class="bg-gray-500 hover:bg-gray-600 ml-2 text-default p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
                              Reset Data</button>                    
                     </div>
                         <div class="space-x-2">
                             <button @click="closeModal" class="bg-red-500 text-default p-2 rounded">Cancel</button>
-                            <button @click="updateSMTPConfig" class="bg-green-500 text-default p-2 rounded">Save</button>
+                            <button @click="updateSMTPConfig" :disabled="savingSMTP" class="bg-green-500 text-white p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                                {{ savingSMTP ? "Saving..." : "Save" }}
+                            </button>
                         </div>
                     </div>            
                 </div>
@@ -311,6 +317,9 @@ const sendWarning = ref(false)
 const sendCritical = true
 const emailInput = ref('')
 const emailChips = ref<string[]>([]);
+const sendingTestEmail = ref(false)
+const savingWarningLevels = ref(false)
+const savingSMTP = ref(false)
 
 const warningConfig = reactive<WarningConfig>({
   scrubFinish: 'info',
@@ -418,7 +427,8 @@ const isFormValid = () => {
 };
 
 async function saveWarningConfig() {
-  console.log('Warning levels saved:', warningConfig);
+    savingWarningLevels.value = true
+  //console.log('Warning levels saved:', warningConfig);
   try {
         //console.log("🔄 Updating events warning levels for emails via D-Bus...");
 
@@ -440,7 +450,9 @@ async function saveWarningConfig() {
     } catch (error) {
         console.error("❌ Error updating SMTP settings via D-Bus:", error);
         alert("❌ Failed to update SMTP settings: " + error.message);
-    }
+    } finally {
+    savingWarningLevels.value = false // ✅ Stop loading
+  }
 
   // Add your saving logic here
 }
@@ -585,7 +597,7 @@ const updateSMTPConfig = async () => {
     }
     return; // ⬅️ Don't continue if the form isn't valid
   }
-
+  savingSMTP.value = true
   try {
     //console.log("🔄 Updating SMTP Config via D-Bus...");
 
@@ -638,7 +650,10 @@ const updateSMTPConfig = async () => {
   } catch (error: any) {
     console.error("❌ Error updating SMTP settings via D-Bus:", error);
     alert("❌ Failed to update SMTP settings: " + (error.message || error));
+  }finally {
+    savingSMTP.value = false
   }
+
 };
 
 
@@ -656,6 +671,7 @@ const testEmail = async () => {
         }
         return;
     }
+    sendingTestEmail.value = true
 
     try {
         const cockpit = (window as any).cockpit;
@@ -716,6 +732,10 @@ const testEmail = async () => {
         console.error("❌ Error sending test email via D-Bus:", error);
         alert(` Failed to send test email: ${error.message || error}`);
     }
+    finally {
+    sendingTestEmail.value = false 
+  }
+
 };
  
 

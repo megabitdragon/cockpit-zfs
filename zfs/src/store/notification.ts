@@ -117,7 +117,7 @@ export const notificationStore = reactive<{
 
         // ✅ Add notifications to store
         missedNotifications.forEach((notification) => {
-            notificationStore.notifications.unshift(notification);
+          notificationStore.notifications.push(notification)
         });
 
         // ✅ Update UI with new notifications
