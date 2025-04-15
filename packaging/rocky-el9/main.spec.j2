@@ -68,6 +68,8 @@ systemctl enable houston-zfs-storage-alert.service
 # Start services only after setting up the database
 systemctl start houston-dbus.service || true
 systemctl restart zed
+systemctl restart houston-dbus.service || true
+
 
 %changelog
 * Tue Apr 08 2025 Rachit Hans <rhans@45drives.com> 1.2.2-6

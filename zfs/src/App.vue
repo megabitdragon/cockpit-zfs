@@ -26,9 +26,12 @@ const version = __APP_VERSION__;
 
 
 const currentNavigationItem = computed<NavigationItem | undefined>(() => navigation.find(item => item.current));
-onMounted(() => {
-  notificationStore.fetchMissedNotifications();
-  console.log("hello from navigation notification in app vue" )
+onMounted(async () => {
+  await Promise.all([
+    notificationStore.countMissedNotifications(),
+
+    notificationStore.fetchMissedNotifications(50, 0)
+  ]);
 });
 //navigation for tabs
 const navigationCallback: NavigationCallback = (item: NavigationItem) => {

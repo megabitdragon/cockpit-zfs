@@ -264,7 +264,7 @@ tls_starttls on
         else:
             return {
                 "success": False,
-                "message": f"❌ Failed to send test email: {proc.stderr.strip()}"
+                "message": f"Failed to send test email: {proc.stderr.strip()}"
             }
 
     except Exception as e:
@@ -443,47 +443,86 @@ def sendTestEmail(config_json):
 		}
 
 
-def get_missed_notifications():
-    """Fetch missed notifications (received = 0), mark them as received, and return as JSON."""
+# def get_missed_notifications():
+#     """Fetch missed notifications (received = 0), mark them as received, and return as JSON."""
+#     conn = sqlite3.connect(DB_PATH)
+#     cursor = conn.cursor()
+
+#     try:
+#         print("[DEBUG] Executing SQL Query to fetch missed notifications")
+#         cursor.execute("""
+#             SELECT id, timestamp, event, pool, vdev, state, snapShot, fileSystem, 
+#                    errors, replicationDestination, received, health, severity
+#             FROM notifications WHERE received = 0
+#         """)
+        
+#         rows = cursor.fetchall()
+#         print(f"[DEBUG] Raw Rows from DB: {rows}")
+
+#         # Convert rows into a structured list
+#         notifications = [
+#             {
+#                 "id": row[0], "timestamp": row[1], "event": row[2], "pool": row[3],
+#                 "vdev": row[4], "state": row[5], "snapShot": row[6], "fileSystem": row[7],
+#                 "errors": row[8], "replicationDestination": row[9],
+#                 "received": row[10], "health": row[11], "severity": row[12]
+#             }
+#             for row in rows
+#         ]
+
+#         conn.commit()
+
+#         print(f"[DEBUG] Missed Notifications Processed: {notifications}")
+
+#         return json.dumps(notifications)  # ✅ Return JSON for easy integration with D-Bus
+
+#     except Exception as e:
+#         print(f"❌ [DB Error] Failed to fetch missed notifications: {e}")
+#         return json.dumps([])  # Return an empty list on failure
+
+#     finally:
+#         conn.close()  # ✅ Always close the database connection
+
+def get_missed_notifications(limit=100, offset=0):
+    """Fetch paginated missed notifications (received = 0), mark them as received, and return as JSON."""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     try:
         print("[DEBUG] Executing SQL Query to fetch missed notifications")
+
+        # Step 1: Fetch missed notifications with pagination
         cursor.execute("""
             SELECT id, timestamp, event, pool, vdev, state, snapShot, fileSystem, 
                    errors, replicationDestination, received, health, severity
-            FROM notifications WHERE received = 0
-        """)
-        
+            FROM notifications
+            WHERE received = 0
+            ORDER BY timestamp DESC
+            LIMIT ? OFFSET ?
+        """, (limit, offset))
+
         rows = cursor.fetchall()
         print(f"[DEBUG] Raw Rows from DB: {rows}")
 
-        # Convert rows into a structured list
-        notifications = [
-            {
+        # Step 2: Prepare the structured notification list
+        notifications = []
+        notification_ids = []
+
+        for row in rows:
+            notification = {
                 "id": row[0], "timestamp": row[1], "event": row[2], "pool": row[3],
                 "vdev": row[4], "state": row[5], "snapShot": row[6], "fileSystem": row[7],
                 "errors": row[8], "replicationDestination": row[9],
                 "received": row[10], "health": row[11], "severity": row[12]
             }
-            for row in rows
-        ]
+            notifications.append(notification)
+            notification_ids.append(row[0])  # track IDs to mark as received
 
         conn.commit()
-
-        print(f"[DEBUG] Missed Notifications Processed: {notifications}")
-
-        return json.dumps(notifications)  # ✅ Return JSON for easy integration with D-Bus
-
-    except Exception as e:
-        print(f"❌ [DB Error] Failed to fetch missed notifications: {e}")
-        return json.dumps([])  # Return an empty list on failure
+        return json.dumps(notifications)
 
     finally:
-        conn.close()  # ✅ Always close the database connection
-
-
+        conn.close()
 def mark_notification_as_read(notification_id):
     """Mark a specific notification as read by setting received = 1"""
     try:
@@ -1017,3 +1056,37 @@ def resetMsmtpData():
 
     except Exception as e:
         return json.dumps({"error": f"Failed to reset SMTP config: {str(e)}"})
+
+def getNotificationCount():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        # Update notification to mark as read
+        cursor.execute("SELECT COUNT(*) FROM notifications where received = 0")
+        conn.commit()
+        total = cursor.fetchone()[0]
+
+        conn.close()
+        return total
+
+    except Exception as e:
+        return f"❌ DB Error: {str(e)}"
+
+def getHighestMissedSeverity():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT severity
+        FROM notifications
+        WHERE received = 0
+        ORDER BY CASE severity
+            WHEN 'critical' THEN 1
+            WHEN 'warning' THEN 2
+            WHEN 'info' THEN 3
+        END
+        LIMIT 1
+    """)
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else "info"

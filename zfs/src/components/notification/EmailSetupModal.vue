@@ -633,7 +633,7 @@ const updateSMTPConfig = async () => {
     );
 
     console.log(`✅ D-Bus Response: ${response}`);
-    alert("✅ SMTP Configuration updated successfully!");
+    alert("✅ Email Configuration updated successfully!");
     closeModal();
   } catch (error: any) {
     console.error("❌ Error updating SMTP settings via D-Bus:", error);
@@ -658,8 +658,6 @@ const testEmail = async () => {
     }
 
     try {
-        //console.log("🔄 Sending test email via D-Bus...");
-
         const cockpit = (window as any).cockpit;
         const dbus = cockpit.dbus("org._45drives.Houston");
 
@@ -716,7 +714,7 @@ const testEmail = async () => {
             }
     } catch (error: any) {
         console.error("❌ Error sending test email via D-Bus:", error);
-        alert(`❌ Failed to send test email: ${error.message || error}`);
+        alert(` Failed to send test email: ${error.message || error}`);
     }
 };
  

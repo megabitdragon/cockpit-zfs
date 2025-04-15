@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status
+set -e
 export DEBIAN_FRONTEND=noninteractive
 
 echo "[INFO] Reloading systemd daemon..."
@@ -7,13 +7,15 @@ systemctl daemon-reload
 
 echo "[INFO] Enabling services..."
 systemctl enable houston-dbus.service || true
+systemctl enable --now houstonzfs-storage-alert.timer || true
+systemctl enable houstonzfs-storage-alert.service || true
 
 echo "[INFO] Starting services..."
-systemctl start houston-dbus.service || true
 systemctl restart zed || true
-
-echo "[✅ SUCCESS] jq installed and services started!"
+systemctl restart houston-dbus.service || true
 
 echo "[INFO] Installing Python dependencies..."
 pip3 install --upgrade pip
 pip3 install --upgrade google-auth google-auth-oauthlib
+
+echo "[SUCCESS] Services started and Python packages installed!"

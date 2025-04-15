@@ -9,12 +9,14 @@ export const notificationStore = reactive<{
   addNotification: (message: string) => void;
   removeNotification: (id: number) => void;
   removeAllNotifications: () => void;
-  fetchMissedNotifications: () => Promise<void>;
+  fetchMissedNotifications: (limit, offset) => Promise<void>;
   markNotificationAsRead: (id: number) => Promise<void>;
-  
   clearAllNotifications: () => Promise<void>;
+  countMissedNotifications: () => void;
+  notificationsCount: number
 }>({
   notifications: [],
+  notificationsCount: 0,
 
   // Add notification to the list
   addNotification(message: string) {
@@ -88,10 +90,12 @@ export const notificationStore = reactive<{
     // Remove notification by ID
   removeAllNotifications() {
     notificationStore.notifications = []
+    this.notificationsCount = 0;
     sideBarNotification();
 
   },
-  async fetchMissedNotifications() {
+
+  async fetchMissedNotifications(limit = 50, offset = 0) {
     try {
         console.log("🔄 Fetching missed notifications via D-Bus...");
 
@@ -99,10 +103,11 @@ export const notificationStore = reactive<{
 
         // ✅ Call GetMissedNotifications with correct object path & interface
         const response = await dbus.call(
-          "/org/_45drives/Houston",  // ✅ Object path (MUST match service)
-          "org._45drives.Houston",   // ✅ Interface name (MUST match service)
-          "GetMissedNotifications"   // ✅ Method name (MUST match service)
-      );
+          "/org/_45drives/Houston",       
+          "org._45drives.Houston",       
+          "GetMissedNotifications",      
+          [limit, offset]                
+        );
         if (!response) throw new Error("❌ No response received from Houston D-Bus.");
 
         //console.log("📥 Raw response from D-Bus:", response);
@@ -117,6 +122,8 @@ export const notificationStore = reactive<{
 
         // ✅ Update UI with new notifications
         sideBarNotification();
+
+    return missedNotifications.length; 
 
         //console.log("✅ Missed notifications fetched successfully.");
     } catch (error) {
@@ -146,6 +153,7 @@ export const notificationStore = reactive<{
             (n) => n.id !== notificationId
         );
 
+        this.notificationsCount -= 1;
         sideBarNotification();
 
     } catch (error) {
@@ -175,29 +183,49 @@ export const notificationStore = reactive<{
     } catch (error) {
         console.error("❌ Error clearing notifications via D-Bus:", error);
     }
-}
+  },
+
+  async countMissedNotifications(){
+    const dbus = cockpit.dbus("org._45drives.Houston");
+    const result = await dbus.call(
+      "/org/_45drives/Houston",
+      "org._45drives.Houston",
+      "GetNotificationCount"
+    );
+    const count = result[0]; // ✅ Extract the count
+    this.notificationsCount = count;
+    console.log("🔢 Total missed notifications:", count);
+
+    return parseInt(result); // result is returned as a string
+  }
 
 
   
   
 });
 
-function sideBarNotification(): void {
-  const count: number = notificationStore.notifications.length;
-    // 🔹 Find the highest severity among all notifications
-    let highestSeverity: "info" | "warning" | "error" = "info";
-    notificationStore.notifications.forEach((notification) => {
-        if (notification.severity === "error") highestSeverity = "error";
-        else if (notification.severity === "warning" && highestSeverity !== "error") highestSeverity = "warning";
-    });
+async function sideBarNotification(): Promise<void> {
+  const count: number = notificationStore.notificationsCount;
+
+  const dbus = cockpit.dbus("org._45drives.Houston");
+
+  try {
+    const [highestSeverity] = await dbus.call(
+      "/org/_45drives/Houston",
+      "org._45drives.Houston",
+      "GetHighestMissedSeverity"
+    );
 
     const severityType = count > 0 ? highestSeverity : null;
-    console.log("severityType ", severityType );
-  (cockpit.transport as any).control("notify", {
-      page_status: {
-          type: severityType, // Remove notification if count is 0
-          title: cockpit.gettext(`${count} Notifications available`),
+    console.log("severityType:", severityType);
 
+    (cockpit.transport as any).control("notify", {
+      page_status: {
+        type: severityType,
+        title: cockpit.gettext(`${count} Notifications available`)
       }
-  });
+    });
+  } catch (error) {
+    console.error("❌ Failed to fetch highest severity:", error);
+  }
 }

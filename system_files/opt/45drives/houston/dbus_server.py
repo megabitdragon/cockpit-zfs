@@ -18,7 +18,9 @@ from notification_utils import (
     fetchMsmtpDetails,
     updateWarningLevels,
     resetMsmtpData,
-    fetchWarningLevels
+    fetchWarningLevels,
+    getNotificationCount,
+    getHighestMissedSeverity
 )
 
 # Initialize DBus
@@ -59,10 +61,10 @@ class DBusService(dbus.service.Object):
 
         except json.JSONDecodeError:
             print("❌ Error: Invalid JSON format received")
-    @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
-    def GetMissedNotifications(self):
+    @dbus.service.method("org._45drives.Houston", in_signature="ii", out_signature="s")
+    def GetMissedNotifications(self,limit,offset):
         """D-Bus method to retrieve missed notifications in JSON format."""
-        return get_missed_notifications()
+        return get_missed_notifications(limit,offset)
     @dbus.service.method("org._45drives.Houston", in_signature="i", out_signature="s")
     def MarkNotificationAsRead(self, notification_id):
         return mark_notification_as_read(notification_id)
@@ -88,6 +90,13 @@ class DBusService(dbus.service.Object):
     @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
     def fetchWarningLevels(self):
         return fetchWarningLevels()
+    @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="i")
+    def GetNotificationCount(self):
+        return getNotificationCount()
+    @dbus.service.method("org._45drives.Houston", in_signature="", out_signature="s")
+    def GetHighestMissedSeverity(self):
+        return getHighestMissedSeverity()
+
 
 
 

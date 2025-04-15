@@ -12,7 +12,7 @@ def setup_database():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    # Check if notifications table exists and compare columns
+    # Check if notifications table exists
     cursor.execute("""
         SELECT name FROM sqlite_master WHERE type='table' AND name='notifications'
     """)
@@ -20,17 +20,15 @@ def setup_database():
 
     def get_existing_columns():
         cursor.execute("PRAGMA table_info(notifications)")
-        return {row[1] for row in cursor.fetchall()}  # row[1] = column name
+        return {row[1] for row in cursor.fetchall()}
 
     if table_exists:
         existing_columns = get_existing_columns()
         if existing_columns != EXPECTED_COLUMNS:
             print("⚠️ Schema mismatch detected. Rebuilding 'notifications' table...")
 
-            # Rename old table
             cursor.execute("ALTER TABLE notifications RENAME TO notifications_old")
 
-            # Recreate with updated schema
             cursor.execute("""
             CREATE TABLE notifications (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,7 +48,6 @@ def setup_database():
             )
             """)
 
-            # Copy matching columns from old table
             shared_columns = existing_columns & EXPECTED_COLUMNS
             cols_str = ", ".join(shared_columns)
             cursor.execute(f"""
@@ -72,8 +69,8 @@ def setup_database():
             vdev TEXT,
             state TEXT,
             health TEXT,
-            errors TEXT,
             guid TEXT,
+            errors TEXT,
             severity TEXT DEFAULT 'info' CHECK(severity IN ('info', 'warning', 'error')),
             received INTEGER DEFAULT 0,
             fileSystem TEXT,
@@ -82,7 +79,7 @@ def setup_database():
         )
         """)
 
-    # warning_levels table
+    # Create warning_levels table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS warning_levels (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,6 +87,7 @@ def setup_database():
         severity TEXT NOT NULL CHECK(severity IN ('info', 'warning', 'critical'))
     )
     """)
+
     defaults = {
         "scrubFinish": "info",
         "vdevCleared": "info",
@@ -100,16 +98,16 @@ def setup_database():
         "stateChange": "critical",
         "storageThreshold": "warning",
         "poolImport": "info",
-        "replicationTaskFailure": "info",
         "replicationTaskFailure": "warning"
     }
+
     for event_type, severity in defaults.items():
         cursor.execute("""
             INSERT OR IGNORE INTO warning_levels (event_type, severity)
             VALUES (?, ?)
         """, (event_type, severity))
 
-    # smtp_settings table
+    # Create smtp_settings table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS smtp_settings (
         id INTEGER PRIMARY KEY,
@@ -123,7 +121,15 @@ def setup_database():
     VALUES (1, 0, 1, 1)
     """)
 
+    # ✅ Create index on 'received' column for fast unread count queries
+    print("✅ Ensuring index on 'received' column...")
+    cursor.execute("""
+    CREATE INDEX IF NOT EXISTS idx_notifications_received
+    ON notifications (received)
+    """)
+
     conn.commit()
     conn.close()
 
+# Run the setup
 setup_database()
