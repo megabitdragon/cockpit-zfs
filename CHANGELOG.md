@@ -1,3 +1,3 @@
-## zfs module 1.2.3-2
+## zfs module 1.2.4-1.2.3
 
-* Fixes replacing disk issue where pools/disks were failing to show in UI during replacement
+* updated notification dropdown and postinst files for email
