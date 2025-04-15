@@ -19,9 +19,10 @@
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="py-2 font-semibold text-left text-default col-span-2" :class="truncateText" title="Dataset">Dataset</th>
+								<th class="py-2 font-semibold text-left text-default col-span-1" :class="truncateText" title="Dataset">Dataset</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Available">Available</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used">Used</th>
+								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Used">Used By Snapshots</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Refreservation">Refres.</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Compression">Compression</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText" title="Deduplication">Dedup.</th>
@@ -48,9 +49,10 @@
 															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform" :class="{ 'rotate-90': !open, 'rotate-180': open, }"
 														/> 
 													</div>
-													<div class="py-1 mt-1 col-span-2 text-left" :class="[truncateText, `ml-${getNestingLevel(dataset)}`]" :title="dataset.name">{{ dataset.name }}</div>
+													<div class="py-1 mt-1 col-span-1 text-left " style="text-wrap: auto !important;" :class="[truncateText, `ml-${getNestingLevel(dataset)}`]" :title="dataset.name">{{ dataset.name }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="convertBytesToSize(dataset.properties.available) ? convertBytesToSize(dataset.properties.available) : 'N/A'">{{ convertBytesToSize(dataset.properties.available) ? convertBytesToSize(dataset.properties.available) : 'N/A' }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="dataset.properties.usedByDataset">{{ dataset.properties.usedByDataset }}</div>
+													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="dataset.properties.usedBySnapshots">{{ dataset.properties.usedBySnapshots }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText" :title="dataset.properties.usedbyRefreservation ? dataset.properties.usedbyRefreservation : 'N/A'">{{ dataset.properties.usedbyRefreservation ? dataset.properties.usedbyRefreservation : 'N/A' }}</div>
 													<div v-if="dataset.properties.compression == 'off' || dataset.properties.compression == 'on'" class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(dataset.properties.compression) ? upperCaseWord(dataset.properties.compression) : 'N/A'">{{ upperCaseWord(dataset.properties.compression) ? upperCaseWord(dataset.properties.compression) : 'N/A' }}</div>
 													<div v-else class="py-1 mt-1 col-span-1" :class="truncateText" :title="upperCaseWord(dataset.properties.compression).toUpperCase() ? upperCaseWord(dataset.properties.compression).toUpperCase() : 'N/A'">{{ dataset.properties.compression.toUpperCase() ? dataset.properties.compression.toUpperCase() : 'N/A' }}</div>

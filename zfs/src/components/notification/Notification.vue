@@ -12,23 +12,43 @@
 								<BellIcon class="w-8 h-8 text-white-700" aria-hidden="true" />
 								
 								<!-- Notification Badge -->
-								<span v-if="notificationStore.notifications.length > 0" class="absolute -top-2 -right-2 max-h-[80vh] overflow-y-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold px-1">
-									{{notificationStore.notifications.length }}
+								<span v-if="notificationStore.notificationsCount>0" class="absolute -top-2 -right-2 max-h-[80vh] overflow-y-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold px-1">
+									{{notificationStore.notificationsCount }}
 								</span>
 								</div>
 							</MenuButton>
 
 							<!-- Dropdown Menu Items -->
-							<MenuItems @click.stop class="absolute right-0 overflow-y-scroll z-10 w-[30rem] max-h-[40rem] origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+							<MenuItems v-bind="emailSetUpModal ? { static: true } : {}" @click.stop class="absolute right-0 overflow-y-scroll z-10 w-[30rem] max-h-[40rem] origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 								<div class="flex items-center justify-between text-xl p-4 border-b border-gray-300">
-								<p>Notifications</p>
-								<!-- <Cog6ToothIcon class="w-[2rem] h-[2rem]" /> -->
+									<p>Notifications</p>
+									<div class="relative inline-block">
+										<!-- Dropdown Trigger: Cog Icon -->
+										<button @click="toggleDropdown" class="focus:outline-none">
+											<Cog6ToothIcon class="w-[2rem] h-[2rem] text-gray-300 hover:text-white transition duration-200" />
+										</button>
+
+										<!-- Dropdown Menu -->
+										<transition name="fade">
+											<div v-if="showDropdown" class="absolute right-0 mt-1 w-56 bg-gray-800 rounded-lg shadow-lg z-50 border border-gray-700">
+												<button
+												@click="openEmailSettings"
+												class="block px-4 py-2 text-base text-left text-white hover:bg-gray-700 w-full transition duration-800"
+												>
+												Email Notifications
+												</button>
+											</div>
+										</transition>
+									</div>	
+									<EmailSetupModal v-if="emailSetUpModal" @close="emailSetUpModal = false" />
+							
 								</div>
 
+
 								<!-- Notification Items -->
-								<div class="overflow-y-auto max-h-[30rem] px-4 py-4 space-y-4">								
-								<!-- Pool Degraded (Unrecoverable Error) -->
-								<MenuItem as="div" v-for="notification in notificationStore.notifications" :key="notification.id" v-slot="{ active }">
+								 <div class="overflow-y-auto max-h-[30rem] px-4 py-4 space-y-4" ref="scrollContainer" >								
+								<!--  Pool Degraded (Unrecoverable Error) -->
+								 <MenuItem as="div" v-for="notification in notificationStore.notifications" :key="notification.id" v-slot="{ active }"> 
 									<div class="flex items-start gap-3" v-if="notification.event === 'scrub_finish'">
 										<!-- Icon Based on Scrub Status -->
 										<div>
@@ -75,7 +95,166 @@
 										</div>
 									</div>
 
-										<div class="flex items-start gap-3" v-if="notification.event === 'vdev_attach'" >
+									<div class="flex items-start gap-3" v-if="notification.event === 'storage_threshold'">
+										<!-- Icon Based on Scrub Status -->
+										<div>
+
+											<ExclamationCircleIcon 
+												class="icon-warning size-icon-lg text-yellow-500" 
+												aria-hidden="true" 
+											/>
+										</div>
+
+										<!-- Notification Content -->
+										<div class="w-full">
+											<p class="text-xl font-semibold text-yellow-500">
+											Storage Warning - {{ notification.pool }}
+											</p>
+											<p class="pl-4 text-sm text-white-400">
+												- Pool <strong>{{ notification.pool }}</strong> is more than 80% full (triggered at {{ notification.timestamp }})		
+											</p>
+										</div>
+
+										<!-- Close Button -->
+										<div>
+											<XMarkIcon 
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500" 
+											aria-hidden="true" 
+											@click.stop="handleDismiss(notification.id)" 
+											/> 
+										</div>
+									</div>
+
+									<!-- Snapshot Creation -->
+									<div class="flex items-start gap-3" v-if="notification.event === 'snapshot_created'">
+									<!-- Icon -->
+										<div>
+											<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
+										</div>
+
+										<!-- Message Content -->
+										<div class="w-full">
+											<p class="text-xl font-semibold text-green-500">
+											Snapshot Created - <span class="text-lg">{{ notification.snapShot }}</span>
+											</p>
+
+											<p class="pl-4 text-sm text-white-500">
+											 - A new snapshot <strong>{{ notification.snapShot }}</strong> has been successfully created
+											for the filesystem <strong>{{ notification.fileSystem }}</strong>.
+											<br />
+											<br />
+											<strong>Timestamp:</strong> {{ notification.timestamp }}
+											</p>
+										</div>
+										<!-- Dismiss Icon -->
+										<div>
+											<XMarkIcon
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500"
+											aria-hidden="true"
+											@click.stop="handleDismiss(notification.id)"
+											/>
+										</div>
+									</div>
+
+										<!-- Snapshot Failed -->
+									<!-- Snapshot Creation Failed -->
+									<div class="flex items-start gap-3" v-if="notification.event === 'snapshot_failed'">
+									<!-- Icon -->
+										<div>
+											<XCircleIcon class="icon-error size-icon-lg text-red-500" aria-hidden="true" />
+										</div>
+
+									<!-- Message Content -->
+										<div class="w-full">
+											<p class="text-xl font-semibold text-red-500">
+											Snapshot Creation Failed - {{ notification.snapShot || 'Unknown Snapshot' }}
+											</p>
+
+											<p class="pl-4 text-sm text-white-500">
+											 Failed to create snapshot on <strong>{{ notification.fileSystem || 'unknown filesystem' }}</strong>.
+											<br />
+											 <strong>Error:</strong> {{ notification.error  || 'Unknown error' }}
+											<br />
+											<strong>Timestamp:</strong> {{ notification.timestamp }}
+											</p>
+										</div>
+
+									<!-- Dismiss Icon -->
+										<div>
+											<XMarkIcon
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500"
+											aria-hidden="true"
+											@click.stop="handleDismiss(notification.id)"
+											/>
+										</div>
+									</div>
+									
+									<!-- ZFS Replication Success -->
+									<div class="flex items-start gap-3" v-if="notification.event === 'zfs_replication_success'">
+										<!-- Icon -->
+										<div>
+											<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
+										</div>
+										<div class="w-[85%]">
+											<p class="text-xl font-semibold text-green-500">
+											ZFS Replication Completed - <span class="text-lg">{{ notification.snapShot || 'Snapshot Unknown' }}</span>
+											</p>
+
+											<p class="pl-4 text-sm text-white-500">
+											- Snapshot <strong>{{ notification.snapShot }}</strong> was successfully replicated
+											from <strong>{{ notification.fileSystem || 'source unknown' }}</strong>.
+											<br />
+											<strong>Destination:</strong> {{ notification.replicationDestination || 'N/A' }}
+											<br />
+											 <strong>Timestamp:</strong> {{ notification.timestamp }}
+											</p>
+										</div>
+
+											<!-- Dismiss Icon -->
+										<div>
+											<XMarkIcon
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500"
+											aria-hidden="true"
+											@click.stop="handleDismiss(notification.id)"
+											/>
+										</div>
+									</div>
+									<!-- ZFS Replication Failed -->
+										<div class="flex items-start gap-3" v-if="notification.event === 'zfs_replication_failed'">
+										<!-- Icon -->
+										<div>
+											<XCircleIcon class="icon-error size-icon-lg text-red-500" aria-hidden="true" />
+										</div>
+
+										<!-- Message Content -->
+										<div class="w-[85%]">
+											<p class="text-xl font-semibold text-red-500">
+											ZFS Replication Failed - <span class="text-lg">{{ notification.snapShot || 'Snapshot Unknown' }}</span>
+											</p>
+
+											<p class="pl-4 text-sm text-white-500">
+											- Replication failed for snapshot <strong>{{ notification.snapShot || 'unknown' }}</strong>
+											from <strong>{{ notification.fileSystem || 'unknown filesystem' }}</strong>.
+											<br />
+											 <strong>Error:</strong> {{ notification.errors ||  'Unknown error' }}
+											<br />
+											 <strong>Timestamp:</strong> {{ notification.timestamp }}
+											</p>
+										</div>
+
+										<!-- Dismiss Icon -->
+										<div>
+											<XMarkIcon
+											class="size-icon text-white-500 cursor-pointer hover:text-red-500"
+											aria-hidden="true"
+											@click.stop="handleDismiss(notification.id)"
+											/>
+										</div>
+										</div>
+
+
+										<!-- Vdev Attatch -->
+									<div class="flex items-start gap-3" v-if="notification.event === 'vdev_attach'" >
 											<div >
 												<CheckCircleIcon class="icon-success size-icon-lg text-green-500" aria-hidden="true" />
 											</div>
@@ -127,11 +306,6 @@
 													'text-yellow-500': notification.state === 'DEGRADED',
 													'text-red-500': notification.state === 'FAULTED' || notification.state === 'UNAVAIL'
 													}">{{ notification.state }}</span>
-												</p>
-
-												<!-- Show Last Recorded Error Only If It Exists -->
-												<p class="pl-4 text-sm text-white-500" v-if="notification.description && notification.description !== 'None'">
-													Last Recorded Error: <strong>{{ notification.description }}</strong>
 												</p>
 
 												<!-- GUID, Error, Timestamp Section -->
@@ -222,12 +396,14 @@
 										</div>
 									</div>
 								</MenuItem>
-							</div>
+								<div ref="loadMoreTrigger" class="h-6 w-full bg-transparent"></div>
+							 </div> 
 
 								<!-- Dismiss Button
 								<div class="text-md p-4 flex justify-center border-t border-gray-300">
 								<button   @click="dismissAllNotifications()" class=" hover:underline">Dismiss all Notifications</button>
 								</div> -->
+
 								<div class="text-md p-4 border-t border-gray-300">
 									<button @click="dismissAllNotifications()" class="hover:underline w-full text-center">
 									Dismiss all Notifications
@@ -240,7 +416,6 @@
 
 			</div>
 		</div>
-
 	
 	</div>
 </template>
@@ -255,11 +430,15 @@
 
 import { BellIcon, Cog6ToothIcon, CheckCircleIcon,ExclamationCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import {Menu,MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { ref, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { notificationStore } from "../../store/notification";
+import EmailSetupModal from './EmailSetupModal.vue';
 
 // Reactive state to track menu visibility
 const menuOpen = ref(false);
+const showDropdown = ref(false);
+const emailSetUpModal = ref(false);
+const loadMoreTrigger = ref(null)
 
 // Watch for menu state changes and control page scrolling
 watch(menuOpen, (isOpen) => {
@@ -278,10 +457,84 @@ async function dismissAllNotifications() {
   await notificationStore.clearAllNotifications();
  notificationStore.removeAllNotifications();
 }
-// onMounted(() => {
-//   notificationStore.fetchMissedNotifications();
-//   console.log("hello from navigation notification")
-// });
 
+
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
+};
+const openEmailSettings = () => {
+	console.log("Opening Email Settings...");
+	emailSetUpModal.value = true;
+	showDropdown.value = false; // Close dropdown when opening modal
+};
+
+const offset = ref(0)
+const limit = 50
+const loading = ref(false)
+const scrollContainer = ref<HTMLElement | null>(null)
+
+async function loadMoreNotifications() {
+  if (loading.value) return
+  loading.value = true
+  const count = await notificationStore.fetchMissedNotifications(limit, offset.value)
+  if (count > 0) offset.value += limit
+  loading.value = false
+}
+
+let observer: IntersectionObserver | null = null
+
+onMounted(() => {
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        loadMoreNotifications()
+      }
+    },
+    {
+      root: scrollContainer.value, // 👈 observe within the scrollable container
+      threshold: 1.0
+    }
+  )
+
+  if (loadMoreTrigger.value) {
+    observer.observe(loadMoreTrigger.value)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (observer && loadMoreTrigger.value) {
+    observer.unobserve(loadMoreTrigger.value)
+  }
+})
+
+watch(menuOpen, async (isOpen) => {
+  if (isOpen) {
+    await nextTick()
+
+    if (observer && loadMoreTrigger.value) {
+      observer.disconnect() // clear any existing observer
+    }
+
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreNotifications()
+        }
+      },
+      {
+        root: scrollContainer.value,
+        threshold: 1.0
+      }
+    )
+
+    if (loadMoreTrigger.value) {
+      observer.observe(loadMoreTrigger.value)
+    }
+  } else {
+    if (observer && loadMoreTrigger.value) {
+      observer.unobserve(loadMoreTrigger.value)
+    }
+  }
+})
 
 </script>

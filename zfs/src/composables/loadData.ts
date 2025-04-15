@@ -329,7 +329,7 @@ export async function loadDatasets(datasets) {
 						unit: getSizeUnitFromString(getQuotaRefreservUnit(parsedJSON[i].properties.refreservation.parsed)),
 					},
 					used: parsedJSON[i].properties.used.parsed,
-
+					usedBySnapshots: convertBytesToSize(parsedJSON[i].properties.usedbysnapshots.parsed)
 				},
 				children: parsedJSON[i].children,
 				parentFS: getParentPath(parsedJSON[i].name),
@@ -339,6 +339,7 @@ export async function loadDatasets(datasets) {
 		}
 
 		console.log("loaded Datasets:", datasets);
+
 
 	} catch (error) {
 		// Handle any errors that may occur during the asynchronous operation

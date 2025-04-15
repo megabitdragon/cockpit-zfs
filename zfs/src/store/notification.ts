@@ -1,21 +1,7 @@
 import { reactive } from "vue";
-
+import { Notification } from "../types";
 // Define the Notification type
-interface Notification {
-  id: number;
-  timestamp: string;
-  event: string;
-  pool?: string;
-  text: string;
-  state?: string;
-  vdev?: string;
-  error?: string;
-  description?: string;
-  guid?: string;
-  health?: string;
-  errors?: string;
-  severity?: string;
-}
+
 
 // Define the reactive notification store
 export const notificationStore = reactive<{
@@ -23,12 +9,14 @@ export const notificationStore = reactive<{
   addNotification: (message: string) => void;
   removeNotification: (id: number) => void;
   removeAllNotifications: () => void;
-  fetchMissedNotifications: () => Promise<void>;
+  fetchMissedNotifications: (limit, offset) => Promise<void>;
   markNotificationAsRead: (id: number) => Promise<void>;
-  
   clearAllNotifications: () => Promise<void>;
+  countMissedNotifications: () => void;
+  notificationsCount: number
 }>({
   notifications: [],
+  notificationsCount: 0,
 
   // Add notification to the list
   addNotification(message: string) {
@@ -43,8 +31,12 @@ export const notificationStore = reactive<{
         health?: string;
         errors?: string;
         severity?: string;
+        fileSystem?: string;
+        snapShot?: string;
+        replicationDestination?: string
       };
       console.log("message id recieved in adddnotification: ", parsedMessage.id)
+   //   console.log("message recieved in adddnotification: ", message)
 
   
       // ✅ Find existing notification by ID
@@ -69,6 +61,9 @@ export const notificationStore = reactive<{
           health: parsedMessage.health,
           errors: parsedMessage.errors,
           severity: parsedMessage.severity,
+          fileSystem: parsedMessage.fileSystem,
+          snapShot: parsedMessage.snapShot,
+          replicationDestination: parsedMessage.replicationDestination
         });
   
         console.log(`✅ Added new notification severity ${parsedMessage.severity}`);
@@ -95,10 +90,12 @@ export const notificationStore = reactive<{
     // Remove notification by ID
   removeAllNotifications() {
     notificationStore.notifications = []
+    this.notificationsCount = 0;
     sideBarNotification();
 
   },
-  async fetchMissedNotifications() {
+
+  async fetchMissedNotifications(limit = 50, offset = 0) {
     try {
         console.log("🔄 Fetching missed notifications via D-Bus...");
 
@@ -106,87 +103,35 @@ export const notificationStore = reactive<{
 
         // ✅ Call GetMissedNotifications with correct object path & interface
         const response = await dbus.call(
-          "/org/_45drives/Houston",  // ✅ Object path (MUST match service)
-          "org._45drives.Houston",   // ✅ Interface name (MUST match service)
-          "GetMissedNotifications"   // ✅ Method name (MUST match service)
-      );
+          "/org/_45drives/Houston",       
+          "org._45drives.Houston",       
+          "GetMissedNotifications",      
+          [limit, offset]                
+        );
         if (!response) throw new Error("❌ No response received from Houston D-Bus.");
 
-        console.log("📥 Raw response from D-Bus:", response);
+        //console.log("📥 Raw response from D-Bus:", response);
 
         // ✅ Parse response JSON
         const missedNotifications = JSON.parse(response);
 
         // ✅ Add notifications to store
         missedNotifications.forEach((notification) => {
-            notificationStore.notifications.unshift(notification);
+          notificationStore.notifications.push(notification)
         });
 
         // ✅ Update UI with new notifications
         sideBarNotification();
 
-        console.log("✅ Missed notifications fetched successfully.");
+    return missedNotifications.length; 
+
+        //console.log("✅ Missed notifications fetched successfully.");
     } catch (error) {
         console.error("❌ Error fetching missed notifications via D-Bus:", error);
     }
 },
 
 
-  // // Fetch missed notifications from FastAPI
-  // async fetchMissedNotifications() {
-  //   try {
-  //     const http = (cockpit as any).http({
-  //       address: "127.0.0.1",
-  //       port: 8000, // FastAPI is running on this port
-  //     });
-
-  //     // Perform GET request to FastAPI
-  //     const response = await http.get("/missed-notifications/");
-      
-  //     if (!response) {
-  //       throw new Error("No response received from FastAPI.");
-  //     }
-  //     console.log("response " ,response)
-  //     // Parse response
-  //     const missedNotifications: Notification[] = JSON.parse(response);
-
-  //     // Add notifications to store
-  //     missedNotifications.forEach((notification) => {
-  //       notificationStore.notifications.unshift(notification);
-  //     });
-  //     sideBarNotification();
-
-  //     console.log("Missed notifications fetched successfully.");
-
-  //   } catch (error) {
-  //     console.error("Error fetching missed notifications:", error);
-  //   }
-  // },
-  
-  // async markNotificationAsRead(notificationId: number) {
-  //   try {
-  //     const http = (cockpit as any).http({
-  //       address: "127.0.0.1",
-  //       port: 8000, // FastAPI is running on this port
-  //     });
-  
-  //     const response = await http.request({
-  //       method: "PUT",
-  //       path: `/markNotificationAsRead/${notificationId}`, // ✅ Correct API path
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ received: 1 }) // ✅ Mark as read
-  //     });
-  
-  
-  //     // ✅ Check if the response is valid
-  //     if (!response) {
-  //       throw new Error("❌ No response received from FastAPI.");
-  //     }
-  
-  //   } catch (error) {
-  //     console.error("❌ Error marking notification as read:", error);
-  //   }
-  // },  
   async markNotificationAsRead(notificationId: number) {
     try {
         console.log(`🔄 Marking notification ${notificationId} as read via D-Bus...`);
@@ -208,6 +153,7 @@ export const notificationStore = reactive<{
             (n) => n.id !== notificationId
         );
 
+        this.notificationsCount -= 1;
         sideBarNotification();
 
     } catch (error) {
@@ -237,29 +183,49 @@ export const notificationStore = reactive<{
     } catch (error) {
         console.error("❌ Error clearing notifications via D-Bus:", error);
     }
-}
+  },
+
+  async countMissedNotifications(){
+    const dbus = cockpit.dbus("org._45drives.Houston");
+    const result = await dbus.call(
+      "/org/_45drives/Houston",
+      "org._45drives.Houston",
+      "GetNotificationCount"
+    );
+    const count = result[0]; // ✅ Extract the count
+    this.notificationsCount = count;
+    console.log("🔢 Total missed notifications:", count);
+
+    return parseInt(result); // result is returned as a string
+  }
 
 
   
   
 });
 
-function sideBarNotification(): void {
-  const count: number = notificationStore.notifications.length;
-    // 🔹 Find the highest severity among all notifications
-    let highestSeverity: "info" | "warning" | "error" = "info";
-    notificationStore.notifications.forEach((notification) => {
-        if (notification.severity === "error") highestSeverity = "error";
-        else if (notification.severity === "warning" && highestSeverity !== "error") highestSeverity = "warning";
-    });
+async function sideBarNotification(): Promise<void> {
+  const count: number = notificationStore.notificationsCount;
+
+  const dbus = cockpit.dbus("org._45drives.Houston");
+
+  try {
+    const [highestSeverity] = await dbus.call(
+      "/org/_45drives/Houston",
+      "org._45drives.Houston",
+      "GetHighestMissedSeverity"
+    );
 
     const severityType = count > 0 ? highestSeverity : null;
-    console.log("severityType ", severityType );
-  (cockpit.transport as any).control("notify", {
-      page_status: {
-          type: severityType, // Remove notification if count is 0
-          title: cockpit.gettext(`${count} Notifications available`),
+    console.log("severityType:", severityType);
 
+    (cockpit.transport as any).control("notify", {
+      page_status: {
+        type: severityType,
+        title: cockpit.gettext(`${count} Notifications available`)
       }
-  });
+    });
+  } catch (error) {
+    console.error("❌ Failed to fetch highest severity:", error);
+  }
 }

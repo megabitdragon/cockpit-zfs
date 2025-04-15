@@ -27,6 +27,11 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/zfs/*
 # D-Bus configuration
 %config(noreplace) /etc/dbus-1/system.d/org._45drives.Houston.conf
+%config(noreplace) /etc/45drives/msmtp_oauth-email.py
+%config(noreplace) /etc/45drives/zfs-storage-check.sh
+/etc/systemd/system/houston-zfs-storage-alert.service
+/etc/systemd/system/houston-zfs-storage-alert.timer
+/opt/45drives/houston/notification_utils.py
 
 # ZED event scripts (set executable permissions)
 %attr(0755, root, root) /etc/zfs/zed.d/*
@@ -40,26 +45,50 @@ make DESTDIR=%{buildroot} install
 %attr(0755, root, root) /opt/45drives/houston/dbus_server.py
 %attr(0755, root, root) /opt/45drives/houston/houston-notify
 %attr(0755, root, root) /opt/45drives/houston/setup_notification_db.py
+%attr(0755,root,root) /etc/45drives/zfs-storage-check.sh
+%attr(0755,root,root) /opt/45drives/houston/notification_utils.py
 
 %post
 pip3 install --upgrade pip
+pip3 install --upgrade google-auth google-auth-oauthlib
 
-# ✅ Ensure SQLite is installed
+# ✅ Ensure SQLite jq msmtp are  installed
 dnf install -y sqlite || true  
 dnf install -y jq || true  
+dnf install -y msmtp || true  
+
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
 systemctl enable houston-dbus.service
+sudo systemctl enable --now houston-zfs-storage-alert.timer
+systemctl enable houston-zfs-storage-alert.service
+
+
 
 # Start services only after setting up the database
 systemctl start houston-dbus.service || true
 systemctl restart zed
+systemctl daemon-reload
+systemctl restart houston-dbus.service || true
+
 
 %changelog
 * Thu Apr 10 2025 Jordan Keough <jkeough@45drives.com> 1.2.3-2
 - Fixes replacing disk issue where pools/disks were failing to show in UI during
   replacement
+* Tue Apr 08 2025 Rachit Hans <rhans@45drives.com> 1.2.2-6
+- build packag + fix UI and email issues
+* Tue Apr 08 2025 Rachit Hans <rhans@45drives.com> 1.2.2-5
+- fixing ubuntu posinst script
+* Tue Apr 08 2025 Rachit Hans <rhans@45drives.com> 1.2.2-4
+- fixing ubuntu posinst script
+* Mon Apr 07 2025 Rachit Hans <rhans@45drives.com> 1.2.2-3
+- build package to install msmtp
+* Mon Apr 07 2025 Rachit Hans <rhans@45drives.com> 1.2.2-2
+- build package to checkup if new builds will have new method of installing msmtp
+* Fri Apr 04 2025 Rachit Hans <rhans@45drives.com> 1.2.2-1
+- building package + added email functionality in zfs notifications
 * Tue Apr 01 2025 Rachit Hans <rhans@45drives.com> 1.2.1-1
 - Added zfs alerts bell
 * Fri Mar 28 2025 Jordan Keough <jkeough@45drives.com> 1.1.18-5

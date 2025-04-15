@@ -19,10 +19,14 @@ MESSAGE=$(jq -n \
   --arg state "$EVENT_STATE" \
   --arg pool_guid "$EVENT_POOL_GUID" \
   --argjson errors "$EVENT_ERRORS" \
+  --arg subject "$EMAIL_SUBJECT" \
+  --arg email_message "$EMAIL_MESSAGE" \
   '{timestamp: $timestamp, event: $event, pool: $pool, state: $state, pool_guid: $pool_guid, errors: $errors}')
 
 # Print for debugging (Optional, remove in production)
 echo "Sending JSON: $MESSAGE"
 
 # Send the message to Houston D-Bus service
-python3 "$DBUS_CLIENT" "$MESSAGE"
+python3 "$DBUS_CLIENT" forward "$FORWARD_MESSAGE"
+
+python3 "$DBUS_CLIENT" email "$EMAIL_SUBJECT" "$EMAIL_MESSAGE"

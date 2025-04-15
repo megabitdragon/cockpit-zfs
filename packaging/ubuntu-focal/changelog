@@ -5,6 +5,42 @@ cockpit-zfs (1.2.3-2focal) focal; urgency=medium
 
  -- Jordan Keough <jkeough@45drives.com>  Thu, 10 Apr 2025 08:23:24 -0300
 
+cockpit-zfs (1.2.2-6focal) focal; urgency=medium
+
+  * build packag + fix UI and email issues
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 08 Apr 2025 09:08:23 -0300
+
+cockpit-zfs (1.2.2-5focal) focal; urgency=medium
+
+  * fixing ubuntu posinst script
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 08 Apr 2025 08:04:21 -0300
+
+cockpit-zfs (1.2.2-4focal) focal; urgency=medium
+
+  * fixing ubuntu posinst script
+
+ -- Rachit Hans <rhans@45drives.com>  Tue, 08 Apr 2025 07:42:44 -0300
+
+cockpit-zfs (1.2.2-3focal) focal; urgency=medium
+
+  * build package to install msmtp
+
+ -- Rachit Hans <rhans@45drives.com>  Mon, 07 Apr 2025 14:07:36 -0300
+
+cockpit-zfs (1.2.2-2focal) focal; urgency=medium
+
+  * build package to checkup if new builds will have new method of installing msmtp
+
+ -- Rachit Hans <rhans@45drives.com>  Mon, 07 Apr 2025 12:51:54 -0300
+
+cockpit-zfs (1.2.2-1focal) focal; urgency=medium
+
+  * building package + added email functionality in zfs notifications
+
+ -- Rachit Hans <rhans@45drives.com>  Fri, 04 Apr 2025 09:52:56 -0300
+
 cockpit-zfs (1.2.1-1focal) focal; urgency=medium
 
   * Updates Build Number + Added zfs alerts bell

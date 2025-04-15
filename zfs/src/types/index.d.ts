@@ -210,4 +210,59 @@ interface StepsNavigationItem {
 	show: boolean;
 }
 
+//object for warning levels
+interface WarningConfig {
+	scrubFinish: string;
+	// vdevCleared: string;
+	// resilverFinish: string;
+	clearPoolErrors: string;
+	snapshotCreation: string;
+	stateChange: string; // even though not user-editable, can still be tracked
+	poolImport: string;
+	storageThreshold: string;
+	replicationTaskSuccess: string,
+	replicationTaskFailure: string,
+	snapshotFailure: string;
+
+  }
 type StepNavigationCallback = (item: StepsNavigationItem) => void;
+
+interface Notification {
+	id: number;
+	timestamp: string;
+	event: string;
+	pool?: string;
+	text: string;
+	state?: string;
+	vdev?: string;
+	error?: string;
+	description?: string;
+	guid?: string;
+	health?: string;
+	errors?: string;
+	severity?: string;
+	fileSystem?: string;
+	snapShot?: string;
+	replicationDestination?: string
+  }
+  interface AuthEmailConfig {
+	email: string;
+	recieversEmail: string[];
+	authMethod: string;
+	oauthAccessToken: string;
+	tokenExpiry: string;
+	oauthRefreshToken: string;
+  }
+
+  interface SmtpEmailConfig {
+	email: string;
+	smtpServer: string;
+	smtpPort: number;
+	username: string;
+	password: string;
+	recieversEmail: string[];
+	tls: boolean;
+	authMethod: string;
+	oauthAccessToken: string;
+	tokenExpiry: string;
+  }
