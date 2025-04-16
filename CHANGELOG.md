@@ -1,3 +1,3 @@
-## zfs module 1.2.4-6
+## zfs module 1.2.4-7
 
-* build package and dependencies install from manifest
+* build package and fixing email validation 

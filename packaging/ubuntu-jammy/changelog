@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.4-7jammy) jammy; urgency=medium
+
+  * build package and fixing email validation 
+
+ -- Rachit Hans <rhans@45drives.com>  Wed, 16 Apr 2025 10:31:07 -0300
+
 cockpit-zfs (1.2.4-6jammy) jammy; urgency=medium
 
   * build package and dependencies install from manifest
