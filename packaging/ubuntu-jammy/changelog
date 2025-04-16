@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.4-10jammy) jammy; urgency=medium
+
+  * build pakcage and changed heading of modal
+
+ -- Rachit Hans <rhans@45drives.com>  Wed, 16 Apr 2025 13:28:13 -0300
+
 cockpit-zfs (1.2.4-9jammy) jammy; urgency=medium
 
   * fixed duplication notification and build package

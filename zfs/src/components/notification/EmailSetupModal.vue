@@ -18,7 +18,7 @@
                         @click="activeTab = 'warning-levels'"
                         :class="['px-4 py-2', activeTab === 'warning-levels' ? 'border-b-2 text-default font-semibold' : 'text-gray-500 hover:text-default']"
                     >
-                        Warning Levels
+                        Alert Levels
                     </button>
                     </div>
                  <!-- UI for setting up warning levels -->

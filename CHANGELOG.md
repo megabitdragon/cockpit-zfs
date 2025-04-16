@@ -1,4 +1,3 @@
-## zfs module 1.2.4-8
+## zfs module 1.2.4-10
 
-* build package for rocky linux 
-* build package for rocky and ubuntu  linux 
+* build pakcage and changed heading of modal
