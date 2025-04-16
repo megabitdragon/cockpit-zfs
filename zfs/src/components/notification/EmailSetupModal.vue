@@ -375,20 +375,19 @@ const smtpEmailConfig = ref<SmtpEmailConfig>({
 
 const isEmailValid = computed(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //console.log("smtpMethod.value: ", smtpMethod.value)
 
     if (smtpMethod.value === "smtp") {
+
         return (
             emailRegex.test(smtpEmailConfig.value.email) &&
-            Array.isArray(smtpEmailConfig.value.recieversEmail) &&      
-                smtpEmailConfig.value.recieversEmail.length > 0 &&
-                smtpEmailConfig.value.recieversEmail.every(email => emailRegex.test(email)) 
-        );
+            emailChips.value.length > 0 && emailChips.value.every(email => emailRegex.test(email))
+            );
     } else {
         return (
             emailRegex.test(authEmailConfig.value.email) &&
-            Array.isArray(authEmailConfig.value.recieversEmail) &&
-                authEmailConfig.value.recieversEmail.length > 0 &&
-                authEmailConfig.value.recieversEmail.every(email => emailRegex.test(email))        );
+            emailChips.value.length > 0 && emailChips.value.every(email => emailRegex.test(email))
+       );
     }
 });
 
@@ -399,32 +398,33 @@ const termsOfServiceUrl = ref('https://email-auth.45d.io/tos');
 const formValidationAttempted = ref(false); // Tracks if validation has been triggered
 
 const isFormValid = () => {
-    formValidationAttempted.value = true; // Mark validation as triggered
-    if (smtpMethod.value=="smtp"){
-        return (
-        smtpEmailConfig.value.email.trim() !== "" &&
-        smtpEmailConfig.value.recieversEmail.every(email => email.trim() !== "") &&
-        smtpEmailConfig.value.smtpServer.trim() !== "" &&
-        smtpEmailConfig.value.smtpPort > 0 &&
-        smtpEmailConfig.value.username.trim() !== "" &&
-        smtpEmailConfig.value.password.trim() !== ""
-        );
-    }else{
-        authEmailConfig.value.recieversEmail = (
-        Array.isArray(authEmailConfig.value.recieversEmail)
-            ? authEmailConfig.value.recieversEmail
-            : (authEmailConfig.value.recieversEmail || "").split(",")
-        )
-        .map(email => email.trim())
-        .filter(email => email.length > 0);
-        return (
-        authEmailConfig.value.email.trim() !== "" &&
-        authEmailConfig.value.recieversEmail.length > 0
-        );
+  formValidationAttempted.value = true;
 
-    }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+  // 📨 Check for valid email recipients
+  const receiversValid = emailChips.value.length > 0 &&
+    emailChips.value.every(email => emailRegex.test(email));
+
+  if (smtpMethod.value === "smtp") {
+    return (
+      smtpEmailConfig.value.email.trim() !== "" &&
+      emailRegex.test(smtpEmailConfig.value.email) &&
+      receiversValid &&
+      smtpEmailConfig.value.smtpServer.trim() !== "" &&
+      smtpEmailConfig.value.smtpPort > 0 &&
+      smtpEmailConfig.value.username.trim() !== "" &&
+      smtpEmailConfig.value.password.trim() !== ""
+    );
+  } else {
+    return (
+      authEmailConfig.value.email.trim() !== "" &&
+      emailRegex.test(authEmailConfig.value.email) &&
+      receiversValid
+    );
+  }
 };
+
 
 async function saveWarningConfig() {
     savingWarningLevels.value = true
@@ -506,8 +506,7 @@ const fetchMsmtpDetails = async () => {
             smtpMethod.value = "oauth2"
 
             authEmailConfig.value.email = smtpData.email;
-            authEmailConfig.value.authMethod = smtpData.auth
-            authEmailConfig.value.authMethod = "oauth2"
+            authEmailConfig.value.authMethod = smtpData.auth || "oauth2";
             authDetailsExist.value = true;
             authEmailConfig.value.oauthRefreshToken = smtpData.oauthRefreshToken
            console.log("smtpData Recived" , smtpData)
@@ -687,9 +686,7 @@ const testEmail = async () => {
                 username: smtpEmailConfig.value.username,
                 password: smtpEmailConfig.value.password,
                 tls: smtpEmailConfig.value.tls,
-                recieversEmail: Array.isArray(smtpEmailConfig.value.recieversEmail)
-                    ? smtpEmailConfig.value.recieversEmail.join(",")
-                    : smtpEmailConfig.value.recieversEmail,
+                recieversEmail: emailChips.value.join(","),
                 authMethod: "plain"
             };
         } else {
@@ -699,9 +696,7 @@ const testEmail = async () => {
                 tokenExpiry: tokenExpiry.value || authEmailConfig.value.tokenExpiry,
                 oauthRefreshToken: authEmailConfig.value.oauthAccessToken,
                 authMethod: "oauth2",
-                recieversEmail: Array.isArray(authEmailConfig.value.recieversEmail)
-                    ? authEmailConfig.value.recieversEmail.join(",")
-                    : authEmailConfig.value.recieversEmail
+                recieversEmail: emailChips.value.join(","),
             };
         }
 
