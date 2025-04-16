@@ -118,8 +118,15 @@ export const notificationStore = reactive<{
 
         // ✅ Add notifications to store
         missedNotifications.forEach((notification) => {
-          notificationStore.notifications.push(notification)
+          const exists = notificationStore.notifications.some(
+            (n) => n.id === notification.id
+          );
+        
+          if (!exists) {
+            notificationStore.notifications.push(notification);
+          }
         });
+        
 
         // ✅ Update UI with new notifications
         sideBarNotification();
