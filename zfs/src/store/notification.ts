@@ -65,6 +65,7 @@ export const notificationStore = reactive<{
           snapShot: parsedMessage.snapShot,
           replicationDestination: parsedMessage.replicationDestination
         });
+        this.notificationsCount +=1
   
         console.log(`✅ Added new notification severity ${parsedMessage.severity}`);
       }
