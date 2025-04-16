@@ -76,9 +76,12 @@
     "changelog": {
         "urgency": "medium",
         "version": "1.2.4",
-        "build_number": "7",
-        "date": null,
-        "packager": "Jordan Keough <jkeough@45drives.com>",
-        "changes": []
+        "build_number": "8",
+        "date": "2025-04-16T13:57:08.325303",
+        "packager": "Rachit Hans <rhans@45drives.com>",
+        "changes": [
+            "build package for rocky linux ",
+            "build package for rocky and ubuntu  linux "
+        ]
     }
 }

@@ -59,18 +59,31 @@ make DESTDIR=%{buildroot} install
 
 
 # Ensure systemd reloads and starts the service after installation
+# Reload systemd to ensure unit files are recognized
+systemctl daemon-reexec
 systemctl daemon-reload
-systemctl enable houston-dbus.service
-sudo systemctl enable --now houston-zfs-storage-alert.timer
-systemctl enable houston-zfs-storage-alert.service
 
+# Enable and start houston-dbus.service if it exists
+if systemctl cat houston-dbus.service &>/dev/null; then
+    systemctl enable --now houston-dbus.service || true
+        systemctl restart --now houston-dbus.service || true
 
+fi
 
-# Start services only after setting up the database
-systemctl start houston-dbus.service || true
-systemctl restart zed
-systemctl daemon-reload
-systemctl restart houston-dbus.service || true
+# Start the storage alert timer if it exists
+if systemctl cat houston-zfs-storage-alert.timer &>/dev/null; then
+    systemctl start houston-zfs-storage-alert.timer || true
+fi
+
+# Start the alert service if it exists
+if systemctl cat houston-zfs-storage-alert.service &>/dev/null; then
+    systemctl start houston-zfs-storage-alert.service || true
+fi
+
+# Optional: Restart zed if present (ZFS Event Daemon)
+if systemctl cat zed.service &>/dev/null; then
+    systemctl restart zed || true
+fi
 
 
 %changelog
