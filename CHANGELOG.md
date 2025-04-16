@@ -1,3 +1,3 @@
-## zfs module 1.2.4-4
+## zfs module 1.2.4-6
 
-* added zfs-storage-check bash file
+* build package and dependencies install from manifest

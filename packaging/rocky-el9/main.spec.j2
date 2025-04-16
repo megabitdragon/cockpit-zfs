@@ -48,14 +48,15 @@ make DESTDIR=%{buildroot} install
 %attr(0755,root,root) /etc/45drives/zfs-storage-check.sh
 %attr(0755,root,root) /opt/45drives/houston/notification_utils.py
 
-%post
-pip3 install --upgrade pip
-pip3 install --upgrade google-auth google-auth-oauthlib
+#%post
+#pip3 install --upgrade pip
+#pip3 install --upgrade google-auth google-auth-oauthlib
 
 # ✅ Ensure SQLite jq msmtp are  installed
-dnf install -y sqlite || true  
-dnf install -y jq || true  
-dnf install -y msmtp || true  
+#dnf install -y sqlite || true  
+#dnf install -y jq || true  
+#dnf install -y msmtp || true  
+
 
 # Ensure systemd reloads and starts the service after installation
 systemctl daemon-reload
@@ -72,6 +73,8 @@ systemctl restart houston-dbus.service || true
 
 
 %changelog
+* Wed Apr 16 2025 Rachit Hans <rhans@45drives.com> 1.2.4-6
+- build package and dependencies install from manifest
 * Wed Apr 16 2025 Rachit Hans <rhans@45drives.com> 1.2.4-4
 - added zfs-storage-check bash file
 * Tue Apr 15 2025 Rachit Hans <rhans@45drives.com> 1.2.4-1.2.3

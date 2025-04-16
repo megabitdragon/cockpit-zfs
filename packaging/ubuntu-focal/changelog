@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.4-6focal) focal; urgency=medium
+
+  * build package and dependencies install from manifest
+
+ -- Rachit Hans <rhans@45drives.com>  Wed, 16 Apr 2025 08:42:20 -0300
+
 cockpit-zfs (1.2.4-4focal) focal; urgency=medium
 
   * added zfs-storage-check bash file
