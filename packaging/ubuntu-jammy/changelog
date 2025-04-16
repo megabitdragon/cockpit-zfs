@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.4-4jammy) jammy; urgency=medium
+
+  * added zfs-storage-check bash file
+
+ -- Rachit Hans <rhans@45drives.com>  Wed, 16 Apr 2025 07:49:46 -0300
+
 cockpit-zfs (1.2.4-1.2.3jammy) jammy; urgency=medium
 
   * updated notification dropdown and postinst files for email
