@@ -1,5 +1,5 @@
-## zfs module 1.2.4-11
+## zfs module 1.2.4-12
 
 * manup
-* fixing ubuntu postinst to install googleauth package
+* fixing smtp bug not allowing to send email through different port + fix error message + building package
 * manup

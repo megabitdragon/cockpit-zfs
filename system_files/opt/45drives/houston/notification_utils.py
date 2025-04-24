@@ -212,7 +212,7 @@ def sendTestEmailViaSMTP(config):
         username = config.get("username")
         password = config.get("password")
         server = config.get("smtpServer")
-        port = config.get("smtpPort")
+        port = int(config.get("smtpPort", 587))
         tls = config.get("tls", True)
         recipients = config.get("recieversEmail", [])
 
@@ -223,6 +223,9 @@ def sendTestEmailViaSMTP(config):
                 "success": False,
                 "message": "❌ No valid recipients provided."
             }
+
+        # Determine TLS type
+        implicit_tls = (port == 465)
 
         # Create a secure temporary file for msmtp config
         with tempfile.NamedTemporaryFile("w", delete=False) as tmp:
@@ -235,17 +238,17 @@ user {username}
 password {password}
 from {email}
 tls {"on" if tls else "off"}
-tls_starttls on
+tls_starttls {"off" if implicit_tls else "on"}
 """)
-        
+
         os.chmod(config_path, 0o600)
 
-        # Compose test message
+        # Compose test message (including To: header)
         test_subject = "SMTP Test Email from 45Drives"
         test_body = "This is a test email to verify your SMTP settings are working properly."
-        email_msg = f"Subject: {test_subject}\n\n{test_body}"
+        email_msg = f"To: {', '.join(recipients)}\nSubject: {test_subject}\n\n{test_body}"
 
-        # Run msmtp with temporary config
+        # Run msmtp with the temporary config
         proc = subprocess.run(
             ["msmtp", "-C", config_path] + recipients,
             input=email_msg,
@@ -254,7 +257,7 @@ tls_starttls on
             stderr=subprocess.PIPE,
         )
 
-        os.remove(config_path)  # Clean up after use
+        os.remove(config_path)  # Clean up temp config
 
         if proc.returncode == 0:
             return {
@@ -264,7 +267,7 @@ tls_starttls on
         else:
             return {
                 "success": False,
-                "message": f"Failed to send test email: {proc.stderr.strip()}"
+                "message": f"❌ Failed to send test email:\n{proc.stderr.strip()}"
             }
 
     except Exception as e:
@@ -590,7 +593,7 @@ def updateSMTPConfig(config_json):
 
         # Store recipient email for both cases
         with open(MSMTP_RECIPIENT_PATH, "w") as f:
-              f.write(", ".join(valid_recipients))
+            f.write(", ".join(valid_recipients))
         os.chmod(MSMTP_RECIPIENT_PATH, 0o600)
 
         if auth_method == "oauth2":
@@ -613,7 +616,7 @@ def updateSMTPConfig(config_json):
 
             # Empty out msmtp config
             with open(MSMTP_CONFIG_PATH, "w") as f:
-                f.write("")  # clear the file
+                f.write("")
             os.chmod(MSMTP_CONFIG_PATH, 0o600)
 
             print("✅ Gmail API config (OAuth2) saved and msmtp config cleared.")
@@ -621,18 +624,21 @@ def updateSMTPConfig(config_json):
         else:
             # Traditional SMTP config (msmtp)
             smtp_server = config.get("smtpServer", "smtp.gmail.com")
-            smtp_port = config.get("smtpPort", 587)
+            smtp_port = int(config.get("smtpPort", 587))
             username = config.get("username", "")
             password = config.get("password", "")
-            
+
             with open(MSMTP_OAUTH_JSON_PATH, "w") as f:
-                f.write("")  # clear the file
-                os.chmod(MSMTP_OAUTH_JSON_PATH, 0o600)
+                f.write("")
+            os.chmod(MSMTP_OAUTH_JSON_PATH, 0o600)
 
             # Save password securely
             with open(MSMTP_PASSWORD_PATH, "w") as f:
                 f.write(password)
             os.chmod(MSMTP_PASSWORD_PATH, 0o600)
+
+            # Decide whether to use STARTTLS
+            use_starttls = "off" if smtp_port == 465 else "on"
 
             config_content = f"""account default
 host {smtp_server}
@@ -642,7 +648,7 @@ user {username}
 passwordeval cat {MSMTP_PASSWORD_PATH}
 from {email}
 tls {tls}
-tls_starttls on
+tls_starttls {use_starttls}
 """
 
             with open(MSMTP_CONFIG_PATH, "w") as f:
@@ -747,7 +753,8 @@ def sendEmailNotification(subject, message, severity):
 
         else:
             # Use msmtp
-            email_content = f"""Subject: {subject}\n\n{message}"""
+            email_content = f"""To: {', '.join(recipients)}\nSubject: {subject}\n\n{message}"""
+
 
             logging.info(f"📤 Sending email to: {', '.join(recipients)} using msmtp...")
             process = subprocess.run(

@@ -38,7 +38,6 @@ Scrub Details
 ----------------------------------------------------
 - Pool Name: $EVENT_POOL
 - Pool GUID: $EVENT_POOL_GUID
-- Pool State: $EVENT_STATE
 - Errors Found: $EVENT_ERRORS
 - Errors Repaired: $EVENT_REPAIRED
 - Timestamp: $EVENT_TIMESTAMP

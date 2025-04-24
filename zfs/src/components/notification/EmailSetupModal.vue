@@ -390,6 +390,29 @@ const isEmailValid = computed(() => {
        );
     }
 });
+const emailValidationError = computed(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const senderEmail = smtpMethod.value === "smtp"
+    ? smtpEmailConfig.value.email
+    : authEmailConfig.value.email;
+
+  if (!emailRegex.test(senderEmail)) {
+    return "⚠️ Please enter a valid sender email.";
+  }
+
+  if (emailChips.value.length === 0) {
+    return "⚠️ Please enter at least one recipient email address.";
+  }
+
+  const invalidRecipients = emailChips.value.filter(email => !emailRegex.test(email));
+  if (invalidRecipients.length > 0) {
+    return `⚠️ Invalid recipient email(s): ${invalidRecipients.join(", ")}`;
+  }
+
+  return "";
+});
+
 
 
 const privacyPolicyUrl = ref('https://email-auth.45d.io/privacy');
@@ -590,7 +613,8 @@ const fetchWarningLevels = async () => {
 const updateSMTPConfig = async () => {
   if (!isFormValid() || !isEmailValid.value) {
     if (!isEmailValid.value) {
-      alert("⚠️ Please fill valid email address before sending a test email.");
+        alert(emailValidationError.value || "⚠️ Email validation failed.");
+        return;
     } else {
       alert("⚠️ Please fill in all fields before sending a test email.");
     }
@@ -658,17 +682,20 @@ const updateSMTPConfig = async () => {
 
 
 const testEmail = async () => {
-    if (!isFormValid() || !isEmailValid.value) {
-        if (!isEmailValid.value) {
-            alert("⚠️ Please enter a valid email address before sending a test email.");
-        } 
-        if (smtpMethod.value === "smtp") {
-            alert("⚠️ Please fill in all fields before sending a test email.");
-        } else {
-          //  console.log("isEmailValid:", isEmailValid.value, "isFormValid:", isFormValid());
-            alert("⚠️ Please sign in with Gmail.");
-        }
+    const method = smtpMethod.value;
+
+    if (!isEmailValid.value) {
+        alert(emailValidationError.value || "⚠️ Email validation failed.");
         return;
+    }
+
+    if (!isFormValid()) {
+    if (method === "smtp") {
+        alert("⚠️ Please fill in all required SMTP fields before sending a test email.");
+    } else {
+        alert("⚠️ Please sign in with your Gmail account before sending a test email.");
+    }
+    return;
     }
     sendingTestEmail.value = true
 
@@ -834,8 +861,8 @@ const resetMsmtpData = async () => {
             emailChips.value = []
         }
         //console.log(`✅ D-Bus Response: ${response}`);
-        alert(response.includes("✅") ? response : `✅ Test email sent: ${response}`);
-};
+        alert(response.includes("✅") ? "✅ Email configuration was reset successfully!" : `⚠️ Something went wrong: ${response}`);
+    };
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const addEmail = () => {
