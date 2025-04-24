@@ -1,3 +1,5 @@
-## zfs module 1.2.4-10
+## zfs module 1.2.4-11
 
-* build pakcage and changed heading of modal
+* manup
+* fixing ubuntu postinst to install googleauth package
+* manup
