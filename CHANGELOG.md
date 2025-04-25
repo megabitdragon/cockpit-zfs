@@ -1,5 +1,6 @@
-## zfs module 1.2.4-12
+## zfs module 1.2.4-13
 
 * manup
-* fixing smtp bug not allowing to send email through different port + fix error message + building package
+* fix email notification modal not showing connected as button
+* manup
 * manup

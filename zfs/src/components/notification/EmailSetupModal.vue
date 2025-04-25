@@ -799,7 +799,7 @@ async function oAuthBtn() {
                     authEmailConfig.value.authMethod = "oauth2";
                     authEmailConfig.value.oauthAccessToken = tokenValue;
                     authEmailConfig.value.tokenExpiry = expiry;
-                    
+                    authDetailsExist.value = true;
                     pushNotification(new Notification('Gmail Authentication Successful', `Tokens updated for ${emailFromOAuth}`, 'success', 8000));
                     const cockpit = (window as any).cockpit;
                     const dbus = cockpit.dbus("org._45drives.Houston");
