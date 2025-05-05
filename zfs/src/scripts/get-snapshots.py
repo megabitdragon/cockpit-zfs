@@ -45,53 +45,6 @@ def get_snapshots_by_dataset(dataset_name):
 
     return json.dumps(z_datasets, indent=4)  # Return the JSON string
 
-import libzfs
-import json
-import sys
-
-def basic_typed_children(children):
-    for i in range(len(children)):
-        children[i]['properties']['creation']['parsed'] = str(children[i]['properties']['creation']['parsed'])
-        
-        if len(children[i]['children']) >= 1:
-            children[i]['children'] = basic_typed_children(children[i]['children'])
-
-    return children
-
-def get_all_snapshots():
-    with libzfs.ZFS() as zfs:
-        z_datasets = {}
-
-        for d in zfs.datasets:
-            snaps = []
-
-            for snap in d.snapshots:
-                z_snap = snap.asdict()
-                z_snap['properties']['creation']['parsed'] = str(z_snap['properties']['creation']['parsed'])
-                snaps.append(z_snap)
-
-            z_datasets[d.name] = snaps
-
-    return json.dumps(z_datasets, indent=4)  # Return the JSON string
-
-def get_snapshots_by_dataset(dataset_name):
-    with libzfs.ZFS() as zfs:
-        z_datasets = {}
-
-        for d in zfs.datasets:
-            if d.name == dataset_name:  # Use 'd.name' for checking the dataset name
-                snaps = []
-
-                for snap in d.snapshots:
-                    z_snap = snap.asdict()
-                    z_snap['properties']['creation']['parsed'] = str(z_snap['properties']['creation']['parsed'])
-                    snaps.append(z_snap)
-
-                z_datasets[d.name] = snaps
-                break  # Stop after finding the desired dataset
-
-    return json.dumps(z_datasets, indent=4)  # Return the JSON string
-
 # Placeholder for the function to get snapshots by pool (implement as needed)
 def get_snapshots_by_pool(pool_name):
     with libzfs.ZFS() as zfs:
