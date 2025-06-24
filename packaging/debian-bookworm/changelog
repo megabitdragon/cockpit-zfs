@@ -1,3 +1,9 @@
+cockpit-zfs (1.2.5-1bookworm) bookworm; urgency=medium
+
+  * Updated debian dependency for proper sqlite package name
+
+ -- Jordan Keough <jkeough@45drives.com>  Tue, 24 Jun 2025 05:25:42 -0300
+
 cockpit-zfs (1.2.4-13bookworm) bookworm; urgency=medium
 
   * manup

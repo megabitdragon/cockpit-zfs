@@ -1,6 +1,3 @@
-## zfs module 1.2.4-13
+## zfs module 1.2.5-1
 
-* manup
-* fix email notification modal not showing connected as button
-* manup
-* manup
+* Updated debian dependency for proper sqlite package name
