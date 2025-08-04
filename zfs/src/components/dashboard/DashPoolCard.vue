@@ -493,17 +493,39 @@ watch(confirmDelete, async (newValue, oldValue) => {
             const output: any = await destroyPool(selectedPool.value!, firstOptionToggle.value);
             console.log("Destroy Pool Output:", output);
 
-            if (output == null || output.error) {
-                const errorMessage = output?.error || 'Unknown error';
-                operationRunning.value = false;
-                confirmDelete.value = false;
+            // if (output == null || output.error) {
+            //     const errorMessage = output?.error || 'Unknown error';
+            //     operationRunning.value = false;
+            //     confirmDelete.value = false;
 
-                if (errorMessage.includes("is busy")) {
-                    pushNotification(new Notification('Destroy Pool Failed', `Pool ${poolName} is busy. Close any active processes using it and try again.`, 'warning', 5000));
-                } else {
-                    pushNotification(new Notification('Destroy Pool Failed', `${poolName} was not destroyed: ${errorMessage}`, 'error', 5000));
-                }
-            } else {
+            //     if (errorMessage.includes("is busy")) {
+            //         pushNotification(new Notification('Destroy Pool Failed', `Pool ${poolName} is busy. Close any active processes using it and try again.`, 'warning', 5000));
+            //     } else {
+            //         pushNotification(new Notification('Destroy Pool Failed', `${poolName} was not destroyed: ${errorMessage}`, 'error', 5000));
+            //     }
+            // } 
+			if (output == null || output.error) {
+				await refreshAllData();
+				const stillExists = poolData.value.find(p => p.name === poolName);
+
+				if (stillExists) {
+					const errorMessage = output?.error || 'Unknown error';
+					operationRunning.value = false;
+					confirmDelete.value = false;
+
+					if (errorMessage.includes("is busy")) {
+						pushNotification(new Notification('Destroy Pool Failed', `Pool ${poolName} is busy. Close any active processes using it and try again.`, 'warning', 5000));
+					} else {
+						pushNotification(new Notification('Destroy Pool Failed', `${poolName} was not destroyed: ${errorMessage}`, 'error', 5000));
+					}
+				} else {
+					// Treat as success
+					confirmDelete.value = false;
+					operationRunning.value = false;
+					pushNotification(new Notification('Pool Destroyed', `${poolName} destroyed.`, 'success', 5000));
+					showDeletePoolConfirm.value = false;
+				}
+			} else {
                 if (secondOptionToggle.value == true) {
                     selectedPool.value!.vdevs.forEach(vDev => {
                         vDev.disks.forEach(async disk => {

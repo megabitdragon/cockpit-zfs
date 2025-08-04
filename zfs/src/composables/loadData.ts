@@ -47,27 +47,6 @@ export async function loadDisksThenPools(disks, pools) {
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
-			// const disk = {
-			// 	name: parsedJSON[i].name,
-			// 	capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
-			// 	model: parsedJSON[i].model,
-			// 	type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
-			// 	phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
-			// 	sd_path: parsedJSON[i].sd_path || 'N/A',
-			// 	vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
-			// 	serial: parsedJSON[i].serial || 'N/A',
-			// 	usable: parsedJSON[i].usable || false,
-			// 	path: '',
-			// 	guid: '',
-			// 	status: parsedJSON[i].health || 'Unknown',
-			// 	powerOnHours: parsedJSON[i].power_on_time || 0,
-			// 	powerOnCount: parsedJSON[i].power_on_count || 0,
-			// 	temp: parsedJSON[i].temp || 'N/A',
-			// 	rotationRate: parsedJSON[i].rotation_rate || 0,
-			// 	stats: {},
-			// 	errors: errors,
-			// 	hasPartitions: parsedJSON[i].has_partitions || false,
-			// };
 			const disk = {
 				name: parsedJSON[i].name,
 				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
@@ -355,27 +334,6 @@ export async function loadDisks(disks) {
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
 		for (let i = 0; i < parsedJSON.length; i++) {
-			// const disk = {
-			// 	name: parsedJSON[i].name,
-			// 	capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
-			// 	model: parsedJSON[i].model,
-			// 	type: parsedJSON[i].type === 'Disk' ? 'Disk' : parsedJSON[i].type,
-			// 	phy_path: parsedJSON[i].phy_path || 'N/A', // Default value for missing paths
-			// 	sd_path: parsedJSON[i].sd_path || 'N/A',
-			// 	vdev_path: parsedJSON[i].type === 'Disk' ? 'N/A' : parsedJSON[i].vdev_path,
-			// 	serial: parsedJSON[i].serial || 'N/A',
-			// 	usable: parsedJSON[i].usable || false,
-			// 	path: '',
-			// 	guid: '',
-			// 	status: parsedJSON[i].health || 'Unknown',
-			// 	powerOnHours: parsedJSON[i].power_on_time || 0,
-			// 	powerOnCount: parsedJSON[i].power_on_count || 0,
-			// 	temp: parsedJSON[i].temp || 'N/A',
-			// 	rotationRate: parsedJSON[i].rotation_rate || 0,
-			// 	stats: {},
-			// 	errors: errors,
-			// 	hasPartitions: parsedJSON[i].has_partitions || false,
-			// }
 			const disk = {
 				name: parsedJSON[i].name,
 				capacity: isCapacityPatternInvalid(parsedJSON[i].capacity) ? formatCapacityString(parsedJSON[i].capacity) : parsedJSON[i].capacity,
@@ -410,48 +368,6 @@ export async function loadDisks(disks) {
 }
 
 // Helper function to clean disk paths by removing partition numbers but leaving the rest intact
-// function cleanDiskPath(path) {
-// 	// Only strip suffixes for paths that are known to contain partitions (e.g., /dev/sdX, /dev/nvmeXnY)
-// 	if (/\/dev\/sd[a-z][0-9]*$/.test(path) || /\/dev\/nvme\d+n\d+p[0-9]+$/.test(path) || /-part\d+$/.test(path)) {
-// 		return path.replace(/[-p]?\d+$/, ''); // Removes -partN or pN at the end
-// 	}
-// 	// If path doesn't match those patterns, return as is
-// 	return path;
-// }
-
-/* function cleanDiskPath(path) {
-	if (!path) return ''; // Handle null/undefined paths gracefully
-
-	// Handle known patterns for paths with partitions
-	if (/\/dev\/sd[a-z][0-9]*$/.test(path)) {
-		return path.replace(/\d+$/, ''); // Remove numeric suffix (e.g., /dev/sda1 → /dev/sda)
-	}
-	if (/\/dev\/nvme\d+n\d+p[0-9]+$/.test(path)) {
-		return path.replace(/p\d+$/, ''); // Remove 'pN' suffix (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
-	}
-	if (/-part\d+$/.test(path)) {
-		return path.replace(/-part\d+$/, ''); // Remove '-partN' suffix (e.g., /dev/disk/by-vdev/1-1-part1 → /dev/disk/by-vdev/1-1)
-	}
-
-	// Return unmodified for unknown patterns
-	return path;
-} */
-
-/* function cleanDiskPath(path) {
-	if (!path) return '';
-
-	// Remove partition numbers but keep NVMe device names intact
-	if (/\/dev\/sd[a-z][0-9]+$/.test(path)) {
-		return path.replace(/[0-9]+$/, ''); // Remove numbers from end (e.g., /dev/sda1 → /dev/sda)
-	}
-	if (/\/dev\/nvme\d+n\d+p\d+$/.test(path)) {
-		return path.replace(/p\d+$/, ''); // Remove pN from NVMe paths (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
-	}
-
-	return path; // Return as is if no modifications are needed
-}
- */
-
 function cleanDiskPath(path) {
 	if (!path) return '';
 
@@ -472,26 +388,6 @@ function cleanDiskPath(path) {
 
 	return path; // Return unchanged if no modifications needed
 }
-
-
-// function cleanDiskPath(path) {
-// 	if (!path) return ''; // Handle null/undefined paths gracefully
-
-// 	// Handle known patterns for paths with partitions
-// 	if (/\/dev\/sd[a-z]\d*$/.test(path)) {
-// 		return path.replace(/\d+$/, ''); // Remove numeric suffix (e.g., /dev/sda1 → /dev/sda)
-// 	}
-// 	if (/\/dev\/nvme\d+n\d+p\d+$/.test(path)) {
-// 		return path.replace(/p\d+$/, ''); // Remove 'pN' suffix (e.g., /dev/nvme0n1p2 → /dev/nvme0n1)
-// 	}
-// 	if (/-part\d+$/.test(path)) {
-// 		return path.replace(/-part\d+$/, ''); // Remove '-partN' suffix (e.g., /dev/disk/by-vdev/1-1-part1 → /dev/disk/by-vdev/1-1)
-// 	}
-
-// 	// Return unmodified for unknown patterns
-// 	return path;
-// }
-
 
 export async function loadDisksExtraData(disks, pools) {
 	try {
@@ -759,15 +655,6 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 			child.path?.startsWith(cleanedDiskPath)
 		);
 	});
-	// // If not found, log only if there's no path match
-	// if (!fullDiskData) {
-	//  console.warn(`Disk not found for path: ${child.path}. Cleaned path: ${cleanedChildPath}`);
-	//  fullDiskData = createMissingDisk(vDevData.path, vDevData.name, vDevType, poolName);
-	//  // Ensure the missing disk is added to the VDev
-	//  if (!vDevData.disks.some(disk => disk.path === fullDiskData!.path)) {
-	//      vDevData.disks.push(fullDiskData);
-	//  }
-	// }
 	// If no matching disk was found, create a missing disk ONLY if the original disk is truly missing
 	if (!fullDiskData && (child.path === null || child.path === "")) {
 		console.warn(`Disk not found for path: ${child.path}. Creating placeholder.`);

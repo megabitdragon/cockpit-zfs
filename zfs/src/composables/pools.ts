@@ -1,4 +1,4 @@
-import { legacy, ZPool } from '@45drives/houston-common-lib';
+import { legacy, ZPool, server, Command, unwrap } from '@45drives/houston-common-lib';
 import { convertSizeToBytes } from './helpers';
 import { ref } from 'vue';
 // @ts-ignore
@@ -49,43 +49,108 @@ export async function setRefreservation(pool: ZPool, refreservationPercent: numb
 	}
 }
 
+// export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
+// 	try {
+// 		// Construct the zpool destroy command
+// 		const cmdString = ['zpool', 'destroy'];
+// 		if (forceDestroy) {
+// 			cmdString.push('-f');
+// 		}
+// 		cmdString.push(pool.name);
+
+// 		console.log('Executing command:', cmdString.join(' '));
+
+// 		const state = useSpawn(cmdString);
+// 		const output = await state.promise();
+
+// 		if (output.stderr) {
+// 			console.warn('Destroy command warnings:', output.stderr);
+// 		}
+
+// 		console.log('Destroy command output:', output.stdout);
+// 		return output.stdout;
+// 	} catch (err: any) {
+// 		console.error('Error during destroyPool:', err);
+
+// 		const errorMessage = errorString(err);
+
+// 		// Detect if the error is related to "pool is busy"
+// 		if (err.stderr && err.stderr.includes('is busy')) {
+// 			return { error: 'Pool is busy. Please ensure no active processes are using it and try again.' };
+// 		}
+
+// 		// If unmount error, try unmounting once and retry destruction
+// 		if (err.stderr && err.stderr.includes('cannot unmount')) {
+// 			console.warn(`Unmount failed for pool: ${pool.name}. Retrying forced unmount...`);
+// 			await useSpawn(['zfs', 'unmount', '-f', pool.name]);
+// 			return destroyPool(pool, true);
+// 		}
+
+// 		return { error: errorMessage };
+// 	}
+// }
+
 export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
 	try {
-		// Construct the zpool destroy command
-		const cmdString = ['zpool', 'destroy'];
-		if (forceDestroy) {
-			cmdString.push('-f');
+		// Build the destroy command
+		const cmdArgs = ['zpool', 'destroy'];
+		if (forceDestroy) cmdArgs.push('-f');
+		cmdArgs.push(pool.name);
+
+		console.log('Executing command:', cmdArgs.join(' '));
+
+		const result = await unwrap(server.execute(new Command(cmdArgs)));
+
+		if (result.stderr) {
+			console.warn('Destroy command warnings:', result.stderr);
 		}
-		cmdString.push(pool.name);
+		console.log('Destroy command output:', result.stdout);
+		return result.stdout;
 
-		console.log('Executing command:', cmdString.join(' '));
-
-		const state = useSpawn(cmdString);
-		const output = await state.promise();
-
-		if (output.stderr) {
-			console.warn('Destroy command warnings:', output.stderr);
-		}
-
-		console.log('Destroy command output:', output.stdout);
-		return output.stdout;
 	} catch (err: any) {
 		console.error('Error during destroyPool:', err);
-
+		const stderr = err.stderr || '';
 		const errorMessage = errorString(err);
 
-		// Detect if the error is related to "pool is busy"
-		if (err.stderr && err.stderr.includes('is busy')) {
+		// Treat these errors as "already gone" (soft success)
+		if (
+			stderr.includes("dataset does not exist") ||
+			stderr.includes("no such pool") ||
+			stderr.includes("cannot open")
+		) {
+			console.warn(`Pool ${pool.name} already gone. Treating as successful destroy.`);
+			return '';
+		}
+
+		// Handle busy pool
+		if (stderr.includes("is busy")) {
 			return { error: 'Pool is busy. Please ensure no active processes are using it and try again.' };
 		}
 
-		// If unmount error, try unmounting once and retry destruction
-		if (err.stderr && err.stderr.includes('cannot unmount')) {
+		// Retry on unmount error
+		if (stderr.includes("cannot unmount")) {
 			console.warn(`Unmount failed for pool: ${pool.name}. Retrying forced unmount...`);
-			await useSpawn(['zfs', 'unmount', '-f', pool.name]);
-			return destroyPool(pool, true);
+
+			try {
+				const check = await unwrap(server.execute(new Command(['zpool', 'list', '-H', pool.name])));
+				await unwrap(server.execute(new Command(['zfs', 'unmount', '-f', pool.name])));
+				return destroyPool(pool, true);
+			} catch (checkErr: any) {
+				if (
+					checkErr.stderr?.includes("no such pool") ||
+					checkErr.stderr?.includes("dataset does not exist") ||
+					checkErr.stderr?.includes("cannot open")
+				) {
+					console.warn(`Pool ${pool.name} not found after failed destroy. Skipping retry.`);
+					return '';
+				}
+
+				// Rethrow if the check/unmount failed unexpectedly
+				throw checkErr;
+			}
 		}
 
+		// All other errors
 		return { error: errorMessage };
 	}
 }
