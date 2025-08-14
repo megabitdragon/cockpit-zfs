@@ -49,47 +49,6 @@ export async function setRefreservation(pool: ZPool, refreservationPercent: numb
 	}
 }
 
-// export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
-// 	try {
-// 		// Construct the zpool destroy command
-// 		const cmdString = ['zpool', 'destroy'];
-// 		if (forceDestroy) {
-// 			cmdString.push('-f');
-// 		}
-// 		cmdString.push(pool.name);
-
-// 		console.log('Executing command:', cmdString.join(' '));
-
-// 		const state = useSpawn(cmdString);
-// 		const output = await state.promise();
-
-// 		if (output.stderr) {
-// 			console.warn('Destroy command warnings:', output.stderr);
-// 		}
-
-// 		console.log('Destroy command output:', output.stdout);
-// 		return output.stdout;
-// 	} catch (err: any) {
-// 		console.error('Error during destroyPool:', err);
-
-// 		const errorMessage = errorString(err);
-
-// 		// Detect if the error is related to "pool is busy"
-// 		if (err.stderr && err.stderr.includes('is busy')) {
-// 			return { error: 'Pool is busy. Please ensure no active processes are using it and try again.' };
-// 		}
-
-// 		// If unmount error, try unmounting once and retry destruction
-// 		if (err.stderr && err.stderr.includes('cannot unmount')) {
-// 			console.warn(`Unmount failed for pool: ${pool.name}. Retrying forced unmount...`);
-// 			await useSpawn(['zfs', 'unmount', '-f', pool.name]);
-// 			return destroyPool(pool, true);
-// 		}
-
-// 		return { error: errorMessage };
-// 	}
-// }
-
 export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
 	try {
 		// Build the destroy command

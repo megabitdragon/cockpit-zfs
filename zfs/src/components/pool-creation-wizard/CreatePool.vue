@@ -220,56 +220,103 @@ const poolDiskStats = inject<Ref<PoolDiskStats>>('pool-disk-stats')!;
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
+
+function extractProcessErr(e: any): string {
+	// Our ProcessError usually carries stderr; fall back sensibly.
+	if (e?.stderr) return String(e.stderr).trim();
+	if (e?.getStderr) try { return String(e.getStderr()).trim(); } catch { }
+	return e?.message ?? String(e);
+}
+
+
+
 //finish button method for creating pool
+// async function finishBtn(newPoolData) {
+//   	finishPressed.value = true;
+// 	poolConfiguration.value.fillNewPoolData();
+// 	creatingPool.value = true;
+// 	console.log('newPoolData received:', newPoolData);
+// 	const { name, vdevs, ...options } = newPoolData;
+// 	const poolBase: ZPoolBase = { name, vdevs };
+// 	const poolOptions: ZpoolCreateOptions = options;
+	
+// 	console.log("poolBase: ", poolBase)
+// 	console.log("PoolOptions: ", poolOptions)
+
+// 	try {
+// 		const output: any = await zfsManager.createPool(poolBase, poolOptions);
+
+// 		if (output == null || output.error) {
+// 			const errorMessage = output?.error || 'Unknown error';
+// 			finishPressed.value = false;
+// 			pushNotification(new Notification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}`, 'error', 5000));
+// 			await newFS();
+// 			await refreshAllData();
+// 			showWizard.value = false;
+// 			poolCreated.value = false;
+// 			filesystemCreated.value = false;
+// 			finishPressed.value = false;
+// 		} else {
+// 			await refreshAllData();
+// 			const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
+// 			creatingPool.value = false;
+// 			poolCreated.value = true;
+// 			pushNotification(new Notification('Pool Created!', `Created new pool.`, 'success', 5000));
+// 			if (newPoolFound) {
+// 				console.log('newPoolFound:', newPoolFound);
+// 				setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
+// 			} else {
+// 				console.log("Pool not found, refreservation unsuccessful");
+// 			}
+// 			await newFS();
+// 			await refreshAllData();
+// 			showWizard.value = false;
+// 			poolCreated.value = false;
+// 			filesystemCreated.value = false;
+// 			finishPressed.value = false;
+// 		}
+
+// 	} catch (error) {
+// 		console.error(error);
+// 	}
+
+// }
+
 async function finishBtn(newPoolData) {
-  	finishPressed.value = true;
-	poolConfiguration.value.fillNewPoolData();
+	finishPressed.value = true;
 	creatingPool.value = true;
-	console.log('newPoolData received:', newPoolData);
+
+	poolConfiguration.value.fillNewPoolData();
+
 	const { name, vdevs, ...options } = newPoolData;
 	const poolBase: ZPoolBase = { name, vdevs };
 	const poolOptions: ZpoolCreateOptions = options;
-	
-	console.log("poolBase: ", poolBase)
-	console.log("PoolOptions: ", poolOptions)
 
 	try {
-		const output: any = await zfsManager.createPool(poolBase, poolOptions);
+		// This will throw on non-zero exit (e.g., LVM2_member on the disk)
+		const proc: any = await zfsManager.createPool(poolBase, poolOptions);
 
-		if (output == null || output.error) {
-			const errorMessage = output?.error || 'Unknown error';
-			finishPressed.value = false;
-			pushNotification(new Notification('Pool Creation Failed', `There was an error creating this pool: ${errorMessage}`, 'error', 5000));
-			await newFS();
-			await refreshAllData();
-			showWizard.value = false;
-			poolCreated.value = false;
-			filesystemCreated.value = false;
-			finishPressed.value = false;
-		} else {
-			await refreshAllData();
-			const newPoolFound = pools.value.find(pool => pool.name === newPoolData.name);
-			creatingPool.value = false;
-			poolCreated.value = true;
-			pushNotification(new Notification('Pool Created!', `Created new pool.`, 'success', 5000));
-			if (newPoolFound) {
-				console.log('newPoolFound:', newPoolFound);
-				setRefreservation(newPoolFound!, newPoolData.refreservationPercent);
-			} else {
-				console.log("Pool not found, refreservation unsuccessful");
-			}
-			await newFS();
-			await refreshAllData();
-			showWizard.value = false;
-			poolCreated.value = false;
-			filesystemCreated.value = false;
-			finishPressed.value = false;
-		}
+		// success path
+		await refreshAllData();
+		const newPoolFound = pools.value.find(p => p.name === newPoolData.name);
+		pushNotification(new Notification('Pool Created!', 'Created new pool.', 'success', 5000));
+		if (newPoolFound) setRefreservation(newPoolFound, newPoolData.refreservationPercent);
 
-	} catch (error) {
-		console.error(error);
+		// Only create filesystem if the pool creation actually succeeded
+		await newFS();
+
+		showWizard.value = false;
+	} catch (e: any) {
+		const msg = extractProcessErr(e);
+		pushNotification(new Notification('Pool Creation Failed', msg, 'error', 10000));
+		// keep wizard open so user can toggle “Forcefully Create” or fix disks
+		// optionally: await refreshAllData();
+	} finally {
+		creatingPool.value = false;
+		poolCreated.value = false;
+		filesystemCreated.value = false;
+		finishPressed.value = false;
 	}
-
 }
 
 async function newFS() {
