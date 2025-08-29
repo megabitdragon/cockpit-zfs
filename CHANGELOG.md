@@ -1,3 +1,3 @@
-## zfs module 1.2.6-1
+## zfs module 1.2.8-1
 
-* Fixes destroyPool error
+* Adds support for non-privledged users -> hides/disables any destructive actions (module is read-only with exception for creating datasets)
