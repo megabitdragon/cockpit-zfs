@@ -81,7 +81,7 @@
 								<MenuItems @click.stop
 									class="absolute right-0 z-10 w-max origin-top-right rounded-md bg-default shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 									<div class="py-1">
-										<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+										<MenuItem as="div" v-slot="{ active }" >
 										<a href="#" @click="showPoolModal(poolData[props.poolIdx])!"
 											:class="[active ? 'bg-accent text-default' : 'text-muted', 'block px-4 py-2 text-sm']">
 											Pool Details</a>

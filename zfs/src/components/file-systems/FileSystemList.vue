@@ -73,31 +73,31 @@
 													<div class="py-1 mt-1 col-span-1" :class="truncateText"
 														:title="convertBytesToSize(dataset.properties.available) ? convertBytesToSize(dataset.properties.available) : 'N/A'">
 														{{ convertBytesToSize(dataset.properties.available) ?
-															convertBytesToSize(dataset.properties.available) : 'N/A' }}
+														convertBytesToSize(dataset.properties.available) : 'N/A' }}
 													</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText"
 														:title="dataset.properties.usedByDataset">{{
-															dataset.properties.usedByDataset }}</div>
+														dataset.properties.usedByDataset }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText"
 														:title="dataset.properties.usedBySnapshots">{{
-															dataset.properties.usedBySnapshots }}</div>
+														dataset.properties.usedBySnapshots }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText"
 														:title="dataset.properties.usedbyRefreservation ? dataset.properties.usedbyRefreservation : 'N/A'">
 														{{ dataset.properties.usedbyRefreservation ?
-															dataset.properties.usedbyRefreservation : 'N/A' }}</div>
+														dataset.properties.usedbyRefreservation : 'N/A' }}</div>
 													<div v-if="dataset.properties.compression == 'off' || dataset.properties.compression == 'on'"
 														class="py-1 mt-1 col-span-1" :class="truncateText"
 														:title="upperCaseWord(dataset.properties.compression) ? upperCaseWord(dataset.properties.compression) : 'N/A'">
 														{{ upperCaseWord(dataset.properties.compression) ?
-															upperCaseWord(dataset.properties.compression) : 'N/A' }}</div>
+														upperCaseWord(dataset.properties.compression) : 'N/A' }}</div>
 													<div v-else class="py-1 mt-1 col-span-1" :class="truncateText"
 														:title="upperCaseWord(dataset.properties.compression).toUpperCase() ? upperCaseWord(dataset.properties.compression).toUpperCase() : 'N/A'">
 														{{ dataset.properties.compression.toUpperCase() ?
-															dataset.properties.compression.toUpperCase() : 'N/A' }}</div>
+														dataset.properties.compression.toUpperCase() : 'N/A' }}</div>
 													<div class="py-1 mt-1 col-span-1" :class="truncateText"
 														:title="getValue('dedup', dataset.properties.deduplication) ? getValue('dedup', dataset.properties.deduplication) : 'N/A'">
 														{{ getValue('dedup', dataset.properties.deduplication) ?
-															getValue('dedup', dataset.properties.deduplication) : 'N/A' }}
+														getValue('dedup', dataset.properties.deduplication) : 'N/A' }}
 													</div>
 
 													<div v-if="dataset.encrypted && dataset.key_loaded"
@@ -142,8 +142,14 @@
 														class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
 														<Menu as="div" class="relative inline-block text-right -mt-1">
 															<div>
-																<MenuButton @click.stop
-																	class="flex items-center rounded-full bg-default p-2 text-default hover:text-default focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+																<MenuButton @click.stop :disabled="!canDestructive"
+																	:aria-disabled="!canDestructive"
+																	:title="!canDestructive ? 'Requires administrative privileges' : ''"
+																	:class="[
+																		'flex items-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100',
+																		canDestructive ? 'bg-primary hover:text-white cursor-pointer'
+																			: 'bg-primary/60 text-muted cursor-not-allowed'
+																	]">
 																	<span class="sr-only">Open options</span>
 																	<EllipsisVerticalIcon class="w-5"
 																		aria-hidden="true" />
@@ -160,14 +166,15 @@
 																<MenuItems @click.stop
 																	class="absolute right-0 z-10 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																	<div class="py-1">
-																		<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+																		<MenuItem as="div" v-slot="{ active }"
+																			>
 																		<a href="#"
 																			@click="loadFileSystemConfig(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="!findPoolDataset(allDatasets[datasetIdx]) && canDestructive"
+																			v-if="!findPoolDataset(allDatasets[datasetIdx])"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="renameThisDataset(allDatasets[datasetIdx])"
@@ -175,7 +182,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'yes' && canDestructive"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'yes'"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="unmountThisFileSystem(allDatasets[datasetIdx])"
@@ -183,7 +190,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && !allDatasets[datasetIdx].encrypted && canDestructive"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && !allDatasets[datasetIdx].encrypted"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="mountThisFileSystem(allDatasets[datasetIdx])"
@@ -191,7 +198,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded && canDestructive"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="mountThisFileSystem(allDatasets[datasetIdx])"
@@ -199,7 +206,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && !allDatasets[datasetIdx].key_loaded && canDestructive"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && !allDatasets[datasetIdx].key_loaded"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="handleFileSystemEncryption(allDatasets[datasetIdx], 'unlock')"
@@ -207,7 +214,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded && canDestructive"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="handleFileSystemEncryption(allDatasets[datasetIdx], 'lock')"
@@ -215,21 +222,22 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded && canDestructive"
+																			v-if="allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="changeThisPassphrase(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change
 																			Passphrase</a>
 																		</MenuItem>
-																		<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+																		<MenuItem as="div" v-slot="{ active }"
+																			>
 																		<a href="#"
 																			@click="createSnapshotBtn(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create
 																			Snapshot</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="!findPoolDataset(allDatasets[datasetIdx]) && canDestructive"
+																			v-if="!findPoolDataset(allDatasets[datasetIdx])"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="deleteFileSystem(allDatasets[datasetIdx])"
@@ -237,7 +245,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="!bulkSnapDestroyMode.get(dataset.name) && canDestructive"
+																			v-if="!bulkSnapDestroyMode.get(dataset.name)"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="enterBulkSnapDestroyMode(allDatasets[datasetIdx])"
@@ -245,7 +253,7 @@
 																			Destroy Snapshot Mode</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="bulkSnapDestroyMode.get(dataset.name) && canDestructive"
+																			v-if="bulkSnapDestroyMode.get(dataset.name)"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="exitBulkSnapDestroyMode(allDatasets[datasetIdx])"
@@ -280,7 +288,7 @@
 												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
 												<div class="py-1 mt-1 col-span-1 text-white" :class="truncateText"
 													:title="convertBytesToSize(dataset.properties.used.parsed)">{{
-														convertBytesToSize(dataset.properties.used.parsed) }}</div>
+													convertBytesToSize(dataset.properties.used.parsed) }}</div>
 												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
 												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
 												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>

@@ -29,8 +29,12 @@
 						class="col-span-1 relative p-1 pl-3 pr-4 text-right font-medium sm:pr-6 lg:pr-8 justify-self-end justify-items-end">
 						<Menu as="div" class="relative inline-block text-right">
 							<div>
-								<MenuButton @click.stop
-									class="flex items-center rounded-full bg-primary p-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+								<MenuButton @click.stop :disabled="!canDestructive" :aria-disabled="!canDestructive"
+									:title="!canDestructive ? 'Requires administrative privileges' : ''" :class="[
+										'flex items-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100',
+										canDestructive ? 'bg-primary hover:text-white cursor-pointer'
+											: 'bg-primary/60 text-muted cursor-not-allowed'
+									]">
 									<span class="sr-only">Open options</span>
 									<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 								</MenuButton>
@@ -49,13 +53,13 @@
 											<a href="#" @click.stop="clearVDevErrors(props.pool.name, props.vDev.name)" :class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Clear Virtual Device Errors</a>
 										</MenuItem> -->
 										<MenuItem
-											v-if="pool.vdevs.length !== 1 && vDev !== pool.vdevs[0] && !vDev.type.includes('raid') && canDestructive"
+											v-if="pool.vdevs.length !== 1 && vDev !== pool.vdevs[0] && !vDev.type.includes('raid')"
 											as="div" v-slot="{ active }">
 										<a href="#" @click="removeVDev(props.pool, props.pool.vdevs[vDevIdx])"
 											:class="[active ? 'bg-danger text-white' : 'text-white', 'block px-4 py-2 text-sm']">Remove
 											Virtual Device</a>
 										</MenuItem>
-										<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+										<MenuItem as="div" v-slot="{ active }">
 										<a href="#" @click="showAttachDisk(props.pool, props.vDev)"
 											:class="[active ? 'bg-primary text-white' : 'text-white', 'block px-4 py-2 text-sm']">Attach
 											Disk</a>

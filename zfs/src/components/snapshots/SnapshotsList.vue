@@ -71,23 +71,23 @@
 									<MenuItems @click.stop
 										class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 										<div class="py-1">
-											<!-- <MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<!-- <MenuItem as="div" v-slot="{ active }" >
 												<a href="#" @click="cloneThisSnapshot(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone Snapshot</a>
 											</MenuItem> -->
-											<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<MenuItem as="div" v-slot="{ active }" >
 											<a href="#" @click="renameThisSnapshot(snapshot)"
 												:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename
 												Snapshot</a>
 											</MenuItem>
-											<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<MenuItem as="div" v-slot="{ active }" >
 											<a href="#" @click="rollbackThisSnapshot(snapshot)"
 												:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll
 												Back Snapshot</a>
 											</MenuItem>
-											<!-- <MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<!-- <MenuItem as="div" v-slot="{ active }" >
 												<a href="#" @click="sendThisDataset(snapshot)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send Snapshot</a>
 											</MenuItem> -->
-											<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<MenuItem as="div" v-slot="{ active }" >
 											<a href="#" @click="destroyThisSnapshot(snapshot)"
 												:class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy
 												Snapshot</a>
@@ -181,8 +181,12 @@
 							class="relative py-1 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8 col-span-1 justify-self-end">
 							<Menu as="div" class="relative inline-block text-right">
 								<div>
-									<MenuButton
-										class="flex items-center rounded-full bg-accent p-2 text-muted hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+									<MenuButton @click.stop :disabled="!canDestructive" :aria-disabled="!canDestructive"
+										:title="!canDestructive ? 'Requires administrative privileges' : ''" :class="[
+											'flex items-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100',
+											canDestructive ? 'bg-primary hover:text-white cursor-pointer'
+												: 'bg-primary/60 text-muted cursor-not-allowed'
+										]">
 										<span class="sr-only">Open options</span>
 										<EllipsisVerticalIcon class="w-5" aria-hidden="true" />
 									</MenuButton>
@@ -197,27 +201,27 @@
 									<MenuItems
 										class="absolute right-0 z-10 mt-2 w-max origin-top-left rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 										<div class="py-1">
-											<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<MenuItem as="div" v-slot="{ active }" >
 											<a href="#" @click="cloneThisSnapshot(snapshot)"
 												:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clone
 												Snapshot</a>
 											</MenuItem>
-											<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<MenuItem as="div" v-slot="{ active }" >
 											<a href="#" @click="renameThisSnapshot(snapshot)"
 												:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Rename
 												Snapshot</a>
 											</MenuItem>
-											<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<MenuItem as="div" v-slot="{ active }" >
 											<a href="#" @click="rollbackThisSnapshot(snapshot)"
 												:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Roll
 												Back Snapshot</a>
 											</MenuItem>
-											<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<MenuItem as="div" v-slot="{ active }" >
 											<a href="#" @click="sendThisDataset(snapshot)"
 												:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Send
 												Snapshot</a>
 											</MenuItem>
-											<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
+											<MenuItem as="div" v-slot="{ active }" >
 											<a href="#" @click="destroyThisSnapshot(snapshot)"
 												:class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy
 												Snapshot</a>
@@ -230,8 +234,9 @@
 					</tr>
 				</tbody>
 			</table>
-			<button v-if="bulkSnapDestroyMode.get(props.filesystem!.name) && canDestructive" @click="destroySelectedSnapshots()"
-				name="destroy-multiple-snaps-btn" class="mt-1 btn btn-danger h-fit w-full">Destroy Selected
+			<button v-if="bulkSnapDestroyMode.get(props.filesystem!.name) && canDestructive"
+				@click="destroySelectedSnapshots()" name="destroy-multiple-snaps-btn"
+				class="mt-1 btn btn-danger h-fit w-full">Destroy Selected
 				Snapshots</button>
 			<div v-if="snapshotsInFilesystem.length === 0 && snapshotNotFound" class="text-center bg-well">
 				<p>No snapshots found.</p>
