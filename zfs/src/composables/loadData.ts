@@ -7,6 +7,7 @@ import { getSnapshots, getSnapshotsOfDataset, getSnapshotsOfPool } from './snaps
 import { getDiskStats, getScanGroup } from './scan';
 import { VDevDisk, ZFSFileSystemInfo, VDev } from "@45drives/houston-common-lib"
 import { PoolDiskStats, PoolScanObjectGroup, Snapshot } from '../types';
+import { safeParse, unpackArray } from '../utils/json';
 
 const vDevs = ref<VDev[]>([]);
 const errors: string[] = [];
@@ -14,7 +15,7 @@ const errors: string[] = [];
 export async function loadDiskStats(poolDiskStats: Ref<PoolDiskStats>) {
 	try {
 		const rawJSON = await getDiskStats();
-		const parsedJSON = JSON.parse(rawJSON!);
+		const parsedJSON = safeParse(rawJSON, {});
 		// console.log('***Disk Stats JSON:', parsedJSON);
 
 		poolDiskStats.value = parsedJSON;
@@ -27,7 +28,7 @@ export async function loadDiskStats(poolDiskStats: Ref<PoolDiskStats>) {
 export async function loadScanObjectGroup(scanObject: Ref<PoolScanObjectGroup>) {
 	try {
 		const rawJSON = await getScanGroup();
-		const parsedJSON = JSON.parse(rawJSON!);
+		const parsedJSON = safeParse(rawJSON, {});
 		// console.log('---Scan Object JSON:', parsedJSON);
 
 		scanObject.value = parsedJSON;
@@ -42,7 +43,8 @@ export async function loadDisksThenPools(disks, pools) {
 	try {
 		const rawJSON = await getDisks();
 		// console.log('Raw JSON:', rawJSON);
-		const parsedJSON = JSON.parse(rawJSON!);
+		const { data: parsedJSON, error: disksErr } = unpackArray<any>(rawJSON, [])
+		if (disksErr) console.warn('getDisks error:', disksErr);
 		console.log('Disks JSON:', parsedJSON);
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
@@ -79,7 +81,8 @@ export async function loadDisksThenPools(disks, pools) {
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
 			const rawJSON = await getPools();
-			const parsedJSON = JSON.parse(rawJSON!);
+			const { data: parsedJSON, error: poolsErr } = unpackArray<any>(rawJSON, []);
+			if (poolsErr) console.warn('getPools error:', poolsErr);
 			//loops through pool JSON
 			for (let i = 0; i < parsedJSON.length; i++) {
 				//calls parse function for each type of VDev that could be in the Pool, then pushes the VDev data to VDev array
@@ -261,7 +264,8 @@ export async function loadDatasets(datasets) {
 	//executes a python script to retrieve all dataset data and outputs a JSON
 	try {
 		const rawJSON = await getDatasets();
-		const parsedJSON = JSON.parse(rawJSON!);
+		const { data: parsedJSON, error } = unpackArray<any>(rawJSON, []);
+		if (error) console.warn('getDatasets error:', error);
 		// console.log('Datasets JSON:', parsedJSON);
 
 		//loops through JSON data and adds data to a Dataset object
@@ -329,7 +333,8 @@ export async function loadDatasets(datasets) {
 export async function loadDisks(disks) {
 	try {
 		const rawJSON = await getDisks();
-		const parsedJSON = JSON.parse(rawJSON!);
+		const { data: parsedJSON, error } = unpackArray<any>(rawJSON, []);
+		if (error) console.warn('getDisks error:', error);
 		// console.log('Disks JSON:', parsedJSON);
 
 		//loops through and adds disk data from JSON to disk data object, pushes objects to disks array
@@ -664,32 +669,46 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 			vDevData.disks.push(fullDiskData);
 		}
 	}
-	// If fullDiskData is still null (but child has a valid path), assume it was REMOVED but still exists in JSON
+	// If fullDiskData is still null (but child has a valid path), try to recover it
 	if (!fullDiskData) {
-		console.warn(`Disk marked as REMOVED but not found in disks array: ${child.path}`);
-		fullDiskData = {
-			name: child.name || "Unknown",
-			path: child.path,
-			guid: child.guid || "N/A",
-			type: "N/A",
-			health: "REMOVED",
-			stats: child.stats || {},
-			capacity: "Unknown",
-			model: "N/A",
-			phy_path: child.path || "N/A",
-			sd_path: "N/A",
-			vdev_path: "",
-			serial: "N/A",
-			powerOnHours: 0,
-			powerOnCount: "0",
-			temp: "0",
-			rotationRate: 0,
-			vDevName: vDevName,
-			poolName: poolName,
-			vDevType: vDevType,
-			errors: [`Disk was removed from pool: ${poolName}, vDev: ${vDevName}`],
-		};
+		// 1) If the child path is a by-vdev partition, match its base by-vdev
+		const vdevBase = cleanedChildPath.replace(/-part\d+$/, '');
+		fullDiskData = disks.value.find(d =>
+			cleanDiskPath(d.vdev_path) === vdevBase ||
+			cleanDiskPath(d.sd_path) === cleanDiskPath(child.path) ||
+			cleanDiskPath(d.phy_path) === cleanDiskPath(child.path)
+		);
+
+		if (fullDiskData) {
+			console.warn(`Recovered disk via safety net using ${vdevBase}`);
+		} else {
+			// 2) Still nothing → create a real placeholder
+			console.warn(`Disk marked as REMOVED but not found in disks array: ${child.path}`);
+			fullDiskData = {
+				name: child.name || "Unknown",
+				path: child.path,
+				guid: child.guid || "N/A",
+				type: "N/A",
+				health: "REMOVED",
+				stats: child.stats || {},
+				capacity: "Unknown",
+				model: "N/A",
+				phy_path: child.path || "N/A",
+				sd_path: "N/A",
+				vdev_path: "",
+				serial: "N/A",
+				powerOnHours: 0,
+				powerOnCount: "0",
+				temp: "0",
+				rotationRate: 0,
+				vDevName: vDevName,
+				poolName: poolName,
+				vDevType: vDevType,
+				errors: [`Disk was removed from pool: ${poolName}, vDev: ${vDevName}`],
+			};
+		}
 	}
+
 	console.log("fulldisk stats", fullDiskData)
 	console.log("child.path 2 ", child.path)
 	// Construct the disk object

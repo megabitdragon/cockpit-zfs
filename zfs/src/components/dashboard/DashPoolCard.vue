@@ -36,22 +36,22 @@
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pool
 										Details</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a href="#" @click="clearPoolErrors(props.pool.name)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear
 										Pool Errors</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="upgradeablePool" href="#" @click="upgradeThisPool(props.pool)!"
 										:class="[active ? 'bg-orange-700 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Upgrade
 										Pool</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="!scanActivity!.isActive" href="#" @click="resilverThisPool(props.pool)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Resilver
 										Pool</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="!scanActivity!.isActive" href="#" @click="scrubThisPool(props.pool)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Scrub
 										Pool</a>
@@ -64,13 +64,13 @@
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause
 										Scrub</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="scanActivity!.isActive && scanOperation == 'SCRUB'" href="#"
 										@click="stopScrub(props.pool)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel
 										Scrub</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && pool.diskType != 'HDD' && getIsTrimmable()"
 										href="#" @click="trimThisPool(props.pool)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM
@@ -84,23 +84,23 @@
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause
 										TRIM (Pool)</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="trimActivity!.isActive || trimActivity!.isPaused && pool.diskType != 'HDD' && getIsTrimmable()"
 										href="#" @click="stopTrim(props.pool)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel
 										TRIM (Pool)</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a href="#" @click="showAddVDev(props.pool)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Add
 										Virtual Device</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a href="#" @click="exportThisPool(props.pool)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Export
 										Pool</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a href="#" @click="destroyPoolAndUpdate(props.pool)!"
 										:class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy
 										Pool</a>
@@ -282,6 +282,7 @@ interface DashPoolCardProps {
 }
 
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
+const canDestructive = inject<Ref<boolean>>('can-destructive')!;
 
 const props = defineProps<DashPoolCardProps>();
 const selectedPool = ref<ZPool>();

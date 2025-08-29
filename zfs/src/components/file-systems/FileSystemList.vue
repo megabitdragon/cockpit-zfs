@@ -160,14 +160,14 @@
 																<MenuItems @click.stop
 																	class="absolute right-0 z-10 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																	<div class="py-1">
-																		<MenuItem as="div" v-slot="{ active }">
+																		<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 																		<a href="#"
 																			@click="loadFileSystemConfig(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="!findPoolDataset(allDatasets[datasetIdx])"
+																			v-if="!findPoolDataset(allDatasets[datasetIdx]) && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="renameThisDataset(allDatasets[datasetIdx])"
@@ -175,7 +175,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'yes'"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'yes' && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="unmountThisFileSystem(allDatasets[datasetIdx])"
@@ -183,7 +183,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && !allDatasets[datasetIdx].encrypted"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && !allDatasets[datasetIdx].encrypted && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="mountThisFileSystem(allDatasets[datasetIdx])"
@@ -191,7 +191,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="mountThisFileSystem(allDatasets[datasetIdx])"
@@ -199,7 +199,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && !allDatasets[datasetIdx].key_loaded"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && !allDatasets[datasetIdx].key_loaded && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="handleFileSystemEncryption(allDatasets[datasetIdx], 'unlock')"
@@ -207,7 +207,7 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded"
+																			v-if="allDatasets[datasetIdx].properties.mounted == 'no' && allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="handleFileSystemEncryption(allDatasets[datasetIdx], 'lock')"
@@ -215,30 +215,29 @@
 																			File System</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded"
+																			v-if="allDatasets[datasetIdx].encrypted && allDatasets[datasetIdx].key_loaded && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="changeThisPassphrase(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change
 																			Passphrase</a>
 																		</MenuItem>
-																		<MenuItem as="div" v-slot="{ active }">
+																		<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 																		<a href="#"
 																			@click="createSnapshotBtn(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create
 																			Snapshot</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="!findPoolDataset(allDatasets[datasetIdx])"
+																			v-if="!findPoolDataset(allDatasets[datasetIdx]) && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="deleteFileSystem(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Destroy
 																			File System</a>
 																		</MenuItem>
-
 																		<MenuItem as="div"
-																			v-if="!bulkSnapDestroyMode.get(dataset.name)"
+																			v-if="!bulkSnapDestroyMode.get(dataset.name) && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="enterBulkSnapDestroyMode(allDatasets[datasetIdx])"
@@ -246,14 +245,13 @@
 																			Destroy Snapshot Mode</a>
 																		</MenuItem>
 																		<MenuItem as="div"
-																			v-if="bulkSnapDestroyMode.get(dataset.name)"
+																			v-if="bulkSnapDestroyMode.get(dataset.name) && canDestructive"
 																			v-slot="{ active }">
 																		<a href="#"
 																			@click="exitBulkSnapDestroyMode(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Leave
 																			Bulk Destroy Mode</a>
 																		</MenuItem>
-
 																	</div>
 																</MenuItems>
 															</transition>
@@ -423,7 +421,8 @@ import { pushNotification, Notification } from '@45drives/houston-common-ui';
 import { ConfirmationCallback, Snapshot } from "../../types";
 
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
-
+const canDestructive = inject<Ref<boolean>>('can-destructive')!;
+	
 ///////// Values for Confirmation Modals ////////////
 /////////////////////////////////////////////////////
 const operationRunning = ref(false);

@@ -1,35 +1,47 @@
 import { legacy } from '@45drives/houston-common-lib';
 // @ts-ignore
 import script_py from "../scripts/get-disks.py?raw";
-
+import { sanitizeRawJson } from '../utils/json';
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 const {errorString, useSpawn } = legacy;
 
+// export async function getDisks() {
+// 	try {
+// 		// Ensure useSpawn is properly defined and invoked
+// 		console.info('getDisks() build-id: 2025-08-29b');
+// 		const spawnState = useSpawn(['/usr/bin/env', 'python3', '-c', script_py], { superuser: 'try' });
+// 		console.debug('Spawn state:', spawnState);
+		
+// 		// Check if spawnState is valid
+// 		if (!spawnState || !spawnState.promise) {
+// 		throw new Error('Failed to initialize spawnState or promise is undefined');
+// 		}
+
+// 		// Await the promise and retrieve disks
+// 		const result = await spawnState.promise();
+
+// 		// console.log(result.stdout)
+		
+// 		// return result.stdout;
+// 		return sanitizeRawJson(result.stdout ?? '', '[]');
+// 	} catch (error: any) {
+// 		console.error('Error in getDisks:', error.message);
+// 		// throw new Error(error.message); // Propagate the error to the caller
+// 		return JSON.stringify({ error: String(error?.message ?? error) });
+// 	}
+// }
 export async function getDisks() {
-  try {
-    // Ensure useSpawn is properly defined and invoked
-	
-    const spawnState = useSpawn(['/usr/bin/env', 'python3', '-c', script_py], { superuser: 'try' });
-	console.debug('Spawn state:', spawnState);
-	
-    // Check if spawnState is valid
-    if (!spawnState || !spawnState.promise) {
-      throw new Error('Failed to initialize spawnState or promise is undefined');
-    }
-
-    // Await the promise and retrieve disks
-    const result = await spawnState.promise();
-
-	// console.log(result.stdout)
-	
-    return result.stdout;
-  } catch (error: any) {
-    console.error('Error in getDisks:', error.message);
-    throw new Error(error.message); // Propagate the error to the caller
-  }
+	try {
+		const spawnState = useSpawn(['/usr/bin/env', 'python3', '-c', script_py], { superuser: 'try' });
+		const result = await spawnState.promise();
+		return result.stdout;                   // JSON string from Python
+	} catch (err: any) {
+		console.error('getDisks failed:', err);
+		// Safety: always return a JSON string
+		return JSON.stringify([]);              // or JSON.stringify({ error: errorString(err) })
+	}
 }
-
 
 export async function clearPartitions(disk) {
     try {

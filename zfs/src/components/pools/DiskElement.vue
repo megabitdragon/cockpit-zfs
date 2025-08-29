@@ -45,49 +45,49 @@
 									<!-- <MenuItem as="div" v-slot="{ active }">
                                         <a href="#" @click="clearDiskErrors(props.pool.name, props.disk.name)" :class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Clear Disk Errors</a>
                                     </MenuItem> -->
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="props.vDev.disks.length > 1 && diskState !== 'REMOVED'" href="#"
 										@click="detachThisDisk(props.pool, props.disk)"
 										:class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Detach
 										Disk</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="diskState == 'ONLINE'" href="#"
 										@click="offlineThisDisk(props.pool, props.disk)"
 										:class="[active ? 'bg-danger text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Offline
 										Disk</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="diskState == 'OFFLINE'" href="#"
 										@click="onlineThisDisk(props.pool, props.disk)"
 										:class="[active ? 'bg-green-600 text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Online
 										Disk</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="diskState !== 'REMOVED'" href="#"
 										@click="replaceThisDisk(props.pool, props.vDev, props.disk)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Replace
 										Disk</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="!trimActivity!.isActive && !trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'"
 										href="#" @click="trimThisDisk(props.pool, props.disk)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM
 										Disk</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'"
 										href="#" @click="resumeTrim(props.pool, props.disk)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">TRIM
 										Disk</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="trimActivity!.isActive && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'"
 										href="#" @click="pauseTrim(props.pool, props.disk)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Pause
 										TRIM (Disk)</a>
 									</MenuItem>
-									<MenuItem as="div" v-slot="{ active }">
+									<MenuItem as="div" v-slot="{ active }" v-if="canDestructive">
 									<a v-if="trimActivity!.isActive || trimActivity!.isPaused && props.pool.diskType != 'HDD' && getIsTrimmable() && diskState !== 'REMOVED'"
 										href="#" @click="stopTrim(props.pool, props.disk)"
 										:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Cancel
@@ -179,7 +179,7 @@ interface DiskListElementProps {
 }
 
 const props = defineProps<DiskListElementProps>();
-
+const canDestructive = inject<Ref<boolean>>('can-destructive')!;
 
 const selectedPool = ref<ZPool>();
 const selectedDisk = ref<VDevDisk>();

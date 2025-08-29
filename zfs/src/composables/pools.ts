@@ -8,6 +8,7 @@ import get_importable_pools_script from "../scripts/get-importable-pools.py?raw"
 // @ts-ignore
 import get_importable_destroyed_pools_script from "../scripts/get-importable-destroyed-pools.py?raw";
 import { PoolEditConfig } from '../types';
+import { sanitizeRawJson } from '../utils/json';
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 const { errorString, useSpawn } = legacy;
@@ -15,9 +16,11 @@ const { errorString, useSpawn } = legacy;
 export async function getPools() {
 	try {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_pools_script], { superuser: 'try' });
-		const pools = (await state.promise()).stdout;
-		// console.log('getPools stdout:', pools);
-		return pools;
+		// const pools = (await state.promise()).stdout;
+		// // console.log('getPools stdout:', pools);
+		// return pools;
+		const pools = (await state.promise()).stdout ?? '';
+		return sanitizeRawJson(pools, '[]');
 	} catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
@@ -288,8 +291,10 @@ export async function exportPool(pool, force?) {
 export async function getImportablePools() {
 	try {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_importable_pools_script], { superuser: 'try' });
-		const pools = (await state.promise()).stdout;
-		return pools;
+		// const pools = (await state.promise()).stdout;
+		// return pools;
+		const pools = (await state.promise()).stdout ?? '';
+		return sanitizeRawJson(pools, '[]');
 	} catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
@@ -300,8 +305,10 @@ export async function getImportablePools() {
 export async function getImportableDestroyedPools() {
 	try {
 		const state = useSpawn(['/usr/bin/env', 'python3', '-c', get_importable_destroyed_pools_script], { superuser: 'try' });
-		const pools = (await state.promise()).stdout;
-		return pools;
+		// const pools = (await state.promise()).stdout;
+		// return pools;
+		const pools = (await state.promise()).stdout ?? '';
+		return sanitizeRawJson(pools, '[]');
 	} catch (state) {
 		const errorMessage = errorString(state);
 		console.error(errorMessage);
