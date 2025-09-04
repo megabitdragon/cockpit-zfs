@@ -127,7 +127,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	console.log('PoolList trimActivities', trimActivities.value);
+	// console.log('PoolList trimActivities', trimActivities.value);
 }
 
 /////////////// Create/Import Pool //////////////////

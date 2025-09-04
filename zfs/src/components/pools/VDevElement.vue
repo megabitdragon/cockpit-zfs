@@ -168,7 +168,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	console.log('VDevElement trimActivities', trimActivities.value);
+	// console.log('VDevElement trimActivities', trimActivities.value);
 }
 
 /////////////////// Clear Errors ////////////////////
@@ -199,7 +199,7 @@ async function removeVDev(pool: ZPool, vDev : VDev) {
 	await loadShowRemoveVDevComponent();
 	showRemoveVDevConfirm.value = true;
 
-	console.log('preparing to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
+	// console.log('preparing to remove:', selectedVDev.value, 'from pool:', selectedPool.value);
 }
 
 const confirmThisRemove : ConfirmationCallback = () => {
@@ -275,7 +275,7 @@ const updateShowAttachDisk = (newVal) => {
 async function showAttachDisk(pool: ZPool, vdev: VDev) {
 	selectedPool.value = pool;
 	selectedVDev.value = vdev;
-	console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
+	// console.log('selectedPool:', selectedPool, 'selectedVDev:', selectedVDev)
 	await loadShowAttachDiskComponent();
 	showAttachDiskModal.value = true;
 }

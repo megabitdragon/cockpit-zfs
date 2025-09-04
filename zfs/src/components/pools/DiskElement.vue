@@ -246,7 +246,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	console.log('DiskElement trimActivities', trimActivities.value);
+	// console.log('DiskElement trimActivities', trimActivities.value);
 }
 
 const starting = ref(false);
@@ -254,7 +254,7 @@ const starting = ref(false);
 const scanStatusBox = inject<Ref<any>>('scan-status-box')!;
 
 async function getScanStatus() {
-	console.log('scanStatusBox', scanStatusBox.value);
+	// console.log('scanStatusBox', scanStatusBox.value);
 	await scanStatusBox.value.pollScanStatus();
 }
 
@@ -349,7 +349,7 @@ const loadOfflineDiskComponent = async () => {
 async function offlineThisDisk(pool: ZPool, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
-	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	// console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
 	await loadOfflineDiskComponent();
 	showOfflineDiskModal.value = true;
 }
@@ -408,7 +408,7 @@ const loadOnlineDiskComponent = async () => {
 async function onlineThisDisk(pool: ZPool, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
-	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	// console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
 	await loadOnlineDiskComponent();
 	showOnlineDiskModal.value = true;
 }
@@ -506,7 +506,7 @@ const loadTrimStopDiskComponent = async () => {
 async function trimThisDisk(pool: ZPool, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
-	console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
+	// console.log('selected pool:', selectedPool.value, 'selected disk:', selectedDisk.value);
 	await loadTrimDiskComponent();
 	showTrimDiskModal.value = true;
 }
@@ -681,7 +681,7 @@ async function replaceThisDisk(pool: ZPool,  vdev: VDev, disk: VDevDisk) {
 	selectedPool.value = pool;
 	selectedDisk.value = disk;
 	selectedVDev.value = vdev;
-	console.log('selected pool:', selectedPool.value, 'selectedVDev:', selectedVDev, 'selected disk:', selectedDisk.value);
+	// console.log('selected pool:', selectedPool.value, 'selectedVDev:', selectedVDev, 'selected disk:', selectedDisk.value);
 	await loadReplaceDiskComponent();
 	showReplaceDiskModal.value = true;
 }

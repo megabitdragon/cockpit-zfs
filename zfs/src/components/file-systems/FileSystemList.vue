@@ -510,7 +510,7 @@ async function populateDatasetList() {
 			allDatasets.value.push(data);
 		});
 
-		console.log('Final allDatasets:', allDatasets.value);
+		// console.log('Final allDatasets:', allDatasets.value);
 
 	} catch (error) {
 		console.error('Error in populateDatasetList:', error);
@@ -574,13 +574,13 @@ function findPoolDataset(fileSystem) {
 
 function findSnapDataset(fileSystem) {
 	try {
-		console.log('Searching for snapshot dataset:', fileSystem.name);
+		// console.log('Searching for snapshot dataset:', fileSystem.name);
 		const foundSnapshot = snapshots.value.some(snapshot => {
-			console.log('Checking snapshot:', snapshot.dataset);
+			// console.log('Checking snapshot:', snapshot.dataset);
 			return snapshot.dataset === fileSystem.name;
 		});
 
-		console.log('Snapshot dataset found:', foundSnapshot);
+		// console.log('Snapshot dataset found:', foundSnapshot);
 
 		return foundSnapshot;
 	} catch (error) {
@@ -613,7 +613,7 @@ const loadConfigFileSystemComponent = async () => {
 
 async function loadFileSystemConfig(fileSystem) {
 	selectedDataset.value = fileSystem;
-	console.log('loading:', selectedDataset);
+	// console.log('loading:', selectedDataset);
 	await loadConfigFileSystemComponent();
 	showFSConfig.value = true
 }
@@ -634,7 +634,7 @@ async function createSnapshotBtn(filesystem) {
 	selectedDataset.value = filesystem;
 	await loadCreateSnapshotComponent();
 	showSnapshotModal.value = true;
-	console.log('create snapshot modal triggered');
+	// console.log('create snapshot modal triggered');
 }
 
 watch(confirmCreateSnap, async (newVal, oldVal) => {
@@ -670,8 +670,8 @@ async function deleteFileSystem(fileSystem) {
 		if (selectedDataset.value && selectedDataset.value.children) {
 			const hasPoolDataset = findPoolDataset(selectedDataset.value);
 			const hasSnapDataset = findSnapDataset(selectedDataset.value);
-			console.log('hasPoolDataset:', hasPoolDataset);
-			console.log('hasSnapDataset:', hasSnapDataset);
+			// console.log('hasPoolDataset:', hasPoolDataset);
+			// console.log('hasSnapDataset:', hasSnapDataset);
 
 			// Check if hasPoolDataset is undefined and assign it false in that case
 			const hasPool = typeof hasPoolDataset !== 'undefined' ? hasPoolDataset : false;
@@ -681,9 +681,9 @@ async function deleteFileSystem(fileSystem) {
 
 		return false;
 	});
-	console.log(`dataset ${selectedDataset.value?.name} HasChildren: ${datasetHasChildren.value}`);
+	// console.log(`dataset ${selectedDataset.value?.name} HasChildren: ${datasetHasChildren.value}`);
 	hasChildren.value = datasetHasChildren.value!;
-	console.log('hasChildren', hasChildren.value);
+	// console.log('hasChildren', hasChildren.value);
 
 	await loadDeleteFileSystemComponent();
 	showDeleteFileSystemConfirm.value = true;
@@ -761,7 +761,7 @@ const updateShowUnmountFileSystem = (newVal) => {
 }
 
 watch(confirmUnmount, async (newValue, oldValue) => {
-	console.log('confirmUnmount changed:', newValue);
+	// console.log('confirmUnmount changed:', newValue);
 
 	if (confirmUnmount.value == true) {
 		unmounting.value = true;
@@ -842,7 +842,7 @@ const updateShowMountFileSystem = (newVal) => {
 }
 
 watch(confirmMount, async (newValue, oldValue) => {
-	console.log('confirmMount changed:', newValue);
+	// console.log('confirmMount changed:', newValue);
 
 	if (confirmMount.value == true) {
 		mounting.value = true;
@@ -996,7 +996,7 @@ const bulkSnapDestroyMode = reactive(new Map<string, boolean>());
 
 function enterBulkSnapDestroyMode(dataset) {
 	bulkSnapDestroyMode.set(dataset.name, true);
-	console.log('Bulk Snap Destroy Mode Enabled for:', dataset.name);
+	// console.log('Bulk Snap Destroy Mode Enabled for:', dataset.name);
 }
 
 function exitBulkSnapDestroyMode(dataset) {

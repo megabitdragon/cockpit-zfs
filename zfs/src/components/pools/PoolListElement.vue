@@ -317,7 +317,7 @@ const loadShowPoolDetailsComponent = async () => {
 
 async function showPoolModal(pool) {
 	selectedPool.value = pool;
-	console.log('loading:', selectedPool.value);
+	// console.log('loading:', selectedPool.value);
 	await loadShowPoolDetailsComponent();
 	showPoolDetails.value = true;
 }
@@ -368,7 +368,7 @@ async function refreshAllData() {
 	disksLoaded.value = true;
 	poolsLoaded.value = true;
 	fileSystemsLoaded.value = true;
-	console.log('PoolListElement trimActivities', trimActivities.value);
+	// console.log('PoolListElement trimActivities', trimActivities.value);
 }
 
 ////////////////// Destroy Pool /////////////////////
@@ -1018,7 +1018,7 @@ const loadShowAddVDevComponent = async () => {
 
 async function showAddVDev(pool) {
 	selectedPool.value = pool;
-	console.log(selectedPool);
+	// console.log(selectedPool);
 	await loadShowAddVDevComponent();
 	showAddVDevModal.value = true;
 }
@@ -1029,7 +1029,7 @@ const scanStatusBox = ref();
 const scanActivities = inject<Ref<Map<string, Activity>>>('scan-activities')!;
 	
 async function getScanStatus() {
-	console.log('scanStatusBox', scanStatusBox.value);
+	// console.log('scanStatusBox', scanStatusBox.value);
 
 	await scanStatusBox.value.pollScanStatus();
 }
@@ -1041,7 +1041,7 @@ const trimActivities = inject<Ref<Map<string, Activity>>>('trim-activities')!;
 
 async function getTrimStatus() {
     // console.log('vDevElement', vDevElement.value);
-	console.log('trimActivity:', trimActivity.value);
+	// console.log('trimActivity:', trimActivity.value);
     // Check if vDevElement is defined and is an array
     if (vDevElement.value && Array.isArray(vDevElement.value) && vDevElement.value.length > 0) {
      	await vDevElement.value[0].getDiskStatus();

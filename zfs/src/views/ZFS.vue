@@ -80,21 +80,21 @@ async function initialLoad(disks, pools, datasets, snapshots) {
 
 async function setUpMessageHandler(handler) {
     try {
-        console.log("Setting up DBus message handler...");
+        console.log("Setting up ZFS Notification DBus message handler...");
 
         const client = cockpit.dbus("org._45drives.Houston");
         const houston = await client.proxy("org._45drives.Houston", "/org/_45drives/Houston");
 
-        console.log("Connected to DBus. Subscribing to Message signal...");
+        console.log("Connected to ZFS Notification DBus. Subscribing to Message signal...");
 
         houston.addEventListener("Message", (_, message) => {
 			notificationStore.addNotification(message);
             handler(message);
         });
 
-        console.log("DBus message handler successfully set up.");
+        console.log("ZFS Notification DBus message handler successfully set up.");
     } catch (error) {
-        console.error("Error setting up DBus message handler:", error);
+        console.error("Error setting up ZFS Notification DBus message handler:", error);
     }
 }
 

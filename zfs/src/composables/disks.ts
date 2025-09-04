@@ -1,36 +1,10 @@
 import { legacy } from '@45drives/houston-common-lib';
 // @ts-ignore
 import script_py from "../scripts/get-disks.py?raw";
-import { sanitizeRawJson } from '../utils/json';
 
 //['/usr/bin/env', 'python3', '-c', script, ...args ]
 const {errorString, useSpawn } = legacy;
 
-// export async function getDisks() {
-// 	try {
-// 		// Ensure useSpawn is properly defined and invoked
-// 		console.info('getDisks() build-id: 2025-08-29b');
-// 		const spawnState = useSpawn(['/usr/bin/env', 'python3', '-c', script_py], { superuser: 'try' });
-// 		console.debug('Spawn state:', spawnState);
-		
-// 		// Check if spawnState is valid
-// 		if (!spawnState || !spawnState.promise) {
-// 		throw new Error('Failed to initialize spawnState or promise is undefined');
-// 		}
-
-// 		// Await the promise and retrieve disks
-// 		const result = await spawnState.promise();
-
-// 		// console.log(result.stdout)
-		
-// 		// return result.stdout;
-// 		return sanitizeRawJson(result.stdout ?? '', '[]');
-// 	} catch (error: any) {
-// 		console.error('Error in getDisks:', error.message);
-// 		// throw new Error(error.message); // Propagate the error to the caller
-// 		return JSON.stringify({ error: String(error?.message ?? error) });
-// 	}
-// }
 export async function getDisks() {
 	try {
 		const spawnState = useSpawn(['/usr/bin/env', 'python3', '-c', script_py], { superuser: 'try' });
@@ -47,7 +21,7 @@ export async function clearPartitions(disk) {
     try {
         const state = useSpawn(['wipefs', '-a', '/dev/' + disk.name]);
         const output = await state.promise();
-        console.log(output)
+        // console.log(output)
         return output.stdout;
       } catch (state) {
 		const errorMessage = errorString(state);
@@ -61,11 +35,11 @@ export async function labelClear(disk) {
 		const cmdString = ['zpool', 'labelclear'];
 		cmdString.push(disk.name);
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
         const output = await state.promise();
-        console.log(output)
+        // console.log(output)
         return output.stdout;
       } catch (state) {
 		const errorMessage = errorString(state);
@@ -86,11 +60,11 @@ export async function attachDisk(diskVDevPoolData) {
 		cmdString.push(diskVDevPoolData.existingDiskName);
 		cmdString.push(diskVDevPoolData.newDiskName);
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -106,11 +80,11 @@ export async function detachDisk(poolName, diskName) {
 		cmdString.push(poolName);
 		cmdString.push(diskName);
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -135,11 +109,11 @@ export async function offlineDisk(poolName, diskName, forceFault, temporary) {
 		cmdString.push(poolName);
 		cmdString.push(diskName);
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -160,11 +134,11 @@ export async function onlineDisk(poolName, diskName, expand) {
 		cmdString.push(poolName);
 		cmdString.push(diskName);
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -187,11 +161,11 @@ export async function replaceDisk(poolName, diskName, newDiskName, forceReplace?
 		cmdString.push(diskName);
 		cmdString.push(newDiskName);
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -221,11 +195,11 @@ export async function trimDisk(poolName : string, diskName : string, isSecure? :
 		cmdString.push(poolName);
 		cmdString.push(diskName);
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);

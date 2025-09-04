@@ -336,14 +336,14 @@ async function pollScanStatus() {
 function startScanInterval() {
 	if (!scanIntervalID.value) {
 		scanIntervalID.value = setInterval(pollScanStatus, 3000);
-        console.log('----scan interval set----', scanIntervalID.value);
+        // console.log('----scan interval set----', scanIntervalID.value);
 	}
 }
 
 function stopScanInterval() {
 	if (scanIntervalID.value) {
 		clearInterval(scanIntervalID.value);
-        console.log('----scan interval cleared----', scanIntervalID.value);
+        // console.log('----scan interval cleared----', scanIntervalID.value);
 		scanIntervalID.value = null;
 	}
 }
@@ -603,14 +603,14 @@ function checkActivityState(activity : Activity) {
 function startDiskStatsInterval() {
 	if (!diskStatsIntervalID.value) {
 		diskStatsIntervalID.value = setInterval(pollTrimStatus, 3000);
-        console.log('****trim interval set****', diskStatsIntervalID.value);
+        // console.log('****trim interval set****', diskStatsIntervalID.value);
 	}
 }
 
 function stopDiskStatsInterval() {
 	if (diskStatsIntervalID.value) {
 		clearInterval(diskStatsIntervalID.value);
-        console.log('****trim interval cleared****', diskStatsIntervalID.value);
+        // console.log('****trim interval cleared****', diskStatsIntervalID.value);
 		diskStatsIntervalID.value = null;
 	}
 }

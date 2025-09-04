@@ -76,7 +76,7 @@ export async function loadDisksThenPools(disks, pools) {
 			// console.log("Disk:");
 			// console.log(disk);
 		}
-		console.log("pre-loaded Disks:", disks);
+		// console.log("pre-loaded Disks:", disks);
 
 		//executes a python script to retrieve all pool data and outputs a JSON
 		try {
@@ -606,9 +606,9 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 			if (result) {
 
 				const fullOldDisk = disks.value.find(d => d.name === vDev.children[0].name);
-				console.log("vDev.children[0]", fullOldDisk)
+				// console.log("vDev.children[0]", fullOldDisk)
 				const shortSdPath = fullOldDisk?.sd_path?.replace(sdPathPrefix, "") ?? "";
-				console.log("shortSdPath", shortSdPath)
+				// console.log("shortSdPath", shortSdPath)
 				result.replacingTarget = (vDev.children[0].name + " (" + shortSdPath + ")") as any;
 			}
 		} else {
@@ -620,7 +620,7 @@ export function parseVDevData(vDev, poolName, disks, vDevType) {
 				else if (child.type === "replacing" && child.children?.length >= 2) {
 					// Handle replacement: show only the new disk
 					const [oldDisk, newDisk] = child.children;
-					console.log("oldDisk, ", disks)
+					// console.log("oldDisk, ", disks)
 					const result = handleDiskChild(newDisk, vDevData, disks, child.name, poolName, child.type);
 					if (result) {
 
@@ -641,7 +641,7 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 	if (!child || child.path === null) {
 		return null;
 	}
-	console.log("child", child)
+	// console.log("child", child)
 	const cleanedChildPath = cleanDiskPath(child.path); // Strip partition suffix for comparison
 	// Try finding the disk using cleaned paths
 	let fullDiskData: VDevDisk | undefined = disks.value.find(disk => {
@@ -709,8 +709,8 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 		}
 	}
 
-	console.log("fulldisk stats", fullDiskData)
-	console.log("child.path 2 ", child.path)
+	// console.log("fulldisk stats", fullDiskData)
+	// console.log("child.path 2 ", child.path)
 	// Construct the disk object
 	const childDisk = {
 		name: child.name || fullDiskData.name,
@@ -743,7 +743,7 @@ function handleDiskChild(child, vDevData, disks, vDevName, poolName, vDevType) {
 }
 
 function createMissingDisk(path, vDevName, vDevType, poolName) {
-	console.log(`Creating placeholder for missing disk at path: ${path}`);
+	// console.log(`Creating placeholder for missing disk at path: ${path}`);
 	return {
 		name: 'Missing Disk',
 		path: path,

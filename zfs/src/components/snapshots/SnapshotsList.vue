@@ -363,7 +363,7 @@ const loadDestroySnapshotComponent = async () => {
 }
 
 async function destroyThisSnapshot(snapshot) {
-	console.log("snapshot: ", snapshot)
+	// console.log("snapshot: ", snapshot)
 	operationRunning.value = false;
 	selectedSnapshot.value = snapshot;
 	
@@ -373,13 +373,11 @@ async function destroyThisSnapshot(snapshot) {
 
 	await loadDestroySnapshotComponent();
 	showDestroySnapshotModal.value = true;
-	console.log('selected for destroy:', selectedSnapshot.value);
+	// console.log('selected for destroy:', selectedSnapshot.value);
 }
 
 const confirmThisDestroy : ConfirmationCallback = () => {
-
 	confirmDestroy.value = true;
-
 }
 
 const updateShowDestroySnapshot = (newVal) => {
@@ -439,7 +437,7 @@ async function destroySelectedSnapshots() {
 	operationRunning.value = false;
 	await loadDestroyBulkSnapshotsComponent();
 	showDestroyBulkSnapshotModal.value = true;
-	console.log('Selected snapshots to destroy:', selectedForDestroy.value);
+	// console.log('Selected snapshots to destroy:', selectedForDestroy.value);
 }
 
 const confirmThisBulkDestroy : ConfirmationCallback = () => {
@@ -542,7 +540,7 @@ const loadCloneSnapshotComponent = async () => {
 
 async function cloneThisSnapshot(snapshot) {
 	selectedSnapshot.value = snapshot;
-	console.log('clone snapshot modal triggered');
+	// console.log('clone snapshot modal triggered');
 	await loadCloneSnapshotComponent();
 	showCloneSnapshotModal.value = true;
 }
@@ -628,7 +626,7 @@ const loadRenameSnapshotComponent = async () => {
 
 async function renameThisSnapshot(snapshot) {
 	selectedSnapshot.value = snapshot;
-	console.log('rename snapshot modal triggered');
+	// console.log('rename snapshot modal triggered');
 	await loadRenameSnapshotComponent();
 	showRenameSnapshotModal.value = true;
 }

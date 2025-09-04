@@ -36,11 +36,11 @@ export async function setRefreservation(pool: ZPool, refreservationPercent: numb
 		const refreservationBytes = (sizeInBytes / 100) * refreservationPercent;
 
 		const cmdString = ['zfs', 'set', 'refreservation=' + refreservationBytes, pool.name];
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	
 	} catch (state) {
@@ -59,14 +59,14 @@ export async function destroyPool(pool: ZPool, forceDestroy?: boolean) {
 		if (forceDestroy) cmdArgs.push('-f');
 		cmdArgs.push(pool.name);
 
-		console.log('Executing command:', cmdArgs.join(' '));
+		// console.log('Executing command:', cmdArgs.join(' '));
 
 		const result = await unwrap(server.execute(new Command(cmdArgs)));
 
 		if (result.stderr) {
 			console.warn('Destroy command warnings:', result.stderr);
 		}
-		console.log('Destroy command output:', result.stdout);
+		// console.log('Destroy command output:', result.stdout);
 		return result.stdout;
 
 	} catch (err: any) {
@@ -142,11 +142,11 @@ export async function configurePool(pool: PoolEditConfig) {
 					let cmdString = ['zpool', 'set'];
 					cmdString.push(`${property}=${pool[property]}`);
 					cmdString.push(pool.name);
-					console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+					// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 					const state = useSpawn(cmdString);
 					const output = await state.promise();
-					console.log(output);
+					// console.log(output);
 
 					await new Promise(resolve => setTimeout(resolve, 250));
 				}
@@ -186,7 +186,7 @@ export async function clearErrors(poolName, deviceName?) {
 		
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -213,11 +213,11 @@ export async function trimPool(pool : ZPool, isSecure? : boolean, action? : stri
 
 		// cmdString.push('-w');
 		cmdString.push(pool.name);
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -239,11 +239,11 @@ export async function scrubPool(pool, action?) {
 		}
 
 		cmdString.push(pool.name);
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -256,7 +256,7 @@ export async function resilverPool(pool) {
 	try {
 		const state = useSpawn(['zpool', 'resilver', pool.name]);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -275,11 +275,11 @@ export async function exportPool(pool, force?) {
 		}
 
 		cmdString.push(pool.name);
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -317,7 +317,7 @@ export async function getImportableDestroyedPools() {
 }
 
 export async function importPool(pool) {
-	console.log("hello from import pool")
+	// console.log("hello from import pool")
 	try {
 		let cmdString = ['zpool', 'import'];
 
@@ -362,11 +362,11 @@ export async function importPool(pool) {
 			cmdString.push(pool.newPoolName);
 		}
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 		
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);
@@ -383,11 +383,11 @@ export async function removeVDevFromPool(vdev, pool) {
 		cmdString.push(pool.name);
 		cmdString.push(vdev.name);
 
-		console.log('****\ncmdstring:\n', ...cmdString, "\n****");
+		// console.log('****\ncmdstring:\n', ...cmdString, "\n****");
 
 		const state = useSpawn(cmdString);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		// console.error(errorString(state));
@@ -402,7 +402,7 @@ export async function upgradePool(pool) {
 	try {
 		const state = useSpawn(['zpool', 'upgrade', pool.name]);
 		const output = await state.promise();
-		console.log(output)
+		// console.log(output)
 		return output.stdout;
 	} catch (state) {
 		const errorMessage = errorString(state);

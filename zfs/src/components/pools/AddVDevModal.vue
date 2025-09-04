@@ -314,7 +314,7 @@ function getVDevType() {
         firstVDevType.value = 'disk';
     }
 
-    console.log('firstVDevType:', firstVDevType.value);
+    // console.log('firstVDevType:', firstVDevType.value);
     newVDev.value.type = firstVDevType.value;
 }
 
@@ -353,9 +353,9 @@ const availableDisks = computed<VDevDisk[]>(() => {
     return allDisks.value.filter(disk => disk.guid === "");
 });
 
-watch(selectedDisks, (newVal, oldVal) => {
-    console.log('selectedDisks:', selectedDisks.value);
-});
+// watch(selectedDisks, (newVal, oldVal) => {
+//     console.log('selectedDisks:', selectedDisks.value);
+// });
 
 //change color of disk when selected
 const diskCardClass = (diskName) => {
@@ -371,12 +371,12 @@ async function addVDevBtn() {
             if (diskCheck()) {
                 if (!diskBelongsToImportablePool() || newVDev.value.forceAdd!) {
                     selectedDisks.value.forEach(selectedDisk => {
-                        console.log('selectedDisk', selectedDisk);
+                        // console.log('selectedDisk', selectedDisk);
                         const diskNameFinal = getDiskIDName(allDisks.value, diskIdentifier.value, selectedDisk)
-                        console.log('disk:', diskNameFinal);
+                        // console.log('disk:', diskNameFinal);
                         const diskFinal = getFullDiskInfo(allDisks.value, diskNameFinal);
                         newVDev.value.disks!.push(diskFinal!);
-                        console.log('newVdev.disks:', newVDev.value.disks);
+                        // console.log('newVdev.disks:', newVDev.value.disks);
                     });
                     adding.value = true;
 
@@ -496,24 +496,24 @@ const diskBelongsToImportablePool = () => {
 
     selectedDisks.value.forEach(diskName => {
         const selectedDisk = allDisks.value.find(fullDisk => fullDisk.name == diskName);
-        console.log('selectedDisk:', selectedDisk);
+        // console.log('selectedDisk:', selectedDisk);
         importablePools.value.forEach(pool => {
-            console.log('importablePool:', pool);
+            // console.log('importablePool:', pool);
             pool.vdevs.forEach(importableVDev => {
-                console.log('importableVDev:', importableVDev);
+                // console.log('importableVDev:', importableVDev);
                 importableVDev.disks.forEach(disk => {
-                    console.log('importableDisk:', disk);
+                    // console.log('importableDisk:', disk);
                     if (selectedDisk!.name == disk.name) {
                         result = true;
                         diskBelongsFeedback.value = `This disk was used in exported pool '${pool.name}'.\n Use Force Add to override and use disk in new Vdev.`;
-                        console.log(`Disk belongs to importable pool: ${pool.name}`);
+                        // console.log(`Disk belongs to importable pool: ${pool.name}`);
                     }
                 });
             });
         });
     });
 
-    console.log('diskBelongsFeedback:', diskBelongsFeedback.value);
+    // console.log('diskBelongsFeedback:', diskBelongsFeedback.value);
     return result;
 }
 

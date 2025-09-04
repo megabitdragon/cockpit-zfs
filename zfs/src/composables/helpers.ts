@@ -277,7 +277,7 @@ export async function loadScanActivities(pools, scanActivities) {
 	pools.value.forEach(pool => {
 		addActivity(pool.name, scanActivities);
 	});
-	console.log('scanActivities', scanActivities);
+	// console.log('scanActivities', scanActivities);
 }
 
 export async function loadTrimActivities(pools, trimActivities) {
@@ -293,7 +293,7 @@ export async function loadTrimActivities(pools, trimActivities) {
 		});		
 	});
 	
-	console.log('trimActivities', trimActivities);
+	// console.log('trimActivities', trimActivities);
 }
 
 export function getValue(type : string, value : string) {
@@ -453,11 +453,11 @@ export function checkInheritance(type: string, value : string, poolConfigOptions
 
 export async function testSSH(sshTarget) {
     try {
-        console.log(`target: ${sshTarget}`);
+        // console.log(`target: ${sshTarget}`);
         const state = useSpawn(['/usr/bin/env', 'python3', '-c', test_ssh_script, sshTarget], { superuser: 'try' });
 
         const output = await state.promise();
-        console.log('testSSH output:', output);
+        // console.log('testSSH output:', output);
 
         if (output.stdout!.includes('True')) {
 			return true;
@@ -532,7 +532,7 @@ export function getFullDiskInfo(disks: VDevDisk[], diskName: string): VDevDisk |
 		uuid: '/dev/disk/by-uuid/',
 	};
 
-	console.log("Searching for disk with name:", diskName);
+	// console.log("Searching for disk with name:", diskName);
 
 	// Find the disk by matching its name against possible paths
 	const foundDisk = disks.find(disk => {
@@ -553,7 +553,7 @@ export function getFullDiskInfo(disks: VDevDisk[], diskName: string): VDevDisk |
 	});
 
 	if (foundDisk) {
-		console.log("Found disk:", foundDisk);
+		// console.log("Found disk:", foundDisk);
 	}
 
 	return foundDisk;
