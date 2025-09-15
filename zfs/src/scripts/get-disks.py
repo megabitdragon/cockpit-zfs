@@ -2,6 +2,7 @@
 import sys, os, logging, subprocess, json, re
 from logging.handlers import RotatingFileHandler, SysLogHandler
 from pathlib import Path
+from typing import Set
 
 # ------------------------- logging -------------------------
 def get_logger(name: str, file_basename: str, app_name: str = "cockpit-zfs") -> logging.Logger:
@@ -88,34 +89,201 @@ def _dev_base(p: str) -> str:
     return s
 
 
-def _get_boot_disk():
-    """Return base device of /boot (preferred) or / (fallback), e.g. /dev/sda or /dev/nvme0n1."""
+def _bootlike_bases_from_lsblk() -> Set[str]:
+    """
+    Identify disks that look like OS/boot disks even if not mounted,
+    by scanning partition metadata (ESP/boot flags/part types).
+    """
+    out: Set[str] = set()
     try:
         r = subprocess.run(
-            ["lsblk", "-no", "NAME,MOUNTPOINT"],
+            ["lsblk", "-J", "-o", "NAME,PATH,TYPE,PARTTYPE,PARTTYPENAME,PARTFLAGS"],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
         )
         if r.returncode != 0:
-            logger.error(f"lsblk for boot detection failed: {r.stderr}")
-            return None
+            return out
+        data = json.loads(r.stdout or "{}")
 
-        boot = None
-        for line in r.stdout.strip().splitlines():
-            parts = line.strip().split(None, 1)
-            if len(parts) < 2:
+        EFI_GUID = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
+        BIOS_GRUB_GUID = "21686148-6449-6e6f-744e-656564454649"
+
+        def walk(node, cur_disk_base=None):
+            ntype = (node.get("type") or "").lower()
+            path = node.get("path")
+            if ntype == "disk" and path:
+                cur_disk_base = _dev_base(path)
+            elif ntype == "part" and cur_disk_base:
+                ptn = (node.get("parttypename") or "").lower()
+                ptg = (node.get("parttype") or "").lower()
+                pfl = (node.get("partflags") or "").lower()
+                looks_boot = (
+                    "boot" in pfl or "esp" in pfl or
+                    "efi" in ptn or "bios boot" in ptn or
+                    ptg == EFI_GUID or ptg == BIOS_GRUB_GUID
+                )
+                if looks_boot:
+                    out.add(cur_disk_base)
+            for ch in node.get("children", []) or []:
+                walk(ch, cur_disk_base)
+
+        for top in data.get("blockdevices", []) or []:
+            walk(top)
+    except Exception:
+        pass
+    return out
+
+
+def _resolve_to_base_disks(src: str) -> Set[str]:
+    """Return base /dev/sdX, /dev/nvmeXnY, etc. that back 'src' (md/dm/lvm/crypt safe)."""
+    out: Set[str] = set()
+
+    # If findmnt gave UUID=/LABEL=, resolve to a device first
+    dev = src
+    try:
+        if src.startswith("UUID="):
+            rr = subprocess.run(
+                ["blkid", "-U", src.split("=", 1)[1]],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
+            )
+            if rr.returncode == 0 and rr.stdout.strip():
+                dev = rr.stdout.strip()
+        elif src.startswith("LABEL="):
+            rr = subprocess.run(
+                ["blkid", "-L", src.split("=", 1)[1]],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
+            )
+            if rr.returncode == 0 and rr.stdout.strip():
+                dev = rr.stdout.strip()
+    except Exception:
+        pass
+
+    # Inverse dependencies first so we see slaves (e.g., md0 -> sda2/sdb2 -> sda/sdb)
+    for args in (
+        ["lsblk", "-nrspo", "NAME,TYPE", dev],  # -s: holders -> slaves
+        ["lsblk", "-nrpo",  "NAME,TYPE", dev],  # fallback: normal listing
+    ):
+        try:
+            r = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            if r.returncode != 0:
                 continue
-            dev, mp = parts
-            dev = "/dev/" + re.sub(r"[^\w/-]", "", dev.strip())
-            if mp == "/boot":
-                boot = dev; break
-            if mp == "/":
-                boot = dev
-        boot_base = _dev_base(boot) if boot else None
-        logger.info(f"Boot base device: {boot_base}")
-        return boot_base
+            for line in r.stdout.splitlines():
+                parts = line.split()
+                if len(parts) < 2:
+                    continue
+                name, typ = parts[0], parts[1]
+                if typ in ("disk", "part"):
+                    out.add(_dev_base(name))
+            if out:
+                break
+        except Exception:
+            pass
+
+    return out
+
+
+def _zpool_leaf_bases(pool: str) -> Set[str]:
+    """Return base devices that back a ZFS pool, via `zpool status -P` (best-effort for non-root)."""
+    out = set()
+    try:
+        zr = subprocess.run(["zpool", "status", "-P", pool],
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        if zr.returncode != 0:
+            return out
+        for ln in zr.stdout.splitlines():
+            ln = ln.strip()
+            # leaf device lines usually start with a path or short dev name as first token
+            if not ln or ln.startswith(("pool:", "state:", "errors:", "config:", "action:", "see:")):
+                continue
+            tok = ln.split()[0]
+            # Accept absolute /dev paths, or bare sdX/sdXn/nvmeXnYpZ
+            if tok.startswith("/dev/"):
+                out.add(_dev_base(tok))
+            elif re.match(r"^(sd[a-z]+(\d+)?|nvme\d+n\d+(p\d+)?)$", tok):
+                out.add(_dev_base("/dev/" + tok))
+    except Exception:
+        pass
+    return out
+
+
+def _get_boot_bases() -> Set[str]:
+    """
+    Return base block devices (e.g. {'/dev/sda','/dev/sdb','/dev/nvme0n1'})
+    that back '/', '/boot', '/boot/efi'. Handles md/LVM/DM and ZFS root.
+    Also unions in disks that look bootable (ESP/boot flags) even if not mounted.
+    """
+    out: Set[str] = set()
+
+    # Pass 1: try lsblk topology (works when mountpoints appear under disks)
+    try:
+        r = subprocess.run(
+            ["lsblk", "-J", "-o", "NAME,PATH,TYPE,MOUNTPOINT,MOUNTPOINTS"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
+        )
+        if r.returncode == 0:
+            data = json.loads(r.stdout or "{}")
+            boot_mounts = {"/", "/boot", "/boot/efi", "/efi"}
+
+            def _first_mount(n):
+                mp = n.get("mountpoint")
+                if mp:
+                    return mp
+                mps = n.get("mountpoints")
+                if isinstance(mps, list):
+                    for x in mps:
+                        if x:
+                            return x
+                return None
+
+            def walk(node):
+                has_boot = _first_mount(node) in boot_mounts
+                disks = set()
+                for ch in node.get("children", []) or []:
+                    dset, ch_has = walk(ch)
+                    disks |= dset
+                    has_boot = has_boot or ch_has
+                if has_boot and node.get("type") == "disk":
+                    path = node.get("path") or ("/dev/" + node.get("name", ""))
+                    disks.add(_dev_base(path))
+                return disks, has_boot
+
+            for top in data.get("blockdevices", []) or []:
+                dset, _ = walk(top)
+                out |= dset
     except Exception as e:
-        logger.error(f"boot detection error: {e}")
-        return None
+        logger.warning(f"lsblk topology walk failed: {e}")
+
+    # Pass 2: authoritative via findmnt → devices (covers md/LVM/crypt/UUID/LABEL)
+    try:
+        fstype_src = {}
+        for mp in ("/", "/boot", "/boot/efi", "/efi"):
+            fr = subprocess.run(
+                ["findmnt", "-nro", "FSTYPE,SOURCE", mp],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
+            )
+            if fr.returncode == 0 and fr.stdout.strip():
+                fs, src = (fr.stdout.strip().split(None, 1) + [""])[:2]
+                fstype_src[mp] = (fs.strip(), src.strip())
+
+        # ZFS root: extract pool from dataset and add its leaves
+        root_fs, root_src = fstype_src.get("/", ("", ""))
+        if (root_fs or "").lower() == "zfs" and root_src:
+            pool = root_src.split("/", 1)[0]
+            out |= _zpool_leaf_bases(pool)
+
+        # Non-ZFS or other mounts → resolve to base devices
+        for mp, (fs, src) in fstype_src.items():
+            if (fs or "").lower() != "zfs" and src:
+                out |= _resolve_to_base_disks(src)
+    except Exception as e:
+        logger.warning(f"findmnt/resolve pass failed: {e}")
+
+    # Pass 3: include disks that look bootable even if not currently mounted
+    out |= _bootlike_bases_from_lsblk()
+
+    logger.info(f"Boot ancestor/bootlike base devices: {sorted(out)}")
+    return out
+
+
 
 def _enrich_with_lsblk_and_udev(disks):
     """
@@ -292,10 +460,9 @@ def _parse_lsdev_text_table(text: str):
 
 def get_lsdev_disks():
     try:
-        boot_base = _get_boot_disk()
+        boot_bases = _get_boot_bases()
 
         if hasattr(os, "geteuid") and os.geteuid() == 0:
-            # Root path: JSON with SMART
             r = subprocess.run(["lsdev", "-jdHmtTsfcp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             if r.returncode != 0:
                 logger.error(f"lsdev JSON failed: {r.stderr}")
@@ -303,38 +470,21 @@ def get_lsdev_disks():
 
             data = json.loads(r.stdout or "{}")
             disks = []
-            for row in data.get("rows", []):
+            for row in data.get("rows", []) or []:
                 for d in row:
                     if not d.get("occupied"):
                         continue
                     dev = d.get("dev")
                     if not dev:
                         continue
-                    if boot_base and _dev_base(dev) == boot_base:
-                        logger.info(f"Skipping boot drive (lsdev JSON): {dev}")
+                    if _dev_base(dev) in boot_bases:
+                        logger.info(f"Skipping boot-ancestor drive (lsdev JSON): {dev}")
                         continue
-                    parts = int(d.get("partitions", 0))
-                    disks.append({
-                        "vdev_path": f"/dev/disk/by-vdev/{d['bay-id']}",
-                        "phy_path": d.get("dev-by-path") or "unknown",
-                        "sd_path": dev,
-                        "name": d["bay-id"],
-                        "model": d.get("model-name", "Unknown"),
-                        "serial": d.get("serial", "Unknown"),
-                        "capacity": d.get("capacity", "0"),
-                        "type": d.get("disk_type", "Disk"),
-                        "usable": True,
-                        "temp": d.get("temp-c"),
-                        "health": d.get("health", "Unknown"),
-                        "rotation_rate": d.get("rotation-rate", 0),
-                        "power_on_count": d.get("power-cycle-count"),
-                        "power_on_time": d.get("power-on-time"),
-                        "has_partitions": parts > 0,
-                    })
+                    ...
             logger.info(f"Disks discovered via lsdev (JSON): {len(disks)}")
             return disks
 
-        # Non-root path: parse table, enrich
+        # Non-root path
         r = subprocess.run(["lsdev", "-ndtcp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         if r.returncode != 0:
             logger.warning(f"lsdev text failed ({r.returncode}): {r.stderr.strip()}")
@@ -342,12 +492,11 @@ def get_lsdev_disks():
 
         disks = _parse_lsdev_text_table(r.stdout)
 
-        # Skip boot drive
-        if boot_base:
+        if boot_bases:
             before = len(disks)
-            disks = [d for d in disks if _dev_base(d.get("sd_path","")) != boot_base]
+            disks = [d for d in disks if _dev_base(d.get("sd_path","")) not in boot_bases]
             if len(disks) != before:
-                logger.info(f"Skipped boot drive (lsdev text): {boot_base}")
+                logger.info(f"Skipped {before - len(disks)} boot-ancestor drive(s) (lsdev text)")
 
         # Enrich non-root details
         disks = _enrich_with_lsblk_and_udev(disks)
@@ -401,7 +550,7 @@ def _map_by_vdev():
 
 def get_lsblk_disks(nvme_only=False):
     try:
-        boot_base = _get_boot_disk()
+        boot_bases = _get_boot_bases()
         byv_map = _map_by_vdev()
 
         r = subprocess.run(
@@ -415,45 +564,35 @@ def get_lsblk_disks(nvme_only=False):
         data = json.loads(r.stdout or "{}")
         disks = []
 
-        for device in data.get("blockdevices", []):
+        for device in (data.get("blockdevices") or []):
             name = device.get("name")
             if not name:
-                logger.debug("lsblk device without name -> skip")
                 continue
             if nvme_only and "nvme" not in name:
-                logger.debug(f"lsblk skip (nvme_only=True): {name}")
                 continue
             if device.get("type","").lower() == "loop":
-                logger.debug(f"lsblk skip (loop): {name}")
-                continue
-            if boot_base and _dev_base(name) == boot_base:
-                logger.info(f"Skipping boot drive (lsblk): {name}")
                 continue
 
-            vdev_path = byv_map.get(_dev_base(name), "N/A")
+            base = _dev_base(name)
+            if base in boot_bases:
+                logger.info(f"Skipping boot-ancestor drive (lsblk): {name}")
+                continue
 
-            # non-root SMART likely empty; still call best-effort
-            smart = get_smartctl_data(name.split("/")[-1])
+            vdev_path = byv_map.get(base)  # None if no alias
+            slot_name = os.path.basename(vdev_path) if vdev_path else None
+            pretty_name = slot_name or os.path.basename(base)  # prefer by-vdev, else sdX/nvmeXnY
 
-            rota_raw = device.get("rota", 0)
-            try:
-                rota_bool = bool(int(rota_raw))
-            except Exception:
-                rota_bool = False
+            # SMART (best-effort non-root)
+            smart = get_smartctl_data(os.path.basename(name))
+            rota = bool(int(device.get("rota", 0) or 0))
+            try: usable = (int(device.get("ro", 0) or 0) == 0)
+            except Exception: usable = True
 
-            ro_raw = device.get("ro", 0)
-            try:
-                usable = (int(ro_raw) == 0)
-            except Exception:
-                usable = True
-
-            # prefer udev ID_PATH for phy_path
+            # phy_path via udev (best-effort)
             phy_path = "unknown"
             try:
-                ur = subprocess.run(
-                    ["udevadm", "info", "--query=property", f"--name={name}"],
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
-                )
+                ur = subprocess.run(["udevadm", "info", "--query=property", f"--name={name}"],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
                 if ur.returncode == 0:
                     props = dict(line.split("=",1) for line in ur.stdout.splitlines() if "=" in line)
                     if props.get("ID_PATH"):
@@ -463,24 +602,26 @@ def get_lsblk_disks(nvme_only=False):
 
             health_raw = smart.get("health")
             health = "Unknown" if not health_raw else ("OK" if str(health_raw).upper() == "PASSED" else "POOR")
+            is_nvme = "nvme" in name
 
             disks.append({
-                "vdev_path": vdev_path,
+                "vdev_path": vdev_path or "N/A",
                 "phy_path": phy_path,
                 "sd_path": name,
-                "name": os.path.basename(_dev_base(name)),
+                "name": pretty_name,                     # <- slot id when available
                 "model": device.get("model") or "Unknown",
                 "serial": device.get("serial") or "Unknown",
                 "capacity": device.get("size", "0"),
-                "type": "NVMe" if "nvme" in name else device.get("type","Disk").capitalize(),
+                "type": "NVMe" if is_nvme else device.get("type","Disk").capitalize(),
                 "usable": usable,
                 "temp": f"{smart['temp']}℃" if smart["temp"] is not None else "Unknown",
                 "health": health,
-                "rotation_rate": 0 if "nvme" in name else (7200 if rota_bool else 0),
+                "rotation_rate": 0 if is_nvme else (7200 if rota else 0),
                 "power_on_count": smart["power_cycle_count"],
                 "power_on_time": smart["power_on_hours"],
-                "has_partitions": False,  # we don't care here; UI can compute if needed
+                "has_partitions": False,
             })
+
         logger.info(f"Disks discovered via lsblk: {len(disks)}")
         return disks
     except Exception as e:
@@ -490,10 +631,7 @@ def get_lsblk_disks(nvme_only=False):
 UNKNOWN = {None, "", "Unknown", "N/A"}
 
 PREFER_LSDEV = {
-    # lsdev is authoritative for these
-    "vdev_path", "name", "phy_path", "type", "capacity",
-    # if you trust lsdev’s rotation_rate more than lsblk’s rota heuristic:
-    "rotation_rate",
+    "vdev_path", "name", "phy_path", "type", "capacity", "rotation_rate",
 }
 
 def merge_overlay(base: dict, overlay: dict) -> dict:
@@ -536,8 +674,18 @@ def main():
 
         all_disks = list(disks_by_base.values())
 
+        # FINAL SAFETY FILTER: remove any boot-ancestor devices
+        boot_bases_final = _get_boot_bases()
+        before = len(all_disks)
+        # all_disks = [d for d in all_disks if _dev_base(d.get("sd_path","")) not in boot_bases_final]
+        all_disks = [d for d in all_disks if _dev_base(d.get("sd_path","")) not in boot_bases_final]
+
+        if len(all_disks) != before:
+            logger.info(f"Final filter removed {before - len(all_disks)} boot-ancestor disk(s)")
+
         logger.info(f"Total disks discovered: {len(all_disks)}")
         print(json.dumps(all_disks, indent=4))
+            
     except Exception as e:
         logger.error(f"Exception in main: {e}")
         print("[]")
