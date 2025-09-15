@@ -427,6 +427,7 @@ import SnapshotsList from "../snapshots/SnapshotsList.vue";
 import { ZPool, ZFSFileSystemInfo } from "@45drives/houston-common-lib";
 import { pushNotification, Notification } from '@45drives/houston-common-ui';
 import { ConfirmationCallback, Snapshot } from "../../types";
+import { getSnapshotsOfDataset } from "../../composables/snapshots";
 
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 const canDestructive = inject<Ref<boolean>>('can-destructive')!;
@@ -571,12 +572,36 @@ function findPoolDataset(fileSystem) {
 		console.log('error finding pool:', error);
 	}
 }
+async function hasSnapshotsForDataset(fsName: string): Promise<boolean> {
+	try {
+		const map = await getSnapshotsOfDataset(fsName); // returns { [datasetName]: Snapshot[] }
+		const list = map?.[fsName];
+		return Array.isArray(list) && list.length > 0;
+	} catch (e) {
+		console.error('hasSnapshotsForDataset error:', e);
+		return false;
+	}
+}
+
+async function hasSnapshotsFor(fs: ZFSFileSystemInfo): Promise<boolean> {
+	// Fast in-memory check first
+	const inMemory = snapshots.value.some((s: any) =>
+		(s?.dataset && s.dataset === fs.name) ||
+		(typeof s?.name === 'string' && s.name.startsWith(fs.name + '@'))
+	);
+
+	if (inMemory) return true;
+
+	// Authoritative fallback
+	return hasSnapshotsForDataset(fs.name);
+}
+
 
 function findSnapDataset(fileSystem) {
 	try {
-		// console.log('Searching for snapshot dataset:', fileSystem.name);
+		console.log('Searching for snapshot dataset:', fileSystem.name);
 		const foundSnapshot = snapshots.value.some(snapshot => {
-			// console.log('Checking snapshot:', snapshot.dataset);
+			console.log('Checking snapshot:', snapshot.dataset);
 			return snapshot.dataset === fileSystem.name;
 		});
 
@@ -662,32 +687,27 @@ const loadDeleteFileSystemComponent = async () => {
 	deleteFileSystemComponent.value = module.default;
 }
 
-async function deleteFileSystem(fileSystem) {
+async function deleteFileSystem(fileSystem: ZFSFileSystemInfo) {
 	operationRunning.value = false;
 	selectedDataset.value = fileSystem;
 
-	const datasetHasChildren = computed(() => {
-		if (selectedDataset.value && selectedDataset.value.children) {
-			const hasPoolDataset = findPoolDataset(selectedDataset.value);
-			const hasSnapDataset = findSnapDataset(selectedDataset.value);
-			// console.log('hasPoolDataset:', hasPoolDataset);
-			// console.log('hasSnapDataset:', hasSnapDataset);
+	const isPool = !!findPoolDataset(fileSystem);
+	const hasChildDatasets =
+		Array.isArray(fileSystem.children) && fileSystem.children.length > 0;
 
-			// Check if hasPoolDataset is undefined and assign it false in that case
-			const hasPool = typeof hasPoolDataset !== 'undefined' ? hasPoolDataset : false;
+	const hasSnaps = await hasSnapshotsFor(fileSystem);
 
-			return !hasPool && selectedDataset.value.children.length > 0 || hasSnapDataset;
-		}
+	hasChildren.value = (!isPool && hasChildDatasets) || hasSnaps;
 
-		return false;
+	console.log({
+		fs: fileSystem.name,
+		hasChildDatasets,
+		hasSnaps,
+		hasChildren: hasChildren.value,
 	});
-	// console.log(`dataset ${selectedDataset.value?.name} HasChildren: ${datasetHasChildren.value}`);
-	hasChildren.value = datasetHasChildren.value!;
-	// console.log('hasChildren', hasChildren.value);
 
 	await loadDeleteFileSystemComponent();
 	showDeleteFileSystemConfirm.value = true;
-	console.log('selected for deletion:', selectedDataset.value);
 }
 
 const confirmThisDestroy: ConfirmationCallback = () => {
