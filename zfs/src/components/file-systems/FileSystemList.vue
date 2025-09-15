@@ -147,8 +147,8 @@
 																	:title="!canDestructive ? 'Requires administrative privileges' : ''"
 																	:class="[
 																		'flex items-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100',
-																		canDestructive ? 'bg-primary hover:text-white cursor-pointer'
-																			: 'bg-primary/60 text-muted cursor-not-allowed'
+																		canDestructive ? 'bg-default hover:text-white cursor-pointer'
+																			: 'bg-default/60 text-muted cursor-not-allowed'
 																	]">
 																	<span class="sr-only">Open options</span>
 																	<EllipsisVerticalIcon class="w-5"

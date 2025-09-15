@@ -3,10 +3,22 @@ import sys, os, logging, subprocess, json, re
 from logging.handlers import RotatingFileHandler, SysLogHandler
 from pathlib import Path
 
+# ------------------------- debug prints -------------------------
+# Set GETDISKS_DEBUG=0 to suppress stderr debug prints.
+DEBUG = os.environ.get("GETDISKS_DEBUG", "1") not in ("0", "false", "False", "no", "NO")
+
+def dprint(msg: str):
+    if DEBUG:
+        try:
+            print(msg, file=sys.stderr, flush=True)
+        except Exception:
+            pass
+
 # ------------------------- logging -------------------------
 def get_logger(name: str, file_basename: str, app_name: str = "cockpit-zfs") -> logging.Logger:
     logger = logging.getLogger(name)
     if logger.handlers:
+        dprint(f"[get_logger] Reusing existing logger for {name}")
         return logger
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
@@ -18,8 +30,10 @@ def get_logger(name: str, file_basename: str, app_name: str = "cockpit-zfs") -> 
                 h.setFormatter(logging.Formatter(f"{name}: %(levelname)s: %(message)s"))
                 logger.addHandler(h)
                 logger.debug(f"Syslog handler attached via {addr}")
+                dprint(f"[get_logger] Using syslog at {addr}")
                 return logger
-        except Exception:
+        except Exception as e:
+            dprint(f"[get_logger] Syslog attach failed for {addr}: {e}")
             pass
 
     def _candidates():
@@ -40,14 +54,17 @@ def get_logger(name: str, file_basename: str, app_name: str = "cockpit-zfs") -> 
             fh.setFormatter(fmt)
             logger.addHandler(fh)
             logger.debug(f"File logger attached at {path}")
+            dprint(f"[get_logger] Using file logger at {path}")
             return logger
-        except Exception:
+        except Exception as e:
+            dprint(f"[get_logger] File logger setup failed at {path}: {e}")
             pass
 
     sh = logging.StreamHandler(sys.stderr)
     sh.setFormatter(fmt)
     logger.addHandler(sh)
     logger.warning("No syslog/file target available; logging to stderr.")
+    dprint("[get_logger] Using stderr logging (fallback)")
     return logger
 
 
@@ -55,6 +72,7 @@ logger = get_logger("cockpit_zfs_getdisks", "getdisks.log")
 
 # ------------------------- helpers -------------------------
 _partitions_text_cache = None
+
 def _partitions_text():
     """Cache /proc/partitions for cheap has_partitions checks (non-root-safe)."""
     global _partitions_text_cache
@@ -62,13 +80,16 @@ def _partitions_text():
         try:
             with open("/proc/partitions", "r") as f:
                 _partitions_text_cache = f.read()
-        except Exception:
+                dprint(f"[_partitions_text] Loaded /proc/partitions ({len(_partitions_text_cache)} bytes)")
+        except Exception as e:
+            dprint(f"[_partitions_text] Failed to read /proc/partitions: {e}")
             _partitions_text_cache = ""
     return _partitions_text_cache
 
 def _has_partitions_for(base_name: str) -> bool:
     # matches sda1 / nvme0n1p2 lines in /proc/partitions
     return re.search(rf"\b{re.escape(base_name)}(p?\d+)\b", _partitions_text()) is not None
+
 
 def _dev_base(p: str) -> str:
     """
@@ -97,10 +118,13 @@ def _get_boot_disk():
         )
         if r.returncode != 0:
             logger.error(f"lsblk for boot detection failed: {r.stderr}")
+            dprint(f"[_get_boot_disk] lsblk failed with code {r.returncode}: {r.stderr.strip()}")
             return None
 
         boot = None
-        for line in r.stdout.strip().splitlines():
+        lines = r.stdout.strip().splitlines()
+        dprint(f"[_get_boot_disk] Scanning {len(lines)} lsblk lines for /boot or /")
+        for line in lines:
             parts = line.strip().split(None, 1)
             if len(parts) < 2:
                 continue
@@ -112,10 +136,13 @@ def _get_boot_disk():
                 boot = dev
         boot_base = _dev_base(boot) if boot else None
         logger.info(f"Boot base device: {boot_base}")
+        dprint(f"[_get_boot_disk] boot={boot} -> base={boot_base}")
         return boot_base
     except Exception as e:
         logger.error(f"boot detection error: {e}")
+        dprint(f"[_get_boot_disk] Exception: {e}")
         return None
+
 
 def _enrich_with_lsblk_and_udev(disks):
     """
@@ -123,7 +150,10 @@ def _enrich_with_lsblk_and_udev(disks):
     using one lsblk JSON call and per-device udevadm property calls.
     """
     if not disks:
+        dprint("[_enrich_with_lsblk_and_udev] No disks to enrich")
         return disks
+
+    dprint(f"[_enrich_with_lsblk_and_udev] Starting with {len(disks)} disks")
 
     # Build quick lookup by sd_path base
     by_sd = { _dev_base(d["sd_path"]): d for d in disks if d.get("sd_path") }
@@ -136,6 +166,7 @@ def _enrich_with_lsblk_and_udev(disks):
         )
         if r.returncode == 0:
             data = json.loads(r.stdout or "{}")
+            touched = 0
             for bd in data.get("blockdevices", []):
                 name = bd.get("name")
                 if not name:
@@ -165,16 +196,23 @@ def _enrich_with_lsblk_and_udev(disks):
                 rota = bd.get("rota")
                 try:
                     rota_bool = bool(int(rota))
-                    if target.get("type","").upper() != "NVME":
+                    if target.get("type","" ).upper() != "NVME":
                         target["rotation_rate"] = 7200 if rota_bool else 0
                 except Exception:
                     pass
+                touched += 1
+            dprint(f"[_enrich_with_lsblk_and_udev] Updated {touched} entries from lsblk")
         else:
             logger.warning(f"lsblk enrichment failed: {r.stderr.strip()}")
+            dprint(f"[_enrich_with_lsblk_and_udev] lsblk returned {r.returncode}: {r.stderr.strip()}")
     except Exception as e:
         logger.warning(f"lsblk enrichment exception: {e}")
+        dprint(f"[_enrich_with_lsblk_and_udev] Exception running lsblk: {e}")
 
     # Per-device udevadm for ID_PATH fallback and possible model/serial if lsblk lacked them
+    had_id_path = 0
+    model_set = 0
+    serial_set = 0
     for base, d in by_sd.items():
         try:
             ur = subprocess.run(
@@ -193,19 +231,24 @@ def _enrich_with_lsblk_and_udev(disks):
                 id_path = props.get("ID_PATH")
                 if id_path:
                     d["phy_path"] = f"/dev/disk/by-path/{id_path}"
+                    had_id_path += 1
 
             # model / serial (only fill if still Unknown)
             if d.get("model", "Unknown") == "Unknown":
                 m = props.get("ID_MODEL")
                 if m:
                     d["model"] = m
+                    model_set += 1
             if d.get("serial", "Unknown") == "Unknown":
                 s = props.get("ID_SERIAL_SHORT") or props.get("ID_SERIAL")
                 if s:
                     d["serial"] = s
-        except Exception:
+                    serial_set += 1
+        except Exception as e:
+            dprint(f"[_enrich_with_lsblk_and_udev] udevadm failed for {base}: {e}")
             pass
 
+    dprint(f"[_enrich_with_lsblk_and_udev] Added ID_PATH for {had_id_path}, model for {model_set}, serial for {serial_set}")
     return disks
 
 # ------------------------- lsdev paths -------------------------
@@ -218,6 +261,8 @@ def _parse_lsdev_text_table(text: str):
     """
     disks = []
     nonmatch_sample = 0
+
+    dprint(f"[_parse_lsdev_text_table] Parsing {len(text)} bytes of lsdev text")
 
     for raw in text.splitlines():
         # 0) Strip ANSI
@@ -287,18 +332,22 @@ def _parse_lsdev_text_table(text: str):
         disks.append(disk_data)
 
     logger.info(f"Disks discovered via lsdev (text): {len(disks)}")
+    dprint(f"[_parse_lsdev_text_table] Parsed {len(disks)} disks from lsdev text")
     return disks
 
 
 def get_lsdev_disks():
     try:
         boot_base = _get_boot_disk()
+        dprint(f"[get_lsdev_disks] boot_base={boot_base}")
 
         if hasattr(os, "geteuid") and os.geteuid() == 0:
+            dprint("[get_lsdev_disks] Running as root: using lsdev JSON path")
             # Root path: JSON with SMART
             r = subprocess.run(["lsdev", "-jdHmtTsfcp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             if r.returncode != 0:
                 logger.error(f"lsdev JSON failed: {r.stderr}")
+                dprint(f"[get_lsdev_disks] lsdev JSON failed ({r.returncode}): {r.stderr.strip()}")
                 return None
 
             data = json.loads(r.stdout or "{}")
@@ -312,6 +361,7 @@ def get_lsdev_disks():
                         continue
                     if boot_base and _dev_base(dev) == boot_base:
                         logger.info(f"Skipping boot drive (lsdev JSON): {dev}")
+                        dprint(f"[get_lsdev_disks] Skipping boot drive (JSON): {dev}")
                         continue
                     parts = int(d.get("partitions", 0))
                     disks.append({
@@ -332,12 +382,15 @@ def get_lsdev_disks():
                         "has_partitions": parts > 0,
                     })
             logger.info(f"Disks discovered via lsdev (JSON): {len(disks)}")
+            dprint(f"[get_lsdev_disks] Parsed {len(disks)} disks from lsdev JSON")
             return disks
 
         # Non-root path: parse table, enrich
+        dprint("[get_lsdev_disks] Non-root path: using lsdev text + enrichment")
         r = subprocess.run(["lsdev", "-ndtcp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         if r.returncode != 0:
             logger.warning(f"lsdev text failed ({r.returncode}): {r.stderr.strip()}")
+            dprint(f"[get_lsdev_disks] lsdev text failed ({r.returncode}): {r.stderr.strip()}")
             return None
 
         disks = _parse_lsdev_text_table(r.stdout)
@@ -348,13 +401,16 @@ def get_lsdev_disks():
             disks = [d for d in disks if _dev_base(d.get("sd_path","")) != boot_base]
             if len(disks) != before:
                 logger.info(f"Skipped boot drive (lsdev text): {boot_base}")
+                dprint(f"[get_lsdev_disks] Skipped boot drive (text): {boot_base}")
 
         # Enrich non-root details
         disks = _enrich_with_lsblk_and_udev(disks)
+        dprint(f"[get_lsdev_disks] Returning {len(disks)} disks after enrichment")
         return disks
 
     except Exception as e:
         logger.error(f"Exception in get_lsdev_disks: {e}")
+        dprint(f"[get_lsdev_disks] Exception: {e}")
         return None
 
 # ------------------------- lsblk (NVMe & fallback) -------------------------
@@ -364,6 +420,7 @@ def get_smartctl_data(device):
         r = subprocess.run(["smartctl", "-a", f"/dev/{device}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         if r.returncode != 0:
             logger.info(f"smartctl limited/failed for {device}: {r.stderr.strip()}")
+            dprint(f"[get_smartctl_data] smartctl {device} returned {r.returncode}: {r.stderr.strip()}")
             return {"temp": None, "power_on_hours": None, "power_cycle_count": None, "health": None}
 
         out = r.stdout.splitlines()
@@ -381,12 +438,14 @@ def get_smartctl_data(device):
         return info
     except Exception as e:
         logger.error(f"smartctl exception: {e}")
+        dprint(f"[get_smartctl_data] Exception for {device}: {e}")
         return {"temp": None, "power_on_hours": None, "power_cycle_count": None, "health": None}
 
 def _map_by_vdev():
     base_dir = "/dev/disk/by-vdev"
     m = {}
     if not os.path.isdir(base_dir):
+        dprint(f"[_map_by_vdev] {base_dir} not present")
         return m
     for link in os.listdir(base_dir):
         full = os.path.join(base_dir, link)
@@ -395,8 +454,10 @@ def _map_by_vdev():
             base = _dev_base(target)
             base_name = link.split("-part")[0]
             m[base] = os.path.join(base_dir, base_name)
-        except Exception:
+        except Exception as e:
+            dprint(f"[_map_by_vdev] Failed to resolve {full}: {e}")
             pass
+    dprint(f"[_map_by_vdev] Mapped {len(m)} entries from {base_dir}")
     return m
 
 def get_lsblk_disks(nvme_only=False):
@@ -404,16 +465,22 @@ def get_lsblk_disks(nvme_only=False):
         boot_base = _get_boot_disk()
         byv_map = _map_by_vdev()
 
+        dprint(f"[get_lsblk_disks] nvme_only={nvme_only} boot_base={boot_base}")
         r = subprocess.run(
             ["lsblk", "-dnpJ", "-o", "NAME,TYPE,SIZE,ROTA,SERIAL,MODEL,MOUNTPOINT,RO"],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
         )
         if r.returncode != 0:
             logger.error(f"lsblk command failed: {r.stderr}")
+            dprint(f"[get_lsblk_disks] lsblk failed ({r.returncode}): {r.stderr.strip()}")
             return []
 
         data = json.loads(r.stdout or "{}")
         disks = []
+
+        skipped_loop = 0
+        skipped_nvme_only = 0
+        skipped_boot = 0
 
         for device in data.get("blockdevices", []):
             name = device.get("name")
@@ -421,13 +488,14 @@ def get_lsblk_disks(nvme_only=False):
                 logger.debug("lsblk device without name -> skip")
                 continue
             if nvme_only and "nvme" not in name:
-                logger.debug(f"lsblk skip (nvme_only=True): {name}")
+                skipped_nvme_only += 1
                 continue
-            if device.get("type","").lower() == "loop":
-                logger.debug(f"lsblk skip (loop): {name}")
+            if device.get("type","" ).lower() == "loop":
+                skipped_loop += 1
                 continue
             if boot_base and _dev_base(name) == boot_base:
                 logger.info(f"Skipping boot drive (lsblk): {name}")
+                skipped_boot += 1
                 continue
 
             vdev_path = byv_map.get(_dev_base(name), "N/A")
@@ -458,7 +526,8 @@ def get_lsblk_disks(nvme_only=False):
                     props = dict(line.split("=",1) for line in ur.stdout.splitlines() if "=" in line)
                     if props.get("ID_PATH"):
                         phy_path = f"/dev/disk/by-path/{props['ID_PATH']}"
-            except Exception:
+            except Exception as e:
+                dprint(f"[get_lsblk_disks] udevadm failed for {name}: {e}")
                 pass
 
             health_raw = smart.get("health")
@@ -482,9 +551,11 @@ def get_lsblk_disks(nvme_only=False):
                 "has_partitions": False,  # we don't care here; UI can compute if needed
             })
         logger.info(f"Disks discovered via lsblk: {len(disks)}")
+        dprint(f"[get_lsblk_disks] Built {len(disks)} disks (skipped loop={skipped_loop}, nvme_only={skipped_nvme_only}, boot={skipped_boot})")
         return disks
     except Exception as e:
         logger.error(f"Exception in get_lsblk_disks: {e}")
+        dprint(f"[get_lsblk_disks] Exception: {e}")
         return []
 
 UNKNOWN = {None, "", "Unknown", "N/A"}
@@ -503,15 +574,20 @@ def merge_overlay(base: dict, overlay: dict) -> dict:
         if k not in out and v not in UNKNOWN:
             out[k] = v
     # 2) Resolve conflicts
+    conflicts = []
     for k, v in overlay.items():
         if v in UNKNOWN:
             continue
         if k in PREFER_LSDEV:
+            if out.get(k) != v:
+                conflicts.append(k)
             out[k] = v
         else:
             # keep existing unless it's unknown
             if out.get(k) in UNKNOWN:
                 out[k] = v
+    if conflicts:
+        dprint(f"[merge_overlay] Preferred lsdev fields overridden: {conflicts}")
     return out
 
 # ------------------------- main -------------------------
@@ -519,27 +595,37 @@ def main():
     try:
         if hasattr(os, "geteuid") and os.geteuid() != 0:
             logger.info("Running unprivileged: SMART/serial may be limited.")
+            dprint("[main] Running unprivileged; SMART/serial may be limited")
 
         logger.info("=" * 80)
         logger.info("Starting a new run of get-disks script")
+        dprint("[main] Starting discovery run")
 
         # Always collect everything from lsblk first (covers NVMe + sda/sdb/...)
         blk_all = get_lsblk_disks(nvme_only=False)
+        dprint(f"[main] lsblk returned {len(blk_all)} entries")
         disks_by_base = { _dev_base(d["sd_path"]): d for d in blk_all }
+        dprint(f"[main] After lsblk, bases={len(disks_by_base)} (sample: {list(disks_by_base.keys())[:5]})")
 
         lsdev_disks = get_lsdev_disks() or []
+        dprint(f"[main] lsdev returned {len(lsdev_disks)} entries")
+        merged = 0
         for d in lsdev_disks:
             base = _dev_base(d.get("sd_path",""))
             if not base:
                 continue
             disks_by_base[base] = merge_overlay(disks_by_base.get(base, {}), d)
+            merged += 1
+        dprint(f"[main] Merged {merged} lsdev entries into map -> {len(disks_by_base)} total bases")
 
         all_disks = list(disks_by_base.values())
 
         logger.info(f"Total disks discovered: {len(all_disks)}")
+        dprint(f"[main] Total disks discovered: {len(all_disks)}")
         print(json.dumps(all_disks, indent=4))
     except Exception as e:
         logger.error(f"Exception in main: {e}")
+        dprint(f"[main] Exception: {e}")
         print("[]")
 
 if __name__ == "__main__":

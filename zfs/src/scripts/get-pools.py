@@ -64,7 +64,7 @@ def _pools_from_zpool_list_min():
         # -H (scripted) -p (parsable numbers) -o selected fields
         res = subprocess.run(
             ["zpool", "list", "-Hpo", "name,size,allocated,capacity,free,health,guid"],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
         )
         if res.returncode != 0:
             logger.error(f"zpool list failed: {res.stderr.strip()}")
