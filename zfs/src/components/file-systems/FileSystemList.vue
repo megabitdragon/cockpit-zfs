@@ -144,7 +144,7 @@
 													</div>
 
 													<div class="py-1 mt-1 pr-2 col-span-1 justify-self-end">
-														<Menu as="div" class="relative inline-block text-center -mt-1">
+														<Menu as="div" class="relative inline-block text-right -mt-1">
 															<div>
 																<MenuButton @click.stop :disabled="!canDestructive"
 																	:aria-disabled="!canDestructive"
