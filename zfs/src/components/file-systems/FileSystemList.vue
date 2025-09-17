@@ -20,11 +20,12 @@
 
 					<table class="min-w-full divide-y divide-default rounded-md">
 						<thead class="rounded-md">
-							<tr class="bg-well rounded-t-md grid grid-cols-12">
+							<tr
+								class="bg-well rounded-t-md grid grid-cols-[2rem_4fr_repeat(9,_minmax(0,_1fr))_2.25rem]">
 								<th class="relative py-2 rounded-tl-md col-span-1">
 									<span class="sr-only"></span>
 								</th>
-								<th class="py-2 font-semibold text-left text-default col-span-1" :class="truncateText"
+								<th class="py-2 font-semibold text-center text-default col-span-1" :class="truncateText"
 									title="Dataset">Dataset</th>
 								<th class="py-2 font-semibold text-default col-span-1" :class="truncateText"
 									title="Available">Available</th>
@@ -59,29 +60,32 @@
 										<div v-if="dataset.type == 'FILESYSTEM'" class="border border-default">
 											<Disclosure v-slot="{ open }">
 												<DisclosureButton
-													class="bg-default grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
-													<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start"
+													class="bg-default grid grid-cols-[2rem_4fr_repeat(9,_minmax(0,_1fr))_2.25rem] w-full items-center">
+													<div class="py-1 mt-1 col-span-1 pl-2 justify-self-start"
 														:title="dataset.name">
 														<ChevronUpIcon
-															class="-mt-2 h-10 w-10 text-default transition-all duration-200 transform"
+															class="h-10 w-10 text-default transition-all duration-200 transform"
 															:class="{ 'rotate-90': !open, 'rotate-180': open, }" />
 													</div>
-													<div class="py-1 mt-1 col-span-1 text-left "
-														style="text-wrap: auto !important;"
+													<div class="py-1 mt-1 col-span-1 text-left min-w-0"
 														:class="[truncateText, `ml-${getNestingLevel(dataset)}`]"
 														:title="dataset.name">{{ dataset.name }}</div>
-													<div class="py-1 mt-1 col-span-1" :class="truncateText"
+													<div class="py-1 mt-1 px-2 text-center font-medium col-span-1 min-w-0"
+														:class="truncateText"
 														:title="convertBytesToSize(dataset.properties.available) ? convertBytesToSize(dataset.properties.available) : 'N/A'">
 														{{ convertBytesToSize(dataset.properties.available) ?
 														convertBytesToSize(dataset.properties.available) : 'N/A' }}
 													</div>
-													<div class="py-1 mt-1 col-span-1" :class="truncateText"
-														:title="dataset.properties.usedByDataset">{{
+													<div class="py-1 mt-1 px-2 text-center font-medium col-span-1 min-w-0"
+														:class="truncateText" :title="dataset.properties.usedByDataset">
+														{{
 														dataset.properties.usedByDataset }}</div>
-													<div class="py-1 mt-1 col-span-1" :class="truncateText"
+													<div class="py-1 mt-1 px-2 text-center font-medium col-span-1 min-w-0"
+														:class="truncateText"
 														:title="dataset.properties.usedBySnapshots">{{
 														dataset.properties.usedBySnapshots }}</div>
-													<div class="py-1 mt-1 col-span-1" :class="truncateText"
+													<div class="py-1 mt-1 px-2 text-center font-medium col-span-1 min-w-0"
+														:class="truncateText"
 														:title="dataset.properties.usedbyRefreservation ? dataset.properties.usedbyRefreservation : 'N/A'">
 														{{ dataset.properties.usedbyRefreservation ?
 														dataset.properties.usedbyRefreservation : 'N/A' }}</div>
@@ -94,53 +98,53 @@
 														:title="upperCaseWord(dataset.properties.compression).toUpperCase() ? upperCaseWord(dataset.properties.compression).toUpperCase() : 'N/A'">
 														{{ dataset.properties.compression.toUpperCase() ?
 														dataset.properties.compression.toUpperCase() : 'N/A' }}</div>
-													<div class="py-1 mt-1 col-span-1" :class="truncateText"
+													<div class="py-1 mt-1 px-2 text-center font-medium col-span-1 min-w-0"
+														:class="truncateText"
 														:title="getValue('dedup', dataset.properties.deduplication) ? getValue('dedup', dataset.properties.deduplication) : 'N/A'">
 														{{ getValue('dedup', dataset.properties.deduplication) ?
 														getValue('dedup', dataset.properties.deduplication) : 'N/A' }}
 													</div>
 
 													<div v-if="dataset.encrypted && dataset.key_loaded"
-														class="py-1 mt-1 col-span-1 justify-self-center items-center text-center"
+														class="py-1 mt-1 col-span-1 justify-self-center"
 														title="Encrypted & Unlocked">
 														<LockOpenIcon class="w-5 mt-0.5" aria-hidden="true" />
 													</div>
 													<div v-if="dataset.encrypted && !dataset.key_loaded"
-														class="py-1 mt-1 col-span-1 justify-self-center items-center text-center"
+														class="py-1 mt-1 col-span-1 justify-self-center"
 														title="Encrypted & Locked">
 														<LockClosedIcon class="w-5 mt-0.5" aria-hidden="true" />
 													</div>
 													<div v-if="!dataset.encrypted"
-														class="py-1 mt-1 col-span-1 justify-self-center items-center text-center"
+														class="py-1 mt-1 col-span-1 justify-self-center"
 														title="Not Encrypted">
 														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true" />
 													</div>
 
 													<div v-if="yesNoToBool(dataset.properties.mounted)"
-														class="py-1 mt-1 col-span-1 justify-self-center items-center text-center"
+														class="py-1 mt-1 col-span-1 justify-self-center"
 														title="Mounted">
 														<CheckIcon class="w-5 mt-0.5" aria-hidden="true" />
 													</div>
 													<div v-if="!yesNoToBool(dataset.properties.mounted)"
-														class="py-1 mt-1 col-span-1 justify-self-center items-center text-center"
+														class="py-1 mt-1 col-span-1 justify-self-center"
 														title="Not Mounted">
 														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true" />
 													</div>
 
 													<div v-if="dataset.properties.isReadOnly!"
-														class="py-1 mt-1 col-span-1 justify-self-center items-center text-center"
+														class="py-1 mt-1 col-span-1 justify-self-center"
 														title="Read Only ON">
 														<CheckIcon class="w-5 mt-0.5" aria-hidden="true" />
 													</div>
 													<div v-if="!dataset.properties.isReadOnly!"
-														class="py-1 mt-1 col-span-1 justify-self-center items-center text-center"
+														class="py-1 mt-1 col-span-1 justify-self-center"
 														title="Read Only OFF">
 														<NoSymbolIcon class="w-5 mt-0.5" aria-hidden="true" />
 													</div>
 
-													<div
-														class="relative py-1 mt-1 p-3 text-right font-medium sm:pr-6 lg:pr-8">
-														<Menu as="div" class="relative inline-block text-right -mt-1">
+													<div class="py-1 mt-1 pr-2 col-span-1 justify-self-end">
+														<Menu as="div" class="relative inline-block text-center -mt-1">
 															<div>
 																<MenuButton @click.stop :disabled="!canDestructive"
 																	:aria-disabled="!canDestructive"
@@ -166,8 +170,7 @@
 																<MenuItems @click.stop
 																	class="absolute right-0 z-10 w-56 origin-top-right rounded-md bg-accent shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 																	<div class="py-1">
-																		<MenuItem as="div" v-slot="{ active }"
-																			>
+																		<MenuItem as="div" v-slot="{ active }">
 																		<a href="#"
 																			@click="loadFileSystemConfig(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Configure
@@ -229,8 +232,7 @@
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Change
 																			Passphrase</a>
 																		</MenuItem>
-																		<MenuItem as="div" v-slot="{ active }"
-																			>
+																		<MenuItem as="div" v-slot="{ active }">
 																		<a href="#"
 																			@click="createSnapshotBtn(allDatasets[datasetIdx])"
 																			:class="[active ? 'bg-default text-default' : 'text-muted', 'block px-4 py-2 text-sm']">Create
@@ -277,12 +279,12 @@
 										</div>
 										<div v-if="dataset.type == 'SNAPSHOT'" class="border border-default">
 											<div
-												class="bg-primary grid grid-cols-12 grid-flow-cols w-full justify-center text-center">
+												class="bg-primary grid grid-cols-[2rem_3fr_repeat(9,_minmax(0,_1fr))_2rem] w-full justify-center text-center">
 												<div class="py-1 mt-1 mr-2 col-span-1 ml-4 justify-self-start"
 													:title="dataset.name">
 													<CameraIcon class="-mt-1 mx-2 h-8 w-8 text-muted" />
 												</div>
-												<div class="py-1 mt-1 col-span-2 text-left text-white"
+												<div class="py-1 mt-1 col-span-1 text-left text-white"
 													:class="[truncateText, `ml-${getNestingLevel(dataset)}`]"
 													:title="dataset.name">{{ dataset.name }}</div>
 												<div class="py-1 mt-1 col-span-1 text-white">N/A</div>
