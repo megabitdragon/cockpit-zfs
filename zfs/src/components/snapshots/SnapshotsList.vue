@@ -234,7 +234,7 @@
 					</tr>
 				</tbody>
 			</table>
-			<button v-if="bulkSnapDestroyMode.get(props.filesystem!.name) && canDestructive"
+			<button v-if="bulkSnapDestroyMode.get(props.filesystem!.name) && canDestructive" :disabled="selectedForDestroy.length == 0"
 				@click="destroySelectedSnapshots()" name="destroy-multiple-snaps-btn"
 				class="mt-1 btn btn-danger h-fit w-full">Destroy Selected
 				Snapshots</button>
