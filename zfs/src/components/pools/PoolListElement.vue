@@ -701,7 +701,7 @@ watch(confirmPauseScrub, async (newVal, oldVal) => {
 		console.log('now pausing scrub:', selectedPool.value);
 		pausing.value = true;
 		try {
-			const output: any = await scrubPool(selectedPool.value, 'pause');
+			const output: any = await scrubPool(selectedPool.value!, 'pause');
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
@@ -740,7 +740,7 @@ watch(confirmStopScrub, async (newVal, oldVal) => {
 		stopping.value = true;
 
 		try {
-			const output: any = await scrubPool(selectedPool.value, 'stop');
+			const output: any = await scrubPool(selectedPool.value!, 'stop');
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';

@@ -603,6 +603,8 @@ def get_lsblk_disks(nvme_only=False):
             health_raw = smart.get("health")
             health = "Unknown" if not health_raw else ("OK" if str(health_raw).upper() == "PASSED" else "POOR")
             is_nvme = "nvme" in name
+            rota = bool(int(device.get("rota", 0) or 0))  # 1 = rotating
+            dev_type = "NVMe" if is_nvme else ("HDD" if rota else "SSD")
 
             disks.append({
                 "vdev_path": vdev_path or "N/A",
@@ -612,10 +614,10 @@ def get_lsblk_disks(nvme_only=False):
                 "model": device.get("model") or "Unknown",
                 "serial": device.get("serial") or "Unknown",
                 "capacity": device.get("size", "0"),
-                "type": "NVMe" if is_nvme else device.get("type","Disk").capitalize(),
                 "usable": usable,
                 "temp": f"{smart['temp']}℃" if smart["temp"] is not None else "Unknown",
                 "health": health,
+                "type": dev_type,
                 "rotation_rate": 0 if is_nvme else (7200 if rota else 0),
                 "power_on_count": smart["power_cycle_count"],
                 "power_on_time": smart["power_on_hours"],

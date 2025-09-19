@@ -7,7 +7,7 @@
 			<!-- <div name="disk-name" class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">{{ props.disk.name }} {{ diskSdName }}</div> -->
 			<div name="disk-name" class="py-1 mt-1 col-span-2" :class="truncateText" :title="props.disk.name">
 				{{ props.disk.name }} {{ diskSdName }} <span v-if="props.disk.replacingTarget">
-					<span class="text-orange-600">replacing</span> {{ props.disk.replacingTarget }}</span>
+					<span class="text-orange-600">replacing</span> {{ props.disk.replacingTargetLabel }}</span>
 			</div>
 			<div name="disk-state" class="py-1 mt-1 col-span-1 font-semibold"
 				:class="[formatStatus(diskState), truncateText]" :title="diskState">{{ diskState }}</div>
@@ -306,7 +306,7 @@ watch(confirmDetach, async (newValue, oldValue) => {
 		console.log("now detaching:", selectedDisk.value!.name, "from:", selectedPool.value!.name);
 
 		try {
-			const output: any = await detachDisk(selectedPool.value!.name, selectedDisk.value!.name);
+			const output: any = await detachDisk(selectedPool.value!.name, selectedDisk.value!.name!);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
@@ -369,7 +369,7 @@ watch(confirmOffline, async (newVal, oldVal) => {
 		console.log('now offlining:', selectedDisk.value);
 
 		try {
-			const output: any = await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value, secondOptionToggle.value);
+			const output: any = await offlineDisk(selectedPool.value!.name, selectedDisk.value!.name!, firstOptionToggle.value, secondOptionToggle.value);
 			
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';
@@ -428,7 +428,7 @@ watch(confirmOnline, async (newVal, oldVal) => {
 		console.log('now onlining:', selectedDisk.value);
 
 		try {
-			const output: any = await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name, firstOptionToggle.value);
+			const output: any = await onlineDisk(selectedPool.value!.name, selectedDisk.value!.name!, firstOptionToggle.value);
 
 			if (output == null || output.error) {
 				const errorMessage = output?.error || 'Unknown error';

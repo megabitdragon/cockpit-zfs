@@ -216,21 +216,21 @@ const poolID = ref(props.pool.name);
 const truncateText = inject<Ref<string>>('style-truncate-text')!;
 
 function getIsTrimmable(disk) {
-    if (props.pool.vdevs && disk) {
-        switch ((props.pool.vdevs.find(vdev => vdev.disks.some(vDevDisk => vDevDisk.name == disk.name)))!.type) {
-            case 'data':
-                return true;
-            case 'log':
-                return true;
-            case 'special':
-                return true;
-            case 'dedup':
-                return true;
-            default:
-                return false;
-        }
+    if (!disk || !props.pool?.vdevs) return false;
+    const vdev = props.pool.vdevs.find(v =>
+        Array.isArray(v.disks) && v.disks.some(d => d?.name === disk.name)
+    );
+    switch (vdev?.type) {
+        case 'data':
+        case 'log':
+        case 'special':
+        case 'dedup':
+            return true;
+        default:
+            return false;
     }
 }
+
 
 const adjustedScanPercentage = computed(() => {
     if (isFinished.value && parseFloat(scanPercentage.value.toFixed(2)) > 90) {

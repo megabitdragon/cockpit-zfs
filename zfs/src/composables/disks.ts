@@ -66,7 +66,7 @@ export async function clearPartitions(disk: { name: string }) {
 	}
 }
 
-export async function labelClear(disk: { name: string }) {
+export async function labelClear(disk: any) {
 	try {
 		const { stdout } = await exec(["zpool", "labelclear", disk.name]);
 		return stdout;

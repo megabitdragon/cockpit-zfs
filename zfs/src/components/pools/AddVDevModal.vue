@@ -366,56 +366,71 @@ const diskCardClass = (diskName) => {
 const adding = ref(false);
 
 async function addVDevBtn() {
-    if (replicationLevelCheck()) {
-        if (diskSizeMatch()) {
-            if (diskCheck()) {
-                if (!diskBelongsToImportablePool() || newVDev.value.forceAdd!) {
-                    selectedDisks.value.forEach(selectedDisk => {
-                        // console.log('selectedDisk', selectedDisk);
-                        const diskNameFinal = getDiskIDName(allDisks.value, diskIdentifier.value, selectedDisk)
-                        // console.log('disk:', diskNameFinal);
-                        const diskFinal = getFullDiskInfo(allDisks.value, diskNameFinal);
-                        newVDev.value.disks!.push(diskFinal!);
-                        // console.log('newVdev.disks:', newVDev.value.disks);
-                    });
-                    adding.value = true;
+    newVDev.value.disks = [];   
+    if (replicationLevelCheck() && diskSizeMatch() && diskCheck()) {
+        if (!diskBelongsToImportablePool() || newVDev.value.forceAdd!) {
 
-                    try {
-                        const output: any = await zfsManager.addVDevsToPool(props.pool, [newVDev.value], newVDev.value.forceAdd!);
+            for (const selectedDisk of selectedDisks.value) {
+                const diskNameFinal = getDiskIDName(allDisks.value, diskIdentifier.value, selectedDisk);
+                const diskFinal = getFullDiskInfo(allDisks.value, diskNameFinal);
+                if (diskFinal) newVDev.value.disks.push(diskFinal);
+            }
+
+            // dedupe just in case (by a stable key; vdev_path is safest here)
+            const seen = new Set<string>();
+            newVDev.value.disks = newVDev.value.disks.filter(d => {
+                const key = d.vdev_path || d.phy_path || d.sd_path || d.name;
+                if (!key || seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+
+            adding.value = true;
+
+            try {
+                const output: any = await zfsManager.addVDevsToPool(props.pool, [newVDev.value], newVDev.value.forceAdd!);
+                if (output == null || output.error) {
+                    const errorMessage = output?.error || 'Unknown error';
+                    pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${errorMessage}`, 'error', 5000));
+
+                } else {
+                    pushNotification(new Notification('Added VDev', `Virtual device added successfully.`, 'success', 5000));
+
+                    if (props.pool.properties.refreservationRawSize!) {
+                        const output: any = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
                         if (output == null || output.error) {
                             const errorMessage = output?.error || 'Unknown error';
-                            pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${errorMessage}`, 'error', 5000));
-
+                            pushNotification(new Notification('Refreservation Update Failed', `There was an error updating pools refreservation value: ${errorMessage}`, 'error', 5000));
                         } else {
-                            pushNotification(new Notification('Added VDev', `Virtual device added successfully.`, 'success', 5000));
-
-                            if (props.pool.properties.refreservationRawSize!) {
-                                const output: any = await setRefreservation(props.pool, props.pool.properties.refreservationPercent!);
-                                if (output == null || output.error) {
-                                    const errorMessage = output?.error || 'Unknown error';
-                                    pushNotification(new Notification('Refreservation Update Failed', `There was an error updating pools refreservation value: ${errorMessage}`, 'error', 5000));
-                                } else {
-                                    pushNotification(new Notification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success', 5000));
-                                    showAddVDevModal.value = false;
-                                }
-                            } else {
-                                showAddVDevModal.value = false;
-                            }
+                            pushNotification(new Notification('Refreservation Updated', `Refreservation of pool was updated successfully.`, 'success', 5000));
+                            resetModalState();
+                            showAddVDevModal.value = false;
                         }
-
-                        adding.value = false;
-                        await refreshAllData();
-
-                    } catch (error) {
-                        pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${error}`, 'error', 5000));
-                        adding.value = false;
-                        console.error(error);
+                    } else {
+                        showAddVDevModal.value = false;
                     }
-
                 }
+
+            } catch (error) {
+                pushNotification(new Notification('Add VDev Failed', `There was an error adding this virtual device: ${error}`, 'error', 5000));
+                adding.value = false;
+                console.error(error);
+            } finally {
+                adding.value = false;
+                await refreshAllData();
             }
+
         }
     }
+}
+
+function resetModalState() {
+    newVDev.value = { type: firstVDevType.value, disks: [], isMirror: false, forceAdd: { force: false } };
+    selectedDisks.value = [];
+    diskFeedback.value = '';
+    diskSizeFeedback.value = '';
+    isProperReplicationFeedback.value = '';
+    diskBelongsFeedback.value = '';
 }
 
 async function refreshAllData() {
@@ -558,6 +573,7 @@ const diskCheck = () => {
 }
 
 const closeModal = () => {
+    resetModalState();
     showAddVDevModal.value = false;
     emit('close');
 }
