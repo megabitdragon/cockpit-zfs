@@ -5,6 +5,7 @@ on:
       - build
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
 jobs:
   prebuild:
     runs-on: buildinator-5
